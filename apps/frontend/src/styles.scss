@@ -1,1 +1,412 @@
 /* You can add global styles to this file, and also import other style files */
+/* Colores principales */
+
+:root{
+    --true-green: #039300;   
+    --black: #000000;
+    --gray: #9595b2 !important;
+    --deep-green: #006400;
+    --very-dark-blue: #000032;
+    --pale-gray: #9595b2;
+    --dark-blue: #00155b;
+}
+
+.footer-icon-div{
+    background-color: #d7d7e1;
+}
+
+#sticky-footer {
+    flex-shrink: none;
+}
+
+.footer-info{
+    display: flex;
+}
+.footer-div{
+    background-color: #30393a;
+}
+.footer-title{
+    @extend .plex-serif;
+    font-weight: bold;
+}
+
+.dark-footer{
+    background-color: black;
+    width: 100%;
+    height: 8px;
+}
+
+.footer-text-title{
+    @extend .plex-sans;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.footer-direction{
+    @extend .plex-sans;
+    font-weight: normal;
+}
+
+.mat-drawer-container{
+    background: unset;
+}
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap');
+@import 'bootstrap';
+@import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
+html, body { height: 100%;
+background: url("./assets/img/background.jpg");
+background-position: center center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+background-size: cover;}
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+app-root{
+    height: inherit;
+}
+
+.inline-flex{
+    display: inline-flex;
+}
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.google-html{
+    border-radius: 4px;
+    width: inherit;
+}
+
+.plex-sans{
+    font-family: 'IBM Plex Sans', serif;
+}
+mat-sidenav-container{
+    height: 100%;
+}
+
+.main-toolbar{
+    position: absolute;
+    top: 0;
+}
+
+.main-toolbar, .white-back{
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.full-width{
+    width: 100%;
+}
+
+.sidenav-header{
+    display: grid;
+    padding-left: 24px;
+}
+
+.logo-nav{
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.right{
+    margin-left: auto;
+}
+
+.text-right{
+    text-align: right;
+}
+.link{
+    @extend .plex-serif;
+    margin-right: 28px;
+    text-decoration: unset !important;
+    letter-spacing: 0.3px;
+    color: var(--gray);
+    font-weight: normal;
+}
+
+.link:hover, .green-text:hover{
+    color: var(--deep-green) !important;
+}
+
+.menu-text{
+    @extend .link;
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.link2{
+    margin-bottom: 16px;
+    padding-right: 16px;
+}
+
+.active{
+    font-weight: bold;
+    color: var(--black);
+    border-bottom:2px solid var(--true-green);
+}
+.green-text{
+    @extend .plex-serif;
+    font-weight: 600;
+    color: var(--true-green) !important;
+}
+.close-div{
+    margin-top: 16px;
+    text-align: right;
+    padding-right: 24px;
+    margin-bottom: 16px;
+}
+.center{
+    text-align: center;
+}
+
+.center-vertical{
+    vertical-align: middle;
+}
+svg{
+    width: inherit;
+    height: inherit;
+}
+
+.card-div{
+    box-shadow: 0 -4px 10px 0 rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.grupo-header{
+    @extend .plex-serif;
+}
+
+.card-text-question{
+    @extend .plex-serif;
+    font-weight: 500;
+    color: var(--very-dark-blue);
+}
+
+.card-text{
+    margin-top: 8px;
+    @extend .plex-sans;
+    font-weight: 300;
+    color: var(--black);
+    margin-bottom: 16px;
+}
+
+.card-text-2{
+    margin-top: unset !important;
+    margin-bottom: 16px;
+}
+
+.btn-green{
+    @extend .plex-serif;
+    padding: 6px 16px 8px 16px !important;
+    border-radius: 200px !important;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
+    background-image: linear-gradient(90deg , var(--deep-green), var(--true-green));
+    font-weight: 600;
+    color: #ffffff;
+    line-height: unset !important;
+}
+
+.btn-green:hover{
+    background-color: var(--deep-green) !important;
+    background-image: unset;
+}
+
+.header-text1{
+    color: #9595b2;
+    font-weight: 500;
+}
+.header-text2{
+    font-weight: bold;
+    color: var(--black);
+}
+.carousel-item {
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+.carousel-inner{
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.carousel-card{
+    box-shadow: 0 -2px 10px 0 rgba(0, 0, 0, 0.1);
+    border: solid 1px var(--pale-grey);
+    background-color: #ffffff;
+    padding: 16px 16px 9px 16px;
+    border-radius: 10px;
+}
+
+.carousel-control-next, .carousel-control-prev{
+    background-color: var(--pale-gray);
+    border-radius: 200px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.carousel-icon{
+    color: white;
+    font-size: 20px;
+    margin-top: -1.90px;
+    margin-bottom: auto;
+} 
+.carousel-card-title{
+    @extend .plex-serif;
+    font-weight: 600;
+    color: var(--black);
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+}
+.carousel-card-authors{
+    @extend .plex-serif;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    color: #9595b2;
+    margin-bottom: 8px;
+}
+
+.carousel-card-btn{
+    display: -webkit-box;
+    margin-left: auto;
+    width: max-content;
+}
+.preview-parent{
+    margin-right: 16px;
+}
+.preview{
+    vertical-align: middle;
+}
+.preview-div{
+    margin-top: 4px;
+}
+.input-search-div{
+    display: inline-flex;
+    border-radius: 100px;
+    box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.05), 0 4px 4px 0 rgba(0, 0, 0, 0.05), 0 4px 4px 0 rgba(0, 0, 0, 0.05), 0 4px 4px 0 rgba(0, 0, 0, 0.05);
+    border: solid 1px var(--pale-grey);
+    background-color: #ffffff;
+}
+
+.input-search{
+    @extend .plex-serif;
+    border: unset;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.11;
+    letter-spacing: 0.3px;
+}
+
+::placeholder{    
+    color: #9595b2;;
+}
+
+.icon-search{
+    margin-right: 8px;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: #9595b2;
+}
+
+.fecha{
+    margin-top: 8px;
+    @extend .plex-serif;
+    font-weight: 500;
+    color: #9595b2;
+}
+
+.share{
+    @extend .fecha;
+    margin-top: unset;
+    display: inline-flex;
+}
+
+.share-icon{
+    margin-left: 12px;
+    align-self: center;
+}
+
+.preview-2{
+    margin-left: auto;
+}
+
+.icon-right{
+    font-size: 16px;
+    height: 16px !important; 
+    width: 16px !important;
+}
+.block-div{
+    display: block;
+}
+.down-icon{
+    margin-bottom: 4px;
+}
+.border-mid{
+    height: 3px;
+    background-color: #d7d7e1;
+    flex-grow: 1;
+}
+.adjust{
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+}
+.columna{
+    @extend .full-width;
+    display: flex;
+}
+.share2{
+    flex-grow: 0.2;
+    justify-content: center;
+}
+.other-news-div{
+    padding-left: 24px;
+    padding-right: 24px;
+}
+.other-news{
+    padding-bottom: 14px;
+    border-bottom: 2px #e5e5e5 solid;
+    
+}
+.other-news-text{
+    @extend .plex-serif;
+    font-weight: 500;
+    color: var(--black);
+    flex-grow: 1;
+}
+
+.card-text-question-2{
+    @extend .plex-sans;
+    color: var(--dark-blue);
+}
+.flex-news{
+    display: flex;
+}
+.other-news-date{
+    color: var(--pale-gray);
+    align-self: center;
+    display: block ruby;
+}
+.date-icon{
+    color: var(--true-green);
+}
+
+.text-other{
+    @extend .plex-sans;
+    color: var(--black);
+}
+
+.mante-title{
+    @extend .plex-serif;
+    font-weight: bold;
+    color: var(--black);
+}
+.mante-sub{
+    @extend .plex-serif;
+    color: #9595b2;
+}

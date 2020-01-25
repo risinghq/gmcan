@@ -1,0 +1,128 @@
+@media(min-width:840px){
+    .main-toolbar{
+        padding-left: 88px !important;
+        padding-right: 88px !important;
+        height: 100px !important;
+    }
+    .active{
+        padding-bottom:4px !important;
+    }
+    
+    .logo-nav{
+        height: 85px !important;
+    }
+    .green-text, .link{
+        font-size: 18px !important;
+    }
+    .footer-div{
+        padding-top: 32px !important;
+        padding-left: 153px !important;
+        padding-right: 153px !important;
+        padding-bottom: 32px !important; 
+    }
+    .footer-text-title, .footer-direction{
+        font-size: 20px !important;
+    }
+    .footer-title{
+        font-size: 25px !important;
+    }
+    .footer-text{
+        margin-left: 16px !important;
+    }
+    .footer-title{
+        margin-bottom: 32px !important;
+    }
+    .footer-icon-div{
+        height: 40px !important;
+        width: 40px !important;
+        padding: 8px !important;
+    }
+    .footer-icon{
+        vertical-align: unset !important;
+        height: 24px !important;
+    }
+    .footer-info-2{
+        margin-top: 32px !important;
+        margin-bottom: 40px !important;
+    }
+    .logo-footer{
+        height: 88px !important;
+    }
+    .logo-footer-2{
+        margin-left: 52px !important;
+    }
+    .footer-logo{
+        margin-left:unset !important;
+        margin-right: unset !important;
+    }
+    .google-maps{
+        margin-bottom: unset !important;
+    }
+    .google-html{
+        height: 393px !important;
+    }
+}
+@media(min-width:100px){
+    .green-text, .link{
+        font-size: 16px;
+    }
+    .main-toolbar{
+        padding-left: 24px ;
+        padding-right: 24px ;
+        height: min-content !important;
+    }
+    .active{
+        padding-bottom:1px;
+    }
+    .logo-nav{
+        height: 46px;
+    }
+    .footer-div{
+        padding-top: 16px;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-bottom: 16px;
+    }
+    .footer-text-title, .footer-direction{
+        font-size: 13px;
+    }
+    .footer-title{
+        font-size: 15px;
+    }
+    .footer-text{
+        margin-left: 8px;
+    }
+    .footer-title{
+        margin-bottom: 22px;
+    }
+    .footer-icon-div{
+        height: 20px;
+        width: 20px;
+        border-radius: 100px;
+        padding: 4px;
+    }
+    .footer-icon{
+        vertical-align: super;
+        height: 12px;
+    }
+    .footer-info-2{
+        margin-bottom: 24px;
+        margin-top: 16px;
+    }
+    .logo-footer{
+        height: 53px;
+    }
+    .logo-footer-2{
+        margin-left: 32px;
+    }
+    .footer-logo{
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .google-maps{
+        margin-bottom: 16px;
+    }
+    .google-html{
+        height: 128px;
+    }
+}
