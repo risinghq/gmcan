@@ -13,13 +13,15 @@ import  {MatSidenavModule,
           MatFormFieldModule,
           MatInputModule } from '@angular/material';
 import { HomeComponent } from './home/home.component';
-import { MantenimientoComponent } from './mantenimiento/mantenimiento.component'; 
+import { MantenimientoComponent } from './mantenimiento/mantenimiento.component';
+import { AboutComponent } from './about/about.component'; 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    MantenimientoComponent
+    MantenimientoComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,

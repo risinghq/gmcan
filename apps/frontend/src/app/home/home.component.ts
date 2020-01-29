@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
     private _usuarioService: UsuarioService,
     private _noticiaService: NoticiaService,
     ) { 
-      this.info = new Grupo(null,'','','','','','','','','',null,null)
+      this.info = new Grupo(null,'','','','','','','','','','','','',null,null)
       this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','')
       this.publicaciones=[];
       this.autores=[];

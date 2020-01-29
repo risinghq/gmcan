@@ -29,7 +29,7 @@
   <mat-sidenav-content>
     <mat-toolbar class="main-toolbar">
       <div id="logoHeader" class="logo-nav" innerHTML>
-        <img  class="logo-nav" src="{{grupoinfo.logoHeader}}">
+        <img  class="logo-nav" src="{{grupoinfo.logoHeader}}" alt="logo">
       </div>
       <div class="right" [ngStyle]="{'display' : (screenWidth < 1050) ? 'none' : 'flex'}">
         <div class="center">
@@ -72,8 +72,8 @@
         </mat-icon>
       </div>  
     </mat-toolbar>
-    <router-outlet class="container"></router-outlet>
-    <footer class="footer-div text-white mt-4">
+    <router-outlet></router-outlet>
+    <footer class="footer-div text-white">
       <div class="row">
         <div class="col-12 col-sm-6">
           <div class="footer-title">

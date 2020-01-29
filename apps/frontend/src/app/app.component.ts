@@ -23,7 +23,7 @@ export class AppComponent {
       this.screenWidth = window.innerWidth;
     };
 
-    this.grupoinfo = new Grupo(null,'','','','','','','','','',null,null)
+    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','',null,null)
   }
 
   ngOnInit(){
