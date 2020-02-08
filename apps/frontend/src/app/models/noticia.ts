@@ -8,6 +8,8 @@ export class Noticia{
         public fechaCreacion: Date,
         public fechaActualizacion: Date,
         public foto: String,
-        public autorPublicacion: String
+        public autorPublicacion: String,
+        public tipoNoticia_idtipoNoticia: Number,
+        public nombreTipoNoticia: String
     ){}
 }

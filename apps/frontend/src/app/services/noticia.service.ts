@@ -14,11 +14,18 @@ export class NoticiaService{
 		this.url = GLOBAL.url;
     }
     
-    getNoticia(): any{
+    getNoticias(): any{
         let headers = new HttpHeaders ({
 			'Content-Type':'application/json'
 		});
         return this.http.get(this.url+'noticia/get-noticia',{headers:headers});
+    }
+    
+    getNoticia(idNoticia){
+      let headers = new HttpHeaders ({
+        'Content-Type':'application/json'
+      });
+          return this.http.get(this.url+'noticia/get-noticia/'+idNoticia,{headers:headers});
     }
 
 }

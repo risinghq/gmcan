@@ -1,0 +1,195 @@
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans-medium{
+    font-family: 'IBMPlexSans-Medium', 'serif';
+}
+
+/*zoom-effect*/
+.img-hover-zoom, .img-hover-zoom-2 {
+    overflow: hidden; /* [1.2] Hide the overflowing of child elements */
+  }
+  
+  /* [2] Transition property for smooth transformation of images */
+  .img-hover-zoom img {
+    transition: transform .5s ease;
+  }
+
+  .img-hover-zoom-2 img{
+    transition: transform .5s ease;
+  }
+  
+  /* [3] Finally, transforming the image when container gets hovered */
+  .img-hover-zoom:hover img {
+    transform: scale(1.2);
+  }
+  .img-hover-zoom-2:hover img {
+    transform: scale(1.05);
+  }
+
+.flex-news-2{
+    margin-top: 8px;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.plex-sans{
+    font-family: 'IBM Plex Sans', serif;
+}
+
+.other-news-date{
+    font-size: 14px;
+}
+
+.card-img-div{
+    object-fit: cover;
+    width: 100% ;
+    border-radius: 4px;
+}
+
+.other-news-text-div{
+    padding-left: 16px;
+}
+
+figure::before {
+	background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
+	background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,.3) 100%);
+	-webkit-transform: skewX(-25deg);
+	transform: skewX(-25deg);
+}
+figure:hover::before {
+	-webkit-animation: shine .75s;
+	animation: shine .75s;
+}
+@-webkit-keyframes shine {
+	100% {
+		left: 125%;
+	}
+}
+@keyframes shine {
+	100% {
+		left: 125%;
+	}
+}
+
+.other-news:hover{
+    background-color: rgba(215, 215, 225, 0.2);
+}
+
+.other-news-img{
+    object-fit: cover;
+    border-radius: 4px;
+}
+.other-news-text:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.other-news-text{
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.other-news-text-2{
+    cursor: pointer;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1.29;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.news-title{
+    @extend .plex-sans; 
+    font-weight: bold;
+    font-stretch: normal;  
+    font-style: normal;  
+    line-height: 0.72;  
+    letter-spacing: 0.3px;  
+    color: #000000;
+    margin-bottom: 16px;
+}
+
+@media(min-width:840px){
+    .news-title{
+        margin-top: unset !important;
+    }
+    .img-div-zoom{
+        width:200px !important;
+    }
+    .card-text-div-3{
+        padding-bottom: 20px !important;
+    }
+    .news-title{
+        font-size: 25px !important; 
+    }
+    
+    .other-news{
+        padding-top: 16px !important;
+        padding-bottom: 16px !important;
+    }
+    .other-news-img{
+        width: 98px !important;
+        height: 86px !important;
+    }
+    .other-news-text{
+        font-size: 18px !important;
+    }
+    .other-news-text-2{
+        font-size: 16px !important;
+    }
+    .other-news-ending{
+        padding-bottom: 32px !important;
+        padding-top: 24px !important;
+    }
+    .share-icon{
+        height: 16px !important;
+    }
+    .card-img-div{
+        height: 159px;
+    }
+}
+
+@media(min-width:100px){
+    .news-title{
+        margin-top: 24px;
+    }
+    .img-div-zoom{
+        width: 148px;
+    }
+    .news-title{
+        font-size: 15px;
+    }
+    .card-text-div-3{
+        padding-bottom: 16px;
+    }
+    .fecha, .share, .card-text-question-2{
+        font-size: 10px;
+    }
+    .other-news-text{
+        font-size: 14px;
+    }
+    .other-news{
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }
+    .other-news-img{
+        width: 82px;
+        height: 82px;
+    }
+    .other-news-text-2{
+        font-size: 14px;
+    }
+    .other-news-ending{
+        padding-bottom: 16px;
+        padding-top: 16px;
+    }
+    .share-icon{
+        height: 10px;
+    }
+}

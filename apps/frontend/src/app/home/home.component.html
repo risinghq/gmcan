@@ -87,72 +87,7 @@
             </div>
         </div>
         <div class="col-12 col-md-4 col-lg-4">
-            <div class="card-div">
-                <img class="card-img-div-2" src="../../assets/img/grupal.jpg" alt="nada">
-                <div class="card-text-div card-text-div-3">
-                    <div class="card-text-question">
-                        {{noticiaPrincipal.titulo}}
-                    </div>
-                    <div class="fecha">
-                        {{noticiaPrincipal.fechaPublicacion}}
-                    </div>
-                    <div class="card-text card-text-2">
-                        {{noticiaPrincipal.resumen}}
-                    </div>
-                    <div class="inline-flex full-width">
-                        <div class="share">
-                            Compartir:
-                            <img class="share-icon" src="../../assets/img/Facebook.svg">
-                            <img class="share-icon" src="../../assets/img/twitter.svg">
-                        </div>
-                        <a class="green-text preview preview-2">
-                            Leer historia
-                            <mat-icon class="center-vertical icon-right">
-                                keyboard_arrow_right
-                            </mat-icon>
-                        </a>
-                    </div>
-                </div>
-                <div class="full-width center block-div">
-                    <img class="down-icon" src="../../assets/img/down.svg">
-                </div>
-                <div class="adjust">
-                    <div class="columna">
-                        <div class="border-mid">
-                        </div>
-                        <div class="share share2">
-                            Más noticias
-                        </div>
-                        <div class="border-mid">
-                        </div>
-                    </div>
-                </div>
-                <div class="other-news-div">
-                    <div class="other-news flex-news" *ngFor="let noticia of noticias">
-                        <div class="other-news-text">
-                            {{noticia.titulo}}
-                        </div>
-                        <div class="other-news-date">
-                            {{noticia.fechaPublicacion}}
-                            <mat-icon class="center-vertical date-icon icon-right">
-                                keyboard_arrow_right
-                            </mat-icon>
-                        </div>
-                    </div>
-                    <div class="other-news-ending">
-                        <div class="card-text-question card-text-question-2">
-                            ¿Quieres conocer más?
-                        </div>
-                        <div class="text-other">
-                            Revisa nuestras noticias más destacadas 
-                            <a class="green-text">
-                                aqui
-                            </a>
-                        </div>       
-                    </div>
-                </div
-                >
-            </div>
+            <app-news></app-news>
         </div>
     </div>
 </div>

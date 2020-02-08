@@ -21,4 +21,11 @@ export class UsuarioService{
         return this.http.get(this.url+'usuario/get-usuario-name',{headers:headers});
     }
 
+    getUser(idUsuario): any{
+      let headers = new HttpHeaders ({
+        'Content-Type':'application/json'
+      });
+      return this.http.get(this.url+'usuario/get-usuario/'+idUsuario,{headers:headers});
+  }
+
 }

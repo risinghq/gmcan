@@ -12,7 +12,9 @@ export class AboutComponent implements OnInit {
 
   constructor(
     private _grupoService: GrupoService,
-  ) { }
+  ) {
+    this.info= new Grupo(null,'','','','','','','','','','','','',null,null);
+  }
 
   ngOnInit() {
     this.getGrupoInfo();

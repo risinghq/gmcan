@@ -11,7 +11,6 @@ import { Usuario } from '../models/usuario';
 import { UsuarioService } from '../services/usuario.service';
 import { Noticia } from '../models/noticia';
 import { NoticiaService } from '../services/noticia.service';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -26,17 +25,15 @@ export class HomeComponent implements OnInit {
   private noticias: Array<Noticia>;
   private noticiaPrincipal: Noticia;
   constructor(
-    private datePipe: DatePipe,
     private _grupoService: GrupoService,
     private _publicacionService: PublicacionService,
     private _autorService: AutorService,
     private _publicacionhasautorService: PublicacionHasAutorService,
     private _publicacionhasusuarioService: PublicacionHasUsuarioService,
     private _usuarioService: UsuarioService,
-    private _noticiaService: NoticiaService,
     ) { 
       this.info = new Grupo(null,'','','','','','','','','','','','',null,null)
-      this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','')
+      this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','',null,'')
       this.publicaciones=[];
       this.autores=[];
       this.noticias=[];
@@ -47,7 +44,6 @@ export class HomeComponent implements OnInit {
     this.getAutores();
     this.getPublicacion();
     this.getUsuario();
-    this.getNoticia();
   }
 
   getGrupoInfo(){
@@ -115,20 +111,6 @@ export class HomeComponent implements OnInit {
         }
       }
     }
-  }
-
-  getNoticia(){
-    this._noticiaService.getNoticia().subscribe((res)=>{
-      if(res!=null){
-        res.sort((a,b) => (a.prioridad > b.prioridad) ? 1 : ((b.prioridad > a.prioridad) ? -1 : 0));
-        this.noticias=res;
-        for (let index = 0; index < this.noticias.length; index++) {
-          this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMM dd");
-        }
-        this.noticiaPrincipal=this.noticias[0];
-        this.noticias.splice(0,1);
-      }
-    });
   }
 
 }

@@ -1,0 +1,135 @@
+<div class="publication-div">
+    <div *ngIf="!cargado">
+        <mat-spinner [color]="green"></mat-spinner>
+    </div>
+    <div class="row" *ngIf="cargado">
+        <div class="col-lg-8 col-sm-6 col-12">
+                <div class="publication-links">
+                    <a class="publication-link-active" href="/">Inicio</a>
+                    <mat-icon class="publication-icon">
+                        arrow_right
+                    </mat-icon>
+                    <a class="publication-link">Publicaciones</a>
+                </div>
+                <div class="card-publication">
+                    <div class="card-publication-title">
+                        Nuestras Publicaciones
+                    </div>
+                    <div class="card-publication-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elit in ridiculus aliquam risus purus, et etiam convallis lorem. 
+                        Molestie sed vel tristique viverra feugiat lacus massa neque. Aliquet feugiat faucibus tellus iaculis. Montes, turpis mattis gravida aliquet tellus phasellus. 
+                        Facilisis eu, augue condimentum sapien est arcu. Nibh at turpis egestas.
+                    </div>
+                    <mat-tab-group (selectedTabChange)="changeTab($event)">
+                        <mat-tab label="{{tipoPublicacion.nombre}}" *ngFor="let tipoPublicacion of tipoPublicaciones"> 
+                            <div class="input-search-publication">
+                                <mat-icon class="icon-search">search</mat-icon>
+                                <input class="input-search" placeholder="Buscar {{tipoPublicacion.nombre}}">
+                                <button mat-button class="btn-green btn-green-2">
+                                    Buscar 
+                                </button>
+                            </div>
+                            <div *ngIf="!allCharged">
+                                <mat-spinner [color]="green"></mat-spinner>
+                            </div>
+                            <div *ngIf="allCharged">
+                                <div class="publication" *ngFor="let publicacion of publicaciones | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize; let i = index">
+                                    <div class="flex-news">
+                                        <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1, 
+                                        'publication-type-2' : publicacion.tipoPublicacion_idTipoPublicacion == 2 }">
+                                            {{tipoPublicacion.nombre}}
+                                        </div>
+                                        <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
+                                            {{publicacion.fecha}}
+                                        </div>
+                                        <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
+                                            <div class="flex-news">
+                                                <img id="fb{{i}}" class="share-icon" (mouseenter) ="mouseEnter(1, i)"  (mouseleave) ="mouseLeave(1, i)" src="{{fbicon}}">
+                                                <img id="t{{i}}" class="share-icon" (mouseenter) ="mouseEnter(2, i)"  (mouseleave) ="mouseLeave(2, i)" src="{{twitter}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-news publication-mt">
+                                        <div class="publication-title">
+                                            {{publicacion.titulo}}
+                                        </div>
+                                        <div class="share-div d-none d-md-block d-lg-block d-xl-block">
+                                            <div class="flex-news">
+                                                <img id="fbl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
+                                                <img id="tl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(4, i)"  (mouseleave) ="mouseLeave(4, i)" src="{{twitter}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex-news publication-mt">
+                                        <div class="publication-date d-none d-md-block d-lg-block d-xl-block">
+                                            {{publicacion.fecha}}
+                                        </div>
+                                        <div class="elipse d-none d-md-block d-lg-block d-xl-block">
+                                        </div>
+                                        <div class="publication-rev">
+                                            {{publicacion.revista}} Vol. {{publicacion.nroRevista}}
+                                        </div>
+                                    </div>
+                                    <div class="publication-rev" style="line-height: 12px;" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
+                                        DOI: <a class="publication-rev link-DOI" href="/publicacion.DOI">{{publicacion.DOI}}</a>
+                                    </div>
+                                    <div class="flex-news publication-mt" style="flex-flow: wrap;">
+                                        <div class="publication-members" *ngFor="let usuario of publicacion.usuario">
+                                            <div class="member-img-round">
+                                                <img class="member-img" src="../../assets/img/user.png">
+                                            </div>
+                                            <div class="member-name">
+                                                {{usuario.nombreCompleto}}
+                                            </div>
+                                        </div>
+                                        <div class="publication-authors" *ngFor="let autores of publicacion.autor">
+                                            {{autores.nombreAutor}}
+                                        </div>
+                                    </div>
+                                    <div class="flex-news mt-16">
+                                        <a class="publication-green"> 
+                                            Vista Previa
+                                        </a>
+                                        <a class="publication-green">
+                                            Descargar
+                                        </a>
+                                        <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="publication-abstract" 
+                                        data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
+                                        aria-expanded="false" aria-controls="collapseExample">
+                                            Ver resumen
+                                        </a>
+                                        <mat-icon class="publication-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
+                                            keyboard_arrow_down
+                                        </mat-icon>
+                                    </div>
+                                    <div class="collapse collapsed-resumen" id="collapseExample{{i}}">
+                                        <div class="abstract-title">
+                                            Resumen:
+                                        </div>
+                                        <div class="abstract">                                        
+                                            {{publicacion.resumen}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="publicaciones.length" *ngIf="publicaciones.length>5">
+                                    <ng-template ngbPaginationPrevious style="margin-left: 0 !important;">
+                                        <mat-icon class="pag-arrow">
+                                            keyboard_arrow_left
+                                        </mat-icon>
+                                    </ng-template>
+                                    <ng-template ngbPaginationNext>
+                                        <mat-icon class="pag-arrow" style="padding-bottom: 20px !important;">
+                                            keyboard_arrow_right
+                                        </mat-icon>
+                                    </ng-template>
+                                </ngb-pagination>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>                      
+                </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-12">
+            <app-news></app-news>
+        </div>
+    </div>
+</div>

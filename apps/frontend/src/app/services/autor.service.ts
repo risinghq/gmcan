@@ -21,4 +21,11 @@ export class AutorService{
         return this.http.get(this.url+'autor/get-autor',{headers:headers});
     }
 
+    getAuthor(idAutor): any{
+      let headers = new HttpHeaders ({
+    'Content-Type':'application/json'
+  });
+      return this.http.get(this.url+'autor/get-autor/'+idAutor,{headers:headers});
+  }
+
 }

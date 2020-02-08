@@ -1,0 +1,39 @@
+<div>
+    <div class="news-title">
+        {{title}}
+    </div>
+    <div class="img-hover-zoom">
+        <img class="card-img-div" src="../../assets/img/grupal.jpg" alt="nada">
+    </div>
+    <div class="card-text-div card-text-div-3">
+        <div class="flex-news flex-news-2">
+            <div class="news-type">
+                {{noticiaPrincipal.nombreTipoNoticia}}
+            </div>
+            <div class="other-news-date">
+                {{noticiaPrincipal.fechaPublicacion}}
+            </div>
+        </div>
+        <div class="other-news-text" (click)="detalleNoticia(noticiaPrincipal)">
+            {{noticiaPrincipal.titulo}}
+        </div>
+    </div>
+    <div class="other-news-div">
+        <div class="other-news flex-news" *ngFor="let noticia of noticias | slice:0:numberShown; let i=index" >
+            <div class="img-hover-zoom-2 img-div-zoom">
+                <img class="other-news-img" src="../../assets/img/grupal.jpg" alt="nada">
+            </div>
+            <div class="other-news-text-div">
+                <div class="news-type">
+                    {{noticia.nombreTipoNoticia}}
+                </div>
+                <div class="other-news-text-2" (click)="detalleNoticia(noticia)">
+                    {{noticia.titulo}}
+                </div>
+                <div class="other-news-date">
+                    {{noticia.fechaPublicacion}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
