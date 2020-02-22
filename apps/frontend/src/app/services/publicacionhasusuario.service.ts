@@ -21,4 +21,12 @@ export class PublicacionHasUsuarioService{
         return this.http.get(this.url+'publicacion-usuario/get-publicacionhasusuario/'+idPublicacion,{headers:headers});
     }
 
+    searchPublicacionHasUsuario(DNI): any{
+      let body = {"usuario_DNI":DNI};
+      let headers = new HttpHeaders ({
+        'Content-Type':'application/json'
+      });
+      return this.http.post(this.url+'publicacion-usuario/search-publicacionhasusuario',body,{headers:headers});
+    }
+
 }

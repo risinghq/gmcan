@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 import { TipoNoticia } from '../models/tiponoticia';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
 import { Router, ActivatedRoute, Params} from '@angular/router';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-news',
@@ -19,6 +20,7 @@ export class NewsComponent implements OnInit {
   private tiponoticias: Array<TipoNoticia>
   
   constructor(
+    private titlecasePipe:TitleCasePipe,
     private datePipe: DatePipe,
     private _noticiaService: NoticiaService,
     private _route: ActivatedRoute,
@@ -69,7 +71,8 @@ export class NewsComponent implements OnInit {
               this.noticias[index].nombreTipoNoticia=this.tiponoticias[j].nombre;
             }
           }
-          this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMM dd, y", "es");
+          this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMMM dd, y", "es");
+          this.noticias[index].fechaPublicacion=this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
         }
         this.noticiaPrincipal=this.noticias[0];
         this.noticias.splice(0,1);

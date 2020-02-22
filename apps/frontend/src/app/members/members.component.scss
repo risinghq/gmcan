@@ -1,0 +1,298 @@
+/* Members CSS */
+
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+}
+
+.member-icon{
+    vertical-align: middle;
+    height: 24px;
+}
+
+.member-link{
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #9595b2 !important;
+}
+.member-link-active:hover{
+    text-decoration: underline;
+    color: black;
+}
+.member-link-active{
+    @extend .plex-sans;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #000000;
+    text-decoration: none;
+}
+
+.member-div{
+    background-color: #f8f8f8;
+}
+
+.member-card{
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.member-title{
+    @extend .plex-sans;
+    font-weight: bold;
+    line-height: 1.17;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.member-sub{
+    @extend .plex-sans;
+    margin-bottom: 24px;
+    margin-top: 8px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #939393;
+}
+
+.member-type-title{
+    padding-bottom: 8px;
+    @extend .plex-sans;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #30393a;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.member-img-div{
+    width: 62px;
+    height: 62px;  
+    border-radius: 4px;
+    background-color: #c4c4c4;
+}
+.member-img{
+    border-radius: inherit;
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+}
+
+.member-name{
+    @extend .plex-sans;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.member-email{
+    margin-top: 4px;
+    @extend .plex-sans;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+.member-profile{
+    @extend .plex-sans;
+    line-height: 0.75;
+    letter-spacing: 0.3px;
+    color: var(--deep-green);
+}
+
+.email-icon, .profile-icon{
+    height: auto;
+    width: auto;
+    vertical-align: middle;
+}
+.email-icon{
+    color: #b5b5b5;
+}
+.profile-icon{
+    font-size: 16px;
+    margin-left: -4px;
+    margin-top: -4px;
+    color: var(--deep-green);
+}
+
+.member-profile:hover{
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--dark-forest-green);
+}
+.member-profile:hover .profile-icon{
+    cursor: pointer;
+    color: var(--dark-forest-green);
+}
+/* tabs de publicacion */
+::ng-deep .mat-tab-label{
+    width: 100% !important;
+    height: 32px !important;
+}
+
+::ng-deep .mat-ink-bar{
+    background-color: #000000 !important;
+}
+
+::ng-deep .mat-tab-body-content{
+    overflow: hidden !important;
+}
+
+::ng-deep .mat-tab-label-active .mat-tab-label-content, ::ng-deep .mat-tab-label-active{
+    color: black;
+    opacity: 1 !important;
+}
+
+
+@media(min-width:1400px){
+    .member-div{
+        padding-left: 343px !important;    
+        padding-right: 343px !important;
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+    }
+    .member-links{
+        padding-bottom: 8px;
+    }
+    .member-link-active, .member-link, .member-profile, .member-email, .email-icon{
+        font-size: 15px;
+    }
+    .member-card{
+        padding: 40px 40px 0px 40px;
+    }
+    .member-title{
+        font-size: 30px;
+    }
+    .member-sub, .member-name{
+        font-size: 20px;  
+    }
+    .members-container{
+        padding-top: 24px;
+    }
+    .member-type-title{
+        font-size: 20px;
+    }
+    .member-mt{
+        margin-top: 24px;
+    }
+    .member-text{
+        padding-left: 16px;
+    }
+    .member-img-div{
+        width: 62px;
+        height: 62px;  
+    }
+    .member-profile{
+        margin-top: 8px;
+    }
+    .profile-icon{
+        font-size: 20px;
+    }
+    .member-type-container{
+        margin-bottom: 32px;
+    }
+}
+
+@media(max-width:1400px){
+    .member-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+    .member-links{
+        padding-bottom: 8px;
+    }
+    .member-link-active, .member-link, .member-profile, .member-email, .email-icon{
+        font-size: 15px;
+    }
+    .member-card{
+        padding: 40px 40px 0px 40px;
+    }
+    .member-title{
+        font-size: 30px;
+    }
+    .member-sub, .member-name{
+        font-size: 20px;  
+    }
+    .members-container{
+        padding-top: 24px;
+    }
+    .member-type-title{
+        font-size: 20px;
+    }
+    .member-mt{
+        margin-top: 24px;
+    }
+    .member-text{
+        padding-left: 16px;
+    }
+    .member-img-div{
+        width: 62px;
+        height: 62px;  
+    }
+    .member-profile{
+        margin-top: 8px;
+    }
+    .profile-icon{
+        font-size: 20px;
+    }
+    .member-type-container{
+        margin-bottom: 32px;
+    }
+}
+
+@media(max-width:960px){
+    .member-div{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 20px;
+    }
+    .member-links{
+        padding-bottom: 16px;
+    }
+    .member-link-active, .member-link, .member-subtitle{
+        font-size: 13px;
+    }
+    .member-card{
+        padding: 24px 16px 0px 16px;
+    }
+    .member-title{
+        font-size: 16px;
+    }
+    .member-sub, .member-profile, .member-email, .email-icon{
+        font-size: 13px;  
+    }
+    .members-container{
+        padding-top: 16px;
+    }
+    .member-type-title, .member-name{
+        font-size: 15px;
+    }
+    .member-mt{
+        margin-top: 16px;
+    }
+    .member-text{
+        padding-left: 8px;
+    }
+    .member-img-div{
+        width: 46px;
+        height: 46px;  
+    }
+    .member-profile{
+        margin-top: 4px;
+    }
+    .profile-icon{
+        font-size: 16px;
+    }
+    .member-type-container{
+        margin-bottom: 24px;
+    }
+}

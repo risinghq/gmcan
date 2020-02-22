@@ -9,6 +9,7 @@
     --very-dark-blue: #000032;
     --pale-gray: #9595b2;
     --dark-blue: #00155b;
+    --dark-forest-green:#003000;
 }
 
 .footer-icon-div{
@@ -452,4 +453,13 @@ mat-spinner{
     border-radius: 4px;
     border: solid 1px #30393a;
     margin-left: 8px;
+}
+
+/* CSS No encontrados */
+
+.not-found{
+    @extend .plex-sans;
+    text-align: center;
+    padding: 24px 8px;
+    color: #000000;
 }

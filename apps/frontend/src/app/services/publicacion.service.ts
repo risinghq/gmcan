@@ -25,6 +25,12 @@ export class PublicacionService{
         'Content-Type':'application/json'
       });
       return this.http.get(this.url+'publicacion/get-publicaciones/'+idTipoPublicacion,{headers:headers});
-  }
+    }
+    getPublication(idPublicacion): any{
+      let headers = new HttpHeaders ({
+        'Content-Type':'application/json'
+      });
+      return this.http.get(this.url+'publicacion/get-publicacion/'+idPublicacion,{headers:headers});
+    }
 
 }

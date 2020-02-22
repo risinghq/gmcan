@@ -1,0 +1,276 @@
+/* Members CSS */
+
+@import '../publication/publication.component.scss';
+
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+}
+
+.member-detail-icon{
+    vertical-align: middle;
+    height: 24px;
+}
+
+.member-detail-link{
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #9595b2 !important;
+}
+.member-detail-link-active:hover{
+    text-decoration: underline;
+    color: black;
+}
+.member-detail-link-active{
+    @extend .plex-sans;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #000000;
+    text-decoration: none;
+}
+
+.member-detail-div{
+    background-color: #f8f8f8;
+}
+
+.member-detail-card{
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.member-detail-title{
+    @extend .plex-sans;
+    font-weight: bold;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.back-icon{
+    margin-right: 8px;
+    width: max-content !important;
+    height: max-content !important;
+    color: #9595b2;
+}
+
+.back-text{
+    align-self: center;
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #9595b2;
+}
+
+.member-detail-img-div{
+    border-radius: 4px;
+}
+
+.member-detail-img{
+    border-radius: inherit;
+    height: inherit;
+    width: inherit;
+    object-fit: cover;
+}
+
+.member-detail-name-div{
+    margin-left: 24px;
+}
+
+.member-detail-active{
+    @extend .plex-sans;    
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: var(--deep-green);
+}
+
+.member-detail-type{
+    margin-top: 8px;
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #b5b5b5;
+}
+
+.member-email{
+    margin-top: 8px;
+    @extend .plex-sans;
+    line-height: 1;
+    letter-spacing: 0.3px;
+}
+
+.email-icon{
+    margin-right: 8px;
+    height: auto;
+    width: auto;
+    vertical-align: middle;
+}
+
+.detail-member-resum{
+    margin-top: 24px;
+    @extend .plex-sans;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.flex-detail{
+    display: flex;
+}
+
+.member-publications{
+    margin-top: 24px;
+    @extend .plex-sans;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #30393a;
+    padding-bottom: 6px;
+}
+
+.back-div{
+    cursor: pointer;
+}
+
+.back-div:hover .back-text, .back-div:hover .back-icon{
+    color: black;
+}
+
+@media(min-width:1400px){
+    .member-detail-div{
+        padding-left: 343px !important;    
+        padding-right: 343px !important;
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+    }
+    .member-detail-links{
+        padding-bottom: 8px;
+    }
+    .member-detail-link-active, .member-detail-link, .back-text, .member-detail-active,
+    .member-email, .detail-member-resum{
+        font-size: 15px;
+    }
+    .email-icon{
+        font-size: 20px;
+    }
+    .member-detail-card{
+        padding: 32px 40px;
+    }
+    .back-icon, .member-detail-type, .member-publications{
+        font-size: 20px;
+    }
+    .member-publications{
+        border-bottom: solid 2px #30393a;
+    }
+    .member-detail-title{
+        font-size: 30px;
+    }
+    .member-title-div{
+        margin-top: 32px;
+    }
+    .member-detail-img-div{
+        height: 100px;
+        width: 100px;
+    }
+}
+
+@media(max-width:1400px){
+    .member-detail-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+    .member-detail-links{
+        padding-bottom: 8px;
+    }
+    .member-detail-link-active, .member-detail-link, .back-text, .member-detail-active,
+    .member-email, .detail-member-resum{
+        font-size: 15px;
+    }
+    .email-icon{
+        font-size: 20px;
+    }
+    .member-detail-card{
+        padding: 32px 40px;
+    }
+    .member-detail-title{
+        font-size: 30px;
+    }
+    .member-publications{
+        border-bottom: solid 2px #30393a;
+    }
+    .member-detail-sub, .member-detail-type, .member-publications{
+        font-size: 20px;  
+    }
+    .back-icon{
+        font-size: 20px;
+    }
+    .member-title-div{
+        margin-top: 32px;
+    }
+    .member-detail-img-div{
+        height: 100px;
+        width: 100px;
+    }
+}
+
+@media(max-width:960px){
+    .member-detail-div{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 20px;
+    }
+    .member-detail-links{
+        padding-bottom: 16px;
+    }
+    .member-detail-link-active, .member-detail-link, .member-detail-subtitle, .member-detail-active{
+        font-size: 13px;
+    }
+    .member-detail-card{
+        padding: 16px;
+    }
+    .member-detail-title, .email-icon{
+        font-size: 16px;
+    }
+    .member-detail-sub, .back-text, .member-detail-type, .member-email, .detail-member-resum{
+        font-size: 13px;  
+    }
+    .member-publications{
+        line-height: 1;
+        font-size: 15px;
+        border-bottom: solid 1px #30393a;
+    }
+    .back-icon{
+        font-size: 16px;
+    }
+    .member-title-div{
+        margin-top: 22px;
+    }
+    .member-detail-img-div{
+        height: 75px;
+        width: 75px;
+    }
+    .member-detail-img-div{
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .member-detail-name-div{
+        margin-top: 16px;
+        margin-left: unset;
+    }
+    .flex-detail{
+        text-align: center;
+        display: block !important;
+    }
+}

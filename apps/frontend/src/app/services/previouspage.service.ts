@@ -11,6 +11,8 @@ export class PreviousPageService{
                 return "Sobre Nosotros";
             case "publications":
                 return "Publicaciones";
+            case "members":
+                return "Miembros";
             case "":
                 return "Inicio";
             default:

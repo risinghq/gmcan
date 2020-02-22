@@ -1,0 +1,92 @@
+<div class="member-div">
+    <div *ngIf="!cargado">
+        <mat-spinner [color]="green"></mat-spinner>
+    </div>
+    <div class="row" *ngIf="cargado">
+        <div class="col-lg-8 col-sm-6 col-12">
+            <div class="member-links">
+                <a class="member-link-active" href="/">Inicio</a>
+                <mat-icon class="member-icon">
+                    arrow_right
+                </mat-icon>
+                <a class="member-link">Miembros</a>
+            </div>
+            <div class="member-card">
+                <div class="member-title">
+                    Nuestros Miembros
+                </div>
+                <div class="member-sub">
+                    Conoce a las increíbles personas que hacen grande al grupo.
+                </div>
+                <mat-tab-group>
+                    <mat-tab label="Miembros actuales">
+                        <div class="members-container">
+                            <div class="member-type-container" *ngFor="let tipoMiembro of tipoMiembros">
+                                <div class="member-type-title">
+                                    {{tipoMiembro.nombre}}
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-sm-6" *ngFor="let miembro of tipoMiembro.miembros">
+                                        <div class="flex-news member-mt">
+                                            <div class="member-img-div">
+                                                <img class="member-img" src="{{miembro.foto}}" alt="foto">
+                                            </div>
+                                            <div class="member-text">
+                                                <div class="member-name full-width">
+                                                    {{miembro.prefijo}} {{miembro.nombre}} {{miembro.apellidoPaterno}} {{miembro.apellidoMaterno}}
+                                                </div>
+                                                <div class="member-email">
+                                                    <mat-icon class="email-icon">
+                                                        email
+                                                    </mat-icon>
+                                                    {{miembro.correo}}
+                                                </div>
+                                                <div class="member-profile" (click)="profile(miembro)">
+                                                    Ver Perfil
+                                                    <mat-icon class="profile-icon">
+                                                        keyboard_arrow_right
+                                                    </mat-icon>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Antiguos Miembros">
+                        <div class="row member-type-container">
+                            <div class="col-12 col-sm-6" *ngFor="let usuario of usuariosNoActivos">
+                                <div class="flex-news member-mt">
+                                    <div class="member-img-div">
+                                        <img class="member-img" src="../../assets/img/user.png">
+                                    </div>
+                                    <div class="member-text full-width">
+                                        <div class="member-name">
+                                            {{usuario.prefijo}} {{usuario.nombre}} {{usuario.apellidoPaterno}} {{usuario.apellidoMaterno}}
+                                        </div>
+                                        <div class="member-email">
+                                            <mat-icon class="email-icon">
+                                                email
+                                            </mat-icon>
+                                            {{usuario.correo}}
+                                        </div>
+                                        <div class="member-profile" (click)="profile(usuario)">
+                                            Ver Perfil
+                                            <mat-icon class="profile-icon">
+                                                keyboard_arrow_right
+                                            </mat-icon>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </mat-tab>
+                </mat-tab-group>              
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-12">
+            <app-news></app-news>
+        </div>
+    </div>
+</div>

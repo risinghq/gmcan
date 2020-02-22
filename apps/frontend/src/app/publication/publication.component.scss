@@ -72,6 +72,15 @@
     background-color: #000000 !important;
 }
 
+::ng-deep .mat-tab-body-content{
+    overflow: hidden !important;
+}
+
+::ng-deep .mat-tab-label-active .mat-tab-label-content, ::ng-deep .mat-tab-label-active{
+    color: black;
+    opacity: 1 !important;
+}
+
 /*Buscador CSS*/
 .input-search-publication{
     border-radius: 7px;
@@ -169,6 +178,7 @@
     background-color: #c4c4c4
 }
 .member-img{
+    vertical-align: unset;
     background-color: #c4c4c4;
     width: inherit;
     height: inherit;
@@ -202,7 +212,14 @@
 }
 
 .mt-16{
+    height: 36px;
     padding-top: 16px;
+}
+
+@media(max-width:336px){
+    .mt-16{
+        height: 52px !important;
+    }
 }
 
 .publication-green:hover{
@@ -342,6 +359,7 @@
     }
     ::ng-deep .pagination{
         justify-content: right;
+        justify-content: flex-end;
     }
     .collapsed-resumen{
         padding-top: 16px;
@@ -379,6 +397,7 @@
     }
     ::ng-deep .pagination{
         justify-content: right;
+        justify-content: flex-end;
     }
     .publication-type{
         padding: 4px 8px 4px 8px;
@@ -435,4 +454,11 @@
     .collapsed-resumen{
         padding-top: 8px;
     }
+}
+.unique-left .ul .li{
+    margin-left: 0 !important;
+}
+
+.h-ih{
+    height: inherit;
 }

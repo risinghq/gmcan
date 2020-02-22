@@ -12,20 +12,27 @@ export class UsuarioService{
 
 	constructor(private http: HttpClient){
 		this.url = GLOBAL.url;
-    }
+  }
     
-    getUsuario(): any{
-        let headers = new HttpHeaders ({
-			'Content-Type':'application/json'
-		});
-        return this.http.get(this.url+'usuario/get-usuario-name',{headers:headers});
-    }
+  getUsuario(): any{
+    let headers = new HttpHeaders ({
+		  'Content-Type':'application/json'
+	  });
+    return this.http.get(this.url+'usuario/get-usuario-name',{headers:headers});
+  }
 
-    getUser(idUsuario): any{
-      let headers = new HttpHeaders ({
-        'Content-Type':'application/json'
-      });
-      return this.http.get(this.url+'usuario/get-usuario/'+idUsuario,{headers:headers});
+  getUser(idUsuario): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json'
+    });
+    return this.http.get(this.url+'usuario/get-usuario/'+idUsuario,{headers:headers});
+  }
+
+  getUsuarios():any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json'
+    });
+    return this.http.get(this.url+'usuario/get-usuario',{headers:headers});
   }
 
 }

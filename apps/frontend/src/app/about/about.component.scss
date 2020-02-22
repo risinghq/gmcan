@@ -38,6 +38,7 @@
     color: #b5b5b5;
 }
 .about-text{
+    white-space: pre-wrap;
     @extend .plex-sans;
     font-weight: 300;
     line-height: 1.33;

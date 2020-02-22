@@ -7,6 +7,7 @@ import { PreviousPageService } from '../services/previouspage.service';
 import { DatePipe } from '@angular/common';
 import { Usuario } from '../models/usuario';
 import { UsuarioService } from '../services/usuario.service';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-detail-news',
@@ -19,6 +20,7 @@ export class DetailNewsComponent implements OnInit {
   private previouslink;
   private usuario: Usuario;
   constructor(
+    private titlecasePipe:TitleCasePipe,
     private datePipe:DatePipe,
     private _noticiaService: NoticiaService,
     private _tipoNoticiaService: TipoNoticiaService,

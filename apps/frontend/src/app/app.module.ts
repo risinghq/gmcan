@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core';
-import {DatePipe} from '@angular/common';
+import {DatePipe, TitleCasePipe } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -19,6 +19,7 @@ import { MantenimientoComponent } from './mantenimiento/mantenimiento.component'
 import { AboutComponent } from './about/about.component';
 import { NewsComponent } from './news/news.component'; 
 import { registerLocaleData } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import localePy from '@angular/common/locales/es-PY';
     import localePt from '@angular/common/locales/pt';
@@ -27,6 +28,8 @@ import localePy from '@angular/common/locales/es-PY';
 import { DetailNewsComponent } from './detail-news/detail-news.component';
 import { PublicationComponent } from './publication/publication.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { MembersComponent } from './members/members.component';
+import { DetailMemberComponent } from './detail-member/detail-member.component';
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
 registerLocaleData(localePt, 'pt');
@@ -42,6 +45,8 @@ registerLocaleData(localeEsAr, 'es-Ar');
     NewsComponent,
     DetailNewsComponent,
     PublicationComponent,
+    MembersComponent,
+    DetailMemberComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,8 +63,9 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatProgressSpinnerModule,
     MatTabsModule,
     NgbModule,
+    FormsModule, ReactiveFormsModule
   ],
-  providers: [DatePipe, {provide: LOCALE_ID, useValue: 'es-Ar'}],
+  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: 'es-Ar'}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

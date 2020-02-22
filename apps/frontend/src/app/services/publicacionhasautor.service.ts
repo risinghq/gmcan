@@ -21,4 +21,12 @@ export class PublicacionHasAutorService{
         return this.http.get(this.url+'publicacion-autor/get-publicacionhasautor/'+idPublicacion,{headers:headers});
     }
 
+    searchPublicacionHasAutor(id): any{
+      let body = {"autores_idAutor":id};
+      let headers = new HttpHeaders ({
+        'Content-Type':'application/json'
+      });
+      return this.http.post(this.url+'publicacion-autor/search-publicacionhasautor',body,{headers:headers});
+    }
+
 }

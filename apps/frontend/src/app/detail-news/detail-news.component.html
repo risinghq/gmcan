@@ -5,11 +5,15 @@
     <div class="row" *ngIf="cargado">
         <div class="col-lg-8 col-sm-6 col-12">
                 <div class="detail-links">
+                    <a class="detail-link-active" href="/">Inicio</a>
+                    <mat-icon class="detail-icon">
+                        arrow_right
+                    </mat-icon>
                     <a class="detail-link-active" href="/{{previouslink}}">{{previouspage}}</a>
                     <mat-icon class="detail-icon">
                         arrow_right
                     </mat-icon>
-                    <a class="detail-link">Noticia</a>
+                    <a class="detail-link">Detalle de Noticia</a>
                 </div>
                 <div class="card-detail">
                     <div class="news-title-div">

@@ -4,7 +4,7 @@ export class Noticia{
         public titulo: String,
         public resumen: String,
         public cuerpo: String,
-        public fechaPublicacion: String,
+        public fechaPublicacion: string,
         public fechaCreacion: Date,
         public fechaActualizacion: Date,
         public foto: String,
