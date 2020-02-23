@@ -25,8 +25,8 @@
                             <form [formGroup]="searchForm">
                                 <div class="input-search-publication">
                                     <mat-icon class="icon-search">search</mat-icon>
-                                    <input #titulo class="input-search" placeholder="Buscar {{tipoPublicacion.nombreTab}}"
-                                    name = "titulo" formControlName="titulo" >
+                                    <input (keyup)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" #titulo class="input-search" placeholder="Buscar {{tipoPublicacion.nombreTab}}"
+                                    name = "titulo" formControlName="titulo" autocomplete="off">
                                     <button type="submit" mat-button class="btn-green btn-green-2" 
                                     (click) = "search(titulo.value, tipoPublicacion.idTipoPublicacion)">
                                         Buscar 
@@ -81,7 +81,7 @@
                                         </div>
                                     </div>
                                     <div class="publication-rev" style="line-height: 12px;" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
-                                        DOI: <a class="publication-rev link-DOI" href="/publicacion.DOI">{{publicacion.DOI}}</a>
+                                        DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
                                     </div>
                                     <div class="flex-news publication-mt" style="flex-flow: wrap;">
                                         <div class="publication-members" *ngFor="let usuario of publicacion.usuario">

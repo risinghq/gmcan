@@ -98,7 +98,7 @@
                             </div>
                         </div>
                         <div class="publication-rev" style="line-height: 12px;" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
-                            DOI: <a class="publication-rev link-DOI" href="/publicacion.DOI">{{publicacion.DOI}}</a>
+                            DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
                         </div>
                         <div class="flex-news publication-mt" style="flex-flow: wrap;">
                             <div class="publication-members" *ngFor="let usuario of publicacion.usuario">
