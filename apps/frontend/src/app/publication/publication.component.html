@@ -1,50 +1,50 @@
 <div class="publication-div">
     <div *ngIf="!cargado">
-        <mat-spinner [color]="green"></mat-spinner>
+        <mat-spinner ></mat-spinner>
     </div>
     <div class="row" *ngIf="cargado">
         <div class="col-lg-8 col-sm-6 col-12">
                 <div class="publication-links">
-                    <a class="publication-link-active" href="/">Inicio</a>
+                    <a class="publication-link-active" href="/">{{language.home}}</a>
                     <mat-icon class="publication-icon">
                         arrow_right
                     </mat-icon>
-                    <a class="publication-link">Publicaciones</a>
+                    <a class="publication-link">{{language.publications}}</a>
                 </div>
                 <div class="card-publication">
                     <div class="card-publication-title">
-                        Nuestras Publicaciones
+                        {{language.publicationsText[0].publicationsTitle}}
                     </div>
                     <div class="card-publication-text">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elit in ridiculus aliquam risus purus, et etiam convallis lorem. 
-                        Molestie sed vel tristique viverra feugiat lacus massa neque. Aliquet feugiat faucibus tellus iaculis. Montes, turpis mattis gravida aliquet tellus phasellus. 
-                        Facilisis eu, augue condimentum sapien est arcu. Nibh at turpis egestas.
+                        {{language.publicationsText[0].publicationsText}}
                     </div>
                     <mat-tab-group (selectedTabChange)="changeTab($event)">
                         <mat-tab label="{{tipoPublicacion.nombreTab}}" *ngFor="let tipoPublicacion of tipoPublicaciones"> 
                             <form [formGroup]="searchForm">
                                 <div class="input-search-publication">
-                                    <mat-icon class="icon-search">search</mat-icon>
-                                    <input (keyup)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" #titulo class="input-search" placeholder="Buscar {{tipoPublicacion.nombreTab}}"
+                                    <input (keyup)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" #titulo class="input-search" 
+                                    placeholder="{{tipoPublicacion.search}}"
                                     name = "titulo" formControlName="titulo" autocomplete="off">
-                                    <button type="submit" mat-button class="btn-green btn-green-2" 
-                                    (click) = "search(titulo.value, tipoPublicacion.idTipoPublicacion)">
-                                        Buscar 
-                                    </button>
+                                    <mat-icon class="icon-search">search</mat-icon>
                                 </div>
                             </form>
                             <div *ngIf="!allCharged">
-                                <mat-spinner [color]="green"></mat-spinner>
+                                <mat-spinner ></mat-spinner>
                             </div>
                             <div class="not-found" *ngIf="allCharged && publicaciones.length==0">
-                                No se encontraron resultados
+                                {{language.publicationsText[0].results}}
                             </div>
                             <div *ngIf="allCharged && publicaciones.length>0">
                                 <div class="publication" *ngFor="let publicacion of publicaciones | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize; let i = index">
                                     <div class="flex-news">
-                                        <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1, 
-                                        'publication-type-2' : publicacion.tipoPublicacion_idTipoPublicacion == 2 }">
+                                        <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1,  
+                                        'publication-type-3' : publicacion.tipoPublicacion_idTipoPublicacion == 3 }"
+                                        *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 2">
                                             {{tipoPublicacion.nombre}}
+                                        </div>
+                                        <div class="publication-type publication-type-2"
+                                        *ngIf="publicacion.tipoPublicacion_idTipoPublicacion == 2">
+                                            {{publicacion.tipoTesis}}
                                         </div>
                                         <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                             {{publicacion.fecha}}
@@ -79,8 +79,16 @@
                                         <div class="publication-rev" *ngIf="publicacion.universidad!=null && publicacion.universidad!=''">
                                             {{publicacion.universidad}}
                                         </div>
+                                        <div class="publication-rev" *ngIf="publicacion.evento!=null && publicacion.evento!=''">
+                                            {{publicacion.evento}}
+                                        </div>
+                                        <div class="elipse d-none d-md-block d-lg-block d-xl-block" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
+                                        </div>
+                                        <div class="publication-rev" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
+                                            {{publicacion.ciudad}}, {{publicacion.pais}}
+                                        </div>
                                     </div>
-                                    <div class="publication-rev" style="line-height: 12px;" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
+                                    <div class="publication-rev line-1" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
                                         DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
                                     </div>
                                     <div class="flex-news publication-mt" style="flex-flow: wrap;">
@@ -98,16 +106,16 @@
                                         </div>
                                     </div>
                                     <div class="flex-news mt-16">
-                                        <a class="publication-green"> 
-                                            Vista Previa
+                                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3"> 
+                                            {{this.language.publicationsText[0].preview}}
                                         </a>
-                                        <a class="publication-green">
-                                            Descargar
+                                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3">
+                                            {{this.language.publicationsText[0].download}}
                                         </a>
                                         <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="publication-abstract" 
                                         data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
                                         aria-expanded="false" aria-controls="collapseExample">
-                                            Ver resumen
+                                            {{this.language.publicationsText[0].seeMore}}
                                         </a>
                                         <mat-icon class="publication-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
                                             keyboard_arrow_down
@@ -115,7 +123,7 @@
                                     </div>
                                     <div class="collapse collapsed-resumen" id="collapseExample{{i}}">
                                         <div class="abstract-title">
-                                            Resumen:
+                                            {{this.language.publicationsText[0].abstract}}:
                                         </div>
                                         <div class="abstract">                                        
                                             {{publicacion.resumen}}

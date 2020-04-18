@@ -10,15 +10,21 @@ import { stringify } from 'querystring';
 export class TipoMiembroService{
     public url: string;
 
-	constructor(private http: HttpClient){
-		this.url = GLOBAL.url;
-    }
+	languagelocal;
+	constructor(public http: HttpClient){
+    this.url = GLOBAL.url;
+    this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
+  }
     
-    getTipoMiembros(): any{
-        let headers = new HttpHeaders ({
+  getTipoMiembros(): any{
+    let headers = new HttpHeaders ({
 			'Content-Type':'application/json'
 		});
-        return this.http.get(this.url+'tipo-miembro/get-tipomiembro',{headers:headers});
-    }
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'tipo-miembro/get-tipomiembro',{headers:headers});
+    }else{
+      return this.http.get(this.url+'tipo-miembro/get-tipomiembro-en',{headers:headers});
+    } 
+  }
 
 }

@@ -7,16 +7,35 @@ import { DetailNewsComponent } from './detail-news/detail-news.component';
 import { PublicationComponent } from './publication/publication.component';
 import { MembersComponent } from './members/members.component';
 import { DetailMemberComponent } from './detail-member/detail-member.component';
+import { JoinUsComponent } from './join-us/join-us.component';
+import { MainNewsComponent } from './main-news/main-news.component';
+import { ProjectsComponent } from './projects/projects.component';
+import { AboutUsComponent } from './about-us/about-us.component';
+import { LinesInvestigationComponent } from './lines-investigation/lines-investigation.component';
+import { MethodComponent } from './method/method.component';
+import { FacilitiesComponent } from './facilities/facilities.component';
+import { WorksComponent } from './works/works.component';
+import { GlobalSearchComponent } from './global-search/global-search.component';
 
 
 const routes: Routes = [
   {path:"", component:HomeComponent},
   {path:"publications", component:PublicationComponent},
-  {path:"news", component:MantenimientoComponent},
+  {path:"news", component:MainNewsComponent},
   {path:"members", component:MembersComponent},
-  {path:"about-us", component:AboutComponent},
+  {path:"projects", component:ProjectsComponent},
+  {path:"about-us", component:AboutComponent, children: [
+    {path: '', component: AboutUsComponent},
+    {path: 'about', component: AboutUsComponent},
+    {path: 'lines-investigation', component: LinesInvestigationComponent},
+    {path: 'methods', component: MethodComponent},
+    {path: 'facilities-resources', component: FacilitiesComponent},
+    {path: 'works', component: WorksComponent}
+  ]},
   {path:"detail-news/:id", component:DetailNewsComponent},
   {path:"detail-member/:id", component:DetailMemberComponent},
+  {path:"search/:id", component:GlobalSearchComponent},
+  {path:"join-us", component:JoinUsComponent},
 ];
 
 @NgModule({

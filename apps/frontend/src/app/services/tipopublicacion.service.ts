@@ -10,22 +10,32 @@ import { stringify } from 'querystring';
 export class TipoPublicacionService{
     public url: string;
 
-	constructor(private http: HttpClient){
-		this.url = GLOBAL.url;
-    }
+	languagelocal;
+  constructor(public http: HttpClient){
+    this.url = GLOBAL.url;
+    this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
+  }
     
-    getTipoPublicaciones(): any{
-        let headers = new HttpHeaders ({
+  getTipoPublicaciones(): any{
+    let headers = new HttpHeaders ({
 			'Content-Type':'application/json'
 		});
-        return this.http.get(this.url+'tipo-publicacion/get-tipopublicacion',{headers:headers});
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'tipo-publicacion/get-tipopublicacion',{headers:headers});
+    }else{
+      return this.http.get(this.url+'tipo-publicacion/get-tipopublicacion-en',{headers:headers});
     }
+  }
 
-    getTipoPublicacion(idTipoPublicacion){
-      let headers = new HttpHeaders ({
-        'Content-Type':'application/json'
-      });
-          return this.http.get(this.url+'tipo-publicacion/get-tipopublicacion/'+idTipoPublicacion,{headers:headers});
+  getTipoPublicacion(idTipoPublicacion){
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json'
+    });
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'tipo-publicacion/get-tipopublicacion/'+idTipoPublicacion,{headers:headers});
+    }else{
+      return this.http.get(this.url+'tipo-publicacion/get-tipopublicacion-en/'+idTipoPublicacion,{headers:headers});
     }
+  }
 
 }

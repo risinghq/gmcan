@@ -1,0 +1,127 @@
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+    @extend .plex-sans;
+}
+
+.card-about{
+    width: inherit;
+    border-radius: 4px;
+    padding:8px;
+    background-color: #ffffff;
+}
+.about-img{
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.about-title{
+    line-height: 1.17;
+    letter-spacing: 0.3px;
+    font-weight: bold;
+    color: #000000;
+}
+.about-subtitle{
+    line-height: 1.75;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+    color: #b5b5b5;
+}
+.about-text{
+    white-space: pre-wrap;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+.about-sub-divi{
+    height: 2px;
+    width: 40px;
+    background-color: #006400;
+}
+.about-icon{
+    vertical-align: middle;
+    height: 24px;
+}
+@media(min-width:1400px){
+    .about-div{
+        padding-left: 343px !important;    
+        padding-right: 343px !important;
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+    }
+}
+@media(min-width:961px) and (max-width:1400px){
+    .about-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+}
+
+@media(min-width:961px){
+    .about-text{
+        margin-bottom: 32px;
+    }
+    .card-about{
+        padding-bottom: 40px;
+    }
+    .about-img{
+        height: 300px;
+    }
+    .about-text-div{
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-top: 32px;
+    }
+    .about-title{
+        font-size: 30px;
+    }
+    .about-subtitle{
+        font-size: 20px ;
+    }
+    .about-sub-divi{
+        margin-top: 22px;        
+        margin-bottom: 16px;
+    }
+    .about-text{
+        font-size: 15px;
+    }
+}
+
+@media(max-width:960px){
+    .about-div{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 20px;
+    }
+    .card-about{
+        padding-bottom: 20px;
+    }
+    .about-img{
+        height: 128px;
+    }
+    .about-text-div{
+        padding-left: 8px;
+        padding-right: 8px;
+        padding-top: 16px;
+    }
+    .about-title{
+        font-size: 15px;
+    }
+    .about-sub-divi{
+        margin-top: 12px;        
+        margin-bottom: 12px;
+    }
+    .about-text{
+        margin-bottom: 24px;
+    }
+    .about-text, .about-subtitle{
+        font-size: 13px;
+    }
+}

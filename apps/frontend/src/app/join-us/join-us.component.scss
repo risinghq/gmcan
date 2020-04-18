@@ -1,0 +1,251 @@
+::placeholder{
+    color: #30393a !important;
+}
+
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+}
+
+.join-div{
+    @extend .plex-sans;
+    background-color: #f8f8f8;
+}
+
+
+.join-icon{
+    vertical-align: middle;
+    height: 24px;
+}
+
+.email-div{
+    width: inherit;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.join-link{
+    font-weight: 500;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #9595b2 !important;
+}
+.join-link-active:hover{
+    text-decoration: underline;
+    color: black;
+}
+.join-link-active{
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #000000;
+    text-decoration: none;
+}
+
+.join-text{
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.back-icon{
+    margin-right: 8px;
+    width: max-content !important;
+    height: max-content !important;
+    color: #9595b2;
+}
+
+.back-text{
+    align-self: center;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #9595b2;
+}
+
+.back-div{
+    cursor: pointer;
+}
+
+.back-div:hover .back-text, .back-div:hover .back-icon{
+    color: black;
+}
+
+.input-email{
+    width: inherit;
+    outline: none;
+    border: none;
+    background-color: #f4f5f4;
+    padding: 11px 16px;
+}
+
+.email-btn{
+    border-radius: 4px;
+    border: solid 2px #000000;
+    background-color: #ffffff;
+    font-weight: 600;
+    line-height: 2;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.email-btn:disabled{
+    border: solid 2px gray;
+}
+
+.email-title{
+    font-weight: bold;
+    line-height: 1.33;
+    color: #000000;
+}
+
+.email-subtitle{
+    font-weight: 500;
+    line-height: 1.54;
+    color: #30393a;
+}
+
+form .ng-dirty.ng-invalid{
+    border: red solid 1px;
+}
+
+.error{
+    border-radius: 4px;
+    color: white;
+    background-color: rgba(160, 0, 0, 0.85);
+    padding: 8px;
+    text-align: center;
+}
+
+
+@media(min-width:1400px){
+    .join-div{
+        padding-left: 343px !important;    
+        padding-right: 343px !important;
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+    }
+    .join-links{
+        padding-bottom: 8px;
+    }
+    .join-link-active, .join-link, .back-text, .input-email, .error{
+        font-size: 15px;
+    }
+    .email-btn, .email-subtitle{
+        font-size: 20px;
+    }
+    .email-title{
+        margin-top: 24px;
+        font-size: 30px;
+        margin-bottom: 24px;
+    }
+    .email-div{
+        padding: 32px 40px;
+    }
+    .flex-email{
+        display: flex;
+        margin-bottom: 24px;
+    }
+    .mr-8{
+        margin-right: 8px;
+    }
+    .ml-8{
+        margin-left: 8px;
+    }
+    .mb-16-8{
+        margin-bottom: 16px;
+    }
+    .back-icon{
+        font-size: 20px;
+    }
+}
+
+@media(max-width:1400px){
+    .join-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+    .join-links{
+        padding-bottom: 8px;
+    }
+    .join-link-active, .join-link, .back-text, .input-email, .error{
+        font-size: 15px;
+    }
+    .email-btn, .email-subtitle{
+        font-size: 20px;
+    }
+    .email-title{
+        margin-top: 24px;
+        font-size: 30px;
+        margin-bottom: 24px;
+    }
+    .email-div{
+        padding: 32px 40px;
+    }
+    .flex-email{
+        display: flex;
+        margin-bottom: 24px;
+    }
+    .mr-8{
+        margin-right: 8px;
+    }
+    .ml-8{
+        margin-left: 8px;
+    }
+    .mb-16-8{
+        margin-bottom: 16px;
+    }
+    .back-icon{
+        font-size: 20px;
+    }
+}
+
+@media(max-width:960px){
+    .join-div{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 20px;
+    }
+    .join-links{
+        padding-bottom: 16px;
+    }
+    .join-link-active, .join-link, .back-text, .email-btn, .email-subtitle,
+    .input-email, .error{
+        font-size: 13px;
+    }
+
+    .email-title{
+        margin-top: 16px;
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+    .email-div{
+        padding: 16px;
+    }
+    .flex-email{
+        display: block;
+        margin-bottom: 16px;
+    }
+    .mr-8, .ml-8{
+        margin-right: unset;
+        margin-left: unset;
+    }
+    .mb-16-8{
+        margin-bottom: 8px;
+    }
+    .mb-8{
+        margin-bottom: 8px;
+    }
+    .back-icon{
+        font-size: 16px;
+    }
+}

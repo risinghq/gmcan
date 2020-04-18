@@ -10,8 +10,10 @@ import { stringify } from 'querystring';
 export class UsuarioService{
     public url: string;
 
-	constructor(private http: HttpClient){
-		this.url = GLOBAL.url;
+	languagelocal;
+	constructor(public http: HttpClient){
+    this.url = GLOBAL.url;
+    this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
   }
     
   getUsuario(): any{
@@ -25,14 +27,22 @@ export class UsuarioService{
     let headers = new HttpHeaders ({
       'Content-Type':'application/json'
     });
-    return this.http.get(this.url+'usuario/get-usuario/'+idUsuario,{headers:headers});
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'usuario/get-usuario/'+idUsuario,{headers:headers});
+    }else{
+      return this.http.get(this.url+'usuario/get-usuario-en/'+idUsuario,{headers:headers});
+    } 
   }
 
   getUsuarios():any{
     let headers = new HttpHeaders ({
       'Content-Type':'application/json'
     });
-    return this.http.get(this.url+'usuario/get-usuario',{headers:headers});
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'usuario/get-usuario',{headers:headers});
+    }else{
+      return this.http.get(this.url+'usuario/get-usuario-en',{headers:headers});
+    } 
   }
 
 }

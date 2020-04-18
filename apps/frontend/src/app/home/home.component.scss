@@ -1,217 +1,422 @@
-.card-img-div, .card-img-div-2{
-    object-fit: cover;
-    width: 100% ;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
 }
-@media(min-width:840px){
-    .white-back{
-        height: 382px !important;
-    }
-    .btn-green{
-        width: unset !important;
-        font-size: 15px !important;
-    }
-    .preview{
-        font-size: 15px !important;
-    }
-    .home-div{
-        margin-top: -304px !important;
-        padding-left: 88px !important;
-        padding-right: 88px !important;
-    }
-    .grupo-header{
-        font-size: 40px !important;
-        margin-bottom: 32px !important;
-    }
-    .card-text, .text-other{
-        font-size: 15px !important;
-    }
-    .card-text-div{
-        padding-left: 48px !important;
-        padding-right: 40px !important;
-        padding-top: 16px !important;
-        padding-bottom: 24px !important;
-    }
-    .card-text-div-2{
-        padding-left: 48px !important;
-        padding-right: 40px !important;
-        padding-top: 34px !important;
-        padding-bottom: 32px !important;
-    }
-    .card-img-div {
-        height: 272px !important;
-    }
-    .card-img-div-2{
-        height: 258px !important;
-    }
-    .card-text-question{
-        font-size: 20px !important;
-    }
-    .header-text1, .header-text2{
-        font-size: 40px !important;
-    }
-    .header-text2{
-        margin-top: -12px !important;
-    }
-    .other-news-date{
-        font-size: 12px !important;
-    }
-    .card-div{
-        margin-bottom: 32px !important;
-    }
-    .carousel{
-        margin-bottom: 24px !important;
-        margin-left: -4px !important;
-        margin-right: -4px !important;
-    }
-    .carousel-card{
-        padding: 24px 32px 16px 32px !important;
-    }
-    .carousel-card-title{
-        font-size: 20px !important;
-    }
-    .carousel-card-authors{
-        font-size: 15px !important;
-    }
-    .input-search-div{
-        padding: 11px 16px 11px 16px !important;
-    }
-    .input-search{
-        font-size: 18px !important;
-        width: 82% !important;
-    }
-    .carousel-control-next, .carousel-control-prev{
-        width: 20px !important;
-        height: 20px !important;
-    }
-    .fecha, .share, .card-text-question-2{
-        font-size: 14px !important;
-    }
 
-    .share-icon{
-        height: 16px !important;
+.plex-sans{
+    font-family: 'IBM Plex Sans', serif;
+}
+
+.home-div{
+    @extend .plex-sans;
+}
+
+.box{
+    color: #e8e8e8;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+    background-color: rgba(48, 57, 58, 0.6);
+    text-align: center;
+}
+
+.primer-box{
+    background-size: cover;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 100, 0, 0.3)), url("../../assets/img/graphene.jpg");
+}
+
+.counter{
+    font-weight: bold;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+}
+
+.counter-text{
+    margin-left: 8px;
+    font-weight: bold;
+    line-height: 0.9;
+    letter-spacing: 0.3px;
+    color: #f5f5f5;
+}
+
+.description-info{
+    text-align: center;
+    color: #ffffff;
+    font-weight: bold;
+    line-height: 1.17;
+    letter-spacing: 0.3px;
+    color: #ffffff;
+}
+
+.white-btn{
+    border-radius: 4px;
+    border: solid 2px #ffffff;
+    color: #ffffff;
+    background-color: unset;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.3px;
+}
+
+.know-more{
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #ffffff;   
+}
+
+.linea-title{
+    margin: 16px 0px;
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.line-img-div{
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    margin: auto;
+    overflow: hidden;
+}
+
+.line-img{
+    width: inherit;
+    height: inherit;
+}
+
+.linea-text{
+    margin-bottom: 16px;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.linea-text-green{
+    width: max-content;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: var(--deep-green);
+    margin-top: 16px;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.grey-title{
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: 0.3px;  
+    color: #939393;
+}
+
+.black-title{
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.news-date, .other-news-date{
+    margin-left: auto;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+.news-type, .other-news-type{
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: var(--deep-green);
+}
+
+.main-news-title, .other-news-title{
+    font-weight: bold;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.main-news-res{
+    font-size: 20px;
+    line-height: 1.1;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+.news-author{
+    line-height: 2.67;
+    letter-spacing: 0.3px;
+    color: #939393;
+}
+
+.news-box{
+    border-bottom: 1px solid #b5b5b5;
+}
+
+.services-card{
+    text-align: center;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.btn-black{
+    height: max-content;
+    background-color: unset;
+    border-radius: 4px;
+    border: solid 2px #000000;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.align-center{
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.mt-services{
+    font-weight: 300;
+    line-height: 1.17;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+.main-news-title:hover, .other-news-title:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+@media(min-width:961px){
+    .box{
+        width: 284px;
+        padding: 20px 64px;
     }
-    .down-icon{
-        width: 28px !important;
+    .numbers-div{
+        justify-content: space-between;
+        display: flex;
+        margin-bottom: 39px;
     }
-    .border-mid{
-        margin-top: 10px !important;
+    .counter{
+        font-size: 40px;
     }
-    .other-news{
-        padding-top: 20px !important;
+    .counter-text, .white-btn, .linea-title{
+        font-size: 20px;
     }
-    .other-news-text{
-        font-size: 15px !important;
+    .description-info{
+        padding-top: 60px;
+        padding-bottom: 32px;
+        font-size: 30px;
+        padding-left: 112px;
+        padding-right: 112px;
     }
-    .other-news-ending{
-        padding-bottom: 32px !important;
+    .white-btn{
+        padding: 12px 24px;
+        margin-bottom: 32px;
+    }
+    .primer-box{
+        padding-bottom: 120px !important;
+    }
+    .segundo-box{
+        padding-top: unset !important;
+    }
+    .lines-investigation{
+        margin-bottom: 48px;
+        margin-top: -82px;
+    }
+    .line-card{
+        padding: 32px 32px 16px 32px;
+        margin-bottom: 32px;
+        height: 332px;
+    }
+    .linea-text, .linea-text-green, .news-date,
+    .news-type, .news-author, .other-news-date,
+    .other-news-type, .btn-black{
+        font-size: 15px;
+    }
+    .other-news-title{
+        font-size: 20px;
+    }
+    .grey-title{
+        font-size: 25px;
+        margin-bottom: 16px;
+    }
+    .black-title{
+        font-size: 50px;
+        margin-bottom: 48px;
+    }
+    .mt-mb-flex{
+        margin-bottom: 16px;
+    }
+    .main-news-title{
+        font-size: 30px;
+        margin-bottom: 16px;
+    }
+    .mt-main{
+        margin-top: 24px;
+    }
+    .mt-other{
+        margin-top: 16px;
+    }
+    .mb-other{
+        margin-bottom: 32px;
+    }
+    .services-card{
+        padding: 40px 172px 32px 172px;
+    }
+    .mt-services{
+        font-size: 30px;
+        margin-top: 56px;
+    }
+    .services-icon{
+        height: 84px;
+    }
+    .btn-black{
+        margin-left: 24px;
+        margin-top: 12px;
+        padding: 8px;
+    }
+    .main-img-news{
+        height: 321px;
+    }
+    .other-img-news{
+        height: 160px;
+    }
+}
+
+@media(max-width:960px){
+    .box{        
+        padding-top: 2px;
+        padding-bottom: 2px;
+    }
+    .segundo-box{
         padding-top: 24px !important;
     }
-}
-
-.active{
-    font-weight: normal;
-    color: unset;
-    border-bottom: unset;
-}
-
-@media(min-width:100px){
-    .white-back{
-        height: 181px;
-    }
     .home-div{
-        margin-top: -144px;
-        padding-left: 24px;
-        padding-right: 24px;
-    }
-    .preview, .text-other{
-        font-size: 10px;
-    }
-    .grupo-header{
-        font-size: 15px;
-        margin-bottom: 12px;
-    }
-    .card-text{
-        font-size: 10px;
-    }
-    .card-text-div{
-        padding-left: 24px;
-        padding-right: 24px;
-        padding-top: 16px;
-        padding-bottom: 16px;
-    }
-    .card-text-div-2{
-        padding-left: 24px;
-        padding-right: 24px;
-        padding-top: 24px;
-        padding-bottom: 24px;
-    }
-    .card-img-div, .card-img-div-2{
-        height: 140px;
-    }
-    .card-text-question{
-        font-size: 12px;
-    }
-    .btn-green{
-        width: 100%;
-        font-size: 10px;
-    }
-    .header-text1, .header-text2{
-        font-size: 15px;
-    }
-    .header-text2{
-        margin-top: -4px !important;
-    }
-    .card-div{
-        margin-bottom: 16px;
-    }
-    .carousel{
-        margin-bottom: 16px;
-        margin-left: -16px;
-        margin-right: -16px;
-    }
-    .carousel-control-next, .carousel-control-prev{
-        width: 16px;
-        height: 16px;
-    }
-    .carousel-card{
-        padding: 16px 16px 9px 16px;
-    }
-    .carousel-card-title{
-        font-size: 12px;
-    }
-    .carousel-card-authors{
-        font-size: 10px;
-    }
-    .input-search-div{
-        padding: 8px 16px 8px 16px !important;
-    }
-    .input-search{
-        font-size: 10px;
-        width: 54%;
-    }
-    .fecha, .share, .card-text-question-2 ,.other-news-text, .other-news-date{
-        font-size: 10px;
-    }
-    .share-icon{
-        height: 10px;
-    }
-    .down-icon{
-        width: 20px;
-    }
-    .border-mid{
-        margin-top: 7px;
-    }
-    .other-news{
+        padding-left: 20px;
+        padding-right: 20px;
         padding-top: 12px;
+        padding-bottom: 20px;
     }
-    .other-news-ending{
+    .numbers-div{
+        display: block;
+        justify-content: 8px;
+    }
+    .mb-box-8{
+        margin-bottom: 8px;
+    }
+    .counter{
+        font-size: 20px;
+    }
+    .counter-text, .description-info, .white-btn, .linea-text,
+    .linea-text-green, .news-date, .news-type, .news-author,
+    .other-news-date, .other-news-type, .btn-black, .mt-services{
+        font-size: 13px;
+    }
+    .description-info{
+        padding-top: 32px;
         padding-bottom: 16px;
-        padding-top: 16px;
+    }
+    .white-btn{
+        padding: 9px;
+        width: 100%;
+        margin-bottom: 16px;
+    }
+    .lines-investigation{
+        margin-bottom: 32px;
+    }
+    .linea-title, .other-news-title{
+        font-size: 15px;
+    }
+    .line-card{
+        padding: 24px 24px 16px 24px;
+        margin-bottom: 16px;
+    }
+    .grey-title{
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+    .black-title{
+        font-size: 20px;
+        margin-bottom: 24px;
+    }
+    .services-card{
+        padding: 24px 16px 16px 16px;
+    }
+    .mt-services, .mt-main{
+        margin-top: 16px;
+    }
+    .services-icon{
+        height: 24px;
+    }
+    .btn-black{
+        width: 100%;
+        padding: 9px;
+        margin-bottom: 24px;
+    }
+    .main-img-news{
+        height: 159px;
+    }
+    .news-box{
+        margin-bottom: 16px;
+    }
+    .other-img-news{
+        height: 60px;
+        width: 60px;
+        margin-left: 16px;
     }
 }
 
-::ng-deep .mat-form-field-underline{
-    display: none !important;
+@media (min-width:961px) and (max-width:1400px){
+    .home-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
 }
+
+@media(min-width:1400px){
+    .home-div{
+        padding-left: 343px;    
+        padding-right: 343px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+}
+
+/*zoom-effect*/
+.main-img-news{
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.other-img-news{
+    border-radius: 4px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.img-hover-zoom, .img-hover-zoom-2 {
+    overflow: hidden; /* [1.2] Hide the overflowing of child elements */
+  }
+  
+  /* [2] Transition property for smooth transformation of images */
+  .img-hover-zoom img {
+    transition: transform .5s ease;
+  }
+
+  .img-hover-zoom-2 img{
+    transition: transform .5s ease;
+  }
+  
+  /* [3] Finally, transforming the image when container gets hovered */
+  .img-hover-zoom:hover img {
+    transform: scale(1.2);
+  }
+  .img-hover-zoom-2:hover img {
+    transform: scale(1.05);
+  }

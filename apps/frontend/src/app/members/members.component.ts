@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Location } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
 import { UsuarioFull } from '../models/usuarioFull';
@@ -14,23 +14,25 @@ import { GLOBAL } from '../services/global';
   styleUrls: ['./members.component.scss']
 })
 export class MembersComponent implements OnInit {
-  private cargado;
-  private usuarios: Array<UsuarioFull>;
-  private usuariosNoActivos: Array<UsuarioFull>;
-  private tipoMiembros: Array<TipoMiembro>;
-  private url;
+  public cargado;
+  public usuarios: Array<UsuarioFull>;
+  public usuariosNoActivos: Array<UsuarioFull>;
+  public tipoMiembros: Array<TipoMiembro>;
+  public url;
+  language;
   constructor(
-    private _route: ActivatedRoute,
-    private _router: Router,
-    private _usuarioService: UsuarioService,
-    private _prefijoService: PrefijoService,
-    private _tipoMiembroService: TipoMiembroService,
-    private location: Location,
+    public _route: ActivatedRoute,
+    public _router: Router,
+    public _usuarioService: UsuarioService,
+    public _prefijoService: PrefijoService,
+    public _tipoMiembroService: TipoMiembroService,
+    public location: Location,
   ) {
     this.url=GLOBAL.url;
   }
 
   ngOnInit() {
+    this.language=JSON.parse(localStorage.getItem("language"));
     this.usuariosNoActivos=[];
     this.cargado=true;
     this.getTipoMiembros();

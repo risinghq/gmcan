@@ -1,7 +1,12 @@
-import {Component} from '@angular/core';
+import {Component,Renderer2, HostListener} from '@angular/core';
 import { GrupoService } from './services/grupo.service';
 import { GLOBAL } from './services/global';
 import { Grupo } from './models/grupo';
+import { Languages } from '../app/models/languages'
+import { SessionService } from './services/session.service';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { SearchService } from './services/search.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -10,31 +15,93 @@ import { Grupo } from './models/grupo';
 })
 export class AppComponent {
   screenWidth: number;
-  private grupoinfo:Grupo;
-  private url;
+  public  grupoinfo:Grupo;
+  public  url;
+  enteredButton = false;
+  isMatMenuOpen = false;
+  prevButtonTrigger;
+  language;
+  public searchGlobalForm:FormGroup;
   constructor(
-    private _grupoService: GrupoService,
+    public _route: ActivatedRoute,
+    public _router: Router,
+    private ren: Renderer2,
+    public  _grupoService: GrupoService,
+    private session: SessionService,
+    public fb:FormBuilder,    
   ) {
+    this.searchGlobalForm = this.fb.group({
+      nombre: ['']
+    });
+    this.language = Languages[this.lanSelected];
+    if(JSON.parse(localStorage.getItem("lanId"))){
+      this.language = Languages[JSON.parse(localStorage.getItem("lanId"))];
+      this.lanSelected= JSON.parse(localStorage.getItem("lanId"));
+    }
     this.url=GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
-    window.onresize = () => {
-      // set screenWidth on screen size change
-      this.screenWidth = window.innerWidth;
-    };
+    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','',null,null)
+  }
 
-    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','',null,null)
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.screenWidth = window.innerWidth;
   }
 
   ngOnInit(){
     this.getGrupoInfo();
+    localStorage.setItem("language", JSON.stringify(this.language));
+    this.verifyLocale(JSON.parse(localStorage.getItem("language")));
+  }
+
+  lanSelected=0;
+
+  verifyLocale(language){
+    if(language.locale=="en"){
+      this.english()
+    }else{
+      this.spanish()
+    }
+  }
+
+  english() {
+    this.session.registerCulture('en-en');
+  }
+
+  spanish() {
+    this.session.registerCulture('es-es');
+  }
+
+  lanSelect(number){
+    this.lanSelected=number;
+    this.verifyLocale(this.language);
+    localStorage.setItem("language", JSON.stringify(this.language));
+    localStorage.setItem("lanId",JSON.stringify(number));
+    window.location.reload();
   }
 
   getGrupoInfo(){
     this._grupoService.getGrupoInfo().subscribe((res)=>{
       this.grupoinfo=res[0];
+      localStorage.setItem("grupoInfo",JSON.stringify(this.grupoinfo));
       this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
     });
+  }
+  inputExpand=false;
+  expandInput(){
+    this.inputExpand=!this.inputExpand;
+    if(this.inputExpand){
+      document.getElementById("inputExpand").setAttribute("class", "search-top-input search-top-input-decompressed");
+    }else{
+      document.getElementById("inputExpand").setAttribute("class", "search-top-input search-top-input-compressed");
+    }
+  }
+
+  /* globalSearch */
+
+  searchGlobal(value){
+    this._router.navigate(['/search/'+value]);
   }
 
 }

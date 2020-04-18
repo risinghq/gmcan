@@ -7,6 +7,7 @@ import { TipoNoticia } from '../models/tiponoticia';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
+import { UsuarioService } from '../services/usuario.service';
 
 @Component({
   selector: 'app-news',
@@ -15,20 +16,21 @@ import { TitleCasePipe } from '@angular/common';
 })
 export class NewsComponent implements OnInit {
 
-  private noticias: Array<Noticia>;
-  private noticiaPrincipal: Noticia;
-  private tiponoticias: Array<TipoNoticia>
+  public noticias: Array<Noticia>;
+  public noticiaPrincipal: Noticia;
+  public tiponoticias: Array<TipoNoticia>
   
   constructor(
-    private titlecasePipe:TitleCasePipe,
-    private datePipe: DatePipe,
-    private _noticiaService: NoticiaService,
-    private _route: ActivatedRoute,
-    private _tiponoticiaService: TipoNoticiaService,
-    private location: Location,
-    private _router: Router,
+    public titlecasePipe:TitleCasePipe,
+    public datePipe: DatePipe,
+    public _noticiaService: NoticiaService,
+    public _route: ActivatedRoute,
+    public _tiponoticiaService: TipoNoticiaService,
+    public location: Location,
+    public _router: Router,
+    public _usuarioService: UsuarioService,
   ) { 
-    this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','',null,'');
+    this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','',null,'',null);
     this.noticias=[];
   }
   numberShown;
@@ -40,13 +42,11 @@ export class NewsComponent implements OnInit {
       this.numberShown=5;
     }
   }
-  private title;
-  private idNoticiaE;
+  public title;
+  public idNoticiaE;
+  language;
   ngOnInit() {
-    this.title="Noticias";
-    if(this.location.path().slice(1,12)==="detail-news"){
-      this.title="Más Noticias";
-    }
+    this.language=JSON.parse(localStorage.getItem("language"));
     if(window.innerWidth>=1300){
       this.numberShown=10;
     }else{
@@ -56,6 +56,12 @@ export class NewsComponent implements OnInit {
     this._route.params.forEach((params:Params)=>{
       this.idNoticiaE = params['id'];
     });
+  }
+  ngDoCheck(){
+    this.title=this.language.news;
+    if(this.location.path().slice(1,12)==="detail-news"){
+      this.title=this.language.moreNews;
+    }
   }
   getNoticia(){
     this._noticiaService.getNoticias().subscribe((res)=>{
@@ -73,9 +79,11 @@ export class NewsComponent implements OnInit {
           }
           this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMMM dd, y", "es");
           this.noticias[index].fechaPublicacion=this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
+          this.getUsuario(this.noticias[index].autorPublicacion, index);
         }
         this.noticiaPrincipal=this.noticias[0];
         this.noticias.splice(0,1);
+        this.getUser(this.noticiaPrincipal.autorPublicacion);
       }
     });
   }
@@ -83,6 +91,25 @@ export class NewsComponent implements OnInit {
     this._tiponoticiaService.getTipoNoticia().subscribe((res)=>{
       this.tiponoticias=res;
       this.getNoticia();
+    });
+  }
+
+  getUsuario(idUser, i){
+    this._usuarioService.getUser(idUser).subscribe((res)=>{
+      if(res[0]!=undefined){
+        if(this.noticias[i]!=undefined){
+          this.noticias[i].autor=res[0].nombre+" "+res[0].apellidoPaterno;
+        }
+      }
+    });
+  }
+  getUser(idUser){
+    this._usuarioService.getUser(idUser).subscribe((res)=>{
+      if(res[0]!=undefined){
+        if(this.noticiaPrincipal!=undefined){
+          this.noticiaPrincipal.autor=res[0].nombre+" "+res[0].apellidoPaterno;
+        }
+      }
     });
   }
 

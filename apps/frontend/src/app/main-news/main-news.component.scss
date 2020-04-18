@@ -1,0 +1,335 @@
+::placeholder{
+    color: #30393a !important;
+}
+
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+}
+
+.main-news-div{
+    @extend .plex-sans;
+    background-color: #f8f8f8;
+}
+
+
+.main-news-icon{
+    vertical-align: middle;
+    height: 24px;
+}
+
+.news-list-div{
+    width: inherit;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.main-news-link{
+    font-weight: 500;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #9595b2 !important;
+}
+.main-news-link-active:hover{
+    text-decoration: underline;
+    color: black;
+}
+.main-news-link-active{
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #000000;
+    text-decoration: none;
+}
+
+.main-news-title{
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 1.17;
+    color: #000000;
+}
+
+.news-date{
+    color: #939393;
+}
+.news:hover .news-text-2:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.news-img{
+    object-fit: cover;
+    border-radius: 4px;
+}
+.news-text{
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.news-text-2{
+    cursor: pointer;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    @extend .plex-sans;
+    font-weight: 500;
+    line-height: 1.29;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.news-abstract{
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+.news-author{    
+    color: #939393;
+}
+
+.news-text-div{
+    width: 100%;
+}
+
+.img-div-zoom{
+    min-width: 132px;
+}
+
+/*zoom-effect*/
+.img-hover-zoom, .img-hover-zoom-2 {
+    overflow: hidden; /* [1.2] Hide the overflowing of child elements */
+  }
+  
+  /* [2] Transition property for smooth transformation of images */
+  .img-hover-zoom img {
+    transition: transform .5s ease;
+  }
+
+  .img-hover-zoom-2 img{
+    transition: transform .5s ease;
+  }
+  
+  /* [3] Finally, transforming the image when container gets hovered */
+  .img-hover-zoom:hover img {
+    transform: scale(1.2);
+  }
+  .img-hover-zoom-2:hover img {
+    transform: scale(1.05);
+  }
+
+@media(min-width:1400px){
+    .main-news-div{
+        padding-left: 343px !important;    
+        padding-right: 343px !important;
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+    }
+}
+
+@media(max-width:1400px){
+    .main-news-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+}
+
+.news{
+    border-bottom: 1px #e5e5e5 solid;
+}
+
+/*Categorias list*/
+
+.category-title{
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    color: #000000;
+    margin-bottom: 16px;
+}
+
+.category{
+    border-top: solid 1px #d7d7e1;
+    padding: 17px;
+    border-bottom: solid 1px #d7d7e1;    
+    font-weight: 500;
+    line-height: 1.33;
+    color: #30393a;
+}
+
+.category:hover{
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.active{
+    @extend .category;
+    background-color: rgba(48, 57, 58, 0.05);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+@media(min-width:961px){
+    .main-news-links{
+        padding-bottom: 8px;
+    }
+    .main-news-link-active, .main-news-link, .news-abstract, .news-date, .category{
+        font-size: 15px;
+    }
+    .news-list-div{
+        padding: 40px 40px 32px 40px;
+    }
+    .main-news-title{
+        font-size: 30px;
+    }
+    .news{
+        padding-top: 16px !important;
+        padding-bottom: 16px !important;
+    }
+    .news-img{
+        width: 132px !important;
+        height: 116px;
+    }
+    .news-text{
+        font-size: 18px !important;
+    }
+    .news-text-2{
+        font-size: 20px !important;
+    }
+    .news-ending{
+        padding-bottom: 32px !important;
+        padding-top: 24px !important;
+    }
+    ::ng-deep .pagination{
+        justify-content: right;
+        justify-content: flex-end;
+    }
+    .news-author{
+        margin-top: 20px;
+        font-size: 15px;
+    }
+    .news-abstract{
+        margin-top: 8px;
+    }
+    .category-title{
+        margin-top: 24px;
+        font-size: 25px;
+    }
+    .news-type {
+        font-size: 15px !important;
+    }
+}
+
+@media(max-width:960px){
+    .main-news-div{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 20px;
+    }
+    .main-news-links{
+        padding-bottom: 16px;
+    }
+    .main-news-link-active, .main-news-link, .back-text,.news-abstract, .news-date{
+        font-size: 13px;
+    }
+    .news-list-div{
+        padding: 24px 16px;
+    }
+    .main-news-title,.news-text-2{
+        font-size: 15px;
+    }
+    .news-text{
+        font-size: 14px;
+    }
+    .news{
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }
+    .news-img{
+        width: 100%;
+        height: 104px;
+        margin-bottom: 16px;
+    }
+    .news-ending{
+        padding-bottom: 16px;
+        padding-top: 16px;
+    }
+    .flex-news{
+        display: block;
+    }
+    .pl-24{
+        padding: unset !important;
+    }
+    ::ng-deep .pagination{
+        justify-content: center;
+    }
+    .news-author{
+        margin-top: 16px;
+        font-size: 13px;
+    }
+    .news-abstract{
+        margin-top: 16px;
+    }
+}
+
+.right{
+    margin-top: -8px;
+    margin-left: auto;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    color: #000000;
+    padding: unset;
+}
+
+/*Paginator CSS*/
+::ng-deep .pagination{
+    margin-top: 22px;
+}
+::ng-deep .page-item{
+    height: max-content;
+    border-radius: 2px;
+    margin-left: 8px;
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    border: solid 1px #e5e5e5;
+    background-color: #ffffff;
+    color: #b5b5b5;
+}
+::ng-deep .page-link{
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    color: #b5b5b5;
+    font-size: 20px;
+    line-height: 1.6;
+    padding-left: unset !important;
+    padding-bottom: unset !important;
+    padding-top: unset !important;
+    padding-right: unset !important;
+    height: 35px;    
+    width: 35px;
+    text-align: center;
+}
+.pag-arrow{
+    color: #b5b5b5;
+    font-size: 32px;
+    height: inherit;
+    width: inherit;
+}
+::ng-deep .page-item.active .page-link{
+    color: #ffffff !important;
+    background-color: #000000 !important;
+    border: solid 1px #e5e5e5 !important;
+}
+
+::ng-deep .page-link:hover {
+    color: black !important;
+}

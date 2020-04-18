@@ -15,24 +15,27 @@ import { TitleCasePipe } from '@angular/common';
   styleUrls: ['./detail-news.component.scss']
 })
 export class DetailNewsComponent implements OnInit {
-  private noticia: Noticia;
-  private previouspage;
-  private previouslink;
-  private usuario: Usuario;
+  public noticia: Noticia;
+  public previouspage;
+  public previouslink;
+  public usuario: Usuario;
   constructor(
-    private titlecasePipe:TitleCasePipe,
-    private datePipe:DatePipe,
-    private _noticiaService: NoticiaService,
-    private _tipoNoticiaService: TipoNoticiaService,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    private _previousService: PreviousPageService,
-    private _usuarioService: UsuarioService,
+    public titlecasePipe:TitleCasePipe,
+    public datePipe:DatePipe,
+    public _noticiaService: NoticiaService,
+    public _tipoNoticiaService: TipoNoticiaService,
+    public _route: ActivatedRoute,
+    public _router: Router,
+    public _previousService: PreviousPageService,
+    public _usuarioService: UsuarioService,
   ) {
-    this.noticia = new Noticia(null,'','','','',null,null,'','',null,'');
+    this.noticia = new Noticia(null,'','','','',null,null,'','',null,'',null);
     this.usuario = new Usuario('','','','','','');
    }
+
+  language;
   ngOnInit() {
+    this.language=JSON.parse(localStorage.getItem("language"));
     this.cargado=false;
     this.getNoticia();
     this.previouslink=sessionStorage.getItem("previous-page");
@@ -43,8 +46,8 @@ export class DetailNewsComponent implements OnInit {
   anio;
   datere:Date;
   cargado;
-  private fbicon="../../assets/img/Facebook.svg";
-  private twitter="../../assets/img/twitter.svg";
+  public fbicon="../../assets/img/Facebook.svg";
+  public twitter="../../assets/img/twitter.svg";
   mouseEnter(int){
     switch (int) {
       case 1:
@@ -79,11 +82,13 @@ export class DetailNewsComponent implements OnInit {
         this.getTipoNoticia(this.noticia.tipoNoticia_idtipoNoticia);
         this.getUsuario(this.noticia.autorPublicacion);
       });
+      this.cargado=true;
     });    
   }
 
   getTipoNoticia(idTipoNoticia){
     this._tipoNoticiaService.getTipoNews(idTipoNoticia).subscribe((res)=>{
+      console.log(res);
       this.noticia.nombreTipoNoticia=res[0].nombre;
     });
   }
@@ -91,7 +96,6 @@ export class DetailNewsComponent implements OnInit {
   getUsuario(idUsuario){
     this._usuarioService.getUser(idUsuario).subscribe((res)=>{
       this.usuario=res[0];
-      this.cargado=true;
     });
   }
 

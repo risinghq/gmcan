@@ -1,0 +1,371 @@
+::placeholder{
+    color: #30393a !important;
+}
+
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+}
+
+.project-div{
+    @extend .plex-sans;
+    background-color: #f8f8f8;
+}
+
+.project-icon{
+    vertical-align: middle;
+    height: 24px;
+}
+
+.project-card-div{
+    width: inherit;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.project-link{
+    font-weight: 500;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #9595b2 !important;
+}
+.project-link-active:hover{
+    text-decoration: underline;
+    color: black;
+}
+.project-link-active{
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.54;
+    letter-spacing: 0.3px;
+    color: #000000;
+    text-decoration: none;
+}
+
+.project-header{
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 1.17;
+    color: #000000;
+}
+
+.project-subtext{
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.abstract{
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.resp-title{
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.abstract-title{
+    font-weight: normal;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.project-abstract{
+    margin-left: auto;
+    @extend .plex-sans;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+@media(min-width:1400px){
+    .project-div{
+        padding-left: 343px !important;    
+        padding-right: 343px !important;
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+    }
+}
+
+@media(max-width:1400px){
+    .project-div{
+        padding-left: 68px;
+        padding-right: 68px;
+        padding-top: 24px;
+        padding-bottom: 40px;
+    }
+}
+
+@media(min-width:961px){
+    .project-links{
+        padding-bottom: 8px;
+    }
+    ::placeholder, .project-link-active, .project-link, .project-subtext, .abstract-title,
+    .abstract, .project-abstract, .member-name, .resp-title{
+        font-size: 15px;
+    }
+    .project-card-div{
+        padding: 40px 40px 32px 40px;
+    }
+    .project-header{
+        margin-bottom: 24px;
+        font-size: 30px;
+    }
+    ::ng-deep .pagination{
+        justify-content: right;
+        justify-content: flex-end;
+    }
+    .project-subtext{
+        margin-bottom: 24px;
+    }
+}
+
+@media(max-width:960px){
+    .project-card-div{
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 20px;
+    }
+    .project-links{
+        padding-bottom: 16px;
+    }
+    ::placeholder,.project-link-active, .project-link, .project-subtext, .abstract-title,
+    .abstract,.project-abstract, .member-name, .resp-title{
+        font-size: 13px;
+    }
+    .project-div{
+        padding: 24px 16px;
+    }
+    .project-header,.news-text-2{
+        font-size: 15px;
+    }
+    .project-header{
+        margin-bottom: 16px;
+    }
+    ::ng-deep .pagination{
+        justify-content: center;
+    }
+    .project-subtext{
+        margin-bottom: 16px;
+    }
+}
+
+/*Paginator CSS*/
+::ng-deep .pagination{
+    margin-top: 22px;
+}
+::ng-deep .page-item{
+    height: max-content;
+    border-radius: 2px;
+    margin-left: 8px;
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    border: solid 1px #e5e5e5;
+    background-color: #ffffff;
+    color: #b5b5b5;
+}
+::ng-deep .page-link{
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    color: #b5b5b5;
+    font-size: 20px;
+    line-height: 1.6;
+    padding-left: unset !important;
+    padding-bottom: unset !important;
+    padding-top: unset !important;
+    padding-right: unset !important;
+    height: 35px;    
+    width: 35px;
+    text-align: center;
+}
+.pag-arrow{
+    color: #b5b5b5;
+    font-size: 32px;
+    height: inherit;
+    width: inherit;
+}
+::ng-deep .page-item.active .page-link{
+    color: #ffffff !important;
+    background-color: #000000 !important;
+    border: solid 1px #e5e5e5 !important;
+}
+
+::ng-deep .page-link:hover {
+    color: black !important;
+}
+
+/* tabs de publicacion */
+::ng-deep .mat-tab-label{
+    width: 100% !important;
+    height: 32px !important;
+}
+
+::ng-deep .mat-ink-bar{
+    background-color: #000000 !important;
+}
+
+::ng-deep .mat-tab-body-content{
+    overflow: hidden !important;
+}
+
+::ng-deep .mat-tab-label-active .-label-content, ::ng-deep .mat-tab-label-active{
+    color: black;
+    opacity: 1 !important;
+}
+
+/*Buscador CSS*/
+.input-search-project{
+    vertical-align: middle;
+    padding: 4px 24px 4px 12px;
+    border-radius: 4px;
+    border: solid 1px #e8e8e8;
+    background-color: #f5f5f5;
+    margin: 2px;
+    display: flex;
+}
+.input-search{
+    background-color: inherit;
+    @extend .plex-sans;
+    flex-grow: 200;
+    width: 17px;
+}
+.btn-green{
+    @extend .plex-sans;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25) !important;
+    flex-grow: 1;
+}
+::placeholder {
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    color: #9595b2;
+}
+
+/*Project CSS*/
+
+/* Publication CSS */
+
+.project{
+    padding-top: 16px;
+    padding-bottom: 20px;
+    border-bottom: solid 2px #d7d7e1;;
+}
+
+.project-code{
+    border-radius: 4px;
+    width: max-content;
+    padding: 6px 8px;
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #939393;
+    background-color: #e8e8e8;
+}
+.project-mt{
+    margin-top: 8px;
+}
+.project-title{
+    @extend .plex-sans;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+.project-date{
+    margin-top: auto;
+    margin-bottom: auto;
+    @extend .plex-sans;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #939393;
+}
+.project-rev{
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    color: #939393;
+}
+
+.line-1{
+    line-height: 1;
+}
+.elipse{
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 10px;
+    width: 4px;
+    height: 4px;
+    background-color: #c4c4c4;
+}
+
+
+.member-img-round{
+    overflow: hidden;
+    width: 20px;
+    height: 20px;
+    border-radius: 40.5px;
+    background-color: #c4c4c4
+}
+.member-img{
+    vertical-align: unset;
+    background-color: #c4c4c4;
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+}
+
+.project-members{
+    display: flex;
+}
+
+.member-name:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}
+.member-name{
+    margin-left: 8px;
+    margin-right: 8px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+.project-authors{
+    margin-left: 4px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+/*Rotate CSS*/
+.project-abs-icon{
+    height: auto;
+    width: auto;
+    font-size: 20px;
+    vertical-align: middle;
+    -webkit-transition: -webkit-transform .8s ease-in-out;
+    -ms-transition: -ms-transform .8s ease-in-out;
+    transition: transform .8s ease-in-out;  
+}
+
+.abs-active {
+    transform:rotate(180deg);
+    -ms-transform:rotate(180deg);
+    -webkit-transform:rotate(180deg);
+}
+.abs-not-active {
+    transform:rotate(0deg);
+    -ms-transform:rotate(0deg);
+    -webkit-transform:rotate(0deg);
+}

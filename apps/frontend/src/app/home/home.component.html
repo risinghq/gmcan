@@ -1,93 +1,138 @@
-<div class="white-back">
-</div>
-<div class="home-div">
-    <div class="row">
-        <div class="col-12 col-md-8 col-lg-8">
-            <div class="grupo-header">
-                <div class="header-text1">
-                    {{info.nombreGrupo}}
-                </div>
-                <div class="header-text2">
-                    {{info.nombreGrupo2}}
-                </div>
-            </div>
-            <div class="card-div">
-                <img class="card-img-div" src="../../assets/img/grupal.jpg" alt="nada">
-                <div class="card-text-div">
-                    <div class="card-text-question">
-                        ¿Quiénes somos?
-                    </div>
-                    <div class="card-text">
-                        {{info.quienesSomosResumen}}
-                    </div>
-                    <div class="text-right">
-                        <button mat-button class="btn-green">
-                            Conócenos
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-div ">
-                <div class="card-text-div-2">
-                    <div class="card-text-question">
-                        Revisa nuestras últimas publicaciones científicas
-                    </div>
-                    <div class="card-text">
-                        Los miembros del GMCAN cuentan con más de x publicaciones entre papers y tesis. 
-                    </div>
-                    <div id="carouselExampleControls" data-interval="false" class="carousel slide" data-ride="carousel">
-                        <div class="carousel-inner">
-                            <div class="carousel-item" *ngFor="let publicacion of publicaciones; let k = index" [ngClass]="k == 0 ? 'item active' : 'item'">
-                                <div class="carousel-card">
-                                    <div class="carousel-card-title">
-                                        {{publicacion.titulo}}
-                                    </div>
-                                    <div class="carousel-card-authors">
-                                        {{publicacion.autores}}
-                                    </div>
-                                    <div class="carousel-card-btn">
-                                        <div class="center preview-parent">
-                                            <div class="preview-div">
-                                                <a class="green-text preview">
-                                                    Vista previa
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <button mat-button class="btn-green">
-                                            Descargar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-                            <mat-icon class="center-vertical">
-                                keyboard_arrow_left
-                            </mat-icon>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-                            <mat-icon class="center-vertical">
-                                keyboard_arrow_right
-                            </mat-icon>
-                        <span class="sr-only">Next</span>
-                        </a>
-                    </div>
-                    <div class="card-text">
-                        También puedes buscar las publicaciones del GMCAN por título o autor:
-                    </div>
-                    <div class="input-search-div full-width">
-                        <mat-icon class="icon-search">search</mat-icon>
-                        <input class="input-search" placeholder="Buscar publicaciones">
-                        <button mat-button class="btn-green btn-green-2">
-                            Buscar
-                        </button>
-                    </div>
-                </div>
-            </div>
+<div class="home-div primer-box">
+    <div class="center">
+        <div class="description-info">
+            {{info.quienesSomosResumen}}
         </div>
-        <div class="col-12 col-md-4 col-lg-4">
-            <app-news></app-news>
+        <button mat-flat-button class="white-btn" (click)="navigate('/about-us/about')">Conócenos</button>
+    </div>
+    <div class="numbers-div">
+        <div class="box mb-box-8">
+            <span class="counter" id="users">{{usuarios.length}}</span>
+            <span class="counter-text">{{language.members}}</span>
+        </div>
+        <div class="box mb-box-8">
+            <span class="counter" id="articulos">{{articulos}}</span>
+            <span class="counter-text">{{language.articles}}</span>
+        </div>
+        <div class="box mb-box-8">
+            <span class="counter" id="tesis">{{tesis}}</span>
+            <span class="counter-text">{{language.thesis}}</span>
+        </div>
+        <div class="box">
+            <span class="counter" id="resumenes">{{resumenes}}</span>
+            <span class="counter-text">{{language.resumenes}}</span>
         </div>
     </div>
+    <div class="center know-more" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
+        {{language.knowAbout}} <span style="text-decoration: underline;" (click)="navigate('/about-us/lines-investigation')">{{language.linesminus}}</span>
+    </div>
+</div>
+<div class="home-div segundo-box">
+    <div class="grey-title" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
+        {{language.knowAbout}}
+    </div>
+    <div class="black-title"[ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
+        {{language.linesminus}}
+    </div>
+    <div class="row lines-investigation">
+        <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let linea of lineasInvestigacion">
+            <mat-card class="line-card center">
+                <div class="line-img-div">
+                    <img class="line-img" src="../../assets/img/prop_estruc.jpg">
+                </div>
+                <div style="margin-bottom: 8px; height: 201px; overflow:hidden">
+                    <div class="linea-title">
+                        {{linea.nombre}}
+                    </div>
+                    <div class="linea-text">
+                        {{linea.descripcion}}
+                    </div>
+                </div>
+                <a class="linea-text-green" href="/about-us/lines-investigation">
+                    {{language.seeMore}}
+                </a>
+            </mat-card>
+        </div>
+    </div>
+    <div class="grey-title">
+        {{language.knowAbout}}
+    </div>
+    <div class="flex-news">
+        <div class="black-title">
+            {{language.newsminus}}
+        </div>
+        <button mat-flat-button class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/news')">
+            {{language.seeNews}}
+        </button>
+    </div>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="news-box">
+                <div class="img-hover-zoom">
+                    <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada">
+                </div>
+                <div class="news-div mt-main">
+                    <div class="flex-news mt-mb-flex">
+                        <div class="news-type">
+                            {{noticiaPrincipal.nombreTipoNoticia}}
+                        </div>
+                        <div class="news-date">
+                            {{noticiaPrincipal.fechaPublicacion}}
+                        </div>
+                    </div>
+                    <div class="main-news-title" (click)="detalleNoticia(noticiaPrincipal)">
+                        {{noticiaPrincipal.titulo}}
+                    </div>
+                    <div class="main-news-res" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
+                        {{noticiaPrincipal.resumen}}
+                    </div>
+                    <div class="news-author">
+                        {{language.newsText[0].by}} {{noticiaPrincipal.autor}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="news-box mb-other" *ngFor="let noticia of noticias | slice:1:3; let i=index">
+                <div class="img-hover-zoom" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
+                    <img class="other-img-news" src="../../assets/img/grupal.jpg" alt="nada">
+                </div>
+                <div class="flex-news">
+                    <div class="news-div mt-other">
+                        <div class="flex-news mt-mb-flex">
+                            <div class="other-news-type">
+                                {{noticia.nombreTipoNoticia}}
+                            </div>
+                            <div class="other-news-date">
+                                {{noticia.fechaPublicacion}}
+                            </div>
+                        </div>
+                        <div class="other-news-title" (click)="detalleNoticia(noticiaPrincipal)">
+                            {{noticia.titulo}}
+                        </div>
+                        <div class="news-author">
+                            {{language.newsText[0].by}} {{noticia.autor}}
+                        </div>
+                    </div>
+                    <div class="img-hover-zoom" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
+                        <img class="other-img-news" src="../../assets/img/grupal.jpg" alt="nada">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button mat-flat-button class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/news')"> 
+        {{language.seeNews}}
+    </button>
+    <div class="services-card">
+        <img class="services-icon" src="../../assets/img/bulb.svg">
+        <div class="mt-services" id="services"></div>
+        <button mat-flat-button class="btn-black align-center" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}"
+        (click)="navigate('/about-us/about')">
+            {{language.knowMore}}
+        </button>
+    </div>
+    <button mat-flat-button class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/about-us/about')">
+        {{language.knowMore}}
+    </button>
 </div>

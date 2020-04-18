@@ -21,5 +21,12 @@ export class Publicacion{
         public universidad: String,
         public autor: Array<Autor>,
         public usuario: Array<Usuario>,
+        public ciudad_idCiudad: Number,
+        public ciudad: String,
+        public pais: String,
+        public evento_idEvento: Number,
+        public evento:String,
+        public tipoTesis_idTipoTesis: Number,
+        public tipoTesis: String,
     ){}
 }

@@ -10,7 +10,7 @@ import { stringify } from 'querystring';
 export class RevistaService{
     public url: string;
 
-	constructor(private http: HttpClient){
+	constructor(public http: HttpClient){
 		this.url = GLOBAL.url;
     }
     

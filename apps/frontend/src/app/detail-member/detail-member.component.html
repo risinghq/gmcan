@@ -1,11 +1,11 @@
 <div class="member-detail-div">
     <div *ngIf="!cargado">
-        <mat-spinner [color]="green"></mat-spinner>
+        <mat-spinner ></mat-spinner>
     </div>
     <div class="row" *ngIf="cargado">
         <div class="col-lg-8 col-sm-6 col-12">
             <div class="member-detail-links">
-                <a class="member-detail-link-active" href="/">Inicio</a>
+                <a class="member-detail-link-active" href="/">{{language.home}}</a>
                 <mat-icon class="member-detail-icon">
                     arrow_right
                 </mat-icon>
@@ -23,7 +23,7 @@
                         arrow_back
                     </mat-icon>
                     <div class="back-text">
-                        Volver
+                        {{language.detailMemberText[0].back}}
                     </div>                    
                 </div>
                 <div class="flex-detail member-title-div">
@@ -54,14 +54,19 @@
                     {{usuario.resumenPro}}
                 </div>
                 <div class="member-publications" *ngIf="publicaciones.length>0">
-                    Publicaciones
+                    {{language.detailMemberText[0].publications}}
                 </div>
                 <div *ngIf="publicaciones.length>0">
                     <div class="publication" *ngFor="let publicacion of publicaciones | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize; let i = index">
                         <div class="flex-news">
-                            <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1, 
-                            'publication-type-2' : publicacion.tipoPublicacion_idTipoPublicacion == 2 }">
+                            <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1,  
+                            'publication-type-3' : publicacion.tipoPublicacion_idTipoPublicacion == 3 }"
+                            *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 2">
                                 {{publicacion.tipoPublicacion}}
+                            </div>
+                            <div class="publication-type publication-type-2"
+                            *ngIf="publicacion.tipoPublicacion_idTipoPublicacion == 2">
+                                {{publicacion.tipoTesis}}
                             </div>
                             <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                 {{publicacion.fecha}}
@@ -96,6 +101,14 @@
                             <div class="publication-rev" *ngIf="publicacion.universidad!=null && publicacion.universidad!=''">
                                 {{publicacion.universidad}}
                             </div>
+                            <div class="publication-rev" *ngIf="publicacion.evento!=null && publicacion.evento!=''">
+                                {{publicacion.evento}}
+                            </div>
+                            <div class="elipse d-none d-md-block d-lg-block d-xl-block" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
+                            </div>
+                            <div class="publication-rev" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
+                                {{publicacion.ciudad}}, {{publicacion.pais}}
+                            </div>
                         </div>
                         <div class="publication-rev" style="line-height: 12px;" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
                             DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
@@ -105,7 +118,7 @@
                                 <div class="member-img-round">
                                     <img class="member-img" src="../../assets/img/user.png">
                                 </div>
-                                <div class="member-name">
+                                <div class="member-name" (click)="profile(usuario)">
                                     {{usuario.nombreCompleto}}
                                 </div>
                             </div>
@@ -115,15 +128,15 @@
                         </div>
                         <div class="flex-news mt-16">
                             <a class="publication-green"> 
-                                Vista Previa
+                                {{language.detailMemberText[0].preview}}
                             </a>
                             <a class="publication-green">
-                                Descargar
+                                {{language.detailMemberText[0].download}}
                             </a>
                             <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="publication-abstract" 
                             data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
                             aria-expanded="false" aria-controls="collapseExample">
-                                Ver resumen
+                                {{language.detailMemberText[0].seeMore}}
                             </a>
                             <mat-icon class="publication-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
                                 keyboard_arrow_down
@@ -131,7 +144,7 @@
                         </div>
                         <div class="collapse collapsed-resumen" id="collapseExample{{i}}">
                             <div class="abstract-title">
-                                Resumen:
+                                {{language.detailMemberText[0].abstract}}:
                             </div>
                             <div class="abstract">                                        
                                 {{publicacion.resumen}}

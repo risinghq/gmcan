@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
 import { PreviousPageService } from '../services/previouspage.service';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { TipoPublicacionService } from '../services/tipopublicacion.service';
@@ -19,6 +19,11 @@ import { SearchService } from '../services/search.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { GLOBAL } from '../services/global';
+import { CiudadService } from '../services/ciudad.service';
+import { PaisService } from '../services/pais.service';
+import { EventoService } from '../services/evento.service';
+import { identifierModuleUrl } from '@angular/compiler';
+import { TipoTesisService } from '../services/tipotesis.service';
 
 @Component({
   selector: 'app-publication',
@@ -26,35 +31,39 @@ import { GLOBAL } from '../services/global';
   styleUrls: ['./publication.component.scss']
 })
 export class PublicationComponent implements OnInit {
-  private previouslink;
-  private previouspage;
-  private tipoPublicaciones: Array<TipoPublicacion>;
-  private publicaciones: Array<Publicacion>;
-  private autores: Array<Autor>;
-  private usuarios: Array<Usuario>;
-  private cargado;
-  private allCharged;
-  private searchForm:FormGroup;
-  private publicacionSearch: Array<Publicacion>;
-  private tipoPublicacion;
-  private url;
+  public previouslink;
+  public previouspage;
+  public tipoPublicaciones: Array<TipoPublicacion>;
+  public publicaciones: Array<Publicacion>;
+  public autores: Array<Autor>;
+  public usuarios: Array<Usuario>;
+  public cargado;
+  public allCharged;
+  public searchForm:FormGroup;
+  public publicacionSearch: Array<Publicacion>;
+  public tipoPublicacion;
+  public url;
   constructor(
-    private fb:FormBuilder,
-    private titlecasePipe:TitleCasePipe,
-    private datePipe: DatePipe,
-    private _previousService: PreviousPageService,
-    private _tipoPublicacionService: TipoPublicacionService,
-    private _publicacionService: PublicacionService,
-    private _revistaService: RevistaService,
-    private _autorService: AutorService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _usuarioService: UsuarioService,
-    private _universidadService: UniversidadService,
-    private _searchService: SearchService,
-    private location: Location,
-    private _route: ActivatedRoute,
-    private _router: Router,
+    public fb:FormBuilder,
+    public titlecasePipe:TitleCasePipe,
+    public datePipe: DatePipe,
+    public _previousService: PreviousPageService,
+    public _tipoPublicacionService: TipoPublicacionService,
+    public _publicacionService: PublicacionService,
+    public _revistaService: RevistaService,
+    public _autorService: AutorService,
+    public _publicacionhasautorService: PublicacionHasAutorService,
+    public _publicacionhasusuarioService: PublicacionHasUsuarioService,
+    public _usuarioService: UsuarioService,
+    public _universidadService: UniversidadService,
+    public _searchService: SearchService,
+    public _ciudadService: CiudadService,
+    public _paisService: PaisService,
+    public _eventoService: EventoService,
+    public _tipotesisService: TipoTesisService,
+    public location: Location,
+    public _route: ActivatedRoute,
+    public _router: Router,
   ) { 
     this.tipoPublicaciones=[];
     this.autores=[];
@@ -64,24 +73,36 @@ export class PublicationComponent implements OnInit {
     });
     this.url=GLOBAL.url;
   }
+  language;
   selectedItem;
   oldValue;
   listClick(event, newValue) {
     this.oldValue=this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract"+newValue).innerText="Ocultar resumen";
+    document.getElementById("abstract"+newValue).innerText=this.language.publicationsText[0].seeLess;
     if(this.selectedItem==this.oldValue){
       this.selectedItem=-1;
-      document.getElementById("abstract"+this.oldValue).innerText="Ver resumen";
+      document.getElementById("abstract"+this.oldValue).innerText=this.language.publicationsText[0].seeMore;
     }
   }
   page;
   pageSize;
   ngOnInit() {
+    this.language=JSON.parse(localStorage.getItem("language"));
     this.allCharged=false;
     this.previouslink=sessionStorage.getItem("previous-page");
     this.previouspage=this._previousService.getPreviousPage(this.previouslink);
     this.getTipoPublicacion();
+  }
+  ngDoCheck(){
+    if(this.tipoPublicaciones && this.tipoPublicaciones[0]){
+      this.tipoPublicaciones[0].nombreTab=this.language.publicationsText[0].nameTab1;
+      this.tipoPublicaciones[1].nombreTab=this.language.publicationsText[0].nameTab2;
+      this.tipoPublicaciones[2].nombreTab=this.language.publicationsText[0].nameTab3;
+      this.tipoPublicaciones[0].search=this.language.publicationsText[0].search1;
+      this.tipoPublicaciones[1].search=this.language.publicationsText[0].search2;
+      this.tipoPublicaciones[2].search=this.language.publicationsText[0].search3;
+    }
   }
 
   scroll() {
@@ -93,8 +114,6 @@ export class PublicationComponent implements OnInit {
     this._tipoPublicacionService.getTipoPublicaciones().subscribe((res)=>{
       if(res){
         this.tipoPublicaciones=res;
-        this.tipoPublicaciones[0].nombreTab="Artículos";
-        this.tipoPublicaciones[1].nombreTab="Tesis";
         this.getPublicaciones(this.tipoPublicaciones[0].idTipoPublicacion);
         this.cargado=true;
       }
@@ -128,20 +147,24 @@ export class PublicationComponent implements OnInit {
     this._usuarioService.getUser(idUser).subscribe((res)=>{
       if(res[0]!=undefined){
         res[0].nombre=res[0].nombre.slice(0,1)+".";
-        if(this.publicaciones[i].usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
-          this.publicaciones[i].usuario.push(res[0]);
+        if(this.publicaciones[i]!=undefined){
+          if(this.publicaciones[i].usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
+            this.publicaciones[i].usuario.push(res[0]);
+          }
+          this.fillName(this.publicaciones[i]);
         }
-        this.fillName(this.publicaciones[i]);
       }
     });
   }
 
   getAutores(idAutor, i){
     this._autorService.getAuthor(idAutor).subscribe((res)=>{
-      if(this.publicaciones[i].autor.findIndex(x => x.idAutor === res[0].idAutor)==-1){
-          this.publicaciones[i].autor.push(res[0]);
+      if(this.publicaciones[i]!=undefined){
+        if(this.publicaciones[i].autor.findIndex(x => x.idAutor === res[0].idAutor)==-1){
+            this.publicaciones[i].autor.push(res[0]);
+        }
+        this.fillAuthName(this.publicaciones[i]);
       }
-      this.fillAuthName(this.publicaciones[i]);
     });
   }
   
@@ -157,6 +180,31 @@ export class PublicationComponent implements OnInit {
     this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe((res)=>{
       for (let index = 0; index < res.length; index++) {
         this.getUsuario(res[index].usuario_DNI, i);
+      }
+    });
+  }
+
+  getCiudad(idCiudad, publicacion){
+    this._ciudadService.getCiudad(idCiudad).subscribe((res)=>{
+      if(res.length>0){
+        publicacion.ciudad=res[0].nombre;
+        this.getPais(res[0].pais_idPais,publicacion);
+      }
+    });
+  }
+
+  getPais(idPais, publicacion){
+    this._paisService.getPais(idPais).subscribe((res)=>{
+      if(res.length>0){
+        publicacion.pais=res[0].nombre;
+      }
+    });
+  }
+
+  getEvento(idEvento, publicacion){
+    this._eventoService.getEvento(idEvento).subscribe((res)=>{
+      if(res.length>0){
+        publicacion.evento=res[0].nombre;
       }
     });
   }
@@ -193,6 +241,18 @@ export class PublicationComponent implements OnInit {
     });
   }
 
+  getTipoTesis(publicacion){
+    this._tipotesisService.getTiposTesis().subscribe((res)=>{
+      if(res.length>0){
+        for (let index = 0; index < res.length; index++) {
+          if(publicacion.tipoTesis_idTipoTesis == res[index].idTipoTesis){
+            publicacion.tipoTesis=res[index].nombre;
+          }
+        }
+      }
+    });
+  }
+
   fillPublicacion(publicacion, index){
       publicacion.usuario=[];
       publicacion.autor=[];
@@ -202,6 +262,9 @@ export class PublicationComponent implements OnInit {
       this.getRevista(publicacion);
       this.getPublicacionHasAutor(publicacion.idPublicacion, index);
       this.getPublicacionHasUsuario(publicacion.idPublicacion, index);
+      this.getCiudad(publicacion.ciudad_idCiudad, publicacion);
+      this.getEvento(publicacion.evento_idEvento, publicacion);
+      this.getTipoTesis(publicacion);
   }
 
   fillName(obj){
@@ -226,13 +289,14 @@ export class PublicationComponent implements OnInit {
 
   /* Request Publicaciones at Tab Change */
   changeTab($event){
+    this.publicaciones=[];
     this.getPublicaciones(this.tipoPublicaciones[$event.index].idTipoPublicacion);
     this.searchForm.controls.titulo.setValue("");
   }
 
   /* Share Hover */
-  private fbicon="../../assets/img/Facebook.svg";
-  private twitter="../../assets/img/twitter.svg";
+  public fbicon="../../assets/img/Facebook.svg";
+  public twitter="../../assets/img/twitter.svg";
   mouseEnter(int, index){
     let element: any;
     switch (int) {
@@ -273,18 +337,29 @@ export class PublicationComponent implements OnInit {
   search(value, id){
     this.publicaciones=[];
     this.allCharged=false;
-    this.searchPublicaciones(value,id);
-    this.allCharged=true;
+    if(value!=""){
+      this.searchPublicaciones(value,id);
+    }else{
+      this.getPublicaciones(id);
+    }
   }
 
   searchPublicaciones(titulo,id){
     this.tipoPublicacion=id;
     this._searchService.searchPublicaciones(titulo,id).subscribe((res)=>{
-      this.publicacionSearch=[];
+      this.publicacionSearch=[]
       if(res.length>0){
         this.publicacionSearch=res;
       }
       this.searchAutores(titulo);
+      if(id===3){
+        this.searchEventos(titulo,id);
+        this.searchPaises(titulo,id);
+      }
+      if(id===2){
+        this.searchTipoTesis(titulo, id);
+      }
+      this.allCharged=true;
     });
   }
   searchAutores(nombre){
@@ -328,6 +403,96 @@ export class PublicationComponent implements OnInit {
       }
     });
   }
+  searchEventos(nombre,tipoPublicacion){
+    this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res)=>{
+      if(res.length>0){
+        let publicacionesFound=res;
+        this._searchService.searchEventos(nombre).subscribe((res)=>{
+          if(res.length>0){
+            for (let index = 0; index < res.length; index++) {
+              let valor=publicacionesFound.findIndex(x => x.evento_idEvento === res[index].idEvento);
+              if(valor!=-1){
+                this.getPublicacion(publicacionesFound[valor].idPublicacion);
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  paisesEncontrados;
+
+  searchPaises(nombre,tipoPublicacion){
+    this._searchService.searchPaises(nombre).subscribe((res)=>{
+      if(res.length>0){
+        this.paisesEncontrados=res;
+        for (let index = 0; index < this.paisesEncontrados.length; index++) {
+          this.getCiudades(this.paisesEncontrados[index].idPais, tipoPublicacion);
+        }
+      }
+      this.searchCiudades(nombre,tipoPublicacion);
+    });
+  }
+
+  searchCiudades(nombre,tipoPublicacion){
+    this._searchService.searchCiudades(nombre).subscribe((res)=>{
+      if(res.length>0){
+        let ciudades=res;
+        this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res)=>{
+          if(res.length>0){
+            let publicacionesFound=res;
+            for (let index = 0; index < ciudades.length; index++) {
+              let valor=publicacionesFound.findIndex(x => x.ciudad_idCiudad === ciudades[index].idCiudad);
+              if(valor!=-1){
+                this.getPublicacion(publicacionesFound[valor].idPublicacion);
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  searchTipoTesis(nombre, tipoPublicacion){
+    this._searchService.searchTipoTesis(nombre).subscribe((res)=>{
+      if(res.length>0){
+        let tipoTesis=res;
+        this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res)=>{
+          if(res.length>0){
+            let publicacionesFound=res;
+            for (let index = 0; index < publicacionesFound.length; index++) {
+              for (let j = 0; j < tipoTesis.length; j++) {
+                if(tipoTesis[j].idTipoTesis===publicacionesFound[index].tipoTesis_idTipoTesis){
+                  this.getPublicacion(publicacionesFound[index].idPublicacion);
+                }
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  getCiudades(idPais, tipoPublicacion){
+    this._ciudadService.getCiudades(idPais).subscribe((res)=>{
+      if(res.length>0){
+        let ciudades=res;
+        this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res)=>{
+          if(res.length>0){
+            let publicacionesFound=res;
+            for (let index = 0; index < ciudades.length; index++) {
+              let valor=publicacionesFound.findIndex(x => x.ciudad_idCiudad === ciudades[index].idCiudad);
+              if(valor!=-1){
+                this.getPublicacion(publicacionesFound[valor].idPublicacion);
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
   /* Fin de busqueda */
 
   profile(user){

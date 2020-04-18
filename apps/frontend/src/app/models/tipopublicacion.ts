@@ -5,5 +5,6 @@ export class TipoPublicacion{
         public nombreTab: String,
         public fechaActualizacion: Date,
         public fechaCreacion: Date,
+        public search:String
     ){}
 }

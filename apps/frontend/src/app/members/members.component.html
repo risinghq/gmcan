@@ -1,25 +1,25 @@
 <div class="member-div">
     <div *ngIf="!cargado">
-        <mat-spinner [color]="green"></mat-spinner>
+        <mat-spinner ></mat-spinner>
     </div>
     <div class="row" *ngIf="cargado">
         <div class="col-lg-8 col-sm-6 col-12">
             <div class="member-links">
-                <a class="member-link-active" href="/">Inicio</a>
+                <a class="member-link-active" href="/">{{language.home}}</a>
                 <mat-icon class="member-icon">
                     arrow_right
                 </mat-icon>
-                <a class="member-link">Miembros</a>
+                <a class="member-link">{{language.members}}</a>
             </div>
             <div class="member-card">
                 <div class="member-title">
-                    Nuestros Miembros
+                    {{language.membersText[0].memberTitle}}
                 </div>
                 <div class="member-sub">
-                    Conoce a las increíbles personas que hacen grande al grupo.
+                    {{language.membersText[0].memberText}}
                 </div>
                 <mat-tab-group>
-                    <mat-tab label="Miembros actuales">
+                    <mat-tab label="{{language.membersText[0].memberActual}}">
                         <div class="members-container">
                             <div class="member-type-container" *ngFor="let tipoMiembro of tipoMiembros">
                                 <div class="member-type-title">
@@ -42,7 +42,7 @@
                                                     {{miembro.correo}}
                                                 </div>
                                                 <div class="member-profile" (click)="profile(miembro)">
-                                                    Ver Perfil
+                                                    {{language.membersText[0].seeProfile}}
                                                     <mat-icon class="profile-icon">
                                                         keyboard_arrow_right
                                                     </mat-icon>
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </mat-tab>
-                    <mat-tab label="Antiguos Miembros">
+                    <mat-tab label="{{language.membersText[0].memberOld}}">
                         <div class="row member-type-container">
                             <div class="col-12 col-sm-6" *ngFor="let usuario of usuariosNoActivos">
                                 <div class="flex-news member-mt">
@@ -72,7 +72,7 @@
                                             {{usuario.correo}}
                                         </div>
                                         <div class="member-profile" (click)="profile(usuario)">
-                                            Ver Perfil
+                                            {{language.membersText[0].seeProfile}}
                                             <mat-icon class="profile-icon">
                                                 keyboard_arrow_right
                                             </mat-icon>

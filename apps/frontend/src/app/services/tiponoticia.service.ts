@@ -10,22 +10,32 @@ import { stringify } from 'querystring';
 export class TipoNoticiaService{
     public url: string;
 
-	constructor(private http: HttpClient){
-		this.url = GLOBAL.url;
-    }
+	languagelocal;
+  constructor(public http: HttpClient){
+    this.url = GLOBAL.url;
+    this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
+  }
     
-    getTipoNoticia(): any{
-        let headers = new HttpHeaders ({
-			'Content-Type':'application/json'
+  getTipoNoticia(): any{
+    let headers = new HttpHeaders ({
+	  	'Content-Type':'application/json'
 		});
-        return this.http.get(this.url+'tipo-noticia/get-tiponoticia',{headers:headers});
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'tipo-noticia/get-tiponoticia',{headers:headers});
+    }else{
+      return this.http.get(this.url+'tipo-noticia/get-tiponoticia-en',{headers:headers});
     }
+  }
 
-    getTipoNews(idTipoNoticia){
-      let headers = new HttpHeaders ({
-        'Content-Type':'application/json'
-      });
-          return this.http.get(this.url+'tipo-noticia/get-tiponoticia/'+idTipoNoticia,{headers:headers});
+  getTipoNews(idTipoNoticia){
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json'
+    });
+    if(this.languagelocal=="es"){
+      return this.http.get(this.url+'tipo-noticia/get-tiponoticia/'+idTipoNoticia,{headers:headers});
+    }else{
+      return this.http.get(this.url+'tipo-noticia/get-tiponoticia-en/'+idTipoNoticia,{headers:headers});
     }
+  }
 
 }

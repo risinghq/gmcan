@@ -1,11 +1,11 @@
 <div class="detail-div">
     <div *ngIf="!cargado">
-        <mat-spinner [color]="green"></mat-spinner>
+        <mat-spinner ></mat-spinner>
     </div>
     <div class="row" *ngIf="cargado">
         <div class="col-lg-8 col-sm-6 col-12">
                 <div class="detail-links">
-                    <a class="detail-link-active" href="/">Inicio</a>
+                    <a class="detail-link-active" href="/">{{language.home}}</a>
                     <mat-icon class="detail-icon">
                         arrow_right
                     </mat-icon>
@@ -13,7 +13,7 @@
                     <mat-icon class="detail-icon">
                         arrow_right
                     </mat-icon>
-                    <a class="detail-link">Detalle de Noticia</a>
+                    <a class="detail-link">{{language.detailNews}}</a>
                 </div>
                 <div class="card-detail">
                     <div class="news-title-div">
@@ -23,10 +23,10 @@
                         </div>
                     </div>
                     <div class="detail-text-div">
+                        <div class="news-abstract">
+                            {{noticia.resumen}}
+                        </div>
                         <div class="flex-news other-div">
-                            <div class="news-type d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                                {{noticia.nombreTipoNoticia}}
-                            </div>
                             <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                 <div class="flex-news">
                                     <img class="share-icon" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
@@ -39,14 +39,14 @@
                                 <img class="autor-img" src="../../assets/img/images.png">
                             </div>
                             <div class="autor-text">
-                                <div class="news-type d-none d-md-block d-lg-block d-xl-block">
+                                <div class="news-type">
                                     {{noticia.nombreTipoNoticia}}
                                 </div>
                                 <div class="autor-name">
-                                    {{usuario.nombre}}
+                                    {{usuario.nombre}} {{usuario.apellidoPaterno}} {{usuario.apellidoMaterno}}
                                 </div>
                                 <div class="news-date">
-                                    Escrito el {{dia}} de {{mes}} del {{anio}}
+                                    {{language.detailNewsText[0].written1}} {{dia}} {{language.detailNewsText[0].written2}} {{mes}} {{language.detailNewsText[0].written3}} {{anio}}
                                 </div>
                             </div>
                             <div class="share-div d-none d-md-block d-lg-block d-xl-block">

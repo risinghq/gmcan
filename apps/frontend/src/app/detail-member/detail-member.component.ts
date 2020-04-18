@@ -18,6 +18,11 @@ import { TipoPublicacionService } from '../services/tipopublicacion.service';
 import { TipoPublicacion } from '../models/tipopublicacion';
 import { timeout } from 'rxjs/operators';
 import { GLOBAL } from '../services/global';
+import { CiudadService } from '../services/ciudad.service';
+import { PaisService } from '../services/pais.service';
+import { EventoService } from '../services/evento.service';
+import { Location } from '@angular/common';
+import { TipoTesisService } from '../services/tipotesis.service';
 
 @Component({
   selector: 'app-detail-member',
@@ -25,36 +30,45 @@ import { GLOBAL } from '../services/global';
   styleUrls: ['./detail-member.component.scss']
 })
 export class DetailMemberComponent implements OnInit {
-  private usuario: UsuarioFull;
-  private publicaciones: Array<Publicacion>;
-  private tipoPublicaciones: Array<TipoPublicacion>;
-  private cargado;
-  private previouspage;
-  private previouslink;
-  private url;
+  public usuario: UsuarioFull;
+  public publicaciones: Array<Publicacion>;
+  public tipoPublicaciones: Array<TipoPublicacion>;
+  public cargado;
+  public previouspage;
+  public previouslink;
+  public url;
   page;
   pageSize;
   constructor(
-    private _route: ActivatedRoute,
-    private _router: Router,
-    private titlecasePipe:TitleCasePipe,
-    private datePipe: DatePipe,
-    private _usuarioService: UsuarioService,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _publicacionService: PublicacionService,
-    private _revistaService: RevistaService,
-    private _autorService: AutorService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
-    private _universidadService: UniversidadService,
-    private _previousService: PreviousPageService,
-    private _prefijoService: PrefijoService,
-    private _tipoMiembroService: TipoMiembroService,
-    private _tipoPublicacionService: TipoPublicacionService,
+    public _route: ActivatedRoute,
+    public _router: Router,
+    public titlecasePipe:TitleCasePipe,
+    public datePipe: DatePipe,
+    public _usuarioService: UsuarioService,
+    public _publicacionhasusuarioService: PublicacionHasUsuarioService,
+    public _publicacionService: PublicacionService,
+    public _revistaService: RevistaService,
+    public _autorService: AutorService,
+    public _publicacionhasautorService: PublicacionHasAutorService,
+    public _universidadService: UniversidadService,
+    public _previousService: PreviousPageService,
+    public _prefijoService: PrefijoService,
+    public _tipoMiembroService: TipoMiembroService,
+    public _tipoPublicacionService: TipoPublicacionService,
+    public _tipotesisService: TipoTesisService,
+    public _ciudadService: CiudadService,
+    public _paisService: PaisService,
+    public _eventoService: EventoService,
+    public location: Location,
   ) { 
     this.url=GLOBAL.url;
+    this.usuario=new UsuarioFull('','','','','','','',null,'','',null,null,null,null,'',null,'',null);
   }
 
+  language;
+
   ngOnInit() {
+    this.language=JSON.parse(localStorage.getItem("language"));
     this.getTipoPublicacion();
     this.previouslink=sessionStorage.getItem("previous-page");
     this.previouspage=this._previousService.getPreviousPage(this.previouslink);
@@ -66,10 +80,10 @@ export class DetailMemberComponent implements OnInit {
   listClick(event, newValue) {
     this.oldValue=this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract"+newValue).innerText="Ocultar resumen";
+    document.getElementById("abstract"+newValue).innerText=this.language.detailMemberText[0].seeLess;
     if(this.selectedItem==this.oldValue){
       this.selectedItem=-1;
-      document.getElementById("abstract"+this.oldValue).innerText="Ver resumen";
+      document.getElementById("abstract"+this.oldValue).innerText=this.language.detailMemberText[0].seeMore;
     }
   }
 
@@ -79,8 +93,8 @@ export class DetailMemberComponent implements OnInit {
   }
 
   /* Share Hover */
-  private fbicon="../../assets/img/Facebook.svg";
-  private twitter="../../assets/img/twitter.svg";
+  public fbicon="../../assets/img/Facebook.svg";
+  public twitter="../../assets/img/twitter.svg";
   mouseEnter(int, index){
     let element: any;
     switch (int) {
@@ -125,15 +139,14 @@ export class DetailMemberComponent implements OnInit {
         if(res){
           this.usuario=res[0];
           if (this.usuario.estado===1) {
-            this.usuario.active="Miembro activo";
+            this.usuario.active=this.language.detailMemberText[0].activeMember;
           }else{
-            this.usuario.active="Antiguo miembro";
+            this.usuario.active=this.language.detailMemberText[0].oldMember;
           }
           this.usuario.foto=this.url+'usuario/get-image-usuario/'+this.usuario.foto;
           this.searchPublicacionHasUsuario(this.usuario.DNI);
           this.getPrefijos();
           this.getTipoMiembros();
-          this.cargado=true;
         }
       });
     });    
@@ -152,10 +165,12 @@ export class DetailMemberComponent implements OnInit {
 
   getTipoPublicacion(){
     this._tipoPublicacionService.getTipoPublicaciones().subscribe((res)=>{
+      this.tipoPublicaciones=[];
       if(res){
         this.tipoPublicaciones=res;
         this.searchUsuario();
       }
+      this.cargado=true;
     });
   }
 
@@ -164,10 +179,25 @@ export class DetailMemberComponent implements OnInit {
       if(res.length>0){
         this.publicaciones.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         for (let index = 0; index < res.length; index++) {
-          this.publicaciones.push(res[index]);
+          if(this.publicaciones.findIndex(x => x.idPublicacion === res[index].idPublicacion)===-1){
+            this.publicaciones.push(res[index]);
+          }
         }
         for (let index = 0; index < this.publicaciones.length; index++) {
           this.fillPublicacion(this.publicaciones[index],index);
+        }
+        this.cargado=true;
+      }
+    });
+  }
+
+  getTipoTesis(publicacion){
+    this._tipotesisService.getTiposTesis().subscribe((res)=>{
+      if(res.length>0){
+        for (let index = 0; index < res.length; index++) {
+          if(publicacion.tipoTesis_idTipoTesis == res[index].idTipoTesis){
+            publicacion.tipoTesis=res[index].nombre;
+          }
         }
       }
     });
@@ -176,7 +206,7 @@ export class DetailMemberComponent implements OnInit {
   fillPublicacion(publicacion, index){
     publicacion.usuario=[];
     publicacion.autor=[];
-    publicacion.fecha=this.datePipe.transform(publicacion.fechaPublicacion,"MMMM y", "es");
+    publicacion.fecha=this.datePipe.transform(publicacion.fechaPublicacion,"MMMM y");
     publicacion.fecha=this.titlecasePipe.transform(publicacion.fecha);
     for (let index = 0; index < this.tipoPublicaciones.length; index++) {
       if (publicacion.tipoPublicacion_idTipoPublicacion===this.tipoPublicaciones[index].idTipoPublicacion) {
@@ -187,6 +217,34 @@ export class DetailMemberComponent implements OnInit {
     this.getRevista(publicacion);
     this.getPublicacionHasAutor(publicacion.idPublicacion, index);
     this.getPublicacionHasUsuario(publicacion.idPublicacion, index);
+    this.getCiudad(publicacion.ciudad_idCiudad, publicacion);
+    this.getEvento(publicacion.evento_idEvento, publicacion);
+    this.getTipoTesis(publicacion);
+  }
+
+  getCiudad(idCiudad, publicacion){
+    this._ciudadService.getCiudad(idCiudad).subscribe((res)=>{
+      if(res.length>0){
+        publicacion.ciudad=res[0].nombre;
+        this.getPais(res[0].pais_idPais,publicacion);
+      }
+    });
+  }
+
+  getPais(idPais, publicacion){
+    this._paisService.getPais(idPais).subscribe((res)=>{
+      if(res.length>0){
+        publicacion.pais=res[0].nombre;
+      }
+    });
+  }
+
+  getEvento(idEvento, publicacion){
+    this._eventoService.getEvento(idEvento).subscribe((res)=>{
+      if(res.length>0){
+        publicacion.evento=res[0].nombre;
+      }
+    });
   }
 
   getPublicacionHasUsuario(idPublicacion, i){
@@ -290,6 +348,12 @@ export class DetailMemberComponent implements OnInit {
         }
       }
     });
+  }
+
+  profile(user){
+    sessionStorage.setItem("previous-page", this.location.path().slice(1));
+    this._router.navigate(['/detail-member/'+user.DNI]);
+    this.getTipoPublicacion();
   }
 
 }

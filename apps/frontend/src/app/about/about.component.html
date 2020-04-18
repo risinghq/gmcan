@@ -2,60 +2,41 @@
     <div class="row">
         <div class="col-lg-8 col-sm-6 col-12">
             <div class="about-links">
-                <a class="about-link-active" href="/">Inicio</a>
+                <a class="about-link-active" href="/">{{language.home}}</a>
                 <mat-icon class="about-icon">
                     arrow_right
                 </mat-icon>
-                <a class="about-link">Sobre Nosotros</a>
+                <a class="about-link-active">{{language.aboutUs}}</a>
+                <mat-icon class="about-icon">
+                    arrow_right
+                </mat-icon>
+                <a class="about-link short-text">{{selectedCategory}}</a>
             </div>
-            <div class="card-about">
-                <img class="about-img" src="../../assets/img/grupal.jpg">
-                <div class="about-text-div">
-                    <div class="about-title">
-                        Sobre Nosotros
-                    </div>
-                    <div class="about-subtitle">
-                        ¿Quiénes somos?
-                    </div>
-                    <div class="about-sub-divi"></div>
-                    <div class="about-text">
-                        {{info.quienesSomos}}
-                    </div>
-                    <div class="about-title about-top">
-                        Nuestros objetivos
-                    </div>
-                    <div class="about-subtitle">
-                        ¿Qué hacemos?
-                    </div>
-                    <div class="about-sub-divi"></div>
-                    <div class="about-text">
-                        {{info.objetivos}}
-                    </div>
-                    <div class="about-title about-top">
-                        Líneas de investigación
-                    </div>
-                    <div class="about-subtitle">
-                        ¿Qué buscamos?
-                    </div>
-                    <div class="about-sub-divi"></div>
-                    <div class="about-text">
-                        {{info.lineasInvestigacion}}
-                    </div>
-                    <div class="about-title about-top">
-                        Servicios
-                    </div>
-                    <div class="about-subtitle">
-                        ¿Qué ofrecemos?
-                    </div>
-                    <div class="about-sub-divi"></div>
-                    <div class="about-text">
-                        {{info.servicios}}
-                    </div>
-                </div>
-            </div>
+            <router-outlet></router-outlet>
         </div>
         <div class="col-lg-4 col-sm-6 col-12">
-            <app-news></app-news>
+            <div class="about-categories">
+                <div class="about-category" routerLink="./about" (click)="selected(language.who)"
+                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    {{language.who}}
+                </div>
+                <div class="about-category" routerLink="./lines-investigation" (click)="selected(language.linesInvestigation)"
+                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    {{language.linesInvestigation}}
+                </div>
+                <div class="about-category" routerLink="./methods" (click)="selected(language.methods)"
+                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    {{language.methods}}
+                </div>
+                <div class="about-category" routerLink="./facilities-resources" (click)="selected(language.resources)"
+                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    {{language.resources}}
+                </div>
+                <div class="about-category" routerLink="./works" (click)="selected(language.futureWorks)"
+                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    {{language.futureWorks}}
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -1,3 +1,5 @@
+import { Usuario } from './usuario';
+
 export class Noticia{
     constructor(
         public idNoticia: Number,
@@ -10,6 +12,7 @@ export class Noticia{
         public foto: String,
         public autorPublicacion: String,
         public tipoNoticia_idtipoNoticia: Number,
-        public nombreTipoNoticia: String
+        public nombreTipoNoticia: String,
+        public autor: String
     ){}
 }

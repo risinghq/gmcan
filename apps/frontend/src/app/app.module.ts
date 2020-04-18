@@ -13,13 +13,18 @@ import  {MatSidenavModule,
           MatFormFieldModule,
           MatInputModule,
           MatProgressSpinnerModule,
-          MatTabsModule } from '@angular/material';
+          MatTabsModule,
+          MatDialogModule,
+          MatMenuModule,
+          MatChipsModule,
+          MatCardModule } from '@angular/material';
 import { HomeComponent } from './home/home.component';
 import { MantenimientoComponent } from './mantenimiento/mantenimiento.component';
 import { AboutComponent } from './about/about.component';
 import { NewsComponent } from './news/news.component'; 
 import { registerLocaleData } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {AutosizeModule} from 'ngx-autosize';
 
 import localePy from '@angular/common/locales/es-PY';
     import localePt from '@angular/common/locales/pt';
@@ -30,6 +35,16 @@ import { PublicationComponent } from './publication/publication.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { MembersComponent } from './members/members.component';
 import { DetailMemberComponent } from './detail-member/detail-member.component';
+import { JoinUsComponent, EmailExitoso } from './join-us/join-us.component';
+import { MainNewsComponent } from './main-news/main-news.component';
+import { ProjectsComponent } from './projects/projects.component';
+import { LocalDatePipe } from './services/localdatepipe';
+import { AboutUsComponent } from './about-us/about-us.component';
+import { LinesInvestigationComponent } from './lines-investigation/lines-investigation.component';
+import { MethodComponent } from './method/method.component';
+import { FacilitiesComponent } from './facilities/facilities.component';
+import { WorksComponent } from './works/works.component';
+import { GlobalSearchComponent } from './global-search/global-search.component';
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
 registerLocaleData(localePt, 'pt');
@@ -47,6 +62,17 @@ registerLocaleData(localeEsAr, 'es-Ar');
     PublicationComponent,
     MembersComponent,
     DetailMemberComponent,
+    JoinUsComponent,
+    EmailExitoso,
+    MainNewsComponent,
+    ProjectsComponent,
+    LocalDatePipe,
+    AboutUsComponent,
+    LinesInvestigationComponent,
+    MethodComponent,
+    FacilitiesComponent,
+    WorksComponent,
+    GlobalSearchComponent
   ],
   imports: [
     BrowserModule,
@@ -63,9 +89,16 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatProgressSpinnerModule,
     MatTabsModule,
     NgbModule,
-    FormsModule, ReactiveFormsModule
+    FormsModule, ReactiveFormsModule,
+    MatDialogModule,
+    AutosizeModule,
+    MatMenuModule,
+    MatChipsModule,
+    MatCardModule
   ],
-  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: 'es-Ar'}],
+  exports:[LocalDatePipe],
+  entryComponents:[EmailExitoso],
+  providers: [DatePipe, TitleCasePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
