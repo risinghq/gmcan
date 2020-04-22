@@ -45,6 +45,7 @@ import { MethodComponent } from './method/method.component';
 import { FacilitiesComponent } from './facilities/facilities.component';
 import { WorksComponent } from './works/works.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
+import { NotFoundComponent } from './not-found/not-found.component';
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
 registerLocaleData(localePt, 'pt');
@@ -72,7 +73,8 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MethodComponent,
     FacilitiesComponent,
     WorksComponent,
-    GlobalSearchComponent
+    GlobalSearchComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,

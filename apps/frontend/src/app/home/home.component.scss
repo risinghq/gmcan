@@ -1,3 +1,7 @@
+@import '../global-search/global-search.component.scss';
+
+$thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
+
 .plex-serif{
     font-family: 'IBM Plex Serif', serif;
 }
@@ -18,18 +22,24 @@
     text-align: center;
 }
 
+.box:hover{
+    background-color: rgba(48, 57, 58, 0.4);
+}
+
 .primer-box{
     background-size: cover;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 100, 0, 0.3)), url("../../assets/img/graphene.jpg");
+    background-image: radial-gradient(circle 300px at top right,rgba(0, 100, 0, 0.8), rgba(0, 0, 0, 0.9)), url("../../assets/img/graphene.jpg");
 }
 
 .counter{
+    cursor: pointer;
     font-weight: bold;
     line-height: 1.25;
     letter-spacing: 0.3px;
 }
 
 .counter-text{
+    cursor: pointer;
     margin-left: 8px;
     font-weight: bold;
     line-height: 0.9;
@@ -87,10 +97,14 @@
 }
 
 .linea-text{
-    margin-bottom: 16px;
     line-height: 1.33;
     letter-spacing: 0.3px;
     color: #000000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 5; /* number of lines to show */
+    -webkit-box-orient: vertical;
 }
 
 .linea-text-green{
@@ -98,7 +112,6 @@
     line-height: 1.54;
     letter-spacing: 0.3px;
     color: var(--deep-green);
-    margin-top: 16px;
     cursor: pointer;
     margin-left: auto;
     margin-right: auto;
@@ -162,14 +175,13 @@
 }
 
 .btn-black{
+    text-align: center;
+    width: max-content;
+    cursor: pointer;
     height: max-content;
     background-color: unset;
     border-radius: 4px;
-    border: solid 2px #000000;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.3px;
-    color: #000000;
+    border: solid 2px #000000;    
 }
 
 .align-center{
@@ -189,7 +201,48 @@
     text-decoration: underline;
 }
 
+.methods-card{
+    margin-bottom: 16px;
+}
+
+.method-green{
+    height: max-content;
+    margin-top: auto;
+}
+
+.method-text, .method-title{
+    align-self: center;
+}
+
+.method-title{
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.publication-list{
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.mt-8{
+    margin-top: 8px;
+}
+
+.grid{
+    display: grid;
+}
+
+.display-sub-flex{
+    display: flex;
+    flex-direction: column;
+}
+
 @media(min-width:961px){
+    .main-author{
+        margin-top: auto;
+    }
     .box{
         width: 284px;
         padding: 20px 64px;
@@ -227,9 +280,13 @@
         margin-top: -82px;
     }
     .line-card{
+        display: grid;
         padding: 32px 32px 16px 32px;
         margin-bottom: 32px;
         height: 332px;
+    }
+    .img-hover-zoom-s{
+        min-height: 322px;
     }
     .linea-text, .linea-text-green, .news-date,
     .news-type, .news-author, .other-news-date,
@@ -256,6 +313,8 @@
     }
     .mt-main{
         margin-top: 24px;
+        display: flex;
+        flex-direction: column;
     }
     .mt-other{
         margin-top: 16px;
@@ -276,13 +335,47 @@
     .btn-black{
         margin-left: 24px;
         margin-top: 12px;
-        padding: 8px;
+        padding: 4px 8px;
     }
     .main-img-news{
         height: 321px;
     }
     .other-img-news{
         height: 160px;
+    }
+    .mt-48{
+        margin-top: 48px;
+    }
+    .linea-text{
+        height: 100px;
+    }
+    .methods-card{
+        display: grid;
+        padding: 48px 32px 32px 32px;
+        height: 313px;
+    }
+    .method-title-div{
+        height: 44px;
+        display: grid;
+    }
+    .method-title{
+        font-size: 20px;
+    }
+    .mt-publications{
+        margin-top: 32px;
+    }
+    .publication-list{
+        padding: 40px;
+    }
+    .abstract{
+        padding-top: 16px;
+    }
+    .nopd{
+        padding-top: unset !important;
+        padding-bottom: unset !important;
+    }
+    .mb-news{
+        margin-bottom: 48px;
     }
 }
 
@@ -353,11 +446,14 @@
     }
     .btn-black{
         width: 100%;
-        padding: 9px;
+        padding: 4px 9px;
         margin-bottom: 24px;
     }
     .main-img-news{
         height: 159px;
+    }
+    .img-hover-zoom-s{
+        min-height: 159px;
     }
     .news-box{
         margin-bottom: 16px;
@@ -365,7 +461,39 @@
     .other-img-news{
         height: 60px;
         width: 60px;
+    }
+    .ml-16{
         margin-left: 16px;
+    }
+    .mt-48{
+        margin-top: 32px;
+    }
+    .methods-card{
+        padding: 24px 24px 16px 24px;
+    }
+    .linea-text{
+        height: 88px;
+    }
+    .method-title{
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+    .method-text{
+        margin-bottom: 16px;
+    }
+    .mt-publications{
+        margin-top: 16px;
+    }
+    .publication-list{
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    .publication-title{
+        margin-top: 8px;
+    }
+    .nopd{
+        padding-left: unset !important;
+        padding-right: unset !important;
     }
 }
 
@@ -420,3 +548,38 @@
   .img-hover-zoom-2:hover img {
     transform: scale(1.05);
   }
+
+  .notoppd{
+    padding-top: unset !important;
+  }
+
+  .btn-text2{
+    line-height: 1px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #000000;
+    @extend .plex-sans;
+    font-weight: bold;
+    text-decoration: unset !important;
+    position: relative;
+    &:before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        bottom: 0;
+        left: 0;
+        background-color: #30393a;
+        visibility: hidden;
+        -webkit-transform: scaleX(0);
+        transform: scaleX(0);
+        -webkit-transition: $thetransition;
+        transition: $thetransition;
+        }
+        &:hover:before {
+        visibility: visible;
+        -webkit-transform: scaleX(1);
+        transform: scaleX(1);
+        }
+}

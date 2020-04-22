@@ -15,7 +15,7 @@ export class AboutComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
   ) {
-    this.info= new Grupo(null,'','','','','','','','','','','','','',null,null);
+    this.info= new Grupo(null,'','','','','','','','','','','','','','',null,null);
   }
 
   selectedCategory;

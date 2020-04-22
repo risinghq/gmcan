@@ -16,6 +16,7 @@ import { MethodComponent } from './method/method.component';
 import { FacilitiesComponent } from './facilities/facilities.component';
 import { WorksComponent } from './works/works.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 
 const routes: Routes = [
@@ -36,6 +37,7 @@ const routes: Routes = [
   {path:"detail-member/:id", component:DetailMemberComponent},
   {path:"search/:id", component:GlobalSearchComponent},
   {path:"join-us", component:JoinUsComponent},
+  {path:"**", component:NotFoundComponent},
 ];
 
 @NgModule({

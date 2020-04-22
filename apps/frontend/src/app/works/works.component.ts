@@ -13,7 +13,7 @@ export class WorksComponent implements OnInit {
   constructor(
     public _grupoService: GrupoService,
   ) { 
-    this.info = new Grupo(null,'','','','','','','','','','','','','',null,null)
+    this.info = new Grupo(null,'','','','','','','','','','','','','','',null,null)
   }
 
   ngOnInit() {

@@ -248,13 +248,25 @@
                 </div>
               </div>
             </div>
-            <div class="footer-info footer-info-2">
-              <div class="footer-icon-div">
-                <img class="footer-icon" src="../assets/img/mail.svg">
+            <div class="footer-info footer-info-2 footerdiflex">
+              <div class="flex-news">
+                <div class="footer-icon-div">
+                  <img class="footer-icon" src="../assets/img/mail.svg">
+                </div>
+                <div class="footer-text" style="display: flex;">
+                  <div class="footer-direction footer-email">
+                    {{grupoinfo.correo}}
+                  </div>
+                </div>
               </div>
-              <div class="footer-text" style="display: flex;">
-                <div class="footer-direction footer-email">
-                  {{grupoinfo.correo}}
+              <div class="flex-news mt-8">
+                <div class="footer-icon-div ml-footer" *ngIf="grupoinfo.telefono && grupoinfo.telefono!=''">
+                  <img class="footer-icon" src="../assets/img/phone.svg">
+                </div>
+                <div class="footer-text" style="display: flex;">
+                  <div class="footer-direction footer-email">
+                    {{grupoinfo.telefono}}
+                  </div>
                 </div>
               </div>
             </div>

@@ -33,6 +33,8 @@ import { lineasInvestigacion } from '../models/lineaInvestigacion';
 import { MethodsService } from '../services/methods.service';
 import { Method } from '../models/method';
 import { AboutUsService } from '../services/aboutus.service';
+import { GLOBAL } from '../services/global';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -52,6 +54,7 @@ export class HomeComponent implements OnInit {
   public lineasInvestigacion: Array<lineasInvestigacion>;
   public metodos: Array<Method>;
   screenWidth: number;
+  url;
   constructor(
     public _grupoService:GrupoService,
     public titlecasePipe:TitleCasePipe,
@@ -78,9 +81,10 @@ export class HomeComponent implements OnInit {
     public _tipoPublicacionService: TipoPublicacionService,
     public fb:FormBuilder, 
     public _methodsService: MethodsService,
-    public aboutusService: AboutUsService
+    public aboutusService: AboutUsService,
+    public location: Location,
     ) { 
-      this.info = new Grupo(null,'','','','','','','','','','','','','',null,null)
+      this.info = new Grupo(null,'','','','','','','','','','','','','','',null,null)
       this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','',null,'',null)
       this.publicaciones=[];
       this.autores=[];
@@ -93,6 +97,7 @@ export class HomeComponent implements OnInit {
         // set screenWidth on screen size change
         this.screenWidth = window.innerWidth;
       };
+      this.url=GLOBAL.url;
     }
 
     @HostListener('window:resize', ['$event'])
@@ -100,7 +105,7 @@ export class HomeComponent implements OnInit {
       this.screenWidth = window.innerWidth;
     }
 
-    language
+    language;
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
@@ -146,6 +151,7 @@ export class HomeComponent implements OnInit {
   getPublicaciones(){
     this._publicacionesService.getPublicacion().subscribe((res)=>{
       if(res.length>0){
+        res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.publicaciones=res;
         for (let index = 0; index < this.publicaciones.length; index++) {
           this.fillPublicacion(this.publicaciones[index]);
@@ -477,12 +483,72 @@ export class HomeComponent implements OnInit {
     this._router.navigate([route]);
   }
 
+  selectedItem;
+  oldValue;
+
+  listClick(event, newValue) {
+    this.oldValue=this.selectedItem;
+    this.selectedItem = newValue;
+    document.getElementById("abstract"+newValue).innerText=this.language.publicationsText[0].seeLess;
+    if(this.selectedItem==this.oldValue){
+      this.selectedItem=-1;
+      document.getElementById("abstract"+this.oldValue).innerText=this.language.publicationsText[0].seeMore;
+    }
+  }
+
+  profile(user){
+    sessionStorage.setItem("previous-page", this.location.path().slice(1));
+    this._router.navigate(['/detail-member/'+user.DNI]);
+  }
+
   detalleNoticia(noticia){
     this._router.navigate(['/detail-news/'+noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
   }
+
   scroll(el: HTMLElement) {
     el.scrollIntoView({ behavior: "smooth"});
+  }
+
+  /* Hovers Publicaciones */
+
+  /* Share Hover */
+  public fbicon="../../assets/img/Facebook.svg";
+  public twitter="../../assets/img/twitter.svg";
+  mouseEnter(int, index){
+    let element: any;
+    switch (int) {
+      case 1:
+        document.getElementById("fb"+index).setAttribute("src","../../assets/img/Facebook2.svg");
+        break;
+      case 2:
+        document.getElementById("t"+index).setAttribute("src", "../../assets/img/twitter2.svg");
+        break;
+      case 3:
+        document.getElementById("fbl"+index).setAttribute("src", "../../assets/img/Facebook2.svg");
+        break;
+      case 4:
+        document.getElementById("tl"+index).setAttribute("src", "../../assets/img/twitter2.svg");
+        break;
+    }
+  }
+
+  mouseLeave(int, index){
+    let element: any;
+    switch (int) {
+      case 1:
+        document.getElementById("fb"+index).setAttribute("src","../../assets/img/Facebook.svg");
+        break;
+      case 2:
+        document.getElementById("t"+index).setAttribute("src", "../../assets/img/twitter.svg");
+        break;
+      case 3:
+        document.getElementById("fbl"+index).setAttribute("src","../../assets/img/Facebook.svg");
+        break;
+      case 4:
+        document.getElementById("tl"+index).setAttribute("src", "../../assets/img/twitter.svg");
+        break;
+    }
   }
 
 }

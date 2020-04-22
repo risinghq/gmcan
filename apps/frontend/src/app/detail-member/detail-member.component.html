@@ -40,7 +40,10 @@
                         <div class="member-detail-type">
                             {{usuario.tipoMiembro}}
                         </div>
-                        <div class="member-email flex-detail">
+                        <div class="member-email flex-detail cursive" *ngIf="usuario.estado===3">
+                            In memoriam
+                        </div>
+                        <div class="member-email flex-detail" *ngIf="usuario.estado!=3">
                             <mat-icon class="email-icon">
                                 email
                             </mat-icon>

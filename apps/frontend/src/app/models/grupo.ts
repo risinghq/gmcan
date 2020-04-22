@@ -9,6 +9,7 @@ export class Grupo{
         public nombreGrupo2: String,
         public objetivos: String,
         public lineasInvestigacion: String,
+        public telefono: String,
         public servicios: string,
         public trabajosFuturos: string,
         public foto: String,

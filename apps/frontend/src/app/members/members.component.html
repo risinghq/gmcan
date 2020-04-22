@@ -65,7 +65,10 @@
                                         <div class="member-name">
                                             {{usuario.prefijo}} {{usuario.nombre}} {{usuario.apellidoPaterno}} {{usuario.apellidoMaterno}}
                                         </div>
-                                        <div class="member-email">
+                                        <div class="member-email cursive" *ngIf="usuario.estado===3">
+                                            In memoriam
+                                        </div>
+                                        <div class="member-email" *ngIf="usuario.estado!=3">
                                             <mat-icon class="email-icon">
                                                 email
                                             </mat-icon>

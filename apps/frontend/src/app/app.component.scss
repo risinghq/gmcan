@@ -441,7 +441,7 @@ mat-sidenav{
         height: 118px;
     }
     .contact-div{
-        padding: 24px 40px;
+        padding: 24px 24px 24px 40px;
     }
     .footer-info-2{
         margin-top: 32px;
@@ -461,6 +461,12 @@ mat-sidenav{
     }
     .link3{
         margin-bottom: 4px;
+    }
+    .footerdiflex{
+        display: flex;
+    }
+    .ml-footer{
+        margin-left: 28px;
     }
 }
 
@@ -487,7 +493,7 @@ mat-sidenav{
         height: 118px;
     }
     .contact-div{
-        padding: 24px 40px;
+        padding: 24px 24px 24px 40px;
     }
     .footer-info-2{
         margin-top: 32px;
@@ -507,6 +513,12 @@ mat-sidenav{
     }
     .link3{
         margin-bottom: 4px;
+    }
+    .footerdiflex{
+        display: flex;
+    }
+    .ml-footer{
+        margin-left: 28px;
     }
 }
 
@@ -562,5 +574,11 @@ mat-sidenav{
     }
     .logo-modal{
         height: 26px !important;
+    }
+    .footerdiflex{
+        display: block;
+    }
+    .mt-8{
+        margin-top: 8px;
     }
 }

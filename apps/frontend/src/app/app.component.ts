@@ -41,7 +41,7 @@ export class AppComponent {
     this.url=GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
-    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','',null,null)
+    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','',null,null)
   }
 
   @HostListener('window:resize', ['$event'])

@@ -79,7 +79,9 @@ export class MembersComponent implements OnInit {
         for (let j = 0; j < this.usuarios.length; j++) {
           if(tipoMiembro.idTipoMiembro==this.usuarios[j].tipoMiembro_idTipoMiembro && this.usuarios[j].estado===1){
             tipoMiembro.miembros.push(this.usuarios[j]);
-          }else if(this.usuarios[j].estado===0 && 
+            
+          }else if(this.usuarios[j].estado!=1 && 
+            // Si el usuario tiene estado 2, es inactivo si es 3 es in memoriam
             this.usuariosNoActivos.findIndex(x => x.DNI === this.usuarios[j].DNI)==-1){
             this.usuariosNoActivos.push(this.usuarios[j]);
           }

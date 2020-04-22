@@ -9,8 +9,8 @@
                     <mat-icon class="detail-icon">
                         arrow_right
                     </mat-icon>
-                    <a class="detail-link-active" href="/{{previouslink}}">{{previouspage}}</a>
-                    <mat-icon class="detail-icon">
+                    <a class="detail-link-active" *ngIf="previouspage!='Inicio'" href="/{{previouslink}}">{{previouspage}}</a>
+                    <mat-icon class="detail-icon" *ngIf="previouspage!='Inicio'">
                         arrow_right
                     </mat-icon>
                     <a class="detail-link">{{language.detailNews}}</a>
