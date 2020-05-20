@@ -1,0 +1,111 @@
+<mat-drawer-container class="example-container" style="height: 100%;">
+    <mat-drawer #drawer class="example-sidenav mdc-drawer" mode="side" opened>
+      <nav class="mdc-list">
+        <img  class="dashboard-icon" src="{{grupoinfo.logoHeader}}" alt="logo">
+        <a class="mdc-list-item" routerLink="/dashboard" routerLinkActive="active" (click)="textChange('Dashboard')" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dashboard</i>
+          <span class="mdc-list-item__text">Dashboard</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/noticias" routerLinkActive="active" (click)="textChange('Noticias')" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">chrome_reader_mode</i>
+          <span class="mdc-list-item__text">Noticias</span>
+        </a>
+        <hr class="mdc-list-divider">
+        <h6 class="mdc-list-group__subheader">Miembros</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/miembros" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Miembros Activos</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/miembros" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Miembros antiguos</span>
+        </a>
+        <hr class="mdc-list-divider">
+        <h6 class="mdc-list-group__subheader">Publicaciones</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Artículos</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Tesis</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+            <span class="mdc-list-item__text">Resumen en eventos</span>
+          </a>
+        <hr class="mdc-list-divider">
+        <h6 class="mdc-list-group__subheader">Proyectos</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/proyectos" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Proyectos en ejecución</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/proyectos" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Proyectos concluidos</span>
+        </a>
+        <hr class="mdc-list-divider">
+        <h6 class="mdc-list-group__subheader">Mi perfil</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Mi información personal</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+          <span class="mdc-list-item__text">Mis artículos</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+            <span class="mdc-list-item__text">Mis tesis</span>
+        </a>
+        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
+            <span class="mdc-list-item__text">Mis resúmenes en eventos</span>
+        </a>
+        <hr class="mdc-list-divider">
+        <a class="mdc-list-item" routerLink="/dashboard/contenidos" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">description</i>
+            <span class="mdc-list-item__text">Contenidos</span>
+        </a>
+      </nav>
+    </mat-drawer>
+  
+    <div class="example-sidenav-content">
+      <div class="flex-news dashboard-tool">
+        <button mat-icon-button class="middle btn-sidemenu" (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
+        <div class="tool-text middle">{{title}}</div>
+        <div class="right user-div flex-news">
+          <div class="user-img">
+            <img class="img-css" src="{{url+'usuario/get-image-usuario/'+user.foto}}">
+          </div>
+          <div class="ml-16">
+            <div class="user-name">
+              {{user.nombreCompleto}}
+            </div>
+            <div class="user-email">
+              {{user.correo}}
+            </div>
+          </div>
+          <div class="ml-24">
+            <mat-icon class="middle" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger" (mouseover)="menuTrigger.openMenu()">arrow_drop_down</mat-icon>
+            <mat-menu #menu="matMenu" [overlapTrigger]="false">
+              <span (mouseleave)="menuTrigger.closeMenu()">
+                <div mat-menu-item [disableRipple]="true">
+                  <a class="link" href="/dashboard/perfil" (click)="textChange('Perfil')" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    Mi información
+                  </a>
+                </div>
+                <div mat-menu-item [disableRipple]="true">
+                  <a class="link" (click)="logout()" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                    Cerrar Sesión
+                  </a>
+                </div>
+              </span>
+            </mat-menu>
+          </div>
+        </div>
+      </div>
+        <router-outlet></router-outlet>
+    </div>
+  
+  </mat-drawer-container>

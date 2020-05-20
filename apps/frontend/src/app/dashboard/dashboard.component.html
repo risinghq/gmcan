@@ -1,0 +1,109 @@
+<div class="main-content" id="main-content">
+  <div class="flex-news">
+    <div class="dashboard-card wd-1">
+      <div class="dashboard-title">
+        ¡Bienvenido al administrador del sistema!
+      </div>
+      <div class="dashboard-subtitle">
+        ¿Qué deseas hacer?
+      </div>
+      <div class="flex-news item clickable" *ngIf="permisos.noticiaPermiso" routerLink="/dashboard/noticias">
+        <img class="mr-16" src="../../assets/img/iconfinder_newspaper_3890941 1.svg">
+        <div>
+          <div class="item-title">
+            Gestionar noticias
+          </div>
+          <div class="item-subtitle">
+            Puedes crear, editar o eliminar una noticia.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news item clickable" *ngIf="permisos.miembroPermiso" routerLink="/dashboard/miembros">
+        <img class="mr-16" src="../../assets/img/members.svg">
+        <div>
+          <div class="item-title">
+            Gestionar miembros del grupo
+          </div>
+          <div class="item-subtitle">
+            Puedes crear, editar o eliminar a un miembro del grupo.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news item clickable" *ngIf="permisos.publicacionPermiso" routerLink="/dashboard/publicaciones">
+        <img class="mr-16" src="../../assets/img/publicaciones.svg">
+        <div>
+          <div class="item-title">
+            Gestionar publicaciones
+          </div>
+          <div class="item-subtitle">
+            Puedes crear, editar o eliminar una publicación del grupo.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news item clickable" *ngIf="permisos.proyectoPermiso" routerLink="/dashboard/proyectos">
+        <img class="mr-16" src="../../assets/img/proyectos.svg">
+        <div>
+          <div class="item-title">
+            Gestionar proyectos
+          </div>
+          <div class="item-subtitle">
+            Puedes crear, editar o eliminar un proyecto del grupo.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news item clickable" *ngIf="permisos.contenidoPermiso" routerLink="/dashboard/contenidos">
+        <img class="mr-16" src="../../assets/img/contenido.svg">
+        <div>
+          <div class="item-title">
+            Gestionar contenidos
+          </div>
+          <div class="item-subtitle">
+            Puedes modificar algunos contenidos de la plataforma.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news item clickable" routerLink="/dashboard/perfil">
+        <img class="mr-16" src="../../assets/img/perfil.svg">
+        <div>
+          <div class="item-title">
+            Gestionar perfil
+          </div>
+          <div class="item-subtitle">
+            Puedes actualizar tu información personal y agregar publicaciones.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news item" *ngIf="permisos.analiticaPermiso">
+        <img class="mr-16" src="../../assets/img/analitica.svg">
+        <div>
+          <div class="item-title">
+            Visualizar analíticas de uso
+          </div>
+          <div class="item-subtitle">
+            Puedes visualizar cómo está siendo utilizada la plataforma.
+          </div>
+        </div>
+      </div>
+      <div class="flex-news">
+        <div class="center btn-black mr-8">
+          <a class="link" routerLink="./join-us" routerLinkActive="active">
+            Google Analytics
+          </a>
+        </div>
+        <div class="center btn-black">
+          <a class="link" routerLink="./join-us" routerLinkActive="active">
+            Hotjar
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="ml-16">
+      <div class="dashboard-card wd-2">
+        Imagen
+      </div>
+      <div class="dashboard-card mt-16">
+        Imagen
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+.plex-serif{
+    font-family: 'IBM Plex Serif', serif;
+}
+
+.plex-sans{
+    font-family: "IBM Plex Sans", serif;
+}
+
+::ng-deep .mat-drawer-inner-container{
+    overflow: hidden !important;
+}
+
+.middle{
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.btn-sidemenu{
+    margin-left: 24px;
+    margin-right:8px;
+}
+
+.mdc-top-app-bar {  
+    background-color: white;
+    color: black;
+}
+
+.mdc-top-app-bar .mdc-top-app-bar__navigation-icon {
+    color: black;
+}
+
+.mr-16{
+    margin-right: 16px;
+}
+
+.dashboard-tool{
+    min-width: 1096px;
+    height: 64px;
+    box-shadow: 0 2px 5px 0 #e8e8e8;
+    background-color: #ffffff;
+}
+
+.tool-text{
+    font-size: 25px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+.dashboard-icon{
+    margin: 24px 32px 40px 32px;
+    width: 192px;
+    height: 25px;
+}
+
+.user-div{
+    margin-right: 40px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.user-img{
+    width: 36px;
+    height: 36px;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.img-css{
+    vertical-align: unset;
+    background-color: #c4c4c4;
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+}
+
+.user-name{
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.user-email{
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #939393;
+}
+
+.ml-24{
+    margin-left: 24px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+::ng-deep .mat-menu-panel{
+    width: 222px !important;
+    border-radius: 4px;
+    border: solid 1px #e8e8e8;
+    background-color: #ffffff;
+}
+
+.mat-menu-item{
+    background-color: unset;
+    line-height: 1;
+    height: 28px;
+    padding: 8px 14px;
+}
+
+.mat-menu-item:hover,.mat-menu-item:focus{
+    background-color: unset;
+}
+
+.active{
+    color: var(--deep-green);
+    background-color: rgba(3, 147, 0, 0.25);
+}
+
+.active > .mdc-list-item__graphic{
+    color: var(--deep-green);
+}

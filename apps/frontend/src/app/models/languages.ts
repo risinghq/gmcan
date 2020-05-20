@@ -53,6 +53,13 @@ export const Languages = [{
         ourServices:"Servicios",
         ourServicesQuestion:"¿Qué ofrecemos?"
         }],
+    loginText:[{
+        email:"Correo electrónico",
+        password:"Contraseña",
+        login:"Ingresar",
+        forgot:"¿Olvidaste tu contraseña?",
+        error:"Correo o contraseña incorrectos"
+        }],
     membersText:[{
         memberTitle:"Nuestros Miembros",
         memberText:"Conoce a las increíbles personas que hacen grande al grupo.",
@@ -209,6 +216,13 @@ export const Languages = [{
         ourLineasQuestion: "¿What do we look for?",
         ourServices:"Services",
         ourServicesQuestion:"¿What do we offer?"
+        }],
+    loginText:[{
+        email:"Email",
+        password:"Password",
+        login:"Login",
+        forgot:"Have you forgotten your password?",
+        error:"Iconrrect email or password"
         }],
     membersText:[{
         memberTitle:"Our Members",

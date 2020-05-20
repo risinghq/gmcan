@@ -22,4 +22,12 @@ export class EmailService{
       return this.http.post(this.url+'email/send-email',body,{headers:headers});
     }
 
+    recoverEmail(user): any{
+      let body = JSON.stringify(user);
+      let headers = new HttpHeaders ({
+        'Content-Type':'application/json'
+      });
+      return this.http.post(this.url+'email/reset-password-email ',body,{headers:headers});
+    }
+
 }

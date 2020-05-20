@@ -1,0 +1,43 @@
+<div class="login-div" *ngIf="status">
+    <div class="flex-news back-div" (click)="return()">
+        <mat-icon class="back-icon">
+            arrow_back
+        </mat-icon>
+        <div class="back-text">
+            Volver a la página principal
+        </div>        
+    </div>
+    <div class="login-card">
+        <img  class="logo-icon" src="{{grupoinfo.logoHeader}}" alt="logo">
+        <form [formGroup]="passwordForm" *ngIf="!recoverValue && !succesful">
+            <div class="login-title recover-title">
+                Establecer nueva contraseña
+            </div>
+            <div class="login-subtitle">
+                Tu nueva contraseña debe tener como mínimo 8 caractéres
+            </div>
+            <input class="input-password mt-input-16 full-width" placeholder="Nueva contraseña" #password (keyup)="verifyEqual()"
+            name = "password" formControlName="password" autocomplete="off" required type="password">
+            <input (keyup)="verifyEqual()" class="input-password mt-input-16 full-width" placeholder="Repetir contraseña" #newPassword
+            name = "newPassword" formControlName="newPassword" autocomplete="off" required type="password">
+            <div (click)="resetPassword()" [ngClass]="{'btn-grey':passwordForm.invalid || passwordSame,'btn-black':!passwordForm.invalid || !passwordSame}">
+                <div class="link">
+                    Cambiar contraseña
+                </div>
+            </div>
+        </form>
+        <div *ngIf="!recoverValue && succesful">
+            <div class="login-title succesful-title">
+                ¡Contraseña cambiada exitosamente!
+            </div>
+            <div (click)="return()" class="btn-black">
+                <div class="link">
+                    Ir al inicio de sesión
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="error" *ngIf="(this.passwordForm.controls.newPassword.value=='' && this.passwordForm.controls.password.value!='') || passwordSame">
+        Las contraseñas no coinciden
+    </div>
+</div>

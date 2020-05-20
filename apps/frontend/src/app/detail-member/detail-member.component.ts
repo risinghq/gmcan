@@ -352,7 +352,7 @@ export class DetailMemberComponent implements OnInit {
 
   profile(user){
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(['/detail-member/'+user.DNI]);
+    this._router.navigate(['/home/detail-member/'+user.DNI]);
     this.getTipoPublicacion();
   }
 

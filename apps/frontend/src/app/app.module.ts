@@ -17,6 +17,9 @@ import  {MatSidenavModule,
           MatDialogModule,
           MatMenuModule,
           MatChipsModule,
+          MatTableModule,
+          MatPaginatorModule,
+          MatSortModule,
           MatCardModule } from '@angular/material';
 import { HomeComponent } from './home/home.component';
 import { MantenimientoComponent } from './mantenimiento/mantenimiento.component';
@@ -46,6 +49,18 @@ import { FacilitiesComponent } from './facilities/facilities.component';
 import { WorksComponent } from './works/works.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { LandingComponent } from './landing/landing.component';
+import { ChangePassComponent } from './change-pass/change-pass.component';
+import { LogHomeComponent } from './log-home/log-home.component';
+import { NoticiasComponent } from './noticias/noticias.component';
+import { ProyectosComponent } from './proyectos/proyectos.component';
+import { PublicacionesComponent } from './publicaciones/publicaciones.component';
+import { PerfilComponent } from './perfil/perfil.component';
+import { MiembrosComponent } from './miembros/miembros.component';
+import { ContenidosComponent } from './contenidos/contenidos.component';
+
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
 registerLocaleData(localePt, 'pt');
@@ -74,7 +89,18 @@ registerLocaleData(localeEsAr, 'es-Ar');
     FacilitiesComponent,
     WorksComponent,
     GlobalSearchComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    LoginComponent,
+    DashboardComponent,
+    LandingComponent,
+    ChangePassComponent,
+    LogHomeComponent,
+    NoticiasComponent,
+    ProyectosComponent,
+    PublicacionesComponent,
+    PerfilComponent,
+    MiembrosComponent,
+    ContenidosComponent
   ],
   imports: [
     BrowserModule,
@@ -96,11 +122,14 @@ registerLocaleData(localeEsAr, 'es-Ar');
     AutosizeModule,
     MatMenuModule,
     MatChipsModule,
-    MatCardModule
+    MatCardModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   exports:[LocalDatePipe],
   entryComponents:[EmailExitoso],
-  providers: [DatePipe, TitleCasePipe],
+  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

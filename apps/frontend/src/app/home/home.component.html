@@ -3,28 +3,28 @@
         <div class="description-info">
             {{info.quienesSomosResumen}}
         </div>
-        <button mat-flat-button class="white-btn" (click)="navigate('/about-us/about')">Conócenos</button>
+        <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">Conócenos</button>
     </div>
     <div class="numbers-div">
-        <div class="box mb-box-8" (click)="navigate('/members')">
+        <div class="box mb-box-8" (click)="navigate('/home/members')">
             <span class="counter" id="users">{{usuarios.length}}</span>
             <span class="counter-text">{{language.members}}</span>
         </div>
-        <div class="box mb-box-8" (click)="navigate('/publications')">
+        <div class="box mb-box-8" (click)="navigate('/home/publications')">
             <span class="counter" id="articulos">{{articulos}}</span>
             <span class="counter-text">{{language.articles}}</span>
         </div>
-        <div class="box mb-box-8" (click)="navigate('/publications')">
+        <div class="box mb-box-8" (click)="navigate('/home/publications')">
             <span class="counter" id="tesis">{{tesis}}</span>
             <span class="counter-text">{{language.thesis}}</span>
         </div>
-        <div class="box" (click)="navigate('/publications')">
+        <div class="box" (click)="navigate('/home/publications')">
             <span class="counter" id="resumenes">{{resumenes}}</span>
             <span class="counter-text">{{language.resumenes}}</span>
         </div>
     </div>
     <div class="center know-more" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-        {{language.knowAbout}} <span style="text-decoration: underline;" (click)="navigate('/about-us/lines-investigation')">{{language.linesminus}}</span>
+        {{language.knowAbout}} <span style="text-decoration: underline;" (click)="navigate('/home/about-us/lines-investigation')">{{language.linesminus}}</span>
     </div>
 </div>
 <div class="home-div segundo-box">
@@ -46,7 +46,7 @@
                 <div class="linea-text">
                     {{linea.descripcion}}
                 </div>
-                <a class="linea-text-green" href="/about-us/lines-investigation">
+                <a class="linea-text-green" href="/home/about-us/lines-investigation">
                     {{language.seeMore}}
                 </a>
             </mat-card>
@@ -59,7 +59,7 @@
         <div class="black-title">
             {{language.newsminus}}
         </div>
-        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/news')">
+        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/home/news')">
             <a class="btn-text2">
                 {{language.seeNews}}
             </a>
@@ -121,7 +121,7 @@
             </div>
         </div>
     </div>
-    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/news')"> 
+    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/news')"> 
         <a class="btn-text2">
             {{language.seeNews}}
         </a>
@@ -130,13 +130,13 @@
         <img class="services-icon" src="../../assets/img/bulb.svg">
         <div class="mt-services" id="services"></div>
         <div class="btn-black align-center" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}"
-        (click)="navigate('/about-us/about')">
+        (click)="navigate('/home/about-us/about')">
             <a class="btn-text2">
                 {{language.knowMore}}
             </a>
         </div>
     </div>
-    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/about-us/about')">
+    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/about-us/about')">
         <a class="btn-text2">
             {{language.knowMore}}
         </a>
@@ -158,7 +158,7 @@
                 <div class="linea-text method-text">
                     {{metodo.descripcion}}
                 </div>
-                <a class="linea-text-green method-green" href="/about-us/methods">
+                <a class="linea-text-green method-green" href="/home/about-us/methods">
                     {{language.seeMore}}
                 </a>
             </mat-card>
@@ -171,7 +171,7 @@
         <div class="black-title">
             {{language.publicationsminus}}
         </div>
-        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/publications')">
+        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/home/publications')">
             <a class="btn-text2">
                 {{language.seePublications}}
             </a>
@@ -213,10 +213,12 @@
                 <div class="publication-rev line-1" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
                     DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
                 </div>
-                <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3"> 
+                <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
+                href="{{this.url+'publicacion/get-file-publicacion/'+publicacion.archivo}}" target="_blank"> 
                     {{this.language.publicationsText[0].preview}}
                 </a>
-                <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3">
+                <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
+                href="{{this.url+'publicacion/download-publicacion/'+publicacion.archivo}}">
                     {{this.language.publicationsText[0].download}}
                 </a>
             </div>
@@ -295,10 +297,12 @@
                         {{publicacion.resumen}}
                     </div>
                     <div class="flex-news mt-16" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'flex'}">
-                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3"> 
+                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3  && publicacion.archivo && publicacion.archivo!=''"
+                        href="{{this.url+'publicacion/get-file-publicacion/'+publicacion.archivo}}" target="_blank"> 
                             {{this.language.publicationsText[0].preview}}
                         </a>
-                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3">
+                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
+                        href="{{this.url+'publicacion/download-publicacion/'+publicacion.archivo}}">
                             {{this.language.publicationsText[0].download}}
                         </a>
                         <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="publication-abstract" 
@@ -322,7 +326,7 @@
             </div>
         </div>
     </div>
-    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/publications')">
+    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/publications')">
         <a class="btn-text2">
             {{language.seePublications}}
         </a>
@@ -334,7 +338,7 @@
         <div class="black-title">
             {{language.projectsminus}}
         </div>
-        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/projects')">
+        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/home/projects')">
             <a class="btn-text2">
                 {{language.seeProjects}}
             </a>
@@ -448,7 +452,7 @@
             </div>
         </div>
     </div>
-    <button mat-flat-button class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/projects')">
+    <button mat-flat-button class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/projects')">
         {{language.seeProjects}}
     </button>
 </div>

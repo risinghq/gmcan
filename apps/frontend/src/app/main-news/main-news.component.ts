@@ -56,7 +56,7 @@ export class MainNewsComponent implements OnInit {
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.noticias=res;
         for (let index = 0; index < this.noticias.length; index++) {
-          if(this.noticias[index].tipoNoticia_idtipoNoticia != this.categorySelected && this.categorySelected !=-1){
+          if((this.noticias[index].tipoNoticia_idtipoNoticia != this.categorySelected && this.categorySelected !=-1) || this.noticias[index].estado==0){
             this.noticias.splice(index,1);
             index=-1;
           }
@@ -91,7 +91,7 @@ export class MainNewsComponent implements OnInit {
 
   detalleNoticia(noticia){
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(['/detail-news/'+noticia.idNoticia]);
+    this._router.navigate(['/home/detail-news/'+noticia.idNoticia]);
     this.scroll();
     this.getTipoNoticias();
   }

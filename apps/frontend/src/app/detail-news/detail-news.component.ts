@@ -29,7 +29,7 @@ export class DetailNewsComponent implements OnInit {
     public _previousService: PreviousPageService,
     public _usuarioService: UsuarioService,
   ) {
-    this.noticia = new Noticia(null,'','','','',null,null,'','',null,'',null);
+    this.noticia = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
     this.usuario = new Usuario('','','','','','');
    }
 

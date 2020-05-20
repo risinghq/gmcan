@@ -85,7 +85,7 @@ export class HomeComponent implements OnInit {
     public location: Location,
     ) { 
       this.info = new Grupo(null,'','','','','','','','','','','','','','',null,null)
-      this.noticiaPrincipal = new Noticia(null,'','','','',null,null,'','',null,'',null)
+      this.noticiaPrincipal = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
       this.publicaciones=[];
       this.autores=[];
       this.noticias=[];
@@ -299,6 +299,11 @@ export class HomeComponent implements OnInit {
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.noticias=res;
         for (let index = 0; index < this.noticias.length; index++) {
+          if(this.noticias[index].estado==0){
+            this.noticias.splice(index,1);
+          }          
+        }
+        for (let index = 0; index < this.noticias.length; index++) {
           this.fillNoticia(this.noticias[index]);
         }
         this.noticiaPrincipal=this.noticias[0];
@@ -498,11 +503,11 @@ export class HomeComponent implements OnInit {
 
   profile(user){
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(['/detail-member/'+user.DNI]);
+    this._router.navigate(['/home/detail-member/'+user.DNI]);
   }
 
   detalleNoticia(noticia){
-    this._router.navigate(['/detail-news/'+noticia.idNoticia]);
+    this._router.navigate(['/home/detail-news/'+noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
   }
 

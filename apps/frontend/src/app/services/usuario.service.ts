@@ -45,4 +45,50 @@ export class UsuarioService{
     } 
   }
 
+  login(user):any{
+    let body = {"correo":user.correo, "password":user.password};
+    let headers = new HttpHeaders ({
+		  'Content-Type':'application/json'
+	  });
+    return this.http.post(this.url+'usuario/login',body,{headers});
+  }  
+
+  changePassword(user): any{
+    let body = {"password":user.password,"correo":user.correo};
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+user.token
+	  });
+    return this.http.put(this.url+'usuario/update-password',body,{headers});
+  }
+  checkStatus(user): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+user.token
+	  });
+    return this.http.get(this.url+'usuario/check-res/'+user.correo,{headers});
+  }
+
+  checkToken():any{
+    let token=JSON.parse(localStorage.getItem("token"));
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+token
+	  });
+    return this.http.get(this.url+'usuario/check-token',{headers});
+  }
+
+  getToken(){
+    return JSON.parse(localStorage.getItem("token"));
+  }
+
+  getUserLogged(){
+    return JSON.parse(localStorage.getItem("user"));
+  }
+
+  logout(){
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+  }
+
 }

@@ -1,3 +1,3 @@
 export var GLOBAL={
-	url: "http://localhost:3000/"
+	url: "http://192.168.1.12:3000/"
 };

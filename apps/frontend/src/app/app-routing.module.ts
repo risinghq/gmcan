@@ -17,26 +17,51 @@ import { FacilitiesComponent } from './facilities/facilities.component';
 import { WorksComponent } from './works/works.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { LandingComponent } from './landing/landing.component';
+import { ChangePassComponent } from './change-pass/change-pass.component';
+import { LogHomeComponent } from './log-home/log-home.component';
+import { MiembrosComponent } from './miembros/miembros.component';
+import { PublicacionesComponent } from './publicaciones/publicaciones.component';
+import { ProyectosComponent } from './proyectos/proyectos.component';
+import { NoticiasComponent } from './noticias/noticias.component';
+import { PerfilComponent } from './perfil/perfil.component';
+import { ContenidosComponent } from './contenidos/contenidos.component';
 
 
 const routes: Routes = [
-  {path:"", component:HomeComponent},
-  {path:"publications", component:PublicationComponent},
-  {path:"news", component:MainNewsComponent},
-  {path:"members", component:MembersComponent},
-  {path:"projects", component:ProjectsComponent},
-  {path:"about-us", component:AboutComponent, children: [
-    {path: '', component: AboutUsComponent},
-    {path: 'about', component: AboutUsComponent},
-    {path: 'lines-investigation', component: LinesInvestigationComponent},
-    {path: 'methods', component: MethodComponent},
-    {path: 'facilities-resources', component: FacilitiesComponent},
-    {path: 'works', component: WorksComponent}
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
+  {path:"home",component:LandingComponent,children:[
+    {path:"", component:HomeComponent},
+    {path:"publications", component:PublicationComponent},
+    {path:"news", component:MainNewsComponent},
+    {path:"members", component:MembersComponent},
+    {path:"projects", component:ProjectsComponent},
+    {path:"about-us", component:AboutComponent, children: [
+      {path: '', component: AboutUsComponent},
+      {path: 'about', component: AboutUsComponent},
+      {path: 'lines-investigation', component: LinesInvestigationComponent},
+      {path: 'methods', component: MethodComponent},
+      {path: 'facilities-resources', component: FacilitiesComponent},
+      {path: 'works', component: WorksComponent}
+    ]},
+    {path:"detail-news/:id", component:DetailNewsComponent},
+    {path:"detail-member/:id", component:DetailMemberComponent},
+    {path:"search/:id", component:GlobalSearchComponent},
+    {path:"join-us", component:JoinUsComponent},
   ]},
-  {path:"detail-news/:id", component:DetailNewsComponent},
-  {path:"detail-member/:id", component:DetailMemberComponent},
-  {path:"search/:id", component:GlobalSearchComponent},
-  {path:"join-us", component:JoinUsComponent},
+  {path:"login", component:LoginComponent},
+  {path:"dashboard", component:LogHomeComponent, children: [
+    {path: '', component: DashboardComponent},
+    {path: 'miembros', component: MiembrosComponent},
+    {path: 'publicaciones', component: PublicacionesComponent},
+    {path: 'proyectos', component: ProyectosComponent},
+    {path: 'noticias', component: NoticiasComponent},
+    {path: 'perfil', component: PerfilComponent},
+    {path: 'contenidos', component: ContenidosComponent},
+  ]},
+  {path:"recover/:id", component:ChangePassComponent},
   {path:"**", component:NotFoundComponent},
 ];
 

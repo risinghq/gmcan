@@ -8,13 +8,21 @@ export class PreviousPageService{
     getPreviousPage(param){
         if(this.language.locale=="es"){
             switch (param) {
-                case "about-us":
-                    return "Sobre Nosotros";
-                case "publications":
+                case "home/about-us/about":
+                    return "¿Quiénes Somos?";
+                case "home/about-us/lines-investigation":
+                    return "Líneas de investigación";
+                case "home/about-us/methods":
+                    return "Métodos";
+                case "home/about-us/facilities-resources":
+                    return "Facilidades y recursos";
+                case "home/about-us/works":
+                    return "Trabajos futuros";
+                case "home/publications":
                     return "Publicaciones";
-                case "members":
+                case "home/members":
                     return "Miembros";
-                case "projects":
+                case "home/projects":
                     return "Proyectos";
                 case "":
                     return "Inicio";
@@ -23,13 +31,21 @@ export class PreviousPageService{
             }
         }else{
             switch (param) {
-                case "about-us":
-                    return "About Us";
-                case "publications":
+                case "home/about-us/about":
+                    return "Who are we?";
+                case "home/about-us/lines-investigation":
+                    return "Lines of investigation";
+                case "home/about-us/methods":
+                    return "Methods";
+                case "home/about-us/facilities-resources":
+                    return "Facilities and Resources";
+                case "home/about-us/works":
+                    return "Future Works";
+                case "home/publications":
                     return "Publications";
-                case "members":
+                case "home/members":
                     return "Members";
-                case "projects":
+                case "home/projects":
                     return "Projects";
                 case "":
                     return "Home";

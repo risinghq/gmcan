@@ -29,19 +29,19 @@ export class AboutComponent implements OnInit {
 
   verifyRoutes(route){
     switch (route) {
-      case '/about-us/about':
+      case '/home/about-us/about':
         this.selectedCategory=this.language.who;
         break;
-      case '/about-us/lines-investigation':
+      case '/home/about-us/lines-investigation':
         this.selectedCategory=this.language.linesInvestigation;
         break;
-      case '/about-us/methods':
+      case '/home/about-us/methods':
         this.selectedCategory=this.language.methods;
         break;
-      case '/about-us/facilities-resources':
+      case '/home/about-us/facilities-resources':
         this.selectedCategory=this.language.resources;
         break;
-      case '/about-us/works':
+      case '/home/about-us/works':
         this.selectedCategory=this.language.futureWorks;
         break;
       default:

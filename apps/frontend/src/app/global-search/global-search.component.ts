@@ -89,7 +89,7 @@ export class GlobalSearchComponent implements OnInit {
   /* globalSearch */
 
   searchGlobal(value){
-    this._router.navigate(['/search/'+value]);
+    this._router.navigate(['/home/search/'+value]);
     this.ngOnInit();
   }
   findGlobal(){
@@ -698,7 +698,7 @@ export class GlobalSearchComponent implements OnInit {
 
   profile(user){
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(['/detail-member/'+user.DNI]);
+    this._router.navigate(['/home/detail-member/'+user.DNI]);
   }
 
   publicationExpanded=true;
