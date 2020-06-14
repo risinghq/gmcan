@@ -160,3 +160,8 @@
     width: 100% !important;
     color: unset !important;
 }
+
+::ng-deep .mat-snack-bar-container{
+    margin-top: 65px !important;
+    margin-right: 32px !important;
+}

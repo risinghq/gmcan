@@ -104,18 +104,32 @@ export class NoticiasComponent implements OnInit {
     });
   }  
 
+  displayedNotFound;
+  displayedNotFound2;
+
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+    if(this.dataSource.filteredData.length==0){
+      this.displayedNotFound=true;
+    }else{
+      this.displayedNotFound=false;
+    }
   }
+  
   applyFilter2(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource2.filter = filterValue.trim().toLowerCase();
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
+    }
+    if(this.dataSource2.filteredData.length==0){
+      this.displayedNotFound2=true;
+    }else{
+      this.displayedNotFound2=false
     }
   }
 

@@ -11,7 +11,7 @@
         </a>
       </div>
     </div>
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table mat-table [dataSource]="dataSource" *ngIf="!displayedNotFound" matSort>
 
       <!-- ID Column -->
       <ng-container matColumnDef="titulo">
@@ -53,11 +53,10 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;">
-      </tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound"></mat-paginator>
+    <span class="plex-sans" *ngIf="displayedNotFound">No se encontraron resultados</span>
   </mat-tab>
   <mat-tab label="Categorías">
     <div class="flex-news mb-16">
@@ -71,7 +70,7 @@
         </a>
       </div>
     </div>
-    <table mat-table [dataSource]="dataSource2" matSort>
+    <table mat-table [dataSource]="dataSource2" *ngIf="!displayedNotFound2" matSort>
 
       <!-- ID Column -->
       <ng-container matColumnDef="nombre">
@@ -84,7 +83,8 @@
       </tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2"></mat-paginator>
+    <span class="plex-sans" *ngIf="displayedNotFound2">No se encontraron resultados</span>
   </mat-tab>
 </mat-tab-group>
   

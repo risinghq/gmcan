@@ -81,7 +81,7 @@ export class EditNewsComponent implements OnInit {
       autorPublicacion: ['',Validators.required],
       tipoNoticia_idtipoNoticia: ['',Validators.required],
     });
-    this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'','',null);
+    this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'',null,null);
     this.url=GLOBAL.url;
   }
 
@@ -92,8 +92,8 @@ export class EditNewsComponent implements OnInit {
   public newsForm: FormGroup;
   categorias: Array<TipoNoticia>;
   autores: Array<Usuario>;
-  button_text="Actualizar noticia";
-  button_text2="Dejar de publicar y guardar cambios";
+  button_text;
+  button_text2;
 
   getNews(){
     this._route.params.forEach((params:Params)=>{
@@ -104,6 +104,13 @@ export class EditNewsComponent implements OnInit {
           this.noticia.fechaPublicacionDate=this.noticia.fechaPublicacion;
           sessionStorage.setItem('noticiaPublicada', JSON.stringify(this.noticia.estado));
           this.getCategorias();
+          if(this.noticia.estado==0){
+            this.button_text="Publicar noticia";
+            this.button_text2="Guardar sin publicar";
+          }else{
+            this.button_text="Actualizar noticia";
+            this.button_text2="Dejar de publicar y guardar cambios";
+          }
         }
       });
     })
@@ -135,15 +142,20 @@ export class EditNewsComponent implements OnInit {
   }
 
   submitNews(value){
-    if(value==1 && this.newsForm.valid && this.noticia.foto){
-      this.publishDialog(value)
+    if(value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)){
+      this.publishDialog(value);
     }else if(value==0){
-      this.notPublishDialog(value)
+      if(this.noticia.estado==0){
+        this.publishMethod(value);
+      }else{
+        this.notPublishDialog(value)
+      }
     }
   }
 
   publish(value){
-    if (value==1 && this.newsForm.valid && this.noticia.foto) {
+    if (value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
+      console.log(value);
       this.publishMethod(value);
     }else if(value==0){
       this.publishMethod(value)
@@ -151,22 +163,32 @@ export class EditNewsComponent implements OnInit {
   }
 
   publishMethod(value){
+    let publicationStatus=this.noticia.estado;
     this.noticia.estado=value;
     if (this.noticia.fechaPublicacionDate) {
       const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
       this.noticia.fechaPublicacion=formattedDate; 
+    }else{
+      this.noticia.fechaPublicacion=null;
+    }
+    if(!this.noticia.autorPublicacion){
+      this.noticia.autorPublicacion=null;
     }
       this._noticiaService.updateNoticia(this.noticia).subscribe(result => {
         if(result.status==1){
           if(this.fileData){
-            this._noticiaService.uploadNoticiaFoto(this.fileData, result.rows)
+            this._noticiaService.uploadNoticiaFoto(this.fileData, this.noticia.idNoticia)
             .subscribe(res => {
             console.log(res);
           })
+          }
           this.return();
-          this.openSnackBar("Noticia actualizada exitosamente");
-          } 
+          if(publicationStatus==0){
+            this.openSnackBar("Noticia publicada exitosamente");
+          }else{
+            this.openSnackBar("Noticia actualizada exitosamente");
+          }
         }
       });
   }
@@ -235,16 +257,28 @@ export class EditNewsComponent implements OnInit {
   private dialogRef2: MatDialogRef<DialogPublish2>
 
   publishDialog(value) {
-    this.dialogRef2 = this.dialog.open(DialogPublish2,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "¿Estás seguro que deseas actualizar la noticia?",
-            text:"La información será publica para todo el mundo",
-            cancel:"No, cancelar",
-            yes:"Sí, publicar"}
-    });
+    if(this.noticia.estado==1){
+      this.dialogRef2 = this.dialog.open(DialogPublish2,{
+        width:"530px",
+        id:"idleTimer",
+        data: {title: "¿Estás seguro que deseas actualizar la noticia?",
+              text:"La información será publica para todo el mundo",
+              cancel:"No, cancelar",
+              yes:"Sí, publicar"}
+      });
+    }else{
+      this.dialogRef2 = this.dialog.open(DialogPublish2,{
+        width:"530px",
+        id:"idleTimer",
+        data: {title: "¿Estás seguro que deseas publicar la noticia?",
+              text:"La información será publica para todo el mundo",
+              cancel:"No, cancelar",
+              yes:"Sí, publicar"}
+      });
+    }
 
     this.dialogRef2.afterClosed().subscribe(result => {
+      console.log(result);
       if(!result){
         this.publish(value);
       }
@@ -344,7 +378,7 @@ export class EditNewsComponent implements OnInit {
     this._noticiaService.deleteNoticia(this.noticia.idNoticia).subscribe(result => {
       if(result.status==1){
         this.return();
-        this.openSnackBar("Categoría eliminada exitosamente");
+        this.openSnackBar("Noticia eliminada exitosamente");
       }else{
         this.openSnackBar("Hubo un problema al eliminar");
       }

@@ -80,7 +80,7 @@ export class AddNewsComponent implements OnInit {
       cuerpo: ['', Validators.required],
       cuerpoEN: ['', Validators.required],
       fechaPublicacion: ['', Validators.required],
-      autorPublicacion: ['',Validators.required],
+      autorPublicacion: [null,Validators.required],
       tipoNoticia_idtipoNoticia: ['',Validators.required],
     });
     this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'','',null);
@@ -117,32 +117,37 @@ export class AddNewsComponent implements OnInit {
   }
 
   submitNews(value){
-    if(this.newsForm.valid && this.fileData){
-      if(value==1){
-        this.publishDialog(value)
-      }else{
-        publish(value);
-      }
+    if (value==1 && this.newsForm.valid && this.fileData) {
+      this.publishDialog(value)
+    }else if(value==0){
+      this.publish(value);
     }
   }
 
   publish(value){
-    if(this.newsForm.valid && this.fileData){
-      this.noticia.estado=value;
+    this.noticia.estado=value;
+    if (this.noticia.fechaPublicacionDate) {
       const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
-      this.noticia.fechaPublicacion=formattedDate;
-      this._noticiaService.addNews(this.noticia).subscribe(result => {
-        if(result.status==1){
+      this.noticia.fechaPublicacion=formattedDate; 
+    }else{
+      this.noticia.fechaPublicacion=null;
+    }
+    if(!this.noticia.autorPublicacion){
+      this.noticia.autorPublicacion=null
+    }
+    this._noticiaService.addNews(this.noticia).subscribe(result => {
+      if(result.status==1){
+        if(this.fileData){
           this._noticiaService.uploadNoticiaFoto(this.fileData, result.rows)
-            .subscribe(res => {
-            console.log(res);
-            this.return();
-            this.openSnackBar();
-          }) 
-        } 
-      });
-    } 
+          .subscribe(res => {
+          console.log(res);
+        }) 
+        }
+        this.return();
+        this.openSnackBar();
+      } 
+    });
   }
 
   private previewDialog: MatDialogRef<DialogPreview>
