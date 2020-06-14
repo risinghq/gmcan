@@ -28,6 +28,10 @@ import { ProyectosComponent } from './proyectos/proyectos.component';
 import { NoticiasComponent } from './noticias/noticias.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { ContenidosComponent } from './contenidos/contenidos.component';
+import { AddCategoryComponent } from './add-category/add-category.component';
+import { EditCategoryComponent } from './edit-category/edit-category.component';
+import { AddNewsComponent } from './add-news/add-news.component';
+import { EditNewsComponent } from './edit-news/edit-news.component';
 
 
 const routes: Routes = [
@@ -58,6 +62,10 @@ const routes: Routes = [
     {path: 'publicaciones', component: PublicacionesComponent},
     {path: 'proyectos', component: ProyectosComponent},
     {path: 'noticias', component: NoticiasComponent},
+    {path: 'add-news', component: AddNewsComponent},
+    {path: 'edit-news/:id', component: EditNewsComponent},
+    {path: 'add-category', component: AddCategoryComponent},
+    {path: 'edit-category/:id', component: EditCategoryComponent},
     {path: 'perfil', component: PerfilComponent},
     {path: 'contenidos', component: ContenidosComponent},
   ]},

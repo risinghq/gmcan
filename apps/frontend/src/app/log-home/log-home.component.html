@@ -73,7 +73,12 @@
     <div class="example-sidenav-content">
       <div class="flex-news dashboard-tool">
         <button mat-icon-button class="middle btn-sidemenu" (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
-        <div class="tool-text middle">{{title}}</div>
+        <div class="flex-news">
+          <div id="titleDash" class="tool-text middle"></div>
+          <div class="publish-news" *ngIf="noticiaPublicada">
+            Noticia Publicada
+          </div>
+        </div>
         <div class="right user-div flex-news">
           <div class="user-img">
             <img class="img-css" src="{{url+'usuario/get-image-usuario/'+user.foto}}">
@@ -96,7 +101,7 @@
                   </a>
                 </div>
                 <div mat-menu-item [disableRipple]="true">
-                  <a class="link" (click)="logout()" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+                  <a class="link" (click)="openDialogLogOff()" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
                     Cerrar Sesión
                   </a>
                 </div>
@@ -105,7 +110,7 @@
           </div>
         </div>
       </div>
-        <router-outlet></router-outlet>
+        <router-outlet (voted)="onVoted($event)"></router-outlet>
     </div>
   
   </mat-drawer-container>

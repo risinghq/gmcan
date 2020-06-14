@@ -5,6 +5,7 @@ import { UsuarioHasPermisoService } from '../services/usuariohaspermiso.service'
 import { ActivatedRoute, Router } from '@angular/router';
 import { Grupo } from '../models/grupo';
 import { GLOBAL } from '../services/global';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,6 +28,7 @@ export class DashboardComponent implements OnInit {
   };
   permisoUsuario;
   constructor(
+    public authService: AuthService,
     public _usuarioService: UsuarioService,
     public _permisoService: PermisoService,
     public _usuarioHasPermisoService: UsuarioHasPermisoService,
@@ -37,26 +39,14 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.checkToken();
+    this.user=JSON.parse(localStorage.getItem("user"));
+    this.getPermiso();
     this.getGrupoInfo();
   }
 
   getGrupoInfo(){
     this.grupoinfo=JSON.parse(localStorage.getItem("grupoInfo"));
     this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
-  }
-
-  checkToken(){
-    this._usuarioService.checkToken().subscribe((res)=>{
-      if(res && res.state==1){
-        this.user=this._usuarioService.getUserLogged();
-        this.getPermiso();
-        
-      }
-      if(res.success==0){
-        this._router.navigate(['/login']);
-      }
-    });
   }
 
   getPermiso(){

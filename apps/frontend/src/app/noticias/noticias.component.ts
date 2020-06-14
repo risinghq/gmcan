@@ -7,6 +7,8 @@ import { Noticia } from '../models/noticia';
 import { TipoNoticia } from '../models/tiponoticia';
 import { TitleCasePipe, DatePipe } from '@angular/common';
 import { GLOBAL } from '../services/global';
+import { ActivatedRoute, Router } from '@angular/router';
+import { __core_private_testing_placeholder__ } from '@angular/core/testing';
 
 @Component({
   selector: 'app-noticias',
@@ -19,6 +21,7 @@ export class NoticiasComponent implements OnInit {
   displayedColumns2: string[] = ['nombre'];
   dataSource: MatTableDataSource<Noticia>;
   dataSource2: MatTableDataSource<TipoNoticia>;
+  selectedTab;
 
   url
   public noticias: Array<Noticia>;
@@ -26,6 +29,7 @@ export class NoticiasComponent implements OnInit {
 
   ngOnInit(){
     this.getTipoNoticias(); 
+    this.selectedTab=sessionStorage.getItem("oldNews");
   }
 
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -40,6 +44,8 @@ export class NoticiasComponent implements OnInit {
     public _tiponoticiaService: TipoNoticiaService,
     public titlecasePipe:TitleCasePipe,
     public datePipe: DatePipe,
+    public _route: ActivatedRoute,
+    public _router: Router,
   ) {
     this.url=GLOBAL.url;
   }
@@ -48,8 +54,6 @@ export class NoticiasComponent implements OnInit {
    * Set the paginator and sort after the view init since this component will
    * be able to query its view for the initialized paginator and sort.
    */
-  ngAfterViewInit() {
-  }
 
   getNoticia(){
     this._noticiaService.getNoticias().subscribe((res)=>{
@@ -113,5 +117,25 @@ export class NoticiasComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
+  }
+
+  addCategory(){
+    this._router.navigate(['dashboard/add-category']);
+  }
+
+  editCategory(id){
+    this._router.navigate(['dashboard/edit-category/'+id]);
+  }
+
+  addNews(){
+    this._router.navigate(['dashboard/add-news']);
+  }
+
+  editNews(id){
+    this._router.navigate(['dashboard/edit-news/'+id]);
+  }
+
+  changedTab(event){
+    sessionStorage.setItem("oldNews", event);
   }
 }

@@ -3,7 +3,8 @@
         {{title}}
     </div>
     <div class="img-hover-zoom">
-        <img class="card-img-div" src="../../assets/img/grupal.jpg" alt="nada">
+        <img class="card-img-div" src="../../assets/img/grupal.jpg" *ngIf="!noticiaPrincipal.foto">
+        <img class="card-img-div" src="{{url+'noticia/get-image-noticia/'+noticiaPrincipal.foto}}" *ngIf="noticiaPrincipal.foto">
     </div>
     <div class="card-text-div card-text-div-3">
         <div class="flex-news flex-news-3">
@@ -40,7 +41,8 @@
                 </div>
             </div>
             <div class="img-hover-zoom-2 img-div-zoom">
-                <img class="other-news-img" src="../../assets/img/grupal.jpg" alt="nada">
+                <img class="other-news-img" src="../../assets/img/grupal.jpg" alt="nada" *ngIf="!noticia.foto">
+                <img class="other-news-img" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" alt="nada" *ngIf="noticia.foto">
             </div>
         </div>
     </div>

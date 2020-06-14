@@ -5,7 +5,7 @@ export class Noticia{
         public idNoticia: Number,
         public titulo: String,
         public resumen: String,
-        public cuerpo: String,
+        public cuerpo: string,
         public fechaPublicacion: string,
         public estado: Number,
         public status: string,

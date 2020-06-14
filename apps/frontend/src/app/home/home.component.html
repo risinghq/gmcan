@@ -69,7 +69,8 @@
         <div class="col-lg-8 grid">
             <div class="news-box display-sub-flex">
                 <div class="img-hover-zoom img-hover-zoom-s">
-                    <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada">
+                    <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada" *ngIf="!noticiaPrincipal.foto">
+                    <img class="main-img-news" src="{{url+'noticia/get-image-noticia/'+noticiaPrincipal.foto}}" alt="imagen" *ngIf="noticiaPrincipal.foto">
                 </div>
                 <div class="news-div mt-main" style="height: 100%;">
                     <div class="flex-news mt-mb-flex">
@@ -95,7 +96,8 @@
         <div class="col-lg-4">
             <div class="news-box" *ngFor="let noticia of noticias | slice:1:3; let i=index" [ngClass]="{'mb-other': i==0}">
                 <div class="img-hover-zoom" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                    <img class="other-img-news" src="../../assets/img/grupal.jpg" alt="nada">
+                    <img class="other-img-news" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
+                    <img class="other-img-news" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                 </div>
                 <div class="flex-news">
                     <div class="news-div mt-other full-width">

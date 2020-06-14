@@ -129,6 +129,7 @@ tr:hover{
 }
 
 .btn-black{
+    cursor: pointer;
     border-radius: 4px;
     margin-left: 16px;
     border: solid 2px #000000;
@@ -141,4 +142,8 @@ tr:hover{
     font-size: 15px;
     margin-right: 0;
     font-weight: 600;
-}   
+}
+
+.mat-row{
+    cursor: pointer;
+}

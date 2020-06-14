@@ -99,6 +99,9 @@ figure:hover::before {
     letter-spacing: 0.3px;
     color: #000000;
 }
+.other-news-text-2:hover{
+    text-decoration: underline;
+}
 
 .news-title{
     @extend .plex-sans; 

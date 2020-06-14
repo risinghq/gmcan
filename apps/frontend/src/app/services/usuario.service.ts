@@ -69,19 +69,6 @@ export class UsuarioService{
     return this.http.get(this.url+'usuario/check-res/'+user.correo,{headers});
   }
 
-  checkToken():any{
-    let token=JSON.parse(localStorage.getItem("token"));
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization':'Bearer '+token
-	  });
-    return this.http.get(this.url+'usuario/check-token',{headers});
-  }
-
-  getToken(){
-    return JSON.parse(localStorage.getItem("token"));
-  }
-
   getUserLogged(){
     return JSON.parse(localStorage.getItem("user"));
   }

@@ -16,7 +16,6 @@ export class JoinUsComponent implements OnInit {
   public validation =true;
   public email: EmailBody
   constructor(
-    
     public fb:FormBuilder,
     public _emailService: EmailService,
     public dialog: MatDialog

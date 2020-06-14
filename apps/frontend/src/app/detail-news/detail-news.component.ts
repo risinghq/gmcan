@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
 import { Usuario } from '../models/usuario';
 import { UsuarioService } from '../services/usuario.service';
 import { TitleCasePipe } from '@angular/common';
+import { GLOBAL } from '../services/global';
 
 @Component({
   selector: 'app-detail-news',
@@ -19,6 +20,7 @@ export class DetailNewsComponent implements OnInit {
   public previouspage;
   public previouslink;
   public usuario: Usuario;
+  url
   constructor(
     public titlecasePipe:TitleCasePipe,
     public datePipe:DatePipe,
@@ -31,6 +33,7 @@ export class DetailNewsComponent implements OnInit {
   ) {
     this.noticia = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
     this.usuario = new Usuario('','','','','','');
+    this.url=GLOBAL.url;
    }
 
   language;
@@ -79,6 +82,7 @@ export class DetailNewsComponent implements OnInit {
         this.dia=this.datePipe.transform(this.datere,'dd');
         this.mes=this.datePipe.transform(this.datere,'MMMM');
         this.anio=this.datePipe.transform(this.datere,'y');
+        document.getElementById("newsBody").innerHTML=this.noticia.cuerpo;
         this.getTipoNoticia(this.noticia.tipoNoticia_idtipoNoticia);
         this.getUsuario(this.noticia.autorPublicacion);
       });

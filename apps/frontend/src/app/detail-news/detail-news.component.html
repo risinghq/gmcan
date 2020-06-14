@@ -17,7 +17,8 @@
                 </div>
                 <div class="card-detail">
                     <div class="news-title-div">
-                        <img class="detail-img" src="../../assets/img/grupal.jpg">
+                        <img class="detail-img" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
+                        <img class="detail-img" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                         <div class="news-title">
                             {{noticia.titulo}}
                         </div>
@@ -36,7 +37,8 @@
                         </div>
                         <div class="autor-div">
                             <div class="autor-img-div">
-                                <img class="autor-img" src="../../assets/img/images.png">
+                                <img class="autor-img" src="../../assets/img/images.png" *ngIf="!usuario.foto">
+                                <img class="autor-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
                             </div>
                             <div class="autor-text">
                                 <div class="news-type">
@@ -56,8 +58,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="detail-text" style="white-space:pre-wrap;">
-                            {{noticia.cuerpo}}
+                        <div id="newsBody" class="detail-text" style="white-space:pre-wrap;">
                         </div>
                     </div>
                 </div>

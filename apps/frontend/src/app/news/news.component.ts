@@ -8,6 +8,7 @@ import { TipoNoticiaService } from '../services/tiponoticia.service';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
+import { GLOBAL } from '../services/global';
 
 @Component({
   selector: 'app-news',
@@ -18,7 +19,8 @@ export class NewsComponent implements OnInit {
 
   public noticias: Array<Noticia>;
   public noticiaPrincipal: Noticia;
-  public tiponoticias: Array<TipoNoticia>
+  public tiponoticias: Array<TipoNoticia>;
+  url;
   
   constructor(
     public titlecasePipe:TitleCasePipe,
@@ -32,6 +34,7 @@ export class NewsComponent implements OnInit {
   ) { 
     this.noticiaPrincipal = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
     this.noticias=[];
+    this.url=GLOBAL.url
   }
   numberShown;
   @HostListener('window:resize', ['$event'])

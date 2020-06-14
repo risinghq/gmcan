@@ -3,7 +3,7 @@ import { NgModule, LOCALE_ID } from '@angular/core';
 import {DatePipe, TitleCasePipe } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import  {MatSidenavModule,
           MatToolbarModule,
@@ -19,8 +19,11 @@ import  {MatSidenavModule,
           MatChipsModule,
           MatTableModule,
           MatPaginatorModule,
+          MatSnackBarModule,
           MatSortModule,
-          MatCardModule } from '@angular/material';
+          MatCardModule,
+          MatSelectModule,
+          MatDatepickerModule } from '@angular/material';
 import { HomeComponent } from './home/home.component';
 import { MantenimientoComponent } from './mantenimiento/mantenimiento.component';
 import { AboutComponent } from './about/about.component';
@@ -53,13 +56,25 @@ import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LandingComponent } from './landing/landing.component';
 import { ChangePassComponent } from './change-pass/change-pass.component';
-import { LogHomeComponent } from './log-home/log-home.component';
+import { LogHomeComponent, DialogIdle } from './log-home/log-home.component';
 import { NoticiasComponent } from './noticias/noticias.component';
 import { ProyectosComponent } from './proyectos/proyectos.component';
 import { PublicacionesComponent } from './publicaciones/publicaciones.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { MiembrosComponent } from './miembros/miembros.component';
 import { ContenidosComponent } from './contenidos/contenidos.component';
+import { AuthGuard } from './guards/auth.guard';
+import { RandomGuard } from './guards/random.guard';
+import { TokenInterceptor } from './token.interceptor';
+import { AuthService } from './services/auth.service';
+import { NgIdleKeepaliveModule } from '@ng-idle/keepalive'; // this includes the core NgIdleModule but includes keepalive providers for easy wireup
+import { MomentModule } from 'angular2-moment';
+import { AddCategoryComponent, DialogCancel } from './add-category/add-category.component';
+import { EditCategoryComponent, DialogCancel2, DialogErase } from './edit-category/edit-category.component';
+import { AddNewsComponent, DialogCancel3, DialogPublish, DialogPreview } from './add-news/add-news.component'; // optional, provides moment-style pipes for date formatting
+import { MomentDateModule } from '@angular/material-moment-adapter';
+import { CKEditorModule } from 'ckeditor4-angular';
+import { EditNewsComponent, DialogCancel4, DialogPreview2, DialogPublish2, DialogPublish3, DialogErase2 } from './edit-news/edit-news.component';
 
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
@@ -100,7 +115,22 @@ registerLocaleData(localeEsAr, 'es-Ar');
     PublicacionesComponent,
     PerfilComponent,
     MiembrosComponent,
-    ContenidosComponent
+    ContenidosComponent,
+    DialogIdle,
+    AddCategoryComponent,
+    DialogCancel, DialogCancel2,
+    EditCategoryComponent,
+    DialogErase,
+    AddNewsComponent,
+    DialogCancel3,
+    DialogPublish,
+    DialogPreview,
+    EditNewsComponent,
+    DialogCancel4,
+    DialogPreview2,
+    DialogPublish2,
+    DialogPublish3,
+    DialogErase2
   ],
   imports: [
     BrowserModule,
@@ -125,11 +155,26 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    NgIdleKeepaliveModule.forRoot(),
+    MomentModule,
+    HttpClientModule,
+    MatSnackBarModule,
+    MatDatepickerModule,
+    MomentDateModule,
+    MatSelectModule,
+    CKEditorModule
   ],
   exports:[LocalDatePipe],
-  entryComponents:[EmailExitoso],
-  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}],
+  entryComponents:[EmailExitoso, DialogIdle, DialogCancel, DialogCancel2, DialogErase, DialogCancel3,DialogPublish, DialogPreview, DialogCancel4,DialogPreview2, DialogPublish2,
+    DialogPublish3, DialogErase2 ],
+  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}, AuthGuard,
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: TokenInterceptor,
+    multi: true
+  }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

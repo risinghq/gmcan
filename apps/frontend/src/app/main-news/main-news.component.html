@@ -34,7 +34,8 @@
                 <div *ngIf="noticias.length>0">
                     <div class="news flex-news" *ngFor="let noticia of noticias | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize" >
                         <div class="img-hover-zoom-2 img-div-zoom right pl-24" [ngStyle]="{'display' : (screenWidth < 960) ? 'block' : 'none'}">
-                            <img class="news-img" src="../../assets/img/grupal.jpg" alt="nada">
+                            <img class="news-img" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
+                            <img class="news-img" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                         </div>
                         <div class="news-text-div">
                             <div class="columna">
@@ -56,7 +57,8 @@
                             </div>
                         </div>
                         <div class="img-hover-zoom-2 img-div-zoom pl-24" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                            <img class="news-img" src="../../assets/img/grupal.jpg" alt="nada">
+                            <img class="news-img" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
+                            <img class="news-img" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                         </div>
                     </div>
                     <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="noticias.length" *ngIf="noticias.length>10">

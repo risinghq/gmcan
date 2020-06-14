@@ -708,3 +708,191 @@ mat-spinner{
         font-size: 13px;
     }
 }
+
+.title-div{
+    display: flex !important;
+}
+
+.title-mat{
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.1;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.red-timer{
+    margin-left: auto;
+    font-size: 30px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 0.83;
+    letter-spacing: 0.3px;
+    color: #a00000;
+}
+
+.mat-dialog-justify{
+    justify-content: space-between !important;
+}
+
+.cancel-button{
+    background-color: unset;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+.mat-text-dialog{
+    margin-bottom: 16px !important;
+    font-size: 20px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+    color: #30393a;
+}
+
+/* CSS MODALS*/
+
+#idleTimer{
+    padding: 32px 40px !important;
+}
+
+#previewNews{
+    overflow: visible;
+    position: relative;
+    padding: 0px !important;
+}
+
+.outside{
+    position: absolute;
+    top: 32px;
+    right: -94px;
+    font-size: 100px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 0.2;
+    letter-spacing: 0.3px;
+    color: #ffffff;
+    background: unset;
+    border: unset;
+    outline: unset;
+}
+
+/* FIN CSS MODALS*/
+
+.black-btn{
+    cursor: pointer;
+    border-radius: 4px;
+    border: solid 2px #000000;
+    padding: 8px;
+    line-height: 1;
+    width: max-content;
+}
+
+.black-btn:hover{
+    cursor: pointer;
+}
+
+.red-btn{
+    cursor: pointer;
+    border-radius: 4px;
+    border: solid 2px #a00000;
+    padding: 8px;
+    line-height: 1;
+    width: max-content;
+}
+
+.link-set{
+    font-size: 15px !important;
+    margin-right: 0 !important;
+    font-weight: 600 !important;
+}   
+
+.link-red{
+    color: #a00000 !important;
+    &:before {
+        background-color: #a00000 !important;
+        }
+}
+
+/* Adding CSS */
+
+.pad{
+    padding: 32px;
+}
+
+.add-box{
+    min-width: 1038px;
+    @extend .plex-sans;
+    padding: 24px;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+.text-category{
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+    color: #30393a;
+    margin-bottom: 8px;
+}
+
+.red-text{
+    color: #a00000;
+}
+
+.input-category{
+    width: 100%;
+    padding: 11px 16px;
+    outline: none;
+    border: none;
+    line-height: 1;
+    background-color: #f4f5f4;
+}
+
+.btn-grey{
+    padding: 8px;
+    line-height: 1;
+    width: max-content;
+    border-radius: 4px;
+    border: solid 2px #9595b2;
+}
+
+.btn-grey>.link{
+    color:#9595b2 !important;
+}
+
+.btn-grey>.link::before{
+    width: unset !important;
+}
+
+.mb-32{
+    margin-bottom: 32px;
+}
+
+::ng-deep .mat-select-value, .mat-select{
+    min-width: 100% !important;
+    width: 100% !important;
+}
+
+.mr-16{
+    margin-right: 16px;
+}
+
+.grey-text{
+    color:#9595b2 !important;
+}
+
+.grey-text::before{
+    width: unset !important;
+}
+
+.grey-title{
+    font-weight: 500;
+    color: #939393;
+}
