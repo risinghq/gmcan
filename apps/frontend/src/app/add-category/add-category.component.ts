@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogData } from '../models/dialogdata';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,6 +6,9 @@ import { TipoNoticia } from '../models/tiponoticia';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { CommonService } from '../services/common.service';
 
 @Component({
   selector: 'app-add-category',
@@ -15,20 +18,26 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 export class AddCategoryComponent implements OnInit {
   category: TipoNoticia;
   public categoryForm: FormGroup;
-  button_text="Agregar categoría"
+  button_text="Agregar categoría";
+  agregar;
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
     public _router: Router,
     public dialog: MatDialog,
     public _tipoNoticiaService:TipoNoticiaService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private _commonService: CommonService,
   ) {
     this.categoryForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       nombreEN: ['', Validators.required]
     });
     this.category = new TipoNoticia(null,"","");
+  }
+
+  @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
+    event.returnValue = false;
   }
 
   ngOnInit() {
@@ -45,15 +54,11 @@ export class AddCategoryComponent implements OnInit {
             cancel:"Sí, volver",
             yes:"No, mantenerme aquí"}
     });
-
-    this.dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        this.return();
-      }
-    });
   }
 
   return(){
+    this.agregar=false;
+    this._commonService.setEndSession('0');
     this._router.navigate(['dashboard/noticias']);
   }
 
@@ -63,6 +68,7 @@ export class AddCategoryComponent implements OnInit {
         if(result.status==1){
           this.return();
           this.openSnackBar();
+          this.agregar=true;
         } 
       });
     }
@@ -74,6 +80,17 @@ export class AddCategoryComponent implements OnInit {
       horizontalPosition: 'right',
       verticalPosition: 'top',
     });
+  }
+
+  canDeactivate(): Observable<boolean> {
+    if(!this.agregar){
+      this.openDialog();
+      return this.dialogRef.afterClosed().pipe(map(result => {
+        return result === true;
+      }));
+    }else{
+      return ;
+    }
   }
 
 }

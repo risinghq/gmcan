@@ -12,6 +12,7 @@ import { Keepalive } from '@ng-idle/keepalive';
 import { AuthService } from '../services/auth.service';
 import { DialogData } from '../models/dialogdata';
 import { CommonService } from '../services/common.service';
+import { stringify } from 'querystring';
 
 @Component({
   selector: 'app-log-home',
@@ -53,7 +54,7 @@ export class LogHomeComponent implements OnInit {
     private _commonService:CommonService,
   ){
     this.url=GLOBAL.url;
-    this.user = new UsuarioFull("","","","","","","",0,"","",null,null,null,1,"",1,"",null);
+    this.user = new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
         // sets an idle timeout of 5 seconds, for testing purposes.
         idle.setIdle(240);
         // sets a timeout period of 5 seconds. after 10 seconds of inactivity, the user will be considered timed out.
@@ -68,6 +69,7 @@ export class LogHomeComponent implements OnInit {
         idle.onTimeout.subscribe(() => {
           this.dialog.closeAll();
           this.timedOut = true;
+          this._commonService.setEndSession('1');
           this.router.navigate(['/login']);
         });
         
@@ -77,6 +79,7 @@ export class LogHomeComponent implements OnInit {
         
         idle.onTimeoutWarning.subscribe((countdown) => {
           this.counterDown=countdown;
+          this._commonService.setEndSession('1');
           if(this.dialogRef.componentInstance){
             this.dialogRef.componentInstance.data.timer=countdown;
           }
@@ -104,6 +107,7 @@ export class LogHomeComponent implements OnInit {
   }  
 
   stay() {
+    this._commonService.setEndSession('0');
     this.reset();
   }
 
@@ -113,9 +117,10 @@ export class LogHomeComponent implements OnInit {
   }
 
   noticiaPublicada;
+
   ngAfterViewChecked(){
     document.getElementById("titleDash").innerHTML=this._commonService.defineTitle(window.location.pathname);
-    if(this._commonService.defineTitle(window.location.pathname)=='<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span'){
+    if(this._commonService.defineTitle(window.location.pathname)=='<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span>'){
       if(JSON.parse(sessionStorage.getItem('noticiaPublicada'))==1){
         this.noticiaPublicada=true;
       }else{
@@ -125,6 +130,10 @@ export class LogHomeComponent implements OnInit {
     else{
       this.noticiaPublicada=false;
     }
+    if(this._commonService.getReset()){
+      this.getUser();
+      this._commonService.setReset(false);
+    }
   }
 
   getGrupoInfo(){
@@ -133,25 +142,30 @@ export class LogHomeComponent implements OnInit {
   }
 
   getUser(){
-    this.user=JSON.parse(localStorage.getItem("user"));
-    this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno + " " + this.user.apellidoMaterno;
-    this.getPermiso();
-  }
-
-  getPermiso(){
-    this._permisoService.getPermisos().subscribe((res)=>{
-      if(res.length>0){
-        this.getPermisoHasUsuario(this.user.DNI, res);
+    let user = this._usuarioService.getUserLogged();
+    this._usuarioService.getFullUser(user.DNI).subscribe(result => {
+      if(result.length>0){
+        this.user=result[0];
+        if(this.user.apellidoMaterno){
+          this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno + " " + this.user.apellidoMaterno;
+        }else{
+          this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno;
+        }
+        if(this.user.nombre.includes(' ')){
+          let string = this.user.nombre.split(' ');
+          this.user.nombre= string[0];
+        }
       }
+      this.getPermisoHasUsuario(this.user.DNI);
     });
   }
 
-  getPermisoHasUsuario(DNI, permisoList){
+  getPermisoHasUsuario(DNI){
     this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res)=>{
       if(res.length>0){
         this.permisoUsuario=res;
-        for (let index = 0; index < permisoList.length; index++) {
-          switch (permisoList[index].idPermiso) {
+        for (let index = 0; index < this.permisoUsuario.length; index++) {
+          switch (this.permisoUsuario[index].permiso_idPermiso) {
             case 1:
               this.permisos.noticiaPermiso=true;
               break;
@@ -179,6 +193,7 @@ export class LogHomeComponent implements OnInit {
   }
 
   logout(){
+    localStorage.setItem("sessionEnd",'1');
     this.idle.stop();
     this.timedOut = true;
     this._authService.logout();
@@ -203,14 +218,13 @@ export class LogHomeComponent implements OnInit {
     });
 
     this.dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
       if(result){
+        this._commonService.setEndSession('1');
         this.logout();
-      }else{
-        this.idle.onIdleEnd.subscribe(() => { 
-          this.idleState = 'No longer idle.'
-          this.reset();
-        });
-        this._authService.refreshToken();
+      }else if(result!=undefined){
+        this._authService.refreshToken().subscribe((res)=>{});;
+        this.stay();
       }
     });
   }

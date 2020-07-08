@@ -9,6 +9,7 @@ import { stringify } from 'querystring';
   })
 export class UsuarioService{
     public url: string;
+    JWT_TOKEN = 'JWT_TOKEN';
 
 	languagelocal;
 	constructor(public http: HttpClient){
@@ -76,6 +77,69 @@ export class UsuarioService{
   logout(){
     localStorage.removeItem("token")
     localStorage.removeItem("user")
+  }
+
+  getUsersActive(id): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.get(this.url+'usuario/get-usuario-active/'+id,{headers});
+  }
+
+  getFullUser(DNI): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.get(this.url+'usuario/get-usuario-full/'+DNI,{headers});
+  }
+
+  addUser(user): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.post(this.url+'usuario/post-usuario',user,{headers});
+  }
+
+  updateUser(user): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.put(this.url+'usuario/update-usuario',user,{headers});
+  }
+
+  verifyUser(user): any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization':'Bearer '+localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.post(this.url+'usuario/verify-email',user,{headers});
+  }
+
+  uploadUsuarioFoto(fileData, id){
+    const formData = new FormData();
+    formData.append('image', fileData, fileData.name); 
+    let headers = new HttpHeaders ({
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.put(this.url+'usuario/upload-usuario-file/'+id, formData, {headers});
+  }
+
+  deleteUsuario(miembro):any{
+    let headers = new HttpHeaders ({
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.delete(this.url+'usuario/delete-usuario/'+miembro.DNI, {headers});
+  }
+
+  deleteImage(idImage):any{
+    let headers = new HttpHeaders ({
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.delete(this.url+'usuario/erase-image/'+idImage, {headers});
   }
 
 }

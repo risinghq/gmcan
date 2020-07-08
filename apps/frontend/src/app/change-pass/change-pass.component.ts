@@ -109,7 +109,7 @@ export class ChangePassComponent implements OnInit {
   }
 
   return(){
-    this._router.navigate(['/home']);
+    this._router.navigate(['/login']);
   }
 
 }

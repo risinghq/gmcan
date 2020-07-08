@@ -23,7 +23,7 @@ export class NoticiasComponent implements OnInit {
   dataSource2: MatTableDataSource<TipoNoticia>;
   selectedTab;
 
-  url
+  url;
   public noticias: Array<Noticia>;
   public tiponoticias: Array<TipoNoticia>
 
@@ -87,8 +87,8 @@ export class NoticiasComponent implements OnInit {
       res.sort((a,b) => a.nombre > b.nombre ? 1 : -1)
       this.tiponoticias=res;
       this.dataSource2 = new MatTableDataSource(this.tiponoticias);
-      this.dataSource2.paginator = this.paginator2;
       this.dataSource2.sort = this.sort2;
+      this.dataSource2.paginator = this.paginator2;
       this.getNoticia();
     });
   }

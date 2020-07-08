@@ -32,6 +32,14 @@ import { AddCategoryComponent } from './add-category/add-category.component';
 import { EditCategoryComponent } from './edit-category/edit-category.component';
 import { AddNewsComponent } from './add-news/add-news.component';
 import { EditNewsComponent } from './edit-news/edit-news.component';
+import { AddMemberComponent } from './add-member/add-member.component';
+import { DeactivateGuard } from './guards/deactivate-guard';
+import { EditMemberComponent } from './edit-member/edit-member.component';
+import { AddMemberGuard } from './guards/change-addmember-guard';
+import { EditMemberGuard } from './guards/change-editmember-guard';
+import { EditCategoryGuard } from './guards/editcategory.guard';
+import { EditNewsGuard } from './guards/editnews.guard';
+import { AddNewsGuard } from './guards/addnews.guard';
 
 
 const routes: Routes = [
@@ -58,14 +66,17 @@ const routes: Routes = [
   {path:"login", component:LoginComponent},
   {path:"dashboard", component:LogHomeComponent, children: [
     {path: '', component: DashboardComponent},
-    {path: 'miembros', component: MiembrosComponent},
+    {path: 'miembros-activos', component: MiembrosComponent},
+    {path: 'miembros-antiguos', component: MiembrosComponent},
+    {path: 'add-member', component: AddMemberComponent, canDeactivate: [AddMemberGuard]},
+    {path: 'edit-member/:id', component: EditMemberComponent , canDeactivate: [EditMemberGuard]},
     {path: 'publicaciones', component: PublicacionesComponent},
     {path: 'proyectos', component: ProyectosComponent},
     {path: 'noticias', component: NoticiasComponent},
-    {path: 'add-news', component: AddNewsComponent},
-    {path: 'edit-news/:id', component: EditNewsComponent},
-    {path: 'add-category', component: AddCategoryComponent},
-    {path: 'edit-category/:id', component: EditCategoryComponent},
+    {path: 'add-news', component: AddNewsComponent, canDeactivate:[AddNewsGuard]},
+    {path: 'edit-news/:id', component: EditNewsComponent, canDeactivate:[EditNewsGuard]},
+    {path: 'add-category', component: AddCategoryComponent, canDeactivate: [DeactivateGuard]},
+    {path: 'edit-category/:id', component: EditCategoryComponent, canDeactivate: [EditCategoryGuard]},
     {path: 'perfil', component: PerfilComponent},
     {path: 'contenidos', component: ContenidosComponent},
   ]},

@@ -17,13 +17,12 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(user: { correo: string, password: string }): Observable<boolean> {
+  login(user: { correo: string, password: string }): Observable<any> {
     return this.http.post<any>(`${config.apiUrl}/usuario/login`, user)
       .pipe(
         tap(tokens => this.doLoginUser(tokens)),
-        mapTo(true),
         catchError(error => {
-          alert(error.error);
+          console.log(error);
           return of(false);
         }));
   }
@@ -35,7 +34,7 @@ export class AuthService {
       tap(() => this.doLogoutUser()),
       mapTo(true),
       catchError(error => {
-        alert(error.error);
+        console.log(error);
         return of(false);
       }));
   }
@@ -83,6 +82,7 @@ export class AuthService {
     localStorage.removeItem(this.JWT_TOKEN);
     localStorage.removeItem(this.REFRESH_TOKEN);
     localStorage.removeItem("user");
+    localStorage.clear()
   }
 
   getUser(){

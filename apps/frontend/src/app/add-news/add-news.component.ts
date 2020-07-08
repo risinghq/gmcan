@@ -11,6 +11,8 @@ import {FormControl} from '@angular/forms';
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
 import * as ClassicEditor from '../../assets/ckeditor/ckeditor.js'
+import { Observable } from 'rxjs/internal/Observable';
+import { map } from 'rxjs/operators';
 
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
@@ -18,10 +20,10 @@ import {default as _rollupMoment} from 'moment';
 import { NoticiaFull } from '../models/noticiafull';
 import { Usuario } from '../models/usuario';
 import { GLOBAL } from '../services/global';
-import { publish } from 'rxjs/operators';
 import { Languages } from '../models/languages';
 import { TitleCasePipe } from '@angular/common';
 import { DatePipe } from '@angular/common';
+import { CommonService } from '../services/common.service';
 
 const moment = _rollupMoment || _moment;
 
@@ -71,6 +73,7 @@ export class AddNewsComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private _tipoNoticiaService:TipoNoticiaService,
     private _usuarioService:UsuarioService,
+    private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
       titulo: ['', Validators.required],
@@ -108,7 +111,12 @@ export class AddNewsComponent implements OnInit {
     });
   }
 
+  agregar;
+  eliminar;
+
+
   return(){
+    this._commonService.setEndSession('0');
     this._router.navigate(['dashboard/noticias']);
   }
 
@@ -129,7 +137,7 @@ export class AddNewsComponent implements OnInit {
     if (this.noticia.fechaPublicacionDate) {
       const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
-      this.noticia.fechaPublicacion=formattedDate; 
+      this.noticia.fechaPublicacion=formattedDate;
     }else{
       this.noticia.fechaPublicacion=null;
     }
@@ -141,9 +149,9 @@ export class AddNewsComponent implements OnInit {
         if(this.fileData){
           this._noticiaService.uploadNoticiaFoto(this.fileData, result.rows)
           .subscribe(res => {
-          console.log(res);
         }) 
         }
+        this.agregar=true;
         this.return();
         this.openSnackBar();
       } 
@@ -238,12 +246,18 @@ export class AddNewsComponent implements OnInit {
             cancel:"Sí, volver",
             yes:"No, mantenerme aquí"}
     });
+  }
 
-    this.dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        this.return();
-      }
-    });
+  canDeactivate(): Observable<boolean> {
+    if(!this.agregar){
+      console.log("hola")
+      this.openDialog();
+      return this.dialogRef.afterClosed().pipe(map(result => {
+        return result === true;
+      }));
+    }else{
+      return ;
+    }
   }
 
   openSnackBar() {

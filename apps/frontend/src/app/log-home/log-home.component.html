@@ -6,41 +6,49 @@
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dashboard</i>
           <span class="mdc-list-item__text">Dashboard</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/noticias" routerLinkActive="active" (click)="textChange('Noticias')" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/noticias" routerLinkActive="active" (click)="textChange('Noticias')" 
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.noticiaPermiso || user.tipoUsuario_idTipoUsuario==2">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">chrome_reader_mode</i>
           <span class="mdc-list-item__text">Noticias</span>
         </a>
-        <hr class="mdc-list-divider">
-        <h6 class="mdc-list-group__subheader">Miembros</h6>
-        <a class="mdc-list-item" routerLink="/dashboard/miembros" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <hr class="mdc-list-divider" *ngIf="user.tipoUsuario_idTipoUsuario==2">
+        <h6 class="mdc-list-group__subheader" *ngIf="user.tipoUsuario_idTipoUsuario==2">Miembros</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/miembros-activos" (click)="textChange('Miembros Activos')" routerLinkActive="active" 
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="user.tipoUsuario_idTipoUsuario==2">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Miembros Activos</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/miembros" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" *ngIf="user.tipoUsuario_idTipoUsuario==2" routerLink="/dashboard/miembros-antiguos" 
+        routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Miembros antiguos</span>
         </a>
-        <hr class="mdc-list-divider">
-        <h6 class="mdc-list-group__subheader">Publicaciones</h6>
-        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <hr class="mdc-list-divider" *ngIf="permisos.publicacionPermiso">
+        <h6 class="mdc-list-group__subheader" *ngIf="permisos.publicacionPermiso">Publicaciones</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" 
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.publicacionPermiso">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Artículos</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.publicacionPermiso">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Tesis</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/publicaciones" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.publicacionPermiso">
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
             <span class="mdc-list-item__text">Resumen en eventos</span>
           </a>
-        <hr class="mdc-list-divider">
-        <h6 class="mdc-list-group__subheader">Proyectos</h6>
-        <a class="mdc-list-item" routerLink="/dashboard/proyectos" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <hr class="mdc-list-divider" *ngIf="permisos.proyectoPermiso">
+        <h6 class="mdc-list-group__subheader" *ngIf="permisos.proyectoPermiso">Proyectos</h6>
+        <a class="mdc-list-item" routerLink="/dashboard/proyectos" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.proyectoPermiso">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Proyectos en ejecución</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/proyectos" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/proyectos" routerLinkActive="active"
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.proyectoPermiso">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Proyectos concluidos</span>
         </a>
@@ -50,20 +58,21 @@
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Mi información personal</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
           <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
           <span class="mdc-list-item__text">Mis artículos</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
             <span class="mdc-list-item__text">Mis tesis</span>
         </a>
-        <a class="mdc-list-item" routerLink="/dashboard/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="mdc-list-item" routerLink="/dashboard/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
             <span class="mdc-list-item__text">Mis resúmenes en eventos</span>
         </a>
-        <hr class="mdc-list-divider">
-        <a class="mdc-list-item" routerLink="/dashboard/contenidos" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <hr class="mdc-list-divider" *ngIf="permisos.contenidoPermiso">
+        <a class="mdc-list-item" routerLink="/dashboard/contenidos" routerLinkActive="active" 
+        [routerLinkActiveOptions]="{exact:true}" *ngIf="permisos.contenidoPermiso">
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">description</i>
             <span class="mdc-list-item__text">Contenidos</span>
         </a>
@@ -75,7 +84,7 @@
         <button mat-icon-button class="middle btn-sidemenu" (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
         <div class="flex-news">
           <div id="titleDash" class="tool-text middle"></div>
-          <div class="publish-news" *ngIf="noticiaPublicada">
+          <div class="publish-news" [hidden]="!noticiaPublicada">
             Noticia Publicada
           </div>
         </div>
@@ -110,7 +119,7 @@
           </div>
         </div>
       </div>
-        <router-outlet (voted)="onVoted($event)"></router-outlet>
+        <router-outlet (parentFun)="parentFun($event)"></router-outlet>
     </div>
   
   </mat-drawer-container>

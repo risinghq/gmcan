@@ -7,20 +7,17 @@ import { stringify } from 'querystring';
 @Injectable({
 	providedIn: 'root'
   })
-export class UsuarioHasPermisoService{
+export class GeneroService{
     public url: string;
 
 	constructor(public http: HttpClient){
 		this.url = GLOBAL.url;
     }
     
-    getUsuarioHasPermiso(): any{
-        let token=JSON.parse(localStorage.getItem("token"));
+    getGeneros(): any{
         let headers = new HttpHeaders ({
-            'Content-Type':'application/json',
-            'Authorization':'Bearer '+token
+			'Content-Type':'application/json'
 		});
-        return this.http.get(this.url+'tipopermiso/get-tipopermiso/',{headers:headers});
+        return this.http.get(this.url+'genero/get-genero',{headers:headers});
     }
-
 }

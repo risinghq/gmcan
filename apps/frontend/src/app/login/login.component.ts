@@ -59,8 +59,10 @@ export class LoginComponent implements OnInit {
         password:this.loginForm.controls.password.value
       }
       this.authService.login(user).subscribe((res)=>{
-        if(res){
+        if(res.state==1){
           this._router.navigate(['/dashboard']);
+        }else{
+          this.error="Correo electrónico o contraseña incorrectos";
         }
       });
     }
@@ -69,6 +71,7 @@ export class LoginComponent implements OnInit {
 
   change(){
     this.recoverValue=!this.recoverValue;
+    this.error=null;
   }
 
   recover(){

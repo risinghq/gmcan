@@ -10,7 +10,6 @@ import { stringify } from 'querystring';
 export class NoticiaService{
     public url: string;
     JWT_TOKEN = 'JWT_TOKEN';
-    REFRESH_TOKEN = 'REFRESH_TOKEN';
 
   languagelocal;
   constructor(public http: HttpClient){
@@ -72,8 +71,8 @@ export class NoticiaService{
 
   uploadNoticiaFoto(fileData, id){
     const formData = new FormData();
-    formData.append('image', fileData, fileData.name); 
-    console.log(formData.get('image'));
+    formData.append('foto', fileData, fileData.name); 
+    console.log(formData.get('foto'));
     let headers = new HttpHeaders ({
       'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
 	  });

@@ -11,6 +11,8 @@ import {FormControl} from '@angular/forms';
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
 import * as ClassicEditor from '../../assets/ckeditor/ckeditor.js'
+import { Observable } from 'rxjs/internal/Observable';
+import { map } from 'rxjs/operators';
 
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
@@ -23,6 +25,7 @@ import { Languages } from '../models/languages';
 import { TitleCasePipe } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { stringify } from 'querystring';
+import { CommonService } from '../services/common.service';
 
 const moment = _rollupMoment || _moment;
 
@@ -69,6 +72,7 @@ export class EditNewsComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private _tipoNoticiaService:TipoNoticiaService,
     private _usuarioService:UsuarioService,
+    private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
       titulo: ['', Validators.required],
@@ -133,7 +137,15 @@ export class EditNewsComponent implements OnInit {
     });
   }
 
+
+  agregar;
+  eliminar;
+
   return(){
+    if(!this.eliminar){
+      this.agregar=false;
+    }
+    this._commonService.setEndSession('0');
     this._router.navigate(['dashboard/noticias']);
   }
 
@@ -183,6 +195,8 @@ export class EditNewsComponent implements OnInit {
             console.log(res);
           })
           }
+          this.eliminar=true;
+          this.agregar=true;
           this.return();
           if(publicationStatus==0){
             this.openSnackBar("Noticia publicada exitosamente");
@@ -315,12 +329,17 @@ export class EditNewsComponent implements OnInit {
             cancel:"Sí, volver",
             yes:"No, mantenerme aquí"}
     });
+  }
 
-    this.dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        this.return();
-      }
-    });
+  canDeactivate(): Observable<boolean> {
+    if(!this.agregar){
+      this.openDialog();
+      return this.dialogRef.afterClosed().pipe(map(result => {
+        return result === true;
+      }));
+    }else{
+      return ;
+    }
   }
 
   openSnackBar(value) {
@@ -377,6 +396,8 @@ export class EditNewsComponent implements OnInit {
   eraseNews(){
     this._noticiaService.deleteNoticia(this.noticia.idNoticia).subscribe(result => {
       if(result.status==1){
+        this.eliminar=true;
+        this.agregar=true;
         this.return();
         this.openSnackBar("Noticia eliminada exitosamente");
       }else{

@@ -23,6 +23,7 @@ import  {MatSidenavModule,
           MatSortModule,
           MatCardModule,
           MatSelectModule,
+          MatCheckboxModule,
           MatDatepickerModule } from '@angular/material';
 import { HomeComponent } from './home/home.component';
 import { MantenimientoComponent } from './mantenimiento/mantenimiento.component';
@@ -75,6 +76,14 @@ import { AddNewsComponent, DialogCancel3, DialogPublish, DialogPreview } from '.
 import { MomentDateModule } from '@angular/material-moment-adapter';
 import { CKEditorModule } from 'ckeditor4-angular';
 import { EditNewsComponent, DialogCancel4, DialogPreview2, DialogPublish2, DialogPublish3, DialogErase2 } from './edit-news/edit-news.component';
+import { AddMemberComponent, DialogReturn } from './add-member/add-member.component';
+import { DeactivateGuard } from './guards/deactivate-guard';
+import { EditMemberComponent, DialogReturn2, DialogCancel5 } from './edit-member/edit-member.component';
+import { AddMemberGuard } from './guards/change-addmember-guard';
+import { EditMemberGuard } from './guards/change-editmember-guard';
+import { EditCategoryGuard } from './guards/editcategory.guard';
+import { AddNewsGuard } from './guards/addnews.guard';
+import { EditNewsGuard } from './guards/editnews.guard';
 
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
@@ -130,7 +139,12 @@ registerLocaleData(localeEsAr, 'es-Ar');
     DialogPreview2,
     DialogPublish2,
     DialogPublish3,
-    DialogErase2
+    DialogErase2,
+    AddMemberComponent,
+    EditMemberComponent,
+    DialogReturn,
+    DialogReturn2,
+    DialogCancel5
   ],
   imports: [
     BrowserModule,
@@ -155,7 +169,6 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule,
     NgIdleKeepaliveModule.forRoot(),
     MomentModule,
     HttpClientModule,
@@ -163,12 +176,20 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatDatepickerModule,
     MomentDateModule,
     MatSelectModule,
-    CKEditorModule
+    MatSortModule,
+    CKEditorModule,
+    MatCheckboxModule
   ],
   exports:[LocalDatePipe],
   entryComponents:[EmailExitoso, DialogIdle, DialogCancel, DialogCancel2, DialogErase, DialogCancel3,DialogPublish, DialogPreview, DialogCancel4,DialogPreview2, DialogPublish2,
-    DialogPublish3, DialogErase2 ],
+    DialogPublish3, DialogErase2, DialogReturn, DialogReturn2, DialogCancel5],
   providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}, AuthGuard,
+  DeactivateGuard, 
+  AddMemberGuard,
+  EditMemberGuard,
+  EditCategoryGuard,
+  AddNewsGuard,
+  EditNewsGuard,
   {
     provide: HTTP_INTERCEPTORS,
     useClass: TokenInterceptor,

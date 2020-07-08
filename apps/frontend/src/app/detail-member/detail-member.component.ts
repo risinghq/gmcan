@@ -62,7 +62,7 @@ export class DetailMemberComponent implements OnInit {
     public location: Location,
   ) { 
     this.url=GLOBAL.url;
-    this.usuario=new UsuarioFull('','','','','','','',null,'','',null,null,null,null,'',null,'',null);
+    this.usuario=new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
   }
 
   language;

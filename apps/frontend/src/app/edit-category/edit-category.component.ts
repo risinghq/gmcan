@@ -7,6 +7,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import { NoticiaService } from '../services/noticia.service';
+import { Observable } from 'rxjs/internal/Observable';
+import { map } from 'rxjs/operators';
+import { CommonService } from '../services/common.service';
 
 @Component({
   selector: 'app-edit-category',
@@ -19,6 +22,9 @@ export class EditCategoryComponent implements OnInit {
   button_text="Actualizar categoría";
   edit=true;
   idCategory;
+  agregar;
+  eliminar;
+
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
@@ -26,7 +32,8 @@ export class EditCategoryComponent implements OnInit {
     public dialog: MatDialog,
     public _tipoNoticiaService:TipoNoticiaService,
     public _noticiaService:NoticiaService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private _commonService: CommonService,
   ) {
     this.categoryForm = this.formBuilder.group({
       nombre: ['', Validators.required],
@@ -47,6 +54,7 @@ export class EditCategoryComponent implements OnInit {
       this._tipoNoticiaService.getTipoNews(this.idCategory).subscribe(result => {
         if(result[0]){
           this.category=result[0];
+          localStorage.setItem("categoryEdit",JSON.stringify(this.category.nombre));
         }
         this.getRelatedNews();
       });
@@ -75,14 +83,25 @@ export class EditCategoryComponent implements OnInit {
             yes:"No, mantenerme aquí"}
     });
 
-    this.dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        this.return();
-      }
-    });
+    
+  }
+
+  canDeactivate(): Observable<boolean> {
+    if(!this.agregar){
+      this.openDialog();
+      return this.dialogRef.afterClosed().pipe(map(result => {
+        return result === true;
+      }));
+    }else{
+      return ;
+    }
   }
 
   return(){
+    if(!this.eliminar){
+      this.agregar=false;
+    }
+    this._commonService.setEndSession('0');
     this._router.navigate(['dashboard/noticias']);
   }
 
@@ -129,6 +148,8 @@ export class EditCategoryComponent implements OnInit {
       if(result.length==0){
         this._tipoNoticiaService.deleteCategory(this.idCategory).subscribe(result => {
           if(result.status==1){
+            this.eliminar=true;
+            this.agregar=true;
             this.return();
             this.openSnackBar("Categoría eliminada exitosamente");
           }else{
