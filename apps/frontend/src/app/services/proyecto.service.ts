@@ -9,6 +9,7 @@ import { stringify } from 'querystring';
   })
 export class ProyectoService{
     public url: string;
+    JWT_TOKEN = 'JWT_TOKEN';
 
 	languagelocal;
   constructor(public http: HttpClient){
@@ -71,6 +72,53 @@ export class ProyectoService{
     }else{
       return this.http.get(this.url+'proyecto/get-proyecto-en/'+idProyecto,{headers:headers});
     }
+  }
+
+  getProyectoFuente(idFuente): any{
+    let headers = new HttpHeaders ({
+		  'Content-Type':'application/json'
+	  });
+    return this.http.get(this.url+'proyecto/get-proyectofuente/'+idFuente,{headers});
+  }
+
+  addProyecto(proyecto):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.post(this.url+'proyecto/post-proyecto/',proyecto,{headers:headers});
+  }
+
+  updateProyecto(proyecto):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.put(this.url+'proyecto/update-proyecto/',proyecto,{headers:headers});
+  }
+
+  deleteProyecto(idProyecto):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.delete(this.url+'proyecto/delete-proyecto/'+idProyecto,{headers:headers});
+  }
+
+  endProyecto(proyecto):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.put(this.url+'proyecto/end-proyecto/',proyecto,{headers:headers});
+  }
+
+  restartProyecto(proyecto):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.put(this.url+'proyecto/restart-proyecto/',proyecto,{headers:headers});
   }
 
 }

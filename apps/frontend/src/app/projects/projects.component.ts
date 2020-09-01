@@ -11,6 +11,10 @@ import { ThrowStmt } from '@angular/compiler';
 import { GLOBAL } from '../services/global';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { SearchService } from '../services/search.service';
+import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
+import { MonedaService } from '../services/moneda.service';
+import { GrupoService } from '../services/grupo.service';
+import { ProgressSpinnerMode } from '@angular/material';
 
 @Component({
   selector: 'app-projects',
@@ -24,6 +28,7 @@ export class ProjectsComponent implements OnInit {
   allCharged;
   public searchForm:FormGroup;
   public url;
+  infoText;
 
   constructor(
     public fb:FormBuilder,
@@ -37,6 +42,9 @@ export class ProjectsComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     public _searchService: SearchService,
+    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
+    public _monedaService: MonedaService,
+    public _grupoService: GrupoService,
   ) { 
     this.searchForm = this.fb.group({
       titulo: ['']
@@ -62,6 +70,7 @@ export class ProjectsComponent implements OnInit {
     this.pageSize = 5;
     this.setSearchText();
     this.getProyectos(1);
+    this.getGrupo();
   }
 
   ngDoCheck(){
@@ -69,6 +78,19 @@ export class ProjectsComponent implements OnInit {
       this.tipoProyectos[0]=this.language.projectsText[0].projectsType1;
       this.tipoProyectos[1]=this.language.projectsText[0].projectsType2;
     }
+  }
+
+  getGrupo(){
+    this._grupoService.getGrupoInfo().subscribe((res)=>{
+      if(res.length>0){ 
+        
+        if(this.language.locale=="es"){
+          this.infoText=res[0].seccionProyectos;
+        }else{
+          this.infoText=res[0].seccionProyectosEN;
+        }
+      }
+    });
   }
 
   setSearchText(){
@@ -84,6 +106,7 @@ export class ProjectsComponent implements OnInit {
     if($event.index==0){
       estado=1;
     }
+    this.allCharged=null;
     this.getProyectos(estado);
   }
 
@@ -141,6 +164,24 @@ export class ProjectsComponent implements OnInit {
     }
     this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion,index);
     this.getUsuarioHasProyecto(proyecto);
+    this.getFuenteFinanciamiento(proyecto)
+    this.getMoneda(proyecto)
+  }
+
+  getFuenteFinanciamiento(proyecto){
+    this._fuenteFinanciamientoService.getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento).subscribe((res)=>{
+      if(res.length>0){
+        proyecto.fuenteFinanciamiento=res[0].nombre;
+      }
+    });
+  }
+
+  getMoneda(proyecto){
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res)=>{
+      if(res.length>0){
+        proyecto.moneda=res[0].simbolo;
+      }
+    });
   }
 
   getUsuarioHasProyecto(proyecto){
@@ -224,6 +265,7 @@ export class ProjectsComponent implements OnInit {
   search(nombre, index){    
     this.proyectos=[]
     let estado = 0;
+    this.allCharged=null;
     if(index==0){
       estado=1;
     }
@@ -238,9 +280,12 @@ export class ProjectsComponent implements OnInit {
     this._searchService.searchProyectos(nombre, estado).subscribe((res)=>{
       if(res.length>0){
         this.proyectos=res;
+        this.allCharged=true;
         for (let index = 0; index < this.proyectos.length; index++) {
-          if(this.proyectos[index]!=undefined){
+          if(this.proyectos[index]!=undefined && this.proyectos[index].estado==estado){
             this.fillProyecto(this.proyectos[index],index);
+          }else{
+            this.proyectos.splice(index,1);
           }
         }
       }

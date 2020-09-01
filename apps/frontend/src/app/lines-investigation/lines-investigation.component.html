@@ -2,7 +2,8 @@
     <div class="lines-text-div">
         <div class="line-mb">
             <div class="line-img-div">
-                <img class="line-img"src="../../assets/img/images.png">
+                <img class="line-img" *ngIf="lineasProyecto[0].foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+lineasProyecto[0].foto}}">
+                <img class="line-img" *ngIf="!lineasProyecto[0].foto"src="../../assets/img/images.png">
             </div>
             <div class="lines-title">
                 {{lineasProyecto[0].nombre}}
@@ -68,7 +69,7 @@
                             <strong class="abstract-title">
                                 {{this.language.projectsText[0].amount}}:
                             </strong>
-                            {{proyecto.montoFinanciado}}
+                            {{proyecto.moneda}} {{proyecto.montoFinanciado}}
                         </div>
                         <div class="abstract mb-8">                                     
                             <strong class="abstract-title">
@@ -109,7 +110,8 @@
         </div>        
         <div class="line-mb">
             <div class="line-img-div">
-                <img class="line-img"src="../../assets/img/images.png">
+                <img class="line-img" *ngIf="lineasProyecto[1].foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+lineasProyecto[1].foto}}">
+                <img class="line-img" *ngIf="!lineasProyecto[1].foto"src="../../assets/img/images.png">
             </div>
             <div class="lines-title">
                 {{lineasProyecto[1].nombre}}
@@ -175,7 +177,7 @@
                             <strong class="abstract-title">
                                 {{this.language.projectsText[0].amount}}:
                             </strong>
-                            {{proyecto.montoFinanciado}}
+                            {{proyecto.moneda}} {{proyecto.montoFinanciado}}
                         </div>
                         <div class="abstract mb-8">                                     
                             <strong class="abstract-title">
@@ -216,7 +218,8 @@
         </div>        
         <div>
             <div class="line-img-div">
-                <img class="line-img"src="../../assets/img/images.png">
+                <img class="line-img" *ngIf="lineasProyecto[2].foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+lineasProyecto[2].foto}}">
+                <img class="line-img" *ngIf="!lineasProyecto[2].foto"src="../../assets/img/images.png">
             </div>
             <div class="lines-title">
                 {{lineasProyecto[2].nombre}}
@@ -282,7 +285,7 @@
                             <strong class="abstract-title">
                                 {{this.language.projectsText[0].amount}}:
                             </strong>
-                            {{proyecto.montoFinanciado}}
+                            {{proyecto.moneda}} {{proyecto.montoFinanciado}}
                         </div>
                         <div class="abstract mb-8">                                     
                             <strong class="abstract-title">

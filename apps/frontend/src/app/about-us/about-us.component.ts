@@ -28,6 +28,8 @@ export class AboutUsComponent implements OnInit {
     this.aboutusService.getAboutUsInfo().subscribe((res)=>{
       this.aboutus=res[0];
       document.getElementById("services").innerHTML=this.aboutus.servicios;
+      document.getElementById("whoAre").innerHTML=this.aboutus.quienesSomos;
+      document.getElementById("objectives").innerHTML=this.aboutus.objetivos;
     });
   }
 

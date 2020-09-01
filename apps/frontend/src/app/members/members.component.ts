@@ -7,6 +7,7 @@ import { TipoMiembroService } from '../services/tipomiembro.service';
 import { TipoMiembro } from '../models/tipomiembro';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { GLOBAL } from '../services/global';
+import { ProgressSpinnerMode } from '@angular/material';
 
 @Component({
   selector: 'app-members',
@@ -30,6 +31,8 @@ export class MembersComponent implements OnInit {
   ) {
     this.url=GLOBAL.url;
   }
+
+  allCharged;
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
@@ -69,6 +72,7 @@ export class MembersComponent implements OnInit {
   getPrefijos(tipoMiembro){
     this._prefijoService.getPrefijos().subscribe((res)=>{
       if(res){
+        this.allCharged=true;
         for (let index = 0; index < this.usuarios.length; index++) {
           for (let j = 0; j < res.length; j++) {
             if(this.usuarios[index].Prefijo_idPrefijo==res[j].idPrefijo){

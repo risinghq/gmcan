@@ -19,11 +19,10 @@ import { SearchService } from '../services/search.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { GLOBAL } from '../services/global';
-import { CiudadService } from '../services/ciudad.service';
-import { PaisService } from '../services/pais.service';
 import { EventoService } from '../services/evento.service';
 import { identifierModuleUrl } from '@angular/compiler';
 import { TipoTesisService } from '../services/tipotesis.service';
+import { GrupoService } from '../services/grupo.service';
 
 @Component({
   selector: 'app-publication',
@@ -43,6 +42,8 @@ export class PublicationComponent implements OnInit {
   public publicacionSearch: Array<Publicacion>;
   public tipoPublicacion;
   public url;
+  infoText;
+
   constructor(
     public fb:FormBuilder,
     public titlecasePipe:TitleCasePipe,
@@ -57,13 +58,12 @@ export class PublicationComponent implements OnInit {
     public _usuarioService: UsuarioService,
     public _universidadService: UniversidadService,
     public _searchService: SearchService,
-    public _ciudadService: CiudadService,
-    public _paisService: PaisService,
     public _eventoService: EventoService,
     public _tipotesisService: TipoTesisService,
     public location: Location,
     public _route: ActivatedRoute,
     public _router: Router,
+    public _grupoService: GrupoService,
   ) { 
     this.tipoPublicaciones=[];
     this.autores=[];
@@ -93,6 +93,7 @@ export class PublicationComponent implements OnInit {
     this.previouslink=sessionStorage.getItem("previous-page");
     this.previouspage=this._previousService.getPreviousPage(this.previouslink);
     this.getTipoPublicacion();
+    this.getGrupo();
   }
   ngDoCheck(){
     if(this.tipoPublicaciones && this.tipoPublicaciones[0]){
@@ -103,6 +104,18 @@ export class PublicationComponent implements OnInit {
       this.tipoPublicaciones[1].search=this.language.publicationsText[0].search2;
       this.tipoPublicaciones[2].search=this.language.publicationsText[0].search3;
     }
+  }
+
+  getGrupo(){
+    this._grupoService.getGrupoInfo().subscribe((res)=>{
+      if(res.length>0){ 
+        if(this.language.locale=="es"){
+          this.infoText=res[0].seccionPublicaciones;
+        }else{
+          this.infoText=res[0].seccionPublicacionesEN;
+        }
+      }
+    });
   }
 
   scroll() {
@@ -184,27 +197,12 @@ export class PublicationComponent implements OnInit {
     });
   }
 
-  getCiudad(idCiudad, publicacion){
-    this._ciudadService.getCiudad(idCiudad).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.ciudad=res[0].nombre;
-        this.getPais(res[0].pais_idPais,publicacion);
-      }
-    });
-  }
-
-  getPais(idPais, publicacion){
-    this._paisService.getPais(idPais).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.pais=res[0].nombre;
-      }
-    });
-  }
-
   getEvento(idEvento, publicacion){
     this._eventoService.getEvento(idEvento).subscribe((res)=>{
       if(res.length>0){
         publicacion.evento=res[0].nombre;
+        publicacion.ciudad=res[0].ciudad;
+        publicacion.pais=res[0].pais;
       }
     });
   }
@@ -262,7 +260,6 @@ export class PublicationComponent implements OnInit {
       this.getRevista(publicacion);
       this.getPublicacionHasAutor(publicacion.idPublicacion, index);
       this.getPublicacionHasUsuario(publicacion.idPublicacion, index);
-      this.getCiudad(publicacion.ciudad_idCiudad, publicacion);
       this.getEvento(publicacion.evento_idEvento, publicacion);
       this.getTipoTesis(publicacion);
   }
@@ -290,6 +287,7 @@ export class PublicationComponent implements OnInit {
   /* Request Publicaciones at Tab Change */
   changeTab($event){
     this.publicaciones=[];
+    this.allCharged=null;
     this.getPublicaciones(this.tipoPublicaciones[$event.index].idTipoPublicacion);
     this.searchForm.controls.titulo.setValue("");
   }
@@ -354,7 +352,6 @@ export class PublicationComponent implements OnInit {
       this.searchAutores(titulo);
       if(id===3){
         this.searchEventos(titulo,id);
-        this.searchPaises(titulo,id);
       }
       if(id===2){
         this.searchTipoTesis(titulo, id);
@@ -421,39 +418,6 @@ export class PublicationComponent implements OnInit {
     });
   }
 
-  paisesEncontrados;
-
-  searchPaises(nombre,tipoPublicacion){
-    this._searchService.searchPaises(nombre).subscribe((res)=>{
-      if(res.length>0){
-        this.paisesEncontrados=res;
-        for (let index = 0; index < this.paisesEncontrados.length; index++) {
-          this.getCiudades(this.paisesEncontrados[index].idPais, tipoPublicacion);
-        }
-      }
-      this.searchCiudades(nombre,tipoPublicacion);
-    });
-  }
-
-  searchCiudades(nombre,tipoPublicacion){
-    this._searchService.searchCiudades(nombre).subscribe((res)=>{
-      if(res.length>0){
-        let ciudades=res;
-        this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res)=>{
-          if(res.length>0){
-            let publicacionesFound=res;
-            for (let index = 0; index < ciudades.length; index++) {
-              let valor=publicacionesFound.findIndex(x => x.ciudad_idCiudad === ciudades[index].idCiudad);
-              if(valor!=-1){
-                this.getPublicacion(publicacionesFound[valor].idPublicacion);
-              }
-            }
-          }
-        });
-      }
-    });
-  }
-
   searchTipoTesis(nombre, tipoPublicacion){
     this._searchService.searchTipoTesis(nombre).subscribe((res)=>{
       if(res.length>0){
@@ -466,25 +430,6 @@ export class PublicationComponent implements OnInit {
                 if(tipoTesis[j].idTipoTesis===publicacionesFound[index].tipoTesis_idTipoTesis){
                   this.getPublicacion(publicacionesFound[index].idPublicacion);
                 }
-              }
-            }
-          }
-        });
-      }
-    });
-  }
-
-  getCiudades(idPais, tipoPublicacion){
-    this._ciudadService.getCiudades(idPais).subscribe((res)=>{
-      if(res.length>0){
-        let ciudades=res;
-        this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res)=>{
-          if(res.length>0){
-            let publicacionesFound=res;
-            for (let index = 0; index < ciudades.length; index++) {
-              let valor=publicacionesFound.findIndex(x => x.ciudad_idCiudad === ciudades[index].idCiudad);
-              if(valor!=-1){
-                this.getPublicacion(publicacionesFound[valor].idPublicacion);
               }
             }
           }

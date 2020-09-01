@@ -53,9 +53,15 @@ export class MainNewsComponent implements OnInit {
     this.pageSize =10;
     this.getTipoNoticias();
   }
+
+  progress=0;
+  augment=100/2;
+  allCharged;
+
   getNoticia(){
     this._noticiaService.getNoticias().subscribe((res)=>{
       if(res!=null){
+        this.progress=this.progress+this.augment;
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.noticias=res;
         for (let index = 0; index < this.tiponoticias.length; index++) {
@@ -79,6 +85,7 @@ export class MainNewsComponent implements OnInit {
           this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMMM dd, y", "es");
           this.noticias[index].fechaPublicacion=this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
           this.getUsuario(this.noticias[index].autorPublicacion, index)
+          this.progress=this.progress+this.augment/this.noticias.length;
         }
       }
     });
@@ -87,6 +94,7 @@ export class MainNewsComponent implements OnInit {
   selectCategory(idtipoNoticia, nombre){
     this.categorySelected=idtipoNoticia;
     this.categoryNombre=nombre;
+    this.allCharged=null;
     this.getNoticia();
     this.page=1;
   }
@@ -112,6 +120,7 @@ export class MainNewsComponent implements OnInit {
   getUsuario(idUser, i){
     this._usuarioService.getUser(idUser).subscribe((res)=>{
       if(res[0]!=undefined){
+        this.allCharged=true;
         if(this.noticias[i]!=undefined){
           this.noticias[i].autor=res[0].nombre+" "+res[0].apellidoPaterno;
         }

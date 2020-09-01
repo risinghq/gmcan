@@ -4,7 +4,7 @@ export class Software{
         public nombre: String,
         public descripcion: String,
         public moreInfo: String,
-        public grupo_idGrupo: String,
+        public grupo_idGrupo: Number,
         public fechaCreacion: Date,
         public fechaActualizacion: Date
     ){}

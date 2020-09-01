@@ -18,8 +18,6 @@ import { TipoPublicacionService } from '../services/tipopublicacion.service';
 import { TipoPublicacion } from '../models/tipopublicacion';
 import { timeout } from 'rxjs/operators';
 import { GLOBAL } from '../services/global';
-import { CiudadService } from '../services/ciudad.service';
-import { PaisService } from '../services/pais.service';
 import { EventoService } from '../services/evento.service';
 import { Location } from '@angular/common';
 import { TipoTesisService } from '../services/tipotesis.service';
@@ -56,8 +54,6 @@ export class DetailMemberComponent implements OnInit {
     public _tipoMiembroService: TipoMiembroService,
     public _tipoPublicacionService: TipoPublicacionService,
     public _tipotesisService: TipoTesisService,
-    public _ciudadService: CiudadService,
-    public _paisService: PaisService,
     public _eventoService: EventoService,
     public location: Location,
   ) { 
@@ -216,33 +212,17 @@ export class DetailMemberComponent implements OnInit {
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
     this.getPublicacionHasAutor(publicacion.idPublicacion, index);
-    this.getPublicacionHasUsuario(publicacion.idPublicacion, index);
-    this.getCiudad(publicacion.ciudad_idCiudad, publicacion);
+    this.getPublicacionHasUsuario(publicacion.idPublicacion, index);    
     this.getEvento(publicacion.evento_idEvento, publicacion);
     this.getTipoTesis(publicacion);
-  }
-
-  getCiudad(idCiudad, publicacion){
-    this._ciudadService.getCiudad(idCiudad).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.ciudad=res[0].nombre;
-        this.getPais(res[0].pais_idPais,publicacion);
-      }
-    });
-  }
-
-  getPais(idPais, publicacion){
-    this._paisService.getPais(idPais).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.pais=res[0].nombre;
-      }
-    });
   }
 
   getEvento(idEvento, publicacion){
     this._eventoService.getEvento(idEvento).subscribe((res)=>{
       if(res.length>0){
         publicacion.evento=res[0].nombre;
+        publicacion.ciudad=res[0].ciudad;
+        publicacion.pais=res[0].pais;
       }
     });
   }

@@ -1,3 +1,4 @@
+<mat-progress-bar mode="determinate" [value]="progress" *ngIf="progress<100"></mat-progress-bar>
 <div class="main-news-div">
     <!-- <div *ngIf="!cargado">
         <mat-spinner ></mat-spinner>
@@ -12,7 +13,13 @@
                 <a class="main-news-link">{{language.news}}</a>
             </div>
             <div class="news-list-div">
-                <div class="columna">
+                <div class="spinner-pad" *ngIf="!allCharged">
+                    <mat-spinner class="auto mb-8"></mat-spinner>
+                    <div class=" loading-text center">
+                        Cargando
+                    </div>
+                </div>
+                <div class="columna" *ngIf="allCharged">
                     <div class="main-news-title">
                         {{language.newsText[0].newsTitle}}
                     </div>
@@ -31,7 +38,7 @@
                         </button>
                     </mat-menu>
                 </div>
-                <div *ngIf="noticias.length>0">
+                <div *ngIf="noticias.length>0 && allCharged">
                     <div class="news flex-news" *ngFor="let noticia of noticias | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize" >
                         <div class="img-hover-zoom-2 img-div-zoom right pl-24" [ngStyle]="{'display' : (screenWidth < 960) ? 'block' : 'none'}">
                             <img class="news-img" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">

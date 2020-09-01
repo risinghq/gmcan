@@ -9,6 +9,7 @@ import { stringify } from 'querystring';
   })
 export class LineasInvestigacionService{
   public url: string;
+  JWT_TOKEN = 'JWT_TOKEN';
 
   languagelocal;
   constructor(public http: HttpClient){
@@ -47,6 +48,40 @@ export class LineasInvestigacionService{
     }else{
       return this.http.get(this.url+'lineasinvestigacion/get-lineasinvestigacion-en/'+idLineasInvestigacion,{headers:headers});
     }
+  }
+
+  addLinea(linea):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.post(this.url+'lineasinvestigacion/post-lineasinvestigacion/',linea,{headers:headers});
+  }
+
+  updateLinea(linea):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.put(this.url+'lineasinvestigacion/update-lineasinvestigacion/',linea,{headers:headers});
+  }
+
+  deleteLinea(idLinea):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.delete(this.url+'lineasinvestigacion/delete-lineasinvestigacion/'+idLinea,{headers:headers});
+  }
+
+  uploadLineaFoto(fileData, id){
+    const formData = new FormData();
+    formData.append('foto', fileData, fileData.name); 
+    console.log(formData.get('foto'));
+    let headers = new HttpHeaders ({
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.put(this.url+'lineasinvestigacion/upload-lineainvestigacion-foto/'+id, formData, {headers});
   }
 
 }

@@ -17,8 +17,6 @@ import { LineasInvestigacionService } from '../services/lineasinvestigacion.serv
 import { ProyectoService } from '../services/proyecto.service';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
 import { NoticiaService } from '../services/noticia.service';
-import { CiudadService } from '../services/ciudad.service';
-import { PaisService } from '../services/pais.service';
 import { EventoService } from '../services/evento.service';
 import { TipoTesisService } from '../services/tipotesis.service';
 import { PublicacionService } from '../services/publicacion.service';
@@ -66,8 +64,6 @@ export class GlobalSearchComponent implements OnInit {
     public _proyectoServices: ProyectoService,
     public _tiponoticiaService: TipoNoticiaService,
     public _noticiaService: NoticiaService,
-    public _ciudadService: CiudadService,
-    public _paisService: PaisService,
     public _eventoService: EventoService,
     public _tipotesisService: TipoTesisService,
     public _publicacionesService: PublicacionService,
@@ -194,28 +190,6 @@ export class GlobalSearchComponent implements OnInit {
           this.getAutorHasPublicacion(res[index].idAutor);
         }
       }
-      this.searchCiudades(nombre);
-    });
-  }
-
-  searchCiudades(nombre){
-    this._searchService.searchCiudades(nombre).subscribe((res)=>{
-      if(res.length>0){
-        for (let index = 0; index < res.length; index++) {
-          this.getPublicacionCiudad(res[index].idCiudad);
-        }
-      }
-      this.searchPaises(nombre);
-    });
-  }
-
-  searchPaises(nombre){
-    this._searchService.searchPaises(nombre).subscribe((res)=>{
-      if(res.length>0){
-        for (let index = 0; index < res.length; index++) {
-          this.getCiudades(res[index].idPais);
-        }
-      }
       this.searchEventos(nombre);
     });
   }
@@ -340,37 +314,12 @@ export class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getCiudad(idCiudad, publicacion){
-    this._ciudadService.getCiudad(idCiudad).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.ciudad=res[0].nombre;
-        this.getPais(res[0].pais_idPais,publicacion);
-      }
-    });
-  }
-
-  getCiudades(idPais){
-    this._ciudadService.getCiudades(idPais).subscribe((res)=>{
-      if(res.length>0){
-        for (let index = 0; index < res.length; index++) {
-          this.getPublicacionCiudad(res[index].idCiudad);
-        }
-      }
-    });
-  }
-
-  getPais(idPais, publicacion){
-    this._paisService.getPais(idPais).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.pais=res[0].nombre;
-      }
-    });
-  }
-
   getEvento(idEvento, publicacion){
     this._eventoService.getEvento(idEvento).subscribe((res)=>{
       if(res.length>0){
         publicacion.evento=res[0].nombre;
+        publicacion.ciudad=res[0].ciudad;
+        publicacion.pais=res[0].pais;
       }
     });
   }
@@ -416,7 +365,6 @@ export class GlobalSearchComponent implements OnInit {
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
     this.getPublicacionHasUsuario(publicacion);
-    this.getCiudad(publicacion.ciudad_idCiudad, publicacion);
     this.getEvento(publicacion.evento_idEvento, publicacion);
     this.getTipoTesis(publicacion);
   }

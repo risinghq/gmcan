@@ -2,7 +2,8 @@
     <div class="methods-text-div">
         <div *ngFor="let method of methods; let i=index">
             <div class="methods-img-div">
-                <img class="methods-img"src="../../assets/img/images.png">
+                <img class="methods-img" src="../../assets/img/images.png" *ngIf="!method.foto">
+                <img class="methods-img" src="{{url+'metodo/get-image-metodo/'+method.foto}}" *ngIf="method.foto">
             </div>
             <div class="methods-title">
                 {{method.nombre}}

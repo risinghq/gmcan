@@ -1,3 +1,4 @@
+<mat-progress-bar mode="determinate" [value]="progress" *ngIf="progress<100"></mat-progress-bar>
 <div class="home-div primer-box">
     <div class="center">
         <div class="description-info">
@@ -38,7 +39,8 @@
         <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let linea of lineasInvestigacion">
             <mat-card class="line-card center">
                 <div class="line-img-div">
-                    <img class="line-img" src="../../assets/img/prop_estruc.jpg">
+                    <img class="line-img" *ngIf="linea.foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+linea.foto}}">
+                    <img class="line-img" *ngIf="!linea.foto" src="../../assets/img/prop_estruc.jpg">
                 </div>
                 <div class="linea-title">
                     {{linea.nombre}}
@@ -365,7 +367,7 @@
                     <strong class="abstract-title">
                         {{this.language.projectsText[0].amount}}:
                     </strong>
-                    {{proyecto.montoFinanciado}}
+                    {{proyecto.moneda}} {{proyecto.montoFinanciado}}
                 </div>
                 <div class="project-rev">                                     
                     <strong class="abstract-title">

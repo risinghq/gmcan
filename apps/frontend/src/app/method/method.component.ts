@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MethodsService } from '../services/methods.service';
 import { Method } from '../models/method';
+import { GLOBAL } from '../services/global';
 
 @Component({
   selector: 'app-method',
@@ -10,12 +11,14 @@ import { Method } from '../models/method';
 export class MethodComponent implements OnInit {
 
   language;
+  url;
 
   methods: Array<Method>;
 
   constructor(
     public _methodService: MethodsService,
   ) {
+    this.url=GLOBAL.url
    }
 
   ngOnInit() {

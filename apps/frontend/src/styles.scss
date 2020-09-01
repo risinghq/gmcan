@@ -14,6 +14,27 @@
 
 $thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
 
+mat-progress-bar .mat-progress-bar-buffer {
+    background: #E4E8EB;
+  }
+
+mat-progress-bar .mat-progress-bar-fill::after{
+    background-color: #006400 !important;
+}
+
+.spinner-pad{
+    padding-top: 64px;
+}
+
+.loading-text{
+    @extend .plex-sans;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
 .publication-green{
     text-decoration: none !important;
 }
@@ -74,7 +95,7 @@ input{
 @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap');
 @import 'bootstrap';
 @import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
-html, body { height: 100%;
+html, body { height: 100%   ;
 background: #f5f5f5;
 background-position: center center;
 background-repeat: no-repeat;
@@ -83,6 +104,10 @@ background-size: cover;}
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 app-root{
     height: inherit;
+}
+
+.auto{
+    margin:auto;
 }
 
 .inline-flex{
@@ -131,6 +156,11 @@ mat-sidenav-container{
 .text-right{
     text-align: right;
 }
+
+.text-left{
+    text-align: left;
+}
+
 .link{
     font-size: 15px;
     font-weight: 500;
@@ -505,7 +535,7 @@ mat-spinner{
     margin-right: auto;
 }
 
-.mat-progress-spinner circle, .mat-spinner circle {
+.mat-spinner circle, .mat-spinner circle {
     stroke: var(--deep-green) !important;
 }
 
@@ -548,6 +578,17 @@ mat-spinner{
 }
 
 /*CSS mb mt*/
+
+circle{
+    stroke-width: 7% !important;
+}
+
+.mb-56{
+    margin-bottom: 56px;
+}
+.mb-64{
+    margin-bottom: 64px;
+}
 .mb-16{
     margin-bottom: 16px;
 }
@@ -574,6 +615,10 @@ mat-spinner{
 }
 .mt-2-5{
     margin-top: 5.5px;
+}
+
+.mt-8{
+    margin-top: 8px;
 }
 
 .ml-16{
@@ -761,10 +806,15 @@ mat-spinner{
     padding: 32px 40px !important;
 }
 
-#previewNews{
+#previewNews, #previewAboutUs, #previewMethod, #previewTrabajosFuturos{
     overflow: visible;
     position: relative;
     padding: 0px !important;
+}
+
+.scroll{
+    height: 800px;
+    overflow: scroll;
 }
 
 .outside{
@@ -908,4 +958,12 @@ mat-spinner{
 
 .invalid-error{
     border: 1px solid #a00000;
+}
+
+.relative{
+    position: relative;
+}
+
+.mid-width{
+    width: 49%;
 }

@@ -1,8 +1,5 @@
 <div class="member-div">
-    <div *ngIf="!cargado">
-        <mat-spinner ></mat-spinner>
-    </div>
-    <div class="row" *ngIf="cargado">
+    <div class="row">
         <div class="col-lg-8 col-sm-6 col-12">
             <div class="member-links">
                 <a class="member-link-active" href="/">{{language.home}}</a>
@@ -20,7 +17,13 @@
                 </div>
                 <mat-tab-group>
                     <mat-tab label="{{language.membersText[0].memberActual}}">
-                        <div class="members-container">
+                        <div class="spinner-pad" *ngIf="!allCharged">
+                            <mat-spinner class="auto mb-8"></mat-spinner>
+                            <div class=" loading-text center">
+                                Cargando
+                            </div>
+                        </div>
+                        <div class="members-container" *ngIf="allCharged">
                             <div class="member-type-container" *ngFor="let tipoMiembro of tipoMiembros">
                                 <div class="member-type-title">
                                     {{tipoMiembro.nombre}}

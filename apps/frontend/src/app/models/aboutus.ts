@@ -1,12 +1,12 @@
 export class SobreNosotros{
     constructor(
         public idSobreNosotros: Number,
-        public quienesSomosResumen: String,
-        public quienesSomos: String,
-        public objetivos: String,
-        public lineasInvestigacion: String,
+        public quienesSomos: string,
+        public quienesSomosEN: string,
+        public objetivos: string,
+        public objetivosEN: string,
         public servicios: string,
-        public fechaCreacion: Date,
-        public fechaActualizacion: Date,
+        public serviciosEN: string,
+        public grupo_idGrupo: Number,
     ){}
 }

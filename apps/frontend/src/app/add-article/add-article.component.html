@@ -1,0 +1,181 @@
+<div class="pad">
+    <div class="add-box">
+        <div class="member-detail-links">
+            <div class="flex-news">
+                <div class="flex-news back-div" (click)="return()">
+                    <mat-icon class="back-icon">
+                        arrow_back
+                    </mat-icon>
+                    <div class="back-text">
+                        Volver
+                    </div>
+                </div>
+                <div class="right obligatory-text">
+                    <span class="red-text">(*) </span>Campos obligatorios
+                </div>
+            </div>
+            <form [formGroup]="publicacionForm"  class="mt-24 mb-32">
+                <div class="full-width">
+                    <div class="text-category">
+                        Título <span class="red-text">*</span>
+                    </div>
+                    <input [(ngModel)]="publicacion.titulo" formControlName="título" name="título" class="input-category" placeholder="Ingresar título" required>
+                </div>
+                <div class="flex-news mt-8">
+                    <div class="mr-32 full-width">
+                        <div class="full-width mr-26">
+                            <div class="text-category">
+                                Fecha de publicación <span class="red-text">*</span>
+                            </div>
+                            <mat-form-field class="input-category" floatLabel="never">
+                                <mat-placeholder class="placeholder mt--7">Seleccionar fecha</mat-placeholder>
+                                <input matInput [(ngModel)]="publicacion.fechaPublicacionDate" [matDatepicker]="dp"
+                                formControlName="fechaPublicacionDate" name="fechaPublicacionDate">
+
+                                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                                <mat-datepicker #dp></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="full-width mr-32">
+                        <div class="text-category">
+                            Revista <span class="red-text">*</span>
+                        </div>
+                        <mat-form-field class="input-category" floatLabel="never">
+                            <mat-placeholder class="placeholder mt--7">Seleccionar revista</mat-placeholder>
+                            <mat-select [(ngModel)]="publicacion.revista_idRevista" formControlName="revista_idRevista" name="revista_idRevista">
+                                <mat-option [value]="revista.idRevista" *ngFor="let revista of revista">{{revista.nombre}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="mr-32 full-width">
+                        <div class="text-category">
+                            Volumen <span class="red-text">*</span>
+                        </div>
+                        <input [(ngModel)]="publicacion.nroRevista" formControlName="nroRevista" name="nroRevista" class="input-category" placeholder="Vol" required>
+                    </div>
+                    <div class="full-width">
+                        <div class="text-category">
+                            DOI <span class="red-text">*</span>
+                        </div>
+                        <input [(ngModel)]="publicacion.DOI" formControlName="DOI" name="DOI" class="input-category" placeholder="Insertar DOI" required>
+                    </div>
+                </div>
+                <div class="full-width">
+                    <div class="text-category mb-0">
+                        Primer autor <span class="red-text">*</span>
+                    </div>
+                    <div class="text-subtitle">
+                        Puedes seleccionar un miembro del GMCAN o escribir directamente el nombre del autor. Recuerda colocarlo en el mismo formato en que se escriben los nombres en un artículo científico
+                    </div>
+                    <div class="mt-16 relative">
+                        <mat-form-field class="input-category width-normal"  floatLabel="never">
+                            <input class="text-autocomplete" type="text"
+                                matInput
+                                [formControl]="myControl"
+                                [matAutocomplete]="auto" [(ngModel)]="selectedUser" formControlName="userSelector" name="userSelector">
+                                <mat-placeholder class="placeholder custom-place">Seleccionar autor principal</mat-placeholder>
+                            <mat-autocomplete (optionSelected)="selectUser($event.option, 0)" autoActiveFirstOption #auto="matAutocomplete">
+                              <mat-option class="mdc-list-item" *ngFor="let option of filteredOptions | async" [value]="option.nombre">
+                                <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">
+                                <img class="mdc-list-item__graphic mr-12 img-user" src="{{url+'usuario/get-image-usuario/'+option.foto}}" *ngIf="option.foto">
+                                <span class="mdc-list-item__text">{{option.nombre}}</span>
+                              </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <mat-form-field class="input-category selector-users-input">
+                            <mat-select (selectionChange)="selectUser($event.value, 1)">
+                                <mat-option class="mdc-list-item" [value]="option" *ngFor="let option of options">
+                                    <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">
+                                    <img class="mdc-list-item__graphic mr-12 img-user" src="{{url+'usuario/get-image-usuario/'+option.foto}}" *ngIf="option.foto">
+                                    <span class="mdc-list-item__text">{{option.nombre}}</span>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="full-width mt-16">
+                    <div class="text-category mb-0">
+                        Autores complementarios <span class="red-text">*</span>
+                    </div>
+                    <div class="text-subtitle">
+                        Puedes seleccionar varios miembros del GMCAN o escribir directamente el nombre de cada uno de los autores. Recuerda colocar cada nombre en el mismo formato en que se escriben los nombres en un artículo científico.
+                    </div>
+                    <div class="flex-flow flex-news mt-16">
+                        <section class="relative mr-80 mb-8" *ngFor="let otroAutor of otrosAutores; let i = index;" style="width: max-content;">
+                            <mat-form-field class="input-category width-normal"   floatLabel="never">
+                                <input class="text-autocomplete" type="text"
+                                    matInput
+                                    [formControl]="otroAutor.myControl"
+                                    [matAutocomplete]="auto" [(ngModel)]="otroAutor.nombre">
+                                <mat-placeholder class="placeholder custom-place">Seleccionar autor</mat-placeholder>
+                                <mat-autocomplete (optionSelected)="selectUserAutor($event.option, 0, i)" autoActiveFirstOption #auto="matAutocomplete">
+                                  <mat-option class="mdc-list-item" *ngFor="let option of otroAutor.filteredOptions | async" [value]="option.nombre">
+                                    <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">
+                                    <img class="mdc-list-item__graphic mr-12 img-user" src="{{url+'usuario/get-image-usuario/'+option.foto}}" *ngIf="option.foto">
+                                    <span class="mdc-list-item__text">{{option.nombre}}</span>
+                                  </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+                            <mat-form-field class="input-category selector-users-input">
+                                <mat-select (selectionChange)="selectUserAutor($event.value, 1, i)">
+                                    <mat-option class="mdc-list-item" [value]="option" *ngFor="let option of options">
+                                        <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">
+                                        <img class="mdc-list-item__graphic mr-12 img-user" src="{{url+'usuario/get-image-usuario/'+option.foto}}" *ngIf="option.foto">
+                                        <span class="mdc-list-item__text">{{option.nombre}}</span>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-icon class="erase-icon" *ngIf="otroAutor.nombre && i!=0" (click)="removeAnotherAuthor(i)">clear</mat-icon>
+                        </section>
+                        <div class="green-text plex-sans mb-8" (click)="addAnotherAuthor()">Agregar autor</div>
+                    </div>
+                </div>
+                <div class="full-width mt-16 mb-16">
+                    <div class="text-category">
+                        Resumen en español <span class="red-text">*</span>
+                    </div>
+                    <textarea [(ngModel)]="publicacion.resumen" placeholder="Insertar resumen" formControlName="resumen" name="resumen" autosize class="input-category"></textarea>
+                </div>
+                <div class="full-width mb-16">
+                    <div class="text-category">
+                        Resumen en inglés <span class="red-text">*</span>
+                    </div>
+                    <textarea [(ngModel)]="publicacion.resumenEN" placeholder="Insertar resumen" formControlName="resumenEN" name="resumenEN" autosize class="input-category"></textarea>
+                </div>
+                <div class="full-width mb-16">
+                    <div class="text-category">
+                        Subir PDF (opcional)
+                    </div>
+                    <div class="flex-news">
+                        <div class="gray-box flex-news mr-16">
+                            <img class="upload-icon mr-16" src="../../assets/img/upload.svg">
+                            <span class="gray-pdf plex-sans" *ngIf="!fileData && !publicacion.archivo">PDF</span>
+                            <span class="gray-pdf plex-sans" *ngIf="fileData">{{fileData.name}}</span>
+                            <span class="gray-pdf plex-sans" *ngIf="!fileData && publicacion.archivo">{{publicacion.archivo}}</span>
+                        </div>
+                        <div class="green-text">
+                            <span class="plex-sans" *ngIf="!fileData && !publicacion.archivo">Seleccionar PDF</span>
+                            <span class="plex-sans" *ngIf="fileData || publicacion.archivo">Cambiar</span>
+                            <input class="file_upload" type="file" #file
+                            accept="application/pdf" required
+                            (change)="fileProgress($event)"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="flex-news">
+                <div class="red-btn" *ngIf="edit">
+                    <div class="link link-set link-red" (click)="openEraser()">
+                      Eliminar artículo
+                    </div>
+                </div>
+                <div class="right" [ngClass]="{'btn-grey':!publicacionForm.valid,'black-btn':publicacionForm.valid && selectedUser}">
+                    <div class="link link-set" (click)="submitArticle()">
+                      {{button_text}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

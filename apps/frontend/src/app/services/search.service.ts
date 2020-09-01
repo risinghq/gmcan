@@ -74,7 +74,7 @@ export class SearchService{
         } 
     }
     searchProyectos(nombre, estado): any{
-        let body = {"nombre":nombre, "estado":estado};
+        let body = {"nombre":nombre, "codigo": nombre, "estado":estado};
         let headers = new HttpHeaders ({
 			'Content-Type':'application/json'
         });

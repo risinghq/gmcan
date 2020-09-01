@@ -45,6 +45,9 @@
     font-weight: bold;
     letter-spacing: 0.3px;
     color: #30393a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dashboard-icon{
@@ -135,4 +138,53 @@
     color: var(--deep-green);
     padding: 8px 8px 6px 8px;
     margin-left: 16px;
+}
+
+.bad-experience{
+    @extend .plex-sans;
+    font-size: 20px;
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+
+.block-div{
+    padding-top: 102px;
+    padding-left: 40px;
+    padding-right: 40px;
+    text-align: center;
+}
+
+.btn-black-true{
+    text-align: center;
+    width: max-content;
+    cursor: pointer;
+    height: max-content;
+    background-color: unset;
+    border-radius: 4px;
+    padding: 10px 28px; 
+    border: solid 2px #000000;    
+}
+
+.btn-text{
+    @extend .plex-sans;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #000000;
+}
+
+.anyway{
+    @extend .plex-sans;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 13px;
+    text-align: center;
+    letter-spacing: 0.3px;
+    color: #30393A;
+}
+
+.icon-bad{
+    width: 262px;
 }

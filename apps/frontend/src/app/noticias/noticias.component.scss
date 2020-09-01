@@ -49,6 +49,8 @@ tr.mat-header-row, tr.mat-row {
     overflow: hidden;
     width: 20px;
     height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     border-radius: 40.5px;
     background-color: #c4c4c4
 }
@@ -146,4 +148,10 @@ tr:hover{
 
 .mat-row{
     cursor: pointer;
+}
+
+.mat-cell{
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-right: 14px;
 }

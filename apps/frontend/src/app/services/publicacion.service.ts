@@ -9,6 +9,7 @@ import { stringify } from 'querystring';
   })
 export class PublicacionService{
     public url: string;
+    JWT_TOKEN = 'JWT_TOKEN';
 
 	languagelocal;
   constructor(public http: HttpClient){
@@ -91,6 +92,40 @@ export class PublicacionService{
     }else{
       return this.http.get(this.url+'publicacion/get-publicacionesrevista-en/'+idRevista,{headers:headers});
     }
+  }
+
+  addPublicacion(publicacion):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.post(this.url+'publicacion/post-publicacion/',publicacion,{headers:headers});
+  }
+
+  updatePublicacion(publicacion):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.put(this.url+'publicacion/update-publicacion/',publicacion,{headers:headers});
+  }
+
+  deletePublicacion(idPublicacion):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.delete(this.url+'publicacion/delete-publicacion/'+idPublicacion,{headers:headers});
+  }
+
+  uploadPublicacionFile(fileData, id){
+    const formData = new FormData();
+    formData.append('file', fileData, fileData.name); 
+    console.log(formData.get('file'));
+    let headers = new HttpHeaders ({
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+	  });
+    return this.http.put(this.url+'publicacion/upload-publicacion-file/'+id, formData, {headers:headers});
   }
 
 }

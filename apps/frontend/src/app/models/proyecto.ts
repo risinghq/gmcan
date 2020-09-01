@@ -20,7 +20,10 @@ export class Proyecto{
         public lineasInvestigacion: String,
         public fechaCreacion: Date,
         public fechaActualizacion: Date,
+        public fuenteFinanciamiento_idFuenteFinanciamiento:Number,
+        public moneda_idMoneda: Number,
+        public moneda: string,
         public usuario: Array<Usuario>,
-        public autor: Array<Autor>
+        public autor: Array<Autor>,
     ){}
 }

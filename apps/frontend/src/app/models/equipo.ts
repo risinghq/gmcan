@@ -6,7 +6,7 @@ export class Equipo{
         public gpu: String,
         public ram: String,
         public hd: String,
-        public grupo_idGrupo: String,
+        public grupo_idGrupo: Number,
         public fechaCreacion: Date,
         public fechaActualizacion: Date,
     ){}

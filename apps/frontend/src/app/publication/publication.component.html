@@ -16,7 +16,7 @@
                         {{language.publicationsText[0].publicationsTitle}}
                     </div>
                     <div class="card-publication-text">
-                        {{language.publicationsText[0].publicationsText}}
+                        {{infoText}}
                     </div>
                     <mat-tab-group (selectedTabChange)="changeTab($event)">
                         <mat-tab label="{{tipoPublicacion.nombreTab}}" *ngFor="let tipoPublicacion of tipoPublicaciones"> 
@@ -28,8 +28,11 @@
                                     <mat-icon class="icon-search">search</mat-icon>
                                 </div>
                             </form>
-                            <div *ngIf="!allCharged">
-                                <mat-spinner ></mat-spinner>
+                            <div class="spinner-pad" *ngIf="!allCharged">
+                                <mat-spinner class="auto mb-8"></mat-spinner>
+                                <div class=" loading-text center">
+                                    Cargando
+                                </div>
                             </div>
                             <div class="not-found" *ngIf="allCharged && publicaciones.length==0">
                                 {{language.publicationsText[0].results}}

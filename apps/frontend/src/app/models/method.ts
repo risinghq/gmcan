@@ -2,9 +2,10 @@ export class Method{
     constructor(
         public idMetodo: Number,
         public nombre: String,
+        public nombreEN: String,
         public descripcion: string,
+        public descripcionEN: string,
         public foto: String,
-        public autorPublicacion: String,
         public grupo_idGrupo: Number,
     ){}
 }

@@ -9,6 +9,7 @@ import { stringify } from 'querystring';
   })
 export class UniversidadService{
   public url: string;
+  JWT_TOKEN = 'JWT_TOKEN';
   languagelocal;
 	constructor(public http: HttpClient){
     this.url = GLOBAL.url;
@@ -35,5 +36,29 @@ export class UniversidadService{
     }else{
       return this.http.get(this.url+'universidad/get-universidad-en/'+idUniversidad,{headers:headers});
     }
+  }
+
+  addUniversidad(universidad):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.post(this.url+'universidad/post-universidad/',universidad,{headers:headers});
+  }
+
+  updateUniversidad(universidad):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.put(this.url+'universidad/update-universidad/',universidad,{headers:headers});
+  }
+
+  deleteUniversidad(idUniversidad):any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.delete(this.url+'universidad/delete-universidad/'+idUniversidad,{headers:headers});
   }
 }

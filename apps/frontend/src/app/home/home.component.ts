@@ -20,8 +20,6 @@ import { UniversidadService } from '../services/universidad.service';
 import { LineasInvestigacionService } from '../services/lineasinvestigacion.service';
 import { ProyectoService } from '../services/proyecto.service';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
-import { CiudadService } from '../services/ciudad.service';
-import { PaisService } from '../services/pais.service';
 import { EventoService } from '../services/evento.service';
 import { TipoTesisService } from '../services/tipotesis.service';
 import { TipoPublicacionService } from '../services/tipopublicacion.service';
@@ -35,6 +33,8 @@ import { Method } from '../models/method';
 import { AboutUsService } from '../services/aboutus.service';
 import { GLOBAL } from '../services/global';
 import { Location } from '@angular/common';
+import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
+import { MonedaService } from '../services/moneda.service';
 
 @Component({
   selector: 'app-home',
@@ -73,8 +73,6 @@ export class HomeComponent implements OnInit {
     public _proyectoServices: ProyectoService,
     public _tiponoticiaService: TipoNoticiaService,
     public _noticiaService: NoticiaService,
-    public _ciudadService: CiudadService,
-    public _paisService: PaisService,
     public _eventoService: EventoService,
     public _tipotesisService: TipoTesisService,
     public _publicacionesService: PublicacionService,
@@ -83,6 +81,8 @@ export class HomeComponent implements OnInit {
     public _methodsService: MethodsService,
     public aboutusService: AboutUsService,
     public location: Location,
+    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
+    public _monedaService: MonedaService,
     ) { 
       this.info = new Grupo(null,'','','','','','','','','','','','','','',null,null)
       this.noticiaPrincipal = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
@@ -106,6 +106,8 @@ export class HomeComponent implements OnInit {
     }
 
     language;
+    progress=0;
+    augment=100/10;
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
@@ -123,12 +125,14 @@ export class HomeComponent implements OnInit {
   getGrupoInfo(){
     this._grupoService.getGrupoInfo().subscribe((res)=>{
       this.info=res[0];
+      this.progress=this.progress+this.augment;
       this.getAboutUs();
     });
   }
 
   getAboutUs(){
     this.aboutusService.getAboutUsInfo().subscribe((res)=>{
+      this.progress=this.progress+this.augment;
       document.getElementById("services").innerHTML=res[0].servicios;
     });
   }
@@ -139,6 +143,7 @@ export class HomeComponent implements OnInit {
     this._tipoPublicacionService.getTipoPublicaciones().subscribe((res)=>{
       if(res){
         this.tipoPublicaciones=res;
+        this.progress=this.progress+this.augment;
         this.getPublicaciones();
       }
     });
@@ -151,6 +156,7 @@ export class HomeComponent implements OnInit {
   getPublicaciones(){
     this._publicacionesService.getPublicacion().subscribe((res)=>{
       if(res.length>0){
+        this.progress=this.progress+this.augment;
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.publicaciones=res;
         for (let index = 0; index < this.publicaciones.length; index++) {
@@ -190,27 +196,12 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  getCiudad(idCiudad, publicacion){
-    this._ciudadService.getCiudad(idCiudad).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.ciudad=res[0].nombre;
-        this.getPais(res[0].pais_idPais,publicacion);
-      }
-    });
-  }
-
-  getPais(idPais, publicacion){
-    this._paisService.getPais(idPais).subscribe((res)=>{
-      if(res.length>0){
-        publicacion.pais=res[0].nombre;
-      }
-    });
-  }
-
   getEvento(idEvento, publicacion){
     this._eventoService.getEvento(idEvento).subscribe((res)=>{
       if(res.length>0){
         publicacion.evento=res[0].nombre;
+        publicacion.ciudad=res[0].ciudad;
+        publicacion.pais=res[0].pais;
       }
     });
   }
@@ -239,7 +230,6 @@ export class HomeComponent implements OnInit {
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
     this.getPublicacionHasUsuario(publicacion);
-    this.getCiudad(publicacion.ciudad_idCiudad, publicacion);
     this.getEvento(publicacion.evento_idEvento, publicacion);
     this.getTipoTesis(publicacion);
   }
@@ -270,9 +260,26 @@ export class HomeComponent implements OnInit {
     this._proyectoServices.getProyecto().subscribe((res)=>{
       if(res.length>0){
         this.proyectos=res;
+        this.progress=this.progress+this.augment;
         for (let index = 0; index < this.proyectos.length; index++) {
           this.fillProyecto(this.proyectos[index], index);
         }
+      }
+    });
+  }
+
+  getFuenteFinanciamiento(proyecto){
+    this._fuenteFinanciamientoService.getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento).subscribe((res)=>{
+      if(res.length>0){
+        proyecto.fuenteFinanciamiento=res[0].nombre;
+      }
+    });
+  }
+
+  getMoneda(proyecto){
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res)=>{
+      if(res.length>0){
+        proyecto.moneda=res[0].simbolo;
       }
     });
   }
@@ -289,6 +296,8 @@ export class HomeComponent implements OnInit {
     }
     this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion,index);
     this.getProyectosHasUsuario(proyecto);
+    this.getFuenteFinanciamiento(proyecto);
+    this.getMoneda(proyecto);
   }
 
   /* get Noticias */
@@ -296,6 +305,7 @@ export class HomeComponent implements OnInit {
   getNoticias(){
     this._noticiaService.getNoticias().subscribe((res)=>{
       if(res!=null){
+        this.progress=this.progress+this.augment;
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.noticias=res;
         for (let index = 0; index < this.noticias.length; index++) {
@@ -314,6 +324,7 @@ export class HomeComponent implements OnInit {
 
   getTipoNoticias(){
     this._tiponoticiaService.getTipoNoticia().subscribe((res)=>{
+      this.progress=this.progress+this.augment;
       this.tiponoticias=res;
       this.getNoticias();
     });
@@ -337,6 +348,7 @@ export class HomeComponent implements OnInit {
   getAllLineasInvestigacion(){
     this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res)=>{
       if(res){
+        this.progress=this.progress+this.augment;
         this.lineasInvestigacion=res;
       }
     });
@@ -347,6 +359,7 @@ export class HomeComponent implements OnInit {
   getMetodos(){
     this._methodsService.getMethods().subscribe((res)=>{
       if(res){
+        this.progress=this.progress+this.augment;
         this.metodos=res;
       }
     });
@@ -357,7 +370,7 @@ export class HomeComponent implements OnInit {
   getUsuario(dni, obj){
     this._usuarioService.getUser(dni).subscribe((res)=>{
       if(res){
-        if(obj.usuario.findIndex(x => x.idAutor === res[0].idAutor)==-1){
+        if(obj.usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
           obj.usuario.push(res[0]);
         }
         this.fillName(obj);
@@ -437,6 +450,7 @@ export class HomeComponent implements OnInit {
 
   getUsuarios(){
     this._usuarioService.getUsuarios().subscribe((res)=>{
+      this.progress=this.progress+this.augment;
       this.usuarios=res;
       this.startCounter();
     });

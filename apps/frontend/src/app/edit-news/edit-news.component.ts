@@ -82,10 +82,10 @@ export class EditNewsComponent implements OnInit {
       cuerpo: ['', Validators.required],
       cuerpoEN: ['', Validators.required],
       fechaPublicacion: ['', Validators.required],
-      autorPublicacion: ['',Validators.required],
+      autorPublicacion: [null,Validators.required],
       tipoNoticia_idtipoNoticia: ['',Validators.required],
     });
-    this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'',null,null);
+    this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'','',null);
     this.url=GLOBAL.url;
   }
 
@@ -154,6 +154,8 @@ export class EditNewsComponent implements OnInit {
   }
 
   submitNews(value){
+    console.log(this.newsForm.valid)
+    console.log((this.noticia.foto || this.fileData))
     if(value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)){
       this.publishDialog(value);
     }else if(value==0){

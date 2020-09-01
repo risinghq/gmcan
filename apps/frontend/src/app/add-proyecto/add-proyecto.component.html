@@ -1,0 +1,165 @@
+<div class="pad">
+    <div class="add-box">
+        <div class="member-detail-links">
+            <div class="flex-news">
+                <div class="flex-news back-div" (click)="return()">
+                    <mat-icon class="back-icon">
+                        arrow_back
+                    </mat-icon>
+                    <div class="back-text">
+                        Volver
+                    </div>
+                </div>
+                <div class="right obligatory-text">
+                    <span class="red-text">(*) </span>Campos obligatorios
+                </div>
+            </div>
+            <form [formGroup]="proyectoForm"  class="mt-24 mb-32">
+                <div class="full-width">
+                    <div class="text-category">
+                        Título del proyecto en español <span class="red-text">*</span>
+                    </div>
+                    <input [(ngModel)]="proyecto.titulo"  formControlName="título" name="título" class="input-category" placeholder="Insertar título del proyecto en español" required>
+                </div>
+                <div class="full-width">
+                    <div class="text-category">
+                        Título del proyecto en inglés <span class="red-text">*</span>
+                    </div>
+                    <input [(ngModel)]="proyecto.tituloEN" formControlName="títuloEN" name="títuloEN" class="input-category" placeholder="Insertar título del proyecto en inglés" required>
+                </div>
+                <div class="flex-news mt-8">
+                    <div class="mr-32 full-width">
+                        <div class="text-category">
+                            Código <span class="red-text">*</span>
+                        </div>
+                        <input [(ngModel)]="proyecto.codigo" formControlName="codigo" name="codigo" class="input-category" required>
+                    </div>
+                    <div class="full-width">
+                        <div class="text-category">
+                            Línea de investigación <span class="red-text">*</span>
+                        </div>
+                        <mat-form-field class="input-category" floatLabel="never">
+                            <mat-placeholder class="placeholder mt--7">Seleccionar revista</mat-placeholder>
+                            <mat-select [(ngModel)]="proyecto.lineasInvestigacion_idLineasInvestigacion" formControlName="lineasInvestigacion_idLineasInvestigacion" name="lineasInvestigacion_idLineasInvestigacion">
+                                <mat-option [value]="lineaInvestigacion.idLineasInvestigacion" *ngFor="let lineaInvestigacion of lineasInvestigacion">{{lineaInvestigacion.nombre}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="full-width mt-16">
+                    <div class="text-category mb-0">
+                        Responsable(s) <span class="red-text">*</span>
+                    </div>
+                    <div class="flex-flow flex-news mt-16">
+                        <section class="relative mr-80 mb-8" *ngFor="let otroAutor of otrosAutores; let i = index;">
+                            <mat-form-field class="input-category width-normal" floatLabel="never">
+                                <input id="autorId" class="text-autocomplete text-autocomplete-normal" type="text"
+                                    matInput
+                                    [(ngModel)]="otroAutor.nombre" [disabled]="true" [ngModelOptions]="{standalone: true}">
+                                <mat-placeholder class="placeholder custom-place">Seleccionar autor</mat-placeholder>
+                            </mat-form-field>
+                            <mat-form-field class="input-category selector-users-input">
+                                <mat-select [disabled]="disableSelect" (selectionChange)="selectUserAutor($event.value, 1, i)">
+                                    <mat-option class="mdc-list-item" [value]="option" *ngFor="let option of options">
+                                        <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">
+                                        <img class="mdc-list-item__graphic mr-12 img-user" src="{{url+'usuario/get-image-usuario/'+option.foto}}" *ngIf="option.foto">
+                                        <span class="mdc-list-item__text">{{option.nombre}}</span>
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-icon class="erase-icon" *ngIf="otroAutor.nombre && i!=0 && proyecto.estado!=0" (click)="removeAnotherAuthor(i)">clear</mat-icon>
+                        </section>
+                        <div class="green-text plex-sans mb-8" *ngIf="proyecto.estado!=0" (click)="addAnotherAuthor()">Agregar responsable</div>
+                    </div>
+                </div>
+                <div class="full-width mt-16 mb-16">
+                    <div class="text-category">
+                        Descripción en español <span class="red-text">*</span>
+                    </div>
+                    <textarea [(ngModel)]="proyecto.descripcion" placeholder="Insertar descripcion" formControlName="descripcion" name="descripcion" autosize class="input-category"></textarea>
+                </div>
+                <div class="full-width mb-16">
+                    <div class="text-category">
+                        Descripción en inglés <span class="red-text">*</span>
+                    </div>
+                    <textarea [(ngModel)]="proyecto.descripcionEN" placeholder="Insertar descripcion" formControlName="descripcionEN" name="descripcionEN" autosize class="input-category"></textarea>
+                </div>
+                <div class="flex-news mt-8">
+                    <div class="mr-32 full-width">
+                        <div class="text-category">
+                            Fuente de financiamiento <span class="red-text">*</span>
+                        </div>
+                        <mat-form-field class="input-category" floatLabel="never">
+                            <mat-placeholder class="placeholder mt--7">Seleccionar fuente de financiamiento</mat-placeholder>
+                            <mat-select [(ngModel)]="proyecto.fuenteFinanciamiento_idFuenteFinanciamiento" formControlName="fuenteFinanciamiento_idFuenteFinanciamiento" name="fuenteFinanciamiento_idFuenteFinanciamiento">
+                                <mat-option [value]="fuenteFinaciamiento.idFuenteFinanciamiento" *ngFor="let fuenteFinaciamiento of fuentesFinaciamiento">{{fuenteFinaciamiento.nombre}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="mr-32 width-128">
+                        <div class="text-category">
+                            Moneda <span class="red-text">*</span>
+                        </div>
+                        <mat-form-field class="input-category" floatLabel="never">
+                            <mat-placeholder class="placeholder mt--7">Tipo</mat-placeholder>
+                            <mat-select [(ngModel)]="proyecto.moneda_idMoneda" formControlName="moneda_idMoneda" name="moneda_idMoneda">
+                                <mat-option [value]="moneda.idMoneda" *ngFor="let moneda of monedas">{{moneda.simbolo}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="full-width">
+                        <div class="full-width">
+                            <div class="text-category">
+                                Monto financiado <span class="red-text">*</span>
+                            </div>
+                            <input [(ngModel)]="proyecto.montoFinanciado" formControlName="montoFinanciado" name="montoFinanciado" class="input-category" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="full-width flex-news">
+                    <div class="width-479 mr-26">
+                        <div class="text-category">
+                            Fecha de inicio <span class="red-text">*</span>
+                        </div>
+                        <mat-form-field class="input-category" floatLabel="never">
+                            <mat-placeholder class="placeholder mt--7">Seleccionar fecha de inicio</mat-placeholder>
+                            <input matInput [(ngModel)]="proyecto.fechaInicio" [matDatepicker]="dp"
+                            formControlName="fechaInicio" name="fechaInicio">
+                            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                            <mat-datepicker #dp></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="width-479 mr-26" *ngIf="proyecto.fechaFin!='' && proyecto.fechaFin">
+                        <div class="text-category">
+                            Fecha de inicio <span class="red-text">*</span>
+                        </div>
+                        <mat-form-field class="input-category" floatLabel="never">
+                            <mat-placeholder class="placeholder mt--7">Seleccionar fecha de inicio</mat-placeholder>
+                            <input matInput [(ngModel)]="proyecto.fechaFin" [matDatepicker]="dp2"
+                            formControlName="fechaFin" name="fechaFin">
+                            <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
+                            <mat-datepicker #dp2></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+            <div class="flex-news">
+                <div class="red-btn" *ngIf="edit">
+                    <div class="link link-set link-red" (click)="openEraser()">
+                      Eliminar proyecto
+                    </div>
+                </div>
+                <div class="right pd-8 mr-16">
+                    <div class="link link-set" (click)="projectEnd()" *ngIf="edit">
+                        {{button_text2}}
+                    </div>
+                </div>
+                <div [ngClass]="{'btn-grey':!proyectoForm.valid,'black-btn':proyectoForm.valid}">
+                    <div class="link link-set" (click)="submitProyecto()">
+                      {{button_text}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

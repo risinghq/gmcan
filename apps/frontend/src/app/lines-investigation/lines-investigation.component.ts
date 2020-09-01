@@ -8,6 +8,8 @@ import { UsuarioHasProyectoService } from '../services/usuariohasproyecto';
 import { UsuarioService } from '../services/usuario.service';
 import { Location } from '@angular/common';
 import { GLOBAL } from '../services/global';
+import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
+import { MonedaService } from '../services/moneda.service';
 
 @Component({
   selector: 'app-lines-investigation',
@@ -36,11 +38,13 @@ export class LinesInvestigationComponent implements OnInit {
     public location: Location,
     public _route: ActivatedRoute,
     public _router: Router,
+    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
+    public _monedaService: MonedaService,
   ) { 
     this.lineasProyecto=[];
-    this.lineasProyecto[0]=new lineasInvestigacion(null,'','',null,null,null,[],0);
-    this.lineasProyecto[1]=new lineasInvestigacion(null,'','',null,null,null,[],0);
-    this.lineasProyecto[2]=new lineasInvestigacion(null,'','',null,null,null,[],0);
+    this.lineasProyecto[0]=new lineasInvestigacion(null,'','','','',null,null,null,[],0);
+    this.lineasProyecto[1]=new lineasInvestigacion(null,'','','','',null,null,null,[],0);
+    this.lineasProyecto[2]=new lineasInvestigacion(null,'','','','',null,null,null,[],0);
   }
 
   ngOnInit() {
@@ -101,6 +105,24 @@ export class LinesInvestigationComponent implements OnInit {
       proyecto.fechaF=this.titlecasePipe.transform(proyecto.fechaF);
     }
     this.getUsuarioHasProyecto(proyecto);
+    this.getFuenteFinanciamiento(proyecto)
+    this.getMoneda(proyecto)
+  }
+
+  getFuenteFinanciamiento(proyecto){
+    this._fuenteFinanciamientoService.getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento).subscribe((res)=>{
+      if(res.length>0){
+        proyecto.fuenteFinanciamiento=res[0].nombre;
+      }
+    });
+  }
+
+  getMoneda(proyecto){
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res)=>{
+      if(res.length>0){
+        proyecto.moneda=res[0].simbolo;
+      }
+    });
   }
 
   getUsuarioHasProyecto(proyecto){

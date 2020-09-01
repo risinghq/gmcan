@@ -1,7 +1,4 @@
 <div class="project-div">
-    <!-- <div *ngIf="!cargado">
-        <mat-spinner ></mat-spinner>
-    </div> -->
     <div class="row">
         <div class="col-lg-8 col-sm-6 col-12">
             <div class="project-links">
@@ -16,7 +13,7 @@
                     {{language.projectsText[0].projectsTitle}}
                 </div>
                 <div class="project-subtext">
-                    {{language.projectsText[0].projectsText}}
+                    {{infoText}}
                 </div>
                 <mat-tab-group (selectedTabChange)="changeTab($event)">
                     <mat-tab label="{{tipoProyecto}}" *ngFor="let tipoProyecto of tipoProyectos; let j = index"> 
@@ -28,103 +25,106 @@
                                 <mat-icon class="icon-search">search</mat-icon>
                             </div>
                         </form>
-                        <div *ngIf="!allCharged">
-                            <mat-spinner ></mat-spinner>
+                        <div class="spinner-pad" *ngIf="!allCharged">
+                            <mat-spinner class="auto mb-8"></mat-spinner>
+                            <div class=" loading-text center">
+                                Cargando
+                            </div>
                         </div>
                         <div class="not-found" *ngIf="allCharged && proyectos.length==0">
-                            {{language.projectsText[0].results}}
+                                {{language.projectsText[0].results}}
                         </div>
                         <div *ngIf="allCharged && proyectos.length>0">
-                            <div class="project" *ngFor="let proyecto of proyectos | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize; let i = index">
-                                <div class="project-code">
-                                    {{proyecto.codigo}}
-                                </div>
-                                <div class="flex-news project-mt">
-                                    <div class="project-title">
-                                        {{proyecto.titulo}}
+                                <div class="project" *ngFor="let proyecto of proyectos | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize; let i = index">
+                                    <div class="project-code">
+                                        {{proyecto.codigo}}
                                     </div>
-                                </div>
-                                <div class="project-rev">
-                                    <strong class="resp-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
-                                </div>
-                                <div class="mt-16">
-                                    <div class="flex-news flex-flow">
-                                        <strong class="resp-title">{{this.language.projectsText[0].responsable}}:</strong>
-                                        <div class="project-members" *ngFor="let usuario of proyecto.usuario">
-                                            <div class="member-img-round">
-                                                <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
-                                                <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
-                                            </div>
-                                            <div class="member-name" (click)="profile(usuario)">
-                                                {{usuario.nombreCompleto}}
-                                            </div>
+                                    <div class="flex-news project-mt">
+                                        <div class="project-title">
+                                            {{proyecto.titulo}}
                                         </div>
                                     </div>
-                                    <div class="flex-news">
-                                        <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="project-abstract" 
-                                        data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
-                                        aria-expanded="false" aria-controls="collapseExample">
-                                            {{this.language.projectsText[0].seeMore}}
-                                        </a>
-                                        <mat-icon class="project-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
-                                            keyboard_arrow_down
-                                        </mat-icon>
+                                    <div class="project-rev">
+                                        <strong class="resp-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
+                                    </div>
+                                    <div class="mt-16">
+                                        <div class="flex-news flex-flow">
+                                            <strong class="resp-title">{{this.language.projectsText[0].responsable}}:</strong>
+                                            <div class="project-members" *ngFor="let usuario of proyecto.usuario">
+                                                <div class="member-img-round">
+                                                    <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
+                                                    <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
+                                                </div>
+                                                <div class="member-name" (click)="profile(usuario)">
+                                                    {{usuario.nombreCompleto}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-news">
+                                            <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="project-abstract" 
+                                            data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
+                                            aria-expanded="false" aria-controls="collapseExample">
+                                                {{this.language.projectsText[0].seeMore}}
+                                            </a>
+                                            <mat-icon class="project-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
+                                                keyboard_arrow_down
+                                            </mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="collapse collapsed-resumen mt-16" id="collapseExample{{i}}">                                        
+                                        <div class="abstract mb-8">                                     
+                                            <strong class="abstract-title">
+                                                {{this.language.projectsText[0].description}}: 
+                                            </strong>
+                                            {{proyecto.descripcion}}
+                                        </div>
+                                        <div class="abstract mb-8">                                     
+                                            <strong class="abstract-title">
+                                                {{this.language.projectsText[0].source}}:
+                                            </strong>
+                                            {{proyecto.fuenteFinanciamiento}}
+                                        </div>
+                                        <div class="abstract mb-8">                                     
+                                            <strong class="abstract-title">
+                                                {{this.language.projectsText[0].amount}}:
+                                            </strong>
+                                            {{proyecto.moneda}}{{proyecto.montoFinanciado}}
+                                        </div>
+                                        <div class="abstract mb-8">                                     
+                                            <strong class="abstract-title">
+                                                {{this.language.projectsText[0].dateStart}}:
+                                            </strong>
+                                            {{proyecto.fechaI}}
+                                        </div>
+                                        <div class="abstract" *ngIf="proyecto.fechaF">
+                                            <strong class="abstract-title">
+                                                {{this.language.projectsText[0].dateEnd}}:
+                                            </strong>
+                                            {{proyecto.fechaF}}
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="collapse collapsed-resumen mt-16" id="collapseExample{{i}}">                                        
-                                    <div class="abstract mb-8">                                     
-                                        <strong class="abstract-title">
-                                            {{this.language.projectsText[0].description}}: 
-                                        </strong>
-                                        {{proyecto.descripcion}}
-                                    </div>
-                                    <div class="abstract mb-8">                                     
-                                        <strong class="abstract-title">
-                                            {{this.language.projectsText[0].source}}:
-                                        </strong>
-                                        {{proyecto.fuenteFinanciamiento}}
-                                    </div>
-                                    <div class="abstract mb-8">                                     
-                                        <strong class="abstract-title">
-                                            {{this.language.projectsText[0].amount}}:
-                                        </strong>
-                                        {{proyecto.montoFinanciado}}
-                                    </div>
-                                    <div class="abstract mb-8">                                     
-                                        <strong class="abstract-title">
-                                            {{this.language.projectsText[0].dateStart}}:
-                                        </strong>
-                                        {{proyecto.fechaI}}
-                                    </div>
-                                    <div class="abstract" *ngIf="proyecto.fechaF">
-                                        <strong class="abstract-title">
-                                            {{this.language.projectsText[0].dateEnd}}:
-                                        </strong>
-                                        {{proyecto.fechaF}}
-                                    </div>
-                                </div>
-                            </div>
-                            <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="proyectos.length" *ngIf="proyectos.length>5">
-                                <ng-template class="unique-left" ngbPaginationPrevious>
-                                    <div (click)="scroll()" class="h-ih">
-                                        <mat-icon class="pag-arrow">
-                                            keyboard_arrow_left
-                                        </mat-icon>
-                                    </div>
-                                </ng-template>
-                                <ng-template ngbPaginationNumber let-page>
-                                    <div (click)="scroll()" class="h-ih">
-                                        {{ page }}
-                                    </div>
-                                </ng-template>
-                                <ng-template ngbPaginationNext>
-                                    <div (click)="scroll()" class="h-ih">
-                                        <mat-icon class="pag-arrow" style="padding-bottom: 20px !important;">
-                                            keyboard_arrow_right
-                                        </mat-icon>
-                                    </div>
-                                </ng-template>
-                            </ngb-pagination>
+                                <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="proyectos.length" *ngIf="proyectos.length>5">
+                                    <ng-template class="unique-left" ngbPaginationPrevious>
+                                        <div (click)="scroll()" class="h-ih">
+                                            <mat-icon class="pag-arrow">
+                                                keyboard_arrow_left
+                                            </mat-icon>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template ngbPaginationNumber let-page>
+                                        <div (click)="scroll()" class="h-ih">
+                                            {{ page }}
+                                        </div>
+                                    </ng-template>
+                                    <ng-template ngbPaginationNext>
+                                        <div (click)="scroll()" class="h-ih">
+                                            <mat-icon class="pag-arrow" style="padding-bottom: 20px !important;">
+                                                keyboard_arrow_right
+                                            </mat-icon>
+                                        </div>
+                                    </ng-template>
+                                </ngb-pagination>
                         </div>
                     </mat-tab>
                 </mat-tab-group>

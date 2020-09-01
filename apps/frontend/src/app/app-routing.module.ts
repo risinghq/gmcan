@@ -40,6 +40,60 @@ import { EditMemberGuard } from './guards/change-editmember-guard';
 import { EditCategoryGuard } from './guards/editcategory.guard';
 import { EditNewsGuard } from './guards/editnews.guard';
 import { AddNewsGuard } from './guards/addnews.guard';
+import { ArticulosComponent } from './articulos/articulos.component';
+import { TesisComponent } from './tesis/tesis.component';
+import { EventosComponent } from './eventos/eventos.component';
+import { AddRevistaComponent } from './add-revista/add-revista.component';
+import { AddRevistaGuard } from './guards/addrevista.guard';
+import { AddUniversidadComponent } from './add-universidad/add-universidad.component';
+import { AddUniversidadGuard } from './guards/adduniversidad.guard';
+import { AddEventoComponent } from './add-evento/add-evento.component';
+import { AddEventoGuard } from './guards/addevento.guard';
+import { EditRevistaComponent } from './edit-revista/edit-revista.component';
+import { EditRevistaGuard } from './guards/editrevista.guard';
+import { EditUniversidadComponent } from './edit-universidad/edit-universidad.component';
+import { EditUniversidadGuard } from './guards/edituniversidad.guard';
+import { EditEventoComponent } from './edit-evento/edit-evento.component';
+import { EditEventoGuard } from './guards/editevento.guard';
+import { AddArticleComponent } from './add-article/add-article.component';
+import { AddArticleGuard } from './guards/addarticle.guard';
+import { EditArticleComponent } from './edit-article/edit-article.component';
+import { EditArticleGuard } from './guards/editarticle.guard';
+import { AddTesisComponent } from './add-tesis/add-tesis.component';
+import { AddTesisGuard } from './guards/addtesis.guard';
+import { EditTesisComponent } from './edit-tesis/edit-tesis.component';
+import { AddResumenComponent } from './add-resumen/add-resumen.component';
+import { AddResumenGuard } from './guards/addresumen.guard';
+import { EditTesisGuard } from './guards/edittesis.guard';
+import { EditResumenComponent } from './edit-resumen/edit-resumen.component';
+import { EditResumenGuard } from './guards/editresumen.guard';
+import { MyArticleComponent } from './my-article/my-article.component';
+import { MyThesisComponent } from './my-thesis/my-thesis.component';
+import { MyResumenesComponent } from './my-resumenes/my-resumenes.component';
+import { AddFuenteComponent } from './add-fuente/add-fuente.component';
+import { AddFuenteGuard } from './guards/addfuente.guard';
+import { EditFuenteComponent } from './edit-fuente/edit-fuente.component';
+import { EditFuenteGuard } from './guards/editfuente.guard';
+import { AddProyectoComponent } from './add-proyecto/add-proyecto.component';
+import { AddProyectoGuard } from './guards/addproyecto.guard';
+import { EditProyectoComponent } from './edit-proyecto/edit-proyecto.component';
+import { EditProyectoGuard } from './guards/editproyecto.guard';
+import { AddLineaComponent } from './add-linea/add-linea.component';
+import { EditLineaComponent } from './edit-linea/edit-linea.component';
+import { AddLineGuard } from './guards/addline.guard';
+import { AddMethodComponent } from './add-method/add-method.component';
+import { EditLineGuard } from './guards/editline.guard';
+import { AddMethodGuard } from './guards/addmethod.guard';
+import { EditMethodComponent } from './edit-method/edit-method.component';
+import { EditMethodGuard } from './guards/editmethod.guard';
+import { AddEquipoComponent } from './add-equipo/add-equipo.component';
+import { AddEquipoGuard } from './guards/addequipo.guard';
+import { EditEquipoComponent } from './edit-equipo/edit-equipo.component';
+import { EditEquipoGuard } from './guards/editequipo.guard';
+import { AddSoftwareComponent } from './add-software/add-software.component';
+import { AddSoftwareGuard } from './guards/addsoftware.guard';
+import { EditSoftwareComponent } from './edit-software/edit-software.component';
+import { EditSoftwareGuard } from './guards/editsoftware.guard';
 
 
 const routes: Routes = [
@@ -71,7 +125,12 @@ const routes: Routes = [
     {path: 'add-member', component: AddMemberComponent, canDeactivate: [AddMemberGuard]},
     {path: 'edit-member/:id', component: EditMemberComponent , canDeactivate: [EditMemberGuard]},
     {path: 'publicaciones', component: PublicacionesComponent},
-    {path: 'proyectos', component: ProyectosComponent},
+    {path: 'proyectos-ejecucion', component: ProyectosComponent},
+    {path: 'proyectos-concluidos', component: ProyectosComponent},
+    {path: 'add-project', component:AddProyectoComponent, canDeactivate:[AddProyectoGuard]},
+    {path: 'edit-project/:id', component:EditProyectoComponent, canDeactivate:[EditProyectoGuard]},
+    {path: 'add-fuente', component:AddFuenteComponent,canDeactivate:[AddFuenteGuard]},
+    {path: 'edit-fuente/:id', component:EditFuenteComponent, canDeactivate:[EditFuenteGuard]},
     {path: 'noticias', component: NoticiasComponent},
     {path: 'add-news', component: AddNewsComponent, canDeactivate:[AddNewsGuard]},
     {path: 'edit-news/:id', component: EditNewsComponent, canDeactivate:[EditNewsGuard]},
@@ -79,6 +138,33 @@ const routes: Routes = [
     {path: 'edit-category/:id', component: EditCategoryComponent, canDeactivate: [EditCategoryGuard]},
     {path: 'perfil', component: PerfilComponent},
     {path: 'contenidos', component: ContenidosComponent},
+    {path: 'add-linea', component: AddLineaComponent, canDeactivate: [AddLineGuard]},
+    {path: 'edit-linea/:id', component: EditLineaComponent, canDeactivate:[EditLineGuard]},
+    {path: 'add-method', component: AddMethodComponent , canDeactivate:[AddMethodGuard]},
+    {path: 'edit-method/:id', component: EditMethodComponent, canDeactivate: [EditMethodGuard]},
+    {path: 'add-equipo', component: AddEquipoComponent, canDeactivate: [AddEquipoGuard]},
+    {path: 'edit-equipo/:id', component: EditEquipoComponent, canDeactivate: [EditEquipoGuard]},
+    {path: 'add-software', component: AddSoftwareComponent, canDeactivate:[AddSoftwareGuard]},
+    {path: 'edit-software/:id', component: EditSoftwareComponent, canDeactivate:[EditSoftwareGuard]},
+    {path: 'articulos', component: ArticulosComponent},
+    {path: 'add-article', component: AddArticleComponent, canDeactivate: [AddArticleGuard]},
+    {path: 'edit-article/:id', component: EditArticleComponent , canDeactivate: [EditArticleGuard]},
+    {path: 'add-revista', component: AddRevistaComponent, canDeactivate: [AddRevistaGuard]},
+    {path: 'edit-revista/:id', component: EditRevistaComponent, canDeactivate: [EditRevistaGuard]},
+    {path: 'tesis', component: TesisComponent},
+    {path: 'add-thesis', component: AddTesisComponent, canDeactivate: [AddTesisGuard]},
+    {path: 'edit-thesis/:id', component: EditTesisComponent, canDeactivate: [EditTesisGuard]},
+    {path: 'add-universidad', component: AddUniversidadComponent, canDeactivate:[AddUniversidadGuard]},
+    {path: 'edit-universidad/:id', component: EditUniversidadComponent, canDeactivate:[EditUniversidadGuard]},
+    {path: 'eventos', component: EventosComponent},
+    {path: 'add-resumen', component: AddResumenComponent, canDeactivate: [AddResumenGuard]},
+    {path: 'edit-resumen/:id', component: EditResumenComponent, canDeactivate: [EditResumenGuard]},
+    {path: 'add-evento', component: AddEventoComponent, canDeactivate:[AddEventoGuard]},
+    {path: 'edit-evento/:id', component: EditEventoComponent, canDeactivate:[EditEventoGuard]},
+    {path: 'my-articles', component:MyArticleComponent},
+    {path: 'my-thesis', component:MyThesisComponent},
+    {path: 'my-abstracts', component:MyResumenesComponent},
+    {path:"**", component:NotFoundComponent},
   ]},
   {path:"recover/:id", component:ChangePassComponent},
   {path:"**", component:NotFoundComponent},

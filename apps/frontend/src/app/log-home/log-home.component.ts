@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { Grupo } from '../models/grupo';
 import { UsuarioService } from '../services/usuario.service';
 import { PermisoService } from '../services/permiso.service';
@@ -13,6 +13,8 @@ import { AuthService } from '../services/auth.service';
 import { DialogData } from '../models/dialogdata';
 import { CommonService } from '../services/common.service';
 import { stringify } from 'querystring';
+import { Languages } from '../models/languages';
+import { GrupoService } from '../services/grupo.service';
 
 @Component({
   selector: 'app-log-home',
@@ -52,7 +54,14 @@ export class LogHomeComponent implements OnInit {
     private idle: Idle, private keepalive: Keepalive,
     private router: Router,
     private _commonService:CommonService,
+    private _grupoService:GrupoService,
   ){
+    this.screenWidth = window.innerWidth;
+    if(this.screenWidth>=960){
+      this.enterAny=false;
+    }else{
+      this.enterAny=true;
+    }
     this.url=GLOBAL.url;
     this.user = new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
         // sets an idle timeout of 5 seconds, for testing purposes.
@@ -69,6 +78,7 @@ export class LogHomeComponent implements OnInit {
         idle.onTimeout.subscribe(() => {
           this.dialog.closeAll();
           this.timedOut = true;
+          localStorage.setItem("sessionEnd", '1');
           this._commonService.setEndSession('1');
           this.router.navigate(['/login']);
         });
@@ -79,6 +89,7 @@ export class LogHomeComponent implements OnInit {
         
         idle.onTimeoutWarning.subscribe((countdown) => {
           this.counterDown=countdown;
+          localStorage.setItem("sessionEnd", '1');
           this._commonService.setEndSession('1');
           if(this.dialogRef.componentInstance){
             this.dialogRef.componentInstance.data.timer=countdown;
@@ -100,6 +111,16 @@ export class LogHomeComponent implements OnInit {
         // this.reset();
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.screenWidth = window.innerWidth;
+    if(this.screenWidth>=960){
+      this.enterAny=false;
+    }else{
+      this.enterAny=true;
+    }
+  }
+
   reset() {
     this.idle.watch();
     //xthis.idleState = 'Started.';
@@ -110,6 +131,8 @@ export class LogHomeComponent implements OnInit {
     this._commonService.setEndSession('0');
     this.reset();
   }
+
+  language
 
   ngOnInit() {
     this.getUser();
@@ -138,11 +161,19 @@ export class LogHomeComponent implements OnInit {
 
   getGrupoInfo(){
     this.grupoinfo=JSON.parse(localStorage.getItem("grupoInfo"));
+    this._grupoService.getGrupoInfo().subscribe((res)=>{
+      this.grupoinfo=res[0];
+      localStorage.setItem("grupoInfo",JSON.stringify(this.grupoinfo));
+      this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
+    });
     this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
   }
 
   getUser(){
     let user = this._usuarioService.getUserLogged();
+    if(!user){
+      this.logout();
+    }
     this._usuarioService.getFullUser(user.DNI).subscribe(result => {
       if(result.length>0){
         this.user=result[0];
@@ -198,6 +229,19 @@ export class LogHomeComponent implements OnInit {
     this.timedOut = true;
     this._authService.logout();
     this._router.navigate(['/login']);
+  }
+
+  backToTop(){
+    localStorage.setItem("sessionEnd",'1');
+    this.idle.stop();
+    this.timedOut = true;
+    this._authService.logout();
+    this._router.navigate(['/']);
+  }
+
+  enterAny;
+  enterAnyway(){
+    this.enterAny=false;
   }
 
   textChange(text){

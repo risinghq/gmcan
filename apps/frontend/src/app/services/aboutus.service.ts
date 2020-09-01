@@ -9,6 +9,7 @@ import { stringify } from 'querystring';
   })
 export class AboutUsService{
     public url: string;
+    JWT_TOKEN = 'JWT_TOKEN';
 
 	languagelocal;
     constructor(public http: HttpClient){
@@ -16,7 +17,7 @@ export class AboutUsService{
       this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
     }
     
-    getAboutUsInfo(){
+    getAboutUsInfo():any{
         let headers = new HttpHeaders ({
 			'Content-Type':'application/json'
 		});
@@ -26,4 +27,37 @@ export class AboutUsService{
             return this.http.get(this.url+'sobrenosotros/get-sobrenosotros-en',{headers:headers});
         }
     }
+
+    updateDescripcion(sobrenosotros):any{
+        let headers = new HttpHeaders ({
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+        });
+        return this.http.put(this.url+'sobrenosotros/update-descripciongrupo/',sobrenosotros,{headers:headers});
+    }
+
+    updateObjetivos(sobrenosotros):any{
+        let headers = new HttpHeaders ({
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+        });
+        return this.http.put(this.url+'sobrenosotros/update-objetivosgrupo/',sobrenosotros,{headers:headers});
+    }
+
+    updateServicios(sobrenosotros):any{
+        let headers = new HttpHeaders ({
+          'Content-Type':'application/json',
+          'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+        });
+        return this.http.put(this.url+'sobrenosotros/update-serviciosgrupo/',sobrenosotros,{headers:headers});
+    }
+
+    uploadGrupoFoto(fileData, id){
+        const formData = new FormData();
+        formData.append('foto', fileData, fileData.name); 
+        let headers = new HttpHeaders ({
+          'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+          });
+        return this.http.put(this.url+'sobrenosotros/upload-sobrenosotros-foto/'+id, formData, {headers});
+      }
 }

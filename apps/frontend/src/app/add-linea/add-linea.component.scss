@@ -1,0 +1,19 @@
+@import '../add-article/add-article.component.scss';
+
+.img-preview, .news-img{
+    min-width: unset;
+    width: 120px;
+    height: 120px;
+}
+
+.news-img{
+    padding: 19px;
+}
+
+.green-text{
+    margin-top: 16px;
+}
+
+.icon-upload{
+    width: 80px;
+}

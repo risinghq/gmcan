@@ -7,6 +7,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmailService } from '../services/email.service';
 import { AuthService } from '../services/auth.service';
+import { Languages } from '../models/languages';
 
 @Component({
   selector: 'app-login',
@@ -42,6 +43,9 @@ export class LoginComponent implements OnInit {
   language;
 
   ngOnInit() {
+    localStorage.setItem("lanId",'0');
+    this.language = Languages[0];
+    localStorage.setItem("language", JSON.stringify(this.language));
     this.language=JSON.parse(localStorage.getItem("language"));
     this.getGrupoInfo();
     this.previouslink=sessionStorage.getItem("previous-page");
@@ -49,6 +53,11 @@ export class LoginComponent implements OnInit {
 
   getGrupoInfo(){
     this.grupoinfo=JSON.parse(localStorage.getItem("grupoInfo"));
+    this._grupoService.getGrupoInfo().subscribe((res)=>{
+        this.grupoinfo=res[0];
+        localStorage.setItem("grupoInfo",JSON.stringify(this.grupoinfo));
+        this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
+    });
     this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
   }
 
@@ -60,7 +69,7 @@ export class LoginComponent implements OnInit {
       }
       this.authService.login(user).subscribe((res)=>{
         if(res.state==1){
-          this._router.navigate(['/dashboard']);
+          window.location.href='/dashboard';
         }else{
           this.error="Correo electrónico o contraseña incorrectos";
         }

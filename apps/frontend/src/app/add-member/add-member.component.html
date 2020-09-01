@@ -1,13 +1,18 @@
 <div class="pad">
     <div class="add-box">
         <div class="member-detail-links">
-            <div class="flex-news back-div" (click)="return(false)">
-                <mat-icon class="back-icon">
-                    arrow_back
-                </mat-icon>
-                <div class="back-text">
-                    Volver
-                </div>                    
+            <div class="flex-news">
+                <div class="flex-news back-div" (click)="return()">
+                    <mat-icon class="back-icon">
+                        arrow_back
+                    </mat-icon>
+                    <div class="back-text">
+                        Volver
+                    </div>
+                </div>
+                <div class="right obligatory-text">
+                    <span class="red-text">(*) </span>Campos obligatorios
+                </div>
             </div>
             <form [formGroup]="memberForm">
                 <div class="flex-news mt-24">

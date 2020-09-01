@@ -4,7 +4,9 @@ export class lineasInvestigacion{
     constructor(
         public idLineasInvestigacion: Number,
         public nombre: String,
+        public nombreEN: String,
         public descripcion: String,
+        public descripcionEN: String,
         public grupo_idGrupo: Number,
         public fechaCreacion: Date,
         public fechaActualizacion: Date,
