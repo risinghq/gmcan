@@ -9,6 +9,7 @@ import { Router, ActivatedRoute, Params} from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
 import { GLOBAL } from '../services/global';
+import { Title } from '@angular/platform-browser';
 
 
 @Component({
@@ -31,6 +32,7 @@ export class MainNewsComponent implements OnInit {
     public location: Location,
     public _router: Router,
     public _usuarioService: UsuarioService,
+    private titleService: Title,
   ) { 
     this.screenWidth = window.innerWidth;
     this.noticias=[];
@@ -48,6 +50,7 @@ export class MainNewsComponent implements OnInit {
   language;
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.news);
     this.categoryNombre=this.language.newsText[0].categoryTitle;
     this.page = 1;
     this.pageSize =10;

@@ -23,6 +23,7 @@ import { EventoService } from '../services/evento.service';
 import { identifierModuleUrl } from '@angular/compiler';
 import { TipoTesisService } from '../services/tipotesis.service';
 import { GrupoService } from '../services/grupo.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-publication',
@@ -64,6 +65,7 @@ export class PublicationComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     public _grupoService: GrupoService,
+    private titleService: Title,
   ) { 
     this.tipoPublicaciones=[];
     this.autores=[];
@@ -89,6 +91,7 @@ export class PublicationComponent implements OnInit {
   pageSize;
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.publications);
     this.allCharged=false;
     this.previouslink=sessionStorage.getItem("previous-page");
     this.previouspage=this._previousService.getPreviousPage(this.previouslink);

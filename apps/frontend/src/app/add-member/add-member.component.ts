@@ -23,6 +23,7 @@ import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment} from 'moment';
 import moment from 'moment';
+import { GLOBAL } from '../services/global';
 
 @Component({
   selector: 'app-add-member',
@@ -52,6 +53,7 @@ export class AddMemberComponent implements OnInit {
   listaPermisos:Array<any>;
   hide = true;
   hide2 = true;
+  url;
 
   button_text="Registrar nuevo miembro"
 
@@ -84,6 +86,7 @@ export class AddMemberComponent implements OnInit {
       resumenPro: [''],
       resumenProEN: [''],
     });
+    this.url=GLOBAL.url;
     this.member=new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
   }
 
@@ -157,6 +160,9 @@ export class AddMemberComponent implements OnInit {
       }else{
         this.member.fechaNacimiento=null;
       }
+      if(this.member.prefijo_idPrefijo==6){
+        this.member.prefijo=null;
+      }
       this._usuarioService.verifyUser(this.member).subscribe(result => {
         if(result.length==0){
           if(this.member.password===this.memberForm.controls.confirmPassword.value){
@@ -183,7 +189,8 @@ export class AddMemberComponent implements OnInit {
                 }) 
                 }
                 this.openSnackBar('Miembro agregado exitosamente', null);
-                this.return(true);  
+                this.agregar=true;
+                this.return();
               }
             });
           }else{
@@ -256,8 +263,7 @@ export class AddMemberComponent implements OnInit {
     }
   }
 
-  return(estado){
-    this.agregar=estado;
+  return(){
     this._commonService.setEndSession('0');
     this._router.navigate(['dashboard/miembros-activos']);
   }
@@ -286,6 +292,13 @@ export class AddMemberComponent implements OnInit {
       return ;
     }
   }
+
+  openEraser(){}
+  edit;
+  permisoNoticia;
+  permisoPublicacion;
+  permisoProyecto;
+  permisoContenido;
 
 }
 

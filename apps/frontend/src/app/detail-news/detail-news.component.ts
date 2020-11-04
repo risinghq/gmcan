@@ -9,6 +9,7 @@ import { Usuario } from '../models/usuario';
 import { UsuarioService } from '../services/usuario.service';
 import { TitleCasePipe } from '@angular/common';
 import { GLOBAL } from '../services/global';
+import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-detail-news',
@@ -30,6 +31,8 @@ export class DetailNewsComponent implements OnInit {
     public _router: Router,
     public _previousService: PreviousPageService,
     public _usuarioService: UsuarioService,
+    public meta: Meta,
+    private titleService: Title
   ) {
     this.noticia = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
     this.usuario = new Usuario('','','','','','');
@@ -44,6 +47,7 @@ export class DetailNewsComponent implements OnInit {
     this.previouslink=sessionStorage.getItem("previous-page");
     this.previouspage=this._previousService.getPreviousPage(this.previouslink);
   }
+
   dia;
   mes;
   anio;
@@ -51,6 +55,7 @@ export class DetailNewsComponent implements OnInit {
   cargado;
   public fbicon="../../assets/img/Facebook.svg";
   public twitter="../../assets/img/twitter.svg";
+
   mouseEnter(int){
     switch (int) {
       case 1:
@@ -72,6 +77,7 @@ export class DetailNewsComponent implements OnInit {
         break;
     }
   }
+  
   getNoticia(){
     this._route.params.forEach((params:Params)=>{
       let idNoticia = params['id'];
@@ -82,6 +88,9 @@ export class DetailNewsComponent implements OnInit {
         this.dia=this.datePipe.transform(this.datere,'dd');
         this.mes=this.datePipe.transform(this.datere,'MMMM');
         this.anio=this.datePipe.transform(this.datere,'y');
+        this.meta.updateTag({ name: 'title', content: String(this.noticia.titulo) });
+        this.meta.updateTag({ property: 'og:title', content: String(this.noticia.titulo) });
+        this.titleService.setTitle(String(this.noticia.titulo));
         document.getElementById("newsBody").innerHTML=this.noticia.cuerpo;
         this.getTipoNoticia(this.noticia.tipoNoticia_idtipoNoticia);
         this.getUsuario(this.noticia.autorPublicacion);
@@ -92,7 +101,6 @@ export class DetailNewsComponent implements OnInit {
 
   getTipoNoticia(idTipoNoticia){
     this._tipoNoticiaService.getTipoNews(idTipoNoticia).subscribe((res)=>{
-      console.log(res);
       this.noticia.nombreTipoNoticia=res[0].nombre;
     });
   }
@@ -104,11 +112,11 @@ export class DetailNewsComponent implements OnInit {
   }
 
   fb(e) {
-    let url = 'www.google.com';
+    let url = location.href;
     e.preventDefault();
     var facebookWindow = window.open(
-      'https://www.facebook.com/sharer/sharer.php?localhost:4200/detail-news/5='+ ' Don’t delay, join the match today! url',
-      'facebook-popup',
+      'https://www.facebook.com/sharer/sharer.php?u='+  url,
+      'facebook-share-dialog', 
       'height=350,width=600'
     );
     if (facebookWindow.focus) {

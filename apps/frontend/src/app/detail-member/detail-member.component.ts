@@ -21,6 +21,7 @@ import { GLOBAL } from '../services/global';
 import { EventoService } from '../services/evento.service';
 import { Location } from '@angular/common';
 import { TipoTesisService } from '../services/tipotesis.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-detail-member',
@@ -56,6 +57,7 @@ export class DetailMemberComponent implements OnInit {
     public _tipotesisService: TipoTesisService,
     public _eventoService: EventoService,
     public location: Location,
+    private titleService: Title,
   ) { 
     this.url=GLOBAL.url;
     this.usuario=new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
@@ -140,6 +142,7 @@ export class DetailMemberComponent implements OnInit {
             this.usuario.active=this.language.detailMemberText[0].oldMember;
           }
           this.usuario.foto=this.url+'usuario/get-image-usuario/'+this.usuario.foto;
+          this.titleService.setTitle('GMCAN | '+this.usuario.nombre+ ' ' +this.usuario.apellidoPaterno);
           this.searchPublicacionHasUsuario(this.usuario.DNI);
           this.getPrefijos();
           this.getTipoMiembros();
@@ -175,6 +178,7 @@ export class DetailMemberComponent implements OnInit {
       if(res.length>0){
         this.publicaciones.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         for (let index = 0; index < res.length; index++) {
+          console.log("ids "+res[index].idPublicacion);
           if(this.publicaciones.findIndex(x => x.idPublicacion === res[index].idPublicacion)===-1){
             this.publicaciones.push(res[index]);
           }
@@ -310,7 +314,7 @@ export class DetailMemberComponent implements OnInit {
     this._prefijoService.getPrefijos().subscribe((res)=>{
       if(res){
         for (let j = 0; j < res.length; j++) {
-          if(this.usuario.Prefijo_idPrefijo==res[j].idPrefijo){
+          if(this.usuario.prefijo_idPrefijo==res[j].idPrefijo){
             this.usuario.prefijo=res[j].nombre;
           }
         }

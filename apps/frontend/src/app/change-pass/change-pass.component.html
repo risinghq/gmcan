@@ -9,7 +9,7 @@
     </div>
     <div class="login-card">
         <img  class="logo-icon" src="{{grupoinfo.logoHeader}}" alt="logo">
-        <form [formGroup]="passwordForm" *ngIf="!recoverValue && !succesful">
+        <form [formGroup]="passwordForm" *ngIf="!succesful">
             <div class="login-title recover-title">
                 Establecer nueva contraseña
             </div>
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </form>
-        <div *ngIf="!recoverValue && succesful">
+        <div *ngIf="succesful">
             <div class="login-title succesful-title">
                 ¡Contraseña cambiada exitosamente!
             </div>

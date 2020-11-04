@@ -6,6 +6,11 @@ $thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
 
 /*CSS MAIN TOOLBAR*/
 
+.logo-nav{
+    cursor: pointer;
+    outline: none;
+}
+
 .search-top-div{
     cursor: pointer;
     width: 42px;
@@ -136,6 +141,12 @@ $thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
 .footer-email{
     margin-top: auto;
     margin-bottom: auto;
+    width: 173px;
+}
+
+.max-con{
+    max-height: max-content;
+    margin-top: auto;
 }
 
 /*Links CSS*/
@@ -220,7 +231,9 @@ mat-sidenav{
 }
 
 .link-logo-div{
+    cursor: pointer;
     display: flex;
+    outline: none;
 }
 
 .footer-flex{

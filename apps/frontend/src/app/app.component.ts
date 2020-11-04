@@ -6,7 +6,10 @@ import { Languages } from '../app/models/languages'
 import { SessionService } from './services/session.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { SearchService } from './services/search.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+declare const gtag: Function;
+
 
 @Component({
   selector: 'app-root',
@@ -29,7 +32,17 @@ export class AppComponent {
     public  _grupoService: GrupoService,
     private session: SessionService,
     public fb:FormBuilder,    
+    private router: Router
   ) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      /** START : Code to Track Page View  */
+       gtag('event', 'page_view', {
+          page_path: event.urlAfterRedirects
+       })
+      /** END */
+    })
     this.searchGlobalForm = this.fb.group({
       nombre: ['']
     });
@@ -41,7 +54,7 @@ export class AppComponent {
     this.url=GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
-    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','',null,null)
+    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
   }
 
   @HostListener('window:resize', ['$event'])

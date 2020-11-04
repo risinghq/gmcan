@@ -72,14 +72,17 @@ export class AddResumenComponent implements OnInit {
       título: ['', Validators.required],
       fechaPublicacionDate: ['', Validators.required],
       evento_idEvento: ['', Validators.required],
-      DOI: ['', Validators.required],
+      DOI: [''],
       resumen: ['', Validators.required],
       resumenEN: ['', Validators.required],
       userSelector: ['']
     });
-    this.publicacion = new Publicacion(null,'','','',null,'',null,null,null,null,3,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
+    this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,3,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
     this.url=GLOBAL.url;
   }
+
+  openEraser(){}
+  edit;
 
   ngOnInit() {
     this.getEventos();

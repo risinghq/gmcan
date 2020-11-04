@@ -182,8 +182,8 @@ export class EditMemberComponent implements OnInit {
     this._usuarioPublicacionService.searchPublicacionHasUsuario(miembro.DNI).subscribe(result => {
       if(result.length==0){
         this.edit=true;
-        this.getNoticias(miembro);
       }
+      this.getNoticias(miembro);
     });
   }
 

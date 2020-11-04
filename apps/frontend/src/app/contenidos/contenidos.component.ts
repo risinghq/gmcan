@@ -61,10 +61,10 @@ export class ContenidosComponent implements OnInit {
     private _equipoService: EquipoService,
     private _softwareService: SoftwareService,
   ) {
-    this.aboutUs= new SobreNosotros(null,'','','','','','',null);
-    this.facilidadesRecursos=new Grupo(null,'','','','','','','','','','','','','','',null,null)
-    this.trabajosFuturos=new Grupo(null,'','','','','','','','','','','','','','',null,null)
-    this.informacionExtra=new Grupo(null,'','','','','','','','','','','','','','',null,null)
+    this.aboutUs= new SobreNosotros(null,'','',null,'','','','',null);
+    this.facilidadesRecursos=new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
+    this.trabajosFuturos=new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
+    this.informacionExtra=new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
     this.descripcionForm = this.formBuilder.group({
       quienesSomos: ['', Validators.required],
       quienesSomosEN: ['', Validators.required],
@@ -122,10 +122,12 @@ export class ContenidosComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator4: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort4: MatSort;
 
-  selectedTab;
+  selectedTab="0";
 
   ngOnInit() {
-    this.selectedTab=sessionStorage.getItem("oldContenidos");
+    if(sessionStorage.getItem("oldContenidos")!=null){
+      this.selectedTab=sessionStorage.getItem("oldContenidos");
+    }
     this.getContenidos();
     this.getLineasInvestigación();
     this.getMetodos();
@@ -242,7 +244,7 @@ export class ContenidosComponent implements OnInit {
 
   displayedNotFound4;
 
-  applyFilte4r(event: Event) {
+  applyFilter4(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource4.filter = filterValue.trim().toLowerCase();
     if (this.dataSource4.paginator) {

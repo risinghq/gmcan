@@ -15,6 +15,7 @@ import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.se
 import { MonedaService } from '../services/moneda.service';
 import { GrupoService } from '../services/grupo.service';
 import { ProgressSpinnerMode } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-projects',
@@ -45,6 +46,7 @@ export class ProjectsComponent implements OnInit {
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
     public _grupoService: GrupoService,
+    private titleService: Title,
   ) { 
     this.searchForm = this.fb.group({
       titulo: ['']
@@ -63,6 +65,7 @@ export class ProjectsComponent implements OnInit {
   }
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.projects);
     this.screenWidth = window.innerWidth;
     this.url=GLOBAL.url;
     this.proyectos=[];

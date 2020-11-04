@@ -40,7 +40,7 @@ export class EditLineaComponent implements OnInit {
       descripcion: ['', Validators.required],
       descripcionEN: ['', Validators.required],
     });
-    this.lineaInvestigacion= new lineasInvestigacion(null,'','','','',1,null,null,null,null);
+    this.lineaInvestigacion= new lineasInvestigacion(null,'','',null,'','',1,null,null,null,null);
     this.url=GLOBAL.url;
   }
 

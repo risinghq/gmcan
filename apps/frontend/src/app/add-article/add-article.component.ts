@@ -77,9 +77,11 @@ export class AddArticleComponent implements OnInit {
       resumenEN: ['', Validators.required],
       userSelector: ['']
     });
-    this.publicacion = new Publicacion(null,'','','',null,'',null,null,null,null,1,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
+    this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,1,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
     this.url=GLOBAL.url;
   }
+
+  edit;
 
   ngOnInit() {
     this.getRevista();
@@ -93,6 +95,8 @@ export class AddArticleComponent implements OnInit {
     const filterValue = value.toLowerCase();
     return this.options.filter(option => option.nombre.toLowerCase().includes(filterValue));
   }
+
+  openEraser(){}
 
   getRevista(){
     this._revistaService.getRevistas().subscribe(result => {

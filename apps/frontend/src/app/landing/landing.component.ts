@@ -7,6 +7,7 @@ import { SessionService } from '../services/session.service';
 import { Languages } from '../models/languages';
 import { GLOBAL } from '../services/global';
 import { Location } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-landing',
@@ -31,6 +32,7 @@ export class LandingComponent implements OnInit {
     private session: SessionService,
     public fb:FormBuilder,   
     public location: Location, 
+    private titleService: Title
   ) {
     this.searchGlobalForm = this.fb.group({
       nombre: ['']
@@ -43,7 +45,7 @@ export class LandingComponent implements OnInit {
     this.url=GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
-    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','',null,null)
+    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
   }
 
   @HostListener('window:resize', ['$event'])
@@ -52,34 +54,17 @@ export class LandingComponent implements OnInit {
   }
 
   ngOnInit(){
+    this.titleService.setTitle('GMCAN | UNMSM');
     this.getGrupoInfo();
     localStorage.setItem("language", JSON.stringify(this.language));
-    this.verifyLocale(JSON.parse(localStorage.getItem("language")));
   }
 
   lanSelected=0;
 
-  verifyLocale(language){
-    if(language.locale=="en"){
-      this.english()
-    }else{
-      this.spanish()
-    }
-  }
-
-  english() {
-    this.session.registerCulture('en-en');
-  }
-
-  spanish() {
-    this.session.registerCulture('es-es');
-  }
-
   lanSelect(number){
     this.lanSelected=number;
-    this.verifyLocale(this.language);
-    localStorage.setItem("language", JSON.stringify(this.language));
-    localStorage.setItem("lanId",JSON.stringify(number));
+    localStorage.setItem("language", JSON.stringify(Languages[this.lanSelected]));
+    localStorage.setItem("lanId",JSON.stringify(number))
     window.location.reload();
   }
 
@@ -88,6 +73,7 @@ export class LandingComponent implements OnInit {
       this.grupoinfo=res[0];
       localStorage.setItem("grupoInfo",JSON.stringify(this.grupoinfo));
       this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
+      this.grupoinfo.logoFooter=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoFooter;
     });
   }
   inputExpand=false;
@@ -111,5 +97,10 @@ export class LandingComponent implements OnInit {
   loginLink(){
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(['/login']);
+  }
+
+  scroll() {
+    let el= document.getElementById("main-toolbar");
+    el.scrollIntoView({ behavior: "smooth"});
   }
 }

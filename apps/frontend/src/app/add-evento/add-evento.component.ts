@@ -91,6 +91,9 @@ export class AddEventoComponent implements OnInit {
     }
   }
 
+  notCanDo;
+  openEraser(){}
+  edit;
 
 }
 

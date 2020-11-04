@@ -19,6 +19,7 @@ export class AddUniversidadComponent implements OnInit {
   universidad: Universidad;
   public universidadForm: FormGroup;
   button_text="Guardar universidad";
+  notCanDo;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -87,6 +88,8 @@ export class AddUniversidadComponent implements OnInit {
     }
   }
 
+  openEraser(){}
+  edit;
 
 }
 

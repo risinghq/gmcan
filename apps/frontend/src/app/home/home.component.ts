@@ -35,6 +35,7 @@ import { GLOBAL } from '../services/global';
 import { Location } from '@angular/common';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
 import { MonedaService } from '../services/moneda.service';
+import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-home',
@@ -83,8 +84,10 @@ export class HomeComponent implements OnInit {
     public location: Location,
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
+    public meta: Meta,
+    private titleService: Title,
     ) { 
-      this.info = new Grupo(null,'','','','','','','','','','','','','','',null,null)
+      this.info = new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
       this.noticiaPrincipal = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
       this.publicaciones=[];
       this.autores=[];
@@ -111,6 +114,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | UNMSM');
     this.getGrupoInfo();
     this.getTipoPublicacion();
     this.getProyectos();
@@ -118,6 +122,17 @@ export class HomeComponent implements OnInit {
     this.getAllLineasInvestigacion();
     this.getMetodos();
     this.getUsuarios();
+  }
+
+  llenado=false;
+
+  ngAfterViewChecked(){
+    if(this.metodos && !this.llenado){
+      for (let index = 0; index < this.metodos.length; index++) {
+        document.getElementById("method"+index).innerHTML=this.metodos[index].descripcion;
+      }
+      this.llenado=true;
+    }
   }
 
   /* Get Grupo */
@@ -262,7 +277,12 @@ export class HomeComponent implements OnInit {
         this.proyectos=res;
         this.progress=this.progress+this.augment;
         for (let index = 0; index < this.proyectos.length; index++) {
-          this.fillProyecto(this.proyectos[index], index);
+          if(this.proyectos[index].fechaFin){
+            this.proyectos.splice(index,1)
+            index--;
+          }else{
+            this.fillProyecto(this.proyectos[index], index);
+          }
         }
       }
     });
@@ -532,6 +552,18 @@ export class HomeComponent implements OnInit {
   /* Hovers Publicaciones */
 
   /* Share Hover */
+  fbsharing(i){
+    let title= String(this.publicaciones[i].titulo);
+    this.meta.updateTag({ name: 'description', content: title });
+    let locationhref= "http://104.131.63.153/home";
+    console.log(this.meta.getTag("name='description'"));
+    window.open(
+      'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(locationhref), 
+      'facebook-share-dialog', 
+      'width=626,height=436'); 
+      return false;
+  }
+
   public fbicon="../../assets/img/Facebook.svg";
   public twitter="../../assets/img/twitter.svg";
   mouseEnter(int, index){

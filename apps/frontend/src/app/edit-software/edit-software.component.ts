@@ -30,7 +30,7 @@ export class EditSoftwareComponent implements OnInit {
     private _commonService: CommonService,
     private _softwareService: SoftwareService,
   ) {
-    this.software=new Software(null,'','','',1,null,null);
+    this.software=new Software(null,'','','','',1,null,null);
     this.softwareForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],

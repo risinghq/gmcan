@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, Meta  } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core';
 import {DatePipe, TitleCasePipe } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
@@ -59,7 +59,7 @@ import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LandingComponent } from './landing/landing.component';
 import { ChangePassComponent } from './change-pass/change-pass.component';
-import { LogHomeComponent, DialogIdle } from './log-home/log-home.component';
+import { LogHomeComponent, DialogIdle, DialogLogOff } from './log-home/log-home.component';
 import { NoticiasComponent } from './noticias/noticias.component';
 import { ProyectosComponent } from './proyectos/proyectos.component';
 import { PublicacionesComponent } from './publicaciones/publicaciones.component';
@@ -225,6 +225,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
     DialogCancel13,
     DialogErase6,
     AddTesisComponent,
+    DialogLogOff,
     DialogCancel14, EditTesisComponent, DialogCancel15, DialogErase7, AddResumenComponent, DialogCancel16, EditResumenComponent,
     DialogErase8, DialogCancel17, MyArticleComponent, MyThesisComponent, MyResumenesComponent, AddFuenteComponent, DialogCancel18, EditFuenteComponent,
     DialogCancel19, DialogErase9, AddProyectoComponent, DialogCancel20, EditProyectoComponent,DialogCancel21, DialogErase10, DialogPreview3, AddLineaComponent, DialogCancel22, EditLineaComponent,
@@ -265,15 +266,15 @@ registerLocaleData(localeEsAr, 'es-Ar');
     CKEditorModule,
     MatCheckboxModule,
     MatAutocompleteModule,
-    MatProgressBarModule
+    MatProgressBarModule,
   ],
   exports:[LocalDatePipe],
-  entryComponents:[EmailExitoso, DialogIdle, DialogCancel, DialogCancel2, DialogErase, DialogCancel3,DialogPublish, DialogPreview, DialogCancel4,DialogPreview2, DialogPublish2,
+  entryComponents:[EmailExitoso, DialogLogOff, DialogIdle, DialogCancel, DialogCancel2, DialogErase, DialogCancel3,DialogPublish, DialogPreview, DialogCancel4,DialogPreview2, DialogPublish2,
     DialogPublish3, DialogErase2, DialogReturn, DialogReturn2, DialogCancel5, DialogCancel6, DialogCancel7, DialogCancel8, DialogCancel9, DialogErase3, DialogErase4, DialogCancel10,
     DialogErase5, DialogCancel11, DialogCancel12, DialogCancel13, DialogErase6, DialogCancel14, DialogCancel15, DialogErase7, DialogCancel16, DialogErase8, DialogCancel17, DialogCancel18, DialogCancel19, DialogErase9,
     DialogCancel20,DialogCancel21, DialogErase10, DialogPreview3,DialogCancel22, DialogErase11, DialogCancel23, DialogCancel24, DialogCancel25, DialogErase12, DialogPreview4, DialogPreview5, DialogCancel26, DialogCancel27,
     DialogErase13,DialogCancel28, DialogCancel29, DialogErase14, DialogPreview6],
-  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}, AuthGuard,
+  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}, AuthGuard, Meta,
   DeactivateGuard, 
   AddMemberGuard, EditMemberGuard, EditCategoryGuard, AddNewsGuard,
   EditNewsGuard, AddRevistaGuard, AddUniversidadGuard, AddEventoGuard,

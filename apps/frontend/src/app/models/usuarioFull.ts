@@ -22,6 +22,6 @@ export class UsuarioFull{
         public tipoMiembro: String,
         public tipoUsuario_idTipoUsuario: Number,
         public prefijo: String,
-        public Prefijo_idPrefijo: Number,
+        public prefijo_idPrefijo: Number,
     ){}
 }

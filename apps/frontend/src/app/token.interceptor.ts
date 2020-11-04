@@ -21,7 +21,7 @@ export class TokenInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(catchError(error => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
-        if(error.url!="http://localhost:3000/usuario/refresh"){
+        if(error.url!="http://104.131.63.153:3000/usuario/refresh"){
           return this.handle401Error(request, next);
         }
         else{

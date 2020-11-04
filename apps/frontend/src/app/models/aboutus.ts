@@ -3,6 +3,7 @@ export class SobreNosotros{
         public idSobreNosotros: Number,
         public quienesSomos: string,
         public quienesSomosEN: string,
+        public foto: string,
         public objetivos: string,
         public objetivosEN: string,
         public servicios: string,

@@ -5,6 +5,7 @@ export class lineasInvestigacion{
         public idLineasInvestigacion: Number,
         public nombre: String,
         public nombreEN: String,
+        public foto: String,
         public descripcion: String,
         public descripcionEN: String,
         public grupo_idGrupo: Number,

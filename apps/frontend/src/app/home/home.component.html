@@ -118,8 +118,8 @@
                             {{language.newsText[0].by}} {{noticia.autor}}
                         </div>
                     </div>
-                    <div class="img-hover-zoom ml-16" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-                        <img class="other-img-news " src="../../assets/img/grupal.jpg" alt="nada">
+                    <div class="img-hover-zoom ml-16 other-img-news-div" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
+                        <img class="other-img-news" src="../../assets/img/grupal.jpg" alt="nada">
                     </div>
                 </div>
             </div>
@@ -152,15 +152,14 @@
         {{language.methodsminus}}
     </div>
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let metodo of metodos">
+        <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let metodo of metodos; let i = index">
             <mat-card class="methods-card center">
                 <div class="method-title-div">
                     <div class="method-title">
                         {{metodo.nombre}}
                     </div>
                 </div>
-                <div class="linea-text method-text">
-                    {{metodo.descripcion}}
+                <div id="method{{i}}" class="linea-text method-text">
                 </div>
                 <a class="linea-text-green method-green" href="/home/about-us/methods">
                     {{language.seeMore}}
@@ -182,7 +181,7 @@
         </div>
     </div>
     <div class="publication-list">
-        <div class="publication flex-news" [ngClass]="{ 'notoppd' : i === 0}" *ngFor="let publicacion of publicaciones | slice: 0 : 5; let i = index;">
+        <div class="publication flex-news" [ngClass]="{ 'notoppd' : i === 0, 'no-border':i+1==publicaciones.length}" *ngFor="let publicacion of publicaciones | slice: 0 : 5; let i = index;">
             <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
                 <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1,  
                 'publication-type-3' : publicacion.tipoPublicacion_idTipoPublicacion == 3 }"
@@ -254,7 +253,9 @@
                         </div>
                         <div class="share-div d-none d-md-block d-lg-block d-xl-block">
                             <div class="flex-news">
-                                <img id="fbl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
+                                <img id="fbl{{i}}" class="share-icon"
+                                (click)="fbsharing(i)"
+                                (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
                                 <img id="tl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(4, i)"  (mouseleave) ="mouseLeave(4, i)" src="{{twitter}}">
                             </div>
                         </div>
@@ -349,7 +350,7 @@
         </div>
     </div>
     <div class="publication-list">
-        <div class="project flex-news" [ngClass]="{ 'notoppd' : i === 0}" *ngFor="let proyecto of proyectos | slice: 0:5; let i = index">
+        <div class="project flex-news" [ngClass]="{ 'notoppd' : i === 0, 'no-border':i+1==proyectos.length}" *ngFor="let proyecto of proyectos | slice: 0:5; let i = index">
             <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
                 <div class="project-code">
                     {{proyecto.codigo}}
@@ -374,12 +375,6 @@
                         {{this.language.projectsText[0].dateStart}}:
                     </strong>
                     {{proyecto.fechaI}}
-                </div>
-                <div class="project-rev" *ngIf="proyecto.fechaF">
-                    <strong class="abstract-title">
-                        {{this.language.projectsText[0].dateEnd}}:
-                    </strong>
-                    {{proyecto.fechaF}}
                 </div>
             </div>
             <div class="col-lg-8 col-md-12 nopd">

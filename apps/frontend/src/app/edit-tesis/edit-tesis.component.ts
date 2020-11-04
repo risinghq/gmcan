@@ -76,7 +76,7 @@ export class EditTesisComponent implements OnInit {
       resumen: ['', Validators.required],
       resumenEN: ['', Validators.required],
     });
-    this.publicacion = new Publicacion(null,'','','',null,'',null,null,null,null,2,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
+    this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,2,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
     this.url=GLOBAL.url;
   }
 

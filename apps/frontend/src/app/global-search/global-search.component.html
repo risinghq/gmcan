@@ -284,7 +284,7 @@
                         <div class="not-found-1" *ngIf="miembros.length==0">
                             {{language.noResultsMembers}}
                         </div>
-                        <div class="flex-news" *ngFor="let miembro of miembros">
+                        <div class="flex-news" [ngClass]="{'mb-24':i+1!=miembros.length}" *ngFor="let miembro of miembros">
                             <div class="miembro-img-div">
                                 <img class="miembro-img" src="{{url+'usuario/get-image-usuario/'+miembro.foto}}" alt="foto">
                             </div>

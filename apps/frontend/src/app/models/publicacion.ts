@@ -7,6 +7,8 @@ export class Publicacion{
         public titulo: String,
         public archivo: String,
         public autores: String,
+        public resumen: String,
+        public resumenEN: String,
         public DOI: number,
         public fecha: string,
         public fechaPublicacionDate:Date,

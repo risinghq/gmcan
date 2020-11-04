@@ -18,14 +18,15 @@ export class AboutUsService{
     }
     
     getAboutUsInfo():any{
-        let headers = new HttpHeaders ({
-			'Content-Type':'application/json'
-		});
-        if(this.languagelocal=="es"){
-            return this.http.get(this.url+'sobrenosotros/get-sobrenosotros',{headers:headers});
-        }else{
-            return this.http.get(this.url+'sobrenosotros/get-sobrenosotros-en',{headers:headers});
-        }
+      let headers = new HttpHeaders ({
+			  'Content-Type':'application/json'
+      });
+      this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
+      if(this.languagelocal=="es"){
+        return this.http.get(this.url+'sobrenosotros/get-sobrenosotros',{headers:headers});
+      }else{
+        return this.http.get(this.url+'sobrenosotros/get-sobrenosotros-en',{headers:headers});
+      }
     }
 
     updateDescripcion(sobrenosotros):any{

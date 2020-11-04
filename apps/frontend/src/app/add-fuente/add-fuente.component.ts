@@ -39,6 +39,9 @@ export class AddFuenteComponent implements OnInit {
   }
 
   agregar;
+  notCanDo;
+  openEraser(){}
+  edit;
 
   submitFuente(){
     this._fuenteFinanciamientoService.addFuenteFinanciamiento(this.fuente).subscribe(result => {
@@ -52,7 +55,7 @@ export class AddFuenteComponent implements OnInit {
 
   return(){
     this._commonService.setEndSession('0');
-    this._router.navigate(['dashboard/proyectos']);
+    this._router.navigate(['dashboard/proyectos-ejecucion']);
   }
 
   openSnackBar() {

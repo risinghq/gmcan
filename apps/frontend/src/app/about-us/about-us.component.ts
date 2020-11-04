@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AboutUsService } from '../services/aboutus.service';
 import { SobreNosotros } from '../models/aboutus';
+import { GLOBAL } from '../services/global';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-about-us',
@@ -8,20 +10,23 @@ import { SobreNosotros } from '../models/aboutus';
   styleUrls: ['./about-us.component.scss']
 })
 export class AboutUsComponent implements OnInit {
-
+  url;
   language;
 
   aboutus:SobreNosotros;
 
   constructor(
-    public aboutusService: AboutUsService
+    public aboutusService: AboutUsService,
+    private titleService: Title,
   ) {
-    this.aboutus=new SobreNosotros(null,"","","","","",null,null)
+    this.aboutus=new SobreNosotros(null,"","",null,"","","",null,null)
+    this.url=GLOBAL.url;
    }
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
     this.getAboutUs();
+    this.titleService.setTitle('GMCAN | '+this.language.who);
   }
 
   getAboutUs(){

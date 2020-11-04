@@ -22,6 +22,10 @@ export class AddLineaComponent implements OnInit {
   public lineaForm: FormGroup;
   url;
 
+  notCanDo;
+  openEraser(){}
+  edit;
+
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
@@ -37,7 +41,7 @@ export class AddLineaComponent implements OnInit {
       descripcion: ['', Validators.required],
       descripcionEN: ['', Validators.required],
     });
-    this.lineaInvestigacion= new lineasInvestigacion(null,'','','','',1,null,null,null,null);
+    this.lineaInvestigacion= new lineasInvestigacion(null,'','',null,'','',1,null,null,null,null);
     this.url=GLOBAL.url;
   }
 

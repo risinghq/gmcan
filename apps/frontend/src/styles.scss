@@ -26,6 +26,10 @@ mat-progress-bar .mat-progress-bar-fill::after{
     padding-top: 64px;
 }
 
+.img-hover-zoom-2{
+    border-radius: 4px;
+}
+
 .loading-text{
     @extend .plex-sans;
     font-style: normal;
@@ -104,6 +108,10 @@ background-size: cover;}
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 app-root{
     height: inherit;
+}
+
+.no-border{
+    border-bottom: unset !important;
 }
 
 .auto{
@@ -426,7 +434,7 @@ svg{
     margin-right: 8px;
     margin-top: auto;
     margin-bottom: auto;
-    color: #9595b2;
+    color: var(--deep-green);
 }
 
 .fecha{
@@ -911,6 +919,8 @@ circle{
     width: max-content;
     border-radius: 4px;
     border: solid 2px #9595b2;
+    color: #9595b2 !important;
+    background-color: white !important;
 }
 
 .btn-grey>.link{

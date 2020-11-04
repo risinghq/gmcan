@@ -3,6 +3,10 @@ import { EquipoService } from '../services/equipo.service';
 import { SoftwareService } from '../services/software.service';
 import { Equipo } from '../models/equipo';
 import { Software } from '../models/software';
+import { GLOBAL } from '../services/global';
+import { Grupo } from '../models/grupo';
+import { GrupoService } from '../services/grupo.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-facilities',
@@ -12,6 +16,8 @@ import { Software } from '../models/software';
 export class FacilitiesComponent implements OnInit {
   equipos: Array<Equipo>;
   software: Array<Software>;
+  url;
+  grupo: Grupo;
 
   public page1;
   public pageSize;
@@ -20,9 +26,12 @@ export class FacilitiesComponent implements OnInit {
 
   constructor(
     public _equipoService: EquipoService,
-    public _softwareService: SoftwareService
+    public _softwareService: SoftwareService,
+    public _grupoService: GrupoService,
+    private titleService: Title,
   ) {
-
+    this.url=GLOBAL.url;
+    this.grupo=new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
   }
 
   language;
@@ -31,11 +40,19 @@ export class FacilitiesComponent implements OnInit {
     this.equipos=[];
     this.software=[];
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.resources);
     this.page1 = 1;
     this.page2 = 1;
     this.pageSize = 5;
     this.getEquipos();
     this.getSoftware();
+    this.getGrupo();
+  }
+
+  getGrupo(){
+    this._grupoService.getFacilidadesRecursos().subscribe((res)=>{
+      this.grupo=res[0];
+    });
   }
 
   getEquipos(){
@@ -48,6 +65,11 @@ export class FacilitiesComponent implements OnInit {
     this._softwareService.getSoftware().subscribe((res)=>{
       this.software=res;
     });
+  }
+
+  scroll() {
+    let el= document.getElementById("main-toolbar");
+    el.scrollIntoView({ behavior: "smooth"});
   }
 
 }

@@ -3,6 +3,10 @@
     font-family: 'IBM Plex Serif', serif;
 }
 
+.no-border{
+    border-bottom: unset;
+}
+
 .plex-sans{
     font-family: "IBM Plex Sans", serif;
     @extend .plex-sans;

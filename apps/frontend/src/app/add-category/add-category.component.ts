@@ -20,6 +20,7 @@ export class AddCategoryComponent implements OnInit {
   public categoryForm: FormGroup;
   button_text="Agregar categoría";
   agregar;
+  notCanDo;
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
@@ -92,6 +93,10 @@ export class AddCategoryComponent implements OnInit {
       return ;
     }
   }
+
+  edit;
+
+  openEraser(){}
 
 }
 

@@ -15,6 +15,7 @@ import { CommonService } from '../services/common.service';
 import { stringify } from 'querystring';
 import { Languages } from '../models/languages';
 import { GrupoService } from '../services/grupo.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-log-home',
@@ -55,6 +56,7 @@ export class LogHomeComponent implements OnInit {
     private router: Router,
     private _commonService:CommonService,
     private _grupoService:GrupoService,
+    private titleService: Title,
   ){
     this.screenWidth = window.innerWidth;
     if(this.screenWidth>=960){
@@ -135,6 +137,7 @@ export class LogHomeComponent implements OnInit {
   language
 
   ngOnInit() {
+    this.titleService.setTitle('GMCAN | Administrador');
     this.getUser();
     this.getGrupoInfo();
   }

@@ -29,7 +29,7 @@ export class ChangePassComponent implements OnInit {
       newPassword: ['', [Validators.required, Validators.minLength(8)]]
     });
     this.url=GLOBAL.url;
-    this.grupoinfo= new Grupo(0,'','','','','','','','','','','','','','',null,null);
+    this.grupoinfo= new Grupo(0,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
   }
 
   public user:any;
@@ -49,6 +49,7 @@ export class ChangePassComponent implements OnInit {
         token:str[0].replace(/slash/g, "/"),
         correo:str[1]
       }
+      localStorage.setItem("JWT_TOKEN",this.user.token)
       this._usuarioService.checkStatus(this.user)
       .subscribe((res)=>{
         if(res.state==1){

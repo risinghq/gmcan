@@ -5,6 +5,7 @@ import { EmailService } from '../services/email.service';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { GLOBAL } from '../services/global';
 import { Router, ActivatedRoute, Params} from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-join-us',
@@ -18,7 +19,9 @@ export class JoinUsComponent implements OnInit {
   constructor(
     public fb:FormBuilder,
     public _emailService: EmailService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public _router: Router,
+    private titleService: Title
   ) {
     this.user = this.fb.group({
       nombre: ['', Validators.required],
@@ -30,9 +33,20 @@ export class JoinUsComponent implements OnInit {
 
   language;
 
+  public previouslink;
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.join);
     this.email = new EmailBody("","","","");
+    this.previouslink=sessionStorage.getItem("previous-page");
+  }
+
+  return(){
+    if(this.previouslink){
+      this._router.navigate([this.previouslink]);
+    }else{
+      this._router.navigate(['/home']);
+    }
   }
 
   sendEmail(){

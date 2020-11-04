@@ -163,6 +163,9 @@ export class PerfilComponent implements OnInit {
       if(this.memberForm.controls.segundoNombre.value!='' && this.memberForm.controls.segundoNombre.value){
         this.member.nombre+= " "+this.memberForm.controls.segundoNombre.value;
       }
+      if(this.oldMem!=this.member.estado){
+        this.member.estado=this.oldMem;
+      }      
       this._usuarioService.verifyUser(this.member).subscribe(result => {
         if(result.length==0 || this.oldEmail==this.member.correo){
           if(this.member.password===this.memberForm.controls.confirmPassword.value){

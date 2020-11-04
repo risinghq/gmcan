@@ -78,7 +78,7 @@ export class EditResumenComponent implements OnInit {
       resumenEN: ['', Validators.required],
       userSelector: ['']
     });
-    this.publicacion = new Publicacion(null,'','','',null,'',null,null,null,null,3,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
+    this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,3,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
     this.url=GLOBAL.url;
   }
 

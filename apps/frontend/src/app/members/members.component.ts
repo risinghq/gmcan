@@ -8,6 +8,7 @@ import { TipoMiembro } from '../models/tipomiembro';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { GLOBAL } from '../services/global';
 import { ProgressSpinnerMode } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-members',
@@ -28,6 +29,7 @@ export class MembersComponent implements OnInit {
     public _prefijoService: PrefijoService,
     public _tipoMiembroService: TipoMiembroService,
     public location: Location,
+    private titleService: Title,
   ) {
     this.url=GLOBAL.url;
   }
@@ -36,6 +38,7 @@ export class MembersComponent implements OnInit {
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.members);
     this.usuariosNoActivos=[];
     this.cargado=true;
     this.getTipoMiembros();
@@ -75,7 +78,7 @@ export class MembersComponent implements OnInit {
         this.allCharged=true;
         for (let index = 0; index < this.usuarios.length; index++) {
           for (let j = 0; j < res.length; j++) {
-            if(this.usuarios[index].Prefijo_idPrefijo==res[j].idPrefijo){
+            if(this.usuarios[index].prefijo_idPrefijo==res[j].idPrefijo){
               this.usuarios[index].prefijo=res[j].nombre;
             }
           }

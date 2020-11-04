@@ -65,7 +65,7 @@ export class UsuarioService{
   checkStatus(user): any{
     let headers = new HttpHeaders ({
       'Content-Type':'application/json',
-      'Authorization':'Bearer '+user.token
+      'Authorization':'Bearer '+localStorage.getItem(this.JWT_TOKEN)
 	  });
     return this.http.get(this.url+'usuario/check-res/'+user.correo,{headers});
   }

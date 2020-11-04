@@ -130,11 +130,13 @@
                             </div>
                         </div>
                         <div class="flex-news mt-16">
-                            <a class="publication-green"> 
-                                {{language.detailMemberText[0].preview}}
+                            <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
+                            href="{{this.url+'publicacion/get-file-publicacion/'+publicacion.archivo}}" target="_blank"> 
+                                {{this.language.publicationsText[0].preview}}
                             </a>
-                            <a class="publication-green">
-                                {{language.detailMemberText[0].download}}
+                            <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
+                            href="{{this.url+'publicacion/download-publicacion/'+publicacion.archivo}}">
+                                {{this.language.publicationsText[0].download}}
                             </a>
                             <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="publication-abstract" 
                             data-toggle="collapse" href="#collapseExample{{i}}" role="button" 

@@ -114,6 +114,8 @@ export class AddNewsComponent implements OnInit {
   agregar;
   eliminar;
 
+  edit;
+  openEraser(){}
 
   return(){
     this._commonService.setEndSession('0');

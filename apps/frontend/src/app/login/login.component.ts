@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EmailService } from '../services/email.service';
 import { AuthService } from '../services/auth.service';
 import { Languages } from '../models/languages';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +28,8 @@ export class LoginComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     public _emailService: EmailService,
-    public authService:AuthService
+    public authService:AuthService,
+    private titleService: Title,
   ) {
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
@@ -36,7 +38,7 @@ export class LoginComponent implements OnInit {
     this.emailForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
     });
-    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','',null,null);
+    this.grupoinfo = new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
     this.url=GLOBAL.url;
   }
   error;
@@ -47,6 +49,7 @@ export class LoginComponent implements OnInit {
     this.language = Languages[0];
     localStorage.setItem("language", JSON.stringify(this.language));
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.login);
     this.getGrupoInfo();
     this.previouslink=sessionStorage.getItem("previous-page");
   }

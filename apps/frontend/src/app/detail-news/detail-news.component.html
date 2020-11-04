@@ -30,7 +30,7 @@
                         <div class="flex-news other-div">
                             <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                 <div class="flex-news">
-                                    <img class="share-icon" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
+                                    <img class="share-icon" (click)="fb($event)" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
                                     <img class="share-icon" (mouseenter) ="mouseEnter(2)"  (mouseleave) ="mouseLeave(2)" src="{{twitter}}">
                                 </div>
                             </div>
@@ -53,7 +53,7 @@
                             </div>
                             <div class="share-div d-none d-md-block d-lg-block d-xl-block">
                                 <div class="flex-news share-flex">
-                                    <img class="share-icon" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
+                                    <img class="share-icon" (click)="fb($event)" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
                                     <img class="share-icon" (mouseenter) ="mouseEnter(2)"  (mouseleave) ="mouseLeave(2)" src="{{twitter}}">
                                 </div>
                             </div>

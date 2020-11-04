@@ -54,6 +54,11 @@ export class AddProyectoComponent implements OnInit {
   monedas: Array<Moneda>;
   url;
 
+  disableSelect;
+  openEraser(){}
+  projectEnd(){}
+  edit;
+
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
@@ -81,7 +86,7 @@ export class AddProyectoComponent implements OnInit {
       montoFinanciado: ['', Validators.required],
       fechaFin: ['']
     });
-    this.proyecto = new Proyecto(null,'','','','','','','',1,null,null,'','',null,'',null,null,null,null,'',null,null);
+    this.proyecto = new Proyecto(null,'','','','','','','',1,null,null,'',null,null,'',null,null,null,null,'',null,null);
     this.url=GLOBAL.url;
   }
 
@@ -196,6 +201,7 @@ export class AddProyectoComponent implements OnInit {
       const momentDate = new Date(this.proyecto.fechaInicio); // Replace event.value with your date value
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
       this.proyecto.fechaI=formattedDate;
+      this.proyecto.fechaF=null;
       this._proyectoService.addProyecto(this.proyecto).subscribe(result => {
         if(result.status==1){
           console.log(this.otrosAutores)

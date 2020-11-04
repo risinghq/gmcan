@@ -10,6 +10,7 @@ import { Location } from '@angular/common';
 import { GLOBAL } from '../services/global';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
 import { MonedaService } from '../services/moneda.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-lines-investigation',
@@ -40,16 +41,18 @@ export class LinesInvestigationComponent implements OnInit {
     public _router: Router,
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
+    private titleService: Title,
   ) { 
     this.lineasProyecto=[];
-    this.lineasProyecto[0]=new lineasInvestigacion(null,'','','','',null,null,null,[],0);
-    this.lineasProyecto[1]=new lineasInvestigacion(null,'','','','',null,null,null,[],0);
-    this.lineasProyecto[2]=new lineasInvestigacion(null,'','','','',null,null,null,[],0);
+    this.lineasProyecto[0]=new lineasInvestigacion(null,'','',null,'','',null,null,null,[],0);
+    this.lineasProyecto[1]=new lineasInvestigacion(null,'','',null,'','',null,null,null,[],0);
+    this.lineasProyecto[2]=new lineasInvestigacion(null,'','',null,'','',null,null,null,[],0);
   }
 
   ngOnInit() {
     this.url=GLOBAL.url;
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.linesInvestigation);
     this.getLineasInvestigacion();
     this.page0 = 1;
     this.pageSize = 5;

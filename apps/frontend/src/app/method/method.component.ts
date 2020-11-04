@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MethodsService } from '../services/methods.service';
 import { Method } from '../models/method';
 import { GLOBAL } from '../services/global';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-method',
@@ -17,12 +18,14 @@ export class MethodComponent implements OnInit {
 
   constructor(
     public _methodService: MethodsService,
+    private titleService: Title,
   ) {
     this.url=GLOBAL.url
    }
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.methods);
     this.getMethods();
   }  
 

@@ -20,6 +20,9 @@ export class AddSoftwareComponent implements OnInit {
   softwareForm: FormGroup;
   button_text="Guardar software";
 
+  openEraser(){}
+  edit;
+
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
@@ -29,7 +32,7 @@ export class AddSoftwareComponent implements OnInit {
     private _commonService: CommonService,
     private _softwareService: SoftwareService,
   ) {
-    this.software=new Software(null,'','','',1,null,null);
+    this.software=new Software(null,'','','','',1,null,null);
     this.softwareForm = this.formBuilder.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],

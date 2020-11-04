@@ -26,6 +26,7 @@ import { TipoPublicacion } from '../models/tipopublicacion';
 import { GLOBAL } from '../services/global';
 import { Location } from '@angular/common';
 import { TipoNoticia } from '../models/tiponoticia';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-global-search',
@@ -70,16 +71,20 @@ export class GlobalSearchComponent implements OnInit {
     public _tipoPublicacionService: TipoPublicacionService,
     public fb:FormBuilder, 
     public location: Location,
+    private titleService: Title
   ) {
     this.searchGlobalForm = this.fb.group({
       nombre: ['']
     });
     this.url=GLOBAL.url;
-   }
+  }
+
+  public previouslink;
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
     this.findGlobal();
+    this.previouslink=sessionStorage.getItem("previous-page");
   }
 
   /* globalSearch */
@@ -105,6 +110,7 @@ export class GlobalSearchComponent implements OnInit {
       }
       this._route.params.forEach((params:Params)=>{
         let nombre = params['id'];
+        this.titleService.setTitle('GMCAN | '+nombre);
         this.searchGlobalForm.controls.nombre.setValue(nombre);
         this.searchProyectos(nombre);
       });   
@@ -509,7 +515,7 @@ export class GlobalSearchComponent implements OnInit {
   getUsuario(dni, obj){
     this._usuarioService.getUser(dni).subscribe((res)=>{
       if(res){
-        if(obj.usuario.findIndex(x => x.idAutor === res[0].idAutor)==-1){
+        if(obj.usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
           obj.usuario.push(res[0]);
         }
         this.fillName(obj);
@@ -649,6 +655,18 @@ export class GlobalSearchComponent implements OnInit {
     this._router.navigate(['/home/detail-member/'+user.DNI]);
   }
 
+  detalleNoticia(noticia){
+    sessionStorage.setItem("previous-page", this.location.path().slice(1));
+    this._router.navigate(['/home/detail-news/'+noticia.idNoticia]);
+  }
+
+  return(){
+    if(this.previouslink){
+      this._router.navigate([this.previouslink]);
+    }else{
+      this._router.navigate(['/home']);
+    }
+  }
   publicationExpanded=true;
   projectExpanded=true;
   memberExpanded=true;

@@ -17,7 +17,7 @@ export class GrupoService{
       if(JSON.parse(localStorage.getItem("language"))){
         this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
       }else{
-          this.languagelocal="es";
+        this.languagelocal="es";
       }
     }
     

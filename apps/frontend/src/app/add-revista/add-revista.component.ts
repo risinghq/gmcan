@@ -39,6 +39,9 @@ export class AddRevistaComponent implements OnInit {
   }
 
   agregar;
+  notCanDo;
+  edit;
+  openEraser(){}
 
   submitRevista(){
     this._revistaService.addRevista(this.revista).subscribe(result => {

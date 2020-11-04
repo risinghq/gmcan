@@ -20,6 +20,9 @@ export class AddEquipoComponent implements OnInit {
   equipoForm: FormGroup;
   button_text="Guardar equipo";
 
+  edit;
+  openEraser(){}
+
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,

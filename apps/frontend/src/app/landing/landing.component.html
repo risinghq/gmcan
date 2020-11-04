@@ -7,8 +7,8 @@
           </mat-icon>
         </div> 
         <div class="link2">
-          <a class="link full-width" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="sidenav.close(); loginLink()">
-            {{language.login}}
+          <a class="link full-width" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="sidenav.close()">
+            {{language.home}}
           </a>
         </div>
         <div class="link4">
@@ -81,7 +81,7 @@
         </div>      
       </div>
       <mat-toolbar id="main-toolbar" class="main-toolbar">
-        <div id="logoHeader" class="logo-nav" innerHTML>
+        <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
           <img  class="logo-nav" src="{{grupoinfo.logoHeader}}" alt="logo">
         </div>
         <div class="full-width ml-40" [ngStyle]="{'display' : (screenWidth < 1050) ? 'none' : 'block'}">
@@ -188,43 +188,43 @@
       <router-outlet></router-outlet>
       <footer class="footer-div text-white">
         <div class="footer-flex">
-          <div class="link-logo-div">
-            <img class="img-logo-white" src="../assets/img/logoWhite.png">
-            <img class="img-logo-white" src="../assets/img/logoUNMSM.png">
+          <div class="link-logo-div" (click)="scroll()" routerLink="/">
+            <img class="img-logo-white" *ngIf="!grupoinfo.logoFooter" src="../assets/img/logoWhite.png">
+            <img class="img-logo-white" *ngIf="grupoinfo.logoFooter" src="{{grupoinfo.logoFooter}}">
           </div>
           <div class="footer-down-bar">
-            <div class="center flex-news">
-              <a class="link3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+            <div class="center max-con flex-news">
+              <a class="link3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="scroll()">
                 {{language.home}}
               </a>
             </div>
-            <div class="center flex-news">
-              <a class="link3"  routerLink="./about-us" routerLinkActive="active">
+            <div class="center max-con flex-news">
+              <a class="link3"  routerLink="./about-us" routerLinkActive="active" (click)="scroll()">
                 {{language.aboutUs}}
               </a>
             </div>
-            <div class="center flex-news">
-              <a class="link3"  routerLink="./members" routerLinkActive="active">
+            <div class="center max-con flex-news">
+              <a class="link3"  routerLink="./members" routerLinkActive="active" (click)="scroll()">
                 {{language.members}}
               </a>
             </div>
-            <div class="center flex-news">
-              <a class="link3"  routerLink="./projects" routerLinkActive="active">
+            <div class="center max-con flex-news">
+              <a class="link3"  routerLink="./projects" routerLinkActive="active" (click)="scroll()">
                 {{language.projects}}
               </a>
             </div>
-            <div class="center flex-news">
-              <a class="link3"  routerLink="./publications" routerLinkActive="active">
+            <div class="center max-con flex-news">
+              <a class="link3"  routerLink="./publications" routerLinkActive="active" (click)="scroll()">
                 {{language.publications}}
               </a>
             </div>
-            <div class="center flex-news">
-              <a class="link3"  routerLink="./news" routerLinkActive="active">
+            <div class="center max-con flex-news">
+              <a class="link3"  routerLink="./news" routerLinkActive="active" (click)="scroll()">
                 {{language.news}}
               </a>
             </div>
             <div class="center link-box2">
-              <a class="link3 link-box-text"  routerLink="./join-us" routerLinkActive="active">
+              <a class="link3 link-box-text"  routerLink="./join-us" routerLinkActive="active" (click)="scroll()">
                 {{language.join}}
               </a>
             </div>
@@ -259,7 +259,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="flex-news mt-8">
+                <div class="flex-news">
                   <div class="footer-icon-div ml-footer" *ngIf="grupoinfo.telefono && grupoinfo.telefono!=''">
                     <img class="footer-icon" src="../assets/img/phone.svg">
                   </div>

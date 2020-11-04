@@ -77,7 +77,7 @@ export class AddTesisComponent implements OnInit {
       resumen: ['', Validators.required],
       resumenEN: ['', Validators.required],
     });
-    this.publicacion = new Publicacion(null,'','','',null,'',null,null,null,null,2,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
+    this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,2,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
     this.url=GLOBAL.url;
   }
 
@@ -314,6 +314,9 @@ export class AddTesisComponent implements OnInit {
   fileProgress(fileInput: any) {
     this.fileData = <File>fileInput.target.files[0];  
   }
+
+  openEraser(){}
+  edit;
 
 }
 

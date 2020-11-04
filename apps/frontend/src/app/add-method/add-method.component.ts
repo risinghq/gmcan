@@ -23,6 +23,9 @@ export class AddMethodComponent implements OnInit {
   public methodForm: FormGroup;
   url;
 
+  openEraser(){}
+  edit
+
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,

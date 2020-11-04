@@ -97,7 +97,7 @@ import { EditSoftwareGuard } from './guards/editsoftware.guard';
 
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'home' },
+  {path: '', pathMatch: 'full', redirectTo: 'home' },
   {path:"home",component:LandingComponent,children:[
     {path:"", component:HomeComponent},
     {path:"publications", component:PublicationComponent},

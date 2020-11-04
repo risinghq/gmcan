@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GrupoService } from '../services/grupo.service';
 import { Grupo } from '../models/grupo';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-works',
@@ -12,12 +13,14 @@ export class WorksComponent implements OnInit {
   language;
   constructor(
     public _grupoService: GrupoService,
+    private titleService: Title,
   ) { 
-    this.info = new Grupo(null,'','','','','','','','','','','','','','',null,null)
+    this.info = new Grupo(null,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
   }
 
   ngOnInit() {
     this.language=JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle('GMCAN | '+this.language.futureWorks);
     this.getGrupoInfo();
   }
 
