@@ -32,7 +32,9 @@
                 <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" alt="../../assets/img/user.png" *ngIf="usuario.foto">
                 <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
               </div>
-              {{usuario.nombreCompleto}}
+              <div>
+                {{usuario.nombreCompleto}}
+              </div>
             </div>
             <div class="flex-news" *ngFor="let autor of row.autor">
               {{autor.nombre}}

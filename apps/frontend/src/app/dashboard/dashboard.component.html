@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div class="flex-news item clickable" *ngIf="permisos.publicacionPermiso" routerLink="/dashboard/publicaciones">
+      <div class="flex-news item clickable" *ngIf="permisos.publicacionPermiso" routerLink="/dashboard/articulos">
         <img class="mr-16" src="../../assets/img/publicaciones.svg">
         <div>
           <div class="item-title">
@@ -73,7 +73,7 @@
           </div>
         </div>
       </div>
-      <div class="flex-news item" *ngIf="permisos.analiticaPermiso">
+      <div class="flex-news item no-border" *ngIf="permisos.analiticaPermiso">
         <img class="mr-16" src="../../assets/img/analitica.svg">
         <div>
           <div class="item-title">
@@ -84,23 +84,36 @@
           </div>
         </div>
       </div>
-      <div class="flex-news">
+      <div class="flex-news" *ngIf="permisos.analiticaPermiso">
         <div class="center btn-black mr-8">
-          <a class="link" routerLink="./join-us" routerLinkActive="active">
+          <a class="link" href="https://analytics.google.com/analytics/web/?authuser=2#/a181640955p250909666/admin" target="_blank" routerLinkActive="active">
             Google Analytics
           </a>
         </div>
         <div class="center btn-black">
-          <a class="link" routerLink="./join-us" routerLinkActive="active">
+          <a class="link" href="https://insights.hotjar.com/login?next=%2Fsites%2F2066869%2Fdashboard" target="_blank" routerLinkActive="active">
             Hotjar
           </a>
         </div>
       </div>
     </div>
-    <div class="ml-16">
-      <div class="dashboard-card wd-2">
-        
-        <!-- <div style="display: block">
+    <div class="ml-16" style="width: max-content;">
+      <div class="dashboard-card pd-8 wd-2">
+        <div class="flex-news">
+          <div>
+            <img class="mt-8" src="../../assets/img/members.svg">
+            <div class="mt-8 item-title bold">
+              Miembros del grupo
+            </div>
+          </div>
+          <div class="gray-box right">
+            <div class="item-subtitle">
+              Miembros activos
+            </div>
+            <div class="bg-number mt-8">{{total}}</div>
+          </div>
+        </div>
+        <div class="mt-12" style="display: block">
           <canvas mdbChart
               [chartType]="chartType"
               [datasets]="chartDatasets"
@@ -111,10 +124,35 @@
               (chartHover)="chartHovered($event)"
               (chartClick)="chartClicked($event)">
           </canvas>
-        </div> -->
+        </div>
       </div>
-      <div class="dashboard-card mt-16">
-        Imagen
+      <div class="dashboard-card pd-8 wd-2 mt-16">
+        <div class="flex-news">
+          <div>
+            <img class="mt-8" src="../../assets/img/publicaciones.svg">
+            <div class="mt-8 item-title bold">
+              Publicaciones
+            </div>
+          </div>
+          <div class="gray-box right">
+            <div class="item-subtitle">
+              Publicaciones
+            </div>
+            <div class="bg-number mt-8">{{total2}}</div>
+          </div>
+        </div>
+        <div class="mt-12" style="display: block">
+          <canvas mdbChart scaleLength="1"
+              [chartType]="chartType2"
+              [datasets]="chartDatasets2"
+              [labels]="chartLabels2"
+              [colors]="chartColors2"
+              [options]="chartOptions"
+              [legend]="false"
+              (chartHover)="chartHovered2($event)"
+              (chartClick)="chartClicked2($event)">
+          </canvas>
+        </div>
       </div>
     </div>
   </div>

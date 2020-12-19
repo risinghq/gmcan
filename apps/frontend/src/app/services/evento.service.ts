@@ -63,4 +63,36 @@ export class EventoService{
     return this.http.delete(this.url+'evento/delete-evento/'+idEvento,{headers:headers});
   }
 
+  getCiudades():any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.get(this.url+'evento/get-ciudad/',{headers:headers});        
+  }
+
+  getCiudadesEN():any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.get(this.url+'evento/get-ciudad-en/',{headers:headers});        
+  }
+
+  getPais():any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.get(this.url+'evento/get-pais/',{headers:headers});        
+  }
+
+  getPaisEN():any{
+    let headers = new HttpHeaders ({
+      'Content-Type':'application/json',
+      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    });
+    return this.http.get(this.url+'evento/get-pais-en/',{headers:headers});        
+  }
+
 }

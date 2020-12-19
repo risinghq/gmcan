@@ -6,10 +6,10 @@
         <div class="col-lg-8 col-sm-6 col-12">
             <div class="member-detail-links">
                 <a class="member-detail-link-active" href="/">{{language.home}}</a>
-                <mat-icon class="member-detail-icon">
+                <mat-icon class="member-detail-icon" *ngIf="previouslink!='home'">
                     arrow_right
                 </mat-icon>
-                <a class="member-detail-link-active" href="/{{previouslink}}">{{previouspage}}</a>
+                <a class="member-detail-link-active" href="/{{previouslink}}" *ngIf="previouslink!='home'">{{previouspage}}</a>
                 <mat-icon class="member-detail-icon">
                     arrow_right
                 </mat-icon>
@@ -28,7 +28,8 @@
                 </div>
                 <div class="flex-detail member-title-div">
                     <div class="member-detail-img-div">
-                        <img class="member-detail-img" src="{{usuario.foto}}" alt="foto">
+                        <img class="member-detail-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" alt="" *ngIf="usuario.foto!=null">
+                        <img class="member-detail-img" src="../../assets/img/user.png" alt="" *ngIf="usuario.foto==null">
                     </div>
                     <div class="member-detail-name-div">
                         <div class="member-detail-active">
@@ -74,22 +75,10 @@
                             <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                 {{publicacion.fecha}}
                             </div>
-                            <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                                <div class="flex-news">
-                                    <img id="fb{{i}}" class="share-icon" (mouseenter) ="mouseEnter(1, i)"  (mouseleave) ="mouseLeave(1, i)" src="{{fbicon}}">
-                                    <img id="t{{i}}" class="share-icon" (mouseenter) ="mouseEnter(2, i)"  (mouseleave) ="mouseLeave(2, i)" src="{{twitter}}">
-                                </div>
-                            </div>
                         </div>
                         <div class="flex-news publication-mt">
                             <div class="publication-title">
                                 {{publicacion.titulo}}
-                            </div>
-                            <div class="share-div d-none d-md-block d-lg-block d-xl-block">
-                                <div class="flex-news">
-                                    <img id="fbl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
-                                    <img id="tl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(4, i)"  (mouseleave) ="mouseLeave(4, i)" src="{{twitter}}">
-                                </div>
                             </div>
                         </div>
                         <div class="flex-news publication-mt">
@@ -119,7 +108,8 @@
                         <div class="flex-news publication-mt" style="flex-flow: wrap;">
                             <div class="publication-members" *ngFor="let usuario of publicacion.usuario">
                                 <div class="member-img-round">
-                                    <img class="member-img" src="../../assets/img/user.png">
+                                    <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" alt="../../assets/img/user.png" *ngIf="usuario.foto">
+                                    <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
                                 </div>
                                 <div class="member-name" (click)="profile(usuario)">
                                     {{usuario.nombreCompleto}}

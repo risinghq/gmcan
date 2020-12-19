@@ -121,7 +121,6 @@ export class PublicacionService{
   uploadPublicacionFile(fileData, id){
     const formData = new FormData();
     formData.append('file', fileData, fileData.name); 
-    console.log(formData.get('file'));
     let headers = new HttpHeaders ({
       'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
 	  });

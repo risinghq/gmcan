@@ -298,7 +298,6 @@ export class ContenidosComponent implements OnInit {
     this._grupoService.getGrupoInfo().subscribe((res)=>{
       if(res.length>0){
         this.informacionExtra=res[0];
-        console.log(this.informacionExtra)
       }
     });
   }

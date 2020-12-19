@@ -158,8 +158,14 @@ export class GlobalSearchComponent implements OnInit {
     this._searchService.searchNoticiasGlobal(nombre).subscribe((res)=>{
       if(res.length>0){
         this.noticias=res;
+        this.noticias.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         for (let index = 0; index < this.noticias.length; index++) {
-          this.fillNoticia(this.noticias[index]);
+          if(this.noticias[index].estado==1){
+            this.fillNoticia(this.noticias[index]);
+          }else{
+            this.noticias.splice(index,1)
+            index--;
+          }
         }
       }
       this.searchTipoNoticia(nombre);
@@ -227,7 +233,7 @@ export class GlobalSearchComponent implements OnInit {
     this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res)=>{
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, publicacion);
+          this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
         }
       }
     });
@@ -390,7 +396,7 @@ export class GlobalSearchComponent implements OnInit {
     this._proyectohasusuarioService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res)=>{
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, proyecto);
+          this.getUsuario(res[index].usuario_DNI, proyecto, null);
         }
       }
     });
@@ -469,9 +475,15 @@ export class GlobalSearchComponent implements OnInit {
           }
         }else{
           this.noticias=res;
+          this.noticias.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         }
         for (let index = 0; index < this.noticias.length; index++) {
-          this.fillNoticia(this.noticias[index]);
+          if(this.noticias[index].estado==1){
+            this.fillNoticia(this.noticias[index]);
+          }else{
+            this.noticias.splice(index,1)
+            index--;
+          }
         }
       }
     });
@@ -488,9 +500,15 @@ export class GlobalSearchComponent implements OnInit {
           }
         }else{
           this.noticias=res;
+          this.noticias.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         }
         for (let index = 0; index < this.noticias.length; index++) {
-          this.fillNoticia(this.noticias[index]);
+          if(this.noticias[index].estado==1){
+            this.fillNoticia(this.noticias[index]);
+          }else{
+            this.noticias.splice(index,1)
+            index--;
+          }
         }
       }
     });
@@ -505,20 +523,29 @@ export class GlobalSearchComponent implements OnInit {
         obj.nombreTipoNoticia=this.tiponoticias[j].nombre;
       }
     }
-    obj.fechaPublicacion=this.datePipe.transform(obj.fechaPublicacion,"MMMM dd, y", "es");
-    obj.fechaPublicacion=this.titlecasePipe.transform(obj.fechaPublicacion);
+    var d = new Date(obj.fechaPublicacion);
+    if(String(d)!='Invalid Date'){
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+      obj.fechaPublicacion=this.datePipe.transform(d,"MMMM dd, y", "es");
+      obj.fechaPublicacion=this.titlecasePipe.transform(obj.fechaPublicacion); 
+    }
     this.getUsuarioNoticia(obj);
   }
 
   /*  Get Normal */  
 
-  getUsuario(dni, obj){
-    this._usuarioService.getUser(dni).subscribe((res)=>{
-      if(res){
-        if(obj.usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
-          obj.usuario.push(res[0]);
+  getUsuario(idUser, obj, isPrincipal){
+    this._usuarioService.getUser(idUser).subscribe((res)=>{
+      if(res[0]!=undefined){
+        res[0].nombre=res[0].nombre.slice(0,1)+".";
+        res[0].isPrincipal=isPrincipal;
+        if(obj!=undefined){
+          if(obj.usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
+            obj.usuario.push(res[0]);
+          }
+          obj.usuario.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));
+          this.fillName(obj);
         }
-        this.fillName(obj);
       }
     });
   }
@@ -565,17 +592,18 @@ export class GlobalSearchComponent implements OnInit {
 
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
+      let first=obj.usuario[index].nombre.split(" ");
       if(obj.autor!=undefined){
         if(index==obj.usuario.length-1 && obj.autor.length===0){
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno;
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
         }else{
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno+",";
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
         }
       }else{
         if(index==obj.usuario.length-1){
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno;
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
         }else{
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno+",";
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
         }
       }
     }

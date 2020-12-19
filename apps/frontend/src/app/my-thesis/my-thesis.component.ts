@@ -184,7 +184,7 @@ export class MyThesisComponent implements OnInit {
       if(res.length>0){
         let user= this._usuarioService.getUserLogged();
         let index = res.findIndex(res => res.usuario_DNI === user.DNI);
-        if(index != -1 && res[index].isPrincipal == 1 ){
+        if(index != -1 && res[index].isPrincipal == 0 ){
           localStorage.setItem('thesis-back','my-thesis');
           this._router.navigate(['dashboard/edit-thesis/'+id]);
         }

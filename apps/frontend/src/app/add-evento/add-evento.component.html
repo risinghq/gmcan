@@ -26,13 +26,31 @@
                         <div class="text-category">
                             País en español <span class="red-text">*</span>
                         </div>
-                        <input [(ngModel)]="evento.pais" formControlName="pais" name="pais" class="input-category" placeholder="Escriba el país" required>
+                        <mat-form-field class="input-category width-normal"  floatLabel="never">
+                            <input class="text-autocomplete" type="text" matInput [formControl]="paisControl" [matAutocomplete]="pais"  autocomplete="off"
+                            [(ngModel)]="evento.pais" formControlName="pais" name="pais" class="input-category">
+                            <mat-placeholder class="placeholder custom-place">Escriba el país</mat-placeholder>
+                            <mat-autocomplete autoActiveFirstOption #pais="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOptions2 | async" [value]="option.pais">
+                                {{option.pais}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
                     </div>
                     <div class="full-width ">
                         <div class="text-category">
                             País en inglés <span class="red-text">*</span>
                         </div>
-                        <input [(ngModel)]="evento.paisEN" formControlName="paisEN" name="paisEN" class="input-category" placeholder="Escriba el país" required>
+                        <mat-form-field class="input-category width-normal"  floatLabel="never">
+                            <input class="text-autocomplete" type="text" matInput [formControl]="paisENControl" [matAutocomplete]="paisEN"  autocomplete="off"
+                            [(ngModel)]="evento.paisEN" formControlName="paisEN" name="paisEN" class="input-category">
+                            <mat-placeholder class="placeholder custom-place">Escriba el país</mat-placeholder>
+                            <mat-autocomplete autoActiveFirstOption #paisEN="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOptions3 | async" [value]="option.paisEN">
+                                {{option.paisEN}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
                     </div>
                 </div>
                 <div class="flex-news mt-8">
@@ -40,13 +58,33 @@
                         <div class="text-category">
                             Ciudad en español <span class="red-text">*</span>
                         </div>
-                        <input [(ngModel)]="evento.ciudad" formControlName="ciudad" name="ciudad" class="input-category" placeholder="Escriba la ciudad" required>
+                        <mat-form-field class="input-category width-normal"  floatLabel="never">
+                            <input class="text-autocomplete" type="text" [(ngModel)]="evento.ciudad" matInput autocomplete="off"
+                            [formControl]="ciudadesControl"
+                            [matAutocomplete]="ciudad" formControlName="ciudad" name="ciudad">
+                            <mat-placeholder class="placeholder custom-place">Escriba la ciudad</mat-placeholder>
+                            <mat-autocomplete autoActiveFirstOption #ciudad="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.ciudad">
+                                {{option.ciudad}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
                     </div>
                     <div class="full-width">
                         <div class="text-category">
                             Ciudad en inglés <span class="red-text">*</span>
                         </div>
-                        <input [(ngModel)]="evento.ciudadEN" formControlName="ciudadEN" name="ciudadEN" class="input-category" placeholder="Escriba la ciudad" required>
+                        <mat-form-field class="input-category width-normal"  floatLabel="never">
+                            <input class="text-autocomplete" type="text" matInput  autocomplete="off"
+                            [formControl]="ciudadesENControl" [matAutocomplete]="ciudadEN" 
+                            [(ngModel)]="evento.ciudadEN" formControlName="ciudadEN" name="ciudadEN">
+                            <mat-placeholder class="placeholder custom-place">Escriba la ciudad</mat-placeholder>
+                            <mat-autocomplete autoActiveFirstOption #ciudadEN="matAutocomplete">
+                                <mat-option *ngFor="let option of filteredOptions1 | async" [value]="option.ciudadEN">
+                                {{option.ciudadEN}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
                     </div>
                 </div>
             </form>

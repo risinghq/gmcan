@@ -73,7 +73,7 @@ export class EditResumenComponent implements OnInit {
       título: ['', Validators.required],
       fechaPublicacionDate: ['', Validators.required],
       evento_idEvento: ['', Validators.required],
-      DOI: ['', Validators.required],
+      DOI: [''],
       resumen: ['', Validators.required],
       resumenEN: ['', Validators.required],
       userSelector: ['']
@@ -94,7 +94,9 @@ export class EditResumenComponent implements OnInit {
       this._publicacionService.getPublication(idArticulo).subscribe(result => {
         if(result){
           this.publicacion = result[0];
-          this.publicacion.fechaPublicacionDate=result[0].fechaPublicacion;
+          var d = new Date(result[0].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+          this.publicacion.fechaPublicacionDate=d;
           localStorage.setItem("resumenEdit",JSON.stringify(this.publicacion.titulo));
           this.getEventos();
           this.getAutoresPublicacion(idArticulo);
@@ -177,7 +179,8 @@ export class EditResumenComponent implements OnInit {
   getAutor(idAutor, isPrincipal){
     this._autorService.getAuthor(idAutor).subscribe(result => {
       if(result){
-        if(isPrincipal==1){
+        result[0].isPrincipal=isPrincipal;
+        if(isPrincipal==0){
           this.selectedUsers.push(result[0])
           this.myControl.setValue(result[0].nombre);
         }else{
@@ -192,7 +195,8 @@ export class EditResumenComponent implements OnInit {
     this._usuarioService.getUser(DNI).subscribe(result => {
       if(result){
         result[0].nombre=result[0].nombre+' '+result[0].apellidoPaterno+' '+result[0].apellidoMaterno
-        if(isPrincipal==1){
+        result[0].isPrincipal=isPrincipal;
+        if(isPrincipal==0){
           this.selectedUsers.push(result[0])
           this.myControl.setValue(result[0].nombre);
         }else{
@@ -205,6 +209,7 @@ export class EditResumenComponent implements OnInit {
 
   setearOtrosAutores(){
     this.otrosAutores=[];
+    this.autoresSeleccionados.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));
     for (let index = 0; index < this.autoresSeleccionados.length; index++) {
       let idAutorSeleccionado;
       let isAutor=true;
@@ -258,6 +263,11 @@ export class EditResumenComponent implements OnInit {
   removeAnotherAuthor(i: number) {
     if(i>0){
       this.otrosAutores.splice(i, 1);
+    }else if(i==0 && this.otrosAutores.length==1){
+      this.otrosAutores.splice(i, 1);
+      this.addAnotherAuthor();
+    }else{
+      this.otrosAutores.splice(i, 1);
     }
   }
 
@@ -274,13 +284,13 @@ export class EditResumenComponent implements OnInit {
               this._publicacionhasusuarioService.deletePublicacionHasUsuario(this.publicacion.idPublicacion).subscribe(result => {
                 if(result.status==1){
                   if(this.selectedUsers.length>0){
-                    this.setAutores(this.selectedUsers[0], 1, this.publicacion.idPublicacion);
+                    this.setAutores(this.selectedUsers[0], 0, this.publicacion.idPublicacion);
                   }else{
                     let autorNuevo={nombre: this.selectedUser}
-                    this.setAutores(autorNuevo, 1, this.publicacion.idPublicacion);
+                    this.setAutores(autorNuevo, 0, this.publicacion.idPublicacion);
                   }
                   for (let index = 0; index < this.otrosAutores.length; index++) {
-                    this.setAutores(this.otrosAutores[index], 0, this.publicacion.idPublicacion);
+                    this.setAutores(this.otrosAutores[index], index+1, this.publicacion.idPublicacion);
                   }
                 } 
               });

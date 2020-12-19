@@ -4,7 +4,7 @@
             arrow_back
         </mat-icon>
         <div class="back-text">
-            {{language.detailMemberText[0].back}}
+            {{language.backAll}}
         </div>        
     </div>
     <div class="login-card">
@@ -52,5 +52,8 @@
     </div>
     <div class="error" *ngIf="error">
         {{error}}
+    </div>
+    <div class="exito" *ngIf="exito">
+        {{exito}}
     </div>
 </div>

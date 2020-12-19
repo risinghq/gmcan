@@ -131,7 +131,7 @@ export class AddProyectoComponent implements OnInit {
   }
 
   openSnackBar() {
-    this._snackBar.open("Tesis agregada exitosamente", null, {
+    this._snackBar.open("Proyecto agregado exitosamente", null, {
       duration: 2000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
@@ -159,7 +159,6 @@ export class AddProyectoComponent implements OnInit {
   }]
 
   addAnotherAuthor(){
-    console.log(this.otrosAutores)
     this.otrosAutores.push({
       id:this.otrosAutores.length+1,
       DNI:'',
@@ -170,6 +169,11 @@ export class AddProyectoComponent implements OnInit {
 
   removeAnotherAuthor(i: number) {
     if(i>0){
+      this.otrosAutores.splice(i, 1);
+    }else if(i==0 && this.otrosAutores.length==1){
+      this.otrosAutores.splice(i, 1);
+      this.addAnotherAuthor();
+    }else{
       this.otrosAutores.splice(i, 1);
     }
   }
@@ -204,7 +208,6 @@ export class AddProyectoComponent implements OnInit {
       this.proyecto.fechaF=null;
       this._proyectoService.addProyecto(this.proyecto).subscribe(result => {
         if(result.status==1){
-          console.log(this.otrosAutores)
           for (let index = 0; index < this.otrosAutores.length; index++) {
             this.setAutores(this.otrosAutores[index], result.idProyecto);
           }

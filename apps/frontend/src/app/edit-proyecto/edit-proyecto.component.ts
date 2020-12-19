@@ -196,6 +196,7 @@ export class EditProyectoComponent implements OnInit {
 
   return(){
     this._commonService.setEndSession('0');
+    sessionStorage.setItem("oldProject", "0");
     this._router.navigate(['dashboard/proyectos-ejecucion']);
   }
 
@@ -232,6 +233,11 @@ export class EditProyectoComponent implements OnInit {
 
   removeAnotherAuthor(i: number) {
     if(i>0){
+      this.otrosAutores.splice(i, 1);
+    }else if(i==0 && this.otrosAutores.length==1){
+      this.otrosAutores.splice(i, 1);
+      this.addAnotherAuthor();
+    }else{
       this.otrosAutores.splice(i, 1);
     }
   }

@@ -60,7 +60,6 @@ export class EditFuenteComponent implements OnInit {
   getFuenteProyecto(fuente){
     this._proyectoService.getProyectoFuente(fuente.idFuenteFinanciamiento).subscribe(result => {
       if(result.length==0){
-        console.log(result)
         this.notCanDo=true;
       }
     });
@@ -82,7 +81,7 @@ export class EditFuenteComponent implements OnInit {
 
   return(){
     this._commonService.setEndSession('0');
-    this._router.navigate(['dashboard/proyectos']);
+    this._router.navigate(['dashboard/proyectos-ejecucion']);
   }
 
   openSnackBar(value) {

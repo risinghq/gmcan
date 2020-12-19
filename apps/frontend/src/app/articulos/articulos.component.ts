@@ -61,7 +61,9 @@ export class ArticulosComponent implements OnInit {
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.articulos=res;
         for (let index = 0; index < this.articulos.length; index++) {
-          this.articulos[index].fecha=this.datePipe.transform(this.articulos[index].fechaPublicacion,"MMMM, y", "es");
+          var d = new Date(this.articulos[index].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.articulos[index].fecha=this.datePipe.transform(d,"MMMM, y", "es");
           this.articulos[index].fecha=this.titlecasePipe.transform(this.articulos[index].fecha);
           this.articulos[index].usuario=[];
           this.articulos[index].autor=[];
@@ -78,7 +80,7 @@ export class ArticulosComponent implements OnInit {
   getArticlesUsers(publicacion){
     this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res)=>{
       if(res){
-        let indexPrincipal = res.findIndex(x => x.isPrincipal == 1);
+        let indexPrincipal = res.findIndex(x => x.isPrincipal == 0);
         if(indexPrincipal!=-1){
           this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
         }
@@ -98,7 +100,7 @@ export class ArticulosComponent implements OnInit {
   getArticlesAuthors(publicacion){
     this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res)=>{
       if(res){
-        let indexPrincipal = res.findIndex(x => x.isPrincipal == 1);
+        let indexPrincipal = res.findIndex(x => x.isPrincipal == 0);
         if(indexPrincipal!=-1){
           this.getAuthor(res[indexPrincipal].autores_idAutor, publicacion);
         }

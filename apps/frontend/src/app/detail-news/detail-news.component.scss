@@ -16,7 +16,10 @@
     border-radius: 4px;
     background-color: #ffffff;
     padding: 8px;
+    min-height: 86vh;
+    overflow-x: auto;
 }
+
 .news-title-div{
     width: inherit;
     position: relative;

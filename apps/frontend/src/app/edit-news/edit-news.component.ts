@@ -154,8 +154,6 @@ export class EditNewsComponent implements OnInit {
   }
 
   submitNews(value){
-    console.log(this.newsForm.valid)
-    console.log((this.noticia.foto || this.fileData))
     if(value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)){
       this.publishDialog(value);
     }else if(value==0){
@@ -169,7 +167,7 @@ export class EditNewsComponent implements OnInit {
 
   publish(value){
     if (value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
-      console.log(value);
+
       this.publishMethod(value);
     }else if(value==0){
       this.publishMethod(value)
@@ -194,7 +192,6 @@ export class EditNewsComponent implements OnInit {
           if(this.fileData){
             this._noticiaService.uploadNoticiaFoto(this.fileData, this.noticia.idNoticia)
             .subscribe(res => {
-            console.log(res);
           })
           }
           this.eliminar=true;
@@ -294,7 +291,6 @@ export class EditNewsComponent implements OnInit {
     }
 
     this.dialogRef2.afterClosed().subscribe(result => {
-      console.log(result);
       if(!result){
         this.publish(value);
       }

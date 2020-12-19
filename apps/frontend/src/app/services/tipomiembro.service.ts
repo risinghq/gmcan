@@ -27,4 +27,11 @@ export class TipoMiembroService{
     } 
   }
 
+  getCountType(): any{
+    let headers = new HttpHeaders ({
+			'Content-Type':'application/json'
+		});    
+    return this.http.get(this.url+'tipo-miembro/get-count-type',{headers:headers});
+  }
+
 }

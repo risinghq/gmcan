@@ -64,7 +64,9 @@ export class TesisComponent implements OnInit {
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.tesis=res;
         for (let index = 0; index < this.tesis.length; index++) {
-          this.tesis[index].fecha=this.datePipe.transform(this.tesis[index].fechaPublicacion,"MMMM, y", "es");
+          var d = new Date(this.tesis[index].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.tesis[index].fecha=this.datePipe.transform(d,"MMMM, y", "es");
           this.tesis[index].fecha=this.titlecasePipe.transform(this.tesis[index].fecha);
           this.tesis[index].usuario=[];
           this.tesis[index].autor=[];
@@ -109,8 +111,8 @@ export class TesisComponent implements OnInit {
   getUsuario(idUser, publicacion){
     this._usuarioService.getUser(idUser).subscribe((res)=>{
       if(res[0]!=undefined){
+        res[0].nombreCompleto=res[0].nombre+' '+res[0].apellidoPaterno+' '+res[0].apellidoMaterno;
         publicacion.usuario.push(res[0]);
-        publicacion.usuario[0].nombreCompleto=publicacion.usuario[0].nombre+' '+publicacion.usuario[0].apellidoPaterno+' '+publicacion.usuario[0].apellidoMaterno;
       }
     });
   }

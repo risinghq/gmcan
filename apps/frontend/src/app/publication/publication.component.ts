@@ -112,11 +112,7 @@ export class PublicationComponent implements OnInit {
   getGrupo(){
     this._grupoService.getGrupoInfo().subscribe((res)=>{
       if(res.length>0){ 
-        if(this.language.locale=="es"){
-          this.infoText=res[0].seccionPublicaciones;
-        }else{
-          this.infoText=res[0].seccionPublicacionesEN;
-        }
+        this.infoText=res[0].seccionPublicaciones;
       }
     });
   }
@@ -138,6 +134,7 @@ export class PublicationComponent implements OnInit {
   getPublicaciones(idTipoPublicacion){
     this._publicacionService.getPublicaciones(idTipoPublicacion).subscribe((res)=>{
       if(res){
+        res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.allCharged=true;
         this.page = 1;
         this.pageSize =5;
@@ -159,14 +156,16 @@ export class PublicationComponent implements OnInit {
     });
   }
 
-  getUsuario(idUser, i){
+  getUsuario(idUser, i, isPrincipal){
     this._usuarioService.getUser(idUser).subscribe((res)=>{
       if(res[0]!=undefined){
         res[0].nombre=res[0].nombre.slice(0,1)+".";
+        res[0].isPrincipal=isPrincipal;
         if(this.publicaciones[i]!=undefined){
           if(this.publicaciones[i].usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
             this.publicaciones[i].usuario.push(res[0]);
           }
+          this.publicaciones[i].usuario.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));
           this.fillName(this.publicaciones[i]);
         }
       }
@@ -195,7 +194,7 @@ export class PublicationComponent implements OnInit {
   getPublicacionHasUsuario(idPublicacion, i){
     this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe((res)=>{
       for (let index = 0; index < res.length; index++) {
-        this.getUsuario(res[index].usuario_DNI, i);
+        this.getUsuario(res[index].usuario_DNI, i, res[index].isPrincipal);
       }
     });
   }
@@ -257,6 +256,9 @@ export class PublicationComponent implements OnInit {
   fillPublicacion(publicacion, index){
       publicacion.usuario=[];
       publicacion.autor=[];
+      var d = new Date(publicacion.fechaPublicacion);
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+      publicacion.fechaPublicacion=d;
       publicacion.fecha=this.datePipe.transform(publicacion.fechaPublicacion,"MMMM y", "es");
       publicacion.fecha=this.titlecasePipe.transform(publicacion.fecha);
       this.getUniversidad(publicacion);
@@ -269,10 +271,11 @@ export class PublicationComponent implements OnInit {
 
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
+      let first=obj.usuario[index].nombre.split(" ");
       if(index==obj.usuario.length-1 && obj.autor.length===0){
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno + " " + obj.usuario[index].apellidoMaterno;
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
       }else{
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno + " " + obj.usuario[index].apellidoMaterno +",";
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
       }
     }
   }
@@ -293,45 +296,6 @@ export class PublicationComponent implements OnInit {
     this.allCharged=null;
     this.getPublicaciones(this.tipoPublicaciones[$event.index].idTipoPublicacion);
     this.searchForm.controls.titulo.setValue("");
-  }
-
-  /* Share Hover */
-  public fbicon="../../assets/img/Facebook.svg";
-  public twitter="../../assets/img/twitter.svg";
-  mouseEnter(int, index){
-    let element: any;
-    switch (int) {
-      case 1:
-        document.getElementById("fb"+index).setAttribute("src","../../assets/img/Facebook2.svg");
-        break;
-      case 2:
-        document.getElementById("t"+index).setAttribute("src", "../../assets/img/twitter2.svg");
-        break;
-      case 3:
-        document.getElementById("fbl"+index).setAttribute("src", "../../assets/img/Facebook2.svg");
-        break;
-      case 4:
-        document.getElementById("tl"+index).setAttribute("src", "../../assets/img/twitter2.svg");
-        break;
-    }
-  }
-
-  mouseLeave(int, index){
-    let element: any;
-    switch (int) {
-      case 1:
-        document.getElementById("fb"+index).setAttribute("src","../../assets/img/Facebook.svg");
-        break;
-      case 2:
-        document.getElementById("t"+index).setAttribute("src", "../../assets/img/twitter.svg");
-        break;
-      case 3:
-        document.getElementById("fbl"+index).setAttribute("src","../../assets/img/Facebook.svg");
-        break;
-      case 4:
-        document.getElementById("tl"+index).setAttribute("src", "../../assets/img/twitter.svg");
-        break;
-    }
   }
 
   /*  Búsqueda */

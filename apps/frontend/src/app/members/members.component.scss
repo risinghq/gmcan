@@ -92,6 +92,11 @@
 }
 
 .member-email{
+    width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: max-content;
     margin-top: 4px;
     @extend .plex-sans;
     line-height: 1;

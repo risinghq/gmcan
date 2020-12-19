@@ -59,7 +59,7 @@ export class AddFuenteComponent implements OnInit {
   }
 
   openSnackBar() {
-    this._snackBar.open("Revista agregada exitosamente", null, {
+    this._snackBar.open("Fuente agregada exitosamente", null, {
       duration: 2000,
       horizontalPosition: 'right',
       verticalPosition: 'top',

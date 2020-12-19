@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Grupo } from '../models/grupo';
 import { GLOBAL } from '../services/global';
 import { AuthService } from '../services/auth.service';
+import { TipoMiembroService } from '../services/tipomiembro.service';
+import { TipoPublicacionService } from '../services/tipopublicacion.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,6 +36,8 @@ export class DashboardComponent implements OnInit {
     public _usuarioHasPermisoService: UsuarioHasPermisoService,
     public _route: ActivatedRoute,
     public _router: Router,
+    public _tipoMiembroService: TipoMiembroService,
+    public _tipoPublicacionService :TipoPublicacionService,
   ){
     this.url=GLOBAL.url;
   }
@@ -42,6 +46,7 @@ export class DashboardComponent implements OnInit {
     this.user=JSON.parse(localStorage.getItem("user"));
     this.getPermiso();
     this.getGrupoInfo();
+    this.getCountTypeMember();
   }
 
   getGrupoInfo(){
@@ -88,4 +93,113 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
+
+  total=0;
+  total2=0;
+
+  getCountTypeMember(){
+    this._tipoMiembroService.getCountType().subscribe((res)=>{
+      if(res.length>0){
+        const filler: Array<any>=[];
+        const filler2: Array<any>=[];
+        for (let index = 0; index < res.length; index++) {
+          filler2.push(res[index].nombre)
+          filler.push(res[index].Total);
+          this.total=this.total+parseInt(res[index].Total);
+        }
+        this.chartLabels=filler2;
+        this.chartDatasets=[{ data: filler , label: 'My First dataset' }];
+      }
+      this.getCountTypePublication();
+    });
+  }
+
+  getCountTypePublication(){
+    this._tipoPublicacionService.getCountType().subscribe((res)=>{
+      if(res.length>0){
+        const filler3: Array<any>=[];
+        const filler4: Array<any>=[];
+        for (let index = 0; index < res.length; index++) {
+          filler4.push(res[index].nombre)
+          filler3.push(res[index].Total);
+          this.total2=this.total2+parseInt(res[index].Total);
+        }
+        filler3.push(0);
+        this.chartLabels2=filler4;
+        this.chartDatasets2=[{ data: filler3 , label: 'Cantidad' }];
+      }
+    });
+  }
+
+  public chartType: string = 'pie';
+
+  public chartDatasets: Array<any> = [
+    { data: [], label: 'My First dataset' }
+  ];
+
+  public chartLabels: Array<any> = [];
+
+  public chartColors: Array<any> = [
+    {
+      backgroundColor: [
+        'rgba(13,56,0,1)',
+        'rgba(0,133,51,1)',
+        'rgba(0,204,24,1)',
+        'rgba(120,240,0,1)',
+        'rgba(142,236,152,1)',
+        'rgba(0,48,0,1)',
+      ],
+      hoverBackgroundColor: [
+        'rgba(13,56,0,0.8)',
+        'rgba(0,133,51,0.8)',
+        'rgba(0,204,24,0.8)',
+        'rgba(120,240,0,0.8)',
+        'rgba(142,236,152,0.8)',
+        'rgba(0,48,0,0.8)',
+      ],
+      borderWidth: 2,
+    }
+  ];
+
+  public chartOptions: any = {
+    responsive: true
+  };
+  public chartClicked(e: any): void { }
+  public chartHovered(e: any): void { }
+
+  public chartType2: string = 'horizontalBar';
+
+  public chartDatasets2: Array<any> = [
+    { data: [], label: 'My First dataset' }
+  ];
+
+  public chartLabels2: Array<any> = [];
+
+  public chartColors2: Array<any> = [
+    {
+      backgroundColor: [
+        'rgba(13,56,0,1)',
+        'rgba(0,133,51,1)',
+        'rgba(0,204,24,1)',
+        'rgba(120,240,0,1)',
+        'rgba(142,236,152,1)',
+        'rgba(0,48,0,1)',
+      ],
+      borderColor: [
+        'rgba(13,56,0,1)',
+        'rgba(13,56,0,1)',
+        'rgba(13,56,0,1)',
+        'rgba(13,56,0,1)',
+        'rgba(13,56,0,1)',
+        'rgba(13,56,0,1)',
+      ],
+      borderWidth: 2,
+    }
+  ];
+
+  public chartOptions2: any = {
+    responsive: true,
+  };
+  public chartClicked2(e: any): void { }
+  public chartHovered2(e: any): void { }
 }

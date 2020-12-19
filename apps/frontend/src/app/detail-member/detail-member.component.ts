@@ -141,7 +141,6 @@ export class DetailMemberComponent implements OnInit {
           }else{
             this.usuario.active=this.language.detailMemberText[0].oldMember;
           }
-          this.usuario.foto=this.url+'usuario/get-image-usuario/'+this.usuario.foto;
           this.titleService.setTitle('GMCAN | '+this.usuario.nombre+ ' ' +this.usuario.apellidoPaterno);
           this.searchPublicacionHasUsuario(this.usuario.DNI);
           this.getPrefijos();
@@ -155,6 +154,7 @@ export class DetailMemberComponent implements OnInit {
     this._publicacionhasusuarioService.searchPublicacionHasUsuario(DNI).subscribe((res)=>{
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
+          res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
           this.getPublicacion(res[index].publicacion_idPublicacion);
         }
       }
@@ -176,9 +176,7 @@ export class DetailMemberComponent implements OnInit {
   getPublicacion(idPublicacion){
     this._publicacionService.getPublication(idPublicacion).subscribe((res)=>{
       if(res.length>0){
-        this.publicaciones.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         for (let index = 0; index < res.length; index++) {
-          console.log("ids "+res[index].idPublicacion);
           if(this.publicaciones.findIndex(x => x.idPublicacion === res[index].idPublicacion)===-1){
             this.publicaciones.push(res[index]);
           }
@@ -206,6 +204,9 @@ export class DetailMemberComponent implements OnInit {
   fillPublicacion(publicacion, index){
     publicacion.usuario=[];
     publicacion.autor=[];
+    var d = new Date(publicacion.fechaPublicacion);
+    d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+    publicacion.fechaPublicacion=d;
     publicacion.fecha=this.datePipe.transform(publicacion.fechaPublicacion,"MMMM y");
     publicacion.fecha=this.titlecasePipe.transform(publicacion.fecha);
     for (let index = 0; index < this.tipoPublicaciones.length; index++) {
@@ -234,7 +235,7 @@ export class DetailMemberComponent implements OnInit {
   getPublicacionHasUsuario(idPublicacion, i){
     this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe((res)=>{
       for (let index = 0; index < res.length; index++) {
-        this.getUsuario(res[index].usuario_DNI, i);
+        this.getUsuario(res[index].usuario_DNI, i, res[index].isPrincipal);
       }
     });
   }
@@ -265,14 +266,18 @@ export class DetailMemberComponent implements OnInit {
     });
   }
 
-  getUsuario(idUser, i){
+  getUsuario(idUser, i, isPrincipal){
     this._usuarioService.getUser(idUser).subscribe((res)=>{
       if(res[0]!=undefined){
         res[0].nombre=res[0].nombre.slice(0,1)+".";
-        if(this.publicaciones[i].usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
-          this.publicaciones[i].usuario.push(res[0]);
+        res[0].isPrincipal=isPrincipal;
+        if(this.publicaciones[i]!=undefined){
+          if(this.publicaciones[i].usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
+            this.publicaciones[i].usuario.push(res[0]);
+          }
+          this.publicaciones[i].usuario.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));
+          this.fillName(this.publicaciones[i]);
         }
-        this.fillName(this.publicaciones[i]);
       }
     });
   }
@@ -292,10 +297,11 @@ export class DetailMemberComponent implements OnInit {
 
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
+      let first=obj.usuario[index].nombre.split(" ");
       if(index==obj.usuario.length-1 && obj.autor.length===0){
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno + " " + obj.usuario[index].apellidoMaterno;
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
       }else{
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno + " " + obj.usuario[index].apellidoMaterno +",";
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
       }
     }
   }
@@ -314,7 +320,7 @@ export class DetailMemberComponent implements OnInit {
     this._prefijoService.getPrefijos().subscribe((res)=>{
       if(res){
         for (let j = 0; j < res.length; j++) {
-          if(this.usuario.prefijo_idPrefijo==res[j].idPrefijo){
+          if(this.usuario.prefijo_idPrefijo==res[j].idPrefijo && res[j].nombre!="Ninguno" && res[j].nombre!="Bachiller"){
             this.usuario.prefijo=res[j].nombre;
           }
         }

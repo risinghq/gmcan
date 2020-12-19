@@ -1,7 +1,3 @@
-::placeholder{
-    color: #30393a !important;
-}
-
 .plex-serif{
     font-family: 'IBM Plex Serif', serif;
 }
@@ -156,6 +152,17 @@
     .project-subtext{
         margin-bottom: 16px;
     }
+    .btn-black{
+        margin-top: 2px;
+    }
+    .mat-icon{
+        width: 14px;
+        height: 14px;
+        font-size: 14px;
+    }
+    .link{
+        font-size: 12px;
+    }
 }
 
 /*Paginator CSS*/
@@ -223,11 +230,12 @@
 
 /*Buscador CSS*/
 .input-search-project{
+    width: 100%;
     vertical-align: middle;
     padding: 8px;
     border-radius: 4px;
-    border: solid 1px #e8e8e8;
-    background-color: #f5f5f5;
+    box-shadow: -1px -1px 3px rgba(0, 0, 0, 0.1), 1px 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
     margin: 2px;
     display: flex;
 }
@@ -247,6 +255,16 @@
     @extend .plex-sans;
     letter-spacing: 0.3px;
     color: #9595b2;
+}
+
+.btn-black{
+    margin-left: 8px;
+}
+
+.link{
+    font-weight: 600;
+    height: max-content;
+    margin: 0px;
 }
 
 /*Project CSS*/

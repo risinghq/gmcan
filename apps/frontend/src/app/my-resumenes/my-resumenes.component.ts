@@ -97,7 +97,7 @@ export class MyResumenesComponent implements OnInit {
   getArticlesUsers(publicacion){
     this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res)=>{
       if(res){
-        let indexPrincipal = res.findIndex(x => x.isPrincipal == 1);
+        let indexPrincipal = res.findIndex(x => x.isPrincipal == 0);
         if(indexPrincipal!=-1){
           this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
         }
@@ -117,7 +117,7 @@ export class MyResumenesComponent implements OnInit {
   getArticlesAuthors(publicacion){
     this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res)=>{
       if(res){
-        let indexPrincipal = res.findIndex(x => x.isPrincipal == 1);
+        let indexPrincipal = res.findIndex(x => x.isPrincipal == 0);
         if(indexPrincipal!=-1){
           this.getAuthor(res[indexPrincipal].autores_idAutor, publicacion);
         }
@@ -176,7 +176,7 @@ export class MyResumenesComponent implements OnInit {
       if(res.length>0){
         let user= this._usuarioService.getUserLogged();
         let index = res.findIndex(res => res.usuario_DNI === user.DNI);
-        if((index != -1 && res[index].isPrincipal == 1) || this.publicacionPermiso){
+        if((index != -1 && res[index].isPrincipal == 0) || this.publicacionPermiso){
           localStorage.setItem('resumen-back','my-abstracts');
           this._router.navigate(['dashboard/edit-resumen/'+id]);
         }

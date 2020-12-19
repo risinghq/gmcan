@@ -92,7 +92,7 @@
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
-                            <mat-icon class="erase-icon" *ngIf="otroAutor.nombre && i!=0" (click)="removeAnotherAuthor(i)">clear</mat-icon>
+                            <mat-icon class="erase-icon" *ngIf="otroAutor.nombre" (click)="removeAnotherAuthor(i)">clear</mat-icon>
                         </section>
                         <div class="green-text plex-sans mb-8" (click)="addAnotherAuthor()">Agregar autor</div>
                     </div>

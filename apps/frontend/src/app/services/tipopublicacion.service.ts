@@ -38,4 +38,11 @@ export class TipoPublicacionService{
     }
   }
 
+  getCountType(): any{
+    let headers = new HttpHeaders ({
+			'Content-Type':'application/json'
+		});    
+    return this.http.get(this.url+'tipo-publicacion/get-count-type',{headers:headers});
+  }
+
 }

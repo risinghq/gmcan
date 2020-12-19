@@ -78,7 +78,7 @@ export class MembersComponent implements OnInit {
         this.allCharged=true;
         for (let index = 0; index < this.usuarios.length; index++) {
           for (let j = 0; j < res.length; j++) {
-            if(this.usuarios[index].prefijo_idPrefijo==res[j].idPrefijo){
+            if(this.usuarios[index].prefijo_idPrefijo==res[j].idPrefijo && res[j].nombre!="Ninguno" && res[j].nombre!="Bachiller"){
               this.usuarios[index].prefijo=res[j].nombre;
             }
           }

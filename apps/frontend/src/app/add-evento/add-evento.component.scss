@@ -1,1 +1,15 @@
-@import '../add-category/add-category.component.scss'
+@import '../add-category/add-category.component.scss';
+@import '../add-news/add-news.component.scss';
+
+::ng-deep .mat-form-field-label{
+    @extend .plex-sans;
+    font-size: 15px !important;
+    top: unset !important;
+    margin-top: 2px !important;
+    color: #939393;
+    opacity: 0.4 !important;
+}
+
+.placeholder{
+    color: #9595b2 !important;
+}

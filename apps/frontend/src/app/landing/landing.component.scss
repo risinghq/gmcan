@@ -44,10 +44,16 @@ $thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
 .input-search-toolbar{
     display: inline-flex;
     vertical-align: middle;
-    padding: 4px 24px 4px 12px;
-    border-radius: 4px;
-    border: solid 1px #e8e8e8;
-    background-color: #f5f5f5;
+    padding: 4px 24px 4px 16px;
+    border-radius: 100px;
+    box-shadow: -1px -1px 3px rgba(0, 0, 0, 0.1), 1px 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #FFFFFF;
+}
+
+.flag{
+    width: 17px;
+    height: 17px;
+    border-radius: 100px;
 }
 
 .input-search-text{
@@ -58,6 +64,7 @@ $thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
     font-size: 15px;
     line-height: 1;
     letter-spacing: 0.3px;
+    margin-left: 16px;
     color: #939393;
 }
 .icon-search-toolbar{
@@ -81,8 +88,9 @@ $thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
 
 .language:hover{
     cursor: pointer;
-    background-color: #f5f5f5;
+    background-color: #E8E8E8;
     border-radius: 4px;
+    border: 1px solid white;
 }
 
 .active-language{
@@ -276,13 +284,20 @@ mat-sidenav{
     border-bottom:2px solid white;
 }
 
+.fitter{
+    margin-right: 4px;
+    height: max-content;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
 /*Responsive Stuff*/
 @media(min-width:1025px){
     .active-language{
-        color: #ffffff !important;
-        background-color: #30393a !important;
+        color: var(--deep-green) !important;
+        background-color: unset !important;
+        border: 1px solid #006400 !important;
     }
-    
     .link{
         padding-bottom:2px;
     }
@@ -342,16 +357,20 @@ mat-sidenav{
         margin-left: 16px !important;
     }
     .language{        
-        margin-right: 8px;
-        color: #30393a;
-        padding: 4px 8px !important;
+        font-size: 15px !important;
+        border: 1px solid #B5B5B5;
+        margin-right: 4px;
+        color: #939393;
+        padding: 4px !important;
     }
     .img-logo-white{
         height: 40px;
     }
+    .mr-12{
+        margin-right: 12px;
+    }
 }
 @media(max-width:1025px){
-
     .active{
         border-bottom:2px solid #30393a;
         font-weight: bold;
@@ -422,8 +441,7 @@ mat-sidenav{
         margin-left: auto;
     }
     .active-language{
-        color: #30393a !important;
-        background-color: #f1f2f2;
+        background: rgba(255, 255, 255, 0.2);
     }
     .language{
         margin-right: 2px;
@@ -535,6 +553,13 @@ mat-sidenav{
     .ml-footer{
         margin-left: 28px;
     }
+    .flag{
+        width: 14px;
+        height: 14px;
+    }
+    .link-logo-div{
+        padding-right: unset !important;
+    }
 }
 
 @media(max-width:960px){
@@ -595,5 +620,12 @@ mat-sidenav{
     }
     .mt-8{
         margin-top: 8px;
+    }
+    .flag{
+        width: 14px;
+        height: 14px;
+    }
+    .link-logo-div{
+        padding-right: unset !important;
     }
 }

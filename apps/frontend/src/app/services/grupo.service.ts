@@ -32,7 +32,6 @@ export class GrupoService{
         }
     }
     getGrupoImage(imageFile){
-        console.log(this.url+'grupo/get-image-grupo/'+imageFile);
         let headers = new HttpHeaders ({
 			'Content-Type':'application/json'
 		});
@@ -58,7 +57,6 @@ export class GrupoService{
     uploadFacilidadesFoto(fileData, id):any{
         const formData = new FormData();
         formData.append('foto', fileData, fileData.name); 
-        console.log(formData.get('foto'));
         let headers = new HttpHeaders ({
           'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
           });
@@ -84,7 +82,6 @@ export class GrupoService{
     uploadHeaderLogo(fileData, id):any{
         const formData = new FormData();
         formData.append('foto', fileData, fileData.name); 
-        console.log(formData.get('foto'));
         let headers = new HttpHeaders ({
           'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
           });
@@ -94,7 +91,6 @@ export class GrupoService{
     uploadFooterLogo(fileData, id):any{
         const formData = new FormData();
         formData.append('foto', fileData, fileData.name); 
-        console.log(formData.get('foto'));
         let headers = new HttpHeaders ({
           'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
           });

@@ -25,10 +25,10 @@
                         </div>
                         <div class="members-container" *ngIf="allCharged">
                             <div class="member-type-container" *ngFor="let tipoMiembro of tipoMiembros">
-                                <div class="member-type-title">
+                                <div class="member-type-title" *ngIf="tipoMiembro.miembros.length>0">
                                     {{tipoMiembro.nombre}}
                                 </div>
-                                <div class="row">
+                                <div class="row" *ngIf="tipoMiembro.miembros.length>0">
                                     <div class="col-12 col-sm-6" *ngFor="let miembro of tipoMiembro.miembros">
                                         <div class="flex-news member-mt">
                                             <div class="member-img-div">

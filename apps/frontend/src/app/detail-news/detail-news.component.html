@@ -9,15 +9,14 @@
                     <mat-icon class="detail-icon">
                         arrow_right
                     </mat-icon>
-                    <a class="detail-link-active" *ngIf="previouspage!='Inicio'" href="/{{previouslink}}">{{previouspage}}</a>
-                    <mat-icon class="detail-icon" *ngIf="previouspage!='Inicio'">
+                    <a class="detail-link-active" *ngIf="previouslink!='home'" href="/{{previouslink}}">{{previouspage}}</a>
+                    <mat-icon class="detail-icon" *ngIf="previouslink!='home'">
                         arrow_right
                     </mat-icon>
                     <a class="detail-link">{{language.detailNews}}</a>
                 </div>
                 <div class="card-detail">
                     <div class="news-title-div">
-                        <img class="detail-img" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
                         <img class="detail-img" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                         <div class="news-title">
                             {{noticia.titulo}}
@@ -27,17 +26,8 @@
                         <div class="news-abstract">
                             {{noticia.resumen}}
                         </div>
-                        <div class="flex-news other-div">
-                            <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                                <div class="flex-news">
-                                    <img class="share-icon" (click)="fb($event)" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
-                                    <img class="share-icon" (mouseenter) ="mouseEnter(2)"  (mouseleave) ="mouseLeave(2)" src="{{twitter}}">
-                                </div>
-                            </div>
-                        </div>
                         <div class="autor-div">
                             <div class="autor-img-div">
-                                <img class="autor-img" src="../../assets/img/images.png" *ngIf="!usuario.foto">
                                 <img class="autor-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
                             </div>
                             <div class="autor-text">
@@ -49,12 +39,6 @@
                                 </div>
                                 <div class="news-date">
                                     {{language.detailNewsText[0].written1}} {{dia}} {{language.detailNewsText[0].written2}} {{mes}} {{language.detailNewsText[0].written3}} {{anio}}
-                                </div>
-                            </div>
-                            <div class="share-div d-none d-md-block d-lg-block d-xl-block">
-                                <div class="flex-news share-flex">
-                                    <img class="share-icon" (click)="fb($event)" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
-                                    <img class="share-icon" (mouseenter) ="mouseEnter(2)"  (mouseleave) ="mouseLeave(2)" src="{{twitter}}">
                                 </div>
                             </div>
                         </div>

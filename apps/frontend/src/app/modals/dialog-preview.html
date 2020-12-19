@@ -14,7 +14,6 @@
         </div>
         <div class="autor-div">
             <div class="autor-img-div">
-                <img class="autor-img" src="../../assets/img/images.png" *ngIf="!noticia.usuario.foto">
                 <img class="autor-img" src="{{url+'usuario/get-image-usuario/'+noticia.usuario.foto}}" *ngIf="noticia.usuario.foto">
             </div>
             <div class="autor-text">
@@ -27,12 +26,6 @@
                 <div class="news-date">
                     {{language.detailNewsText[0].written1}} {{dia}} {{language.detailNewsText[0].written2}} {{mes}}
                     {{language.detailNewsText[0].written3}} {{anio}}
-                </div>
-            </div>
-            <div class="share-div">
-                <div class="flex-news share-flex">
-                    <img class="share-icon" (mouseenter) ="mouseEnter(1)"  (mouseleave) ="mouseLeave(1)" src="{{fbicon}}">
-                    <img class="share-icon" (mouseenter) ="mouseEnter(2)"  (mouseleave) ="mouseLeave(2)" src="{{twitter}}">
                 </div>
             </div>
         </div>

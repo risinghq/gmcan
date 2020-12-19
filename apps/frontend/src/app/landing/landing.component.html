@@ -65,16 +65,22 @@
     <mat-sidenav-content>
       <div class="search-top full-width" [ngStyle]="{'display' : (screenWidth > 1050) ? 'none' : 'inline-flex'}">
         <div class="languages" *ngIf="!inputExpand">
-          <div class="language" [ngClass]="{ 'active-language' : lanSelected==0}" (click)="lanSelect(0)">
-            ES
+          <div class="language flex-news" [ngClass]="{ 'active-language' : lanSelected==1}" (click)="lanSelect(1)">
+            <div class="fitter">
+              EN
+            </div>
+            <img class="flag" src="../../assets/img/usa.jpg">
           </div>
-          <div class="language" [ngClass]="{ 'active-language' : lanSelected==1}" (click)="lanSelect(1)">
-            EN
+          <div class="language flex-news" [ngClass]="{ 'active-language' : lanSelected==0}" (click)="lanSelect(0)">
+            <div class="fitter">
+              ES
+            </div>
+            <img class="flag" src="../../assets/img/spain.png">
           </div>
         </div>
-        <form id="formExpand" [formGroup]="searchGlobalForm">
-          <input id="inputExpand" class="search-top-input search-top-input-compressed" #nombre
-          name = "nombre" formControlName="nombre" placeholder="{{language.searchMobile}}">
+        <form id="formExpand" [formGroup]="searchGlobalForm2">
+          <input id="inputExpand" class="search-top-input search-top-input-compressed" #nombre1 autocomplete="off"
+          name = "nombre1" formControlName="nombre1" placeholder="{{language.searchMobile}}" (keyup.enter)="searchGlobal(nombre1.value)">
         </form>
         <div class="search-top-div center" (click)="expandInput()">
           <mat-icon class="icon-search-top">search</mat-icon>
@@ -84,26 +90,32 @@
         <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
           <img  class="logo-nav" src="{{grupoinfo.logoHeader}}" alt="logo">
         </div>
-        <div class="full-width ml-40" [ngStyle]="{'display' : (screenWidth < 1050) ? 'none' : 'block'}">
+        <div class="full-width ml-16" [ngStyle]="{'display' : (screenWidth < 1050) ? 'none' : 'block'}">
           <div class="top-bar-div">
             <form class="input-search-toolbar full-width" [formGroup]="searchGlobalForm">
-              <input class="input-search-text" placeholder="{{language.search}}" #nombre
-              name = "nombre" formControlName="nombre" (keyup.enter)="searchGlobal(nombre.value)">
               <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
+              <input class="input-search-text" placeholder="{{language.search}}" #nombre autocomplete="off"
+              name = "nombre" formControlName="nombre" (keyup.enter)="searchGlobal(nombre.value)">
             </form>
-            <div class="languages">
-              <div class="language" [ngClass]="{ 'active-language' : lanSelected==0}" (click)="lanSelect(0)">
-                ES
+            <div class="languages mr-12">
+              <div class="language flex-news" [ngClass]="{ 'active-language' : lanSelected==1}" (click)="lanSelect(1)">
+                <div class="fitter">
+                  EN
+                </div>
+                <img class="flag" src="../../assets/img/usa.jpg">
               </div>
-              <div class="language" [ngClass]="{ 'active-language' : lanSelected==1}" (click)="lanSelect(1)">
-                EN
+              <div class="language flex-news" [ngClass]="{ 'active-language' : lanSelected==0}" (click)="lanSelect(0)">
+                <div class="fitter">
+                  ES
+                </div>
+                <img class="flag" src="../../assets/img/spain.png">
               </div>
             </div>
             <div class="login-div" (click)="sidenav.close(); loginLink()"> 
               <div class="login link">
                 {{language.login}}
               </div>
-              <img class="login-icon" src="../assets/img/login.svg">
+              <img class="login-icon" src="../../assets/img/login.svg">
             </div>
           </div>
           <div class="down-bar-div text-right">
@@ -188,9 +200,14 @@
       <router-outlet></router-outlet>
       <footer class="footer-div text-white">
         <div class="footer-flex">
-          <div class="link-logo-div" (click)="scroll()" routerLink="/">
-            <img class="img-logo-white" *ngIf="!grupoinfo.logoFooter" src="../assets/img/logoWhite.png">
-            <img class="img-logo-white" *ngIf="grupoinfo.logoFooter" src="{{grupoinfo.logoFooter}}">
+          <div class="flex-news">
+            <div class="link-logo-div" (click)="scroll()" routerLink="/">
+              <img class="img-logo-white" *ngIf="!grupoinfo.logoFooter" src="../assets/img/logoWhite.png">
+              <img class="img-logo-white" *ngIf="grupoinfo.logoFooter" src="{{grupoinfo.logoFooter}}">
+            </div>
+            <div class="link-logo-div">
+              <img class="img-logo-white" src="../../assets/img/logoUNMSM.png">
+            </div>
           </div>
           <div class="footer-down-bar">
             <div class="center max-con flex-news">

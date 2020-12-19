@@ -252,7 +252,6 @@ export class AddNewsComponent implements OnInit {
 
   canDeactivate(): Observable<boolean> {
     if(!this.agregar){
-      console.log("hola")
       this.openDialog();
       return this.dialogRef.afterClosed().pipe(map(result => {
         return result === true;

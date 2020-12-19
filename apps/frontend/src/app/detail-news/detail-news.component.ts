@@ -35,7 +35,7 @@ export class DetailNewsComponent implements OnInit {
     private titleService: Title
   ) {
     this.noticia = new Noticia(null,'','','','',0,'',null,null,'','',null,'',null);
-    this.usuario = new Usuario('','','','','','');
+    this.usuario = new Usuario('','','','','','','');
     this.url=GLOBAL.url;
    }
 
@@ -45,6 +45,7 @@ export class DetailNewsComponent implements OnInit {
     this.cargado=false;
     this.getNoticia();
     this.previouslink=sessionStorage.getItem("previous-page");
+    console.log(this.previouslink);
     this.previouspage=this._previousService.getPreviousPage(this.previouslink);
   }
 

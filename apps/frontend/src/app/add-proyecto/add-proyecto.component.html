@@ -67,7 +67,7 @@
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
-                            <mat-icon class="erase-icon" *ngIf="otroAutor.nombre && i!=0 && proyecto.estado!=0" (click)="removeAnotherAuthor(i)">clear</mat-icon>
+                            <mat-icon class="erase-icon" *ngIf="otroAutor.nombre && proyecto.estado!=0" (click)="removeAnotherAuthor(i)">clear</mat-icon>
                         </section>
                         <div class="green-text plex-sans mb-8" *ngIf="proyecto.estado!=0" (click)="addAnotherAuthor()">Agregar responsable</div>
                     </div>
@@ -131,10 +131,10 @@
                     </div>
                     <div class="width-479 mr-26" *ngIf="proyecto.fechaFin">
                         <div class="text-category">
-                            Fecha de inicio <span class="red-text">*</span>
+                            Fecha de fin <span class="red-text">*</span>
                         </div>
                         <mat-form-field class="input-category" floatLabel="never">
-                            <mat-placeholder class="placeholder mt--7">Seleccionar fecha de inicio</mat-placeholder>
+                            <mat-placeholder class="placeholder mt--7">Seleccionar fecha de fin</mat-placeholder>
                             <input matInput [(ngModel)]="proyecto.fechaFin" [matDatepicker]="dp2"
                             formControlName="fechaFin" name="fechaFin">
                             <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>

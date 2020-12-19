@@ -86,12 +86,7 @@ export class ProjectsComponent implements OnInit {
   getGrupo(){
     this._grupoService.getGrupoInfo().subscribe((res)=>{
       if(res.length>0){ 
-        
-        if(this.language.locale=="es"){
-          this.infoText=res[0].seccionProyectos;
-        }else{
-          this.infoText=res[0].seccionProyectosEN;
-        }
+        this.infoText=res[0].seccionProyectos;
       }
     });
   }
@@ -121,6 +116,7 @@ export class ProjectsComponent implements OnInit {
   getProyectos(estado){
     this._proyectoServices.getProyectos(estado).subscribe((res)=>{
       if(res.length>0){ 
+        res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.tipoProyectos=[];
         this.proyectos=res;
         this.allCharged=true;
@@ -200,6 +196,7 @@ export class ProjectsComponent implements OnInit {
   getUsuario(idUsuario, proyecto){
     this._usuarioService.getUser(idUsuario).subscribe((res)=>{
       if(res){
+        res[0].nombre=res[0].nombre.slice(0,1)+".";
         proyecto.usuario.push(res[0]);
         this.fillName(proyecto);
       }
@@ -208,10 +205,11 @@ export class ProjectsComponent implements OnInit {
 
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
+      let first=obj.usuario[index].nombre.split(" ");
       if(index==obj.usuario.length-1){
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno;
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
       }else{
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno+",";
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
       }
     }
   }

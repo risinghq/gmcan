@@ -110,6 +110,11 @@ form .ng-dirty.ng-invalid{
     text-align: center;
 }
 
+.exito{
+    @extend .error;
+    background-color: #006400 !important;
+}
+
 .forgot{
     cursor: pointer;
     margin-top: 24px;

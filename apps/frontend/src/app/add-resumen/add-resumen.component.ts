@@ -191,6 +191,11 @@ export class AddResumenComponent implements OnInit {
   removeAnotherAuthor(i: number) {
     if(i>0){
       this.otrosAutores.splice(i, 1);
+    }else if(i==0 && this.otrosAutores.length==1){
+      this.otrosAutores.splice(i, 1);
+      this.addAnotherAuthor();
+    }else{
+      this.otrosAutores.splice(i, 1);
     }
   }
 
@@ -226,13 +231,13 @@ export class AddResumenComponent implements OnInit {
       this._publicacionService.addPublicacion(this.publicacion).subscribe(result => {
         if(result.status==1){
           if(this.selectedUsers.length>0){
-            this.setAutores(this.selectedUsers[0], 1, result.idPublicacion);
+            this.setAutores(this.selectedUsers[0], 0, result.idPublicacion);
           }else{
             let autorNuevo={nombre: this.selectedUser}
-            this.setAutores(autorNuevo, 1, result.idPublicacion);
+            this.setAutores(autorNuevo, 0, result.idPublicacion);
           }
           for (let index = 0; index < this.otrosAutores.length; index++) {
-            this.setAutores(this.otrosAutores[index], 0, result.idPublicacion);
+            this.setAutores(this.otrosAutores[index], index+1, result.idPublicacion);
           }
           this.agregar=true;
           this.return();

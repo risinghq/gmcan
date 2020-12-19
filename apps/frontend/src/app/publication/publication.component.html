@@ -20,12 +20,17 @@
                     </div>
                     <mat-tab-group (selectedTabChange)="changeTab($event)">
                         <mat-tab label="{{tipoPublicacion.nombreTab}}" *ngFor="let tipoPublicacion of tipoPublicaciones"> 
-                            <form [formGroup]="searchForm">
+                            <form class="flex-news" [formGroup]="searchForm">
                                 <div class="input-search-publication">
-                                    <input (keyup)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" #titulo class="input-search" 
+                                    <mat-icon class="icon-search">search</mat-icon>
+                                    <input (keyup.enter)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" #titulo class="input-search" 
                                     placeholder="{{tipoPublicacion.search}}"
                                     name = "titulo" formControlName="titulo" autocomplete="off">
-                                    <mat-icon class="icon-search">search</mat-icon>
+                                </div>
+                                <div (click)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" class="btn-black">
+                                    <div class="link">
+                                        {{language.searchMobile}}
+                                    </div>
                                 </div>
                             </form>
                             <div class="spinner-pad" *ngIf="!allCharged">
@@ -52,22 +57,10 @@
                                         <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                             {{publicacion.fecha}}
                                         </div>
-                                        <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                                            <div class="flex-news">
-                                                <img id="fb{{i}}" class="share-icon" (mouseenter) ="mouseEnter(1, i)"  (mouseleave) ="mouseLeave(1, i)" src="{{fbicon}}">
-                                                <img id="t{{i}}" class="share-icon" (mouseenter) ="mouseEnter(2, i)"  (mouseleave) ="mouseLeave(2, i)" src="{{twitter}}">
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="flex-news publication-mt">
                                         <div class="publication-title">
                                             {{publicacion.titulo}}
-                                        </div>
-                                        <div class="share-div d-none d-md-block d-lg-block d-xl-block">
-                                            <div class="flex-news">
-                                                <img id="fbl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
-                                                <img id="tl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(4, i)"  (mouseleave) ="mouseLeave(4, i)" src="{{twitter}}">
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="flex-news publication-mt">

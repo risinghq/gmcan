@@ -79,17 +79,23 @@
     color: #000000;
 }
 
+.btn-black{
+    margin-left: 16px;
+    padding: 4px 8px;
+}
+
 .input-search-global{
     margin-top: 16px;
     display: inline-flex;
     vertical-align: middle;
     padding: 4px 24px 4px 12px;
     border-radius: 4px;
-    border: solid 1px #e8e8e8;
-    background-color: #f5f5f5;
+    box-shadow: -1px -1px 3px rgba(0, 0, 0, 0.1), 1px 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
 }
 
 .input-search-text{
+    width: inherit;
     flex-grow: 1;
     border: unset;
     background-color: inherit;
@@ -100,6 +106,8 @@
     color: #939393;
 }
 .icon-search-toolbar{
+    margin-top: auto;
+    margin-bottom: auto;
     color: var(--deep-green);
 }
 
@@ -146,6 +154,10 @@
 }
 
 .miembro-email{
+    width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
     margin-top: 4px;
     @extend .plex-sans;
     line-height: 1;
@@ -258,6 +270,12 @@
 }
 
 @media(max-width:960px){
+    .input-search-text{
+        font-size: 12px;
+    }
+    .btn-black{
+        margin-top: 16px;
+    }
     .global-search-div{
         padding-left: 20px;
         padding-right: 20px;

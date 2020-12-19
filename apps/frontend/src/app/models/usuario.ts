@@ -6,5 +6,6 @@ export class Usuario{
         public apellidoPaterno: String,
         public apellidoMaterno: String,
         public foto: String,
+        public isPrincipal,
     ){}
 }

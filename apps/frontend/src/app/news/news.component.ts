@@ -59,6 +59,7 @@ export class NewsComponent implements OnInit {
     this._route.params.forEach((params:Params)=>{
       this.idNoticiaE = params['id'];
     });
+    console.log(this.idNoticiaE)
   }
   ngDoCheck(){
     this.title=this.language.news;
@@ -74,6 +75,8 @@ export class NewsComponent implements OnInit {
         for (let index = 0; index < this.noticias.length; index++) {
           if(this.noticias[index].idNoticia==this.idNoticiaE || this.noticias[index].estado==0){
             this.noticias.splice(index,1);
+            index--;
+            continue;
           }
           for (let j = 0; j < this.tiponoticias.length; j++) {
             if (this.noticias[index].tipoNoticia_idtipoNoticia===this.tiponoticias[j].idtipoNoticia) {

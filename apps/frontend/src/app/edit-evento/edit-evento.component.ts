@@ -1,14 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Evento } from '../models/eventos';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { EventoService } from '../services/evento.service';
 import { CommonService } from '../services/common.service';
 import { PublicacionService } from '../services/publicacion.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { map, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-edit-evento',
@@ -42,8 +42,98 @@ export class EditEventoComponent implements OnInit {
     });
   }
 
+  ciudadesControl = new FormControl();
+  ciudades: Array<any>=[];
+  filteredOptions: Observable<any>;
+  filteredOptions1: Observable<any>;
+  ciudadesENControl = new FormControl();
+  ciudadesEN: Array<any>=[];
+  filteredOptions2: Observable<any>;
+  paisControl = new FormControl();
+  pais: Array<any>=[];
+  filteredOptions3: Observable<any>;
+  paisENControl = new FormControl();
+  paisEN: Array<any>=[];
+
+  private _filter(value): any {
+    const filterValue = value.toLowerCase();
+    return this.ciudades.filter(ciudad => ciudad.ciudad.toLowerCase().includes(filterValue));
+  }
+  private _filter1(value): any {
+    const filterValue1 = value.toLowerCase();
+    return this.ciudadesEN.filter(ciudadEN => ciudadEN.ciudadEN.toLowerCase().includes(filterValue1));
+  }
+  private _filter2(value): any {
+    const filterValue2 = value.toLowerCase();
+    return this.pais.filter(pais => pais.pais.toLowerCase().includes(filterValue2));
+  }
+  private _filter3(value): any {
+    const filterValue3 = value.toLowerCase();
+    return this.paisEN.filter(paisEN => paisEN.paisEN.toLowerCase().includes(filterValue3));
+  }
+  
+  setFilters(){
+    this.filteredOptions = this.ciudadesControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
+  }
+
+  setFilters1(){
+    this.filteredOptions1 = this.ciudadesENControl.valueChanges.pipe(
+      startWith(''),
+      map(value1 => this._filter1(value1))
+    );
+  }
+
+  setFilters2(){
+    this.filteredOptions2 = this.paisControl.valueChanges.pipe(
+      startWith(''),
+      map(value2 => this._filter2(value2))
+    );
+  }
+
+  setFilters3(){
+    this.filteredOptions3 = this.paisENControl.valueChanges.pipe(
+      startWith(''),
+      map(value3 => this._filter3(value3))
+    );
+  }
+
+  getCiudad(){
+    this._eventoService.getCiudades().subscribe(res => {
+      this.ciudades=res;
+    });
+  }
+
+  getCiudadEN(){
+    this._eventoService.getCiudadesEN().subscribe(res => {
+      this.ciudadesEN=res;
+    });
+  }
+
+  getPais(){
+    this._eventoService.getPais().subscribe(res => {
+      this.pais=res;
+    });
+  }
+
+  getPaisEN(){
+    this._eventoService.getPaisEN().subscribe(res => {
+      this.paisEN=res;
+    });
+  }
+
   ngOnInit() {
     this.getEvento();
+    this.getCiudad();
+    this.getCiudadEN();
+    this.getPais();
+    this.getPaisEN();
+    this.setFilters();
+    this.setFilters1();
+    this.setFilters2();
+    this.setFilters3();
   }
 
   getEvento(){

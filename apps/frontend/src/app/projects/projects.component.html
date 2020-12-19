@@ -18,11 +18,18 @@
                 <mat-tab-group (selectedTabChange)="changeTab($event)">
                     <mat-tab label="{{tipoProyecto}}" *ngFor="let tipoProyecto of tipoProyectos; let j = index"> 
                         <form class="mt-16" [formGroup]="searchForm">
-                            <div class="input-search-project">
-                                <input (keyup)="search(titulo.value, j)" #titulo class="input-search" 
-                                placeholder="{{searchText}}"
-                                name = "titulo" formControlName="titulo" autocomplete="off">
-                                <mat-icon class="icon-search">search</mat-icon>
+                            <div class="flex-news">
+                                <div class="input-search-project">
+                                    <mat-icon class="icon-search">search</mat-icon>
+                                    <input (keyup.enter)="search(titulo.value, j)" #titulo class="input-search" 
+                                    placeholder="{{searchText}}"
+                                    name = "titulo" formControlName="titulo" autocomplete="off">
+                                </div>
+                                <div (click)="search(titulo.value, j)" class="btn-black">
+                                    <div class="link">
+                                        {{language.searchMobile}}
+                                    </div>
+                                </div>
                             </div>
                         </form>
                         <div class="spinner-pad" *ngIf="!allCharged">

@@ -99,7 +99,6 @@ export class PerfilComponent implements OnInit {
         if(this.member.nombre.includes(' ')){
           let string = this.member.nombre.split(' ');
           this.member.nombre = string[0];
-          console.log(this.member.nombre);
           this.memberForm.controls.segundoNombre.setValue(string[1]);
         }
         this.getCargo(this.member);
@@ -160,19 +159,20 @@ export class PerfilComponent implements OnInit {
       }else{
         this.member.fechaNacimiento=null;
       }
+      let miembroAGuardar=JSON.parse(JSON.stringify(this.member));
       if(this.memberForm.controls.segundoNombre.value!='' && this.memberForm.controls.segundoNombre.value){
-        this.member.nombre+= " "+this.memberForm.controls.segundoNombre.value;
+        miembroAGuardar.nombre+= " "+this.memberForm.controls.segundoNombre.value;
       }
-      if(this.oldMem!=this.member.estado){
-        this.member.estado=this.oldMem;
-      }      
-      this._usuarioService.verifyUser(this.member).subscribe(result => {
+      if(this.oldMem!=miembroAGuardar.estado.estado){
+        miembroAGuardar.estado=this.oldMem;
+      }
+      this._usuarioService.verifyUser(miembroAGuardar).subscribe(result => {
         if(result.length==0 || this.oldEmail==this.member.correo){
           if(this.member.password===this.memberForm.controls.confirmPassword.value){
-            this._usuarioService.updateUser(this.member).subscribe((res)=>{
+            this._usuarioService.updateUser(miembroAGuardar).subscribe((res)=>{
               if(res.status==1){
                 if(this.member.password!=this.oldPassword){
-                  this._usuarioService.changePassword(this.member).subscribe(res => {
+                  this._usuarioService.changePassword(miembroAGuardar).subscribe(res => {
                     if(res){
                       this.errPass=false;
                     }
@@ -186,7 +186,7 @@ export class PerfilComponent implements OnInit {
                       }
                     }) 
                   }else{
-                    this._usuarioService.deleteImage(this.member.foto)
+                    this._usuarioService.deleteImage(miembroAGuardar.foto)
                     .subscribe(res => {
                       if(res){
                       }

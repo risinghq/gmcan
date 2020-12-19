@@ -93,7 +93,9 @@ export class EditTesisComponent implements OnInit {
       this._publicacionService.getPublication(idTesis).subscribe(result => {
         if(result){
           this.publicacion = result[0];
-          this.publicacion.fechaPublicacionDate=result[0].fechaPublicacion;
+          var d = new Date(result[0].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+          this.publicacion.fechaPublicacionDate=d;
           localStorage.setItem("thesisEdit",JSON.stringify(this.publicacion.titulo));
           this.getUniversidades();
           this.getAutoresPublicacion(idTesis);
@@ -177,7 +179,7 @@ export class EditTesisComponent implements OnInit {
     this._publicacionhasautorService.getPublicacionHasAutor(idPublicacion).subscribe(result => {
       if(result){
         for (let index = 0; index < result.length; index++) {
-          this.getAutor(result[index].autores_idAutor)
+          this.getAutor(result[index].autores_idAutor, result[index].isPrincipal)
         }
       }
       this.getUsuariosPublicacion(idPublicacion);
@@ -187,24 +189,26 @@ export class EditTesisComponent implements OnInit {
     this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe(result => {
       if(result){
         for (let index = 0; index < result.length; index++) {
-          this.getUsuario(result[index].usuario_DNI);
+          this.getUsuario(result[index].usuario_DNI, result[index].isPrincipal);
         }
       } 
     });
   }
 
-  getAutor(idAutor){
+  getAutor(idAutor, isPrincipal){
     this._autorService.getAuthor(idAutor).subscribe(result => {
       if(result){
+        result[0].isPrincipal=isPrincipal;
         this.autoresSeleccionados.push(result[0]);
         this.setearOtrosAutores();
       } 
     });
   }
 
-  getUsuario(DNI){
+  getUsuario(DNI, isPrincipal){
     this._usuarioService.getUser(DNI).subscribe(result => {
       if(result){
+        result[0].isPrincipal=isPrincipal;
         result[0].nombre=result[0].nombre+' '+result[0].apellidoPaterno+' '+result[0].apellidoMaterno
         this.autoresSeleccionados.push(result[0]);
         this.setearOtrosAutores();
@@ -214,6 +218,7 @@ export class EditTesisComponent implements OnInit {
 
   setearOtrosAutores(){
     this.otrosAutores=[];
+    this.autoresSeleccionados.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));
     for (let index = 0; index < this.autoresSeleccionados.length; index++) {
       let idAutorSeleccionado;
       let isAutor=true;
@@ -267,6 +272,11 @@ export class EditTesisComponent implements OnInit {
   removeAnotherAuthor(i: number) {
     if(i>0){
       this.otrosAutores.splice(i, 1);
+    }else if(i==0 && this.otrosAutores.length==1){
+      this.otrosAutores.splice(i, 1);
+      this.addAnotherAuthor();
+    }else{
+      this.otrosAutores.splice(i, 1);
     }
   }
 
@@ -288,7 +298,7 @@ export class EditTesisComponent implements OnInit {
               this._publicacionhasusuarioService.deletePublicacionHasUsuario(this.publicacion.idPublicacion).subscribe(result => {
                 if(result.status==1){
                   for (let index = 0; index < this.otrosAutores.length; index++) {
-                    this.setAutores(this.otrosAutores[index], this.publicacion.idPublicacion);
+                    this.setAutores(this.otrosAutores[index], this.publicacion.idPublicacion, index);
                   }
                 } 
               });
@@ -299,33 +309,33 @@ export class EditTesisComponent implements OnInit {
     }
   }
 
-  setAutores(autor, idPublicacion){
+  setAutores(autor, idPublicacion, isPrincipal){
     if(autor.nombre){
       if(autor.idAutor=='' || (!autor.idAutor && !autor.DNI)){
         let newAuthor={nombre: autor.nombre};
         this._autorService.addAuthor(newAuthor).subscribe(res => {
           if(res){
-            let autorPublicacion={autor_idAutor: res.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:1}
+            let autorPublicacion={autor_idAutor: res.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
             this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(res => {
             }) 
           }
         }) 
       }else if(autor.idAutor){
         if(autor.isAutor){
-          let autorPublicacion={autor_idAutor: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:1}
+          let autorPublicacion={autor_idAutor: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
           this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(res => {
           })
         }else if(autor.isAutor==undefined){
-          let autorPublicacion={autor_idAutor: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:1}
+          let autorPublicacion={autor_idAutor: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
           this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(res => {
           })
         }else{
-          let usuarioPublicacion={usuario_DNI: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:1}
+          let usuarioPublicacion={usuario_DNI: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
           this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(res => {
           })  
         }
       }else if(autor.DNI){
-        let usuarioPublicacion={usuario_DNI: autor.DNI, publicacion_idPublicacion:idPublicacion, isPrincipal:1}
+        let usuarioPublicacion={usuario_DNI: autor.DNI, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
         this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(res => {
         })
       }

@@ -140,6 +140,7 @@ import { EditEquipoGuard } from './guards/editequipo.guard';
 import { AddSoftwareGuard } from './guards/addsoftware.guard';
 import { EditSoftwareComponent, DialogCancel29, DialogErase14 } from './edit-software/edit-software.component';
 import { EditSoftwareGuard } from './guards/editsoftware.guard';
+import { ChartsModule, MDBBootstrapModule, WavesModule } from 'angular-bootstrap-md';
 
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
@@ -267,6 +268,8 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatCheckboxModule,
     MatAutocompleteModule,
     MatProgressBarModule,
+    MDBBootstrapModule.forRoot(),
+    ChartsModule, WavesModule,
   ],
   exports:[LocalDatePipe],
   entryComponents:[EmailExitoso, DialogLogOff, DialogIdle, DialogCancel, DialogCancel2, DialogErase, DialogCancel3,DialogPublish, DialogPreview, DialogCancel4,DialogPreview2, DialogPublish2,

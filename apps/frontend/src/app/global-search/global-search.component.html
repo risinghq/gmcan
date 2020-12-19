@@ -18,11 +18,18 @@
         <div class="global-results-title">
             {{language.results}}
         </div>
-        <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
-            <input class="input-search-text" placeholder="{{language.search}}" #nombre
-            name = "nombre" formControlName="nombre" (keyup.enter)="searchGlobal(nombre.value)">
-            <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
-        </form>
+        <div class="flex-news">
+            <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
+                <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
+                <input class="input-search-text" placeholder="{{language.search}}" #nombre
+                name = "nombre" formControlName="nombre" (keyup.enter)="searchGlobal(nombre.value)">
+            </form>
+            <div (click)="searchGlobal(nombre.value)" class="btn-black">
+                <div class="link">
+                    {{language.searchMobile}}
+                </div>
+            </div>
+        </div>
         <div class="not-found-2" *ngIf="proyectos.length==0 && publicaciones.length==0 && miembros.length==0 && noticias.length==0">
             {{language.noResults}}
         </div>
@@ -56,22 +63,10 @@
                                 <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                                     {{publicacion.fecha}}
                                 </div>
-                                <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                                    <div class="flex-news">
-                                        <img id="fb{{i}}" class="share-icon" (mouseenter) ="mouseEnter(1, i)"  (mouseleave) ="mouseLeave(1, i)" src="{{fbicon}}">
-                                        <img id="t{{i}}" class="share-icon" (mouseenter) ="mouseEnter(2, i)"  (mouseleave) ="mouseLeave(2, i)" src="{{twitter}}">
-                                    </div>
-                                </div>
                             </div>
                             <div class="flex-news publication-mt">
                                 <div class="publication-title">
                                     {{publicacion.titulo}}
-                                </div>
-                                <div class="share-div d-none d-md-block d-lg-block d-xl-block">
-                                    <div class="flex-news">
-                                        <img id="fbl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
-                                        <img id="tl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(4, i)"  (mouseleave) ="mouseLeave(4, i)" src="{{twitter}}">
-                                    </div>
                                 </div>
                             </div>
                             <div class="flex-news publication-mt">
@@ -286,7 +281,8 @@
                         </div>
                         <div class="flex-news" [ngClass]="{'mb-24':i+1!=miembros.length}" *ngFor="let miembro of miembros">
                             <div class="miembro-img-div">
-                                <img class="miembro-img" src="{{url+'usuario/get-image-usuario/'+miembro.foto}}" alt="foto">
+                                <img class="member-img" src="{{url+'usuario/get-image-usuario/'+miembro.foto}}" alt="../../assets/img/user.png" *ngIf="miembro.foto">
+                                <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!miembro.foto">
                             </div>
                             <div class="miembro-text">
                                 <div class="miembro-name full-width">
@@ -324,7 +320,8 @@
                         </div>
                         <div class="news-div-list" *ngFor="let noticia of noticias">
                             <div class="img-hover-zoom">
-                                <img class="card-img-div" src="../../assets/img/grupal.jpg" alt="nada">
+                                <img class="card-img-div" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
+                                <img class="card-img-div" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                             </div>
                             <div class="card-text-div card-text-div-3">
                                 <div class="flex-news flex-news-3">

@@ -53,7 +53,7 @@ export class EditMemberComponent implements OnInit {
   listaPermisos:Array<any>;
   button_text="Actualizar información";
   permisosExistentes:Array<UsuarioPermiso>;
-  edit;
+  edit=false;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -183,7 +183,9 @@ export class EditMemberComponent implements OnInit {
       if(result.length==0){
         this.edit=true;
       }
-      this.getNoticias(miembro);
+      if(this.edit){
+        this.getNoticias(miembro);
+      }
     });
   }
 
@@ -236,7 +238,6 @@ export class EditMemberComponent implements OnInit {
         this.listaPermisos.splice(index,1);
       }
     }
-    console.log(this.listaPermisos);
   }
 
   adHono;

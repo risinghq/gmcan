@@ -141,6 +141,7 @@ export class LinesInvestigationComponent implements OnInit {
   getUsuario(idUsuario, proyecto){
     this._usuarioService.getUser(idUsuario).subscribe((res)=>{
       if(res){
+        res[0].nombre=res[0].nombre.slice(0,1)+".";
         proyecto.usuario.push(res[0]);
         this.fillName(proyecto);
       }
@@ -149,10 +150,11 @@ export class LinesInvestigationComponent implements OnInit {
 
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
-      if(index==obj.usuario.length-1){
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno;
+      let first=obj.usuario[index].nombre.split(" ");
+      if(index==obj.usuario.length-1 && obj.autor!=undefined && obj.autor.length===0){
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
       }else{
-        obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno+",";
+        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
       }
     }
   }

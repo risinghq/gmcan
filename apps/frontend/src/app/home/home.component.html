@@ -4,7 +4,7 @@
         <div class="description-info">
             {{info.quienesSomosResumen}}
         </div>
-        <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">Conócenos</button>
+        <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">{{language.knowAboutUs}}</button>
     </div>
     <div class="numbers-div">
         <div class="box mb-box-8" (click)="navigate('/home/members')">
@@ -25,7 +25,7 @@
         </div>
     </div>
     <div class="center know-more" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-        {{language.knowAbout}} <span style="text-decoration: underline;" (click)="navigate('/home/about-us/lines-investigation')">{{language.linesminus}}</span>
+        {{language.knowAbout}} <span style="text-decoration: underline; cursor: pointer;" (click)="navigate('/home/about-us/lines-investigation')">{{language.linesminus}}</span>
     </div>
 </div>
 <div class="home-div segundo-box">
@@ -98,7 +98,6 @@
         <div class="col-lg-4">
             <div class="news-box" *ngFor="let noticia of noticias | slice:1:3; let i=index" [ngClass]="{'mb-other': i==0}">
                 <div class="img-hover-zoom" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                    <img class="other-img-news" src="../../assets/img/grupal.jpg" *ngIf="!noticia.foto">
                     <img class="other-img-news" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                 </div>
                 <div class="flex-news">
@@ -111,7 +110,7 @@
                                 {{noticia.fechaPublicacion}}
                             </div>
                         </div>
-                        <div class="other-news-title" (click)="detalleNoticia(noticiaPrincipal)">
+                        <div class="other-news-title" (click)="detalleNoticia(noticia)">
                             {{noticia.titulo}}
                         </div>
                         <div class="news-author">
@@ -119,7 +118,7 @@
                         </div>
                     </div>
                     <div class="img-hover-zoom ml-16 other-img-news-div" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-                        <img class="other-img-news" src="../../assets/img/grupal.jpg" alt="nada">
+                        <img class="other-img-news" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
                     </div>
                 </div>
             </div>
@@ -132,7 +131,7 @@
     </div>
     <div class="services-card">
         <img class="services-icon" src="../../assets/img/bulb.svg">
-        <div class="mt-services" id="services"></div>
+        <div class="mt-services about-text" id="services"></div>
         <div class="btn-black align-center" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}"
         (click)="navigate('/home/about-us/about')">
             <a class="btn-text2">
@@ -240,24 +239,10 @@
                         <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
                             {{publicacion.fecha}}
                         </div>
-                        <div class="share-div d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                            <div class="flex-news">
-                                <img id="fb{{i}}" class="share-icon" (mouseenter) ="mouseEnter(1, i)"  (mouseleave) ="mouseLeave(1, i)" src="{{fbicon}}">
-                                <img id="t{{i}}" class="share-icon" (mouseenter) ="mouseEnter(2, i)"  (mouseleave) ="mouseLeave(2, i)" src="{{twitter}}">
-                            </div>
-                        </div>
                     </div>
                     <div class="flex-news">
                         <div class="publication-title">
                             {{publicacion.titulo}}
-                        </div>
-                        <div class="share-div d-none d-md-block d-lg-block d-xl-block">
-                            <div class="flex-news">
-                                <img id="fbl{{i}}" class="share-icon"
-                                (click)="fbsharing(i)"
-                                (mouseenter) ="mouseEnter(3, i)"  (mouseleave) ="mouseLeave(3, i)" src="{{fbicon}}">
-                                <img id="tl{{i}}" class="share-icon" (mouseenter) ="mouseEnter(4, i)"  (mouseleave) ="mouseLeave(4, i)" src="{{twitter}}">
-                            </div>
                         </div>
                     </div>
                     <div class="flex-news publication-mt" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'flex'}">

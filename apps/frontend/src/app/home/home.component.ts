@@ -195,7 +195,7 @@ export class HomeComponent implements OnInit {
     this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res)=>{
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, publicacion);
+          this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
         }
       }
     });
@@ -205,7 +205,7 @@ export class HomeComponent implements OnInit {
     this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res)=>{
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
-          this.getAutor(res[index].autores_idAutor, publicacion);
+          this.getAutor(res[index].autores_idAutor, publicacion, res[index].isPrincipal);
         }
       }
     });
@@ -238,6 +238,9 @@ export class HomeComponent implements OnInit {
   fillPublicacion(publicacion){
     publicacion.usuario=[];
     publicacion.autor=[];
+    var d = new Date(publicacion.fechaPublicacion);
+    d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+    publicacion.fechaPublicacion=d;
     publicacion.fecha=this.datePipe.transform(publicacion.fechaPublicacion,"MMMM y", "es");
     publicacion.fecha=this.titlecasePipe.transform(publicacion.fecha);
     publicacion.tipoPublicacion=this.tipoPublicaciones[this.tipoPublicaciones.findIndex(x => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion)].nombre;
@@ -255,7 +258,7 @@ export class HomeComponent implements OnInit {
     this._proyectohasusuarioService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res)=>{
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, proyecto);
+          this.getUsuario(res[index].usuario_DNI, proyecto, null);
         }
       }
     });
@@ -307,10 +310,16 @@ export class HomeComponent implements OnInit {
   /* Fill Proyecto */
 
   fillProyecto(proyecto, index){
+    var d = new Date(proyecto.fechaInicio);
+    d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+    proyecto.fechaInicio=d;
     proyecto.fechaI=this.datePipe.transform(proyecto.fechaInicio,"MMMM, y", "es");
     proyecto.fechaI=this.titlecasePipe.transform(proyecto.fechaI);
     proyecto.usuario=[];
     if(proyecto.fechaFin){
+      d = new Date(proyecto.fechaFin);
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+      proyecto.fechaFin=d;
       proyecto.fechaF=this.datePipe.transform(proyecto.fechaFin,"MMMM, y", "es");
       proyecto.fechaF=this.titlecasePipe.transform(proyecto.fechaF);
     }
@@ -358,8 +367,12 @@ export class HomeComponent implements OnInit {
         obj.nombreTipoNoticia=this.tiponoticias[j].nombre;
       }
     }
-    obj.fechaPublicacion=this.datePipe.transform(obj.fechaPublicacion,"MMMM dd, y", "es");
-    obj.fechaPublicacion=this.titlecasePipe.transform(obj.fechaPublicacion);
+    var d = new Date(obj.fechaPublicacion);
+    if(String(d)!='Invalid Date'){
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+      obj.fechaPublicacion=this.datePipe.transform(d,"MMMM dd, y", "es");
+      obj.fechaPublicacion=this.titlecasePipe.transform(obj.fechaPublicacion); 
+    }
     this.getUsuarioNoticia(obj);
   }
 
@@ -387,12 +400,15 @@ export class HomeComponent implements OnInit {
 
   /*  Get Normal */  
 
-  getUsuario(dni, obj){
+  getUsuario(dni, obj, isPrincipal){
     this._usuarioService.getUser(dni).subscribe((res)=>{
+      res[0].isPrincipal=isPrincipal;
       if(res){
         if(obj.usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
+          res[0].nombre=res[0].nombre.slice(0,1)+".";
           obj.usuario.push(res[0]);
         }
+        obj.usuario.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));
         this.fillName(obj);
       }
     });
@@ -406,9 +422,10 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  getAutor(idAutor, obj){
+  getAutor(idAutor, obj, isPrincipal){
     this._autorService.getAuthor(idAutor).subscribe((res)=>{
       if(obj!=undefined){
+        res[0].isPrincipal=isPrincipal;
         if(obj.autor.findIndex(x => x.idAutor === res[0].idAutor)==-1){
             obj.autor.push(res[0]);
         }
@@ -440,17 +457,18 @@ export class HomeComponent implements OnInit {
 
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
+      let first=obj.usuario[index].nombre.split(" ");
       if(obj.autor!=undefined){
         if(index==obj.usuario.length-1 && obj.autor.length===0){
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno;
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
         }else{
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno+",";
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
         }
       }else{
         if(index==obj.usuario.length-1){
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno;
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
         }else{
-          obj.usuario[index].nombreCompleto=obj.usuario[index].nombre+ " " +obj.usuario[index].apellidoPaterno+",";
+          obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
         }
       }
     }
@@ -477,13 +495,11 @@ export class HomeComponent implements OnInit {
   }
 
   publicationLink(value){
-    console.log(value);
   }
 
   /* Animation counter */
   steps
   counterFunc(endValue, durationMs, element) {
-    console.log()
     if (!this.steps) {
       this.steps = 12;
     }
@@ -541,6 +557,7 @@ export class HomeComponent implements OnInit {
   }
 
   detalleNoticia(noticia){
+    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(['/home/detail-news/'+noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
   }
@@ -555,8 +572,7 @@ export class HomeComponent implements OnInit {
   fbsharing(i){
     let title= String(this.publicaciones[i].titulo);
     this.meta.updateTag({ name: 'description', content: title });
-    let locationhref= "http://104.131.63.153/home";
-    console.log(this.meta.getTag("name='description'"));
+    let locationhref= "http://128.199.15.131/home";
     window.open(
       'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(locationhref), 
       'facebook-share-dialog', 

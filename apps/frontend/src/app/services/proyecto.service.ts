@@ -47,7 +47,7 @@ export class ProyectoService{
     if(this.languagelocal=="es"){
       return this.http.post(this.url+'proyecto/get-proyectolinea',body,{headers});
     }else{
-      return this.http.post(this.url+'proyecto/get-proyectolinea',body,{headers});
+      return this.http.post(this.url+'proyecto/get-proyectolinea-en',body,{headers});
     }
   }
 

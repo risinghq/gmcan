@@ -84,9 +84,13 @@ export class LoginComponent implements OnInit {
   change(){
     this.recoverValue=!this.recoverValue;
     this.error=null;
+    this.exito=null
   }
 
+  exito;
+
   recover(){
+    this.exito=null
     let user={
       correo:this.emailForm.controls.correo.value
     }  
@@ -94,6 +98,8 @@ export class LoginComponent implements OnInit {
       if(res){
         if(res.state==0){
           this.error="El correo no se encuentra registrado en la base de datos"
+        }else if(res.state==1){
+          this.exito="Correo enviado exitosamente"
         }
       }
       else{
@@ -102,7 +108,7 @@ export class LoginComponent implements OnInit {
     });
   }
   return(){
-    this._router.navigate([this.previouslink]);
+    this._router.navigate(['/home']);
   }
 
 }

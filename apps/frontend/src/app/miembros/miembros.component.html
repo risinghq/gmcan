@@ -1,7 +1,7 @@
 <div class="miembros-card">
     <div class="flex-news mb-16">
         <div class="search-news">
-            <input class="input-search-text" (keyup)="applyFilter($event)" placeholder="Buscar noticias por título, fecha de publicación, categoría, autor o estado.">
+            <input class="input-search-text" (keyup)="applyFilter($event)" placeholder="Buscar miembro por nombre, apellido, grado, cargo o correo.">
             <mat-icon class="icon-search-toolbar">search</mat-icon>
         </div>
         <div class="center btn-black" *ngIf="canAdd"  (click)="addMember()">

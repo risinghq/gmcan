@@ -7,6 +7,9 @@ export class PreviousPageService{
     language=JSON.parse(localStorage.getItem("language"));
     getPreviousPage(param){
         if(this.language.locale=="es"){
+            if( param &&param.includes("search")){
+                return 'Resultados de Búsqueda';
+            }
             switch (param) {
                 case "home/about-us/about":
                     return "¿Quiénes Somos?";
@@ -30,6 +33,9 @@ export class PreviousPageService{
                     return "Inicio";
             }
         }else{
+            if( param &&param.includes("search")){
+                return 'Search Results';
+            }
             switch (param) {
                 case "home/about-us/about":
                     return "Who are we?";

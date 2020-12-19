@@ -24,6 +24,7 @@ export class LandingComponent implements OnInit {
   prevButtonTrigger;
   language;
   public searchGlobalForm:FormGroup;
+  public searchGlobalForm2:FormGroup;
   constructor(
     public _route: ActivatedRoute,
     public _router: Router,
@@ -36,6 +37,9 @@ export class LandingComponent implements OnInit {
   ) {
     this.searchGlobalForm = this.fb.group({
       nombre: ['']
+    });
+    this.searchGlobalForm2 = this.fb.group({
+      nombre1: ['']
     });
     this.language = Languages[this.lanSelected];
     if(JSON.parse(localStorage.getItem("lanId"))){
@@ -91,7 +95,7 @@ export class LandingComponent implements OnInit {
   /* globalSearch */
 
   searchGlobal(value){
-    this._router.navigate(['/home/search/'+value]);
+    window.location.href='/home/search/'+value;
   }
 
   loginLink(){

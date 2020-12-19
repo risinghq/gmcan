@@ -265,7 +265,6 @@ export class LogHomeComponent implements OnInit {
     });
 
     this.dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
       if(result){
         this._commonService.setEndSession('1');
         this.logout();

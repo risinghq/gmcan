@@ -61,7 +61,9 @@ export class EventosComponent implements OnInit {
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.resumenes=res;
         for (let index = 0; index < this.resumenes.length; index++) {
-          this.resumenes[index].fecha=this.datePipe.transform(this.resumenes[index].fechaPublicacion,"MMMM, y", "es");
+          var d = new Date(this.resumenes[index].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.resumenes[index].fecha=this.datePipe.transform(d,"MMMM, y", "es");
           this.resumenes[index].fecha=this.titlecasePipe.transform(this.resumenes[index].fecha);
           this.resumenes[index].usuario=[];
           this.resumenes[index].autor=[];
@@ -87,7 +89,7 @@ export class EventosComponent implements OnInit {
   getArticlesUsers(publicacion){
     this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res)=>{
       if(res){
-        let indexPrincipal = res.findIndex(x => x.isPrincipal == 1);
+        let indexPrincipal = res.findIndex(x => x.isPrincipal == 0);
         if(indexPrincipal!=-1){
           this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
         }
@@ -107,7 +109,7 @@ export class EventosComponent implements OnInit {
   getArticlesAuthors(publicacion){
     this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res)=>{
       if(res){
-        let indexPrincipal = res.findIndex(x => x.isPrincipal == 1);
+        let indexPrincipal = res.findIndex(x => x.isPrincipal == 0);
         if(indexPrincipal!=-1){
           this.getAuthor(res[indexPrincipal].autores_idAutor, publicacion);
         }
