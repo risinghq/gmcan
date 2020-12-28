@@ -105,6 +105,9 @@ export class EditNewsComponent implements OnInit {
       this._noticiaService.getNoticiaFull(idNoticia).subscribe(result => {
         if(result){
           this.noticia=result;
+          var d = new Date(result.fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+          this.noticia.fechaPublicacion=d;
           this.noticia.fechaPublicacionDate=this.noticia.fechaPublicacion;
           sessionStorage.setItem('noticiaPublicada', JSON.stringify(this.noticia.estado));
           this.getCategorias();

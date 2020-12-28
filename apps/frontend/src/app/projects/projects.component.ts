@@ -105,6 +105,7 @@ export class ProjectsComponent implements OnInit {
       estado=1;
     }
     this.allCharged=null;
+    this.proyectos=[];
     this.getProyectos(estado);
   }
 
@@ -116,16 +117,16 @@ export class ProjectsComponent implements OnInit {
   getProyectos(estado){
     this._proyectoServices.getProyectos(estado).subscribe((res)=>{
       if(res.length>0){ 
-        res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
+        res.sort((a,b) => (a.fechaInicio < b.fechaInicio) ? 1 : ((b.fechaInicio < a.fechaInicio) ? -1 : 0));
         this.tipoProyectos=[];
         this.proyectos=res;
-        this.allCharged=true;
         this.tipoProyectos.push(this.language.projectsText[0].projectsType1);
         this.tipoProyectos.push(this.language.projectsText[0].projectsType2);
         for (let index = 0; index < this.proyectos.length; index++) {
           this.fillProyecto(this.proyectos[index], index);
         }
       }
+      this.allCharged=true;
     });
   }
 
@@ -196,9 +197,11 @@ export class ProjectsComponent implements OnInit {
   getUsuario(idUsuario, proyecto){
     this._usuarioService.getUser(idUsuario).subscribe((res)=>{
       if(res){
-        res[0].nombre=res[0].nombre.slice(0,1)+".";
-        proyecto.usuario.push(res[0]);
-        this.fillName(proyecto);
+        if(proyecto.usuario.findIndex(x => x.DNI === res[0].DNI)==-1){
+          res[0].nombre=res[0].nombre.slice(0,1)+".";
+          proyecto.usuario.push(res[0]);
+          this.fillName(proyecto);
+        }
       }
     });
   }
@@ -245,6 +248,7 @@ export class ProjectsComponent implements OnInit {
   getProyectoId(idProyecto, estado){
     this._proyectoServices.getProyectosId(idProyecto, estado).subscribe((res)=>{
       if(res.length>0){
+        res.sort((a,b) => (a.fechaInicio < b.fechaInicio) ? 1 : ((b.fechaInicio < a.fechaInicio) ? -1 : 0));
         if(this.proyectos){
           for (let index = 0; index < res.length; index++) {
             if(this.proyectos.findIndex(x => x.idProyecto === res[index].idProyecto)==-1){
@@ -281,7 +285,6 @@ export class ProjectsComponent implements OnInit {
     this._searchService.searchProyectos(nombre, estado).subscribe((res)=>{
       if(res.length>0){
         this.proyectos=res;
-        this.allCharged=true;
         for (let index = 0; index < this.proyectos.length; index++) {
           if(this.proyectos[index]!=undefined && this.proyectos[index].estado==estado){
             this.fillProyecto(this.proyectos[index],index);
@@ -307,6 +310,7 @@ export class ProjectsComponent implements OnInit {
 
   searchResponsables(nombre, estado){
     this._searchService.searchUsuarios(nombre).subscribe((res)=>{
+      this.allCharged=true;
       if(res.length>0){
         for (let index = 0; index < res.length; index++) {
           this.getUsuarioHasProyectoId(res[0].DNI, estado);

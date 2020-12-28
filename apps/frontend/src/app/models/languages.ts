@@ -180,7 +180,7 @@ export const Languages = [{
     publications:"Publications",
     publicationsminus:"Recent publications",
     seePublications:"More publications",
-    newsminus:"Last news",
+    newsminus:"Latest news",
     news:"News",
     seeNews:"More news",
     moreNews:"More News",

@@ -277,6 +277,7 @@ export class HomeComponent implements OnInit {
   getProyectos(){
     this._proyectoServices.getProyecto().subscribe((res)=>{
       if(res.length>0){
+        res.sort((a,b) => (a.fechaInicio < b.fechaInicio) ? 1 : ((b.fechaInicio < a.fechaInicio) ? -1 : 0));
         this.proyectos=res;
         this.progress=this.progress+this.augment;
         for (let index = 0; index < this.proyectos.length; index++) {
@@ -370,7 +371,7 @@ export class HomeComponent implements OnInit {
     var d = new Date(obj.fechaPublicacion);
     if(String(d)!='Invalid Date'){
       d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
-      obj.fechaPublicacion=this.datePipe.transform(d,"MMMM dd, y", "es");
+      obj.fechaPublicacion=this.datePipe.transform(d,"MMMM dd, y", 'es');
       obj.fechaPublicacion=this.titlecasePipe.transform(obj.fechaPublicacion); 
     }
     this.getUsuarioNoticia(obj);
@@ -489,6 +490,11 @@ export class HomeComponent implements OnInit {
   getUsuarios(){
     this._usuarioService.getUsuarios().subscribe((res)=>{
       this.progress=this.progress+this.augment;
+      for (let index = 0; index < res.length; index++) {
+        if(res[index].estado!=1){
+          res.splice(index,1)
+        }
+      }
       this.usuarios=res;
       this.startCounter();
     });

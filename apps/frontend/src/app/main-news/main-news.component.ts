@@ -67,16 +67,16 @@ export class MainNewsComponent implements OnInit {
         this.progress=this.progress+this.augment;
         res.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
         this.noticias=res;
-        for (let index = 0; index < this.tiponoticias.length; index++) {
-          let found = res.findIndex(x => x.tipoNoticia_idtipoNoticia === this.tiponoticias[index].idtipoNoticia);
-          if(found==-1){
-            this.tiponoticias.splice(index,1);
-          }
-        }
         for (let index = 0; index < this.noticias.length; index++) {
           if((this.noticias[index].tipoNoticia_idtipoNoticia != this.categorySelected && this.categorySelected !=-1) || this.noticias[index].estado==0){
             this.noticias.splice(index,1);
             index=-1;
+          }
+        }
+        for (let index = 0; index < this.tiponoticias.length; index++) {
+          let found = res.findIndex(x => x.tipoNoticia_idtipoNoticia === this.tiponoticias[index].idtipoNoticia);
+          if(found==-1){
+            this.tiponoticias.splice(index,1);
           }
         }
         for (let index = 0; index < this.noticias.length; index++) {

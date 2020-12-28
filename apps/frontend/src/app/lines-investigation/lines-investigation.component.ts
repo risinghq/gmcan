@@ -151,7 +151,7 @@ export class LinesInvestigationComponent implements OnInit {
   fillName(obj){
     for(let index = 0; index < obj.usuario.length; index++){
       let first=obj.usuario[index].nombre.split(" ");
-      if(index==obj.usuario.length-1 && obj.autor!=undefined && obj.autor.length===0){
+      if(index==obj.usuario.length-1){
         obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
       }else{
         obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";

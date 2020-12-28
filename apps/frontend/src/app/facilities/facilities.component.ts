@@ -52,6 +52,9 @@ export class FacilitiesComponent implements OnInit {
   getGrupo(){
     this._grupoService.getFacilidadesRecursos().subscribe((res)=>{
       this.grupo=res[0];
+      if(this.language.locale=="en"){
+        this.grupo.facilidadesRecursos=this.grupo.facilidadesRecursosEN;
+      }
     });
   }
 

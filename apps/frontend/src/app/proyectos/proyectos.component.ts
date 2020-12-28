@@ -72,7 +72,7 @@ export class ProyectosComponent implements OnInit {
   getProyectos(value){
     this._proyectoService.getProyectos(value).subscribe((res)=>{
       if(res){
-        res.sort((a,b) => (a.titulo < b.titulo) ? 1 : ((b.titulo < a.titulo) ? -1 : 0));
+        res.sort((a,b) => (a.fechaInicio < b.fechaInicio) ? 1 : ((b.fechaInicio < a.fechaInicio) ? -1 : 0));
         this.proyectos=res;
         this.dataSource = new MatTableDataSource(this.proyectos);
         this.dataSource.sort = this.sort;

@@ -120,6 +120,7 @@ export class GlobalSearchComponent implements OnInit {
   searchProyectos(nombre){
     this._searchService.searchProyectosGlobal(nombre).subscribe((res)=>{
       if(res){
+        res.sort((a,b) => (a.fechaInicio < b.fechaInicio) ? 1 : ((b.fechaInicio < a.fechaInicio) ? -1 : 0));
         this.proyectos=res;
         for (let index = 0; index < this.proyectos.length; index++) {
           this.fillProyecto(this.proyectos[index],index);

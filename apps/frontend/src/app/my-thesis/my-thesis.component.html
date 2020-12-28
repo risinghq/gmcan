@@ -1,7 +1,7 @@
 <div class="noticias-div">
     <div class="flex-news mb-16">
         <div class="search-news">
-          <input class="input-search-text" (keyup)="applyFilter($event)" placeholder="Buscar tesis por nombre">
+          <input class="input-search-text" (keyup)="applyFilter($event)" placeholder="Buscar tesis por título, universidad o fecha de publicación">
           <mat-icon class="icon-search-toolbar">search</mat-icon>
         </div>
         <div class="center btn-black" *ngIf="publicacionPermiso" (click)="addThesis()">

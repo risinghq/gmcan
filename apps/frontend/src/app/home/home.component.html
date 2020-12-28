@@ -19,9 +19,9 @@
             <span class="counter" id="tesis">{{tesis}}</span>
             <span class="counter-text">{{language.thesis}}</span>
         </div>
-        <div class="box" (click)="navigate('/home/publications')">
-            <span class="counter" id="resumenes">{{resumenes}}</span>
-            <span class="counter-text">{{language.resumenes}}</span>
+        <div class="box flex-news" (click)="navigate('/home/publications')">
+            <div class="counter ml-a" id="resumenes">{{resumenes}}</div>
+            <div class="counter-text auto">{{language.resumenes}}</div>
         </div>
     </div>
     <div class="center know-more" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
