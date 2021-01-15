@@ -23,6 +23,7 @@ import { MY_FORMATS } from '../edit-news/edit-news.component';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
@@ -70,12 +71,12 @@ export class EditResumenComponent implements OnInit {
     private _eventoService: EventoService,
   ) {
     this.publicacionForm = this.formBuilder.group({
-      título: ['', Validators.required],
-      fechaPublicacionDate: ['', Validators.required],
-      evento_idEvento: ['', Validators.required],
+      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacionDate: ['', [Validators.required]],
+      evento_idEvento: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       DOI: [''],
-      resumen: ['', Validators.required],
-      resumenEN: ['', Validators.required],
+      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: ['']
     });
     this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,3,'','',null,null,null,'',null,null,null,'','',null,'',null,'')

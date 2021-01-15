@@ -95,7 +95,9 @@ export class PerfilComponent implements OnInit {
         this.oldEmail=this.member.correo;
         this.oldPassword=this.member.password;
         this.memberForm.controls.confirmPassword.setValue(this.member.password);
-        this.member.fechaNacimientoDate=this.member.fechaNacimiento;
+        var d = new Date(this.member.fechaNacimiento);
+        d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+        this.member.fechaNacimientoDate=d;
         if(this.member.nombre.includes(' ')){
           let string = this.member.nombre.split(' ');
           this.member.nombre = string[0];

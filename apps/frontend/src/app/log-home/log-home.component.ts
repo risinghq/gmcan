@@ -67,7 +67,7 @@ export class LogHomeComponent implements OnInit {
     this.url=GLOBAL.url;
     this.user = new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
         // sets an idle timeout of 5 seconds, for testing purposes.
-        idle.setIdle(240);
+        idle.setIdle(841);
         // sets a timeout period of 5 seconds. after 10 seconds of inactivity, the user will be considered timed out.
         idle.setTimeout(59);
         // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
@@ -82,7 +82,7 @@ export class LogHomeComponent implements OnInit {
           this.timedOut = true;
           localStorage.setItem("sessionEnd", '1');
           this._commonService.setEndSession('1');
-          this.router.navigate(['/login']);
+          this.logout();
         });
         
         idle.onIdleStart.subscribe(() => {
@@ -138,7 +138,6 @@ export class LogHomeComponent implements OnInit {
 
   ngOnInit() {
     this.titleService.setTitle('GMCAN | Administrador');
-    this.getUser();
     this.getGrupoInfo();
   }
 
@@ -168,30 +167,33 @@ export class LogHomeComponent implements OnInit {
       this.grupoinfo=res[0];
       localStorage.setItem("grupoInfo",JSON.stringify(this.grupoinfo));
       this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
+      this.getUser();
     });
     this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
   }
 
   getUser(){
     let user = this._usuarioService.getUserLogged();
-    if(!user){
+    if(user==null){
+      localStorage.setItem("sessionEnd",'1');
       this.logout();
+    }else{
+      this._usuarioService.getFullUser(user.DNI).subscribe(result => {
+        if(result.length>0){
+          this.user=result[0];
+          if(this.user.apellidoMaterno){
+            this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno + " " + this.user.apellidoMaterno;
+          }else{
+            this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno;
+          }
+          if(this.user.nombre.includes(' ')){
+            let string = this.user.nombre.split(' ');
+            this.user.nombre= string[0];
+          }
+        }
+        this.getPermisoHasUsuario(this.user.DNI);
+      });
     }
-    this._usuarioService.getFullUser(user.DNI).subscribe(result => {
-      if(result.length>0){
-        this.user=result[0];
-        if(this.user.apellidoMaterno){
-          this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno + " " + this.user.apellidoMaterno;
-        }else{
-          this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno;
-        }
-        if(this.user.nombre.includes(' ')){
-          let string = this.user.nombre.split(' ');
-          this.user.nombre= string[0];
-        }
-      }
-      this.getPermisoHasUsuario(this.user.DNI);
-    });
   }
 
   getPermisoHasUsuario(DNI){

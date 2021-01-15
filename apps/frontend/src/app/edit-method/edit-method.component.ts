@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
 import { Languages } from '../models/languages';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-edit-method',
@@ -33,10 +34,10 @@ export class EditMethodComponent implements OnInit {
     private _methodService: MethodsService,
   ) {
     this.methodForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      nombreEN: ['', Validators.required],
-      descripcion: ['', Validators.required],
-      descripcionEN: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      nombreEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcion: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.metodo= new Method(null,'','','','','',1);
     this.url=GLOBAL.url;

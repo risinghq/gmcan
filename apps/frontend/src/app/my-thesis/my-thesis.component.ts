@@ -69,8 +69,10 @@ export class MyThesisComponent implements OnInit {
     this._publicacionService.getPublication(idPublicacion).subscribe((res)=>{
       if(res[0]){
         if(res[0].tipoPublicacion_idTipoPublicacion==2){
-          this.tesis.push(res[0]);          
-          this.tesis[this.tesis.length-1].fecha=this.datePipe.transform(this.tesis[this.tesis.length-1].fechaPublicacion,"MMMM, y", "es");
+          this.tesis.push(res[0]);
+          var d = new Date(this.tesis[this.tesis.length-1].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());        
+          this.tesis[this.tesis.length-1].fecha=this.datePipe.transform(d,"MMMM, y", "es");
           this.tesis[this.tesis.length-1].fecha=this.titlecasePipe.transform(this.tesis[this.tesis.length-1].fecha);
           this.tesis[this.tesis.length-1].usuario=[];
           this.tesis[this.tesis.length-1].autor=[];

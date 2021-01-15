@@ -12,7 +12,7 @@ export class SessionService {
         this._locale = value;
     }
     get locale(): string {
-        return this._locale || 'en-US';
+        return localStorage.getItem("locale") || 'es-Ar';
     }
 
     registerCulture(culture: string) {
@@ -23,12 +23,14 @@ export class SessionService {
 
         // Register locale data since only the en-US locale data comes with Angular
         switch (culture) {
-            case 'es-es': {
-                registerLocaleData(localeSpanish);
+            case 'es-Ar': {
+                localStorage.setItem("locale",'es-Ar');
+                registerLocaleData("es-Ar");
                 break;
             }
-            case 'en-en': {
-                registerLocaleData(localeEnglish);
+            case 'en-US': {
+                localStorage.setItem("locale",'en-US');
+                registerLocaleData("en-US");
                 break;
             }
         }

@@ -8,6 +8,7 @@ import { CommonService } from '../services/common.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-add-universidad',
@@ -32,8 +33,8 @@ export class AddUniversidadComponent implements OnInit {
   ) {
     this.universidad=new Universidad(null,'','',null,null);
     this.universidadForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      nombreEN: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      nombreEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 

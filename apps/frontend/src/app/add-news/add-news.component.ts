@@ -24,6 +24,7 @@ import { Languages } from '../models/languages';
 import { TitleCasePipe } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { CommonService } from '../services/common.service';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -76,12 +77,12 @@ export class AddNewsComponent implements OnInit {
     private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
-      titulo: ['', Validators.required],
-      tituloEN: ['', Validators.required],
-      resumen: ['', Validators.required],
-      resumenEN: ['', Validators.required],
-      cuerpo: ['', Validators.required],
-      cuerpoEN: ['', Validators.required],
+      titulo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      tituloEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      cuerpo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      cuerpoEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaPublicacion: ['', Validators.required],
       autorPublicacion: [null,Validators.required],
       tipoNoticia_idtipoNoticia: ['',Validators.required],
@@ -165,7 +166,9 @@ export class AddNewsComponent implements OnInit {
   previewNews(value){
     let indexCat = this.categorias.findIndex(x => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia);
     let indexAut = this.autores.findIndex(x => x.DNI == this.noticia.autorPublicacion);
-    const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
+    var d = new Date(this.noticia.fechaPublicacionDate);
+    d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+    const momentDate = d; // Replace event.value with your date value
     const formattedDate = moment(momentDate).format("YYYY-MM-DD");
     this.noticia.fechaPublicacion=formattedDate;
     let noticiaPreview={

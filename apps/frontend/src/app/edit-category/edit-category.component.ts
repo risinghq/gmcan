@@ -10,6 +10,7 @@ import { NoticiaService } from '../services/noticia.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { map } from 'rxjs/operators';
 import { CommonService } from '../services/common.service';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-edit-category',
@@ -36,8 +37,8 @@ export class EditCategoryComponent implements OnInit {
     private _commonService: CommonService,
   ) {
     this.categoryForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      nombreEN: ['', Validators.required]
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      nombreEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.category = new TipoNoticia(null,"","");
   }

@@ -26,6 +26,7 @@ import { TitleCasePipe } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { stringify } from 'querystring';
 import { CommonService } from '../services/common.service';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -75,15 +76,15 @@ export class EditNewsComponent implements OnInit {
     private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
-      titulo: ['', Validators.required],
-      tituloEN: ['', Validators.required],
-      resumen: ['', Validators.required],
-      resumenEN: ['', Validators.required],
-      cuerpo: ['', Validators.required],
-      cuerpoEN: ['', Validators.required],
-      fechaPublicacion: ['', Validators.required],
-      autorPublicacion: [null,Validators.required],
-      tipoNoticia_idtipoNoticia: ['',Validators.required],
+      titulo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      tituloEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      cuerpo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      cuerpoEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacion: ['', [Validators.required]],
+      autorPublicacion: [null, [Validators.required]],
+      tipoNoticia_idtipoNoticia: ['', [Validators.required]],
     });
     this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'','',null);
     this.url=GLOBAL.url;
@@ -105,8 +106,9 @@ export class EditNewsComponent implements OnInit {
       this._noticiaService.getNoticiaFull(idNoticia).subscribe(result => {
         if(result){
           this.noticia=result;
+          this.newsForm.controls.cuerpo.setValue(this.noticia.cuerpo);
           var d = new Date(result.fechaPublicacion);
-          d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
           this.noticia.fechaPublicacion=d;
           this.noticia.fechaPublicacionDate=this.noticia.fechaPublicacion;
           sessionStorage.setItem('noticiaPublicada', JSON.stringify(this.noticia.estado));
@@ -170,7 +172,6 @@ export class EditNewsComponent implements OnInit {
 
   publish(value){
     if (value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
-
       this.publishMethod(value);
     }else if(value==0){
       this.publishMethod(value)
@@ -178,7 +179,6 @@ export class EditNewsComponent implements OnInit {
   }
 
   publishMethod(value){
-    let publicationStatus=this.noticia.estado;
     this.noticia.estado=value;
     if (this.noticia.fechaPublicacionDate) {
       const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
@@ -200,10 +200,10 @@ export class EditNewsComponent implements OnInit {
           this.eliminar=true;
           this.agregar=true;
           this.return();
-          if(publicationStatus==0){
+          if(value==1){
             this.openSnackBar("Noticia publicada exitosamente");
           }else{
-            this.openSnackBar("Noticia actualizada exitosamente");
+            this.openSnackBar("Noticia guardada exitosamente");
           }
         }
       });
@@ -214,9 +214,6 @@ export class EditNewsComponent implements OnInit {
   previewNews(value){
     let indexCat = this.categorias.findIndex(x => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia);
     let indexAut = this.autores.findIndex(x => x.DNI == this.noticia.autorPublicacion);
-    const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
-    const formattedDate = moment(momentDate).format("YYYY-MM-DD");
-    this.noticia.fechaPublicacion=formattedDate;
     let noticiaPreview={
       language:value,
       titulo:null,
@@ -264,7 +261,7 @@ export class EditNewsComponent implements OnInit {
       data: noticiaPreview
     });
 
-    this.dialogRef.afterClosed().subscribe(result => {
+    this.previewDialog.afterClosed().subscribe(result => {
       if(!result){        
       }
     });

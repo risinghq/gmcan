@@ -371,7 +371,9 @@ export class GlobalSearchComponent implements OnInit {
   fillPublicacion(publicacion){
     publicacion.usuario=[];
     publicacion.autor=[];
-    publicacion.fecha=this.datePipe.transform(publicacion.fechaPublicacion,"MMMM y", "es");
+    var d = new Date(publicacion.fechaPublicacion);
+    d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+    publicacion.fecha=this.datePipe.transform(d,"MMMM y", "es");
     publicacion.fecha=this.titlecasePipe.transform(publicacion.fecha);
     publicacion.tipoPublicacion=this.tipoPublicaciones[this.tipoPublicaciones.findIndex(x => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion)].nombre;
     this.getPublicacionHasAutor(publicacion);

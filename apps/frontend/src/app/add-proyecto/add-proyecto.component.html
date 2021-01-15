@@ -39,7 +39,7 @@
                             Línea de investigación <span class="red-text">*</span>
                         </div>
                         <mat-form-field class="input-category" floatLabel="never">
-                            <mat-placeholder class="placeholder mt--7">Seleccionar revista</mat-placeholder>
+                            <mat-placeholder class="placeholder mt--7">Seleccionar línea</mat-placeholder>
                             <mat-select [(ngModel)]="proyecto.lineasInvestigacion_idLineasInvestigacion" formControlName="lineasInvestigacion_idLineasInvestigacion" name="lineasInvestigacion_idLineasInvestigacion">
                                 <mat-option [value]="lineaInvestigacion.idLineasInvestigacion" *ngFor="let lineaInvestigacion of lineasInvestigacion">{{lineaInvestigacion.nombre}}</mat-option>
                             </mat-select>
@@ -129,14 +129,14 @@
                             <mat-datepicker #dp></mat-datepicker>
                         </mat-form-field>
                     </div>
-                    <div class="width-479 mr-26" *ngIf="proyecto.fechaFin">
+                    <div class="width-479 mr-26" *ngIf="edit">
                         <div class="text-category">
                             Fecha de fin <span class="red-text">*</span>
                         </div>
                         <mat-form-field class="input-category" floatLabel="never">
                             <mat-placeholder class="placeholder mt--7">Seleccionar fecha de fin</mat-placeholder>
                             <input matInput [(ngModel)]="proyecto.fechaFin" [matDatepicker]="dp2"
-                            formControlName="fechaFin" name="fechaFin">
+                            formControlName="fechaFin" name="fechaFin"> 
                             <mat-datepicker-toggle matSuffix [for]="dp2"></mat-datepicker-toggle>
                             <mat-datepicker #dp2></mat-datepicker>
                         </mat-form-field>
@@ -144,13 +144,13 @@
                 </div>
             </form>
             <div class="flex-news">
-                <div class="red-btn" *ngIf="edit">
+                <div class="red-btn" *ngIf="!edit">
                     <div class="link link-set link-red" (click)="openEraser()">
                       Eliminar proyecto
                     </div>
                 </div>
                 <div class="right pd-8 mr-16">
-                    <div class="link link-set" (click)="projectEnd()" *ngIf="edit">
+                    <div class="link link-set" (click)="projectEnd()" *ngIf="!edit">
                         {{button_text2}}
                     </div>
                 </div>

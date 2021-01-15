@@ -9,6 +9,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommonService } from '../services/common.service';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-add-category',
@@ -31,8 +32,8 @@ export class AddCategoryComponent implements OnInit {
     private _commonService: CommonService,
   ) {
     this.categoryForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      nombreEN: ['', Validators.required]
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      nombreEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]]
     });
     this.category = new TipoNoticia(null,"","");
   }

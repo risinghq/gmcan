@@ -8,6 +8,7 @@ import { RevistaService } from '../services/revista.service';
 import { DialogData } from '../models/dialogdata';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-add-revista',
@@ -31,7 +32,7 @@ export class AddRevistaComponent implements OnInit {
   ) {
     this.revista=new Revista(null,'');
     this.revistaForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 

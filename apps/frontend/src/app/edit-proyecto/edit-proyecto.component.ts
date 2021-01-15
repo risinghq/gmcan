@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatSnackBar, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { CommonService } from '../services/common.service';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Usuario } from '../models/usuario';
 import { UsuarioService } from '../services/usuario.service';
@@ -23,6 +23,7 @@ import { Moneda } from '../models/moneda';
 import { ProyectoService } from '../services/proyecto.service';
 import { UsuarioHasProyectoService } from '../services/usuariohasproyecto';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -71,20 +72,44 @@ export class EditProyectoComponent implements OnInit {
     public dialog: MatDialog,
   ) {
     this.proyectoForm = this.formBuilder.group({
-      título: ['', Validators.required],
-      títuloEN: ['', Validators.required],
-      codigo: ['', Validators.required],
-      fechaInicio: ['', Validators.required],
-      lineasInvestigacion_idLineasInvestigacion: ['', Validators.required],
-      fuenteFinanciamiento_idFuenteFinanciamiento:['', Validators.required],
-      moneda_idMoneda:['', Validators.required],
-      descripcion: ['', Validators.required],
-      descripcionEN: ['', Validators.required],
-      montoFinanciado: ['', Validators.required],
+      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      títuloEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      codigo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaInicio: ['', [Validators.required]],
+      lineasInvestigacion_idLineasInvestigacion: ['', [Validators.required]],
+      fuenteFinanciamiento_idFuenteFinanciamiento:['', [Validators.required]],
+      moneda_idMoneda:['', [Validators.required]],
+      descripcion: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      montoFinanciado: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaFin: ['']
     });
     this.proyecto = new Proyecto(null,'','','','','','','',1,null,null,'','',null,'',null,null,null,null,'',null,null);
     this.url=GLOBAL.url;
+    this.proyectoForm.valueChanges.subscribe(() => {
+      if (this.proyectoForm.get('fechaInicio').hasError('lessThan')) {
+        this.field2HasError = true;
+      } else {
+        this.field2HasError = false;
+      }
+    });
+  }
+  field2HasError: boolean;
+
+  greaterThan(field: string): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} => {
+      const group = control.parent;
+      const fieldToCompare = group.get(field);
+      var d = new Date(fieldToCompare.value);
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+      var e = new Date(control.value);
+      e.setMinutes( e.getMinutes() + e.getTimezoneOffset());
+      var isLessThan
+      if(e){
+        isLessThan = d > e;
+      }
+      return isLessThan ? {'lessThan': {value: control.value}} : null;
+    }
   }
 
   ngOnInit() {
@@ -108,8 +133,18 @@ export class EditProyectoComponent implements OnInit {
       this._proyectoService.getProject(idProyecto).subscribe(result => {
         if(result){
           this.proyecto=result[0];
+          var d = new Date(this.proyecto.fechaInicio);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.proyecto.fechaInicio=d;
           localStorage.setItem("proyectoEdit",JSON.stringify(this.proyecto.titulo));
+          if (!this.proyecto.fechaFin) {
+            this.edit=false;
+          }
           if(this.proyecto.estado==0){
+            this.proyectoForm.get('fechaFin').setValidators(this.greaterThan('fechaInicio'));
+            d = new Date(this.proyecto.fechaFin);
+            d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+            this.proyecto.fechaFin=d;
             this.proyectoForm.disable();
             this.proyectoForm.controls.fechaFin.enable();
             this.disableSelect=true;
@@ -264,6 +299,11 @@ export class EditProyectoComponent implements OnInit {
       const momentDate = new Date(this.proyecto.fechaInicio);
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
       this.proyecto.fechaI=formattedDate;
+      if(this.proyecto.fechaFin){
+        const momentDate1 = new Date(this.proyecto.fechaFin);
+        const formattedDate1 = moment(momentDate1).format("YYYY-MM-DD");
+        this.proyecto.fechaF=formattedDate1;
+      }
       this._proyectoService.updateProyecto(this.proyecto).subscribe(result => {
         if(result.status==1){
           this._usuariohasproyecto.deleteUsuarioProyecto(this.proyecto.idProyecto).subscribe(result => {

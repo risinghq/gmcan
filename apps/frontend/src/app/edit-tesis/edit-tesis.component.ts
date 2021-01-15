@@ -23,6 +23,7 @@ import { Usuario } from '../models/usuario';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -69,12 +70,12 @@ export class EditTesisComponent implements OnInit {
     private _tipotesisService: TipoTesisService,
   ) {
     this.publicacionForm = this.formBuilder.group({
-      título: ['', Validators.required],
-      fechaPublicacionDate: ['', Validators.required],
-      universidad_idUniversidad: ['', Validators.required],
-      tipoTesis_idTipoTesis:['', Validators.required],
-      resumen: ['', Validators.required],
-      resumenEN: ['', Validators.required],
+      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacionDate: ['', [Validators.required]],
+      universidad_idUniversidad: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      tipoTesis_idTipoTesis:['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,2,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
     this.url=GLOBAL.url;

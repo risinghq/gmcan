@@ -70,13 +70,14 @@ export class MainNewsComponent implements OnInit {
         for (let index = 0; index < this.noticias.length; index++) {
           if((this.noticias[index].tipoNoticia_idtipoNoticia != this.categorySelected && this.categorySelected !=-1) || this.noticias[index].estado==0){
             this.noticias.splice(index,1);
-            index=-1;
+            index--;
           }
         }
         for (let index = 0; index < this.tiponoticias.length; index++) {
           let found = res.findIndex(x => x.tipoNoticia_idtipoNoticia === this.tiponoticias[index].idtipoNoticia);
           if(found==-1){
             this.tiponoticias.splice(index,1);
+            index--;
           }
         }
         for (let index = 0; index < this.noticias.length; index++) {
@@ -85,7 +86,9 @@ export class MainNewsComponent implements OnInit {
               this.noticias[index].nombreTipoNoticia=this.tiponoticias[j].nombre;
             }
           }
-          this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMMM dd, y", "es");
+          var d = new Date(this.noticias[index].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.noticias[index].fechaPublicacion=this.datePipe.transform(d,"MMMM dd, y", "es");
           this.noticias[index].fechaPublicacion=this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
           this.getUsuario(this.noticias[index].autorPublicacion, index)
           this.progress=this.progress+this.augment/this.noticias.length;

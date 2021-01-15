@@ -95,8 +95,12 @@ export class LinesInvestigationComponent implements OnInit {
   }
 
   fillProyecto(proyecto){
-    proyecto.fechaI=this.datePipe.transform(proyecto.fechaInicio,"MMMM, y", "es");
-    proyecto.fechaI=this.titlecasePipe.transform(proyecto.fechaI);
+    var d = new Date(proyecto.fechaInicio);
+    if(String(d)!='Invalid Date'){
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+      proyecto.fechaI=this.datePipe.transform(d,"MMMM, y", "es");
+      proyecto.fechaI=this.titlecasePipe.transform(proyecto.fechaI);
+    }
     for (let index = 0; index < this.lineasProyecto.length; index++) {
       if(proyecto.lineasInvestigacion_idLineasInvestigacion===this.lineasProyecto[index].idLineasInvestigacion){
         proyecto.lineasInvestigacion=this.lineasProyecto[index].nombre;
@@ -104,8 +108,12 @@ export class LinesInvestigationComponent implements OnInit {
     }
     proyecto.usuario=[];
     if(proyecto.fechaFin){
-      proyecto.fechaF=this.datePipe.transform(proyecto.fechaFin,"MMMM, y", "es");
-      proyecto.fechaF=this.titlecasePipe.transform(proyecto.fechaF);
+      d = new Date(proyecto.fechaFin);
+      if(String(d)!='Invalid Date'){
+        d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+        proyecto.fechaF=this.datePipe.transform(d,"MMMM, y", "es");
+        proyecto.fechaF=this.titlecasePipe.transform(proyecto.fechaF);
+      }
     }
     this.getUsuarioHasProyecto(proyecto);
     this.getFuenteFinanciamiento(proyecto)

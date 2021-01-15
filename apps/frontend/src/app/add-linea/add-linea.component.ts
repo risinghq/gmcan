@@ -9,6 +9,7 @@ import { LineasInvestigacionService } from '../services/lineasinvestigacion.serv
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-add-linea',
@@ -36,10 +37,10 @@ export class AddLineaComponent implements OnInit {
     private _lineaInvestigacionService: LineasInvestigacionService,
   ) {
     this.lineaForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      nombreEN: ['', Validators.required],
-      descripcion: ['', Validators.required],
-      descripcionEN: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      nombreEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcion: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.lineaInvestigacion= new lineasInvestigacion(null,'','',null,'','',1,null,null,null,null);
     this.url=GLOBAL.url;

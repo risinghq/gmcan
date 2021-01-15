@@ -83,7 +83,9 @@ export class NewsComponent implements OnInit {
               this.noticias[index].nombreTipoNoticia=this.tiponoticias[j].nombre;
             }
           }
-          this.noticias[index].fechaPublicacion=this.datePipe.transform(this.noticias[index].fechaPublicacion,"MMMM dd, y", "es");
+          var d = new Date(this.noticias[index].fechaPublicacion);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.noticias[index].fechaPublicacion=this.datePipe.transform(d,"MMMM dd, y", "es");
           this.noticias[index].fechaPublicacion=this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
           this.getUsuario(this.noticias[index].autorPublicacion, index);
         }

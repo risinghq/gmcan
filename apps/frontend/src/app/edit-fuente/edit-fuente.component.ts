@@ -9,6 +9,7 @@ import { ProyectoService } from '../services/proyecto.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-edit-fuente',
@@ -34,7 +35,7 @@ export class EditFuenteComponent implements OnInit {
   ) {
     this.fuente=new FuenteFinanciamiento(null,'');
     this.fuenteForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 

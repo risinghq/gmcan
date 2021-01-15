@@ -8,6 +8,7 @@ import { CommonService } from '../services/common.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-add-software',
@@ -34,9 +35,9 @@ export class AddSoftwareComponent implements OnInit {
   ) {
     this.software=new Software(null,'','','','',1,null,null);
     this.softwareForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      descripcion: ['', Validators.required],
-      descripcionEN: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcion: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       moreInfo: ['']
     });
   }

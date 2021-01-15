@@ -341,8 +341,10 @@ export class HomeComponent implements OnInit {
         for (let index = 0; index < this.noticias.length; index++) {
           if(this.noticias[index].estado==0){
             this.noticias.splice(index,1);
+            index--;
           }          
         }
+        console.log(this.noticias)
         for (let index = 0; index < this.noticias.length; index++) {
           this.fillNoticia(this.noticias[index]);
         }
@@ -493,6 +495,7 @@ export class HomeComponent implements OnInit {
       for (let index = 0; index < res.length; index++) {
         if(res[index].estado!=1){
           res.splice(index,1)
+          index--;
         }
       }
       this.usuarios=res;

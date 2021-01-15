@@ -28,6 +28,16 @@ export class AuthService {
   }
 
   logout() {
+    let language=JSON.parse(localStorage.getItem("language"));
+    let sessionEnd; 
+    if(JSON.parse(localStorage.getItem("sessionEnd"))=='1'){
+      sessionEnd=1
+    }
+    localStorage.clear();
+    localStorage.setItem("language", JSON.stringify(language));
+    if(sessionEnd==1){
+      localStorage.setItem("sessionEnd", '1');
+    }
     return this.http.post<any>(`${config.apiUrl}/usuario/logout`, {
       'refreshToken': this.getRefreshToken()
     }).pipe(

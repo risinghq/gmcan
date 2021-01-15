@@ -23,6 +23,7 @@ import { EventoService } from '../services/evento.service';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -69,12 +70,12 @@ export class AddResumenComponent implements OnInit {
     private _eventoService: EventoService,
   ) {
     this.publicacionForm = this.formBuilder.group({
-      título: ['', Validators.required],
-      fechaPublicacionDate: ['', Validators.required],
-      evento_idEvento: ['', Validators.required],
+      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacionDate: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      evento_idEvento: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       DOI: [''],
-      resumen: ['', Validators.required],
-      resumenEN: ['', Validators.required],
+      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: ['']
     });
     this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,3,'','',null,null,null,'',null,null,null,'','',null,'',null,'')

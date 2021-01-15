@@ -141,6 +141,7 @@ import { AddSoftwareGuard } from './guards/addsoftware.guard';
 import { EditSoftwareComponent, DialogCancel29, DialogErase14 } from './edit-software/edit-software.component';
 import { EditSoftwareGuard } from './guards/editsoftware.guard';
 import { ChartsModule, MDBBootstrapModule, WavesModule } from 'angular-bootstrap-md';
+import { SessionService } from './services/session.service';
 
     // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
@@ -277,7 +278,9 @@ registerLocaleData(localeEsAr, 'es-Ar');
     DialogErase5, DialogCancel11, DialogCancel12, DialogCancel13, DialogErase6, DialogCancel14, DialogCancel15, DialogErase7, DialogCancel16, DialogErase8, DialogCancel17, DialogCancel18, DialogCancel19, DialogErase9,
     DialogCancel20,DialogCancel21, DialogErase10, DialogPreview3,DialogCancel22, DialogErase11, DialogCancel23, DialogCancel24, DialogCancel25, DialogErase12, DialogPreview4, DialogPreview5, DialogCancel26, DialogCancel27,
     DialogErase13,DialogCancel28, DialogCancel29, DialogErase14, DialogPreview6],
-  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID, useValue: "es-Ar"}, AuthGuard, Meta,
+  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID,
+    deps: [SessionService],
+    useFactory: (sessionService) => sessionService.locale}, AuthGuard, Meta,
   DeactivateGuard, 
   AddMemberGuard, EditMemberGuard, EditCategoryGuard, AddNewsGuard,
   EditNewsGuard, AddRevistaGuard, AddUniversidadGuard, AddEventoGuard,

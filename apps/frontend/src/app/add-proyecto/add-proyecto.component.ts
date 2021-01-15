@@ -24,6 +24,7 @@ import { Moneda } from '../models/moneda';
 import { ProyectoService } from '../services/proyecto.service';
 import { UsuarioHasProyectoService } from '../services/usuariohasproyecto';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -57,7 +58,6 @@ export class AddProyectoComponent implements OnInit {
   disableSelect;
   openEraser(){}
   projectEnd(){}
-  edit;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -74,16 +74,16 @@ export class AddProyectoComponent implements OnInit {
     public dialog: MatDialog,
   ) {
     this.proyectoForm = this.formBuilder.group({
-      título: ['', Validators.required],
-      títuloEN: ['', Validators.required],
-      codigo: ['', Validators.required],
-      fechaInicio: ['', Validators.required],
-      lineasInvestigacion_idLineasInvestigacion: ['', Validators.required],
-      fuenteFinanciamiento_idFuenteFinanciamiento:['', Validators.required],
-      moneda_idMoneda:['', Validators.required],
-      descripcion: ['', Validators.required],
-      descripcionEN: ['', Validators.required],
-      montoFinanciado: ['', Validators.required],
+      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      títuloEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      codigo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaInicio: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      lineasInvestigacion_idLineasInvestigacion: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fuenteFinanciamiento_idFuenteFinanciamiento:['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      moneda_idMoneda:['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcion: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      montoFinanciado: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaFin: ['']
     });
     this.proyecto = new Proyecto(null,'','','','','','','',1,null,null,'',null,null,'',null,null,null,null,'',null,null);

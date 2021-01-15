@@ -63,6 +63,7 @@ export class AppComponent {
   }
 
   ngOnInit(){
+    console.log(this.session.locale)
     this.getGrupoInfo();
     localStorage.setItem("language", JSON.stringify(this.language));
     this.verifyLocale(JSON.parse(localStorage.getItem("language")));
@@ -79,11 +80,12 @@ export class AppComponent {
   }
 
   english() {
-    this.session.registerCulture('en-en');
+    console.log("hola");
+    this.session.registerCulture('en-US');
   }
 
   spanish() {
-    this.session.registerCulture('es-es');
+    this.session.registerCulture('es-Ar');
   }
 
   lanSelect(number){

@@ -84,7 +84,9 @@ export class DetailNewsComponent implements OnInit {
       let idNoticia = params['id'];
       this._noticiaService.getNoticia(idNoticia).subscribe((res)=>{
         this.noticia=res[0];
-        this.noticia.fechaPublicacion=this.datePipe.transform(this.noticia.fechaPublicacion,"MM/dd/y", "es");;  
+        var d = new Date(this.noticia.fechaPublicacion);
+        d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+        this.noticia.fechaPublicacion=this.datePipe.transform(d,"MM/dd/y", "es");;  
         this.datere=new Date(String(this.noticia.fechaPublicacion));
         this.dia=this.datePipe.transform(this.datere,'dd');
         this.mes=this.datePipe.transform(this.datere,'MMMM');

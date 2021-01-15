@@ -25,6 +25,7 @@ import * as _moment from 'moment';
 import {default as _rollupMoment} from 'moment';
 import moment from 'moment';
 import { GLOBAL } from '../services/global';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-edit-member',
@@ -71,18 +72,18 @@ export class EditMemberComponent implements OnInit {
     public _noticiaService: NoticiaService,
   ) {
     this.memberForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       segundoNombre: [''],
-      apellidoPaterno: ['', Validators.required],
+      apellidoPaterno: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       apellidoMaterno: [''],
       fechaNacimiento: [''],
-      correo: ['', Validators.required],
+      correo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       genero_idGenero: [''],
       prefijo_idPrefijo: [''],
-      tipoMiembro_idTipoMiembro: ['', Validators.required],
-      DNI: ['', Validators.required],
-      password: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
+      tipoMiembro_idTipoMiembro: ['', [Validators.required]],
+      DNI: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      password: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      confirmPassword: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       resumenPro: [''],
       resumenProEN: [''],
     });
@@ -115,7 +116,9 @@ export class EditMemberComponent implements OnInit {
           this.oldEmail=this.member.correo;
           this.oldPassword=this.member.password;
           this.memberForm.controls.confirmPassword.setValue(this.member.password);
-          this.member.fechaNacimientoDate=this.member.fechaNacimiento;
+          var d = new Date(this.member.fechaNacimiento);
+          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+          this.member.fechaNacimientoDate=d;
           if(this.member.apellidoMaterno){
             this.member.nombreCompleto=this.member.nombre+ " " +this.member.apellidoPaterno + " " + this.member.apellidoMaterno;
           }else{

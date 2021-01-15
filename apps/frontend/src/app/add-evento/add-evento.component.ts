@@ -8,6 +8,7 @@ import { CommonService } from '../services/common.service';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-add-evento',
@@ -31,11 +32,11 @@ export class AddEventoComponent implements OnInit {
   ) {
     this.evento=new Evento(null,'','','','','');
     this.eventoForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
-      pais: ['', Validators.required],
-      paisEN: ['', Validators.required],
-      ciudad: ['', Validators.required],
-      ciudadEN: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      pais: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      paisEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      ciudad: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      ciudadEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 

@@ -8,6 +8,7 @@ import { EquipoService } from '../services/equipo.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
+import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
   selector: 'app-edit-equipo',
@@ -32,7 +33,7 @@ export class EditEquipoComponent implements OnInit {
   ) {
     this.equipo=new Equipo(null,'','','','','',1,null,null);
     this.equipoForm = this.formBuilder.group({
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       cpu: [''],
       gpu: [''],
       ram: [''],

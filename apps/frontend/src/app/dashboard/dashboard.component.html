@@ -69,7 +69,7 @@
             Gestionar perfil
           </div>
           <div class="item-subtitle">
-            Puedes actualizar tu información personal y agregar publicaciones.
+            Puedes actualizar tu información personal.
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@
           </div>
         </div>
       </div>
-      <div class="flex-news" *ngIf="permisos.analiticaPermiso">
+      <div class="flex-news item" *ngIf="permisos.analiticaPermiso" style="padding-top: 0px;">
         <div class="center btn-black mr-8">
           <a class="link" href="https://analytics.google.com/analytics/web/?authuser=2#/a181640955p250909666/admin" target="_blank" routerLinkActive="active">
             Google Analytics
@@ -95,6 +95,12 @@
             Hotjar
           </a>
         </div>
+      </div>
+      <div class="flex-news item last-item">
+        <img class="mr-16" src="../../assets/img/book.svg">
+        <a class="item-title" style="margin-top: auto; margin-bottom: auto;" href="{{this.url+'grupo/get-manual'}}" target="_blank">
+          Ver manual de usuario
+        </a>
       </div>
     </div>
     <div class="ml-16" style="width: max-content;">

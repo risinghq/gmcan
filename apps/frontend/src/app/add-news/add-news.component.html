@@ -133,7 +133,7 @@
                         {{button_text2}}
                     </div>
                 </div>
-                <div [ngClass]="{'btn-grey':!newsForm.valid && (!noticia.foto || !previewUrl),'black-btn':newsForm.valid && (noticia.foto || fileData.name)} ">
+                <div [ngClass]="{'black-btn':newsForm.valid && (noticia.foto || fileData!=null || previewUrl), 'btn-grey':!(newsForm.valid && (noticia.foto || fileData!=null || previewUrl))} ">
                     <div class="link link-set" (click)="submitNews(1)">
                       {{button_text}}
                     </div>

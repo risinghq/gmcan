@@ -70,7 +70,9 @@ export class MyResumenesComponent implements OnInit {
           this.articulos.push(res[0]);
           this.articulos.sort((a,b) => (a.fechaPublicacion < b.fechaPublicacion) ? 1 : ((b.fechaPublicacion < a.fechaPublicacion) ? -1 : 0));
           for (let index = 0; index < this.articulos.length; index++) {
-            this.articulos[index].fecha=this.datePipe.transform(this.articulos[index].fechaPublicacion,"MMMM, y", "es");
+            var d = new Date(this.articulos[index].fechaPublicacion);
+            d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+            this.articulos[index].fecha=this.datePipe.transform(d,"MMMM, y", "es");
             this.articulos[index].fecha=this.titlecasePipe.transform(this.articulos[index].fecha);
             this.articulos[index].usuario=[];
             this.articulos[index].autor=[];

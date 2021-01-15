@@ -22,6 +22,7 @@ import { GLOBAL } from '../services/global';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment} from 'moment';
+import { SpaceValidator } from '../services/spacevalidator';
 
 const moment = _rollupMoment || _moment;
 
@@ -68,13 +69,13 @@ export class AddArticleComponent implements OnInit {
     private _revistaService: RevistaService,
   ) {
     this.publicacionForm = this.formBuilder.group({
-      título: ['', Validators.required],
-      fechaPublicacionDate: ['', Validators.required],
-      revista_idRevista: ['', Validators.required],
-      nroRevista: ['', Validators.required],
-      DOI: ['', Validators.required],
-      resumen: ['', Validators.required],
-      resumenEN: ['', Validators.required],
+      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacionDate: ['', [Validators.required]],
+      revista_idRevista: ['', [Validators.required]],
+      nroRevista: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      DOI: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: ['']
     });
     this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,1,'','',null,null,null,'',null,null,null,'','',null,'',null,'')

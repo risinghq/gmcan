@@ -155,10 +155,14 @@ export class ProjectsComponent implements OnInit {
   /* Fill proyecto data */
 
   fillProyecto(proyecto, index){
-    proyecto.fechaI=this.datePipe.transform(proyecto.fechaInicio,"MMMM, y", "es");
+    var d = new Date(proyecto.fechaInicio);
+    d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
+    proyecto.fechaI=this.datePipe.transform(d,"MMMM, y", "es");
     proyecto.fechaI=this.titlecasePipe.transform(proyecto.fechaI);
     proyecto.usuario=[];
     if(proyecto.fechaFin){
+      d = new Date(proyecto.fechaFin);
+      d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
       proyecto.fechaF=this.datePipe.transform(proyecto.fechaFin,"MMMM, y", "es");
       proyecto.fechaF=this.titlecasePipe.transform(proyecto.fechaF);
     }

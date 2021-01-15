@@ -144,6 +144,26 @@
             {{language.knowMore}}
         </a>
     </div>
+    <div class="future-work">
+        <div class="interested-text">
+            {{language.interested}}
+        </div>
+        <div class="know-more-text">
+            {{language.knowWork}} <span style="text-decoration: underline; cursor: pointer;" (click)="navigate('/home/about-us/works')">{{language.knowWork2}}</span>
+        </div>
+        <div class="flex-news btn-knowmore">
+            <div class="btn-black btn-nm" style="margin-right: 8px !important;" (click)="navigate('/home/about-us/works')">
+                <a class="btn-text2">
+                    {{language.goTo}}
+                </a>
+            </div>
+            <div class="btn-black btn-nm" style="margin-left: 8px !important;" (click)="navigate('/home/join-us')">
+                <a class="btn-text2">
+                    {{language.join}}
+                </a>
+            </div>
+        </div>
+    </div>
     <div class="grey-title mt-48">
         {{language.knowAbout2}}
     </div>
