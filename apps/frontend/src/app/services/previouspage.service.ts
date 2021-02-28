@@ -27,6 +27,8 @@ export class PreviousPageService{
                     return "Miembros";
                 case "home/projects":
                     return "Proyectos";
+                case "home/news":
+                    return "Noticias";
                 case "":
                     return "Inicio";
                 default:
@@ -53,6 +55,8 @@ export class PreviousPageService{
                     return "Members";
                 case "home/projects":
                     return "Projects";
+                case "home/news":
+                    return "News";
                 case "":
                     return "Home";
                 default:

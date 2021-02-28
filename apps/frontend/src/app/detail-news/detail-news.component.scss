@@ -76,7 +76,7 @@
 .detail-text{
     @extend .plex-sans;
     font-weight: 300;
-    line-height: 0.5;
+    line-height: 1;
     letter-spacing: 0.3px;
     color: #000000;
 }
@@ -133,7 +133,7 @@
     padding: 5px;
 }
 
-@media(min-width:1400px){
+@media(min-width:1500px){
     .detail-div{
         padding-left: 343px !important;    
         padding-right: 343px !important;
@@ -179,7 +179,7 @@
     }
 }
 
-@media(max-width:1400px){
+@media(max-width:1500px){
     .detail-div{
         padding-left: 68px;
         padding-right: 68px;

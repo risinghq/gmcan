@@ -47,6 +47,7 @@ const moment = _rollupMoment || _moment;
 export class EditProyectoComponent implements OnInit {
 
   edit=true;
+  terminado=false;
   button_text='Actualizar información';
   button_text2='Concluir proyecto';
   usuarios: Array<Usuario>;
@@ -137,10 +138,8 @@ export class EditProyectoComponent implements OnInit {
           d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
           this.proyecto.fechaInicio=d;
           localStorage.setItem("proyectoEdit",JSON.stringify(this.proyecto.titulo));
-          if (!this.proyecto.fechaFin) {
-            this.edit=false;
-          }
           if(this.proyecto.estado==0){
+            this.terminado=true;
             this.proyectoForm.get('fechaFin').setValidators(this.greaterThan('fechaInicio'));
             d = new Date(this.proyecto.fechaFin);
             d.setMinutes( d.getMinutes() + d.getTimezoneOffset());

@@ -581,7 +581,7 @@ export class HomeComponent implements OnInit {
   fbsharing(i){
     let title= String(this.publicaciones[i].titulo);
     this.meta.updateTag({ name: 'description', content: title });
-    let locationhref= "http://128.199.15.131/home";
+    let locationhref= "http://161.35.230.134/home";
     window.open(
       'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(locationhref), 
       'facebook-share-dialog', 
