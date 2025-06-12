@@ -36,6 +36,7 @@
     "hammerjs": "^2.0.8",
     "material-components-web": "^6.0.0",
     "ngx-autosize": "^1.7.5",
+    "querystring": "^0.2.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
@@ -60,5 +61,10 @@
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
     "typescript": "~3.5.3"
-  }
+  },
+  "trustedDependencies": [
+    "@angular/cli",
+    "@fortawesome/fontawesome-free",
+    "core-js"
+  ]
 }
