@@ -36,6 +36,7 @@ import { Location } from '@angular/common';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
 import { MonedaService } from '../services/moneda.service';
 import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -579,14 +580,16 @@ export class HomeComponent implements OnInit {
 
   /* Share Hover */
   fbsharing(i){
-    let title= String(this.publicaciones[i].titulo);
+    const title = String(this.publicaciones[i].titulo);
     this.meta.updateTag({ name: 'description', content: title });
-    let locationhref= "http://161.35.230.134/home";
+    const locationhref = `${environment.appUrl}/home`;
+
     window.open(
-      'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(locationhref), 
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(locationhref)}`, 
       'facebook-share-dialog', 
-      'width=626,height=436'); 
-      return false;
+      'width=626,height=436'
+    ); 
+    return false;
   }
 
   public fbicon="../../assets/img/Facebook.svg";

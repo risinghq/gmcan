@@ -4,6 +4,7 @@ import { AuthService } from './services/auth.service';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -19,19 +20,22 @@ export class TokenInterceptor implements HttpInterceptor {
       request = this.addToken(request, this.authService.getJwtToken());
     }
 
-    return next.handle(request).pipe(catchError(error => {
-      if (error instanceof HttpErrorResponse && error.status === 401) {
-        if(error.url!="http://161.35.230.134:3000/usuario/refresh"){
-          return this.handle401Error(request, next);
+    return next.handle(request).pipe(
+      catchError(error => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          const refreshUrl = `${environment.apiUrl}/usuario/refresh`;
+          
+          if (error.url !== refreshUrl) {
+            return this.handle401Error(request, next);
+          } else {
+            this.authService.removeTokens();
+            this.router.navigate(['/login']);
+            return throwError(error);
+          }
         }
-        else{
-          this.authService.removeTokens();
-          this.router.navigate(['/login']);
-        }
-      } else {
         return throwError(error);
-      }
-    }));
+      })
+    );
   }
 
   private addToken(request: HttpRequest<any>, token: string) {
@@ -52,15 +56,22 @@ export class TokenInterceptor implements HttpInterceptor {
           this.isRefreshing = false;
           this.refreshTokenSubject.next(token.jwt);
           return next.handle(this.addToken(request, token.jwt));
-        }));
-
+        }),
+        catchError((error) => {
+          this.isRefreshing = false;
+          this.authService.removeTokens();
+          this.router.navigate(['/login']);
+          return throwError(error);
+        })
+      );
     } else {
       return this.refreshTokenSubject.pipe(
         filter(token => token != null),
         take(1),
         switchMap(jwt => {
           return next.handle(this.addToken(request, jwt));
-        }));
+        })
+      );
     }
   }
 }

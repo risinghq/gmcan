@@ -1,3 +1,6 @@
+import { environment } from '../environments/environment';
+
 export const config = {
-  apiUrl: 'http://161.35.230.134:3000'
+  apiUrl: environment.apiUrl,
+  appUrl: environment.appUrl
 };

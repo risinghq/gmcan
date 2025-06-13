@@ -1,3 +1,11 @@
-export var GLOBAL={
-	url: "http://161.35.230.134:3000/"
+import { environment } from '../../environments/environment';
+
+export const GLOBAL = {
+    get url(): string {
+        const apiUrl = environment.apiUrl;
+        if (!apiUrl) {
+            throw new Error('API URL not configured in environment');
+        }
+        return apiUrl;
+    }
 };
