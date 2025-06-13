@@ -81,5 +81,10 @@
       "name": "Pedro Rojas",
       "email": "pedro.rojas.f24@gmail.com"
     }
-  ]
+  ],
+  
+  "engines": {
+    "node": "~10.9.0"
+  }
+  
 }
