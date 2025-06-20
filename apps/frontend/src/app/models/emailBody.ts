@@ -1,8 +1,8 @@
 export class EmailBody{
     constructor(
-        public nombre: String,
-        public razon: String,
-        public correo: String,
-        public telefono: String,
+        public nombre: string,
+        public razon: string,
+        public correo: string,
+        public telefono: string,
     ){}
 }

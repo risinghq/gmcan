@@ -18,7 +18,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(user: { correo: string, password: string }): Observable<any> {
-    return this.http.post<any>(`${config.apiUrl}/usuario/login`, user)
+    return this.http.post<any>(`${config.apiUrl}usuario/login`, user)
       .pipe(
         tap(tokens => this.doLoginUser(tokens)),
         catchError(error => {
@@ -38,7 +38,7 @@ export class AuthService {
     if(sessionEnd==1){
       localStorage.setItem("sessionEnd", '1');
     }
-    return this.http.post<any>(`${config.apiUrl}/usuario/logout`, {
+    return this.http.post<any>(`${config.apiUrl}usuario/logout`, {
       'refreshToken': this.getRefreshToken()
     }).pipe(
       tap(() => this.doLogoutUser()),
@@ -54,7 +54,7 @@ export class AuthService {
   }
 
   refreshToken() {
-    return this.http.post<any>(`${config.apiUrl}/usuario/refresh`, {
+    return this.http.post<any>(`${config.apiUrl}usuario/refresh`, {
       'refreshToken': this.getRefreshToken()
     }).pipe(tap((tokens: Tokens) => {
       this.storeJwtToken(tokens.jwt);

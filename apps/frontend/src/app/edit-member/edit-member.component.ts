@@ -287,10 +287,17 @@ export class EditMemberComponent implements OnInit {
             this._usuarioService.updateUser(this.member).subscribe((res)=>{
               if(res.status==1){
                 if(this.member.password!=this.oldPassword){
-                  this._usuarioService.changePassword(this.member).subscribe(res => {
-                    if(res){
-                    }
-                  }) 
+                  const token = this._usuarioService.getToken();
+                  if (token) {
+                    this._usuarioService.changePassword({
+                      password: this.member.password,
+                      correo: this.member.correo,
+                      token: token
+                    }).subscribe(res => {
+                      if(res){
+                      }
+                    });
+                  }
                 }
                 if(this.fileData){
                   if(this.member.foto==null){
@@ -300,7 +307,7 @@ export class EditMemberComponent implements OnInit {
                       }
                     }) 
                   }else{
-                    this._usuarioService.deleteImage(this.member.foto)
+                    this._usuarioService.deleteImage(String(this.member.foto))
                     .subscribe(res => {
                       if(res){
                       }
@@ -477,12 +484,12 @@ export class EditMemberComponent implements OnInit {
 
   eraseUser(){
     if(this.member.foto)
-    this._usuarioService.deleteImage(this.member.foto)
+    this._usuarioService.deleteImage(String(this.member.foto))
     .subscribe(res => {
       if(res){
       }
     })
-    this._usuarioService.deleteUsuario(this.member).subscribe(result => {
+    this._usuarioService.deleteUsuario({ DNI: String(this.member.DNI) }).subscribe(result => {
       if(result.status==1){
         this.eliminar=true;
         this.agregar=true;

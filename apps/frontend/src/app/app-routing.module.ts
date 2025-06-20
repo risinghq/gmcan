@@ -166,7 +166,7 @@ const routes: Routes = [
     {path: 'my-abstracts', component:MyResumenesComponent},
     {path:"**", component:NotFoundComponent},
   ]},
-  {path:"recover/:id", component:ChangePassComponent},
+  {path:"reset-password", component:ChangePassComponent},
   {path:"**", component:NotFoundComponent},
 ];
 

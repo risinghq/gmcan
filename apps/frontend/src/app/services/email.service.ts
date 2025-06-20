@@ -1,33 +1,70 @@
-import {Injectable} from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import {GLOBAL} from './global';
-import { stringify } from 'querystring';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { GLOBAL } from "./global";
+
+export interface MembershipApplication {
+  nombre: string;
+  razon: string;
+  correo: string;
+  telefono: string;
+}
+
+export interface EmailResponse {
+  success: boolean;
+  message: string;
+  emailId?: string;
+  error?: string;
+}
+
+export interface PasswordResetRequest {
+  correo: string;
+}
 
 @Injectable({
-	providedIn: 'root'
-  })
-export class EmailService{
-    public url: string;
+  providedIn: "root",
+})
+export class EmailService {
+  private readonly url: string;
+  private readonly headers = new HttpHeaders({
+    "Content-Type": "application/json",
+  });
 
-	constructor(public http: HttpClient){
-		this.url = GLOBAL.url;
-    }
-    
-    sendEmail(user): any{
-      let body = JSON.stringify(user);
-      let headers = new HttpHeaders ({
-        'Content-Type':'application/json'
-      });
-      return this.http.post(this.url+'email/send-email',body,{headers:headers});
-    }
+  constructor(private http: HttpClient) {
+    this.url = GLOBAL.url;
+  }
 
-    recoverEmail(user): any{
-      let body = JSON.stringify(user);
-      let headers = new HttpHeaders ({
-        'Content-Type':'application/json'
-      });
-      return this.http.post(this.url+'email/reset-password-email ',body,{headers:headers});
-    }
+  sendMembershipApplication(
+    application: MembershipApplication,
+  ): Observable<EmailResponse> {
+    return this.http.post<EmailResponse>(
+      `${this.url}email/send-email`,
+      application,
+      { headers: this.headers },
+    );
+  }
 
+  sendPasswordReset(request: PasswordResetRequest): Observable<EmailResponse> {
+    return this.http.post<EmailResponse>(
+      `${this.url}email/send-password-reset`,
+      request,
+      { headers: this.headers },
+    );
+  }
+
+  verifyResetToken(token: string): Observable<any> {
+    return this.http.post(
+      `${this.url}email/verify-reset-token`,
+      { token },
+      { headers: this.headers },
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(
+      `${this.url}email/reset-password`,
+      { token, newPassword },
+      { headers: this.headers },
+    );
+  }
 }
