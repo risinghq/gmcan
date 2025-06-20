@@ -1,9 +1,9 @@
 export class UsuarioFull{
     constructor(
         public DNI: String,
-        public correo: String,
+        public correo: string,
         public nombre: String,
-        public password: String,
+        public password: string,
         public segundoNombre: String,
         public nombreCompleto: String,
         public apellidoPaterno: String,

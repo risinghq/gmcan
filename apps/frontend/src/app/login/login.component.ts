@@ -90,21 +90,22 @@ export class LoginComponent implements OnInit {
   exito;
 
   recover(){
-    this.exito=null
-    let user={
+    this.exito = null;
+    this.error = null;
+    if (this.emailForm.invalid) {
+      return;
+    }
+    let user = {
       correo:this.emailForm.controls.correo.value
-    }  
-    this._emailService.recoverEmail(user).subscribe((res)=>{      
-      if(res){
-        if(res.state==0){
-          this.error="El correo no se encuentra registrado en la base de datos"
-        }else if(res.state==1){
-          this.exito="Correo enviado exitosamente"
-        }
+    }
+    this._emailService.sendPasswordReset(user).subscribe((res)=>{
+      if (res && res.success) {
+        this.exito = res.message;
+      } else {
+        this.error = (res && res.message) || 'Ocurrió un error al procesar la solicitud.';
       }
-      else{
-        this.error=null;
-      }
+    }, err => {
+      this.error = 'Hubo un problema de conexión. Intente más tarde.';
     });
   }
   return(){

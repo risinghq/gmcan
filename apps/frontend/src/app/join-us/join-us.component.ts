@@ -55,7 +55,7 @@ export class JoinUsComponent implements OnInit {
         this.email.razon=this.user.controls.razon.value; 
         this.email.correo=this.user.controls.correo.value;
         this.email.telefono=this.user.controls.telefono.value;
-        this._emailService.sendEmail(this.email).subscribe((res)=>{
+        this._emailService.sendMembershipApplication(this.email).subscribe((res)=>{
           this.openDialog();
         });
       }
