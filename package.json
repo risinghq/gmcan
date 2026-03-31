@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel --filter \"./apps/*\" run start",
-    "dev:frontend": "pnpm --filter tesis-front run start",
-    "dev:backend": "pnpm --filter backend-gmcan run start",
+    "dev:frontend": "pnpm --filter frontend run start",
+    "dev:backend": "pnpm --filter backend run start",
     "build": "pnpm --filter \"./apps/*\" run build",
-    "build:frontend": "pnpm --filter tesis-front run build",
-    "build:backend": "pnpm --filter backend-gmcan run build",
+    "build:frontend": "pnpm --filter frontend run build",
+    "build:backend": "pnpm --filter backend run build",
     "test": "pnpm --filter \"./apps/*\" run test",
     "lint": "pnpm --filter \"./apps/*\" run lint"
   },
