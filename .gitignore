@@ -8,3 +8,9 @@ node_modules/
 
 # Backend uploads
 apps/backend/uploads/
+
+# Prevent re-adding large assets that bloated history
+apps/frontend/src/assets/canvasjs*/
+apps/frontend/src/assets/ckeditor*/
+apps/frontend/src/assets/fonts/
+apps/frontend/src/assets/*.min.js
