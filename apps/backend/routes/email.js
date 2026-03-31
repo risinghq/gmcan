@@ -77,12 +77,12 @@ router.post("/send-email", async (req, res) => {
       `,
     });
 
-    console.log("Membership application sent:", result.id);
+    console.log("Membership application sent:", result.data?.id);
 
     res.json({
       success: true,
       message: "La solicitud fue enviada. Te contactaremos pronto.",
-      emailId: result.id,
+      emailId: result.data?.id,
     });
   } catch (error) {
     console.error("Error sending membership application:", error);
@@ -171,13 +171,13 @@ router.post("/send-password-reset", async (req, res) => {
       `,
     });
 
-    console.log("Password reset email sent:", result.id);
+    console.log("Password reset email sent:", result.data?.id);
 
     res.json({
       success: true,
       message:
         "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
-      emailId: result.id,
+      emailId: result.data?.id,
     });
   } catch (error) {
     console.error("Error in password reset:", error);
