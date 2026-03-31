@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const randtoken = require('rand-token');
 const refreshTokens = {};
 const SECRET = 'VERY_SECRET_KEY!';
-const passport = require('passport');
-
 const { checkToken } = require("../auth/token_validation");
 
 var fs=require("fs");
