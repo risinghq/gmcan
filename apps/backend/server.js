@@ -1,5 +1,6 @@
-const express = require("express");
-const mysqlConnection = require("./connection");
+const { Hono } = require("hono");
+const { serve } = require("@hono/node-server");
+const { cors } = require("hono/cors");
 
 const GrupoRoutes = require("./routes/grupo");
 const AutorRoutes = require("./routes/autor");
@@ -33,50 +34,55 @@ const GeneroRoutes = require("./routes/genero");
 const FuenteFinanciamientoRoutes = require("./routes/fuentefinanciamiento");
 const MonedaRoutes = require("./routes/moneda");
 
-var app = express();
-app.use(express.json());
+const app = new Hono();
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method",
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-  res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
-  next();
-});
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowHeaders: [
+      "Authorization",
+      "X-API-KEY",
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Access-Control-Allow-Request-Method",
+    ],
+    allowMethods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+  }),
+);
 
-app.use("/grupo", GrupoRoutes);
-app.use("/autor", AutorRoutes);
-app.use("/noticia", NoticiaRoutes);
-app.use("/tipo-noticia", TipoNoticiaRoutes);
-app.use("/publicacion", PublicacionRoutes);
-app.use("/publicacion-autor", PublicacionHasAutorRoutes);
-app.use("/publicacion-usuario", PublicacionHasUsuarioRoutes);
-app.use("/tipo-usuario", TipoUsuarioRoutes);
-app.use("/tipo-publicacion", TipoPublicacionRoutes);
-app.use("/usuario", UsuarioRoutes);
-app.use("/usuario-grupo", UsuarioHasGrupoRoutes);
-app.use("/revista", RevistaRoutes);
-app.use("/universidad", UniversidadRoutes);
-app.use("/tipo-miembro", TipoMiembroRoutes);
-app.use("/prefijo", PrefijoRoutes);
-app.use("/evento", EventoRoutes);
-app.use("/tipotesis", TipoTesisRoutes);
-app.use("/email", EmailRoutes);
-app.use("/lineasinvestigacion", LineasInvestigacionRoutes);
-app.use("/proyecto", ProyectoRoutes);
-app.use("/usuariohasproyecto", UsuarioHasProyectoRoutes);
-app.use("/sobrenosotros", SobreNosotrosRoutes);
-app.use("/metodo", MetodosRoutes);
-app.use("/equipo", EquiposRoutes);
-app.use("/software", SoftwareRoutes);
-app.use("/permiso", PermisoRoutes);
-app.use("/usuariohaspermiso", UsuarioHasPermisoRoutes);
-app.use("/tipopermiso", TipoPermisoRoutes);
-app.use("/genero", GeneroRoutes);
-app.use("/fuentefinanciamiento", FuenteFinanciamientoRoutes);
-app.use("/moneda", MonedaRoutes);
+app.route("/grupo", GrupoRoutes);
+app.route("/autor", AutorRoutes);
+app.route("/noticia", NoticiaRoutes);
+app.route("/tipo-noticia", TipoNoticiaRoutes);
+app.route("/publicacion", PublicacionRoutes);
+app.route("/publicacion-autor", PublicacionHasAutorRoutes);
+app.route("/publicacion-usuario", PublicacionHasUsuarioRoutes);
+app.route("/tipo-usuario", TipoUsuarioRoutes);
+app.route("/tipo-publicacion", TipoPublicacionRoutes);
+app.route("/usuario", UsuarioRoutes);
+app.route("/usuario-grupo", UsuarioHasGrupoRoutes);
+app.route("/revista", RevistaRoutes);
+app.route("/universidad", UniversidadRoutes);
+app.route("/tipo-miembro", TipoMiembroRoutes);
+app.route("/prefijo", PrefijoRoutes);
+app.route("/evento", EventoRoutes);
+app.route("/tipotesis", TipoTesisRoutes);
+app.route("/email", EmailRoutes);
+app.route("/lineasinvestigacion", LineasInvestigacionRoutes);
+app.route("/proyecto", ProyectoRoutes);
+app.route("/usuariohasproyecto", UsuarioHasProyectoRoutes);
+app.route("/sobrenosotros", SobreNosotrosRoutes);
+app.route("/metodo", MetodosRoutes);
+app.route("/equipo", EquiposRoutes);
+app.route("/software", SoftwareRoutes);
+app.route("/permiso", PermisoRoutes);
+app.route("/usuariohaspermiso", UsuarioHasPermisoRoutes);
+app.route("/tipopermiso", TipoPermisoRoutes);
+app.route("/genero", GeneroRoutes);
+app.route("/fuentefinanciamiento", FuenteFinanciamientoRoutes);
+app.route("/moneda", MonedaRoutes);
 
-app.listen(3000);
+serve({ fetch: app.fetch, port: 3000 });

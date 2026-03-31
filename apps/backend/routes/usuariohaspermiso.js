@@ -1,57 +1,73 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-usuariohaspermiso", checkToken, (req, res) => {
-  mysqlConnection.query("SELECT * from usuarioHasPermiso", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-usuariohaspermiso", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from usuarioHasPermiso", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-usuariohaspermiso/:id", checkToken, (req, res) => {
-  let usuarioHasPermiso = req.params.id;
-  mysqlConnection.query(
-    "SELECT * from usuarioHasPermiso WHERE usuario_DNI=" + usuarioHasPermiso,
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-usuariohaspermiso/:id", checkToken, (c) => {
+  let usuarioHasPermiso = c.req.param("id");
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from usuarioHasPermiso WHERE usuario_DNI=" + usuarioHasPermiso,
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.post("/post-usuariohaspermiso", checkToken, (req, res) => {
-  let usuarioHasPermiso = req.body;
+router.post("/post-usuariohaspermiso", checkToken, async (c) => {
+  let usuarioHasPermiso = await c.req.json();
   var sql = "INSERT INTO usuarioHasPermiso (usuario_DNI, permiso_idPermiso) VALUES(?,?);";
-  mysqlConnection.query(
-    sql,
-    [usuarioHasPermiso.usuario_DNI, usuarioHasPermiso.permiso_idPermiso],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El usuarioHasPermiso ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.delete("/delete-usuariohaspermiso/:id", checkToken, (req, res) => {
-  mysqlConnection.query("DELETE FROM usuarioHasPermiso WHERE usuario_DNI=?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1 });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [usuarioHasPermiso.usuario_DNI, usuarioHasPermiso.permiso_idPermiso],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El usuarioHasPermiso ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-module.exports = Router;
+router.delete("/delete-usuariohaspermiso/:id", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "DELETE FROM usuarioHasPermiso WHERE usuario_DNI=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1 }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+module.exports = router;

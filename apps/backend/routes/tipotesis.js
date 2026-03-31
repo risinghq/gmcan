@@ -1,122 +1,149 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-tipotesis", (req, res) => {
-  mysqlConnection.query("SELECT * from tipotesis", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.get("/get-tipotesis-en", (req, res) => {
-  mysqlConnection.query("SELECT idTipoTesis, nombreEN as 'nombre' from tipotesis", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.get("/get-tipotesis/:id", (req, res) => {
-  mysqlConnection.query("SELECT * FROM tipotesis WHERE idTipoTesis = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.get("/get-tipotesis-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idTipoTesis, nombreEN as 'nombre' FROM tipotesis WHERE idTipoTesis = ?",
-    [req.params.id],
-    (err, rows, fields) => {
+router.get("/get-tipotesis", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from tipotesis", (err, rows, fields) => {
       if (!err) {
-        res.send(rows);
+        resolve(c.json(rows));
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-Router.post("/search-tipotesis", (req, res) => {
-  let tipotesis = req.body;
+router.get("/get-tipotesis-en", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT idTipoTesis, nombreEN as 'nombre' from tipotesis", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
+  });
+});
+
+router.get("/get-tipotesis/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * FROM tipotesis WHERE idTipoTesis = ?", [c.req.param("id")], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
+  });
+});
+
+router.get("/get-tipotesis-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idTipoTesis, nombreEN as 'nombre' FROM tipotesis WHERE idTipoTesis = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.post("/search-tipotesis", async (c) => {
+  let tipotesis = await c.req.json();
   tipotesis.nombre = "%" + tipotesis.nombre + "%";
   var sql = "SELECT * from tipotesis WHERE nombre LIKE ?;";
-  mysqlConnection.query(sql, [tipotesis.nombre], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [tipotesis.nombre], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/search-tipotesis-en", (req, res) => {
-  let tipotesis = req.body;
+router.post("/search-tipotesis-en", async (c) => {
+  let tipotesis = await c.req.json();
   tipotesis.nombre = "%" + tipotesis.nombre + "%";
   var sql = "SELECT idTipoTesis, nombreEN as 'nombre' from tipotesis WHERE nombreEN LIKE ?;";
-  mysqlConnection.query(sql, [tipotesis.nombre], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [tipotesis.nombre], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-tipotesis", (req, res) => {
-  let tipotesis = req.body;
+router.post("/post-tipotesis", async (c) => {
+  let tipotesis = await c.req.json();
   var sql = "INSERT INTO tipotesis (nombre, fechaActualizacion, fechaCreacion) VALUES(?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [tipotesis.nombre, tipotesis.fechaCreacion, tipotesis.fechaActualizacion],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El tipotesis ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.delete("/delete-tipotesis/:id", (req, res) => {
-  mysqlConnection.query("DELETE tipotesis WHERE idTipoPublicacion = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      rows.forEach((element) => {
-        if (element.constructor == Array) {
-          res.send("Insertado id: " + element[0].idtipotesis);
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [tipotesis.nombre, tipotesis.fechaCreacion, tipotesis.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El tipotesis ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
         }
-      });
-    } else {
-      console.log(err);
-    }
+      },
+    );
   });
 });
 
-Router.put("/update-tipotesis", (req, res) => {
-  let tipotesis = req.body;
-  var sql = "UPDATE tipotesis SET nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idTipoPublicacion=?;";
-  mysqlConnection.query(
-    sql,
-    [tipotesis.idTipoPublicacion, tipotesis.nombre, tipotesis.fechaCreacion, tipotesis.fechaActualizacion],
-    (err, rows, fields) => {
+router.delete("/delete-tipotesis/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("DELETE tipotesis WHERE idTipoPublicacion = ?", [c.req.param("id")], (err, rows, fields) => {
       if (!err) {
-        res.send({ message: "El tipotesis ha sido actualizada" });
+        rows.forEach((element) => {
+          if (element.constructor == Array) {
+            resolve(c.json("Insertado id: " + element[0].idtipotesis));
+          }
+        });
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-module.exports = Router;
+router.put("/update-tipotesis", async (c) => {
+  let tipotesis = await c.req.json();
+  var sql = "UPDATE tipotesis SET nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idTipoPublicacion=?;";
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [tipotesis.idTipoPublicacion, tipotesis.nombre, tipotesis.fechaCreacion, tipotesis.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El tipotesis ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+module.exports = router;

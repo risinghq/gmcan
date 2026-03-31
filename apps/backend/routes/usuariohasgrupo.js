@@ -1,79 +1,91 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-usuariohasgrupo", (req, res) => {
-  mysqlConnection.query("SELECT * from usuario_has_grupo", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-usuariohasgrupo", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from usuario_has_grupo", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-usuariohasgrupo", (req, res) => {
-  let usuariohasgrupo = req.body;
+router.post("/post-usuariohasgrupo", async (c) => {
+  let usuariohasgrupo = await c.req.json();
   var sql =
     "INSERT INTO usuario_has_grupo (usuario_DNI, grupo_idGrupo, fechaCreacion, fechaActualizacion) VALUES(?,?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [
-      usuariohasgrupo.usuario_DNI,
-      usuariohasgrupo.grupo_idGrupo,
-      usuariohasgrupo.fechaCreacion,
-      usuariohasgrupo.fechaActualizacion,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El usuario_has_grupo ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        usuariohasgrupo.usuario_DNI,
+        usuariohasgrupo.grupo_idGrupo,
+        usuariohasgrupo.fechaCreacion,
+        usuariohasgrupo.fechaActualizacion,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El usuario_has_grupo ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.delete("/delete-usuariohasgrupo", (req, res) => {
-  let usuariohasgrupo = req.body;
-  mysqlConnection.query(
-    "DELETE usuario_has_grupo WHERE usuario_DNI = ? AND grupo_idGrupo=?",
-    [usuariohasgrupo.usuario_DNI, usuariohasgrupo.grupo_idGrupo],
-    (err, rows, fields) => {
-      if (!err) {
-        rows.forEach((element) => {
-          if (element.constructor == Array) {
-            res.send("Insertado id: " + element[0].idusuario_has_grupo);
-          }
-        });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.delete("/delete-usuariohasgrupo", async (c) => {
+  let usuariohasgrupo = await c.req.json();
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "DELETE usuario_has_grupo WHERE usuario_DNI = ? AND grupo_idGrupo=?",
+      [usuariohasgrupo.usuario_DNI, usuariohasgrupo.grupo_idGrupo],
+      (err, rows, fields) => {
+        if (!err) {
+          rows.forEach((element) => {
+            if (element.constructor == Array) {
+              resolve(c.json("Insertado id: " + element[0].idusuario_has_grupo));
+            }
+          });
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.put("/update-usuariohasgrupo", (req, res) => {
-  let usuariohasgrupo = req.body;
+router.put("/update-usuariohasgrupo", async (c) => {
+  let usuariohasgrupo = await c.req.json();
   var sql =
     "UPDATE usuario_has_grupo SET usuario_DNI=?, grupo_idGrupo=?, fechaCreacion=?,fechaActualizacion=? WHERE  usuario_DNI=? AND grupo_idGrupo=?;";
-  mysqlConnection.query(
-    sql,
-    [
-      usuariohasgrupo.usuario_DNI,
-      usuariohasgrupo.grupo_idGrupo,
-      usuariohasgrupo.fechaCreacion,
-      usuariohasgrupo.fechaActualizacion,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El usuario_has_grupo ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        usuariohasgrupo.usuario_DNI,
+        usuariohasgrupo.grupo_idGrupo,
+        usuariohasgrupo.fechaCreacion,
+        usuariohasgrupo.fechaActualizacion,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El usuario_has_grupo ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-module.exports = Router;
+module.exports = router;

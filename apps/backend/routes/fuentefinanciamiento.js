@@ -1,72 +1,87 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-fuentefinanciamiento", (req, res) => {
-  mysqlConnection.query("SELECT * from fuenteFinanciamiento", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-fuentefinanciamiento", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from fuenteFinanciamiento", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-fuentefinanciamiento/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT * FROM fuenteFinanciamiento WHERE idFuenteFinanciamiento = ?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-fuentefinanciamiento/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * FROM fuenteFinanciamiento WHERE idFuenteFinanciamiento = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.post("/post-fuentefinanciamiento", (req, res) => {
-  let fuentefinanciamiento = req.body;
+router.post("/post-fuentefinanciamiento", async (c) => {
+  let fuentefinanciamiento = await c.req.json();
   var sql = "INSERT INTO fuenteFinanciamiento (nombre) VALUES(?);";
-  mysqlConnection.query(sql, [fuentefinanciamiento.nombre], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1, message: "La fuente ha sido guardada" });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [fuentefinanciamiento.nombre], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json({ status: 1, message: "La fuente ha sido guardada" }));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.delete("/delete-fuentefinanciamiento/:id", (req, res) => {
-  mysqlConnection.query(
-    "DELETE FROM fuenteFinanciamiento WHERE idFuenteFinanciamiento  = ?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "Eliminado tipo de noticia" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.delete("/delete-fuentefinanciamiento/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "DELETE FROM fuenteFinanciamiento WHERE idFuenteFinanciamiento  = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "Eliminado tipo de noticia" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.put("/update-fuentefinanciamiento", (req, res) => {
-  let fuentefinanciamiento = req.body;
+router.put("/update-fuentefinanciamiento", async (c) => {
+  let fuentefinanciamiento = await c.req.json();
   var sql = "UPDATE fuenteFinanciamiento SET nombre=? WHERE idFuenteFinanciamiento = ?";
-  mysqlConnection.query(
-    sql,
-    [fuentefinanciamiento.nombre, fuentefinanciamiento.idFuenteFinanciamiento],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "La fuentefinanciamiento ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [fuentefinanciamiento.nombre, fuentefinanciamiento.idFuenteFinanciamiento],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "La fuentefinanciamiento ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-module.exports = Router;
+module.exports = router;

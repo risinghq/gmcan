@@ -1,26 +1,32 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-moneda", (req, res) => {
-  mysqlConnection.query("SELECT * from moneda", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-moneda", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from moneda", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-moneda/:id", (req, res) => {
-  mysqlConnection.query("SELECT * FROM moneda WHERE idMoneda = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-moneda/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * FROM moneda WHERE idMoneda = ?", [c.req.param("id")], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-module.exports = Router;
+module.exports = router;

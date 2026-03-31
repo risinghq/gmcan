@@ -1,5 +1,5 @@
 const { Resend } = require("resend");
-const express = require("express");
+const { Hono } = require("hono");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const { promisify } = require("node:util");
@@ -9,7 +9,7 @@ const { getFrontendUrl } = require("../config");
 
 const { RESEND_API_KEY, INSTITUTIONAL_EMAIL, NODE_ENV } = process.env;
 
-const router = express.Router();
+const router = new Hono();
 const resend = new Resend(RESEND_API_KEY);
 const queryDb = promisify(mysqlConnection.query).bind(mysqlConnection);
 
@@ -31,18 +31,21 @@ function validateFields(data, requiredFields) {
   };
 }
 
-router.post("/send-email", async (req, res) => {
+router.post("/send-email", async (c) => {
   try {
-    const data = req.body;
+    const data = await c.req.json();
     const { from, to } = getEmailConfig();
 
     const validation = validateFields(data, ["nombre", "razon", "correo", "telefono"]);
     if (!validation.isValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Campos requeridos faltantes",
-        missingFields: validation.missing,
-      });
+      return c.json(
+        {
+          success: false,
+          message: "Campos requeridos faltantes",
+          missingFields: validation.missing,
+        },
+        400,
+      );
     }
 
     const result = await resend.emails.send({
@@ -52,15 +55,15 @@ router.post("/send-email", async (req, res) => {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Solicitud de ingreso al GMCAN</h2>
-          
+
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px;">
             <p><strong>Nombre:</strong> ${data.nombre}</p>
-            
+
             <p><strong>¿A qué te dedicas? ¿Qué te motiva a querer ser parte del GMCAN?</strong></p>
             <div style="background-color: white; padding: 15px; border-left: 4px solid #007bff;">
               ${data.razon}
             </div>
-            
+
             <p><strong>Correo:</strong> <a href="mailto:${data.correo}">${data.correo}</a></p>
             <p><strong>Teléfono:</strong> ${data.telefono}</p>
           </div>
@@ -70,7 +73,7 @@ router.post("/send-email", async (req, res) => {
 
     console.log("Membership application sent:", result.data?.id);
 
-    res.json({
+    return c.json({
       success: true,
       message: "La solicitud fue enviada. Te contactaremos pronto.",
       emailId: result.data?.id,
@@ -78,30 +81,36 @@ router.post("/send-email", async (req, res) => {
   } catch (error) {
     console.error("Error sending membership application:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Error interno del servidor. Por favor intenta nuevamente.",
-      error: NODE_ENV === "development" ? error.message : undefined,
-    });
+    return c.json(
+      {
+        success: false,
+        message: "Error interno del servidor. Por favor intenta nuevamente.",
+        error: NODE_ENV === "development" ? error.message : undefined,
+      },
+      500,
+    );
   }
 });
 
-router.post("/send-password-reset", async (req, res) => {
+router.post("/send-password-reset", async (c) => {
   try {
-    const { correo: email } = req.body;
+    const { correo: email } = await c.req.json();
 
     if (!email?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "El correo electrónico es requerido",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "El correo electrónico es requerido",
+        },
+        400,
+      );
     }
 
     const users = await queryDb("SELECT DNI, nombre, correo FROM usuario WHERE correo = ?", [email]);
 
     if (!users.length) {
       // We always return success to avoid revealing if the email exists
-      return res.json({
+      return c.json({
         success: true,
         message: "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
       });
@@ -130,14 +139,14 @@ router.post("/send-password-reset", async (req, res) => {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Recuperación de contraseña</h2>
-          
+
           <p>Hola <strong>${user.nombre}</strong>,</p>
           <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta.</p>
 
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
             <p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>
-            <a href="${resetUrl}" 
-               style="background-color: #007bff; color: white; padding: 12px 24px; 
+            <a href="${resetUrl}"
+               style="background-color: #007bff; color: white; padding: 12px 24px;
                       text-decoration: none; border-radius: 5px; display: inline-block;">
               Restablecer Contraseña
             </a>
@@ -161,7 +170,7 @@ router.post("/send-password-reset", async (req, res) => {
 
     console.log("Password reset email sent:", result.data?.id);
 
-    res.json({
+    return c.json({
       success: true,
       message: "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
       emailId: result.data?.id,
@@ -171,29 +180,38 @@ router.post("/send-password-reset", async (req, res) => {
 
     if (error.code?.startsWith("ER_")) {
       console.error("Database error:", error.sqlMessage);
-      return res.status(503).json({
-        success: false,
-        message: "Error de base de datos. Por favor intenta más tarde.",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "Error de base de datos. Por favor intenta más tarde.",
+        },
+        503,
+      );
     }
 
-    res.status(500).json({
-      success: false,
-      message: "Error interno del servidor. Por favor intenta nuevamente.",
-      error: NODE_ENV === "development" ? error.message : undefined,
-    });
+    return c.json(
+      {
+        success: false,
+        message: "Error interno del servidor. Por favor intenta nuevamente.",
+        error: NODE_ENV === "development" ? error.message : undefined,
+      },
+      500,
+    );
   }
 });
 
-router.post("/verify-reset-token", async (req, res) => {
+router.post("/verify-reset-token", async (c) => {
   try {
-    const { token } = req.body;
+    const { token } = await c.req.json();
 
     if (!token?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Token requerido",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "Token requerido",
+        },
+        400,
+      );
     }
 
     // Find user with valid token
@@ -203,13 +221,16 @@ router.post("/verify-reset-token", async (req, res) => {
     );
 
     if (!users.length) {
-      return res.status(400).json({
-        success: false,
-        message: "Token inválido o expirado",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "Token inválido o expirado",
+        },
+        400,
+      );
     }
 
-    res.json({
+    return c.json({
       success: true,
       message: "Token válido",
       user: {
@@ -220,29 +241,38 @@ router.post("/verify-reset-token", async (req, res) => {
   } catch (error) {
     console.error("Error verifying reset token:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Error interno del servidor",
-    });
+    return c.json(
+      {
+        success: false,
+        message: "Error interno del servidor",
+      },
+      500,
+    );
   }
 });
 
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", async (c) => {
   try {
-    const { token, newPassword } = req.body;
+    const { token, newPassword } = await c.req.json();
 
     if (!token?.trim() || !newPassword?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Token y nueva contraseña son requeridos",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "Token y nueva contraseña son requeridos",
+        },
+        400,
+      );
     }
 
     if (newPassword.length < 8) {
-      return res.status(400).json({
-        success: false,
-        message: "La contraseña debe tener al menos 8 caracteres",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "La contraseña debe tener al menos 8 caracteres",
+        },
+        400,
+      );
     }
 
     // Verify token is still valid
@@ -252,10 +282,13 @@ router.post("/reset-password", async (req, res) => {
     );
 
     if (!users.length) {
-      return res.status(400).json({
-        success: false,
-        message: "Token inválido o expirado",
-      });
+      return c.json(
+        {
+          success: false,
+          message: "Token inválido o expirado",
+        },
+        400,
+      );
     }
 
     const userDNI = users[0].DNI;
@@ -271,17 +304,20 @@ router.post("/reset-password", async (req, res) => {
 
     console.log("Password reset completed for user DNI:", userDNI);
 
-    res.json({
+    return c.json({
       success: true,
       message: "Contraseña actualizada exitosamente",
     });
   } catch (error) {
     console.error("Error resetting password:", error);
 
-    res.status(500).json({
-      success: false,
-      message: "Error interno del servidor",
-    });
+    return c.json(
+      {
+        success: false,
+        message: "Error interno del servidor",
+      },
+      500,
+    );
   }
 });
 

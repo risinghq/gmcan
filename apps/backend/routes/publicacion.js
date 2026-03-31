@@ -1,356 +1,438 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 var fs = require("fs");
 var path = require("path");
-const multer = require("multer");
-const md_upload = multer({
-  storage: multer.diskStorage({
-    destination: "./uploads/publicaciones",
-    filename: (req, file, cb) => cb(null, file.originalname),
-  }),
-}).any();
 
-Router.get("/get-publicacion", (req, res) => {
-  mysqlConnection.query("SELECT * from publicacion", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-publicacion", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from publicacion", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-publicacion-en", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion",
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.get("/get-publicacion/:id", (req, res) => {
-  mysqlConnection.query("SELECT * from publicacion WHERE idPublicacion=?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-publicacion-en", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion",
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.get("/get-publicacion-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE idPublicacion=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.get("/get-publicaciones/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT * from publicacion WHERE tipoPublicacion_idTipoPublicacion=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.get("/get-publicaciones-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE tipoPublicacion_idTipoPublicacion=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.get("/get-publicacionesciudad/:id", (req, res) => {
-  mysqlConnection.query("SELECT * from publicacion WHER = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-publicacion/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from publicacion WHERE idPublicacion=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.get("/get-publicacionesciudad-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHER=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.get("/get-publicacionesevento/:id", (req, res) => {
-  mysqlConnection.query("SELECT * from publicacion WHERE evento_idEvento = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-publicacion-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE idPublicacion=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.get("/get-publicacionesevento-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE evento_idEvento=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-publicaciones/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from publicacion WHERE tipoPublicacion_idTipoPublicacion=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.get("/get-publicacionesuniversidad/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT * from publicacion WHERE universidad_idUniversidad = ?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-publicaciones-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE tipoPublicacion_idTipoPublicacion=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.get("/get-publicacionesuniversidad-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE universidad_idUniversidad=?",
-    [req.params.id],
-    (err, rows, fields) => {
+router.get("/get-publicacionesciudad/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from publicacion WHER = ?", [c.req.param("id")], (err, rows, fields) => {
       if (!err) {
-        res.send(rows);
+        resolve(c.json(rows));
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-Router.get("/get-publicacionesrevista/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT * from publicacion WHERE revista_idRevista = ?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-publicacionesciudad-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHER=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.get("/get-publicacionesrevista-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE revista_idRevista=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-publicacionesevento/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from publicacion WHERE evento_idEvento = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.post("/search-publicaciones", (req, res) => {
-  let publicacion = req.body;
+router.get("/get-publicacionesevento-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE evento_idEvento=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.get("/get-publicacionesuniversidad/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from publicacion WHERE universidad_idUniversidad = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.get("/get-publicacionesuniversidad-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE universidad_idUniversidad=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.get("/get-publicacionesrevista/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from publicacion WHERE revista_idRevista = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.get("/get-publicacionesrevista-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE revista_idRevista=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.post("/search-publicaciones", async (c) => {
+  let publicacion = await c.req.json();
   publicacion.titulo = "%" + publicacion.titulo + "%";
   var sql = "SELECT * from publicacion WHERE titulo LIKE ? AND tipoPublicacion_idTipoPublicacion=?";
-  mysqlConnection.query(
-    sql,
-    [publicacion.titulo, publicacion.tipoPublicacion_idTipoPublicacion],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.post("/search-publicaciones-global", (req, res) => {
-  let publicacion = req.body;
-  publicacion.titulo = "%" + publicacion.titulo + "%";
-  var sql = "SELECT * from publicacion WHERE titulo LIKE ? OR fechaPublicacion LIKE ? OR resumen LIKE ?;";
-  mysqlConnection.query(sql, [publicacion.titulo, publicacion.titulo, publicacion.titulo], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [publicacion.titulo, publicacion.tipoPublicacion_idTipoPublicacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.post("/search-publicaciones-global-en", (req, res) => {
-  let publicacion = req.body;
+router.post("/search-publicaciones-global", async (c) => {
+  let publicacion = await c.req.json();
+  publicacion.titulo = "%" + publicacion.titulo + "%";
+  var sql = "SELECT * from publicacion WHERE titulo LIKE ? OR fechaPublicacion LIKE ? OR resumen LIKE ?;";
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [publicacion.titulo, publicacion.titulo, publicacion.titulo], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
+  });
+});
+
+router.post("/search-publicaciones-global-en", async (c) => {
+  let publicacion = await c.req.json();
   publicacion.titulo = "%" + publicacion.titulo + "%";
   var sql =
     "SELECT idPublicacion, titulo, archivo, resumenEN as 'resumen', nroRevista, DOI, fechaPublicacion, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, evento_idEvento, tipoTesis_idTipoTesis from publicacion WHERE titulo LIKE ? OR fechaPublicacion LIKE ? OR resumenEN LIKE ?;";
-  mysqlConnection.query(sql, [publicacion.titulo, publicacion.titulo, publicacion.titulo], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [publicacion.titulo, publicacion.titulo, publicacion.titulo], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-publicacion", (req, res) => {
-  let publicacion = req.body;
+router.post("/post-publicacion", async (c) => {
+  let publicacion = await c.req.json();
   var sql =
     "INSERT INTO publicacion (titulo,resumen,resumenEN,DOI,fechaPublicacion, nroRevista, tipoPublicacion_idTipoPublicacion, revista_idRevista, universidad_idUniversidad, tipoTesis_idTipoTesis, evento_idEvento) VALUES(?,?,?,?,?,?,?,?,?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [
-      publicacion.titulo,
-      publicacion.resumen,
-      publicacion.resumenEN,
-      publicacion.DOI,
-      publicacion.fechaPublicacion,
-      publicacion.nroRevista,
-      publicacion.tipoPublicacion_idTipoPublicacion,
-      publicacion.revista_idRevista,
-      publicacion.universidad_idUniversidad,
-      publicacion.tipoTesis_idTipoTesis,
-      publicacion.evento_idEvento,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({
-          status: 1,
-          idPublicacion: rows.insertId,
-          message: "La publicacion ha sido guardada",
-        });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.delete("/delete-publicacion/:id", (req, res) => {
-  mysqlConnection.query("DELETE FROM publicacion WHERE idPublicacion = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1 });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        publicacion.titulo,
+        publicacion.resumen,
+        publicacion.resumenEN,
+        publicacion.DOI,
+        publicacion.fechaPublicacion,
+        publicacion.nroRevista,
+        publicacion.tipoPublicacion_idTipoPublicacion,
+        publicacion.revista_idRevista,
+        publicacion.universidad_idUniversidad,
+        publicacion.tipoTesis_idTipoTesis,
+        publicacion.evento_idEvento,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(
+            c.json({
+              status: 1,
+              idPublicacion: rows.insertId,
+              message: "La publicacion ha sido guardada",
+            }),
+          );
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.put("/update-publicacion", (req, res) => {
-  let publicacion = req.body;
-  var sql =
-    "UPDATE publicacion SET titulo=?, resumen=?, resumenEN=?, DOI=?, fechaPublicacion=?, nroRevista=? ,tipoPublicacion_idTipoPublicacion=?, revista_idRevista=?, universidad_idUniversidad=? , tipoTesis_idTipoTesis=?, evento_idEvento=? WHERE  idPublicacion=?;";
-  mysqlConnection.query(
-    sql,
-    [
-      publicacion.titulo,
-      publicacion.resumen,
-      publicacion.resumenEN,
-      publicacion.DOI,
-      publicacion.fechaPublicacion,
-      publicacion.nroRevista,
-      publicacion.tipoPublicacion_idTipoPublicacion,
-      publicacion.revista_idRevista,
-      publicacion.universidad_idUniversidad,
-      publicacion.tipoTesis_idTipoTesis,
-      publicacion.evento_idEvento,
-      publicacion.idPublicacion,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "La publicacion ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.put("/upload-publicacion-file/:id", md_upload, (req, res) => {
-  let publicacion = req.body;
-  var sql = "UPDATE publicacion SET archivo=? WHERE idPublicacion=" + req.params.id + ";";
-  if (req.files && req.files.length > 0) {
-    var file = req.files[0];
-    publicacion.archivo = file.filename;
-    var file_ext = path.extname(file.originalname).slice(1).toLowerCase();
-    if (file_ext == "pdf") {
-      mysqlConnection.query(sql, [publicacion.archivo], (err, rows, fields) => {
+router.delete("/delete-publicacion/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "DELETE FROM publicacion WHERE idPublicacion = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
         if (!err) {
-          res.send(rows);
+          resolve(c.json({ status: 1 }));
         } else {
           console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
         }
+      },
+    );
+  });
+});
+
+router.put("/update-publicacion", async (c) => {
+  let publicacion = await c.req.json();
+  var sql =
+    "UPDATE publicacion SET titulo=?, resumen=?, resumenEN=?, DOI=?, fechaPublicacion=?, nroRevista=? ,tipoPublicacion_idTipoPublicacion=?, revista_idRevista=?, universidad_idUniversidad=? , tipoTesis_idTipoTesis=?, evento_idEvento=? WHERE  idPublicacion=?;";
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        publicacion.titulo,
+        publicacion.resumen,
+        publicacion.resumenEN,
+        publicacion.DOI,
+        publicacion.fechaPublicacion,
+        publicacion.nroRevista,
+        publicacion.tipoPublicacion_idTipoPublicacion,
+        publicacion.revista_idRevista,
+        publicacion.universidad_idUniversidad,
+        publicacion.tipoTesis_idTipoTesis,
+        publicacion.evento_idEvento,
+        publicacion.idPublicacion,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "La publicacion ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.put("/upload-publicacion-file/:id", async (c) => {
+  const body = await c.req.parseBody({ all: true });
+  const sql = "UPDATE publicacion SET archivo=? WHERE idPublicacion=" + c.req.param("id") + ";";
+
+  const files = [];
+  for (const value of Object.values(body)) {
+    if (value instanceof File) files.push(value);
+    else if (Array.isArray(value)) files.push(...value.filter((v) => v instanceof File));
+  }
+
+  if (files.length > 0) {
+    const file = files[0];
+    const archivoName = file.name;
+    const file_ext = path.extname(file.name).slice(1).toLowerCase();
+    if (file_ext == "pdf") {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      fs.writeFileSync("./uploads/publicaciones/" + file.name, buffer);
+      return new Promise((resolve) => {
+        mysqlConnection.query(sql, [archivoName], (err, rows) => {
+          if (!err) {
+            resolve(c.json(rows));
+          } else {
+            console.log(err);
+            resolve(c.json({ error: "Database error" }, 500));
+          }
+        });
       });
     } else {
-      res.status(200).send({ message: "Extensión del archivo no válida" });
+      return c.json({ message: "Extensión del archivo no válida" });
     }
   } else {
-    return res.status(200).send({ message: "No has subido ninguna imagen" });
+    return c.json({ message: "No has subido ninguna imagen" });
   }
 });
 
-Router.get("/download-publicacion/:pdfFile", (req, res) => {
-  var pdfFile = req.params.pdfFile;
-  var path_file = "./uploads/publicaciones/" + pdfFile;
-  fs.exists(path_file, function (exists) {
-    if (exists) {
-      res.download(path_file);
-    }
-  });
+router.get("/download-publicacion/:pdfFile", async (c) => {
+  const pdfFile = c.req.param("pdfFile");
+  const path_file = "./uploads/publicaciones/" + pdfFile;
+  if (fs.existsSync(path_file)) {
+    const data = await fs.promises.readFile(path_file);
+    return c.body(data, 200, {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${pdfFile}"`,
+    });
+  } else {
+    return c.json({ message: "no existe el archivo" });
+  }
 });
 
-Router.get("/get-file-publicacion/:pdfFile", (req, res) => {
-  var pdfFile = req.params.pdfFile;
-  var path_file = "./uploads/publicaciones/" + pdfFile;
-  fs.exists(path_file, function (exists) {
-    if (exists) {
-      res.sendFile(path.resolve(path_file));
-    } else {
-      res.status(200).send({ message: "no existe la imagen" });
-    }
-  });
+router.get("/get-file-publicacion/:pdfFile", async (c) => {
+  const pdfFile = c.req.param("pdfFile");
+  const path_file = "./uploads/publicaciones/" + pdfFile;
+  if (fs.existsSync(path_file)) {
+    const data = await fs.promises.readFile(path_file);
+    return c.body(data, 200, { "Content-Type": "application/pdf" });
+  } else {
+    return c.json({ message: "no existe la imagen" });
+  }
 });
 
-module.exports = Router;
+module.exports = router;

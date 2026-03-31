@@ -1,96 +1,117 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-software", (req, res) => {
-  mysqlConnection.query("SELECT * from software", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-software", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from software", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-software-en", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idSoftware, nombre, descripcionEN as 'descripcion', moreInfo, fechaActualizacion, grupo_idGrupo from software",
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.get("/get-software/:id", (req, res) => {
-  mysqlConnection.query("SELECT * FROM software WHERE idSoftware = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-software-en", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idSoftware, nombre, descripcionEN as 'descripcion', moreInfo, fechaActualizacion, grupo_idGrupo from software",
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.get("/get-software-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idSoftware, nombre, descripcionEN as 'descripcion', moreInfo, fechaActualizacion, grupo_idGrupo from software WHERE idSoftware = ?",
-    [req.params.id],
-    (err, rows, fields) => {
+router.get("/get-software/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * FROM software WHERE idSoftware = ?", [c.req.param("id")], (err, rows, fields) => {
       if (!err) {
-        res.send(rows);
+        resolve(c.json(rows));
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-Router.post("/post-software", checkToken, (req, res) => {
-  let not = req.body;
+router.get("/get-software-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idSoftware, nombre, descripcionEN as 'descripcion', moreInfo, fechaActualizacion, grupo_idGrupo from software WHERE idSoftware = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.post("/post-software", checkToken, async (c) => {
+  let not = await c.req.json();
   var sql = "INSERT INTO software (nombre,descripcion,descripcionEN,moreInfo,grupo_idGrupo) VALUES(?,?,?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [not.nombre, not.descripcion, not.descripcionEN, not.moreInfo, not.grupo_idGrupo],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "La software ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.delete("/delete-software/:id", checkToken, (req, res) => {
-  mysqlConnection.query("DELETE FROM software WHERE idSoftware = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1, message: "La software ha sido guardada" });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [not.nombre, not.descripcion, not.descripcionEN, not.moreInfo, not.grupo_idGrupo],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "La software ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
   });
 });
 
-Router.put("/update-software", checkToken, (req, res) => {
-  let not = req.body;
+router.delete("/delete-software/:id", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("DELETE FROM software WHERE idSoftware = ?", [c.req.param("id")], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json({ status: 1, message: "La software ha sido guardada" }));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
+  });
+});
+
+router.put("/update-software", checkToken, async (c) => {
+  let not = await c.req.json();
   var sql =
     "UPDATE software SET nombre=?, descripcion=?, descripcionEN=?, moreInfo=?, grupo_idGrupo=? WHERE  idSoftware=?;";
-  mysqlConnection.query(
-    sql,
-    [not.nombre, not.descripcion, not.descripcionEN, not.moreInfo, not.grupo_idGrupo, not.idSoftware],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "La software ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [not.nombre, not.descripcion, not.descripcionEN, not.moreInfo, not.grupo_idGrupo, not.idSoftware],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "La software ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-module.exports = Router;
+module.exports = router;

@@ -1,71 +1,83 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-tipousuario", (req, res) => {
-  mysqlConnection.query("SELECT * from tipouser", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.post("/post-tipousuario", (req, res) => {
-  let tipouser = req.body;
-  var sql = "INSERT INTO tipousuario (idTipoUsuario, nombre, fechaCreacion, fechaActualizacion) VALUES(?,?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [tipouser.idTipoUsuario, tipouser.nombre, tipouser.fechaCreacion, tipouser.fechaActualizacion],
-    (err, rows, fields) => {
+router.get("/get-tipousuario", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from tipouser", (err, rows, fields) => {
       if (!err) {
-        res.send({ message: "El tipousuario ha sido guardada" });
+        resolve(c.json(rows));
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
-});
-
-Router.delete("/delete-tipousuario/:id", (req, res) => {
-  mysqlConnection.query("DELETE tipousuario WHERE idTipoUsuario = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      rows.forEach((element) => {
-        if (element.constructor == Array) {
-          res.send("Insertado id: " + element[0].idtipousuario);
-        }
-      });
-    } else {
-      console.log(err);
-    }
+    });
   });
 });
 
-Router.put("/update-tipousuario", (req, res) => {
-  let tipouser = req.body;
+router.post("/post-tipousuario", async (c) => {
+  let tipouser = await c.req.json();
+  var sql = "INSERT INTO tipousuario (idTipoUsuario, nombre, fechaCreacion, fechaActualizacion) VALUES(?,?,?,?);";
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [tipouser.idTipoUsuario, tipouser.nombre, tipouser.fechaCreacion, tipouser.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El tipousuario ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.delete("/delete-tipousuario/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("DELETE tipousuario WHERE idTipoUsuario = ?", [c.req.param("id")], (err, rows, fields) => {
+      if (!err) {
+        rows.forEach((element) => {
+          if (element.constructor == Array) {
+            resolve(c.json("Insertado id: " + element[0].idtipousuario));
+          }
+        });
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
+  });
+});
+
+router.put("/update-tipousuario", async (c) => {
+  let tipouser = await c.req.json();
   var sql =
     "UPDATE tipousuario SET idTipoUsuario=?, nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idTipoUsuario=?;";
-  mysqlConnection.query(
-    sql,
-    [
-      tipouser.idtipousuario,
-      tipouser.idTipoUsuario,
-      tipouser.nombre,
-      tipouser.fechaCreacion,
-      tipouser.fechaActualizacion,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El tipousuario ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        tipouser.idtipousuario,
+        tipouser.idTipoUsuario,
+        tipouser.nombre,
+        tipouser.fechaCreacion,
+        tipouser.fechaActualizacion,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El tipousuario ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-module.exports = Router;
+module.exports = router;
 
 //INSERT INTO `tesis`.`tipouser` (`idTipoUsuario`, `nombre`, `fechaCreacion`, `fechaActualizacion`) VALUES ('1', 'Administrador', '2020-01-15', '2020-01-15');

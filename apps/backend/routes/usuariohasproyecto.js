@@ -1,74 +1,89 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-usuariohasproyecto", (req, res) => {
-  mysqlConnection.query("SELECT * from usuario_has_proyecto", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-usuariohasproyecto", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from usuario_has_proyecto", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-usuariohasproyecto/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT * FROM usuario_has_proyecto WHERE proyecto_idProyecto = ?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-usuariohasproyecto/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * FROM usuario_has_proyecto WHERE proyecto_idProyecto = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.get("/get-usuariohasproyectos/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT * FROM usuario_has_proyecto WHERE usuario_DNI = ?;",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-      }
-    },
-  );
+router.get("/get-usuariohasproyectos/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * FROM usuario_has_proyecto WHERE usuario_DNI = ?;",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.post("/post-usuariohasproyecto", checkToken, (req, res) => {
-  let usuariohasproyecto = req.body;
+router.post("/post-usuariohasproyecto", checkToken, async (c) => {
+  let usuariohasproyecto = await c.req.json();
   var sql = "INSERT INTO usuario_has_proyecto (proyecto_idProyecto, usuario_DNI) VALUES(?,?);";
-  mysqlConnection.query(
-    sql,
-    [usuariohasproyecto.proyecto_idProyecto, usuariohasproyecto.usuario_DNI],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "El usuariohasproyecto ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [usuariohasproyecto.proyecto_idProyecto, usuariohasproyecto.usuario_DNI],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "El usuariohasproyecto ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.delete("/delete-usuariohasproyecto/:id", checkToken, (req, res) => {
-  mysqlConnection.query(
-    "DELETE FROM usuario_has_proyecto WHERE proyecto_idProyecto = ?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "El publicacion_has_usuario ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.delete("/delete-usuariohasproyecto/:id", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "DELETE FROM usuario_has_proyecto WHERE proyecto_idProyecto = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "El publicacion_has_usuario ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-module.exports = Router;
+module.exports = router;

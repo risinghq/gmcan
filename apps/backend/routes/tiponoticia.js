@@ -1,112 +1,143 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 
-const Router = express.Router();
+const router = new Hono();
 const { checkToken } = require("../auth/token_validation");
 
-Router.get("/get-tiponoticia", (req, res) => {
-  mysqlConnection.query("SELECT * from tiponoticia", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.get("/get-tiponoticia-en", (req, res) => {
-  mysqlConnection.query("SELECT idtipoNoticia, nombreEN as 'nombre' from tiponoticia", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.get("/get-tiponoticia/:id", (req, res) => {
-  mysqlConnection.query("SELECT * FROM tiponoticia WHERE idtipoNoticia = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
-  });
-});
-
-Router.get("/get-tiponoticia-en/:id", (req, res) => {
-  mysqlConnection.query(
-    "SELECT idtipoNoticia, nombreEN as 'nombre' FROM tiponoticia WHERE idtipoNoticia = ?",
-    [req.params.id],
-    (err, rows, fields) => {
+router.get("/get-tiponoticia", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from tiponoticia", (err, rows, fields) => {
       if (!err) {
-        res.send(rows);
+        resolve(c.json(rows));
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-Router.post("/search-tiponoticia-global", (req, res) => {
-  let tiponoticia = req.body;
+router.get("/get-tiponoticia-en", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT idtipoNoticia, nombreEN as 'nombre' from tiponoticia", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
+  });
+});
+
+router.get("/get-tiponoticia/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * FROM tiponoticia WHERE idtipoNoticia = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.get("/get-tiponoticia-en/:id", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT idtipoNoticia, nombreEN as 'nombre' FROM tiponoticia WHERE idtipoNoticia = ?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+router.post("/search-tiponoticia-global", async (c) => {
+  let tiponoticia = await c.req.json();
   tiponoticia.nombre = "%" + tiponoticia.nombre + "%";
   var sql = "SELECT * from tiponoticia WHERE nombre LIKE ? ;";
-  mysqlConnection.query(sql, [tiponoticia.nombre], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [tiponoticia.nombre], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/search-tiponoticia-global-en", (req, res) => {
-  let tiponoticia = req.body;
+router.post("/search-tiponoticia-global-en", async (c) => {
+  let tiponoticia = await c.req.json();
   tiponoticia.nombre = "%" + tiponoticia.nombre + "%";
   var sql = "SELECT * from tiponoticia WHERE nombreEN LIKE ? ;";
-  mysqlConnection.query(sql, [tiponoticia.nombre], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [tiponoticia.nombre], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-tiponoticia", checkToken, (req, res) => {
-  let not = req.body;
+router.post("/post-tiponoticia", checkToken, async (c) => {
+  let not = await c.req.json();
   var sql = "INSERT INTO tiponoticia (nombre, nombreEN) VALUES(?,?);";
-  mysqlConnection.query(sql, [not.nombre, not.nombreEN], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1, message: "La tipo tiponoticia ha sido guardada" });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [not.nombre, not.nombreEN], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json({ status: 1, message: "La tipo tiponoticia ha sido guardada" }));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.delete("/delete-tiponoticia/:id", checkToken, (req, res) => {
+router.delete("/delete-tiponoticia/:id", checkToken, (c) => {
   var sql = "DELETE FROM tiponoticia WHERE idtipoNoticia = ?";
-  mysqlConnection.query(sql, [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1, message: "Eliminado tipo de tiponoticia" });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [c.req.param("id")], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json({ status: 1, message: "Eliminado tipo de tiponoticia" }));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.put("/update-tiponoticia", checkToken, (req, res) => {
-  let not = req.body;
+router.put("/update-tiponoticia", checkToken, async (c) => {
+  let not = await c.req.json();
   var sql = "UPDATE tiponoticia SET nombre=?, nombreEN=?  WHERE idtipoNoticia=?;";
-  mysqlConnection.query(sql, [not.nombre, not.nombreEN, not.idtipoNoticia], (err, rows, fields) => {
-    if (!err) {
-      res.send({ status: 1, message: "La tiponoticia ha sido actualizada" });
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [not.nombre, not.nombreEN, not.idtipoNoticia], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json({ status: 1, message: "La tiponoticia ha sido actualizada" }));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-module.exports = Router;
+module.exports = router;

@@ -1,63 +1,75 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-genero", (req, res) => {
-  mysqlConnection.query("SELECT * from genero", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-genero", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from genero", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-genero", checkToken, (req, res) => {
-  let genero = req.body;
+router.post("/post-genero", checkToken, async (c) => {
+  let genero = await c.req.json();
   var sql = "INSERT INTO genero (idGenero, nombre, fechaCreacion, fechaActualizacion) VALUES(?,?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [genero.idGenero, genero.nombre, genero.fechaCreacion, genero.fechaActualizacion],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El genero ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.delete("/delete-genero/:id", checkToken, (req, res) => {
-  mysqlConnection.query("DELETE genero WHERE idGenero = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      rows.forEach((element) => {
-        if (element.constructor == Array) {
-          res.send("Insertado id: " + element[0].idgenero);
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [genero.idGenero, genero.nombre, genero.fechaCreacion, genero.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El genero ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
         }
-      });
-    } else {
-      console.log(err);
-    }
+      },
+    );
   });
 });
 
-Router.put("/update-genero", checkToken, (req, res) => {
-  let genero = req.body;
-  var sql = "UPDATE genero SET idGenero=?, nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idGenero=?;";
-  mysqlConnection.query(
-    sql,
-    [genero.idgenero, genero.idGenero, genero.nombre, genero.fechaCreacion, genero.fechaActualizacion],
-    (err, rows, fields) => {
+router.delete("/delete-genero/:id", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("DELETE genero WHERE idGenero = ?", [c.req.param("id")], (err, rows, fields) => {
       if (!err) {
-        res.send({ message: "El genero ha sido actualizada" });
+        rows.forEach((element) => {
+          if (element.constructor == Array) {
+            resolve(c.json("Insertado id: " + element[0].idgenero));
+          }
+        });
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-module.exports = Router;
+router.put("/update-genero", checkToken, async (c) => {
+  let genero = await c.req.json();
+  var sql = "UPDATE genero SET idGenero=?, nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idGenero=?;";
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [genero.idgenero, genero.idGenero, genero.nombre, genero.fechaCreacion, genero.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El genero ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+module.exports = router;

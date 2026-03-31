@@ -1,63 +1,75 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-prefijo", (req, res) => {
-  mysqlConnection.query("SELECT * from prefijo", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-prefijo", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from prefijo", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-prefijo", checkToken, (req, res) => {
-  let prefijo = req.body;
+router.post("/post-prefijo", checkToken, async (c) => {
+  let prefijo = await c.req.json();
   var sql = "INSERT INTO prefijo (idPrefijo, nombre, fechaCreacion, fechaActualizacion) VALUES(?,?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [prefijo.idPrefijo, prefijo.nombre, prefijo.fechaCreacion, prefijo.fechaActualizacion],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El prefijo ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
-});
-
-Router.delete("/delete-prefijo/:id", checkToken, (req, res) => {
-  mysqlConnection.query("DELETE prefijo WHERE idPrefijo = ?", [req.params.id], (err, rows, fields) => {
-    if (!err) {
-      rows.forEach((element) => {
-        if (element.constructor == Array) {
-          res.send("Insertado id: " + element[0].idprefijo);
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [prefijo.idPrefijo, prefijo.nombre, prefijo.fechaCreacion, prefijo.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El prefijo ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
         }
-      });
-    } else {
-      console.log(err);
-    }
+      },
+    );
   });
 });
 
-Router.put("/update-prefijo", checkToken, (req, res) => {
-  let prefijo = req.body;
-  var sql = "UPDATE prefijo SET idPrefijo=?, nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idPrefijo=?;";
-  mysqlConnection.query(
-    sql,
-    [prefijo.idprefijo, prefijo.idPrefijo, prefijo.nombre, prefijo.fechaCreacion, prefijo.fechaActualizacion],
-    (err, rows, fields) => {
+router.delete("/delete-prefijo/:id", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("DELETE prefijo WHERE idPrefijo = ?", [c.req.param("id")], (err, rows, fields) => {
       if (!err) {
-        res.send({ message: "El prefijo ha sido actualizada" });
+        rows.forEach((element) => {
+          if (element.constructor == Array) {
+            resolve(c.json("Insertado id: " + element[0].idprefijo));
+          }
+        });
       } else {
         console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
       }
-    },
-  );
+    });
+  });
 });
 
-module.exports = Router;
+router.put("/update-prefijo", checkToken, async (c) => {
+  let prefijo = await c.req.json();
+  var sql = "UPDATE prefijo SET idPrefijo=?, nombre=?, fechaCreacion=?, fechaActualizacion=? WHERE  idPrefijo=?;";
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [prefijo.idprefijo, prefijo.idPrefijo, prefijo.nombre, prefijo.fechaCreacion, prefijo.fechaActualizacion],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El prefijo ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
+});
+
+module.exports = router;

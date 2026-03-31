@@ -1,101 +1,118 @@
-const express = require("express");
+const { Hono } = require("hono");
 const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
 
-const Router = express.Router();
+const router = new Hono();
 
-Router.get("/get-publicacionhasusuario", (req, res) => {
-  mysqlConnection.query("SELECT * from publicacion_has_usuario", (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+router.get("/get-publicacionhasusuario", (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query("SELECT * from publicacion_has_usuario", (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.get("/get-publicacionhasusuario/:id", (req, res) => {
-  let publicacion_has_usuario = req.params.id;
-  mysqlConnection.query(
-    "SELECT * from publicacion_has_usuario WHERE publicacion_idPublicacion=" + publicacion_has_usuario,
-    (err, rows, fields) => {
-      if (!err) {
-        res.send(rows);
-      } else {
-        console.log(err);
-      }
-    },
-  );
+router.get("/get-publicacionhasusuario/:id", (c) => {
+  let publicacion_has_usuario = c.req.param("id");
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "SELECT * from publicacion_has_usuario WHERE publicacion_idPublicacion=" + publicacion_has_usuario,
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json(rows));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.post("/search-publicacionhasusuario", (req, res) => {
-  let publicacionhasusuario = req.body;
+router.post("/search-publicacionhasusuario", async (c) => {
+  let publicacionhasusuario = await c.req.json();
   var sql = "SELECT * from publicacion_has_usuario WHERE usuario_DNI=?";
-  mysqlConnection.query(sql, [publicacionhasusuario.usuario_DNI], (err, rows, fields) => {
-    if (!err) {
-      res.send(rows);
-    } else {
-      console.log(err);
-    }
+  return new Promise((resolve) => {
+    mysqlConnection.query(sql, [publicacionhasusuario.usuario_DNI], (err, rows, fields) => {
+      if (!err) {
+        resolve(c.json(rows));
+      } else {
+        console.log(err);
+        resolve(c.json({ error: "Database error" }, 500));
+      }
+    });
   });
 });
 
-Router.post("/post-publicacionhasusuario", checkToken, (req, res) => {
-  let publicacionhasusuario = req.body;
+router.post("/post-publicacionhasusuario", checkToken, async (c) => {
+  let publicacionhasusuario = await c.req.json();
   var sql = "INSERT INTO publicacion_has_usuario (usuario_DNI, publicacion_idPublicacion, isPrincipal) VALUES(?,?,?);";
-  mysqlConnection.query(
-    sql,
-    [
-      publicacionhasusuario.usuario_DNI,
-      publicacionhasusuario.publicacion_idPublicacion,
-      publicacionhasusuario.isPrincipal,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ message: "El publicacion_has_usuario ha sido guardada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        publicacionhasusuario.usuario_DNI,
+        publicacionhasusuario.publicacion_idPublicacion,
+        publicacionhasusuario.isPrincipal,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ message: "El publicacion_has_usuario ha sido guardada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-Router.delete("/delete-publicacionhasusuario/:id", checkToken, (req, res) => {
-  mysqlConnection.query(
-    "DELETE FROM publicacion_has_usuario WHERE publicacion_idPublicacion=?",
-    [req.params.id],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "Borrado exitosamente" });
-      } else {
-        console.log(err);
-        res.send({ status: 1, message: "La publicacion no existe" });
-      }
-    },
-  );
+router.delete("/delete-publicacionhasusuario/:id", checkToken, (c) => {
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      "DELETE FROM publicacion_has_usuario WHERE publicacion_idPublicacion=?",
+      [c.req.param("id")],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "Borrado exitosamente" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ status: 1, message: "La publicacion no existe" }));
+        }
+      },
+    );
+  });
 });
 
-Router.put("/update-publicacionhasusuario", checkToken, (req, res) => {
-  let publicacionhasusuario = req.body;
+router.put("/update-publicacionhasusuario", checkToken, async (c) => {
+  let publicacionhasusuario = await c.req.json();
   var sql =
     "UPDATE publicacion_has_usuario SET usuario_DNI=?, publicacion_idPublicacion=?, fechaCreacion=?,fechaActualizacion=?, isPrincipal=? WHERE  usuario_DNI=? AND publicacion_idPublicacion=?;";
-  mysqlConnection.query(
-    sql,
-    [
-      publicacionhasusuario.usuario_DNI,
-      publicacionhasusuario.publicacion_idPublicacion,
-      publicacionhasusuario.fechaCreacion,
-      publicacionhasusuario.fechaActualizacion,
-      publicacionhasusuario.isPrincipal,
-    ],
-    (err, rows, fields) => {
-      if (!err) {
-        res.send({ status: 1, message: "El publicacion_has_usuario ha sido actualizada" });
-      } else {
-        console.log(err);
-      }
-    },
-  );
+  return new Promise((resolve) => {
+    mysqlConnection.query(
+      sql,
+      [
+        publicacionhasusuario.usuario_DNI,
+        publicacionhasusuario.publicacion_idPublicacion,
+        publicacionhasusuario.fechaCreacion,
+        publicacionhasusuario.fechaActualizacion,
+        publicacionhasusuario.isPrincipal,
+      ],
+      (err, rows, fields) => {
+        if (!err) {
+          resolve(c.json({ status: 1, message: "El publicacion_has_usuario ha sido actualizada" }));
+        } else {
+          console.log(err);
+          resolve(c.json({ error: "Database error" }, 500));
+        }
+      },
+    );
+  });
 });
 
-module.exports = Router;
+module.exports = router;
