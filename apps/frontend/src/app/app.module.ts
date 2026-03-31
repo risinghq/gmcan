@@ -1,5 +1,5 @@
 import { BrowserModule, Meta  } from '@angular/platform-browser';
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import {DatePipe, TitleCasePipe } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -267,7 +267,7 @@ registerLocaleData(localeEsAr, 'es-Ar');
     BaseChartDirective,
   ],
   exports:[LocalDatePipe],
-  providers: [provideCharts(withDefaultRegisterables()), DatePipe, TitleCasePipe, {provide: LOCALE_ID,
+  providers: [provideZonelessChangeDetection(), provideCharts(withDefaultRegisterables()), DatePipe, TitleCasePipe, {provide: LOCALE_ID,
     deps: [SessionService],
     useFactory: (sessionService) => sessionService.locale}, AuthGuard, Meta,
   DeactivateGuard, 
