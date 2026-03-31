@@ -6,8 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e"
+    "lint": "oxlint",
+    "format": "oxfmt --fix .",
+    "format:check": "oxfmt --check ."
   },
   "private": true,
   "dependencies": {
@@ -50,7 +51,6 @@
     "@types/node": "^25.0.0",
     "@vitest/ui": "^4.1.2",
     "jsdom": "^29.0.1",
-    "prettier": "^3.5.3",
     "typescript": "~5.9.0",
     "vitest": "^4.1.2"
   },

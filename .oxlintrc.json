@@ -1,0 +1,33 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2022": true
+  },
+  "rules": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "style": "off",
+    "perf": "warn",
+    "nursery": "off"
+  },
+  "settings": {
+    "moduleResolver": {
+      "extensions": [".ts", ".tsx", ".js", ".jsx", ".json"]
+    }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts", "**/*.test.ts"],
+      "rules": {
+        "correctness/no-unused-variables": "off"
+      }
+    },
+    {
+      "files": ["**/node_modules/**", "**/dist/**", "**/out-tsc/**"],
+      "rules": {
+        "correctness": "off"
+      }
+    }
+  ]
+}

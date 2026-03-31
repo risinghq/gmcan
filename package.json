@@ -10,7 +10,13 @@
     "build:frontend": "pnpm --filter frontend run build",
     "build:backend": "pnpm --filter backend run build",
     "test": "pnpm --filter \"./apps/*\" run test",
-    "lint": "pnpm --filter \"./apps/*\" run lint"
+    "lint": "oxlint .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
+  },
+  "devDependencies": {
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0"
   },
   "engines": {
     "node": ">=20.19.0",
