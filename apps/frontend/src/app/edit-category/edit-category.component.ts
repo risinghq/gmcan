@@ -7,12 +7,13 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import { NoticiaService } from '../services/noticia.service';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommonService } from '../services/common.service';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-category',
   templateUrl: '../add-category/add-category.component.html',
   styleUrls: ['../add-category/add-category.component.scss']
@@ -164,6 +165,7 @@ export class EditCategoryComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -176,6 +178,7 @@ export class DialogCancel2 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

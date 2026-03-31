@@ -12,6 +12,7 @@ import { CommonService } from '../services/common.service';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-category',
   templateUrl: './add-category.component.html',
   styleUrls: ['./add-category.component.scss']
@@ -102,6 +103,7 @@ export class AddCategoryComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

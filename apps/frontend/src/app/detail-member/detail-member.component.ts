@@ -16,7 +16,6 @@ import { PrefijoService } from '../services/prefijo.service';
 import { TipoMiembroService } from '../services/tipomiembro.service';
 import { TipoPublicacionService } from '../services/tipopublicacion.service';
 import { TipoPublicacion } from '../models/tipopublicacion';
-import { timeout } from 'rxjs/operators';
 import { GLOBAL } from '../services/global';
 import { EventoService } from '../services/evento.service';
 import { Location } from '@angular/common';
@@ -24,6 +23,7 @@ import { TipoTesisService } from '../services/tipotesis.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-detail-member',
   templateUrl: './detail-member.component.html',
   styleUrls: ['./detail-member.component.scss']

@@ -27,7 +27,7 @@
                             Tipo <span class="red-text">*</span>
                         </div>
                         <mat-form-field class="input-category" floatLabel="never">
-                            <mat-placeholder class="placeholder mt--7">Seleccionar tipo</mat-placeholder>
+                            <mat-label>Seleccionar tipo</mat-label>
                             <mat-select [(ngModel)]="publicacion.tipoTesis_idTipoTesis" formControlName="tipoTesis_idTipoTesis" name="tipoTesis_idTipoTesis">
                                 <mat-option [value]="tipoTesis.idTipoTesis" *ngFor="let tipoTesis of tipoTesis">{{tipoTesis.nombre}}</mat-option>
                             </mat-select>
@@ -39,7 +39,7 @@
                                 Fecha de publicación <span class="red-text">*</span>
                             </div>
                             <mat-form-field class="input-category" floatLabel="never">
-                                <mat-placeholder class="placeholder mt--7">Seleccionar fecha de publicación</mat-placeholder>
+                                <mat-label>Seleccionar fecha de publicación</mat-label>
                                 <input matInput [(ngModel)]="publicacion.fechaPublicacionDate" [matDatepicker]="dp"
                                 formControlName="fechaPublicacionDate" name="fechaPublicacionDate">
 
@@ -53,7 +53,7 @@
                             Universidad <span class="red-text">*</span>
                         </div>
                         <mat-form-field class="input-category" floatLabel="never">
-                            <mat-placeholder class="placeholder mt--7">Seleccionar revista</mat-placeholder>
+                            <mat-label>Seleccionar revista</mat-label>
                             <mat-select [(ngModel)]="publicacion.universidad_idUniversidad" formControlName="universidad_idUniversidad" name="universidad_idUniversidad">
                                 <mat-option [value]="universidad.idUniversidad" *ngFor="let universidad of universidad">{{universidad.nombre}}</mat-option>
                             </mat-select>
@@ -74,7 +74,7 @@
                                     matInput
                                     [formControl]="otroAutor.myControl"
                                     [matAutocomplete]="auto" [(ngModel)]="otroAutor.nombre">
-                                <mat-placeholder class="placeholder custom-place">Seleccionar autor</mat-placeholder>
+                                <mat-label>Seleccionar autor</mat-label>
                                 <mat-autocomplete (optionSelected)="selectUserAutor($event.option, 0, i)" autoActiveFirstOption #auto="matAutocomplete">
                                   <mat-option class="mdc-list-item" *ngFor="let option of otroAutor.filteredOptions | async" [value]="option.nombre">
                                     <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">

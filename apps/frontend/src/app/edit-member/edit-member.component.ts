@@ -4,7 +4,9 @@ import { UsuarioService } from '../services/usuario.service';
 import { TipoMiembroService } from '../services/tipomiembro.service';
 import { PrefijoService } from '../services/prefijo.service';
 import { GeneroService } from '../services/genero.service';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../add-news/add-news.component';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -15,7 +17,7 @@ import { Genero } from '../models/genero';
 import { UsuarioHasPermisoService } from '../services/usuariohaspermiso.service';
 import { UsuarioPermiso } from '../models/usuariopermiso';
 import { CommonService } from '../services/common.service';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DialogData } from '../models/dialogdata';
 import { NoticiaService } from '../services/noticia.service';
@@ -28,6 +30,7 @@ import { GLOBAL } from '../services/global';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-member',
   templateUrl: '../add-member/add-member.component.html',
   styleUrls: ['./edit-member.component.scss'],
@@ -506,6 +509,7 @@ export class EditMemberComponent implements OnInit {
 
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -518,6 +522,7 @@ export class DialogReturn2 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

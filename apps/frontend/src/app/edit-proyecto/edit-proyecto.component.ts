@@ -1,12 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatSnackBar, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from '../services/common.service';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Usuario } from '../models/usuario';
 import { UsuarioService } from '../services/usuario.service';
 import { Observable } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { LineasInvestigacionService } from '../services/lineasinvestigacion.service';
 import { lineasInvestigacion } from '../models/lineaInvestigacion';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
@@ -28,6 +30,7 @@ import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
+  standalone: false,
   selector: 'app-edit-proyecto',
   templateUrl: '../add-proyecto/add-proyecto.component.html',
   styleUrls: ['../add-proyecto/add-proyecto.component.scss'],
@@ -417,6 +420,7 @@ export class EditProyectoComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -429,6 +433,7 @@ export class DialogCancel21 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

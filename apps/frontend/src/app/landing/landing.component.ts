@@ -1,5 +1,5 @@
-import { NgModule, Component, OnInit, Renderer2, HostListener } from '@angular/core';
-import { Routes, RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, Renderer2, HostListener } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Grupo } from '../models/grupo';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { GrupoService } from '../services/grupo.service';
@@ -10,6 +10,7 @@ import { Location } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']

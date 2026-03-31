@@ -1,9 +1,14 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { ClassicEditor } from 'ckeditor5';
 import { AboutUsService } from '../services/aboutus.service';
 import { SobreNosotros } from '../models/aboutus';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA, MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { CommonService } from '../services/common.service';
 import { GLOBAL } from '../services/global';
 import { LineasInvestigacionService } from '../services/lineasinvestigacion.service';
@@ -20,11 +25,13 @@ import { Equipo } from '../models/equipo';
 import { Software } from '../models/software';
 
 @Component({
+  standalone: false,
   selector: 'app-contenidos',
   templateUrl: './contenidos.component.html',
   styleUrls: ['./contenidos.component.scss']
 })
 export class ContenidosComponent implements OnInit {
+  public Editor = ClassicEditor;
   displayedColumns: string[] = ['nombre'];
   displayedColumns2: string[] = ['nombre'];
   url;
@@ -540,6 +547,7 @@ export class ContenidosComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/about-us.html',
   styleUrls: ['../about-us/about-us.component.scss'],
@@ -568,6 +576,7 @@ export class DialogPreview3 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/trabajos-futuros.html',
   styleUrls: ['../works/works.component.scss'],

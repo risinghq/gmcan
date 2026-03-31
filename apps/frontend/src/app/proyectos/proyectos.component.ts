@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Proyecto } from '../models/proyecto';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { TitleCasePipe, DatePipe } from '@angular/common';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
@@ -11,6 +13,7 @@ import { UsuarioService } from '../services/usuario.service';
 import { GLOBAL } from '../services/global';
 
 @Component({
+  standalone: false,
   selector: 'app-proyectos',
   templateUrl: './proyectos.component.html',
   styleUrls: ['./proyectos.component.scss']

@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Universidad } from '../models/universidad';
 import { UniversidadService } from '../services/universidad.service';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { Publicacion } from '../models/publicacion';
 import { Router } from '@angular/router';
 import { PublicacionService } from '../services/publicacion.service';
@@ -14,6 +16,7 @@ import { TipoTesisService } from '../services/tipotesis.service';
 import { GLOBAL } from '../services/global';
 
 @Component({
+  standalone: false,
   selector: 'app-tesis',
   templateUrl: './tesis.component.html',
   styleUrls: ['./tesis.component.scss']

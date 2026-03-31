@@ -1,8 +1,4 @@
 import {Injectable} from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import {GLOBAL} from './global';
-import { stringify } from 'querystring';
 
 @Injectable({
 	providedIn: 'root'

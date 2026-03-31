@@ -5,28 +5,28 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import  {MatSidenavModule,
-          MatToolbarModule,
-          MatIconModule,
-          MatListModule,
-          MatButtonModule,
-          MatFormFieldModule,
-          MatInputModule,
-          MatProgressSpinnerModule,
-          MatTabsModule,
-          MatDialogModule,
-          MatMenuModule,
-          MatChipsModule,
-          MatTableModule,
-          MatPaginatorModule,
-          MatSnackBarModule,
-          MatSortModule,
-          MatCardModule,
-          MatSelectModule,
-          MatCheckboxModule,
-          MatDatepickerModule,
-          MatAutocompleteModule, 
-          MatProgressBarModule} from '@angular/material';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { MatCardModule } from '@angular/material/card';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { HomeComponent } from './home/home.component';
 import { MantenimientoComponent } from './mantenimiento/mantenimiento.component';
 import { AboutComponent } from './about/about.component';
@@ -67,16 +67,13 @@ import { PerfilComponent } from './perfil/perfil.component';
 import { MiembrosComponent } from './miembros/miembros.component';
 import { ContenidosComponent, DialogPreview3, DialogPreview6 } from './contenidos/contenidos.component';
 import { AuthGuard } from './guards/auth.guard';
-import { RandomGuard } from './guards/random.guard';
 import { TokenInterceptor } from './token.interceptor';
-import { AuthService } from './services/auth.service';
-import { NgIdleKeepaliveModule } from '@ng-idle/keepalive'; // this includes the core NgIdleModule but includes keepalive providers for easy wireup
-import { MomentModule } from 'angular2-moment';
+import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { AddCategoryComponent, DialogCancel } from './add-category/add-category.component';
 import { EditCategoryComponent, DialogCancel2, DialogErase } from './edit-category/edit-category.component';
-import { AddNewsComponent, DialogCancel3, DialogPublish, DialogPreview } from './add-news/add-news.component'; // optional, provides moment-style pipes for date formatting
+import { AddNewsComponent, DialogCancel3, DialogPublish, DialogPreview } from './add-news/add-news.component';
 import { MomentDateModule } from '@angular/material-moment-adapter';
-import { CKEditorModule } from 'ckeditor4-angular';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { EditNewsComponent, DialogCancel4, DialogPreview2, DialogPublish2, DialogPublish3, DialogErase2 } from './edit-news/edit-news.component';
 import { AddMemberComponent, DialogReturn } from './add-member/add-member.component';
 import { DeactivateGuard } from './guards/deactivate-guard';
@@ -140,10 +137,9 @@ import { EditEquipoGuard } from './guards/editequipo.guard';
 import { AddSoftwareGuard } from './guards/addsoftware.guard';
 import { EditSoftwareComponent, DialogCancel29, DialogErase14 } from './edit-software/edit-software.component';
 import { EditSoftwareGuard } from './guards/editsoftware.guard';
-import { ChartsModule, MDBBootstrapModule, WavesModule } from 'angular-bootstrap-md';
+import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { SessionService } from './services/session.service';
 
-    // registrar los locales con el nombre que quieras utilizar a la hora de proveer
 registerLocaleData(localePy, 'es');
 registerLocaleData(localePt, 'pt');
 registerLocaleData(localeEn, 'en')
@@ -258,7 +254,6 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatTableModule,
     MatPaginatorModule,
     NgIdleKeepaliveModule.forRoot(),
-    MomentModule,
     HttpClientModule,
     MatSnackBarModule,
     MatDatepickerModule,
@@ -269,16 +264,10 @@ registerLocaleData(localeEsAr, 'es-Ar');
     MatCheckboxModule,
     MatAutocompleteModule,
     MatProgressBarModule,
-    MDBBootstrapModule.forRoot(),
-    ChartsModule, WavesModule,
+    BaseChartDirective,
   ],
   exports:[LocalDatePipe],
-  entryComponents:[EmailExitoso, DialogLogOff, DialogIdle, DialogCancel, DialogCancel2, DialogErase, DialogCancel3,DialogPublish, DialogPreview, DialogCancel4,DialogPreview2, DialogPublish2,
-    DialogPublish3, DialogErase2, DialogReturn, DialogReturn2, DialogCancel5, DialogCancel6, DialogCancel7, DialogCancel8, DialogCancel9, DialogErase3, DialogErase4, DialogCancel10,
-    DialogErase5, DialogCancel11, DialogCancel12, DialogCancel13, DialogErase6, DialogCancel14, DialogCancel15, DialogErase7, DialogCancel16, DialogErase8, DialogCancel17, DialogCancel18, DialogCancel19, DialogErase9,
-    DialogCancel20,DialogCancel21, DialogErase10, DialogPreview3,DialogCancel22, DialogErase11, DialogCancel23, DialogCancel24, DialogCancel25, DialogErase12, DialogPreview4, DialogPreview5, DialogCancel26, DialogCancel27,
-    DialogErase13,DialogCancel28, DialogCancel29, DialogErase14, DialogPreview6],
-  providers: [DatePipe, TitleCasePipe, {provide: LOCALE_ID,
+  providers: [provideCharts(withDefaultRegisterables()), DatePipe, TitleCasePipe, {provide: LOCALE_ID,
     deps: [SessionService],
     useFactory: (sessionService) => sessionService.locale}, AuthGuard, Meta,
   DeactivateGuard, 

@@ -5,13 +5,13 @@ import { Grupo } from './models/grupo';
 import { Languages } from '../app/models/languages'
 import { SessionService } from './services/session.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { SearchService } from './services/search.service';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 declare const gtag: Function;
 
 
 @Component({
+  standalone: false,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

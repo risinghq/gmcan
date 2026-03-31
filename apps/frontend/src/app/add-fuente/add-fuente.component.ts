@@ -3,7 +3,8 @@ import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.se
 import { FuenteFinanciamiento } from '../models/fuentefinanciamiento';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -11,6 +12,7 @@ import { DialogData } from '../models/dialogdata';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-fuente',
   templateUrl: './add-fuente.component.html',
   styleUrls: ['./add-fuente.component.scss']
@@ -95,6 +97,7 @@ export class AddFuenteComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

@@ -2,7 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { lineasInvestigacion } from '../models/lineaInvestigacion';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { GLOBAL } from '../services/global';
 import { LineasInvestigacionService } from '../services/lineasinvestigacion.service';
@@ -12,6 +13,7 @@ import { DialogData } from '../models/dialogdata';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-linea',
   templateUrl: './add-linea.component.html',
   styleUrls: ['./add-linea.component.scss']
@@ -130,6 +132,7 @@ export class AddLineaComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

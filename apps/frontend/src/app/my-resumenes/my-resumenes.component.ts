@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { Publicacion } from '../models/publicacion';
 import { Router } from '@angular/router';
 import { RevistaService } from '../services/revista.service';
@@ -14,6 +16,7 @@ import { GLOBAL } from '../services/global';
 import { EventoService } from '../services/evento.service';
 
 @Component({
+  standalone: false,
   selector: 'app-my-resumenes',
   templateUrl: './my-resumenes.component.html',
   styleUrls: ['./my-resumenes.component.scss']

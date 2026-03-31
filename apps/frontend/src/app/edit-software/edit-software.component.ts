@@ -2,7 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Software } from '../models/software';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { SoftwareService } from '../services/software.service';
 import { Observable } from 'rxjs';
@@ -11,6 +12,7 @@ import { DialogData } from '../models/dialogdata';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-software',
   templateUrl: '../add-software/add-software.component.html',
   styleUrls: ['../add-software/add-software.component.scss']
@@ -139,6 +141,7 @@ export class EditSoftwareComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -151,6 +154,7 @@ export class DialogCancel29 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

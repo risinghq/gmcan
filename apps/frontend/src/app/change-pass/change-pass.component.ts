@@ -12,6 +12,7 @@ import { Grupo } from "../models/grupo";
 import { GLOBAL } from "../services/global";
 
 @Component({
+  standalone: false,
   selector: "app-change-pass",
   templateUrl: "./change-pass.component.html",
   styleUrls: ["./change-pass.component.scss"],

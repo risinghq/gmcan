@@ -12,6 +12,7 @@ import { GLOBAL } from '../services/global';
 import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-detail-news',
   templateUrl: './detail-news.component.html',
   styleUrls: ['./detail-news.component.scss']

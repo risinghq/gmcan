@@ -4,7 +4,9 @@ import { GLOBAL } from '../services/global';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment} from 'moment';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../edit-news/edit-news.component';
 import { Universidad } from '../models/universidad';
@@ -29,6 +31,7 @@ import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
+  standalone: false,
   selector: 'app-add-tesis',
   templateUrl: './add-tesis.component.html',
   styleUrls: ['./add-tesis.component.scss'],
@@ -326,6 +329,7 @@ export class AddTesisComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

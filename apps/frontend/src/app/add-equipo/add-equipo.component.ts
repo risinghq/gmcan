@@ -3,7 +3,8 @@ import { EquipoService } from '../services/equipo.service';
 import { Equipo } from '../models/equipo';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -11,6 +12,7 @@ import { DialogData } from '../models/dialogdata';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-equipo',
   templateUrl: './add-equipo.component.html',
   styleUrls: ['./add-equipo.component.scss']
@@ -101,6 +103,7 @@ export class AddEquipoComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

@@ -13,6 +13,7 @@ import { MonedaService } from '../services/moneda.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-lines-investigation',
   templateUrl: './lines-investigation.component.html',
   styleUrls: ['./lines-investigation.component.scss']

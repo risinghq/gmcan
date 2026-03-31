@@ -3,7 +3,8 @@ import { Evento } from '../models/eventos';
 import { EventoService } from '../services/evento.service';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -11,6 +12,7 @@ import { DialogData } from '../models/dialogdata';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-evento',
   templateUrl: './add-evento.component.html',
   styleUrls: ['./add-evento.component.scss']
@@ -189,6 +191,7 @@ export class AddEventoComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

@@ -10,6 +10,7 @@ import { TipoMiembroService } from '../services/tipomiembro.service';
 import { TipoPublicacionService } from '../services/tipopublicacion.service';
 
 @Component({
+  standalone: false,
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -131,16 +132,12 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public chartType: string = 'pie';
+  public chartType: any = 'pie';
 
   public chartDatasets: Array<any> = [
-    { data: [], label: 'My First dataset' }
-  ];
-
-  public chartLabels: Array<any> = [];
-
-  public chartColors: Array<any> = [
     {
+      data: [],
+      label: 'My First dataset',
       backgroundColor: [
         'rgba(13,56,0,1)',
         'rgba(0,133,51,1)',
@@ -161,22 +158,20 @@ export class DashboardComponent implements OnInit {
     }
   ];
 
+  public chartLabels: Array<any> = [];
+
   public chartOptions: any = {
     responsive: true
   };
   public chartClicked(e: any): void { }
   public chartHovered(e: any): void { }
 
-  public chartType2: string = 'horizontalBar';
+  public chartType2: any = 'bar';
 
   public chartDatasets2: Array<any> = [
-    { data: [], label: 'My First dataset' }
-  ];
-
-  public chartLabels2: Array<any> = [];
-
-  public chartColors2: Array<any> = [
     {
+      data: [],
+      label: 'Cantidad',
       backgroundColor: [
         'rgba(13,56,0,1)',
         'rgba(0,133,51,1)',
@@ -197,8 +192,11 @@ export class DashboardComponent implements OnInit {
     }
   ];
 
+  public chartLabels2: Array<any> = [];
+
   public chartOptions2: any = {
     responsive: true,
+    indexAxis: 'y',
   };
   public chartClicked2(e: any): void { }
   public chartHovered2(e: any): void { }

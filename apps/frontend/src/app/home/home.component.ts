@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { GrupoService } from '../services/grupo.service';
 import { PublicacionService } from '../services/publicacion.service';
 import { Grupo } from '../models/grupo';
@@ -35,10 +35,11 @@ import { GLOBAL } from '../services/global';
 import { Location } from '@angular/common';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
 import { MonedaService } from '../services/moneda.service';
-import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 
 @Component({
+  standalone: false,
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

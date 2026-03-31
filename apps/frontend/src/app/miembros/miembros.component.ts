@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UsuarioService } from '../services/usuario.service';
-import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { UsuarioFull } from '../models/usuarioFull';
 import { GLOBAL } from '../services/global';
 import { TipoMiembroService } from '../services/tipomiembro.service';
@@ -8,6 +10,7 @@ import { PrefijoService } from '../services/prefijo.service';
 import { Router } from '@angular/router';
 
 @Component({
+  standalone: false,
   selector: 'app-miembros',
   templateUrl: './miembros.component.html',
   styleUrls: ['./miembros.component.scss']

@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoticiaService } from '../services/noticia.service';
 import { DialogData } from '../models/dialogdata';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
@@ -10,8 +11,8 @@ import { UsuarioService } from '../services/usuario.service';
 import {FormControl} from '@angular/forms';
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
-import * as ClassicEditor from '../../assets/ckeditor/ckeditor.js'
-import { Observable } from 'rxjs/internal/Observable';
+import { ClassicEditor } from 'ckeditor5';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import * as _moment from 'moment';
@@ -41,6 +42,7 @@ export const MY_FORMATS = {
 };
 
 @Component({
+  standalone: false,
   selector: 'app-add-news',
   templateUrl: './add-news.component.html',
   styleUrls: ['./add-news.component.scss'],
@@ -58,6 +60,7 @@ export const MY_FORMATS = {
   ],
 })
 export class AddNewsComponent implements OnInit {
+  public Editor = ClassicEditor;
   url;
   noticia: NoticiaFull;
   public newsForm: FormGroup;
@@ -302,6 +305,7 @@ export class AddNewsComponent implements OnInit {
 
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -314,6 +318,7 @@ export class DialogCancel3 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -326,6 +331,7 @@ export class DialogPublish {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-preview.html',
   styleUrls: ['../detail-news/detail-news.component.scss'],

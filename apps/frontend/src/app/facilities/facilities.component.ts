@@ -9,6 +9,7 @@ import { GrupoService } from '../services/grupo.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-facilities',
   templateUrl: './facilities.component.html',
   styleUrls: ['./facilities.component.scss']

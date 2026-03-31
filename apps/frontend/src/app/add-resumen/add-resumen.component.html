@@ -27,7 +27,7 @@
                             Evento <span class="red-text">*</span>
                         </div>
                         <mat-form-field class="input-category" floatLabel="never">
-                            <mat-placeholder class="placeholder mt--7">Seleccionar evento</mat-placeholder>
+                            <mat-label>Seleccionar evento</mat-label>
                             <mat-select [(ngModel)]="publicacion.evento_idEvento" formControlName="evento_idEvento" name="evento_idEvento">
                                 <mat-option [value]="evento.idEvento" *ngFor="let evento of evento">{{evento.nombre}}, {{evento.ciudad}}, {{evento.pais}}.</mat-option>
                             </mat-select>
@@ -39,7 +39,7 @@
                                 Fecha de publicación <span class="red-text">*</span>
                             </div>
                             <mat-form-field class="input-category" floatLabel="never">
-                                <mat-placeholder class="placeholder mt--7">Seleccionar fecha</mat-placeholder>
+                                <mat-label>Seleccionar fecha</mat-label>
                                 <input matInput [(ngModel)]="publicacion.fechaPublicacionDate" [matDatepicker]="dp"
                                 formControlName="fechaPublicacionDate" name="fechaPublicacionDate">
 
@@ -68,7 +68,7 @@
                                 matInput
                                 [formControl]="myControl"
                                 [matAutocomplete]="auto" [(ngModel)]="selectedUser" formControlName="userSelector" name="userSelector">
-                                <mat-placeholder class="placeholder custom-place">Seleccionar autor principal</mat-placeholder>
+                                <mat-label>Seleccionar autor principal</mat-label>
                             <mat-autocomplete (optionSelected)="selectUser($event.option, 0)" autoActiveFirstOption #auto="matAutocomplete">
                               <mat-option class="mdc-list-item" *ngFor="let option of filteredOptions | async" [value]="option.nombre">
                                 <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">
@@ -102,7 +102,7 @@
                                     matInput
                                     [formControl]="otroAutor.myControl"
                                     [matAutocomplete]="auto" [(ngModel)]="otroAutor.nombre">
-                                <mat-placeholder class="placeholder custom-place">Seleccionar autor</mat-placeholder>
+                                <mat-label>Seleccionar autor</mat-label>
                                 <mat-autocomplete (optionSelected)="selectUserAutor($event.option, 0, i)" autoActiveFirstOption #auto="matAutocomplete">
                                   <mat-option class="mdc-list-item" *ngFor="let option of otroAutor.filteredOptions | async" [value]="option.nombre">
                                     <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" *ngIf="!option.foto && option.apellidoPaterno">

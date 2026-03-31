@@ -2,7 +2,9 @@ import { Component, OnInit, Inject } from '@angular/core';
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
 import {default as _rollupMoment} from 'moment';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../edit-news/edit-news.component';
 import { FormBuilder, Validators, FormGroup, FormControl } from '@angular/forms';
@@ -28,6 +30,7 @@ import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
+  standalone: false,
   selector: 'app-edit-tesis',
   templateUrl: '../add-tesis/add-tesis.component.html',
   styleUrls: ['../add-tesis/add-tesis.component.scss'],
@@ -461,6 +464,7 @@ export class EditTesisComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -473,6 +477,7 @@ export class DialogCancel15 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

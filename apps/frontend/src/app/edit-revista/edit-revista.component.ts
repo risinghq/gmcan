@@ -2,7 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Revista } from '../models/revista';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RevistaService } from '../services/revista.service';
 import { CommonService } from '../services/common.service';
 import { PublicacionService } from '../services/publicacion.service';
@@ -12,6 +13,7 @@ import { DialogData } from '../models/dialogdata';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-revista',
   templateUrl: '../add-revista/add-revista.component.html',
   styleUrls: ['../add-revista/add-revista.component.scss']
@@ -153,6 +155,7 @@ export class EditRevistaComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -165,6 +168,7 @@ export class DialogCancel9 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

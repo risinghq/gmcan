@@ -7,17 +7,16 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { UsuarioHasProyectoService } from '../services/usuariohasproyecto';
 import { UsuarioService } from '../services/usuario.service';
 import { Location } from '@angular/common';
-import { ThrowStmt } from '@angular/compiler';
 import { GLOBAL } from '../services/global';
 import { Router, ActivatedRoute, Params} from '@angular/router';
 import { SearchService } from '../services/search.service';
 import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
 import { MonedaService } from '../services/moneda.service';
 import { GrupoService } from '../services/grupo.service';
-import { ProgressSpinnerMode } from '@angular/material';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-projects',
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.scss']

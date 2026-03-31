@@ -11,6 +11,7 @@ import { UsuarioService } from '../services/usuario.service';
 import { GLOBAL } from '../services/global';
 
 @Component({
+  standalone: false,
   selector: 'app-news',
   templateUrl: './news.component.html',
   styleUrls: ['./news.component.scss']

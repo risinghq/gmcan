@@ -2,7 +2,9 @@ import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UsuarioFull } from '../models/usuarioFull';
 import { UsuarioService } from '../services/usuario.service';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../add-news/add-news.component';
 import { GeneroService } from '../services/genero.service';
@@ -16,7 +18,7 @@ import { UsuarioPermiso } from '../models/usuariopermiso';
 import { UsuarioHasPermisoService } from '../services/usuariohaspermiso.service';
 import { Router } from '@angular/router';
 import { DialogData } from '../models/dialogdata';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommonService } from '../services/common.service';
 import * as _moment from 'moment';
@@ -27,6 +29,7 @@ import { GLOBAL } from '../services/global';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-member',
   templateUrl: './add-member.component.html',
   styleUrls: ['./add-member.component.scss'],
@@ -304,6 +307,7 @@ export class AddMemberComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EmailBody } from '../models/emailBody';
 import { EmailService } from '../services/email.service';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GLOBAL } from '../services/global';
-import { Router, ActivatedRoute, Params} from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-join-us',
   templateUrl: './join-us.component.html',
   styleUrls: ['./join-us.component.scss']
@@ -82,6 +83,7 @@ export class JoinUsComponent implements OnInit {
 
 
 @Component({
+  standalone: false,
   selector: 'exitoso-dialog',
   templateUrl: '../modals/email-exitoso.html',
 })

@@ -1,5 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatSnackBar, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from '../services/common.service';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -29,6 +31,7 @@ import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
+  standalone: false,
   selector: 'app-add-proyecto',
   templateUrl: './add-proyecto.component.html',
   styleUrls: ['./add-proyecto.component.scss'],
@@ -46,6 +49,8 @@ const moment = _rollupMoment || _moment;
   ],
 })
 export class AddProyectoComponent implements OnInit {
+  terminado = false;
+  edit = false;
   button_text='Guardar proyecto';
   usuarios: Array<Usuario>;
   lineasInvestigacion: Array<lineasInvestigacion>;
@@ -263,6 +268,7 @@ export class AddProyectoComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

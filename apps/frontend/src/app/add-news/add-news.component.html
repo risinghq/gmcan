@@ -109,7 +109,7 @@
                         Vista Previa
                     </div>
                 </div>
-                <ckeditor [(ngModel)]="noticia.cuerpo" formControlName="cuerpo" name="cuerpo"></ckeditor>
+                <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpo" formControlName="cuerpo" name="cuerpo"></ckeditor>
             </div>
             <div class="full-width mb-32">
                 <div class="flex-news">
@@ -120,7 +120,7 @@
                         Vista Previa
                     </div>
                 </div>
-                <ckeditor [(ngModel)]="noticia.cuerpoEN"  formControlName="cuerpoEN" name="cuerpoEN"></ckeditor>
+                <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpoEN"  formControlName="cuerpoEN" name="cuerpoEN"></ckeditor>
             </div>
             <div class="flex-news">
                 <div class='red-btn' *ngIf="edit">

@@ -4,6 +4,7 @@ import { Grupo } from '../models/grupo';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-works',
   templateUrl: './works.component.html',
   styleUrls: ['./works.component.scss']

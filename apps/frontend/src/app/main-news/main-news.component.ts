@@ -5,7 +5,7 @@ import { NoticiaService } from '../services/noticia.service';
 import { DatePipe } from '@angular/common';
 import { TipoNoticia } from '../models/tiponoticia';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
-import { Router, ActivatedRoute, Params} from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
 import { GLOBAL } from '../services/global';
@@ -13,6 +13,7 @@ import { Title } from '@angular/platform-browser';
 
 
 @Component({
+  standalone: false,
   selector: 'app-main-news',
   templateUrl: './main-news.component.html',
   styleUrls: ['./main-news.component.scss']

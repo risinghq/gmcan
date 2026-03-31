@@ -10,7 +10,9 @@ import { PublicacionHasAutorService } from '../services/publicacionhasautor.serv
 import { PublicacionHasUsuarioService } from '../services/publicacionhasusuario.service';
 import { UsuarioService } from '../services/usuario.service';
 import { AutorService } from '../services/autor.service';
-import { MatDialog, MatSnackBar, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { CommonService } from '../services/common.service';
 import { EventoService } from '../services/evento.service';
 import { GLOBAL } from '../services/global';
@@ -27,6 +29,7 @@ import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
+  standalone: false,
   selector: 'app-edit-resumen',
   templateUrl: '../add-resumen/add-resumen.component.html',
   styleUrls: ['../add-resumen/add-resumen.component.scss'],
@@ -478,6 +481,7 @@ export class EditResumenComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -490,6 +494,7 @@ export class DialogCancel17 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

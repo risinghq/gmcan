@@ -1,8 +1,10 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { ClassicEditor } from 'ckeditor5';
 import { Method } from '../models/method';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { MethodsService } from '../services/methods.service';
 import { GLOBAL } from '../services/global';
@@ -13,12 +15,13 @@ import { Languages } from '../models/languages';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-edit-method',
   templateUrl: '../add-method/add-method.component.html',
   styleUrls: ['../add-method/add-method.component.scss']
 })
 export class EditMethodComponent implements OnInit {
-
+  public Editor = ClassicEditor;
   button_text="Actualizar información";
   metodo: Method
   public methodForm: FormGroup;
@@ -196,6 +199,7 @@ export class EditMethodComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -208,6 +212,7 @@ export class DialogCancel25 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -220,6 +225,7 @@ export class DialogErase12 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/method-preview.html',
   styleUrls: ['../method/method.component.scss'],

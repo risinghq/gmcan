@@ -1,9 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
+import { ClassicEditor } from 'ckeditor5';
 import { Method } from '../models/method';
 import { MethodsService } from '../services/methods.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonService } from '../services/common.service';
 import { GLOBAL } from '../services/global';
 import { Observable } from 'rxjs';
@@ -13,12 +15,13 @@ import { Languages } from '../models/languages';
 import { SpaceValidator } from '../services/spacevalidator';
 
 @Component({
+  standalone: false,
   selector: 'app-add-method',
   templateUrl: './add-method.component.html',
   styleUrls: ['./add-method.component.scss']
 })
 export class AddMethodComponent implements OnInit {
-
+  public Editor = ClassicEditor;
   button_text="Guardar método";
   metodo: Method
   public methodForm: FormGroup;
@@ -154,6 +157,7 @@ export class AddMethodComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -166,6 +170,7 @@ export class DialogCancel24 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/method-preview.html',
   styleUrls: ['../method/method.component.scss'],

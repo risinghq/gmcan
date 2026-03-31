@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { NoticiaService } from '../services/noticia.service';
 import { UsuarioService } from '../services/usuario.service';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
@@ -8,9 +10,8 @@ import { TipoNoticia } from '../models/tiponoticia';
 import { TitleCasePipe, DatePipe } from '@angular/common';
 import { GLOBAL } from '../services/global';
 import { ActivatedRoute, Router } from '@angular/router';
-import { __core_private_testing_placeholder__ } from '@angular/core/testing';
-
 @Component({
+  standalone: false,
   selector: 'app-noticias',
   templateUrl: './noticias.component.html',
   styleUrls: ['./noticias.component.scss']

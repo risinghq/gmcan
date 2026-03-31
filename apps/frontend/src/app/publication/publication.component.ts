@@ -1,6 +1,6 @@
-import { Component, OnInit, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PreviousPageService } from '../services/previouspage.service';
-import { Router, ActivatedRoute, Params} from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TipoPublicacionService } from '../services/tipopublicacion.service';
 import { TipoPublicacion } from '../models/tipopublicacion';
 import { PublicacionService } from '../services/publicacion.service';
@@ -20,12 +20,12 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { GLOBAL } from '../services/global';
 import { EventoService } from '../services/evento.service';
-import { identifierModuleUrl } from '@angular/compiler';
 import { TipoTesisService } from '../services/tipotesis.service';
 import { GrupoService } from '../services/grupo.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-publication',
   templateUrl: './publication.component.html',
   styleUrls: ['./publication.component.scss']

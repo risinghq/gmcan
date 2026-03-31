@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { EventoService } from '../services/evento.service';
 import { Evento } from '../models/eventos';
 import { Publicacion } from '../models/publicacion';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { PublicacionService } from '../services/publicacion.service';
 import { TitleCasePipe, DatePipe } from '@angular/common';
@@ -13,6 +15,7 @@ import { AutorService } from '../services/autor.service';
 import { GLOBAL } from '../services/global';
 
 @Component({
+  standalone: false,
   selector: 'app-eventos',
   templateUrl: './eventos.component.html',
   styleUrls: ['./eventos.component.scss']

@@ -1,16 +1,16 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { UsuarioService } from '../services/usuario.service';
 import { UsuarioFull } from '../models/usuarioFull';
 import { PrefijoService } from '../services/prefijo.service';
 import { TipoMiembroService } from '../services/tipomiembro.service';
 import { TipoMiembro } from '../models/tipomiembro';
-import { Router, ActivatedRoute, Params} from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { GLOBAL } from '../services/global';
-import { ProgressSpinnerMode } from '@angular/material';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-members',
   templateUrl: './members.component.html',
   styleUrls: ['./members.component.scss']

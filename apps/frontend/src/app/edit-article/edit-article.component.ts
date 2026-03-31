@@ -10,7 +10,9 @@ import { PublicacionHasAutorService } from '../services/publicacionhasautor.serv
 import { PublicacionHasUsuarioService } from '../services/publicacionhasusuario.service';
 import { UsuarioService } from '../services/usuario.service';
 import { AutorService } from '../services/autor.service';
-import { MatDialog, MatSnackBar, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { CommonService } from '../services/common.service';
 import { RevistaService } from '../services/revista.service';
 import { GLOBAL } from '../services/global';
@@ -29,6 +31,7 @@ import { SpaceValidator } from '../services/spacevalidator';
 const moment = _rollupMoment || _moment;
 
 @Component({
+  standalone: false,
   selector: 'app-edit-article',
   templateUrl: '../add-article/add-article.component.html',
   styleUrls: ['../add-article/add-article.component.scss'],
@@ -492,6 +495,7 @@ export class EditArticleComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -504,6 +508,7 @@ export class DialogCancel13 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

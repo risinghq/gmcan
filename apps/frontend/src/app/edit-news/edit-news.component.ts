@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { MatDialog, MatSnackBar, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { NoticiaService } from '../services/noticia.service';
 import { DialogData } from '../models/dialogdata';
 import { TipoNoticiaService } from '../services/tiponoticia.service';
@@ -10,8 +11,8 @@ import { UsuarioService } from '../services/usuario.service';
 import {FormControl} from '@angular/forms';
 import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
-import * as ClassicEditor from '../../assets/ckeditor/ckeditor.js'
-import { Observable } from 'rxjs/internal/Observable';
+import { ClassicEditor } from 'ckeditor5';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import * as _moment from 'moment';
@@ -20,11 +21,9 @@ import {default as _rollupMoment} from 'moment';
 import { NoticiaFull } from '../models/noticiafull';
 import { Usuario } from '../models/usuario';
 import { GLOBAL } from '../services/global';
-import { publish } from 'rxjs/operators';
 import { Languages } from '../models/languages';
 import { TitleCasePipe } from '@angular/common';
 import { DatePipe } from '@angular/common';
-import { stringify } from 'querystring';
 import { CommonService } from '../services/common.service';
 import { SpaceValidator } from '../services/spacevalidator';
 
@@ -43,6 +42,7 @@ export const MY_FORMATS = {
 };
 
 @Component({
+  standalone: false,
   selector: 'app-edit-news',
   templateUrl: '../add-news/add-news.component.html',
   styleUrls: ['../add-news/add-news.component.scss'],
@@ -60,7 +60,7 @@ export const MY_FORMATS = {
   ],
 })
 export class EditNewsComponent implements OnInit {
-
+  public Editor = ClassicEditor;
   noticia: NoticiaFull;
   edit=true;
 
@@ -408,6 +408,7 @@ export class EditNewsComponent implements OnInit {
 
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -420,6 +421,7 @@ export class DialogCancel4 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -433,6 +435,7 @@ export class DialogPublish3 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -446,6 +449,7 @@ export class DialogPublish2 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-preview.html',
   styleUrls: ['../detail-news/detail-news.component.scss'],
@@ -500,6 +504,7 @@ export class DialogPreview2 {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

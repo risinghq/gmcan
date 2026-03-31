@@ -7,17 +7,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GLOBAL } from '../services/global';
 import { UsuarioFull } from '../models/usuarioFull';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
+import { Idle } from '@ng-idle/core';
 import { Keepalive } from '@ng-idle/keepalive';
 import { AuthService } from '../services/auth.service';
 import { DialogData } from '../models/dialogdata';
 import { CommonService } from '../services/common.service';
-import { stringify } from 'querystring';
-import { Languages } from '../models/languages';
 import { GrupoService } from '../services/grupo.service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-log-home',
   templateUrl: './log-home.component.html',
   styleUrls: ['./log-home.component.scss']
@@ -297,6 +296,7 @@ export class LogHomeComponent implements OnInit {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })
@@ -309,6 +309,7 @@ export class DialogIdle {
 }
 
 @Component({
+  standalone: false,
   selector: 'dialog-content-example-dialog',
   templateUrl: '../modals/dialog-options.html',
 })

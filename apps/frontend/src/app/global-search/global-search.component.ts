@@ -29,6 +29,7 @@ import { TipoNoticia } from '../models/tiponoticia';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-global-search',
   templateUrl: './global-search.component.html',
   styleUrls: ['./global-search.component.scss']

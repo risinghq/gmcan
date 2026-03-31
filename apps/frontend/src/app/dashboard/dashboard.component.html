@@ -120,11 +120,10 @@
           </div>
         </div>
         <div class="mt-12" style="display: block">
-          <canvas mdbChart
-              [chartType]="chartType"
+          <canvas baseChart
+              [type]="chartType"
               [datasets]="chartDatasets"
               [labels]="chartLabels"
-              [colors]="chartColors"
               [options]="chartOptions"
               [legend]="true"
               (chartHover)="chartHovered($event)"
@@ -148,12 +147,11 @@
           </div>
         </div>
         <div class="mt-12" style="display: block">
-          <canvas mdbChart scaleLength="1"
-              [chartType]="chartType2"
+          <canvas baseChart
+              [type]="chartType2"
               [datasets]="chartDatasets2"
               [labels]="chartLabels2"
-              [colors]="chartColors2"
-              [options]="chartOptions"
+              [options]="chartOptions2"
               [legend]="false"
               (chartHover)="chartHovered2($event)"
               (chartClick)="chartClicked2($event)">

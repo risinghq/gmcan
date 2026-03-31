@@ -5,6 +5,7 @@ import { GLOBAL } from '../services/global';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: false,
   selector: 'app-method',
   templateUrl: './method.component.html',
   styleUrls: ['./method.component.scss']

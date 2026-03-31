@@ -4,6 +4,7 @@ import { Router, ActivatedRoute, Params} from '@angular/router';
 import { Grupo } from '../models/grupo';
 
 @Component({
+  standalone: false,
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.scss']
