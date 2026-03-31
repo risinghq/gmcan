@@ -3,8 +3,11 @@ const mysqlConnection = require("../connection");
 const { checkToken } = require("../auth/token_validation");
 var fs=require("fs");
 var path=require("path");
-var multipart = require('connect-multiparty');
-var md_upload = multipart({ uploadDir: './uploads/lineainvestigacion'});
+const multer = require('multer');
+const md_upload = multer({ storage: multer.diskStorage({
+    destination: './uploads/lineainvestigacion',
+    filename: (req, file, cb) => cb(null, file.originalname)
+}) }).any();
 
 const Router = express.Router();
 
@@ -110,12 +113,10 @@ Router.put("/update-lineasinvestigacion", checkToken, (req, res) =>{
 
 Router.put("/upload-lineainvestigacion-foto/:id", checkToken, md_upload, (req, res) =>{
     let lineainvestigacion=req.body;
-	if(req.files){
-		var file_path = req.files.foto.path;
-        var file_split = file_path.split('\\');
-		lineainvestigacion.foto = file_split[2];
-		var ext_split =	file_path.split('\.');
-        var file_ext = ext_split[1];
+	if(req.files && req.files.length > 0){
+		var file = req.files[0];
+		lineainvestigacion.foto = file.filename;
+		var file_ext = path.extname(file.originalname).slice(1).toLowerCase();
         var sql = "UPDATE lineasinvestigacion SET foto=? WHERE idLineasInvestigacion="+ req.params.id+ ";";
 		if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg') {
             mysqlConnection.query(sql, [lineainvestigacion.foto], (err, rows, fields)=>{
@@ -133,7 +134,7 @@ Router.put("/upload-lineainvestigacion-foto/:id", checkToken, md_upload, (req, r
     }
 })
 
-Router.get("/get-image-lineainvestigacion/:imageFile", md_upload,  (req, res) =>{
+Router.get("/get-image-lineainvestigacion/:imageFile", (req, res) =>{
     var imageFile = req.params.imageFile;
     var path_file = './uploads/lineainvestigacion/'+imageFile
     fs.exists(path_file, function(exists) {

@@ -4,8 +4,11 @@ const mysqlConnection = require("../connection");
 const Router = express.Router();
 var fs=require("fs");
 var path=require("path");
-var multipart = require('connect-multiparty');
-var md_upload = multipart({ uploadDir: './uploads/publicaciones'});
+const multer = require('multer');
+const md_upload = multer({ storage: multer.diskStorage({
+    destination: './uploads/publicaciones',
+    filename: (req, file, cb) => cb(null, file.originalname)
+}) }).any();
 
 Router.get("/get-publicacion", (req, res) =>{
     mysqlConnection.query("SELECT * from publicacion", (err, rows, fields)=>{
@@ -227,12 +230,10 @@ Router.put("/update-publicacion", (req, res) =>{
 Router.put("/upload-publicacion-file/:id", md_upload, (req, res) =>{
     let publicacion=req.body;
     var sql = "UPDATE publicacion SET archivo=? WHERE idPublicacion="+ req.params.id+ ";";
-	if(req.files){
-		var file_path = req.files.file.path;
-		var file_split = file_path.split('\\');
-		publicacion.archivo = file_split[2];
-		var ext_split =	file_path.split('\.');
-		var file_ext = ext_split[1];
+	if(req.files && req.files.length > 0){
+		var file = req.files[0];
+		publicacion.archivo = file.filename;
+		var file_ext = path.extname(file.originalname).slice(1).toLowerCase();
 		if (file_ext == 'pdf') {
             mysqlConnection.query(sql, [publicacion.archivo], (err, rows, fields)=>{
                 if(!err){
@@ -250,7 +251,7 @@ Router.put("/upload-publicacion-file/:id", md_upload, (req, res) =>{
     }
 })
 
-Router.get("/download-publicacion/:pdfFile", md_upload,  (req, res) =>{
+Router.get("/download-publicacion/:pdfFile", (req, res) =>{
     var pdfFile = req.params.pdfFile;
     var path_file = './uploads/publicaciones/'+pdfFile
     fs.exists(path_file, function(exists) {
@@ -260,7 +261,7 @@ Router.get("/download-publicacion/:pdfFile", md_upload,  (req, res) =>{
     });
 })
 
-Router.get("/get-file-publicacion/:pdfFile", md_upload,  (req, res) =>{
+Router.get("/get-file-publicacion/:pdfFile", (req, res) =>{
     var pdfFile = req.params.pdfFile;
     var path_file = './uploads/publicaciones/'+pdfFile
     fs.exists(path_file, function(exists) {

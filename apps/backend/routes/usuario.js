@@ -9,8 +9,11 @@ const { checkToken } = require("../auth/token_validation");
 
 var fs=require("fs");
 var path=require("path");
-var multipart = require('connect-multiparty');
-var md_upload = multipart({ uploadDir: './uploads/usuario'});
+const multer = require('multer');
+const md_upload = multer({ storage: multer.diskStorage({
+    destination: './uploads/usuario',
+    filename: (req, file, cb) => cb(null, file.originalname)
+}) }).any();
 
 const Router = express.Router();
 
@@ -138,12 +141,10 @@ Router.put("/update-usuario", checkToken, (req, res) =>{
 Router.put("/upload-usuario-file/:id", checkToken, md_upload, (req, res) =>{
     let usuario=req.body;
     var sql = "UPDATE usuario SET foto=? WHERE DNI="+ req.params.id+ ";";
-	if(req.files){
-		var file_path = req.files.image.path;
-		var file_split = file_path.split('\\');
-		usuario.image = file_split[2];
-		var ext_split =	file_path.split('\.');
-		var file_ext = ext_split[1];
+	if(req.files && req.files.length > 0){
+		var file = req.files[0];
+		usuario.image = file.filename;
+		var file_ext = path.extname(file.originalname).slice(1).toLowerCase();
 		if (file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg') {
             mysqlConnection.query(sql, [usuario.image], (err, rows, fields)=>{
                 if(!err){
@@ -161,7 +162,7 @@ Router.put("/upload-usuario-file/:id", checkToken, md_upload, (req, res) =>{
     }
 })
 
-Router.get("/get-image-usuario/:imageFile", md_upload,  (req, res) =>{
+Router.get("/get-image-usuario/:imageFile", (req, res) =>{
     var imageFile = req.params.imageFile;
     var path_file = './uploads/usuario/'+imageFile
     fs.exists(path_file, function(exists) {
