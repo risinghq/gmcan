@@ -37,10 +37,5 @@
   "devDependencies": {
     "nodemon": "^2.0.2",
     "shx": "^0.4.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "bcrypt"
-    ]
   }
 }
