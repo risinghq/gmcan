@@ -1,5 +1,4 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const mysqlConnection = require("./connection");
 
 const GrupoRoutes = require("./routes/grupo");
@@ -35,7 +34,7 @@ const FuenteFinanciamientoRoutes = require("./routes/fuentefinanciamiento");
 const MonedaRoutes = require("./routes/moneda");
 
 var app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use((req,res,next)=>{
 	res.header('Access-Control-Allow-Origin','*');
