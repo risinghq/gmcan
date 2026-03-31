@@ -1,11 +1,3 @@
 # compiled output
 /dist
 /.angular
-
-# dependencies
-/node_modules
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
