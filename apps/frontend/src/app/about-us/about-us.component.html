@@ -1,30 +1,31 @@
 <div class="card-about">
-    <img class="about-img" *ngIf="!aboutus.foto" src="../../assets/img/grupal.jpg">
-    <img class="about-img" *ngIf="aboutus.foto" src="{{url+'sobrenosotros/get-image-sobrenosotros/'+aboutus.foto}}">
-    <div class="about-text-div">
-        <div class="about-title">
-            {{language.aboutText[0].aboutUs}}
-        </div>
-        <div class="about-sub-divi"></div>
-        <div id="whoAre" class="about-text">
-        </div>
-        <div class="about-title about-top">
-            {{language.aboutText[0].ourObjectives}}
-        </div>
-        <div class="about-subtitle">
-            {{language.aboutText[0].ourObjectivesQuestion}}
-        </div>
-        <div class="about-sub-divi"></div>
-        <div id="objectives" class="about-text">
-        </div>
-        <div class="about-title about-top">
-            {{language.aboutText[0].ourServices}}
-        </div>
-        <div class="about-subtitle">
-            {{language.aboutText[0].ourServicesQuestion}}
-        </div>
-        <div class="about-sub-divi"></div>
-        <div id="services" class="about-text">
-        </div>
+  <img class="about-img" *ngIf="!aboutus.foto" src="../../assets/img/grupal.jpg" />
+  <img
+    class="about-img"
+    *ngIf="aboutus.foto"
+    src="{{ url + 'sobrenosotros/get-image-sobrenosotros/' + aboutus.foto }}"
+  />
+  <div class="about-text-div">
+    <div class="about-title">
+      {{ language.aboutText[0].aboutUs }}
     </div>
+    <div class="about-sub-divi"></div>
+    <div id="whoAre" class="about-text"></div>
+    <div class="about-title about-top">
+      {{ language.aboutText[0].ourObjectives }}
+    </div>
+    <div class="about-subtitle">
+      {{ language.aboutText[0].ourObjectivesQuestion }}
+    </div>
+    <div class="about-sub-divi"></div>
+    <div id="objectives" class="about-text"></div>
+    <div class="about-title about-top">
+      {{ language.aboutText[0].ourServices }}
+    </div>
+    <div class="about-subtitle">
+      {{ language.aboutText[0].ourServicesQuestion }}
+    </div>
+    <div class="about-sub-divi"></div>
+    <div id="services" class="about-text"></div>
+  </div>
 </div>

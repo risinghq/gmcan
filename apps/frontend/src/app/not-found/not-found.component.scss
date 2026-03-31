@@ -1,128 +1,128 @@
-.plex-serif{
-    font-family: 'IBM Plex Serif', serif;
+.plex-serif {
+  font-family: "IBM Plex Serif", serif;
 }
 
-.plex-sans{
-    font-family: 'IBM Plex Sans', serif;
+.plex-sans {
+  font-family: "IBM Plex Sans", serif;
 }
 
-$thetransition: all .5s cubic-bezier(.75,.25,0,.75) 0s;
+$thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 
-.not-found-div{
-    @extend .plex-sans;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
+.not-found-div {
+  @extend .plex-sans;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
 
-.not-icon{
-    height: 187px;
+.not-icon {
+  height: 187px;
 }
 
-.not-title{
-    font-weight: 500;
-    line-height: 1.17;
-    letter-spacing: 0.3px;
-    color: #000000;
+.not-title {
+  font-weight: 500;
+  line-height: 1.17;
+  letter-spacing: 0.3px;
+  color: #000000;
 }
 
-.not-text{
-    line-height: 2.69;
-    letter-spacing: 0.3px;
-    color: #939393;
+.not-text {
+  line-height: 2.69;
+  letter-spacing: 0.3px;
+  color: #939393;
 }
 
-.not-btn{
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: auto;
-    width: max-content;
-    border-radius: 4px;
-    border: solid 2px #000000;
-    padding: 4px 9px;
-    background-color: unset;
+.not-btn {
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: auto;
+  width: max-content;
+  border-radius: 4px;
+  border: solid 2px #000000;
+  padding: 4px 9px;
+  background-color: unset;
 }
 
-@media(min-width:961px){
-    .not-title{
-        font-size: 30px;
-        margin-top: 30px;
-    }
-    .not-text{
-        font-size: 20px;
-    }
-    .not-btn{
-        margin-top: 32px;
-    }
+@media (min-width: 961px) {
+  .not-title {
+    font-size: 30px;
+    margin-top: 30px;
+  }
+  .not-text {
+    font-size: 20px;
+  }
+  .not-btn {
+    margin-top: 32px;
+  }
 }
 
-@media(max-width:960px){
-    .not-found-div{
-        padding-left: 20px;
-        padding-right: 20px;
-        padding-top: 46px;
-        padding-bottom: 40px;
-    }
-    .not-title{
-        font-size: 20px;
-        margin-top: 22px;
-    }
-    .not-text{
-        font-size: 13px;   
-    }
-    .not-btn{
-        margin-top: 24px;
-    }
-    .not-btn{
-        width: 100%;
-    }
+@media (max-width: 960px) {
+  .not-found-div {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 46px;
+    padding-bottom: 40px;
+  }
+  .not-title {
+    font-size: 20px;
+    margin-top: 22px;
+  }
+  .not-text {
+    font-size: 13px;
+  }
+  .not-btn {
+    margin-top: 24px;
+  }
+  .not-btn {
+    width: 100%;
+  }
 }
 
-@media (min-width:961px) and (max-width:1500px){
-    .not-found-div{
-        padding-left: 68px;
-        padding-right: 68px;
-        padding-top: 54px;
-        padding-bottom: 48px;
-    }
+@media (min-width: 961px) and (max-width: 1500px) {
+  .not-found-div {
+    padding-left: 68px;
+    padding-right: 68px;
+    padding-top: 54px;
+    padding-bottom: 48px;
+  }
 }
 
-@media(min-width:1500px){
-    .not-found-div{
-        padding-left: 343px;
-        padding-right: 343px;
-        padding-top: 54px;
-        padding-bottom: 48px;
-    }
+@media (min-width: 1500px) {
+  .not-found-div {
+    padding-left: 343px;
+    padding-right: 343px;
+    padding-top: 54px;
+    padding-bottom: 48px;
+  }
 }
 
-.btn-text2{
-    line-height: 1px;
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    color: #000000;
-    @extend .plex-sans;
-    font-weight: bold;
-    text-decoration: unset !important;
-    position: relative;
-    &:before {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 1px;
-        bottom: 0;
-        left: 0;
-        background-color: #30393a;
-        visibility: hidden;
-        -webkit-transform: scaleX(0);
-        transform: scaleX(0);
-        -webkit-transition: $thetransition;
-        transition: $thetransition;
-        }
-        &:hover:before {
-        visibility: visible;
-        -webkit-transform: scaleX(1);
-        transform: scaleX(1);
-        }
+.btn-text2 {
+  line-height: 1px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: #000000;
+  @extend .plex-sans;
+  font-weight: bold;
+  text-decoration: unset !important;
+  position: relative;
+  &:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: #30393a;
+    visibility: hidden;
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    -webkit-transition: $thetransition;
+    transition: $thetransition;
+  }
+  &:hover:before {
+    visibility: visible;
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+  }
 }

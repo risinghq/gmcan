@@ -1,21 +1,23 @@
+import { formatDate } from "@angular/common";
+import { Pipe, PipeTransform } from "@angular/core";
 
-import { Pipe, PipeTransform } from '@angular/core';
-import { formatDate } from '@angular/common';
-import { SessionService } from './session.service';
+import { SessionService } from "./session.service";
 
 @Pipe({
   standalone: false,
-    name: 'localDate'
+  name: "localDate",
 })
 export class LocalDatePipe implements PipeTransform {
+  constructor(private session: SessionService) {}
 
-    constructor(private session: SessionService) { }
-
-    transform(value: any, format: string) {
-     
-        if (!value) { return ''; }
-        if (!format) { format = 'shortDate'; }
-
-        return formatDate(value, format, this.session.locale);       
+  transform(value: any, format: string) {
+    if (!value) {
+      return "";
     }
+    if (!format) {
+      format = "shortDate";
+    }
+
+    return formatDate(value, format, this.session.locale);
+  }
 }

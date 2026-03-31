@@ -1,14 +1,11 @@
-<div class="title-div" mat-dialog-title><span class="title-mat">{{data.title}}</span> <span class="red-timer" *ngIf="data.timer">
-  00:<span [hidden]="!(data.timer<10)">0</span>{{data.timer}}
-</span></div>
-<mat-dialog-content class="mat-text-dialog">
-  {{data.text}}
-</mat-dialog-content>
+<div class="title-div" mat-dialog-title>
+  <span class="title-mat">{{data.title}}</span>
+  <span class="red-timer" *ngIf="data.timer"> 00:<span [hidden]="!(data.timer<10)">0</span>{{data.timer}} </span>
+</div>
+<mat-dialog-content class="mat-text-dialog"> {{data.text}} </mat-dialog-content>
 <mat-dialog-actions class="mat-dialog-justify" align="end">
   <div class="cancel-button link link-set" [mat-dialog-close]="true">{{data.cancel}}</div>
   <div class="black-btn" [mat-dialog-close]="false" cdkFocusInitial>
-    <div class="link link-set">
-      {{data.yes}}
-    </div>
+    <div class="link link-set">{{data.yes}}</div>
   </div>
 </mat-dialog-actions>

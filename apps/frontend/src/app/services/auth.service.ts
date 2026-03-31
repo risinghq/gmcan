@@ -1,52 +1,55 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { of, Observable } from 'rxjs';
-import { catchError, mapTo, tap } from 'rxjs/operators';
-import { config } from '../config';
-import { Tokens } from '../models/tokens';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { of, Observable } from "rxjs";
+import { catchError, mapTo, tap } from "rxjs/operators";
+
+import { config } from "../config";
+import { Tokens } from "../models/tokens";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
-
-  JWT_TOKEN = 'JWT_TOKEN';
-  REFRESH_TOKEN = 'REFRESH_TOKEN';
+  JWT_TOKEN = "JWT_TOKEN";
+  REFRESH_TOKEN = "REFRESH_TOKEN";
   loggedUser: string;
   user;
 
   constructor(private http: HttpClient) {}
 
-  login(user: { correo: string, password: string }): Observable<any> {
-    return this.http.post<any>(`${config.apiUrl}usuario/login`, user)
-      .pipe(
-        tap(tokens => this.doLoginUser(tokens)),
-        catchError(error => {
-          console.log(error);
-          return of(false);
-        }));
+  login(user: { correo: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${config.apiUrl}usuario/login`, user).pipe(
+      tap((tokens) => this.doLoginUser(tokens)),
+      catchError((error) => {
+        console.log(error);
+        return of(false);
+      }),
+    );
   }
 
   logout() {
-    let language=JSON.parse(localStorage.getItem("language"));
-    let sessionEnd; 
-    if(JSON.parse(localStorage.getItem("sessionEnd"))=='1'){
-      sessionEnd=1
+    let language = JSON.parse(localStorage.getItem("language"));
+    let sessionEnd;
+    if (JSON.parse(localStorage.getItem("sessionEnd")) == "1") {
+      sessionEnd = 1;
     }
     localStorage.clear();
     localStorage.setItem("language", JSON.stringify(language));
-    if(sessionEnd==1){
-      localStorage.setItem("sessionEnd", '1');
+    if (sessionEnd == 1) {
+      localStorage.setItem("sessionEnd", "1");
     }
-    return this.http.post<any>(`${config.apiUrl}usuario/logout`, {
-      'refreshToken': this.getRefreshToken()
-    }).pipe(
-      tap(() => this.doLogoutUser()),
-      mapTo(true),
-      catchError(error => {
-        console.log(error);
-        return of(false);
-      }));
+    return this.http
+      .post<any>(`${config.apiUrl}usuario/logout`, {
+        refreshToken: this.getRefreshToken(),
+      })
+      .pipe(
+        tap(() => this.doLogoutUser()),
+        mapTo(true),
+        catchError((error) => {
+          console.log(error);
+          return of(false);
+        }),
+      );
   }
 
   isLoggedIn() {
@@ -54,18 +57,22 @@ export class AuthService {
   }
 
   refreshToken() {
-    return this.http.post<any>(`${config.apiUrl}usuario/refresh`, {
-      'refreshToken': this.getRefreshToken()
-    }).pipe(tap((tokens: Tokens) => {
-      this.storeJwtToken(tokens.jwt);
-    }));
+    return this.http
+      .post<any>(`${config.apiUrl}usuario/refresh`, {
+        refreshToken: this.getRefreshToken(),
+      })
+      .pipe(
+        tap((tokens: Tokens) => {
+          this.storeJwtToken(tokens.jwt);
+        }),
+      );
   }
 
   getJwtToken() {
     return localStorage.getItem(this.JWT_TOKEN);
   }
 
-  private doLoginUser(tokens: Tokens) {    
+  private doLoginUser(tokens: Tokens) {
     this.storeTokens(tokens);
   }
 
@@ -92,10 +99,10 @@ export class AuthService {
     localStorage.removeItem(this.JWT_TOKEN);
     localStorage.removeItem(this.REFRESH_TOKEN);
     localStorage.removeItem("user");
-    localStorage.clear()
+    localStorage.clear();
   }
 
-  getUser(){
+  getUser() {
     return localStorage.getItem("user");
   }
 }

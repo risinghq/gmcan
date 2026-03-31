@@ -1,24 +1,25 @@
-@import '../add-article/add-article.component.scss';
+@import "../add-article/add-article.component.scss";
 
-.selector-users-input, .relative{
-    width: 308px;
-    height: 42px;
+.selector-users-input,
+.relative {
+  width: 308px;
+  height: 42px;
 }
 
-.text-autocomplete-normal{
-    color: #30393A;
+.text-autocomplete-normal {
+  color: #30393a;
 }
 
-.width-479{
-    min-width: 479px !important;
-    width: 479px !important;
+.width-479 {
+  min-width: 479px !important;
+  width: 479px !important;
 }
 
-.width-128{
-    min-width: 128px !important;
-    width: 128px !important;
+.width-128 {
+  min-width: 128px !important;
+  width: 128px !important;
 }
 
-.mat-form-field-disabled{
-    color: #939393 !important;
+.mat-form-field-disabled {
+  color: #939393 !important;
 }

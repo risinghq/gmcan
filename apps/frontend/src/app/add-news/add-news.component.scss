@@ -1,167 +1,169 @@
-.plex-serif{
-    font-family: 'IBM Plex Serif', serif;
+.plex-serif {
+  font-family: "IBM Plex Serif", serif;
 }
 
-.plex-sans{
-    font-family: "IBM Plex Sans", serif;
+.plex-sans {
+  font-family: "IBM Plex Sans", serif;
 }
 
-.back-icon{
-    margin-right: 8px;
-    width: max-content !important;
-    height: max-content !important;
-    color: #9595b2;
+.back-icon {
+  margin-right: 8px;
+  width: max-content !important;
+  height: max-content !important;
+  color: #9595b2;
 }
 
-.back-text{
-    font-size: 15px;
-    align-self: center;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: 0.3px;
-    color: #9595b2;
+.back-text {
+  font-size: 15px;
+  align-self: center;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  color: #9595b2;
 }
 
-.back-div{
-    width: max-content;
-    cursor: pointer;
+.back-div {
+  width: max-content;
+  cursor: pointer;
 }
 
-.back-div:hover .back-text, .back-div:hover .back-icon{
-    color: black;
+.back-div:hover .back-text,
+.back-div:hover .back-icon {
+  color: black;
 }
 
-.green-text{
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: normal;
-    font-stretch: normal;
-    font-style: normal;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    position: relative;
-    text-align: center;
-    color: var(--deep-green);
+.green-text {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: 0.3px;
+  position: relative;
+  text-align: center;
+  color: var(--deep-green);
 }
 
-.green-text:hover{
-    cursor: pointer;
+.green-text:hover {
+  cursor: pointer;
 }
 
 .file_upload {
-    cursor: pointer;
-    opacity: 0.0;
-    /* IE 8 */
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    /* IE 5-7 */
-    filter: alpha(opacity=0);
-    /* Netscape or and older firefox browsers */
-    -moz-opacity: 0.0;
-    /* older Safari browsers */
-    -khtml-opacity: 0.0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height:100;
+  cursor: pointer;
+  opacity: 0;
+  /* IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  /* IE 5-7 */
+  filter: alpha(opacity=0);
+  /* Netscape or and older firefox browsers */
+  -moz-opacity: 0;
+  /* older Safari browsers */
+  -khtml-opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100;
 }
 
 ::ng-deep .mat-form-field-underline {
-    display: none;
-  }
+  display: none;
+}
 
 ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
-    padding-bottom: 0;
-    height: 18px;
+  padding-bottom: 0;
+  height: 18px;
 }
 
 ::ng-deep .mat-form-field-infix {
-    border-top: none;
+  border-top: none;
 }
 
 ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-infix {
-    padding: 0;
+  padding: 0;
 }
 
 ::ng-deep .mat-select-value {
-    min-width: 100% !important;
-    width: 100% !important;
+  min-width: 100% !important;
+  width: 100% !important;
 }
 
-.news-img{
-    min-width: 316px;
-    height: 198px;
-    border-radius: 4px;
-    border: solid 1px #e8e8e8;
-    background-color: #f4f5f4;
-    text-align: center;
-    padding: 49px;
+.news-img {
+  min-width: 316px;
+  height: 198px;
+  border-radius: 4px;
+  border: solid 1px #e8e8e8;
+  background-color: #f4f5f4;
+  text-align: center;
+  padding: 49px;
 }
 
-.mr-32{
-    margin-right: 32px;
+.mr-32 {
+  margin-right: 32px;
 }
 
-.mt-24{
-    margin-top: 24px;
+.mt-24 {
+  margin-top: 24px;
 }
 
-.mr-26{
-    margin-right: 26px;
+.mr-26 {
+  margin-right: 26px;
 }
-.ml-26{
-    margin-left: 26px;
-}
-
-.input-category{
-    margin-bottom: 8px;
+.ml-26 {
+  margin-left: 26px;
 }
 
-.img-user{
-    border-radius:100px;
+.input-category {
+  margin-bottom: 8px;
 }
 
-.img-preview{
-    width: 316px;
-    height: 198px;
-    overflow: hidden;
+.img-user {
+  border-radius: 100px;
 }
 
-.img-set{
-    width: inherit;
-    object-fit: cover;
-    border-radius: 4px;
+.img-preview {
+  width: 316px;
+  height: 198px;
+  overflow: hidden;
 }
 
-.pd-8{
-    cursor: pointer;
-    line-height: 1;
-    padding: 8px;
+.img-set {
+  width: inherit;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
-.obligatory-text{
-    font-size: 15px;
-    font-weight: 500;
+.pd-8 {
+  cursor: pointer;
+  line-height: 1;
+  padding: 8px;
+}
+
+.obligatory-text {
+  font-size: 15px;
+  font-weight: 500;
 }
 
 ::ng-deep .mat-calendar-body-selected {
-    background-color: var(--deep-green);
+  background-color: var(--deep-green);
 }
 
 ::ng-deep .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
-    width: 28px !important;
-    margin-top: -4px;
+  width: 28px !important;
+  margin-top: -4px;
 }
 
-::ng-deep .mat-select-value, .mat-select{
-    min-width: 100% !important;
-    width: 100% !important;
-    color: unset !important;
+::ng-deep .mat-select-value,
+.mat-select {
+  min-width: 100% !important;
+  width: 100% !important;
+  color: unset !important;
 }
 
-::ng-deep .mat-snack-bar-container{
-    margin-top: 65px !important;
-    margin-right: 32px !important;
+::ng-deep .mat-snack-bar-container {
+  margin-top: 65px !important;
+  margin-right: 32px !important;
 }

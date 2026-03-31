@@ -1,51 +1,51 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, Params } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { NoticiaService } from '../services/noticia.service';
-import { DialogData } from '../models/dialogdata';
-import { TipoNoticiaService } from '../services/tiponoticia.service';
-import { TipoNoticia } from '../models/tiponoticia';
-import { UsuarioService } from '../services/usuario.service';
-import {FormControl} from '@angular/forms';
-import {MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS} from '@angular/material-moment-adapter';
-import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
-import { ClassicEditor } from 'ckeditor5';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-import * as _moment from 'moment';
+import { TitleCasePipe } from "@angular/common";
+import { DatePipe } from "@angular/common";
+import { Component, OnInit, Inject } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormControl } from "@angular/forms";
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from "@angular/material/core";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ClassicEditor } from "ckeditor5";
+import * as _moment from "moment";
 // tslint:disable-next-line:no-duplicate-imports
-import {default as _rollupMoment} from 'moment';
-import { NoticiaFull } from '../models/noticiafull';
-import { Usuario } from '../models/usuario';
-import { GLOBAL } from '../services/global';
-import { Languages } from '../models/languages';
-import { TitleCasePipe } from '@angular/common';
-import { DatePipe } from '@angular/common';
-import { CommonService } from '../services/common.service';
-import { SpaceValidator } from '../services/spacevalidator';
+import { default as _rollupMoment } from "moment";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+
+import { DialogData } from "../models/dialogdata";
+import { Languages } from "../models/languages";
+import { NoticiaFull } from "../models/noticiafull";
+import { TipoNoticia } from "../models/tiponoticia";
+import { Usuario } from "../models/usuario";
+import { CommonService } from "../services/common.service";
+import { GLOBAL } from "../services/global";
+import { NoticiaService } from "../services/noticia.service";
+import { SpaceValidator } from "../services/spacevalidator";
+import { TipoNoticiaService } from "../services/tiponoticia.service";
+import { UsuarioService } from "../services/usuario.service";
 
 const moment = _rollupMoment || _moment;
 
 export const MY_FORMATS = {
   parse: {
-    dateInput: 'LL',
+    dateInput: "LL",
   },
   display: {
-    dateInput: 'LL',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
+    dateInput: "LL",
+    monthYearLabel: "MMM YYYY",
+    dateA11yLabel: "LL",
+    monthYearA11yLabel: "MMMM YYYY",
   },
 };
 
 @Component({
   standalone: false,
-  selector: 'app-edit-news',
-  templateUrl: '../add-news/add-news.component.html',
-  styleUrls: ['../add-news/add-news.component.scss'],
+  selector: "app-edit-news",
+  templateUrl: "../add-news/add-news.component.html",
+  styleUrls: ["../add-news/add-news.component.scss"],
   providers: [
     // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
     // application's root module. We provide it at the component level here, due to limitations of
@@ -53,16 +53,16 @@ export const MY_FORMATS = {
     {
       provide: DateAdapter,
       useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
     },
 
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ],
 })
 export class EditNewsComponent implements OnInit {
   public Editor = ClassicEditor;
   noticia: NoticiaFull;
-  edit=true;
+  edit = true;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -71,23 +71,23 @@ export class EditNewsComponent implements OnInit {
     private _noticiaService: NoticiaService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _tipoNoticiaService:TipoNoticiaService,
-    private _usuarioService:UsuarioService,
+    private _tipoNoticiaService: TipoNoticiaService,
+    private _usuarioService: UsuarioService,
     private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
-      titulo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      tituloEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      cuerpo: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      cuerpoEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaPublicacion: ['', [Validators.required]],
+      titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      tituloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumen: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      cuerpo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      cuerpoEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacion: ["", [Validators.required]],
       autorPublicacion: [null, [Validators.required]],
-      tipoNoticia_idtipoNoticia: ['', [Validators.required]],
+      tipoNoticia_idtipoNoticia: ["", [Validators.required]],
     });
-    this.noticia= new NoticiaFull(null,'','','','','','',null,'',null,null,null,null,'','',null);
-    this.url=GLOBAL.url;
+    this.noticia = new NoticiaFull(null, "", "", "", "", "", "", null, "", null, null, null, null, "", "", null);
+    this.url = GLOBAL.url;
   }
 
   ngOnInit() {
@@ -100,359 +100,367 @@ export class EditNewsComponent implements OnInit {
   button_text;
   button_text2;
 
-  getNews(){
-    this._route.params.forEach((params:Params)=>{
-      let idNoticia=params['id'];
-      this._noticiaService.getNoticiaFull(idNoticia).subscribe(result => {
-        if(result){
-          this.noticia=result;
+  getNews() {
+    this._route.params.forEach((params: Params) => {
+      let idNoticia = params["id"];
+      this._noticiaService.getNoticiaFull(idNoticia).subscribe((result) => {
+        if (result) {
+          this.noticia = result;
           this.newsForm.controls.cuerpo.setValue(this.noticia.cuerpo);
           var d = new Date(result.fechaPublicacion);
-          d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
-          this.noticia.fechaPublicacion=d;
-          this.noticia.fechaPublicacionDate=this.noticia.fechaPublicacion;
-          sessionStorage.setItem('noticiaPublicada', JSON.stringify(this.noticia.estado));
+          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+          this.noticia.fechaPublicacion = d;
+          this.noticia.fechaPublicacionDate = this.noticia.fechaPublicacion;
+          sessionStorage.setItem("noticiaPublicada", JSON.stringify(this.noticia.estado));
           this.getCategorias();
-          if(this.noticia.estado==0){
-            this.button_text="Publicar noticia";
-            this.button_text2="Guardar sin publicar";
-          }else{
-            this.button_text="Actualizar noticia";
-            this.button_text2="Dejar de publicar y guardar cambios";
+          if (this.noticia.estado == 0) {
+            this.button_text = "Publicar noticia";
+            this.button_text2 = "Guardar sin publicar";
+          } else {
+            this.button_text = "Actualizar noticia";
+            this.button_text2 = "Dejar de publicar y guardar cambios";
           }
         }
       });
-    })
+    });
   }
 
-  getCategorias(){
-    this._tipoNoticiaService.getTipoNoticia().subscribe(result => {
-      if(result){
-        this.categorias=result;
+  getCategorias() {
+    this._tipoNoticiaService.getTipoNoticia().subscribe((result) => {
+      if (result) {
+        this.categorias = result;
       }
       this.getAuthors();
     });
   }
 
-  getAuthors(){
-    this._usuarioService.getUsuario().subscribe(result => {
-      if(result){
-        this.autores=result;
+  getAuthors() {
+    this._usuarioService.getUsuario().subscribe((result) => {
+      if (result) {
+        this.autores = result;
       }
     });
   }
-
 
   agregar;
   eliminar;
 
-  return(){
-    if(!this.eliminar){
-      this.agregar=false;
+  return() {
+    if (!this.eliminar) {
+      this.agregar = false;
     }
-    this._commonService.setEndSession('0');
-    this._router.navigate(['dashboard/noticias']);
+    this._commonService.setEndSession("0");
+    this._router.navigate(["dashboard/noticias"]);
   }
 
-  submitCategory(value){
-    this.noticia.estado=value;
+  submitCategory(value) {
+    this.noticia.estado = value;
   }
 
-  submitNews(value){
-    if(value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)){
+  submitNews(value) {
+    if (value == 1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
       this.publishDialog(value);
-    }else if(value==0){
-      if(this.noticia.estado==0){
+    } else if (value == 0) {
+      if (this.noticia.estado == 0) {
         this.publishMethod(value);
-      }else{
-        this.notPublishDialog(value)
+      } else {
+        this.notPublishDialog(value);
       }
     }
   }
 
-  publish(value){
-    if (value==1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
+  publish(value) {
+    if (value == 1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
       this.publishMethod(value);
-    }else if(value==0){
-      this.publishMethod(value)
+    } else if (value == 0) {
+      this.publishMethod(value);
     }
   }
 
-  publishMethod(value){
-    this.noticia.estado=value;
+  publishMethod(value) {
+    this.noticia.estado = value;
     if (this.noticia.fechaPublicacionDate) {
       const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
-      this.noticia.fechaPublicacion=formattedDate; 
-    }else{
-      this.noticia.fechaPublicacion=null;
+      this.noticia.fechaPublicacion = formattedDate;
+    } else {
+      this.noticia.fechaPublicacion = null;
     }
-    if(!this.noticia.autorPublicacion){
-      this.noticia.autorPublicacion=null;
+    if (!this.noticia.autorPublicacion) {
+      this.noticia.autorPublicacion = null;
     }
-      this._noticiaService.updateNoticia(this.noticia).subscribe(result => {
-        if(result.status==1){
-          if(this.fileData){
-            this._noticiaService.uploadNoticiaFoto(this.fileData, this.noticia.idNoticia)
-            .subscribe(res => {
-          })
-          }
-          this.eliminar=true;
-          this.agregar=true;
-          this.return();
-          if(value==1){
-            this.openSnackBar("Noticia publicada exitosamente");
-          }else{
-            this.openSnackBar("Noticia guardada exitosamente");
-          }
+    this._noticiaService.updateNoticia(this.noticia).subscribe((result) => {
+      if (result.status == 1) {
+        if (this.fileData) {
+          this._noticiaService.uploadNoticiaFoto(this.fileData, this.noticia.idNoticia).subscribe((res) => {});
         }
-      });
+        this.eliminar = true;
+        this.agregar = true;
+        this.return();
+        if (value == 1) {
+          this.openSnackBar("Noticia publicada exitosamente");
+        } else {
+          this.openSnackBar("Noticia guardada exitosamente");
+        }
+      }
+    });
   }
 
-  private previewDialog: MatDialogRef<DialogPreview2>
+  private previewDialog: MatDialogRef<DialogPreview2>;
 
-  previewNews(value){
-    let indexCat = this.categorias.findIndex(x => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia);
-    let indexAut = this.autores.findIndex(x => x.DNI == this.noticia.autorPublicacion);
-    let noticiaPreview={
-      language:value,
-      titulo:null,
-      resumen:null,
-      foto: this.url+'noticia/get-image-noticia/'+this.noticia.foto,
-      nombreTipoNoticia:null,
-      usuario:{
+  previewNews(value) {
+    let indexCat = this.categorias.findIndex((x) => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia);
+    let indexAut = this.autores.findIndex((x) => x.DNI == this.noticia.autorPublicacion);
+    let noticiaPreview = {
+      language: value,
+      titulo: null,
+      resumen: null,
+      foto: this.url + "noticia/get-image-noticia/" + this.noticia.foto,
+      nombreTipoNoticia: null,
+      usuario: {
         nombre: null,
-        apellidoPaterno:null,
-        apellidoMaterno:null,
-        foto:null,
+        apellidoPaterno: null,
+        apellidoMaterno: null,
+        foto: null,
       },
-      cuerpo:null,
-      fechaPublicacion:this.noticia.fechaPublicacion,
+      cuerpo: null,
+      fechaPublicacion: this.noticia.fechaPublicacion,
     };
-    if(this.previewUrl){
-      noticiaPreview=this.previewUrl;
+    if (this.previewUrl) {
+      noticiaPreview = this.previewUrl;
     }
-    if(indexCat!=-1){
-      noticiaPreview.nombreTipoNoticia=this.categorias[indexCat].nombre
+    if (indexCat != -1) {
+      noticiaPreview.nombreTipoNoticia = this.categorias[indexCat].nombre;
     }
-    if(indexAut!=-1){
-      noticiaPreview.usuario.nombre=this.autores[indexAut].nombre;
-      noticiaPreview.usuario.apellidoPaterno=this.autores[indexAut].apellidoPaterno;
-      noticiaPreview.usuario.apellidoMaterno=this.autores[indexAut].apellidoMaterno;
-      noticiaPreview.usuario.foto=this.autores[indexAut].foto;
+    if (indexAut != -1) {
+      noticiaPreview.usuario.nombre = this.autores[indexAut].nombre;
+      noticiaPreview.usuario.apellidoPaterno = this.autores[indexAut].apellidoPaterno;
+      noticiaPreview.usuario.apellidoMaterno = this.autores[indexAut].apellidoMaterno;
+      noticiaPreview.usuario.foto = this.autores[indexAut].foto;
     }
     switch (value) {
       case 0:
-        noticiaPreview.titulo=this.noticia.titulo;
-        noticiaPreview.resumen=this.noticia.resumen;
-        noticiaPreview.cuerpo=this.noticia.cuerpo;
+        noticiaPreview.titulo = this.noticia.titulo;
+        noticiaPreview.resumen = this.noticia.resumen;
+        noticiaPreview.cuerpo = this.noticia.cuerpo;
         break;
       case 1:
-        noticiaPreview.titulo=this.noticia.tituloEN;
-        noticiaPreview.resumen=this.noticia.resumenEN;
-        noticiaPreview.cuerpo=this.noticia.cuerpoEN;
+        noticiaPreview.titulo = this.noticia.tituloEN;
+        noticiaPreview.resumen = this.noticia.resumenEN;
+        noticiaPreview.cuerpo = this.noticia.cuerpoEN;
         break;
       default:
         break;
     }
-    this.previewDialog = this.dialog.open(DialogPreview2,{
-      width:'871px',
-      id:'previewNews',
-      data: noticiaPreview
+    this.previewDialog = this.dialog.open(DialogPreview2, {
+      width: "871px",
+      id: "previewNews",
+      data: noticiaPreview,
     });
 
-    this.previewDialog.afterClosed().subscribe(result => {
-      if(!result){        
+    this.previewDialog.afterClosed().subscribe((result) => {
+      if (!result) {
       }
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogPublish2>
+  private dialogRef2: MatDialogRef<DialogPublish2>;
 
   publishDialog(value) {
-    if(this.noticia.estado==1){
-      this.dialogRef2 = this.dialog.open(DialogPublish2,{
-        width:"530px",
-        id:"idleTimer",
-        data: {title: "¿Estás seguro que deseas actualizar la noticia?",
-              text:"La información será publica para todo el mundo",
-              cancel:"No, cancelar",
-              yes:"Sí, publicar"}
+    if (this.noticia.estado == 1) {
+      this.dialogRef2 = this.dialog.open(DialogPublish2, {
+        width: "530px",
+        id: "idleTimer",
+        data: {
+          title: "¿Estás seguro que deseas actualizar la noticia?",
+          text: "La información será publica para todo el mundo",
+          cancel: "No, cancelar",
+          yes: "Sí, publicar",
+        },
       });
-    }else{
-      this.dialogRef2 = this.dialog.open(DialogPublish2,{
-        width:"530px",
-        id:"idleTimer",
-        data: {title: "¿Estás seguro que deseas publicar la noticia?",
-              text:"La información será publica para todo el mundo",
-              cancel:"No, cancelar",
-              yes:"Sí, publicar"}
+    } else {
+      this.dialogRef2 = this.dialog.open(DialogPublish2, {
+        width: "530px",
+        id: "idleTimer",
+        data: {
+          title: "¿Estás seguro que deseas publicar la noticia?",
+          text: "La información será publica para todo el mundo",
+          cancel: "No, cancelar",
+          yes: "Sí, publicar",
+        },
       });
     }
 
-    this.dialogRef2.afterClosed().subscribe(result => {
-      if(!result){
+    this.dialogRef2.afterClosed().subscribe((result) => {
+      if (!result) {
         this.publish(value);
       }
     });
   }
 
-  private dialogRef3: MatDialogRef<DialogPublish3>
+  private dialogRef3: MatDialogRef<DialogPublish3>;
 
   notPublishDialog(value) {
-    this.dialogRef3 = this.dialog.open(DialogPublish3,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "Dejar de publicar noticia",
-            text:"¿Estás seguro de que deseas dejar de publicar esta noticia?",
-            cancel:"Si, dejar de publicar",
-            yes:"No, cancelar"}
+    this.dialogRef3 = this.dialog.open(DialogPublish3, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "Dejar de publicar noticia",
+        text: "¿Estás seguro de que deseas dejar de publicar esta noticia?",
+        cancel: "Si, dejar de publicar",
+        yes: "No, cancelar",
+      },
     });
 
-    this.dialogRef3.afterClosed().subscribe(result => {
-      if(result){
+    this.dialogRef3.afterClosed().subscribe((result) => {
+      if (result) {
         this.publish(value);
       }
     });
   }
 
-  private dialogRef: MatDialogRef<DialogCancel4>
+  private dialogRef: MatDialogRef<DialogCancel4>;
 
   openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel4,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "¿Estás seguro que deseas volver sin guardar?",
-            text:"La información no se guardará",
-            cancel:"Sí, volver",
-            yes:"No, mantenerme aquí"}
+    this.dialogRef = this.dialog.open(DialogCancel4, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "¿Estás seguro que deseas volver sin guardar?",
+        text: "La información no se guardará",
+        cancel: "Sí, volver",
+        yes: "No, mantenerme aquí",
+      },
     });
   }
 
   canDeactivate(): Observable<boolean> {
-    if(!this.agregar){
+    if (!this.agregar) {
       this.openDialog();
-      return this.dialogRef.afterClosed().pipe(map(result => {
-        return result === true;
-      }));
-    }else{
-      return ;
+      return this.dialogRef.afterClosed().pipe(
+        map((result) => {
+          return result === true;
+        }),
+      );
+    } else {
+      return;
     }
   }
 
   openSnackBar(value) {
     this._snackBar.open(value, null, {
       duration: 2000,
-      horizontalPosition: 'right',
-      verticalPosition: 'top',
+      horizontalPosition: "right",
+      verticalPosition: "top",
     });
   }
 
   date = new FormControl(moment());
 
   fileData: File = null;
-  previewUrl:any = null;
+  previewUrl: any = null;
   fileUploadProgress: string = null;
   uploadedFilePath: string = null;
   fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];  
+    this.fileData = <File>fileInput.target.files[0];
     this.preview();
   }
 
   preview() {
-    // Show preview 
+    // Show preview
     var mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
- 
-    var reader = new FileReader();      
-    reader.readAsDataURL(this.fileData); 
+
+    var reader = new FileReader();
+    reader.readAsDataURL(this.fileData);
     reader.onload = (_event) => {
-      this.previewUrl = reader.result; 
-    }
+      this.previewUrl = reader.result;
+    };
   }
 
-  private dialogRef5: MatDialogRef<DialogErase2>
+  private dialogRef5: MatDialogRef<DialogErase2>;
 
-  openEraser(){
-    this.dialogRef5 = this.dialog.open(DialogErase2,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "Eliminar noticia",
-        text:"¿Estás seguro que deseas eliminar esta noticia?",
-        cancel:"Sí, eliminar",
-        yes:"No, cancelar"}
-      });  
-      this.dialogRef5.afterClosed().subscribe(result => {
-        if(result){
-          this.eraseNews();
-        }
-      }); 
-  }
-
-  eraseNews(){
-    this._noticiaService.deleteNoticia(this.noticia.idNoticia).subscribe(result => {
-      if(result.status==1){
-        this.eliminar=true;
-        this.agregar=true;
-        this.return();
-        this.openSnackBar("Noticia eliminada exitosamente");
-      }else{
-        this.openSnackBar("Hubo un problema al eliminar");
+  openEraser() {
+    this.dialogRef5 = this.dialog.open(DialogErase2, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "Eliminar noticia",
+        text: "¿Estás seguro que deseas eliminar esta noticia?",
+        cancel: "Sí, eliminar",
+        yes: "No, cancelar",
+      },
+    });
+    this.dialogRef5.afterClosed().subscribe((result) => {
+      if (result) {
+        this.eraseNews();
       }
     });
   }
 
+  eraseNews() {
+    this._noticiaService.deleteNoticia(this.noticia.idNoticia).subscribe((result) => {
+      if (result.status == 1) {
+        this.eliminar = true;
+        this.agregar = true;
+        this.return();
+        this.openSnackBar("Noticia eliminada exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
+      }
+    });
+  }
 }
-
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogCancel4 {
   constructor(
     public dialogRef: MatDialogRef<DialogCancel4>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
-
 export class DialogPublish3 {
   constructor(
     public dialogRef: MatDialogRef<DialogPublish3>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
-
 export class DialogPublish2 {
   constructor(
     public dialogRef: MatDialogRef<DialogPublish2>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-preview.html',
-  styleUrls: ['../detail-news/detail-news.component.scss'],
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-preview.html",
+  styleUrls: ["../detail-news/detail-news.component.scss"],
 })
 export class DialogPreview2 {
   url;
@@ -460,44 +468,45 @@ export class DialogPreview2 {
   dia;
   mes;
   anio;
-  datere:Date;
+  datere: Date;
   constructor(
     public dialogRef: MatDialogRef<DialogPreview2>,
     @Inject(MAT_DIALOG_DATA) public noticia,
-    public titlecasePipe:TitleCasePipe,
-    public datePipe:DatePipe,) {
-      this.url=GLOBAL.url;
-    }
+    public titlecasePipe: TitleCasePipe,
+    public datePipe: DatePipe,
+  ) {
+    this.url = GLOBAL.url;
+  }
 
-    ngOnInit(){
-      this.language=Languages[this.noticia.language];
-      document.getElementById("newsBody").innerHTML=this.noticia.cuerpo;
-      this.datere=new Date(String(this.noticia.fechaPublicacion));
-      this.dia=this.datePipe.transform(this.datere,'dd');
-      this.mes=this.datePipe.transform(this.datere,'MMMM');
-      this.anio=this.datePipe.transform(this.datere,'y');
-    }
+  ngOnInit() {
+    this.language = Languages[this.noticia.language];
+    document.getElementById("newsBody").innerHTML = this.noticia.cuerpo;
+    this.datere = new Date(String(this.noticia.fechaPublicacion));
+    this.dia = this.datePipe.transform(this.datere, "dd");
+    this.mes = this.datePipe.transform(this.datere, "MMMM");
+    this.anio = this.datePipe.transform(this.datere, "y");
+  }
 
-  public fbicon="../../assets/img/Facebook.svg";
-  public twitter="../../assets/img/twitter.svg";
-  mouseEnter(int){
+  public fbicon = "../../assets/img/Facebook.svg";
+  public twitter = "../../assets/img/twitter.svg";
+  mouseEnter(int) {
     switch (int) {
       case 1:
-        this.fbicon="../../assets/img/Facebook2.svg";
+        this.fbicon = "../../assets/img/Facebook2.svg";
         break;
       case 2:
-        this.twitter="../../assets/img/twitter2.svg";
+        this.twitter = "../../assets/img/twitter2.svg";
         break;
     }
   }
 
-  mouseLeave(int){
+  mouseLeave(int) {
     switch (int) {
       case 1:
-        this.fbicon="../../assets/img/Facebook.svg";
+        this.fbicon = "../../assets/img/Facebook.svg";
         break;
       case 2:
-        this.twitter="../../assets/img/twitter.svg";
+        this.twitter = "../../assets/img/twitter.svg";
         break;
     }
   }
@@ -505,15 +514,14 @@ export class DialogPreview2 {
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogErase2 {
   constructor(
     public dialogRef: MatDialogRef<DialogErase2>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
-
-

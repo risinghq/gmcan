@@ -1,24 +1,24 @@
-@import '../noticias/noticias.component.scss';
+@import "../noticias/noticias.component.scss";
 
-.link-DOI{
-    color: black;
-    text-decoration: underline;
+.link-DOI {
+  color: black;
+  text-decoration: underline;
 }
-.link-DOI:hover{
-    color: black;
+.link-DOI:hover {
+  color: black;
 }
 
-.member-img-round{
-    overflow: hidden;
-    width: 20px;
-    height: 20px;
-    border-radius: 40.5px;
-    background-color: #c4c4c4
+.member-img-round {
+  overflow: hidden;
+  width: 20px;
+  height: 20px;
+  border-radius: 40.5px;
+  background-color: #c4c4c4;
 }
-.member-img{
-    vertical-align: unset;
-    background-color: #c4c4c4;
-    width: inherit;
-    height: inherit;
-    object-fit: cover;
+.member-img {
+  vertical-align: unset;
+  background-color: #c4c4c4;
+  width: inherit;
+  height: inherit;
+  object-fit: cover;
 }

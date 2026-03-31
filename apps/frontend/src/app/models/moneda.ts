@@ -1,8 +1,8 @@
-import { Proyecto } from './proyecto';
+import { Proyecto } from "./proyecto";
 
-export class Moneda{
-    constructor(
-        public idMoneda: Number,
-        public simbolo: String,
-    ){}
+export class Moneda {
+  constructor(
+    public idMoneda: Number,
+    public simbolo: String,
+  ) {}
 }

@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, CanLoad, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { Injectable } from "@angular/core";
+import { CanActivate, CanLoad, Router } from "@angular/router";
+
+import { AuthService } from "../services/auth.service";
 
 @Injectable()
 export class RandomGuard implements CanActivate, CanLoad {
-
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   canActivate() {
     return this.canLoad();
@@ -13,7 +16,7 @@ export class RandomGuard implements CanActivate, CanLoad {
 
   canLoad() {
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(["/login"]);
     }
     return this.authService.isLoggedIn();
   }

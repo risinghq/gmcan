@@ -17,17 +17,13 @@ function getEmailConfig() {
   const isDev = NODE_ENV === "development" || !NODE_ENV;
 
   return {
-    from: isDev
-      ? "Development <onboarding@resend.dev>"
-      : "GMCAN <gmcan@unmsm.edu.pe>",
+    from: isDev ? "Development <onboarding@resend.dev>" : "GMCAN <gmcan@unmsm.edu.pe>",
     to: isDev ? "delivered@resend.dev" : INSTITUTIONAL_EMAIL,
   };
 }
 
 function validateFields(data, requiredFields) {
-  const missing = requiredFields.filter(
-    (field) => !data[field] || !data[field].trim(),
-  );
+  const missing = requiredFields.filter((field) => !data[field] || !data[field].trim());
 
   return {
     isValid: missing.length === 0,
@@ -40,12 +36,7 @@ router.post("/send-email", async (req, res) => {
     const data = req.body;
     const { from, to } = getEmailConfig();
 
-    const validation = validateFields(data, [
-      "nombre",
-      "razon",
-      "correo",
-      "telefono",
-    ]);
+    const validation = validateFields(data, ["nombre", "razon", "correo", "telefono"]);
     if (!validation.isValid) {
       return res.status(400).json({
         success: false,
@@ -106,17 +97,13 @@ router.post("/send-password-reset", async (req, res) => {
       });
     }
 
-    const users = await queryDb(
-      "SELECT DNI, nombre, correo FROM usuario WHERE correo = ?",
-      [email],
-    );
+    const users = await queryDb("SELECT DNI, nombre, correo FROM usuario WHERE correo = ?", [email]);
 
     if (!users.length) {
       // We always return success to avoid revealing if the email exists
       return res.json({
         success: true,
-        message:
-          "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
+        message: "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
       });
     }
 
@@ -127,10 +114,11 @@ router.post("/send-password-reset", async (req, res) => {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Store token in database with expiration
-    await queryDb(
-      "UPDATE usuario SET reset_token = ?, reset_expires = ?, restablecer = 1 WHERE DNI = ?",
-      [resetToken, expiresAt, user.DNI],
-    );
+    await queryDb("UPDATE usuario SET reset_token = ?, reset_expires = ?, restablecer = 1 WHERE DNI = ?", [
+      resetToken,
+      expiresAt,
+      user.DNI,
+    ]);
 
     const resetUrl = `${getFrontendUrl()}/reset-password?token=${resetToken}`;
     const { from } = getEmailConfig();
@@ -175,8 +163,7 @@ router.post("/send-password-reset", async (req, res) => {
 
     res.json({
       success: true,
-      message:
-        "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
+      message: "Si el correo existe, recibirás un enlace de recuperación en los próximos minutos",
       emailId: result.data?.id,
     });
   } catch (error) {

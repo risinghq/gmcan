@@ -1,65 +1,89 @@
 <div class="join-div">
-    <!-- <div *ngIf="!cargado">
+  <!-- <div *ngIf="!cargado">
         <mat-spinner ></mat-spinner>
     </div> -->
-    <div class="row">
-        <div class="col-lg-8 col-sm-6 col-12">
-            <div class="join-links">
-                <a class="join-link-active" href="/">{{language.home}}</a>
-                <mat-icon class="join-icon">
-                    arrow_right
-                </mat-icon>
-                <a class="join-link">{{language.join}}</a>
-            </div>
-            <div class="email-div">
-                <div class="flex-news back-div" (click)="return()">
-                    <mat-icon class="back-icon">
-                        arrow_back
-                    </mat-icon>
-                    <div class="back-text">
-                        {{language.joinUsText[0].back}}
-                    </div>                    
-                </div>
-                <div class="email-title">
-                    {{language.joinUsText[0].title}}
-                </div>
-                <div class="email-subtitle mb-16">
-                    {{language.joinUsText[0].talkabout}}
-                </div>
-                <form [formGroup]="user">
-                    <div class="full-width mb-16-8">
-                        <input class="input-email" placeholder="{{language.joinUsText[0].name}}" #nombre
-                        name = "nombre" formControlName="nombre" autocomplete="off" required>
-                    </div>
-                    <div class="full-width mb-24">
-                        <textarea autosize class="input-email" placeholder="{{language.joinUsText[0].reason}}" #razon
-                        name = "razon" formControlName="razon" autocomplete="off" ></textarea>
-                    </div>
-                    <div class="email-subtitle mb-16">
-                        {{language.joinUsText[0].email}}
-                    </div>
-                    <div class="flex-email">
-                        <div class="full-width mr-8 mb-8">
-                            <input class="input-email" placeholder="{{language.joinUsText[0].emailPlace}}" #correo
-                            name = "correo" type="email" formControlName="correo" autocomplete="off">
-                        </div>
-                        <div class="full-width ml-8">
-                            <input class="input-email" type="tel" placeholder="{{language.joinUsText[0].telephone}}" #telefono
-                            name = "telefono" formControlName="telefono" autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="full-width mb-16-8">
-                        <button mat-button [disabled]="user.invalid" class="full-width email-btn btn-under" (click)="sendEmail()">
-                            <div class="btn-under">
-                                {{language.joinUsText[0].send}}
-                            </div>
-                        </button>
-                    </div>
-                </form>
-            </div>
+  <div class="row">
+    <div class="col-lg-8 col-sm-6 col-12">
+      <div class="join-links">
+        <a class="join-link-active" href="/">{{ language.home }}</a>
+        <mat-icon class="join-icon"> arrow_right </mat-icon>
+        <a class="join-link">{{ language.join }}</a>
+      </div>
+      <div class="email-div">
+        <div class="flex-news back-div" (click)="return()">
+          <mat-icon class="back-icon"> arrow_back </mat-icon>
+          <div class="back-text">
+            {{ language.joinUsText[0].back }}
+          </div>
         </div>
-        <div class="col-lg-4 col-sm-6 col-12">
-            <app-news></app-news>
+        <div class="email-title">
+          {{ language.joinUsText[0].title }}
         </div>
+        <div class="email-subtitle mb-16">
+          {{ language.joinUsText[0].talkabout }}
+        </div>
+        <form [formGroup]="user">
+          <div class="full-width mb-16-8">
+            <input
+              class="input-email"
+              placeholder="{{ language.joinUsText[0].name }}"
+              #nombre
+              name="nombre"
+              formControlName="nombre"
+              autocomplete="off"
+              required
+            />
+          </div>
+          <div class="full-width mb-24">
+            <textarea
+              autosize
+              class="input-email"
+              placeholder="{{ language.joinUsText[0].reason }}"
+              #razon
+              name="razon"
+              formControlName="razon"
+              autocomplete="off"
+            ></textarea>
+          </div>
+          <div class="email-subtitle mb-16">
+            {{ language.joinUsText[0].email }}
+          </div>
+          <div class="flex-email">
+            <div class="full-width mr-8 mb-8">
+              <input
+                class="input-email"
+                placeholder="{{ language.joinUsText[0].emailPlace }}"
+                #correo
+                name="correo"
+                type="email"
+                formControlName="correo"
+                autocomplete="off"
+              />
+            </div>
+            <div class="full-width ml-8">
+              <input
+                class="input-email"
+                type="tel"
+                placeholder="{{ language.joinUsText[0].telephone }}"
+                #telefono
+                name="telefono"
+                formControlName="telefono"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="full-width mb-16-8">
+            <button mat-button [disabled]="user.invalid" class="full-width email-btn btn-under" (click)="sendEmail()">
+              <div class="btn-under">
+                {{ language.joinUsText[0].send }}
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+    <div class="col-lg-4 col-sm-6 col-12">
+      <app-news></app-news>
+    </div>
+  </div>
 </div>

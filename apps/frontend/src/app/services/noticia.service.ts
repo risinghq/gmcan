@@ -1,103 +1,107 @@
-import {Injectable} from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {GLOBAL} from './global';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+
+import { GLOBAL } from "./global";
 
 @Injectable({
-	providedIn: 'root'
-  })
-export class NoticiaService{
-    public url: string;
-    JWT_TOKEN = 'JWT_TOKEN';
+  providedIn: "root",
+})
+export class NoticiaService {
+  public url: string;
+  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
-  constructor(public http: HttpClient){
+  constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
-    this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
+    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
-    
-  getNoticias(): any{
-    let headers = new HttpHeaders ({
-			'Content-Type':'application/json'
-		});
-    if(this.languagelocal=="es"){
-      return this.http.get(this.url+'noticia/get-noticia',{headers:headers});
-    }else{
-      return this.http.get(this.url+'noticia/get-noticia-en',{headers:headers});
-    }
-  }
-    
-  getNoticia(idNoticia){
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json'
+
+  getNoticias(): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
     });
-    if(this.languagelocal=="es"){
-      return this.http.get(this.url+'noticia/get-noticia/'+idNoticia,{headers:headers});
-    }else{
-      return this.http.get(this.url+'noticia/get-noticia-en/'+idNoticia,{headers:headers});
+    if (this.languagelocal == "es") {
+      return this.http.get(this.url + "noticia/get-noticia", { headers: headers });
+    } else {
+      return this.http.get(this.url + "noticia/get-noticia-en", { headers: headers });
     }
   }
 
-  getNoticiaTipo(idTipo): any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json'
+  getNoticia(idNoticia) {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
     });
-    if(this.languagelocal=="es"){
-      return this.http.get(this.url+'noticia/get-noticiatipo/'+idTipo,{headers:headers});
-    }else{
-      return this.http.get(this.url+'noticia/get-noticiatipo-en/'+idTipo,{headers:headers});
+    if (this.languagelocal == "es") {
+      return this.http.get(this.url + "noticia/get-noticia/" + idNoticia, { headers: headers });
+    } else {
+      return this.http.get(this.url + "noticia/get-noticia-en/" + idNoticia, { headers: headers });
     }
   }
 
-  getNoticiaUsuario(idUsuario): any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json'
+  getNoticiaTipo(idTipo): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
     });
-    if(this.languagelocal=="es"){
-      return this.http.get(this.url+'noticia/get-noticiausuario/'+idUsuario,{headers:headers});
-    }else{
-      return this.http.get(this.url+'noticia/get-noticiausuario-en/'+idUsuario,{headers:headers});
+    if (this.languagelocal == "es") {
+      return this.http.get(this.url + "noticia/get-noticiatipo/" + idTipo, { headers: headers });
+    } else {
+      return this.http.get(this.url + "noticia/get-noticiatipo-en/" + idTipo, { headers: headers });
     }
   }
 
-  addNews(noticia):any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
-	  });
-    return this.http.post(this.url+'noticia/post-noticia',noticia,{headers});
-  }  
+  getNoticiaUsuario(idUsuario): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+    });
+    if (this.languagelocal == "es") {
+      return this.http.get(this.url + "noticia/get-noticiausuario/" + idUsuario, {
+        headers: headers,
+      });
+    } else {
+      return this.http.get(this.url + "noticia/get-noticiausuario-en/" + idUsuario, {
+        headers: headers,
+      });
+    }
+  }
 
-  uploadNoticiaFoto(fileData, id){
+  addNews(noticia): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
+    });
+    return this.http.post(this.url + "noticia/post-noticia", noticia, { headers });
+  }
+
+  uploadNoticiaFoto(fileData, id) {
     const formData = new FormData();
-    formData.append('foto', fileData, fileData.name); 
-    let headers = new HttpHeaders ({
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
-	  });
-    return this.http.put(this.url+'noticia/upload-noticia-file/'+id, formData, {headers});
-  }
-
-  getNoticiaFull(idNoticia): any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+    formData.append("foto", fileData, fileData.name);
+    let headers = new HttpHeaders({
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.get(this.url+'noticia/get-noticiafull/'+idNoticia,{headers:headers});
+    return this.http.put(this.url + "noticia/upload-noticia-file/" + id, formData, { headers });
   }
 
-  updateNoticia(noticia):any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
-	  });
-    return this.http.put(this.url+'noticia/update-noticia', noticia,{headers});
+  getNoticiaFull(idNoticia): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
+    });
+    return this.http.get(this.url + "noticia/get-noticiafull/" + idNoticia, { headers: headers });
   }
 
-  deleteNoticia(idNoticia):any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
-	  });
-    return this.http.delete(this.url+'noticia/delete-noticia/'+idNoticia,{headers});
+  updateNoticia(noticia): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
+    });
+    return this.http.put(this.url + "noticia/update-noticia", noticia, { headers });
   }
 
+  deleteNoticia(idNoticia): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
+    });
+    return this.http.delete(this.url + "noticia/delete-noticia/" + idNoticia, { headers });
+  }
 }

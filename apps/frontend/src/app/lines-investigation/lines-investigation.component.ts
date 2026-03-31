@@ -1,25 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, Params} from '@angular/router';
-import { LineasInvestigacionService } from '../services/lineasinvestigacion.service';
-import { lineasInvestigacion } from '../models/lineaInvestigacion';
-import { ProyectoService } from '../services/proyecto.service';
-import { TitleCasePipe, DatePipe } from '@angular/common';
-import { UsuarioHasProyectoService } from '../services/usuariohasproyecto';
-import { UsuarioService } from '../services/usuario.service';
-import { Location } from '@angular/common';
-import { GLOBAL } from '../services/global';
-import { FuenteFinanciamientoService } from '../services/fuentefinanciamiento.service';
-import { MonedaService } from '../services/moneda.service';
-import { Title } from '@angular/platform-browser';
+import { TitleCasePipe, DatePipe } from "@angular/common";
+import { Location } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { Title } from "@angular/platform-browser";
+import { Router, ActivatedRoute, Params } from "@angular/router";
+
+import { lineasInvestigacion } from "../models/lineaInvestigacion";
+import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
+import { GLOBAL } from "../services/global";
+import { LineasInvestigacionService } from "../services/lineasinvestigacion.service";
+import { MonedaService } from "../services/moneda.service";
+import { ProyectoService } from "../services/proyecto.service";
+import { UsuarioService } from "../services/usuario.service";
+import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
 @Component({
   standalone: false,
-  selector: 'app-lines-investigation',
-  templateUrl: './lines-investigation.component.html',
-  styleUrls: ['./lines-investigation.component.scss']
+  selector: "app-lines-investigation",
+  templateUrl: "./lines-investigation.component.html",
+  styleUrls: ["./lines-investigation.component.scss"],
 })
 export class LinesInvestigationComponent implements OnInit {
-
   language;
 
   public lineasProyecto: Array<lineasInvestigacion>;
@@ -35,7 +35,7 @@ export class LinesInvestigationComponent implements OnInit {
     private _proyectoServices: ProyectoService,
     private _usuarioHasProyectoService: UsuarioHasProyectoService,
     private _usuarioService: UsuarioService,
-    public titlecasePipe:TitleCasePipe,
+    public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
     public location: Location,
     public _route: ActivatedRoute,
@@ -43,17 +43,17 @@ export class LinesInvestigationComponent implements OnInit {
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
     private titleService: Title,
-  ) { 
-    this.lineasProyecto=[];
-    this.lineasProyecto[0]=new lineasInvestigacion(null,'','',null,'','',null,null,null,[],0);
-    this.lineasProyecto[1]=new lineasInvestigacion(null,'','',null,'','',null,null,null,[],0);
-    this.lineasProyecto[2]=new lineasInvestigacion(null,'','',null,'','',null,null,null,[],0);
+  ) {
+    this.lineasProyecto = [];
+    this.lineasProyecto[0] = new lineasInvestigacion(null, "", "", null, "", "", null, null, null, [], 0);
+    this.lineasProyecto[1] = new lineasInvestigacion(null, "", "", null, "", "", null, null, null, [], 0);
+    this.lineasProyecto[2] = new lineasInvestigacion(null, "", "", null, "", "", null, null, null, [], 0);
   }
 
   ngOnInit() {
-    this.url=GLOBAL.url;
-    this.language=JSON.parse(localStorage.getItem("language"));
-    this.titleService.setTitle('GMCAN | '+this.language.linesInvestigation);
+    this.url = GLOBAL.url;
+    this.language = JSON.parse(localStorage.getItem("language"));
+    this.titleService.setTitle("GMCAN | " + this.language.linesInvestigation);
     this.getLineasInvestigacion();
     this.page0 = 1;
     this.pageSize = 5;
@@ -67,79 +67,81 @@ export class LinesInvestigationComponent implements OnInit {
   oldValue;
 
   listClick(event, newValue) {
-    this.oldValue=this.selectedItem;
+    this.oldValue = this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract"+newValue).innerText=this.language.linesInvestigationText[0].seeLess;
-    if(this.selectedItem==this.oldValue){
-      this.selectedItem=-1;
-      document.getElementById("abstract"+this.oldValue).innerText=this.language.linesInvestigationText[0].seeMore;
+    document.getElementById("abstract" + newValue).innerText = this.language.linesInvestigationText[0].seeLess;
+    if (this.selectedItem == this.oldValue) {
+      this.selectedItem = -1;
+      document.getElementById("abstract" + this.oldValue).innerText = this.language.linesInvestigationText[0].seeMore;
     }
   }
 
-  getLineasInvestigacion(){
-    this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res)=>{
-      this.lineasProyecto=res;
+  getLineasInvestigacion() {
+    this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res) => {
+      this.lineasProyecto = res;
       for (let index = 0; index < this.lineasProyecto.length; index++) {
-        this.lineasProyecto[index].proyectos=[];
+        this.lineasProyecto[index].proyectos = [];
         this.getProyectosLineas(this.lineasProyecto[index]);
       }
     });
   }
 
-  getProyectosLineas(lineaProyecto){
-    this._proyectoServices.getProyectosLinea(lineaProyecto.idLineasInvestigacion, 1).subscribe((res)=>{
-      lineaProyecto.proyectos=res;
+  getProyectosLineas(lineaProyecto) {
+    this._proyectoServices.getProyectosLinea(lineaProyecto.idLineasInvestigacion, 1).subscribe((res) => {
+      lineaProyecto.proyectos = res;
       for (let index = 0; index < lineaProyecto.proyectos.length; index++) {
         this.fillProyecto(lineaProyecto.proyectos[index]);
       }
     });
   }
 
-  fillProyecto(proyecto){
+  fillProyecto(proyecto) {
     var d = new Date(proyecto.fechaInicio);
-    if(String(d)!='Invalid Date'){
-      d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
-      proyecto.fechaI=this.datePipe.transform(d,"MMMM, y", "es");
-      proyecto.fechaI=this.titlecasePipe.transform(proyecto.fechaI);
+    if (String(d) != "Invalid Date") {
+      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+      proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es");
+      proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI);
     }
     for (let index = 0; index < this.lineasProyecto.length; index++) {
-      if(proyecto.lineasInvestigacion_idLineasInvestigacion===this.lineasProyecto[index].idLineasInvestigacion){
-        proyecto.lineasInvestigacion=this.lineasProyecto[index].nombre;
+      if (proyecto.lineasInvestigacion_idLineasInvestigacion === this.lineasProyecto[index].idLineasInvestigacion) {
+        proyecto.lineasInvestigacion = this.lineasProyecto[index].nombre;
       }
     }
-    proyecto.usuario=[];
-    if(proyecto.fechaFin){
+    proyecto.usuario = [];
+    if (proyecto.fechaFin) {
       d = new Date(proyecto.fechaFin);
-      if(String(d)!='Invalid Date'){
-        d.setMinutes( d.getMinutes() + d.getTimezoneOffset());
-        proyecto.fechaF=this.datePipe.transform(d,"MMMM, y", "es");
-        proyecto.fechaF=this.titlecasePipe.transform(proyecto.fechaF);
+      if (String(d) != "Invalid Date") {
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        proyecto.fechaF = this.datePipe.transform(d, "MMMM, y", "es");
+        proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF);
       }
     }
     this.getUsuarioHasProyecto(proyecto);
-    this.getFuenteFinanciamiento(proyecto)
-    this.getMoneda(proyecto)
+    this.getFuenteFinanciamiento(proyecto);
+    this.getMoneda(proyecto);
   }
 
-  getFuenteFinanciamiento(proyecto){
-    this._fuenteFinanciamientoService.getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento).subscribe((res)=>{
-      if(res.length>0){
-        proyecto.fuenteFinanciamiento=res[0].nombre;
+  getFuenteFinanciamiento(proyecto) {
+    this._fuenteFinanciamientoService
+      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento)
+      .subscribe((res) => {
+        if (res.length > 0) {
+          proyecto.fuenteFinanciamiento = res[0].nombre;
+        }
+      });
+  }
+
+  getMoneda(proyecto) {
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res) => {
+      if (res.length > 0) {
+        proyecto.moneda = res[0].simbolo;
       }
     });
   }
 
-  getMoneda(proyecto){
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res)=>{
-      if(res.length>0){
-        proyecto.moneda=res[0].simbolo;
-      }
-    });
-  }
-
-  getUsuarioHasProyecto(proyecto){
-    this._usuarioHasProyectoService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res)=>{
-      if(res.length>0){
+  getUsuarioHasProyecto(proyecto) {
+    this._usuarioHasProyectoService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res) => {
+      if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getUsuario(res[index].usuario_DNI, proyecto);
         }
@@ -147,30 +149,29 @@ export class LinesInvestigationComponent implements OnInit {
     });
   }
 
-  getUsuario(idUsuario, proyecto){
-    this._usuarioService.getUser(idUsuario).subscribe((res)=>{
-      if(res){
-        res[0].nombre=res[0].nombre.slice(0,1)+".";
+  getUsuario(idUsuario, proyecto) {
+    this._usuarioService.getUser(idUsuario).subscribe((res) => {
+      if (res) {
+        res[0].nombre = res[0].nombre.slice(0, 1) + ".";
         proyecto.usuario.push(res[0]);
         this.fillName(proyecto);
       }
     });
   }
 
-  fillName(obj){
-    for(let index = 0; index < obj.usuario.length; index++){
-      let first=obj.usuario[index].nombre.split(" ");
-      if(index==obj.usuario.length-1){
-        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno;
-      }else{
-        obj.usuario[index].nombreCompleto=first[0]+ " " +obj.usuario[index].apellidoPaterno+",";
+  fillName(obj) {
+    for (let index = 0; index < obj.usuario.length; index++) {
+      let first = obj.usuario[index].nombre.split(" ");
+      if (index == obj.usuario.length - 1) {
+        obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
+      } else {
+        obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno + ",";
       }
     }
   }
 
-  profile(user){
+  profile(user) {
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(['/home/detail-member/'+user.DNI]);
+    this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
-
 }

@@ -1,46 +1,46 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
-import { Grupo } from '../models/grupo';
-import { UsuarioService } from '../services/usuario.service';
-import { PermisoService } from '../services/permiso.service';
-import { UsuarioHasPermisoService } from '../services/usuariohaspermiso.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { GLOBAL } from '../services/global';
-import { UsuarioFull } from '../models/usuarioFull';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Idle } from '@ng-idle/core';
-import { Keepalive } from '@ng-idle/keepalive';
-import { AuthService } from '../services/auth.service';
-import { DialogData } from '../models/dialogdata';
-import { CommonService } from '../services/common.service';
-import { GrupoService } from '../services/grupo.service';
-import { Title } from '@angular/platform-browser';
+import { Component, OnInit, Inject, HostListener } from "@angular/core";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Title } from "@angular/platform-browser";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Idle } from "@ng-idle/core";
+import { Keepalive } from "@ng-idle/keepalive";
+
+import { DialogData } from "../models/dialogdata";
+import { Grupo } from "../models/grupo";
+import { UsuarioFull } from "../models/usuarioFull";
+import { AuthService } from "../services/auth.service";
+import { CommonService } from "../services/common.service";
+import { GLOBAL } from "../services/global";
+import { GrupoService } from "../services/grupo.service";
+import { PermisoService } from "../services/permiso.service";
+import { UsuarioService } from "../services/usuario.service";
+import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service";
 
 @Component({
   standalone: false,
-  selector: 'app-log-home',
-  templateUrl: './log-home.component.html',
-  styleUrls: ['./log-home.component.scss']
+  selector: "app-log-home",
+  templateUrl: "./log-home.component.html",
+  styleUrls: ["./log-home.component.scss"],
 })
 export class LogHomeComponent implements OnInit {
-
   token;
   user;
   screenWidth;
-  public  url;
-  public  grupoinfo:Grupo;
-  permisos={
+  public url;
+  public grupoinfo: Grupo;
+  permisos = {
     noticiaPermiso: false,
-    miembroPermiso:false,
-    proyectoPermiso:false,
-    publicacionPermiso:false,
-    contenidoPermiso:false,
-    analiticaPermiso:false,
+    miembroPermiso: false,
+    proyectoPermiso: false,
+    publicacionPermiso: false,
+    contenidoPermiso: false,
+    analiticaPermiso: false,
   };
 
-  idleState = 'Not started.';
+  idleState = "Not started.";
   timedOut = false;
   lastPing?: Date = null;
-  title = 'Dashboard';
+  title = "Dashboard";
   permisoUsuario;
   counterDown;
   constructor(
@@ -51,74 +51,99 @@ export class LogHomeComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     public dialog: MatDialog,
-    private idle: Idle, private keepalive: Keepalive,
+    private idle: Idle,
+    private keepalive: Keepalive,
     private router: Router,
-    private _commonService:CommonService,
-    private _grupoService:GrupoService,
+    private _commonService: CommonService,
+    private _grupoService: GrupoService,
     private titleService: Title,
-  ){
+  ) {
     this.screenWidth = window.innerWidth;
-    if(this.screenWidth>=960){
-      this.enterAny=false;
-    }else{
-      this.enterAny=true;
+    if (this.screenWidth >= 960) {
+      this.enterAny = false;
+    } else {
+      this.enterAny = true;
     }
-    this.url=GLOBAL.url;
-    this.user = new UsuarioFull('','','','','','','','','',0,'','','',null,null,'',null,null,null,'',3,'',null);
-        // sets an idle timeout of 5 seconds, for testing purposes.
-        idle.setIdle(841);
-        // sets a timeout period of 5 seconds. after 10 seconds of inactivity, the user will be considered timed out.
-        idle.setTimeout(59);
-        // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
-    
-        idle.onIdleEnd.subscribe(() => { 
-          this.idleState = 'No longer idle.'
-          this.reset();
-        });
-        
-        idle.onTimeout.subscribe(() => {
-          this.dialog.closeAll();
-          this.timedOut = true;
-          localStorage.setItem("sessionEnd", '1');
-          this._commonService.setEndSession('1');
-          this.logout();
-        });
-        
-        idle.onIdleStart.subscribe(() => {
-            this.openDialog();
-        });
-        
-        idle.onTimeoutWarning.subscribe((countdown) => {
-          this.counterDown=countdown;
-          localStorage.setItem("sessionEnd", '1');
-          this._commonService.setEndSession('1');
-          if(this.dialogRef.componentInstance){
-            this.dialogRef.componentInstance.data.timer=countdown;
-          }
-        });
-    
-        // sets the ping interval to 15 seconds
-        keepalive.interval(5);
-    
-        keepalive.onPing.subscribe(() => this.lastPing = new Date());
-    
-        if (JSON.parse(localStorage.getItem("user"))) {
-          idle.watch();
-          this.timedOut = false;
-        } else {
-          idle.stop();
-        }
+    this.url = GLOBAL.url;
+    this.user = new UsuarioFull(
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      0,
+      "",
+      "",
+      "",
+      null,
+      null,
+      "",
+      null,
+      null,
+      null,
+      "",
+      3,
+      "",
+      null,
+    );
+    // sets an idle timeout of 5 seconds, for testing purposes.
+    idle.setIdle(841);
+    // sets a timeout period of 5 seconds. after 10 seconds of inactivity, the user will be considered timed out.
+    idle.setTimeout(59);
+    // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
 
-        // this.reset();
+    idle.onIdleEnd.subscribe(() => {
+      this.idleState = "No longer idle.";
+      this.reset();
+    });
+
+    idle.onTimeout.subscribe(() => {
+      this.dialog.closeAll();
+      this.timedOut = true;
+      localStorage.setItem("sessionEnd", "1");
+      this._commonService.setEndSession("1");
+      this.logout();
+    });
+
+    idle.onIdleStart.subscribe(() => {
+      this.openDialog();
+    });
+
+    idle.onTimeoutWarning.subscribe((countdown) => {
+      this.counterDown = countdown;
+      localStorage.setItem("sessionEnd", "1");
+      this._commonService.setEndSession("1");
+      if (this.dialogRef.componentInstance) {
+        this.dialogRef.componentInstance.data.timer = countdown;
+      }
+    });
+
+    // sets the ping interval to 15 seconds
+    keepalive.interval(5);
+
+    keepalive.onPing.subscribe(() => (this.lastPing = new Date()));
+
+    if (JSON.parse(localStorage.getItem("user"))) {
+      idle.watch();
+      this.timedOut = false;
+    } else {
+      idle.stop();
+    }
+
+    // this.reset();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener("window:resize", ["$event"])
   onResize(event) {
     this.screenWidth = window.innerWidth;
-    if(this.screenWidth>=960){
-      this.enterAny=false;
-    }else{
-      this.enterAny=true;
+    if (this.screenWidth >= 960) {
+      this.enterAny = false;
+    } else {
+      this.enterAny = true;
     }
   }
 
@@ -126,68 +151,71 @@ export class LogHomeComponent implements OnInit {
     this.idle.watch();
     //xthis.idleState = 'Started.';
     this.timedOut = false;
-  }  
+  }
 
   stay() {
-    this._commonService.setEndSession('0');
+    this._commonService.setEndSession("0");
     this.reset();
   }
 
-  language
+  language;
 
   ngOnInit() {
-    this.titleService.setTitle('GMCAN | Administrador');
+    this.titleService.setTitle("GMCAN | Administrador");
     this.getGrupoInfo();
   }
 
   noticiaPublicada;
 
-  ngAfterViewChecked(){
-    document.getElementById("titleDash").innerHTML=this._commonService.defineTitle(window.location.pathname);
-    if(this._commonService.defineTitle(window.location.pathname)=='<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span>'){
-      if(JSON.parse(sessionStorage.getItem('noticiaPublicada'))==1){
-        this.noticiaPublicada=true;
-      }else{
-        this.noticiaPublicada=false;
+  ngAfterViewChecked() {
+    document.getElementById("titleDash").innerHTML = this._commonService.defineTitle(window.location.pathname);
+    if (
+      this._commonService.defineTitle(window.location.pathname) ==
+      '<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span>'
+    ) {
+      if (JSON.parse(sessionStorage.getItem("noticiaPublicada")) == 1) {
+        this.noticiaPublicada = true;
+      } else {
+        this.noticiaPublicada = false;
       }
+    } else {
+      this.noticiaPublicada = false;
     }
-    else{
-      this.noticiaPublicada=false;
-    }
-    if(this._commonService.getReset()){
+    if (this._commonService.getReset()) {
       this.getUser();
       this._commonService.setReset(false);
     }
   }
 
-  getGrupoInfo(){
-    this.grupoinfo=JSON.parse(localStorage.getItem("grupoInfo"));
-    this._grupoService.getGrupoInfo().subscribe((res)=>{
-      this.grupoinfo=res[0];
-      localStorage.setItem("grupoInfo",JSON.stringify(this.grupoinfo));
-      this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
+  getGrupoInfo() {
+    this.grupoinfo = JSON.parse(localStorage.getItem("grupoInfo"));
+    this._grupoService.getGrupoInfo().subscribe((res) => {
+      this.grupoinfo = res[0];
+      localStorage.setItem("grupoInfo", JSON.stringify(this.grupoinfo));
+      this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
       this.getUser();
     });
-    this.grupoinfo.logoHeader=this.url+'grupo/get-image-grupo/'+this.grupoinfo.logoHeader;
+    this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
   }
 
-  getUser(){
+  getUser() {
     let user = this._usuarioService.getUserLogged();
-    if(user==null){
-      localStorage.setItem("sessionEnd",'1');
+    if (user == null) {
+      localStorage.setItem("sessionEnd", "1");
       this.logout();
-    }else{
-      this._usuarioService.getFullUser(user.DNI).subscribe(result => {
-        if(result.length>0){
-          this.user=result[0];
-          if(this.user.apellidoMaterno){
-            this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno + " " + this.user.apellidoMaterno;
-          }else{
-            this.user.nombreCompleto=this.user.nombre+ " " +this.user.apellidoPaterno;
+    } else {
+      this._usuarioService.getFullUser(user.DNI).subscribe((result) => {
+        if (result.length > 0) {
+          this.user = result[0];
+          if (this.user.apellidoMaterno) {
+            this.user.nombreCompleto =
+              this.user.nombre + " " + this.user.apellidoPaterno + " " + this.user.apellidoMaterno;
+          } else {
+            this.user.nombreCompleto = this.user.nombre + " " + this.user.apellidoPaterno;
           }
-          if(this.user.nombre.includes(' ')){
-            let string = this.user.nombre.split(' ');
-            this.user.nombre= string[0];
+          if (this.user.nombre.includes(" ")) {
+            let string = this.user.nombre.split(" ");
+            this.user.nombre = string[0];
           }
         }
         this.getPermisoHasUsuario(this.user.DNI);
@@ -195,128 +223,133 @@ export class LogHomeComponent implements OnInit {
     }
   }
 
-  getPermisoHasUsuario(DNI){
-    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res)=>{
-      if(res.length>0){
-        this.permisoUsuario=res;
+  getPermisoHasUsuario(DNI) {
+    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res) => {
+      if (res.length > 0) {
+        this.permisoUsuario = res;
         for (let index = 0; index < this.permisoUsuario.length; index++) {
           switch (this.permisoUsuario[index].permiso_idPermiso) {
             case 1:
-              this.permisos.noticiaPermiso=true;
+              this.permisos.noticiaPermiso = true;
               break;
             case 2:
-              this.permisos.proyectoPermiso=true;
+              this.permisos.proyectoPermiso = true;
               break;
             case 3:
-              this.permisos.publicacionPermiso=true;
+              this.permisos.publicacionPermiso = true;
               break;
             case 4:
-              this.permisos.miembroPermiso=true;
+              this.permisos.miembroPermiso = true;
               break;
             case 5:
-              this.permisos.contenidoPermiso=true;
+              this.permisos.contenidoPermiso = true;
               break;
             case 6:
-              this.permisos.analiticaPermiso=true;
+              this.permisos.analiticaPermiso = true;
               break;
             default:
               break;
-          } 
+          }
         }
       }
     });
   }
 
-  logout(){
-    localStorage.setItem("sessionEnd",'1');
+  logout() {
+    localStorage.setItem("sessionEnd", "1");
     this.idle.stop();
     this.timedOut = true;
     this._authService.logout();
-    this._router.navigate(['/login']);
+    this._router.navigate(["/login"]);
   }
 
-  backToTop(){
-    localStorage.setItem("sessionEnd",'1');
+  backToTop() {
+    localStorage.setItem("sessionEnd", "1");
     this.idle.stop();
     this.timedOut = true;
     this._authService.logout();
-    this._router.navigate(['/']);
+    this._router.navigate(["/"]);
   }
 
   enterAny;
-  enterAnyway(){
-    this.enterAny=false;
+  enterAnyway() {
+    this.enterAny = false;
   }
 
-  textChange(text){
-    this.title=text;
+  textChange(text) {
+    this.title = text;
   }
 
-  private dialogRef: MatDialogRef<DialogIdle>
+  private dialogRef: MatDialogRef<DialogIdle>;
 
   openDialog() {
-    this.dialogRef = this.dialog.open(DialogIdle,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "La sesión terminará pronto",
-            text:"Presiona “Continuar” para seguir trabajando con normalidad.",
-            cancel:"Cerrar sesión",
-            yes:"Continuar",
-            timer:this.counterDown}
+    this.dialogRef = this.dialog.open(DialogIdle, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "La sesión terminará pronto",
+        text: "Presiona “Continuar” para seguir trabajando con normalidad.",
+        cancel: "Cerrar sesión",
+        yes: "Continuar",
+        timer: this.counterDown,
+      },
     });
 
-    this.dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        this._commonService.setEndSession('1');
+    this.dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this._commonService.setEndSession("1");
         this.logout();
-      }else if(result!=undefined){
-        this._authService.refreshToken().subscribe((res)=>{});;
+      } else if (result != undefined) {
+        this._authService.refreshToken().subscribe((res) => {});
         this.stay();
       }
     });
   }
 
   openDialogLogOff() {
-    this.dialogRef = this.dialog.open(DialogIdle,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "¿Estás seguro de que deseas cerrar la sesión?",
-            text:"Los cambios sin guardar se perderán.",
-            cancel:"Sí, cerrar sesión",
-            yes:"No, cancelar"}
+    this.dialogRef = this.dialog.open(DialogIdle, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "¿Estás seguro de que deseas cerrar la sesión?",
+        text: "Los cambios sin guardar se perderán.",
+        cancel: "Sí, cerrar sesión",
+        yes: "No, cancelar",
+      },
     });
 
-    this.dialogRef.afterClosed().subscribe(result => {
-      if(result){
+    this.dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
         this.logout();
       }
     });
   }
-
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogIdle {
   constructor(
     public dialogRef: MatDialogRef<DialogIdle>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogLogOff {
   constructor(
     public dialogRef: MatDialogRef<DialogLogOff>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }

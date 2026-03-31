@@ -1,6 +1,7 @@
-import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+
 import { GLOBAL } from "./global";
 
 export interface MembershipApplication {
@@ -34,37 +35,23 @@ export class EmailService {
     this.url = GLOBAL.url;
   }
 
-  sendMembershipApplication(
-    application: MembershipApplication,
-  ): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(
-      `${this.url}email/send-email`,
-      application,
-      { headers: this.headers },
-    );
+  sendMembershipApplication(application: MembershipApplication): Observable<EmailResponse> {
+    return this.http.post<EmailResponse>(`${this.url}email/send-email`, application, {
+      headers: this.headers,
+    });
   }
 
   sendPasswordReset(request: PasswordResetRequest): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(
-      `${this.url}email/send-password-reset`,
-      request,
-      { headers: this.headers },
-    );
+    return this.http.post<EmailResponse>(`${this.url}email/send-password-reset`, request, {
+      headers: this.headers,
+    });
   }
 
   verifyResetToken(token: string): Observable<any> {
-    return this.http.post(
-      `${this.url}email/verify-reset-token`,
-      { token },
-      { headers: this.headers },
-    );
+    return this.http.post(`${this.url}email/verify-reset-token`, { token }, { headers: this.headers });
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(
-      `${this.url}email/reset-password`,
-      { token, newPassword },
-      { headers: this.headers },
-    );
+    return this.http.post(`${this.url}email/reset-password`, { token, newPassword }, { headers: this.headers });
   }
 }

@@ -1,144 +1,186 @@
 <div class="pad">
-    <div class="add-box">
-        <div class="flex-news">
-            <div class="flex-news back-div" (click)="return()">
-                <mat-icon class="back-icon">
-                    arrow_back
-                </mat-icon>
-                <div class="back-text">
-                    Volver
-                </div>
-            </div>
-            <div class="right obligatory-text">
-                <span class="red-text">(*) </span>Campos obligatorios para la publicación de la noticia
-            </div>
-        </div>
-        <form [formGroup]="newsForm" class="mt-24">
-            <div class="flex-news full-width mb-32">
-                <div class="mr-32">
-                    <div class="text-category">
-                        Imagen de portada <span class="red-text">*</span>
-                    </div>
-                    <div class="img-preview" *ngIf="previewUrl">
-                        <img class="img-set" src="{{previewUrl}}">
-                    </div>
-                    <div class="news-img" *ngIf="!previewUrl && !noticia.foto">
-                        <img src="../../assets/img/upload.svg">
-                    </div>
-                    <div class="img-preview" *ngIf="noticia.foto && !previewUrl">
-                        <img class="img-set" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}">
-                    </div>
-                    <div class="green-text mt-16">
-                        <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
-                        <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
-                        <input class="file_upload" type="file" #file
-                        accept="image/*" required
-                        (change)="fileProgress($event)"/>
-                    </div>
-                </div>
-                <div class="full-width">
-                    <div class="full-width">
-                        <div class="text-category">
-                            Título en español <span>({{noticia.titulo.length}}/100) </span> <span class="red-text">*</span>
-                        </div>
-                        <input class="input-category" [(ngModel)]="noticia.titulo" formControlName="titulo" name="titulo" maxlength="100" required>
-                    </div>
-                    <div class="full-width">
-                        <div class="text-category">
-                            Título en inglés <span>({{noticia.tituloEN.length}}/100) </span> <span class="red-text">*</span>
-                        </div>
-                        <input class="input-category" [(ngModel)]="noticia.tituloEN" formControlName="tituloEN" name="tituloEN" maxlength="100" required>
-                    </div>
-                    <div class="full-width flex-news">
-                        <div class="full-width mr-26">
-                            <div class="text-category">
-                                Fecha de publicación <span class="red-text">*</span>
-                            </div>
-                            <mat-form-field class="input-category">
-                                <input matInput [(ngModel)]="noticia.fechaPublicacionDate" [matDatepicker]="dp"
-                                formControlName="fechaPublicacion" name="fechaPublicacion" required>
-                                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-                                <mat-datepicker #dp></mat-datepicker>
-                            </mat-form-field>
-                        </div>
-                        <div class="full-width ml-26">
-                            <div class="text-category">
-                                Categoría <span class="red-text">*</span>
-                            </div>
-                            <mat-form-field class="input-category">
-                                <mat-select [(ngModel)]="noticia.tipoNoticia_idtipoNoticia" formControlName="tipoNoticia_idtipoNoticia" name="tipoNoticia_idtipoNoticia">
-                                    <mat-option [value]="categoria.idtipoNoticia" *ngFor="let categoria of categorias">{{categoria.nombre}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>                        
-                    </div>
-                    <div class="full-width">
-                        <div class="text-category">
-                            Autor <span class="red-text">*</span>
-                        </div>
-                        <mat-form-field class="input-category">
-                            <mat-select [(ngModel)]="noticia.autorPublicacion" formControlName="autorPublicacion" name="autorPublicacion">
-                                <mat-option [value]="autor.DNI" class="mdc-list-item" *ngFor="let autor of autores">
-                                    <img class="mdc-list-item__graphic img-user" src="../../assets/img/user.png" *ngIf="!autor.foto">
-                                    <img class="mdc-list-item__graphic img-user" src="{{url+'usuario/get-image-usuario/'+autor.foto}}" *ngIf="autor.foto">
-                                    <span class="mdc-list-item__text">{{autor.nombre}} {{autor.apellidoPaterno}} {{autor.apellidoMaterno}}</span>
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                </div>
-            </div>
-            <div class="full-width mb-32">
-                <div class="text-category">
-                    Resumen en español <span>({{noticia.resumen.length}}/500) </span> <span class="red-text">*</span>
-                </div>
-                <textarea [(ngModel)]="noticia.resumen" formControlName="resumen" name="resumen" autosize class="input-category" maxlength="500" required></textarea>
-            </div>
-            <div class="full-width mb-32">
-                <div class="text-category">
-                    Resumen en inglés <span>({{noticia.resumenEN.length}}/500) </span> <span class="red-text">*</span>
-                </div>
-                <textarea [(ngModel)]="noticia.resumenEN" formControlName="resumenEN" name="resumenEN" autosize class="input-category" maxlength="500" required></textarea>
-            </div>
-            <div class="full-width mb-32">
-                <div class="flex-news">
-                    <div class="text-category">
-                        Contenido en español <span class="red-text">*</span>
-                    </div>
-                    <div class="green-text right plex-sans" (click)="previewNews(0)">
-                        Vista Previa
-                    </div>
-                </div>
-                <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpo" formControlName="cuerpo" name="cuerpo"></ckeditor>
-            </div>
-            <div class="full-width mb-32">
-                <div class="flex-news">
-                    <div class="text-category">
-                        Contenido en inglés <span class="red-text">*</span>
-                    </div>
-                    <div class="green-text right plex-sans" (click)="previewNews(1)">
-                        Vista Previa
-                    </div>
-                </div>
-                <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpoEN"  formControlName="cuerpoEN" name="cuerpoEN"></ckeditor>
-            </div>
-            <div class="flex-news">
-                <div class='red-btn' *ngIf="edit">
-                    <div class="link link-set link-red" (click)="openEraser()">
-                      Eliminar noticia
-                    </div>
-                </div>
-                <div class="right pd-8 mr-16">
-                    <div class="link link-set" (click)="submitNews(0)">
-                        {{button_text2}}
-                    </div>
-                </div>
-                <div [ngClass]="{'black-btn':newsForm.valid && (noticia.foto || fileData!=null || previewUrl), 'btn-grey':!(newsForm.valid && (noticia.foto || fileData!=null || previewUrl))} ">
-                    <div class="link link-set" (click)="submitNews(1)">
-                      {{button_text}}
-                    </div>
-                </div>
-            </div>
-        </form>
+  <div class="add-box">
+    <div class="flex-news">
+      <div class="flex-news back-div" (click)="return()">
+        <mat-icon class="back-icon"> arrow_back </mat-icon>
+        <div class="back-text">Volver</div>
+      </div>
+      <div class="right obligatory-text">
+        <span class="red-text">(*) </span>Campos obligatorios para la publicación de la noticia
+      </div>
     </div>
+    <form [formGroup]="newsForm" class="mt-24">
+      <div class="flex-news full-width mb-32">
+        <div class="mr-32">
+          <div class="text-category">Imagen de portada <span class="red-text">*</span></div>
+          <div class="img-preview" *ngIf="previewUrl">
+            <img class="img-set" src="{{ previewUrl }}" />
+          </div>
+          <div class="news-img" *ngIf="!previewUrl && !noticia.foto">
+            <img src="../../assets/img/upload.svg" />
+          </div>
+          <div class="img-preview" *ngIf="noticia.foto && !previewUrl">
+            <img class="img-set" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
+          </div>
+          <div class="green-text mt-16">
+            <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
+            <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
+            <input class="file_upload" type="file" #file accept="image/*" required (change)="fileProgress($event)" />
+          </div>
+        </div>
+        <div class="full-width">
+          <div class="full-width">
+            <div class="text-category">
+              Título en español <span>({{ noticia.titulo.length }}/100) </span>
+              <span class="red-text">*</span>
+            </div>
+            <input
+              class="input-category"
+              [(ngModel)]="noticia.titulo"
+              formControlName="titulo"
+              name="titulo"
+              maxlength="100"
+              required
+            />
+          </div>
+          <div class="full-width">
+            <div class="text-category">
+              Título en inglés <span>({{ noticia.tituloEN.length }}/100) </span>
+              <span class="red-text">*</span>
+            </div>
+            <input
+              class="input-category"
+              [(ngModel)]="noticia.tituloEN"
+              formControlName="tituloEN"
+              name="tituloEN"
+              maxlength="100"
+              required
+            />
+          </div>
+          <div class="full-width flex-news">
+            <div class="full-width mr-26">
+              <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
+              <mat-form-field class="input-category">
+                <input
+                  matInput
+                  [(ngModel)]="noticia.fechaPublicacionDate"
+                  [matDatepicker]="dp"
+                  formControlName="fechaPublicacion"
+                  name="fechaPublicacion"
+                  required
+                />
+                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                <mat-datepicker #dp></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="full-width ml-26">
+              <div class="text-category">Categoría <span class="red-text">*</span></div>
+              <mat-form-field class="input-category">
+                <mat-select
+                  [(ngModel)]="noticia.tipoNoticia_idtipoNoticia"
+                  formControlName="tipoNoticia_idtipoNoticia"
+                  name="tipoNoticia_idtipoNoticia"
+                >
+                  <mat-option [value]="categoria.idtipoNoticia" *ngFor="let categoria of categorias">{{
+                    categoria.nombre
+                  }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="full-width">
+            <div class="text-category">Autor <span class="red-text">*</span></div>
+            <mat-form-field class="input-category">
+              <mat-select
+                [(ngModel)]="noticia.autorPublicacion"
+                formControlName="autorPublicacion"
+                name="autorPublicacion"
+              >
+                <mat-option [value]="autor.DNI" class="mdc-list-item" *ngFor="let autor of autores">
+                  <img class="mdc-list-item__graphic img-user" src="../../assets/img/user.png" *ngIf="!autor.foto" />
+                  <img
+                    class="mdc-list-item__graphic img-user"
+                    src="{{ url + 'usuario/get-image-usuario/' + autor.foto }}"
+                    *ngIf="autor.foto"
+                  />
+                  <span class="mdc-list-item__text"
+                    >{{ autor.nombre }} {{ autor.apellidoPaterno }} {{ autor.apellidoMaterno }}</span
+                  >
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="full-width mb-32">
+        <div class="text-category">
+          Resumen en español <span>({{ noticia.resumen.length }}/500) </span>
+          <span class="red-text">*</span>
+        </div>
+        <textarea
+          [(ngModel)]="noticia.resumen"
+          formControlName="resumen"
+          name="resumen"
+          autosize
+          class="input-category"
+          maxlength="500"
+          required
+        ></textarea>
+      </div>
+      <div class="full-width mb-32">
+        <div class="text-category">
+          Resumen en inglés <span>({{ noticia.resumenEN.length }}/500) </span>
+          <span class="red-text">*</span>
+        </div>
+        <textarea
+          [(ngModel)]="noticia.resumenEN"
+          formControlName="resumenEN"
+          name="resumenEN"
+          autosize
+          class="input-category"
+          maxlength="500"
+          required
+        ></textarea>
+      </div>
+      <div class="full-width mb-32">
+        <div class="flex-news">
+          <div class="text-category">Contenido en español <span class="red-text">*</span></div>
+          <div class="green-text right plex-sans" (click)="previewNews(0)">Vista Previa</div>
+        </div>
+        <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpo" formControlName="cuerpo" name="cuerpo"></ckeditor>
+      </div>
+      <div class="full-width mb-32">
+        <div class="flex-news">
+          <div class="text-category">Contenido en inglés <span class="red-text">*</span></div>
+          <div class="green-text right plex-sans" (click)="previewNews(1)">Vista Previa</div>
+        </div>
+        <ckeditor
+          [editor]="Editor"
+          [(ngModel)]="noticia.cuerpoEN"
+          formControlName="cuerpoEN"
+          name="cuerpoEN"
+        ></ckeditor>
+      </div>
+      <div class="flex-news">
+        <div class="red-btn" *ngIf="edit">
+          <div class="link link-set link-red" (click)="openEraser()">Eliminar noticia</div>
+        </div>
+        <div class="right pd-8 mr-16">
+          <div class="link link-set" (click)="submitNews(0)">
+            {{ button_text2 }}
+          </div>
+        </div>
+        <div
+          [ngClass]="{
+            'black-btn': newsForm.valid && (noticia.foto || fileData != null || previewUrl),
+            'btn-grey': !(newsForm.valid && (noticia.foto || fileData != null || previewUrl)),
+          }"
+        >
+          <div class="link link-set" (click)="submitNews(1)">
+            {{ button_text }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

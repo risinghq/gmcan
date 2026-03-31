@@ -1,222 +1,229 @@
 /* CSS de la Carta Sobre nosotros */
 
-.plex-serif{
-    font-family: 'IBM Plex Serif', serif;
+.plex-serif {
+  font-family: "IBM Plex Serif", serif;
 }
 
-.plex-sans{
-    font-family: 'IBM Plex Sans', serif;
+.plex-sans {
+  font-family: "IBM Plex Sans", serif;
 }
 
-.about-div{
-    background-color: #f8f8f8;
+.about-div {
+  background-color: #f8f8f8;
 }
 
-.card-about{
-    width: inherit;
-    border-radius: 4px;
-    padding:8px;
-    background-color: #ffffff;
+.card-about {
+  width: inherit;
+  border-radius: 4px;
+  padding: 8px;
+  background-color: #ffffff;
 }
-.about-img{
-    width: inherit;
-    object-fit: cover;
-    border-radius: 4px;
+.about-img {
+  width: inherit;
+  object-fit: cover;
+  border-radius: 4px;
 }
-.about-title{
-    @extend .plex-sans;
-    line-height: 1.17;
-    letter-spacing: 0.3px;
-    font-weight: bold;
-    color: #000000;
+.about-title {
+  @extend .plex-sans;
+  line-height: 1.17;
+  letter-spacing: 0.3px;
+  font-weight: bold;
+  color: #000000;
 }
-.about-subtitle{
-    @extend .plex-sans;
-    line-height: 1.75;
-    letter-spacing: 0.3px;
-    font-weight: 500;
-    color: #b5b5b5;
+.about-subtitle {
+  @extend .plex-sans;
+  line-height: 1.75;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+  color: #b5b5b5;
 }
-.about-text{
-    white-space: pre-wrap;
-    @extend .plex-sans;
-    font-weight: 300;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
+.about-text {
+  white-space: pre-wrap;
+  @extend .plex-sans;
+  font-weight: 300;
+  line-height: 1.33;
+  letter-spacing: 0.3px;
+  color: #000000;
 }
-.about-sub-divi{
-    height: 2px;
-    width: 40px;
-    background-color: #006400;
+.about-sub-divi {
+  height: 2px;
+  width: 40px;
+  background-color: #006400;
 }
-.about-icon{
-    vertical-align: middle;
-    height: 24px;
+.about-icon {
+  vertical-align: middle;
+  height: 24px;
 }
-.about-link{
-    @extend .plex-sans;
-    font-weight: 500;
-    line-height: 1.54;
-    letter-spacing: 0.3px;
-    color: #9595b2 !important;
+.about-link {
+  @extend .plex-sans;
+  font-weight: 500;
+  line-height: 1.54;
+  letter-spacing: 0.3px;
+  color: #9595b2 !important;
 }
-.about-link-active:hover{
-    text-decoration: underline;
-    color: black;
+.about-link-active:hover {
+  text-decoration: underline;
+  color: black;
 }
-.about-link-active{
-    @extend .plex-sans;
-    font-weight: bold;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
-    text-decoration: none;
+.about-link-active {
+  @extend .plex-sans;
+  font-weight: bold;
+  line-height: 1.33;
+  letter-spacing: 0.3px;
+  color: #000000;
+  text-decoration: none;
 }
-@media(min-width:1500px){
-    .about-div{
-        padding-left: 343px !important;    
-        padding-right: 343px !important;
-        padding-top: 24px !important;
-        padding-bottom: 40px !important;
-    }
-    .card-about{
-        padding-bottom: 40px !important;
-    }
-    .about-img{
-        height: 300px;
-    }
-    .about-text-div{
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-        padding-top: 32px !important;
-    }
-    .about-title{
-        font-size: 30px !important;
-    }
-    .about-subtitle{
-        font-size: 20px !important;
-    }
-    .about-sub-divi{
-        margin-top: 24px !important;        
-        margin-bottom: 24px !important;
-    }
-    .about-top{
-        padding-top: 32px;
-    }
-    .about-links{
-        padding-bottom: 8px;
-    }
-    .about-link-active, .about-link, .about-text{
-        font-size: 15px;
-    }
+@media (min-width: 1500px) {
+  .about-div {
+    padding-left: 343px !important;
+    padding-right: 343px !important;
+    padding-top: 24px !important;
+    padding-bottom: 40px !important;
+  }
+  .card-about {
+    padding-bottom: 40px !important;
+  }
+  .about-img {
+    height: 300px;
+  }
+  .about-text-div {
+    padding-left: 40px !important;
+    padding-right: 40px !important;
+    padding-top: 32px !important;
+  }
+  .about-title {
+    font-size: 30px !important;
+  }
+  .about-subtitle {
+    font-size: 20px !important;
+  }
+  .about-sub-divi {
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+  .about-top {
+    padding-top: 32px;
+  }
+  .about-links {
+    padding-bottom: 8px;
+  }
+  .about-link-active,
+  .about-link,
+  .about-text {
+    font-size: 15px;
+  }
 }
-@media(max-width:1500px){
-    .about-div{
-        padding-left: 68px;
-        padding-right: 68px;
-        padding-top: 24px;
-        padding-bottom: 40px;
-    }
-    .card-about{
-        padding-bottom: 40px;
-    }
-    .about-img{
-        height: 300px;
-    }
-    .about-text-div{
-        padding-left: 40px;
-        padding-right: 40px;
-        padding-top: 32px;
-    }
-    .about-title{
-        font-size: 30px;
-    }
-    .about-subtitle{
-        font-size: 20px ;
-    }
-    .about-sub-divi{
-        margin-top: 24px;        
-        margin-bottom: 24px;
-    }
-    .about-top{
-        padding-top: 32px;
-    }
-    .about-links{
-        padding-bottom: 8px;
-    }
-    .about-link-active, .about-link, .about-text{
-        font-size: 15px;
-    }
-}
-
-@media(max-width:960px){
-    .about-div{
-        padding-left: 20px;
-        padding-right: 20px;
-        padding-top: 12px;
-        padding-bottom: 20px;
-    }
-    .card-about{
-        padding-bottom: 20px;
-    }
-    .about-img{
-        height: 128px;
-    }
-    .about-text-div{
-        padding-left: 8px;
-        padding-right: 8px;
-        padding-top: 16px;
-    }
-    .about-title{
-        font-size: 15px;
-    }
-    .about-sub-divi{
-        margin-top: 12px;        
-        margin-bottom: 12px;
-    }
-    .about-top{
-        padding-top: 24px;
-    }
-    .about-links{
-        padding-bottom: 16px;
-    }
-    .about-link-active, .about-link, .about-text, .about-subtitle{
-        font-size: 13px;
-    }
-    .about-categories{
-        display: none;
-    }
+@media (max-width: 1500px) {
+  .about-div {
+    padding-left: 68px;
+    padding-right: 68px;
+    padding-top: 24px;
+    padding-bottom: 40px;
+  }
+  .card-about {
+    padding-bottom: 40px;
+  }
+  .about-img {
+    height: 300px;
+  }
+  .about-text-div {
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 32px;
+  }
+  .about-title {
+    font-size: 30px;
+  }
+  .about-subtitle {
+    font-size: 20px;
+  }
+  .about-sub-divi {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+  .about-top {
+    padding-top: 32px;
+  }
+  .about-links {
+    padding-bottom: 8px;
+  }
+  .about-link-active,
+  .about-link,
+  .about-text {
+    font-size: 15px;
+  }
 }
 
-.about-category-title{
-    font-weight: bold;
-    letter-spacing: 0.3px;
-    color: #000000;
-    margin-bottom: 16px;
+@media (max-width: 960px) {
+  .about-div {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 12px;
+    padding-bottom: 20px;
+  }
+  .card-about {
+    padding-bottom: 20px;
+  }
+  .about-img {
+    height: 128px;
+  }
+  .about-text-div {
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 16px;
+  }
+  .about-title {
+    font-size: 15px;
+  }
+  .about-sub-divi {
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+  .about-top {
+    padding-top: 24px;
+  }
+  .about-links {
+    padding-bottom: 16px;
+  }
+  .about-link-active,
+  .about-link,
+  .about-text,
+  .about-subtitle {
+    font-size: 13px;
+  }
+  .about-categories {
+    display: none;
+  }
 }
 
-.about-category{
-    border-top: solid 1px #d7d7e1;
-    padding: 17px;
-    border-bottom: solid 1px #d7d7e1;    
-    font-weight: 500;
-    line-height: 1.33;
-    color: #30393a;
+.about-category-title {
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  color: #000000;
+  margin-bottom: 16px;
 }
 
-.about-category:hover{
-    background-color: #f5f5f5;
-    cursor: pointer;
+.about-category {
+  border-top: solid 1px #d7d7e1;
+  padding: 17px;
+  border-bottom: solid 1px #d7d7e1;
+  font-weight: 500;
+  line-height: 1.33;
+  color: #30393a;
 }
 
-.active{
-    @extend .about-category;
-    background-color: rgba(48, 57, 58, 0.05);
-    font-weight: bold;
-    cursor: pointer;
+.about-category:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
 }
 
-.about-categories{
-    margin-top: 34px;
+.active {
+  @extend .about-category;
+  background-color: rgba(48, 57, 58, 0.05);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.about-categories {
+  margin-top: 34px;
 }

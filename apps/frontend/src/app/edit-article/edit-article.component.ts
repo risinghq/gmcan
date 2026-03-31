@@ -1,40 +1,40 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { Publicacion } from '../models/publicacion';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { Revista } from '../models/revista';
-import { Autor } from '../models/autores';
-import { Usuario } from '../models/usuario';
-import { ActivatedRoute, Router, Params } from '@angular/router';
-import { PublicacionService } from '../services/publicacion.service';
-import { PublicacionHasAutorService } from '../services/publicacionhasautor.service';
-import { PublicacionHasUsuarioService } from '../services/publicacionhasusuario.service';
-import { UsuarioService } from '../services/usuario.service';
-import { AutorService } from '../services/autor.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import { CommonService } from '../services/common.service';
-import { RevistaService } from '../services/revista.service';
-import { GLOBAL } from '../services/global';
-
-import * as _moment from 'moment';
+import { Component, OnInit, Inject } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, FormControl } from "@angular/forms";
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from "@angular/material/core";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { ActivatedRoute, Router, Params } from "@angular/router";
+import * as _moment from "moment";
 // tslint:disable-next-line:no-duplicate-imports
-import {default as _rollupMoment} from 'moment';
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
-import { MY_FORMATS } from '../edit-news/edit-news.component';
-import { Observable } from 'rxjs';
-import { startWith } from 'rxjs/internal/operators/startWith';
-import { map } from 'rxjs/internal/operators/map';
-import { DialogData } from '../models/dialogdata';
-import { SpaceValidator } from '../services/spacevalidator';
+import { default as _rollupMoment } from "moment";
+import { Observable } from "rxjs";
+import { map } from "rxjs/internal/operators/map";
+import { startWith } from "rxjs/internal/operators/startWith";
+
+import { MY_FORMATS } from "../edit-news/edit-news.component";
+import { Autor } from "../models/autores";
+import { DialogData } from "../models/dialogdata";
+import { Publicacion } from "../models/publicacion";
+import { Revista } from "../models/revista";
+import { Usuario } from "../models/usuario";
+import { AutorService } from "../services/autor.service";
+import { CommonService } from "../services/common.service";
+import { GLOBAL } from "../services/global";
+import { PublicacionService } from "../services/publicacion.service";
+import { PublicacionHasAutorService } from "../services/publicacionhasautor.service";
+import { PublicacionHasUsuarioService } from "../services/publicacionhasusuario.service";
+import { RevistaService } from "../services/revista.service";
+import { SpaceValidator } from "../services/spacevalidator";
+import { UsuarioService } from "../services/usuario.service";
 
 const moment = _rollupMoment || _moment;
 
 @Component({
   standalone: false,
-  selector: 'app-edit-article',
-  templateUrl: '../add-article/add-article.component.html',
-  styleUrls: ['../add-article/add-article.component.scss'],
+  selector: "app-edit-article",
+  templateUrl: "../add-article/add-article.component.html",
+  styleUrls: ["../add-article/add-article.component.scss"],
   providers: [
     // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
     // application's root module. We provide it at the component level here, due to limitations of
@@ -42,20 +42,19 @@ const moment = _rollupMoment || _moment;
     {
       provide: DateAdapter,
       useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS]
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
     },
 
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ],
 })
 export class EditArticleComponent implements OnInit {
-
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
-  button_text="Actualizar información";
+  button_text = "Actualizar información";
   revista: Array<Revista>;
   autores: Array<Autor>;
-  usuarios: Array<Usuario>
+  usuarios: Array<Usuario>;
   url;
 
   selectedUser;
@@ -75,17 +74,46 @@ export class EditArticleComponent implements OnInit {
     private _revistaService: RevistaService,
   ) {
     this.publicacionForm = this.formBuilder.group({
-      título: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaPublicacionDate: ['', [Validators.required]],
-      revista_idRevista: ['', [Validators.required]],
-      nroRevista: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      DOI: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumen: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumenEN: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      userSelector: ['']
+      título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaPublicacionDate: ["", [Validators.required]],
+      revista_idRevista: ["", [Validators.required]],
+      nroRevista: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      DOI: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumen: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      userSelector: [""],
     });
-    this.publicacion = new Publicacion(null,'','','','','',null,'',null,null,null,null,1,'','',null,null,null,'',null,null,null,'','',null,'',null,'')
-    this.url=GLOBAL.url;
+    this.publicacion = new Publicacion(
+      null,
+      "",
+      "",
+      "",
+      "",
+      "",
+      null,
+      "",
+      null,
+      null,
+      null,
+      null,
+      1,
+      "",
+      "",
+      null,
+      null,
+      null,
+      "",
+      null,
+      null,
+      null,
+      "",
+      "",
+      null,
+      "",
+      null,
+      "",
+    );
+    this.url = GLOBAL.url;
   }
 
   agregar;
@@ -94,66 +122,71 @@ export class EditArticleComponent implements OnInit {
     this.getArticulo();
   }
 
-  getArticulo(){
-    this._route.params.forEach((params:Params)=>{
-      let idArticulo=params['id'];
-      this._publicacionService.getPublication(idArticulo).subscribe(result => {
-        if(result){
+  getArticulo() {
+    this._route.params.forEach((params: Params) => {
+      let idArticulo = params["id"];
+      this._publicacionService.getPublication(idArticulo).subscribe((result) => {
+        if (result) {
           this.publicacion = result[0];
           var d = new Date(result[0].fechaPublicacion);
-          d.setMinutes( d.getMinutes() + d.getTimezoneOffset() );
-          this.publicacion.fechaPublicacionDate=d;
-          localStorage.setItem("articleEdit",JSON.stringify(this.publicacion.titulo));
+          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+          this.publicacion.fechaPublicacionDate = d;
+          localStorage.setItem("articleEdit", JSON.stringify(this.publicacion.titulo));
           this.getRevista();
           this.getAutoresPublicacion(idArticulo);
-        } 
+        }
       });
     });
   }
 
-  getRevista(){
-    this._revistaService.getRevistas().subscribe(result => {
-      if(result){
-        this.revista=result;
+  getRevista() {
+    this._revistaService.getRevistas().subscribe((result) => {
+      if (result) {
+        this.revista = result;
         this.getUsuarios();
-      } 
+      }
     });
   }
 
   myControl = new FormControl();
-  options: Array<any>=[];
+  options: Array<any> = [];
   filteredOptions: Observable<any>;
 
   private _filter(value): any {
     const filterValue = value.toLowerCase();
-    return this.options.filter(option => option.nombre.toLowerCase().includes(filterValue));
+    return this.options.filter((option) => option.nombre.toLowerCase().includes(filterValue));
   }
 
-  selectedUsers=[];
+  selectedUsers = [];
 
-  getAutores(){
-    this._autorService.getAutor().subscribe(result => {
-      if(result){
-        result.sort((a,b) => (a.nombre > b.nombre) ? 1 : ((b.nombre > a.nombre) ? -1 : 0));
-        this.autores=result;
+  getAutores() {
+    this._autorService.getAutor().subscribe((result) => {
+      if (result) {
+        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        this.autores = result;
         for (let index = 0; index < this.autores.length; index++) {
           this.options.push(this.autores[index]);
         }
         this.filteredOptions = this.myControl.valueChanges.pipe(
-          startWith(''),
-          map(value => this._filter(value))
+          startWith(""),
+          map((value) => this._filter(value)),
         );
-      } 
+      }
     });
   }
 
-  getUsuarios(){
-    this._usuarioService.getUsuarios().subscribe(result => {
-      if(result){
-        result.sort((a,b) => (a.nombre > b.nombre) ? 1 : ((b.nombre > a.nombre) ? -1 : 0));
-        this.usuarios=result;
+  getUsuarios() {
+    this._usuarioService.getUsuarios().subscribe((result) => {
+      if (result) {
+        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        this.usuarios = result;
         for (let index = 0; index < this.usuarios.length; index++) {
-          this.usuarios[index].nombre=this.usuarios[index].nombre+' '+this.usuarios[index].apellidoPaterno+' '+this.usuarios[index].apellidoMaterno
+          this.usuarios[index].nombre =
+            this.usuarios[index].nombre +
+            " " +
+            this.usuarios[index].apellidoPaterno +
+            " " +
+            this.usuarios[index].apellidoMaterno;
           this.options.push(this.usuarios[index]);
         }
         this.getAutores();
@@ -161,50 +194,50 @@ export class EditArticleComponent implements OnInit {
     });
   }
 
-  getAutoresPublicacion(idPublicacion){
-    this._publicacionhasautorService.getPublicacionHasAutor(idPublicacion).subscribe(result => {
-      if(result){
+  getAutoresPublicacion(idPublicacion) {
+    this._publicacionhasautorService.getPublicacionHasAutor(idPublicacion).subscribe((result) => {
+      if (result) {
         for (let index = 0; index < result.length; index++) {
-          this.getAutor(result[index].autores_idAutor, result[index].isPrincipal)
+          this.getAutor(result[index].autores_idAutor, result[index].isPrincipal);
         }
       }
       this.getUsuariosPublicacion(idPublicacion);
     });
   }
-  getUsuariosPublicacion(idPublicacion){
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe(result => {
-      if(result){
+  getUsuariosPublicacion(idPublicacion) {
+    this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe((result) => {
+      if (result) {
         for (let index = 0; index < result.length; index++) {
           this.getUsuario(result[index].usuario_DNI, result[index].isPrincipal);
         }
-      } 
+      }
     });
   }
 
-  getAutor(idAutor, isPrincipal){
-    this._autorService.getAuthor(idAutor).subscribe(result => {
-      if(result){
-        result[0].isPrincipal=isPrincipal;
-        if(isPrincipal==0){
-          this.selectedUsers.push(result[0])
+  getAutor(idAutor, isPrincipal) {
+    this._autorService.getAuthor(idAutor).subscribe((result) => {
+      if (result) {
+        result[0].isPrincipal = isPrincipal;
+        if (isPrincipal == 0) {
+          this.selectedUsers.push(result[0]);
           this.myControl.setValue(result[0].nombre);
-        }else{
+        } else {
           this.autoresSeleccionados.push(result[0]);
         }
-      } 
+      }
       this.setearOtrosAutores();
     });
   }
 
-  getUsuario(DNI, isPrincipal){
-    this._usuarioService.getUser(DNI).subscribe(result => {
-      if(result){
-        result[0].nombre=result[0].nombre+' '+result[0].apellidoPaterno+' '+result[0].apellidoMaterno
-        result[0].isPrincipal=isPrincipal;
-        if(isPrincipal==0){
-          this.selectedUsers.push(result[0])
+  getUsuario(DNI, isPrincipal) {
+    this._usuarioService.getUser(DNI).subscribe((result) => {
+      if (result) {
+        result[0].nombre = result[0].nombre + " " + result[0].apellidoPaterno + " " + result[0].apellidoMaterno;
+        result[0].isPrincipal = isPrincipal;
+        if (isPrincipal == 0) {
+          this.selectedUsers.push(result[0]);
           this.myControl.setValue(result[0].nombre);
-        }else{
+        } else {
           this.autoresSeleccionados.push(result[0]);
         }
         this.setearOtrosAutores();
@@ -212,310 +245,345 @@ export class EditArticleComponent implements OnInit {
     });
   }
 
-  setearOtrosAutores(){
-    this.otrosAutores=[];
-    this.autoresSeleccionados.sort((a,b) => (a.isPrincipal > b.isPrincipal) ? 1 : ((b.isPrincipal > a.isPrincipal) ? -1 : 0));    
+  setearOtrosAutores() {
+    this.otrosAutores = [];
+    this.autoresSeleccionados.sort((a, b) =>
+      a.isPrincipal > b.isPrincipal ? 1 : b.isPrincipal > a.isPrincipal ? -1 : 0,
+    );
     for (let index = 0; index < this.autoresSeleccionados.length; index++) {
       let idAutorSeleccionado;
-      let isAutor=true;
-      if(this.autoresSeleccionados[index].idAutor){
-        idAutorSeleccionado=this.autoresSeleccionados[index].idAutor;
-      }else{
-        idAutorSeleccionado=this.autoresSeleccionados[index].DNI;
-        isAutor=false;
+      let isAutor = true;
+      if (this.autoresSeleccionados[index].idAutor) {
+        idAutorSeleccionado = this.autoresSeleccionados[index].idAutor;
+      } else {
+        idAutorSeleccionado = this.autoresSeleccionados[index].DNI;
+        isAutor = false;
       }
       this.otrosAutores.push({
-        id:this.otrosAutores.length+1,
-        idAutor:idAutorSeleccionado,
-        nombre:this.autoresSeleccionados[index].nombre,
+        id: this.otrosAutores.length + 1,
+        idAutor: idAutorSeleccionado,
+        nombre: this.autoresSeleccionados[index].nombre,
         isAutor: isAutor,
         myControl: new FormControl(),
-      })
-      this.otrosAutores[this.otrosAutores.length-1].filteredOptions = this.otrosAutores[this.otrosAutores.length-1].myControl.valueChanges.pipe(
-        startWith(''),
-        map(value => this._filter(value))
+      });
+      this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
+        this.otrosAutores.length - 1
+      ].myControl.valueChanges.pipe(
+        startWith(""),
+        map((value) => this._filter(value)),
       );
     }
-    if(this.autoresSeleccionados.length==0){
+    if (this.autoresSeleccionados.length == 0) {
       this.otrosAutores.push({
-        id:1,
-        idAutor:'',
-        nombre:'',
+        id: 1,
+        idAutor: "",
+        nombre: "",
         isAutor: true,
-        myControl: new FormControl()
-      })
+        myControl: new FormControl(),
+      });
     }
   }
 
-  autoresSeleccionados=[];
+  autoresSeleccionados = [];
 
   otrosAutores: any[];
 
-  addAnotherAuthor(){
+  addAnotherAuthor() {
     this.otrosAutores.push({
-      id:this.otrosAutores.length+1,
-      idAutor:'',
-      nombre:'',
+      id: this.otrosAutores.length + 1,
+      idAutor: "",
+      nombre: "",
       isAutor: true,
       myControl: new FormControl(),
-    })
-    this.otrosAutores[this.otrosAutores.length-1].filteredOptions = this.otrosAutores[this.otrosAutores.length-1].myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value))
+    });
+    this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
+      this.otrosAutores.length - 1
+    ].myControl.valueChanges.pipe(
+      startWith(""),
+      map((value) => this._filter(value)),
     );
   }
 
   removeAnotherAuthor(i: number) {
-    if(i>0){
+    if (i > 0) {
       this.otrosAutores.splice(i, 1);
-    }else if(i==0 && this.otrosAutores.length==1){
+    } else if (i == 0 && this.otrosAutores.length == 1) {
       this.otrosAutores.splice(i, 1);
       this.addAnotherAuthor();
-    }else{
+    } else {
       this.otrosAutores.splice(i, 1);
     }
   }
 
-  submitArticle(){
+  submitArticle() {
     this.revisarValues();
-    if(this.publicacionForm.valid && this.selectedUser){
+    if (this.publicacionForm.valid && this.selectedUser) {
       const momentDate = new Date(this.publicacion.fechaPublicacionDate); // Replace event.value with your date value
       const formattedDate = moment(momentDate).format("YYYY-MM-DD");
-      this.publicacion.fechaPublicacion=formattedDate;
-      this._publicacionService.updatePublicacion(this.publicacion).subscribe(result => {
-        if(result.status==1){
-          if(this.fileData){
-            this._publicacionService.uploadPublicacionFile(this.fileData, this.publicacion.idPublicacion)
-            .subscribe(res => {
-            }) 
+      this.publicacion.fechaPublicacion = formattedDate;
+      this._publicacionService.updatePublicacion(this.publicacion).subscribe((result) => {
+        if (result.status == 1) {
+          if (this.fileData) {
+            this._publicacionService
+              .uploadPublicacionFile(this.fileData, this.publicacion.idPublicacion)
+              .subscribe((res) => {});
           }
-          this._publicacionhasautorService.deletePublicacionHasAutor(this.publicacion.idPublicacion).subscribe(result => {
-            if(result.status==1){
-              this._publicacionhasusuarioService.deletePublicacionHasUsuario(this.publicacion.idPublicacion).subscribe(result => {
-                if(result.status==1){
-                  if(this.selectedUsers.length>0){
-                    this.setAutores(this.selectedUsers[0], 0, this.publicacion.idPublicacion);
-                  }else{
-                    let autorNuevo={nombre: this.selectedUser}
-                    this.setAutores(autorNuevo, 0, this.publicacion.idPublicacion);
-                  }
-                  for (let index = 0; index < this.otrosAutores.length; index++) {
-                    this.setAutores(this.otrosAutores[index], index+1, this.publicacion.idPublicacion);
-                  }
-                } 
-              });
-            } 
-          });
+          this._publicacionhasautorService
+            .deletePublicacionHasAutor(this.publicacion.idPublicacion)
+            .subscribe((result) => {
+              if (result.status == 1) {
+                this._publicacionhasusuarioService
+                  .deletePublicacionHasUsuario(this.publicacion.idPublicacion)
+                  .subscribe((result) => {
+                    if (result.status == 1) {
+                      if (this.selectedUsers.length > 0) {
+                        this.setAutores(this.selectedUsers[0], 0, this.publicacion.idPublicacion);
+                      } else {
+                        let autorNuevo = { nombre: this.selectedUser };
+                        this.setAutores(autorNuevo, 0, this.publicacion.idPublicacion);
+                      }
+                      for (let index = 0; index < this.otrosAutores.length; index++) {
+                        this.setAutores(this.otrosAutores[index], index + 1, this.publicacion.idPublicacion);
+                      }
+                    }
+                  });
+              }
+            });
         }
       });
     }
   }
 
-  setAutores(autor, isPrincipal, idPublicacion){
-    if(autor.nombre){
-      if(autor.idAutor=='' || (!autor.idAutor && !autor.DNI)){
-        let newAuthor={nombre: autor.nombre};
-        this._autorService.addAuthor(newAuthor).subscribe(res => {
-          if(res){
-            let autorPublicacion={autor_idAutor: res.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
-            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(res => {
-            }) 
+  setAutores(autor, isPrincipal, idPublicacion) {
+    if (autor.nombre) {
+      if (autor.idAutor == "" || (!autor.idAutor && !autor.DNI)) {
+        let newAuthor = { nombre: autor.nombre };
+        this._autorService.addAuthor(newAuthor).subscribe((res) => {
+          if (res) {
+            let autorPublicacion = {
+              autor_idAutor: res.idAutor,
+              publicacion_idPublicacion: idPublicacion,
+              isPrincipal: isPrincipal,
+            };
+            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
           }
-        }) 
-      }else if(autor.idAutor){
-        if(autor.isAutor){
-          let autorPublicacion={autor_idAutor: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(res => {
-          })
-        }else if(autor.isAutor==undefined){
-          let autorPublicacion={autor_idAutor: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(res => {
-          })
-        }else{
-          let usuarioPublicacion={usuario_DNI: autor.idAutor, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
-          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(res => {
-          })  
+        });
+      } else if (autor.idAutor) {
+        if (autor.isAutor) {
+          let autorPublicacion = {
+            autor_idAutor: autor.idAutor,
+            publicacion_idPublicacion: idPublicacion,
+            isPrincipal: isPrincipal,
+          };
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+        } else if (autor.isAutor == undefined) {
+          let autorPublicacion = {
+            autor_idAutor: autor.idAutor,
+            publicacion_idPublicacion: idPublicacion,
+            isPrincipal: isPrincipal,
+          };
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+        } else {
+          let usuarioPublicacion = {
+            usuario_DNI: autor.idAutor,
+            publicacion_idPublicacion: idPublicacion,
+            isPrincipal: isPrincipal,
+          };
+          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
         }
-      }else if(autor.DNI){
-        let usuarioPublicacion={usuario_DNI: autor.DNI, publicacion_idPublicacion:idPublicacion, isPrincipal:isPrincipal}
-        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(res => {
-        })
+      } else if (autor.DNI) {
+        let usuarioPublicacion = {
+          usuario_DNI: autor.DNI,
+          publicacion_idPublicacion: idPublicacion,
+          isPrincipal: isPrincipal,
+        };
+        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
       }
     }
-    if(isPrincipal){
-      this.agregar=true;
+    if (isPrincipal) {
+      this.agregar = true;
       this.return();
       this.openSnackBar("Artículo actualizado exitosamente");
     }
   }
 
-  selectUser(evento, value){
-    if(value==1){
+  selectUser(evento, value) {
+    if (value == 1) {
       this.myControl.setValue(evento.nombre);
-      if(this.selectedUsers.length!=0){
-        this.selectedUsers[0]=evento;
-      }else{
-        this.selectedUsers.push(evento)
+      if (this.selectedUsers.length != 0) {
+        this.selectedUsers[0] = evento;
+      } else {
+        this.selectedUsers.push(evento);
       }
-    }else{
-      let index = this.options.findIndex(option => option.nombre === evento.value)
-      if(this.selectedUsers.length!=0){
-        this.selectedUsers[0]=this.options[index];
-      }else{
-        this.selectedUsers.push(this.options[index])
+    } else {
+      let index = this.options.findIndex((option) => option.nombre === evento.value);
+      if (this.selectedUsers.length != 0) {
+        this.selectedUsers[0] = this.options[index];
+      } else {
+        this.selectedUsers.push(this.options[index]);
       }
     }
   }
 
-  selectUserAutor(evento, value, i){
-    if(value==1){
-      if(evento.idAutor){
-        this.otrosAutores[i].idAutor=evento.idAutor;
-      }else{
-        this.otrosAutores[i].idAutor=evento.DNI;
-        this.otrosAutores[i].isAutor=false;
+  selectUserAutor(evento, value, i) {
+    if (value == 1) {
+      if (evento.idAutor) {
+        this.otrosAutores[i].idAutor = evento.idAutor;
+      } else {
+        this.otrosAutores[i].idAutor = evento.DNI;
+        this.otrosAutores[i].isAutor = false;
       }
-      this.otrosAutores[i].nombre=evento.nombre;
-    }else{
-      let index = this.options.findIndex(option => option.nombre === evento.value)
-      if(this.options[index].idAutor){
-        this.otrosAutores[i].idAutor=this.options[index].idAutor;
-      }else{
-        this.otrosAutores[i].idAutor=this.options[index].DNI;
-        this.otrosAutores[i].isAutor=false;
+      this.otrosAutores[i].nombre = evento.nombre;
+    } else {
+      let index = this.options.findIndex((option) => option.nombre === evento.value);
+      if (this.options[index].idAutor) {
+        this.otrosAutores[i].idAutor = this.options[index].idAutor;
+      } else {
+        this.otrosAutores[i].idAutor = this.options[index].DNI;
+        this.otrosAutores[i].isAutor = false;
       }
-      this.otrosAutores[i].nombre=this.options[index].nombre;
+      this.otrosAutores[i].nombre = this.options[index].nombre;
     }
   }
 
-  revisarValues(){
+  revisarValues() {
     for (let index = 0; index < this.otrosAutores.length; index++) {
-      let found = this.options.findIndex(option => option.nombre === this.otrosAutores[index].nombre);
-      if(found==-1){
-        this.otrosAutores[index].idAutor=null;
-        this.otrosAutores[index].isAutor=true;
+      let found = this.options.findIndex((option) => option.nombre === this.otrosAutores[index].nombre);
+      if (found == -1) {
+        this.otrosAutores[index].idAutor = null;
+        this.otrosAutores[index].isAutor = true;
       }
     }
     for (let index = 0; index < this.selectedUsers.length; index++) {
-      let found = this.options.findIndex(option => option.nombre === this.selectedUsers[index].nombre);
-      if(found==-1){
-        if(this.selectedUsers[index].idAutor){
-          this.selectedUsers[index].idAutor=null;
-        }else if(this.selectedUser[index].DNI){
-          this.selectedUsers[index].DNI=null;
+      let found = this.options.findIndex((option) => option.nombre === this.selectedUsers[index].nombre);
+      if (found == -1) {
+        if (this.selectedUsers[index].idAutor) {
+          this.selectedUsers[index].idAutor = null;
+        } else if (this.selectedUser[index].DNI) {
+          this.selectedUsers[index].DNI = null;
         }
       }
-      if(this.selectedUser!=this.selectedUsers[index].nombre){
-        this.selectedUsers.splice(index,1);
+      if (this.selectedUser != this.selectedUsers[index].nombre) {
+        this.selectedUsers.splice(index, 1);
       }
     }
   }
 
-  return(){
-    this._commonService.setEndSession('0');
-    this._router.navigate(['dashboard/'+localStorage.getItem('article-back')]);
+  return() {
+    this._commonService.setEndSession("0");
+    this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
   }
 
   openSnackBar(value) {
     this._snackBar.open(value, null, {
       duration: 2000,
-      horizontalPosition: 'right',
-      verticalPosition: 'top',
+      horizontalPosition: "right",
+      verticalPosition: "top",
     });
   }
 
   fileData: File = null;
-  previewUrl:any = null;
+  previewUrl: any = null;
   fileUploadProgress: string = null;
   uploadedFilePath: string = null;
   fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];  
+    this.fileData = <File>fileInput.target.files[0];
   }
 
   private dialogRef: MatDialogRef<DialogCancel13>;
 
   openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel13,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "¿Estás seguro que deseas volver sin guardar?",
-            text:"La información no se guardará",
-            cancel:"Sí, volver",
-            yes:"No, mantenerme aquí"}
+    this.dialogRef = this.dialog.open(DialogCancel13, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "¿Estás seguro que deseas volver sin guardar?",
+        text: "La información no se guardará",
+        cancel: "Sí, volver",
+        yes: "No, mantenerme aquí",
+      },
     });
   }
 
   canDeactivate(): Observable<boolean> {
-    if(!this.agregar){
+    if (!this.agregar) {
       this.openDialog();
-      return this.dialogRef.afterClosed().pipe(map(result => {
-        return result === true;
-      }));
-    }else{
-      return ;
+      return this.dialogRef.afterClosed().pipe(
+        map((result) => {
+          return result === true;
+        }),
+      );
+    } else {
+      return;
     }
   }
 
-  erasePublicacion(){
-    this._publicacionhasautorService.deletePublicacionHasAutor(this.publicacion.idPublicacion).subscribe(result => {
-      if(result.status==1){
-        this._publicacionhasusuarioService.deletePublicacionHasUsuario(this.publicacion.idPublicacion).subscribe(result => {
-          if(result.status==1){
-            this._publicacionService.deletePublicacion(this.publicacion.idPublicacion).subscribe(result => {
-              if(result.status==1){
-                this.agregar=true;
-                this.return();
-                this.openSnackBar("Artículo eliminado exitosamente");
-              } 
-            });
-          } 
-        });
-      } 
+  erasePublicacion() {
+    this._publicacionhasautorService.deletePublicacionHasAutor(this.publicacion.idPublicacion).subscribe((result) => {
+      if (result.status == 1) {
+        this._publicacionhasusuarioService
+          .deletePublicacionHasUsuario(this.publicacion.idPublicacion)
+          .subscribe((result) => {
+            if (result.status == 1) {
+              this._publicacionService.deletePublicacion(this.publicacion.idPublicacion).subscribe((result) => {
+                if (result.status == 1) {
+                  this.agregar = true;
+                  this.return();
+                  this.openSnackBar("Artículo eliminado exitosamente");
+                }
+              });
+            }
+          });
+      }
     });
   }
 
   private dialogRef2: MatDialogRef<DialogErase6>;
 
-  openEraser(){
-    this.dialogRef2 = this.dialog.open(DialogErase6,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "Eliminar artículo",
-        text:"¿Estás seguro que deseas eliminar este artículo?",
-        cancel:"Sí, eliminar",
-        yes:"No, cancelar"}
-    });  
-    this.dialogRef2.afterClosed().subscribe(result => {
-      if(result){
+  openEraser() {
+    this.dialogRef2 = this.dialog.open(DialogErase6, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "Eliminar artículo",
+        text: "¿Estás seguro que deseas eliminar este artículo?",
+        cancel: "Sí, eliminar",
+        yes: "No, cancelar",
+      },
+    });
+    this.dialogRef2.afterClosed().subscribe((result) => {
+      if (result) {
         this.erasePublicacion();
       }
-    }); 
+    });
   }
-  edit=true;
+  edit = true;
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogCancel13 {
   constructor(
     public dialogRef: MatDialogRef<DialogCancel13>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogErase6 {
   constructor(
     public dialogRef: MatDialogRef<DialogErase6>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }

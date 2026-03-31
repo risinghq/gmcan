@@ -1,28 +1,28 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { Equipo } from '../models/equipo';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, Params } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CommonService } from '../services/common.service';
-import { EquipoService } from '../services/equipo.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { DialogData } from '../models/dialogdata';
-import { SpaceValidator } from '../services/spacevalidator';
+import { Component, OnInit, Inject } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { ActivatedRoute, Router, Params } from "@angular/router";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+
+import { DialogData } from "../models/dialogdata";
+import { Equipo } from "../models/equipo";
+import { CommonService } from "../services/common.service";
+import { EquipoService } from "../services/equipo.service";
+import { SpaceValidator } from "../services/spacevalidator";
 
 @Component({
   standalone: false,
-  selector: 'app-edit-equipo',
-  templateUrl: '../add-equipo/add-equipo.component.html',
-  styleUrls: ['../add-equipo/add-equipo.component.scss']
+  selector: "app-edit-equipo",
+  templateUrl: "../add-equipo/add-equipo.component.html",
+  styleUrls: ["../add-equipo/add-equipo.component.scss"],
 })
 export class EditEquipoComponent implements OnInit {
-
-  edit=true;
+  edit = true;
   equipo: Equipo;
   equipoForm: FormGroup;
-  button_text="Actualizar información";
+  button_text = "Actualizar información";
 
   constructor(
     public formBuilder: FormBuilder,
@@ -33,13 +33,13 @@ export class EditEquipoComponent implements OnInit {
     private _commonService: CommonService,
     private _equipoService: EquipoService,
   ) {
-    this.equipo=new Equipo(null,'','','','','',1,null,null);
+    this.equipo = new Equipo(null, "", "", "", "", "", 1, null, null);
     this.equipoForm = this.formBuilder.group({
-      nombre: ['', [Validators.required, SpaceValidator.cannotContainSpace]],
-      cpu: [''],
-      gpu: [''],
-      ram: [''],
-      hd: [''],
+      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      cpu: [""],
+      gpu: [""],
+      ram: [""],
+      hd: [""],
     });
   }
 
@@ -47,23 +47,23 @@ export class EditEquipoComponent implements OnInit {
     this.getEvento();
   }
 
-  getEvento(){
-    this._route.params.forEach((params:Params)=>{
-      let idEquipo=params['id'];
-      this._equipoService.getEquipo(idEquipo).subscribe(result => {
-        if(result.length>0){
-          this.equipo=result[0];
-          localStorage.setItem("equipoEdit",JSON.stringify(this.equipo.nombre));
-        } 
+  getEvento() {
+    this._route.params.forEach((params: Params) => {
+      let idEquipo = params["id"];
+      this._equipoService.getEquipo(idEquipo).subscribe((result) => {
+        if (result.length > 0) {
+          this.equipo = result[0];
+          localStorage.setItem("equipoEdit", JSON.stringify(this.equipo.nombre));
+        }
       });
     });
   }
 
-  submitEquipo(){
-    if(this.equipoForm.valid){
-      this._equipoService.updateEquipo(this.equipo).subscribe((res)=>{
-        if(res.status==1){
-          this.agregar=true;
+  submitEquipo() {
+    if (this.equipoForm.valid) {
+      this._equipoService.updateEquipo(this.equipo).subscribe((res) => {
+        if (res.status == 1) {
+          this.agregar = true;
           this.return();
           this.openSnackBar("Equipo actualizado exitosamente");
         }
@@ -73,98 +73,104 @@ export class EditEquipoComponent implements OnInit {
 
   agregar;
 
-  return(){
-    this._commonService.setEndSession('0');
-    this._router.navigate(['dashboard/contenidos']);
+  return() {
+    this._commonService.setEndSession("0");
+    this._router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(value) {
     this._snackBar.open(value, null, {
       duration: 2000,
-      horizontalPosition: 'right',
-      verticalPosition: 'top',
+      horizontalPosition: "right",
+      verticalPosition: "top",
     });
   }
 
   private dialogRef: MatDialogRef<DialogCancel27>;
 
   openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel27,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "¿Estás seguro que deseas volver sin guardar?",
-            text:"La información no se guardará",
-            cancel:"Sí, volver",
-            yes:"No, mantenerme aquí"}
+    this.dialogRef = this.dialog.open(DialogCancel27, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "¿Estás seguro que deseas volver sin guardar?",
+        text: "La información no se guardará",
+        cancel: "Sí, volver",
+        yes: "No, mantenerme aquí",
+      },
     });
   }
 
   canDeactivate(): Observable<boolean> {
-    if(!this.agregar){
+    if (!this.agregar) {
       this.openDialog();
-      return this.dialogRef.afterClosed().pipe(map(result => {
-        return result === true;
-      }));
-    }else{
-      return ;
+      return this.dialogRef.afterClosed().pipe(
+        map((result) => {
+          return result === true;
+        }),
+      );
+    } else {
+      return;
     }
   }
 
   private dialogRef2: MatDialogRef<DialogErase13>;
 
-  openEraser(){
-    this.dialogRef2 = this.dialog.open(DialogErase13,{
-      width:"530px",
-      id:"idleTimer",
-      data: {title: "Eliminar equipo",
-        text:"¿Estás seguro que deseas eliminar este equipo?",
-        cancel:"Sí, eliminar",
-        yes:"No, cancelar"}
-      });  
-    this.dialogRef2.afterClosed().subscribe(result => {
-      if(result){
+  openEraser() {
+    this.dialogRef2 = this.dialog.open(DialogErase13, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "Eliminar equipo",
+        text: "¿Estás seguro que deseas eliminar este equipo?",
+        cancel: "Sí, eliminar",
+        yes: "No, cancelar",
+      },
+    });
+    this.dialogRef2.afterClosed().subscribe((result) => {
+      if (result) {
         this.eraseEquipo();
-      }
-    }); 
-  }
-
-  eraseEquipo(){
-    this._equipoService.deleteEquipo(this.equipo.idEquipo).subscribe(result => {
-      if(result.status==1){
-        this.agregar=true;
-        this.return();
-        this.openSnackBar("Equipo eliminado exitosamente");
-      }else{
-        this.openSnackBar("Hubo un problema al eliminar");
       }
     });
   }
 
-
+  eraseEquipo() {
+    this._equipoService.deleteEquipo(this.equipo.idEquipo).subscribe((result) => {
+      if (result.status == 1) {
+        this.agregar = true;
+        this.return();
+        this.openSnackBar("Equipo eliminado exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
+      }
+    });
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogCancel27 {
   constructor(
     public dialogRef: MatDialogRef<DialogCancel27>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }
 
 @Component({
   standalone: false,
-  selector: 'dialog-content-example-dialog',
-  templateUrl: '../modals/dialog-options.html',
+  selector: "dialog-content-example-dialog",
+  templateUrl: "../modals/dialog-options.html",
 })
 export class DialogErase13 {
   constructor(
     public dialogRef: MatDialogRef<DialogErase13>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData) {
-      dialogRef.disableClose = true;
-    }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
+    dialogRef.disableClose = true;
+  }
 }

@@ -1,90 +1,82 @@
 <div class="pad">
-    <div class="add-box">
-        <div class="flex-news">
-            <div class="flex-news back-div" (click)="return()">
-                <mat-icon class="back-icon">
-                    arrow_back
-                </mat-icon>
-                <div class="back-text">
-                    Volver
-                </div>
-            </div>
-            <div class="right obligatory-text">
-                <span class="red-text">(*) </span>Campos obligatorios
-            </div>
-        </div>
-        <form [formGroup]="methodForm" class="mt-24">
-            <div class="flex-news full-width">
-                <div class="full-width mr-32">
-                    <div class="full-width">
-                        <div class="text-category">
-                            Nombre del método en español <span class="red-text">*</span>
-                        </div>
-                        <input class="input-category" [(ngModel)]="metodo.nombre" formControlName="nombre" name="nombre" required>
-                    </div>
-                    <div class="full-width">
-                        <div class="text-category">
-                            Nombre del método en inglés <span class="red-text">*</span>
-                        </div>
-                        <input class="input-category" [(ngModel)]="metodo.nombreEN" formControlName="nombreEN" name="nombreEN" required>
-                    </div>
-                </div>
-                <div class="">
-                    <div class="text-category">
-                        Imagen <span class="red-text">*</span>
-                    </div>
-                    <div class="img-preview" *ngIf="previewUrl">
-                        <img class="img-set" src="{{previewUrl}}">
-                    </div>
-                    <div class="news-img" *ngIf="!previewUrl && !metodo.foto">
-                        <img class="icon-upload" src="../../assets/img/upload.svg">
-                    </div>
-                    <div class="img-preview" *ngIf="metodo.foto && !previewUrl">
-                        <img class="img-set" src="{{url+'metodo/get-image-metodo/'+metodo.foto}}">
-                    </div>
-                    <div class="green-text mt-16">
-                        <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
-                        <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
-                        <input class="file_upload" type="file" #file
-                        accept="image/*" required
-                        (change)="fileProgress($event)"/>
-                    </div>
-                </div>
-            </div>
-            <div class="full-width mb-32">
-                <div class="flex-news">
-                    <div class="text-category">
-                        Descripcion en español <span class="red-text">*</span>
-                    </div>
-                    <div class="green-text top-auto right plex-sans" (click)="previewMethod(0)">
-                        Vista Previa
-                    </div>
-                </div>
-                <ckeditor [editor]="Editor" [(ngModel)]="metodo.descripcion"  formControlName="descripcion" name="descripcion"></ckeditor>
-            </div>
-            <div class="full-width mb-32">
-                <div class="flex-news">
-                    <div class="text-category">
-                        Descripcion en inglés <span class="red-text">*</span>
-                    </div>
-                    <div class="green-text top-auto right plex-sans" (click)="previewMethod(1)">
-                        Vista Previa
-                    </div>
-                </div>
-                <ckeditor [editor]="Editor" [(ngModel)]="metodo.descripcionEN"  formControlName="descripcionEN" name="descripcionEN"></ckeditor>
-            </div>
-            <div class="flex-news">
-                <div class="red-btn" *ngIf="edit">
-                    <div class="link link-set link-red" (click)="openEraser()">
-                      Eliminar método
-                    </div>
-                </div>
-                <div class="right" [ngClass]="{'btn-grey':!methodForm.valid ,'black-btn':methodForm.valid} ">
-                    <div class="link link-set" (click)="submitMethod()">
-                      {{button_text}}
-                    </div>
-                </div>
-            </div>
-        </form>
+  <div class="add-box">
+    <div class="flex-news">
+      <div class="flex-news back-div" (click)="return()">
+        <mat-icon class="back-icon"> arrow_back </mat-icon>
+        <div class="back-text">Volver</div>
+      </div>
+      <div class="right obligatory-text"><span class="red-text">(*) </span>Campos obligatorios</div>
     </div>
+    <form [formGroup]="methodForm" class="mt-24">
+      <div class="flex-news full-width">
+        <div class="full-width mr-32">
+          <div class="full-width">
+            <div class="text-category">Nombre del método en español <span class="red-text">*</span></div>
+            <input class="input-category" [(ngModel)]="metodo.nombre" formControlName="nombre" name="nombre" required />
+          </div>
+          <div class="full-width">
+            <div class="text-category">Nombre del método en inglés <span class="red-text">*</span></div>
+            <input
+              class="input-category"
+              [(ngModel)]="metodo.nombreEN"
+              formControlName="nombreEN"
+              name="nombreEN"
+              required
+            />
+          </div>
+        </div>
+        <div class="">
+          <div class="text-category">Imagen <span class="red-text">*</span></div>
+          <div class="img-preview" *ngIf="previewUrl">
+            <img class="img-set" src="{{ previewUrl }}" />
+          </div>
+          <div class="news-img" *ngIf="!previewUrl && !metodo.foto">
+            <img class="icon-upload" src="../../assets/img/upload.svg" />
+          </div>
+          <div class="img-preview" *ngIf="metodo.foto && !previewUrl">
+            <img class="img-set" src="{{ url + 'metodo/get-image-metodo/' + metodo.foto }}" />
+          </div>
+          <div class="green-text mt-16">
+            <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
+            <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
+            <input class="file_upload" type="file" #file accept="image/*" required (change)="fileProgress($event)" />
+          </div>
+        </div>
+      </div>
+      <div class="full-width mb-32">
+        <div class="flex-news">
+          <div class="text-category">Descripcion en español <span class="red-text">*</span></div>
+          <div class="green-text top-auto right plex-sans" (click)="previewMethod(0)">Vista Previa</div>
+        </div>
+        <ckeditor
+          [editor]="Editor"
+          [(ngModel)]="metodo.descripcion"
+          formControlName="descripcion"
+          name="descripcion"
+        ></ckeditor>
+      </div>
+      <div class="full-width mb-32">
+        <div class="flex-news">
+          <div class="text-category">Descripcion en inglés <span class="red-text">*</span></div>
+          <div class="green-text top-auto right plex-sans" (click)="previewMethod(1)">Vista Previa</div>
+        </div>
+        <ckeditor
+          [editor]="Editor"
+          [(ngModel)]="metodo.descripcionEN"
+          formControlName="descripcionEN"
+          name="descripcionEN"
+        ></ckeditor>
+      </div>
+      <div class="flex-news">
+        <div class="red-btn" *ngIf="edit">
+          <div class="link link-set link-red" (click)="openEraser()">Eliminar método</div>
+        </div>
+        <div class="right" [ngClass]="{ 'btn-grey': !methodForm.valid, 'black-btn': methodForm.valid }">
+          <div class="link link-set" (click)="submitMethod()">
+            {{ button_text }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

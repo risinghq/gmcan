@@ -1,8 +1,8 @@
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const NODE_ENV = process.env.NODE_ENV || "development";
 
 const FRONTEND_URLS = {
   production: "https://gmcan.unmsm.edu.pe",
-  development: "http://localhost:4200"
+  development: "http://localhost:4200",
 };
 
 const getFrontendUrl = () => {
@@ -10,5 +10,5 @@ const getFrontendUrl = () => {
 };
 
 module.exports = {
-  getFrontendUrl
+  getFrontendUrl,
 };

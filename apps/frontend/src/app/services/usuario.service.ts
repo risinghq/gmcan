@@ -1,11 +1,8 @@
+import { HttpClient, HttpHeaders, HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import {
-  HttpClient,
-  HttpHeaders,
-  HttpErrorResponse,
-} from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
+
 import { GLOBAL } from "./global";
 
 export interface LoginResponse {
@@ -48,9 +45,7 @@ export class UsuarioService {
 
   private initializeLanguage(): void {
     try {
-      const language = JSON.parse(
-        localStorage.getItem("language") || '{"locale":"es"}',
-      );
+      const language = JSON.parse(localStorage.getItem("language") || '{"locale":"es"}');
       this.languagelocal = language.locale || "es";
     } catch (error) {
       console.error("Error parsing language from localStorage:", error);
@@ -83,9 +78,7 @@ export class UsuarioService {
       errorMessage = `Error: ${error.error.message}`;
     } else {
       // Server-side error
-      errorMessage =
-        (error && error.error && error.error.message) ||
-        `Error ${error.status}: ${error.statusText}`;
+      errorMessage = (error && error.error && error.error.message) || `Error ${error.status}: ${error.statusText}`;
     }
 
     return throwError(() => new Error(errorMessage));
@@ -125,11 +118,7 @@ export class UsuarioService {
       .pipe(catchError(this.handleError));
   }
 
-  changePassword(user: {
-    password: string;
-    correo: string;
-    token: string;
-  }): Observable<ApiResponse> {
+  changePassword(user: { password: string; correo: string; token: string }): Observable<ApiResponse> {
     const body = { password: user.password, correo: user.correo };
     const headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -153,65 +142,45 @@ export class UsuarioService {
 
   getUsuario(): Observable<any> {
     const headers = this.createHeaders();
-    return this.http
-      .get(this.url + "usuario/get-usuario-name", { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.get(this.url + "usuario/get-usuario-name", { headers }).pipe(catchError(this.handleError));
   }
 
   getUser(idUsuario: string): Observable<any> {
     const headers = this.createHeaders();
-    const endpoint =
-      this.languagelocal === "es"
-        ? "usuario/get-usuario/"
-        : "usuario/get-usuario-en/";
+    const endpoint = this.languagelocal === "es" ? "usuario/get-usuario/" : "usuario/get-usuario-en/";
 
-    return this.http
-      .get(this.url + endpoint + idUsuario, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.get(this.url + endpoint + idUsuario, { headers }).pipe(catchError(this.handleError));
   }
 
   getUsuarios(): Observable<any> {
     const headers = this.createHeaders();
-    const endpoint =
-      this.languagelocal === "es"
-        ? "usuario/get-usuario"
-        : "usuario/get-usuario-en";
+    const endpoint = this.languagelocal === "es" ? "usuario/get-usuario" : "usuario/get-usuario-en";
 
-    return this.http
-      .get(this.url + endpoint, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.get(this.url + endpoint, { headers }).pipe(catchError(this.handleError));
   }
 
   getUsersActive(id: string): Observable<any> {
     const headers = this.createHeaders(true);
 
-    return this.http
-      .get(this.url + "usuario/get-usuario-active/" + id, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.get(this.url + "usuario/get-usuario-active/" + id, { headers }).pipe(catchError(this.handleError));
   }
 
   getFullUser(DNI: string): Observable<any> {
     const headers = this.createHeaders(true);
 
-    return this.http
-      .get(this.url + "usuario/get-usuario-full/" + DNI, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.get(this.url + "usuario/get-usuario-full/" + DNI, { headers }).pipe(catchError(this.handleError));
   }
 
   addUser(user: any): Observable<any> {
     const headers = this.createHeaders(true);
 
-    return this.http
-      .post(this.url + "usuario/post-usuario", user, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.post(this.url + "usuario/post-usuario", user, { headers }).pipe(catchError(this.handleError));
   }
 
   updateUser(user: any): Observable<any> {
     const headers = this.createHeaders(true);
 
-    return this.http
-      .put(this.url + "usuario/update-usuario", user, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.put(this.url + "usuario/update-usuario", user, { headers }).pipe(catchError(this.handleError));
   }
 
   deleteUsuario(miembro: { DNI: string }): Observable<any> {
@@ -227,9 +196,7 @@ export class UsuarioService {
   verifyUser(user: any): Observable<any> {
     const headers = this.createHeaders(true);
 
-    return this.http
-      .post(this.url + "usuario/verify-email", user, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.post(this.url + "usuario/verify-email", user, { headers }).pipe(catchError(this.handleError));
   }
 
   uploadUsuarioFoto(fileData: File, id: string): Observable<any> {

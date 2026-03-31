@@ -1,160 +1,143 @@
 <div class="main-content" id="main-content">
   <div class="flex-news">
     <div class="dashboard-card wd-1">
-      <div class="dashboard-title">
-        ¡Bienvenido al administrador del sistema!
-      </div>
-      <div class="dashboard-subtitle">
-        ¿Qué deseas hacer?
-      </div>
+      <div class="dashboard-title">¡Bienvenido al administrador del sistema!</div>
+      <div class="dashboard-subtitle">¿Qué deseas hacer?</div>
       <div class="flex-news item clickable" *ngIf="permisos.noticiaPermiso" routerLink="/dashboard/noticias">
-        <img class="mr-16" src="../../assets/img/iconfinder_newspaper_3890941 1.svg">
+        <img class="mr-16" src="../../assets/img/iconfinder_newspaper_3890941 1.svg" />
         <div>
-          <div class="item-title">
-            Gestionar noticias
-          </div>
-          <div class="item-subtitle">
-            Puedes crear, editar o eliminar una noticia.
-          </div>
+          <div class="item-title">Gestionar noticias</div>
+          <div class="item-subtitle">Puedes crear, editar o eliminar una noticia.</div>
         </div>
       </div>
       <div class="flex-news item clickable" *ngIf="permisos.miembroPermiso" routerLink="/dashboard/miembros-activos">
-        <img class="mr-16" src="../../assets/img/members.svg">
+        <img class="mr-16" src="../../assets/img/members.svg" />
         <div>
-          <div class="item-title">
-            Gestionar miembros del grupo
-          </div>
-          <div class="item-subtitle">
-            Puedes crear, editar o eliminar a un miembro del grupo.
-          </div>
+          <div class="item-title">Gestionar miembros del grupo</div>
+          <div class="item-subtitle">Puedes crear, editar o eliminar a un miembro del grupo.</div>
         </div>
       </div>
       <div class="flex-news item clickable" *ngIf="permisos.publicacionPermiso" routerLink="/dashboard/articulos">
-        <img class="mr-16" src="../../assets/img/publicaciones.svg">
+        <img class="mr-16" src="../../assets/img/publicaciones.svg" />
         <div>
-          <div class="item-title">
-            Gestionar publicaciones
-          </div>
-          <div class="item-subtitle">
-            Puedes crear, editar o eliminar una publicación del grupo.
-          </div>
+          <div class="item-title">Gestionar publicaciones</div>
+          <div class="item-subtitle">Puedes crear, editar o eliminar una publicación del grupo.</div>
         </div>
       </div>
-      <div class="flex-news item clickable" *ngIf="permisos.proyectoPermiso" routerLink="/dashboard/proyectos-ejecucion">
-        <img class="mr-16" src="../../assets/img/proyectos.svg">
+      <div
+        class="flex-news item clickable"
+        *ngIf="permisos.proyectoPermiso"
+        routerLink="/dashboard/proyectos-ejecucion"
+      >
+        <img class="mr-16" src="../../assets/img/proyectos.svg" />
         <div>
-          <div class="item-title">
-            Gestionar proyectos
-          </div>
-          <div class="item-subtitle">
-            Puedes crear, editar o eliminar un proyecto del grupo.
-          </div>
+          <div class="item-title">Gestionar proyectos</div>
+          <div class="item-subtitle">Puedes crear, editar o eliminar un proyecto del grupo.</div>
         </div>
       </div>
       <div class="flex-news item clickable" *ngIf="permisos.contenidoPermiso" routerLink="/dashboard/contenidos">
-        <img class="mr-16" src="../../assets/img/contenido.svg">
+        <img class="mr-16" src="../../assets/img/contenido.svg" />
         <div>
-          <div class="item-title">
-            Gestionar contenidos
-          </div>
-          <div class="item-subtitle">
-            Puedes modificar algunos contenidos de la plataforma.
-          </div>
+          <div class="item-title">Gestionar contenidos</div>
+          <div class="item-subtitle">Puedes modificar algunos contenidos de la plataforma.</div>
         </div>
       </div>
       <div class="flex-news item clickable" routerLink="/dashboard/perfil">
-        <img class="mr-16" src="../../assets/img/perfil.svg">
+        <img class="mr-16" src="../../assets/img/perfil.svg" />
         <div>
-          <div class="item-title">
-            Gestionar perfil
-          </div>
-          <div class="item-subtitle">
-            Puedes actualizar tu información personal.
-          </div>
+          <div class="item-title">Gestionar perfil</div>
+          <div class="item-subtitle">Puedes actualizar tu información personal.</div>
         </div>
       </div>
       <div class="flex-news item no-border" *ngIf="permisos.analiticaPermiso">
-        <img class="mr-16" src="../../assets/img/analitica.svg">
+        <img class="mr-16" src="../../assets/img/analitica.svg" />
         <div>
-          <div class="item-title">
-            Visualizar analíticas de uso
-          </div>
-          <div class="item-subtitle">
-            Puedes visualizar cómo está siendo utilizada la plataforma.
-          </div>
+          <div class="item-title">Visualizar analíticas de uso</div>
+          <div class="item-subtitle">Puedes visualizar cómo está siendo utilizada la plataforma.</div>
         </div>
       </div>
-      <div class="flex-news item" *ngIf="permisos.analiticaPermiso" style="padding-top: 0px;">
+      <div class="flex-news item" *ngIf="permisos.analiticaPermiso" style="padding-top: 0px">
         <div class="center btn-black mr-8">
-          <a class="link" href="https://analytics.google.com/analytics/web/?authuser=2#/a181640955p250909666/admin" target="_blank" routerLinkActive="active">
+          <a
+            class="link"
+            href="https://analytics.google.com/analytics/web/?authuser=2#/a181640955p250909666/admin"
+            target="_blank"
+            routerLinkActive="active"
+          >
             Google Analytics
           </a>
         </div>
         <div class="center btn-black">
-          <a class="link" href="https://insights.hotjar.com/login?next=%2Fsites%2F2066869%2Fdashboard" target="_blank" routerLinkActive="active">
+          <a
+            class="link"
+            href="https://insights.hotjar.com/login?next=%2Fsites%2F2066869%2Fdashboard"
+            target="_blank"
+            routerLinkActive="active"
+          >
             Hotjar
           </a>
         </div>
       </div>
       <div class="flex-news item last-item">
-        <img class="mr-16" src="../../assets/img/book.svg">
-        <a class="item-title" style="margin-top: auto; margin-bottom: auto;" href="{{this.url+'grupo/get-manual'}}" target="_blank">
+        <img class="mr-16" src="../../assets/img/book.svg" />
+        <a
+          class="item-title"
+          style="margin-top: auto; margin-bottom: auto"
+          href="{{ this.url + 'grupo/get-manual' }}"
+          target="_blank"
+        >
           Ver manual de usuario
         </a>
       </div>
     </div>
-    <div class="ml-16" style="width: max-content;">
+    <div class="ml-16" style="width: max-content">
       <div class="dashboard-card pd-8 wd-2">
         <div class="flex-news">
           <div>
-            <img class="mt-8" src="../../assets/img/members.svg">
-            <div class="mt-8 item-title bold">
-              Miembros del grupo
-            </div>
+            <img class="mt-8" src="../../assets/img/members.svg" />
+            <div class="mt-8 item-title bold">Miembros del grupo</div>
           </div>
           <div class="gray-box right">
-            <div class="item-subtitle">
-              Miembros activos
-            </div>
-            <div class="bg-number mt-8">{{total}}</div>
+            <div class="item-subtitle">Miembros activos</div>
+            <div class="bg-number mt-8">{{ total }}</div>
           </div>
         </div>
         <div class="mt-12" style="display: block">
-          <canvas baseChart
-              [type]="chartType"
-              [datasets]="chartDatasets"
-              [labels]="chartLabels"
-              [options]="chartOptions"
-              [legend]="true"
-              (chartHover)="chartHovered($event)"
-              (chartClick)="chartClicked($event)">
+          <canvas
+            baseChart
+            [type]="chartType"
+            [datasets]="chartDatasets"
+            [labels]="chartLabels"
+            [options]="chartOptions"
+            [legend]="true"
+            (chartHover)="chartHovered($event)"
+            (chartClick)="chartClicked($event)"
+          >
           </canvas>
         </div>
       </div>
       <div class="dashboard-card pd-8 wd-2 mt-16">
         <div class="flex-news">
           <div>
-            <img class="mt-8" src="../../assets/img/publicaciones.svg">
-            <div class="mt-8 item-title bold">
-              Publicaciones
-            </div>
+            <img class="mt-8" src="../../assets/img/publicaciones.svg" />
+            <div class="mt-8 item-title bold">Publicaciones</div>
           </div>
           <div class="gray-box right">
-            <div class="item-subtitle">
-              Publicaciones
-            </div>
-            <div class="bg-number mt-8">{{total2}}</div>
+            <div class="item-subtitle">Publicaciones</div>
+            <div class="bg-number mt-8">{{ total2 }}</div>
           </div>
         </div>
         <div class="mt-12" style="display: block">
-          <canvas baseChart
-              [type]="chartType2"
-              [datasets]="chartDatasets2"
-              [labels]="chartLabels2"
-              [options]="chartOptions2"
-              [legend]="false"
-              (chartHover)="chartHovered2($event)"
-              (chartClick)="chartClicked2($event)">
+          <canvas
+            baseChart
+            [type]="chartType2"
+            [datasets]="chartDatasets2"
+            [labels]="chartLabels2"
+            [options]="chartOptions2"
+            [legend]="false"
+            (chartHover)="chartHovered2($event)"
+            (chartClick)="chartClicked2($event)"
+          >
           </canvas>
         </div>
       </div>

@@ -1,327 +1,390 @@
 <div class="card-lines">
-    <div class="lines-text-div">
-        <div class="line-mb">
-            <div class="line-img-div">
-                <img class="line-img" *ngIf="lineasProyecto[0].foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+lineasProyecto[0].foto}}">
+  <div class="lines-text-div">
+    <div class="line-mb">
+      <div class="line-img-div">
+        <img
+          class="line-img"
+          *ngIf="lineasProyecto[0].foto"
+          src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineasProyecto[0].foto }}"
+        />
+      </div>
+      <div class="lines-title">
+        {{ lineasProyecto[0].nombre }}
+      </div>
+      <div class="line-line-div"></div>
+      <div class="lines-subtitle">
+        {{ lineasProyecto[0].descripcion }}
+      </div>
+      <div class="lines-projects">
+        {{ language.linesInvestigationText[0].projects }}
+      </div>
+      <div>
+        <div
+          class="project"
+          *ngFor="
+            let proyecto of lineasProyecto[0].proyectos
+              | slice: (page0 - 1) * pageSize : (page0 - 1) * pageSize + pageSize;
+            let i = index
+          "
+        >
+          <div class="project-code">
+            {{ proyecto.codigo }}
+          </div>
+          <div class="flex-news project-mt">
+            <div class="project-title">
+              {{ proyecto.titulo }}
             </div>
-            <div class="lines-title">
-                {{lineasProyecto[0].nombre}}
-            </div>
-            <div class="line-line-div"></div>
-            <div class="lines-subtitle">
-                {{lineasProyecto[0].descripcion}}
-            </div>
-            <div class="lines-projects">
-                {{language.linesInvestigationText[0].projects}}
-            </div>
-            <div>
-                <div class="project" *ngFor="let proyecto of lineasProyecto[0].proyectos | slice: (page0-1) * pageSize : (page0-1) * pageSize + pageSize; let i = index">
-                    <div class="project-code">
-                        {{proyecto.codigo}}
-                    </div>
-                    <div class="flex-news project-mt">
-                        <div class="project-title">
-                            {{proyecto.titulo}}
-                        </div>
-                    </div>
-                    <div class="project-rev">
-                        <strong class="resp-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
-                    </div>
-                    <div class="mt-16">
-                        <div class="flex-news flex-flow">
-                            <strong class="resp-title">{{this.language.projectsText[0].responsable}}:</strong>
-                            <div class="project-members" *ngFor="let usuario of proyecto.usuario">
-                                <div class="member-img-round">
-                                    <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
-                                    <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
-                                </div>
-                                <div class="member-name" (click)="profile(usuario)">
-                                    {{usuario.nombreCompleto}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-news">
-                            <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="project-abstract" 
-                            data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
-                            aria-expanded="false" aria-controls="collapseExample">
-                                {{language.linesInvestigationText[0].seeMore}}
-                            </a>
-                            <mat-icon class="project-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
-                                keyboard_arrow_down
-                            </mat-icon>
-                        </div>
-                    </div>
-                    <div class="collapse collapsed-resumen mt-16" id="collapseExample{{i}}">                                        
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].description}}: 
-                            </strong>
-                            {{proyecto.descripcion}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].source}}:
-                            </strong>
-                            {{proyecto.fuenteFinanciamiento}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].amount}}:
-                            </strong>
-                            {{proyecto.moneda}} {{proyecto.montoFinanciado}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].dateStart}}:
-                            </strong>
-                            {{proyecto.fechaI}}
-                        </div>
-                        <div class="abstract" *ngIf="proyecto.fechaF">
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].dateEnd}}:
-                            </strong>
-                            {{proyecto.fechaF}}
-                        </div>
-                    </div>
+          </div>
+          <div class="project-rev">
+            <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong
+            >{{ proyecto.lineasInvestigacion }}
+          </div>
+          <div class="mt-16">
+            <div class="flex-news flex-flow">
+              <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+              <div class="project-members" *ngFor="let usuario of proyecto.usuario">
+                <div class="member-img-round">
+                  <img
+                    class="member-img"
+                    src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                    *ngIf="usuario.foto"
+                  />
+                  <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
                 </div>
-                <ngb-pagination [(page)]="page0" [pageSize]="pageSize" [collectionSize]="lineasProyecto[0].proyectos.length" *ngIf="lineasProyecto[0].proyectos.length>5">
-                    <ng-template class="unique-left" ngbPaginationPrevious>
-                        <div class="h-ih">
-                            <mat-icon class="pag-arrow">
-                                keyboard_arrow_left
-                            </mat-icon>
-                        </div>
-                    </ng-template>
-                    <ng-template ngbPaginationNumber let-page>
-                        <div class="h-ih">
-                            {{ page }}
-                        </div>
-                    </ng-template>
-                    <ng-template ngbPaginationNext>
-                        <div class="h-ih">
-                            <mat-icon class="pag-arrow" style="padding-bottom: 20px !important;">
-                                keyboard_arrow_right
-                            </mat-icon>
-                        </div>
-                    </ng-template>
-                </ngb-pagination>
-            </div>
-        </div>        
-        <div class="line-mb">
-            <div class="line-img-div">
-                <img class="line-img" *ngIf="lineasProyecto[1].foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+lineasProyecto[1].foto}}">
-            </div>
-            <div class="lines-title">
-                {{lineasProyecto[1].nombre}}
-            </div>
-            <div class="line-line-div"></div>
-            <div class="lines-subtitle">
-                {{lineasProyecto[1].descripcion}}
-            </div>
-            <div class="lines-projects">
-                {{language.linesInvestigationText[0].projects}}
-            </div>
-            <div>
-                <div class="project" *ngFor="let proyecto of lineasProyecto[1].proyectos | slice: (page1-1) * pageSize : (page1-1) * pageSize + pageSize; let i = index">
-                    <div class="project-code">
-                        {{proyecto.codigo}}
-                    </div>
-                    <div class="flex-news project-mt">
-                        <div class="project-title">
-                            {{proyecto.titulo}}
-                        </div>
-                    </div>
-                    <div class="project-rev">
-                        <strong class="resp-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
-                    </div>
-                    <div class="mt-16">
-                        <div class="flex-news flex-flow">
-                            <strong class="resp-title">{{this.language.projectsText[0].responsable}}:</strong>
-                            <div class="project-members" *ngFor="let usuario of proyecto.usuario">
-                                <div class="member-img-round">
-                                    <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
-                                    <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
-                                </div>
-                                <div class="member-name" (click)="profile(usuario)">
-                                    {{usuario.nombreCompleto}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-news">
-                            <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="project-abstract" 
-                            data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
-                            aria-expanded="false" aria-controls="collapseExample">
-                                {{this.language.projectsText[0].seeMore}}
-                            </a>
-                            <mat-icon class="project-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
-                                keyboard_arrow_down
-                            </mat-icon>
-                        </div>
-                    </div>
-                    <div class="collapse collapsed-resumen mt-16" id="collapseExample{{i}}">                                        
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].description}}: 
-                            </strong>
-                            {{proyecto.descripcion}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].source}}:
-                            </strong>
-                            {{proyecto.fuenteFinanciamiento}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].amount}}:
-                            </strong>
-                            {{proyecto.moneda}} {{proyecto.montoFinanciado}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].dateStart}}:
-                            </strong>
-                            {{proyecto.fechaI}}
-                        </div>
-                        <div class="abstract" *ngIf="proyecto.fechaF">
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].dateEnd}}:
-                            </strong>
-                            {{proyecto.fechaF}}
-                        </div>
-                    </div>
+                <div class="member-name" (click)="profile(usuario)">
+                  {{ usuario.nombreCompleto }}
                 </div>
-                <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="lineasProyecto[1].proyectos.length" *ngIf="lineasProyecto[1].proyectos.length>5">
-                    <ng-template class="unique-left" ngbPaginationPrevious>
-                        <div class="h-ih">
-                            <mat-icon class="pag-arrow">
-                                keyboard_arrow_left
-                            </mat-icon>
-                        </div>
-                    </ng-template>
-                    <ng-template ngbPaginationNumber let-page>
-                        <div class="h-ih">
-                            {{ page }}
-                        </div>
-                    </ng-template>
-                    <ng-template ngbPaginationNext>
-                        <div class="h-ih">
-                            <mat-icon class="pag-arrow" style="padding-bottom: 20px !important;">
-                                keyboard_arrow_right
-                            </mat-icon>
-                        </div>
-                    </ng-template>
-                </ngb-pagination>
+              </div>
             </div>
-        </div>        
-        <div>
-            <div class="line-img-div">
-                <img class="line-img" *ngIf="lineasProyecto[2].foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+lineasProyecto[2].foto}}">
+            <div class="flex-news">
+              <a
+                id="abstract{{ i }}"
+                [ngClass]="{ 'abstract-active': selectedItem === i }"
+                (click)="listClick($event, i)"
+                class="project-abstract"
+                data-toggle="collapse"
+                href="#collapseExample{{ i }}"
+                role="button"
+                aria-expanded="false"
+                aria-controls="collapseExample"
+              >
+                {{ language.linesInvestigationText[0].seeMore }}
+              </a>
+              <mat-icon
+                class="project-abs-icon"
+                [ngClass]="{
+                  'abs-active': selectedItem === i,
+                  'abs-not-active': selectedItem == -1,
+                }"
+              >
+                keyboard_arrow_down
+              </mat-icon>
             </div>
-            <div class="lines-title">
-                {{lineasProyecto[2].nombre}}
+          </div>
+          <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+              {{ proyecto.descripcion }}
             </div>
-            <div class="line-line-div"></div>
-            <div class="lines-subtitle">
-                {{lineasProyecto[2].descripcion}}
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+              {{ proyecto.fuenteFinanciamiento }}
             </div>
-            <div class="lines-projects">
-                {{language.linesInvestigationText[0].projects}}
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+              {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
             </div>
-            <div>
-                <div class="project" *ngFor="let proyecto of lineasProyecto[2].proyectos | slice: (page2-1) * pageSize : (page2-1) * pageSize + pageSize; let i = index">
-                    <div class="project-code">
-                        {{proyecto.codigo}}
-                    </div>
-                    <div class="flex-news project-mt">
-                        <div class="project-title">
-                            {{proyecto.titulo}}
-                        </div>
-                    </div>
-                    <div class="project-rev">
-                        <strong class="resp-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
-                    </div>
-                    <div class="mt-16">
-                        <div class="flex-news flex-flow">
-                            <strong class="resp-title">{{this.language.projectsText[0].responsable}}:</strong>
-                            <div class="project-members" *ngFor="let usuario of proyecto.usuario">
-                                <div class="member-img-round">
-                                    <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
-                                    <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
-                                </div>
-                                <div class="member-name" (click)="profile(usuario)">
-                                    {{usuario.nombreCompleto}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-news">
-                            <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="project-abstract" 
-                            data-toggle="collapse" href="#collapseExample{{i}}" role="button" 
-                            aria-expanded="false" aria-controls="collapseExample">
-                                {{this.language.projectsText[0].seeMore}}
-                            </a>
-                            <mat-icon class="project-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
-                                keyboard_arrow_down
-                            </mat-icon>
-                        </div>
-                    </div>
-                    <div class="collapse collapsed-resumen mt-16" id="collapseExample{{i}}">                                        
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].description}}: 
-                            </strong>
-                            {{proyecto.descripcion}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].source}}:
-                            </strong>
-                            {{proyecto.fuenteFinanciamiento}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].amount}}:
-                            </strong>
-                            {{proyecto.moneda}} {{proyecto.montoFinanciado}}
-                        </div>
-                        <div class="abstract mb-8">                                     
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].dateStart}}:
-                            </strong>
-                            {{proyecto.fechaI}}
-                        </div>
-                        <div class="abstract" *ngIf="proyecto.fechaF">
-                            <strong class="abstract-title">
-                                {{this.language.projectsText[0].dateEnd}}:
-                            </strong>
-                            {{proyecto.fechaF}}
-                        </div>
-                    </div>
-                </div>
-                <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="lineasProyecto[2].proyectos.length" *ngIf="lineasProyecto[2].proyectos.length>5">
-                    <ng-template class="unique-left" ngbPaginationPrevious>
-                        <div class="h-ih">
-                            <mat-icon class="pag-arrow">
-                                keyboard_arrow_left
-                            </mat-icon>
-                        </div>
-                    </ng-template>
-                    <ng-template ngbPaginationNumber let-page>
-                        <div class="h-ih">
-                            {{ page }}
-                        </div>
-                    </ng-template>
-                    <ng-template ngbPaginationNext>
-                        <div class="h-ih">
-                            <mat-icon class="pag-arrow" style="padding-bottom: 20px !important;">
-                                keyboard_arrow_right
-                            </mat-icon>
-                        </div>
-                    </ng-template>
-                </ngb-pagination>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+              {{ proyecto.fechaI }}
             </div>
-        </div>        
+            <div class="abstract" *ngIf="proyecto.fechaF">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+              {{ proyecto.fechaF }}
+            </div>
+          </div>
+        </div>
+        <ngb-pagination
+          [(page)]="page0"
+          [pageSize]="pageSize"
+          [collectionSize]="lineasProyecto[0].proyectos.length"
+          *ngIf="lineasProyecto[0].proyectos.length > 5"
+        >
+          <ng-template class="unique-left" ngbPaginationPrevious>
+            <div class="h-ih">
+              <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+            </div>
+          </ng-template>
+          <ng-template ngbPaginationNumber let-page>
+            <div class="h-ih">
+              {{ page }}
+            </div>
+          </ng-template>
+          <ng-template ngbPaginationNext>
+            <div class="h-ih">
+              <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
+            </div>
+          </ng-template>
+        </ngb-pagination>
+      </div>
     </div>
+    <div class="line-mb">
+      <div class="line-img-div">
+        <img
+          class="line-img"
+          *ngIf="lineasProyecto[1].foto"
+          src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineasProyecto[1].foto }}"
+        />
+      </div>
+      <div class="lines-title">
+        {{ lineasProyecto[1].nombre }}
+      </div>
+      <div class="line-line-div"></div>
+      <div class="lines-subtitle">
+        {{ lineasProyecto[1].descripcion }}
+      </div>
+      <div class="lines-projects">
+        {{ language.linesInvestigationText[0].projects }}
+      </div>
+      <div>
+        <div
+          class="project"
+          *ngFor="
+            let proyecto of lineasProyecto[1].proyectos
+              | slice: (page1 - 1) * pageSize : (page1 - 1) * pageSize + pageSize;
+            let i = index
+          "
+        >
+          <div class="project-code">
+            {{ proyecto.codigo }}
+          </div>
+          <div class="flex-news project-mt">
+            <div class="project-title">
+              {{ proyecto.titulo }}
+            </div>
+          </div>
+          <div class="project-rev">
+            <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong
+            >{{ proyecto.lineasInvestigacion }}
+          </div>
+          <div class="mt-16">
+            <div class="flex-news flex-flow">
+              <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+              <div class="project-members" *ngFor="let usuario of proyecto.usuario">
+                <div class="member-img-round">
+                  <img
+                    class="member-img"
+                    src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                    *ngIf="usuario.foto"
+                  />
+                  <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
+                </div>
+                <div class="member-name" (click)="profile(usuario)">
+                  {{ usuario.nombreCompleto }}
+                </div>
+              </div>
+            </div>
+            <div class="flex-news">
+              <a
+                id="abstract{{ i }}"
+                [ngClass]="{ 'abstract-active': selectedItem === i }"
+                (click)="listClick($event, i)"
+                class="project-abstract"
+                data-toggle="collapse"
+                href="#collapseExample{{ i }}"
+                role="button"
+                aria-expanded="false"
+                aria-controls="collapseExample"
+              >
+                {{ this.language.projectsText[0].seeMore }}
+              </a>
+              <mat-icon
+                class="project-abs-icon"
+                [ngClass]="{
+                  'abs-active': selectedItem === i,
+                  'abs-not-active': selectedItem == -1,
+                }"
+              >
+                keyboard_arrow_down
+              </mat-icon>
+            </div>
+          </div>
+          <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+              {{ proyecto.descripcion }}
+            </div>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+              {{ proyecto.fuenteFinanciamiento }}
+            </div>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+              {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
+            </div>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+              {{ proyecto.fechaI }}
+            </div>
+            <div class="abstract" *ngIf="proyecto.fechaF">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+              {{ proyecto.fechaF }}
+            </div>
+          </div>
+        </div>
+        <ngb-pagination
+          [(page)]="page1"
+          [pageSize]="pageSize"
+          [collectionSize]="lineasProyecto[1].proyectos.length"
+          *ngIf="lineasProyecto[1].proyectos.length > 5"
+        >
+          <ng-template class="unique-left" ngbPaginationPrevious>
+            <div class="h-ih">
+              <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+            </div>
+          </ng-template>
+          <ng-template ngbPaginationNumber let-page>
+            <div class="h-ih">
+              {{ page }}
+            </div>
+          </ng-template>
+          <ng-template ngbPaginationNext>
+            <div class="h-ih">
+              <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
+            </div>
+          </ng-template>
+        </ngb-pagination>
+      </div>
+    </div>
+    <div>
+      <div class="line-img-div">
+        <img
+          class="line-img"
+          *ngIf="lineasProyecto[2].foto"
+          src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineasProyecto[2].foto }}"
+        />
+      </div>
+      <div class="lines-title">
+        {{ lineasProyecto[2].nombre }}
+      </div>
+      <div class="line-line-div"></div>
+      <div class="lines-subtitle">
+        {{ lineasProyecto[2].descripcion }}
+      </div>
+      <div class="lines-projects">
+        {{ language.linesInvestigationText[0].projects }}
+      </div>
+      <div>
+        <div
+          class="project"
+          *ngFor="
+            let proyecto of lineasProyecto[2].proyectos
+              | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize + pageSize;
+            let i = index
+          "
+        >
+          <div class="project-code">
+            {{ proyecto.codigo }}
+          </div>
+          <div class="flex-news project-mt">
+            <div class="project-title">
+              {{ proyecto.titulo }}
+            </div>
+          </div>
+          <div class="project-rev">
+            <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong
+            >{{ proyecto.lineasInvestigacion }}
+          </div>
+          <div class="mt-16">
+            <div class="flex-news flex-flow">
+              <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+              <div class="project-members" *ngFor="let usuario of proyecto.usuario">
+                <div class="member-img-round">
+                  <img
+                    class="member-img"
+                    src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                    *ngIf="usuario.foto"
+                  />
+                  <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
+                </div>
+                <div class="member-name" (click)="profile(usuario)">
+                  {{ usuario.nombreCompleto }}
+                </div>
+              </div>
+            </div>
+            <div class="flex-news">
+              <a
+                id="abstract{{ i }}"
+                [ngClass]="{ 'abstract-active': selectedItem === i }"
+                (click)="listClick($event, i)"
+                class="project-abstract"
+                data-toggle="collapse"
+                href="#collapseExample{{ i }}"
+                role="button"
+                aria-expanded="false"
+                aria-controls="collapseExample"
+              >
+                {{ this.language.projectsText[0].seeMore }}
+              </a>
+              <mat-icon
+                class="project-abs-icon"
+                [ngClass]="{
+                  'abs-active': selectedItem === i,
+                  'abs-not-active': selectedItem == -1,
+                }"
+              >
+                keyboard_arrow_down
+              </mat-icon>
+            </div>
+          </div>
+          <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+              {{ proyecto.descripcion }}
+            </div>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+              {{ proyecto.fuenteFinanciamiento }}
+            </div>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+              {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
+            </div>
+            <div class="abstract mb-8">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+              {{ proyecto.fechaI }}
+            </div>
+            <div class="abstract" *ngIf="proyecto.fechaF">
+              <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+              {{ proyecto.fechaF }}
+            </div>
+          </div>
+        </div>
+        <ngb-pagination
+          [(page)]="page2"
+          [pageSize]="pageSize"
+          [collectionSize]="lineasProyecto[2].proyectos.length"
+          *ngIf="lineasProyecto[2].proyectos.length > 5"
+        >
+          <ng-template class="unique-left" ngbPaginationPrevious>
+            <div class="h-ih">
+              <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+            </div>
+          </ng-template>
+          <ng-template ngbPaginationNumber let-page>
+            <div class="h-ih">
+              {{ page }}
+            </div>
+          </ng-template>
+          <ng-template ngbPaginationNext>
+            <div class="h-ih">
+              <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
+            </div>
+          </ng-template>
+        </ngb-pagination>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!--Agregar mas ngbpagination conforme se agregue mas lineas-->

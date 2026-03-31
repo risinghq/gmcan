@@ -1,232 +1,341 @@
 <div class="pad">
-    <div class="add-box">
-        <div class="member-detail-links">
-            <div class="flex-news">
-                <div class="flex-news back-div" (click)="return()">
-                    <mat-icon class="back-icon">
-                        arrow_back
-                    </mat-icon>
-                    <div class="back-text">
-                        Volver
-                    </div>
-                </div>
-                <div class="right obligatory-text">
-                    <span class="red-text">(*) </span>Campos obligatorios
-                </div>
-            </div>
-            <form [formGroup]="memberForm">
-                <div class="flex-news mt-24">
-                    <div class="full-width">
-                        <div class="flex-news mb-8">
-                            <div class="mr-32 full-width">
-                                <div class="text-category">
-                                    Primer nombre <span class="red-text">*</span>
-                                </div>
-                                <input [(ngModel)]="member.nombre" formControlName="nombre" name="nombre" class="input-category" placeholder="Insertar primer nombre" required>
-                            </div>
-                            <div class="full-width">
-                                <div class="text-category">
-                                    Segundo nombre 
-                                </div>
-                                <input [(ngModel)]="member.segundoNombre" formControlName="segundoNombre" name="segundoNombre"  placeholder="Insertar segundo nombre"
-                                class="input-category">
-                            </div>
-                        </div>
-                        <div class="flex-news mb-8">
-                            <div class="mr-32 full-width">
-                                <div class="text-category">
-                                    Apellido paterno <span class="red-text">*</span>
-                                </div>
-                                <input [(ngModel)]="member.apellidoPaterno" formControlName="apellidoPaterno" name="apellidoPaterno" class="input-category" placeholder="Inserar apellido paterno" required>
-                            </div>
-                            <div class="full-width">
-                                <div class="text-category">
-                                    Apellido materno 
-                                </div>
-                                <input [(ngModel)]="member.apellidoMaterno" formControlName="apellidoMaterno" name="apellidoMaterno"  placeholder="Insertar apellido materno"
-                                class="input-category">
-                            </div>
-                        </div>
-                        <div class="flex-news mb-8">
-                            <div class="mr-32 full-width">
-                                <div class="text-category">
-                                    Fecha de nacimiento
-                                </div>
-                                <mat-form-field class="input-category">
-                                    <mat-label></mat-label>
-                                    <input matInput [(ngModel)]="member.fechaNacimientoDate" [matDatepicker]="dp"
-                                    formControlName="fechaNacimiento" name="fechaNacimiento" placeholder="Insertar fecha de nacimiento">
-                                    <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-                                    <mat-datepicker #dp></mat-datepicker>
-                                </mat-form-field>
-                            </div>
-                            <div class="full-width">
-                                <div class="text-category">
-                                    Correo electrónico <span class="red-text">*</span>
-                                </div>
-                                <input [(ngModel)]="member.correo" type="email" formControlName="correo" name="correo"  placeholder="Insertar correo electrónico"
-                                class="input-category" required [ngClass]="{'invalid-error':errEmail}">
-                            </div>
-                        </div>
-                        <div class="flex-news mb-8">
-                            <div class="mr-32 full-width">
-                                <div class="text-category">
-                                    Género
-                                </div>
-                                <mat-form-field class="input-category">
-                                    <mat-select [(ngModel)]="member.genero_idGenero" formControlName="genero_idGenero" name="genero_idGenero">
-                                        <mat-option [value]="genero.idGenero" *ngFor="let genero of generos">{{genero.nombre}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                            <div class="full-width">
-                                <div class="text-category">
-                                    Máximo nivel académico alcanzado
-                                </div>
-                                <mat-form-field class="input-category">
-                                    <mat-select [(ngModel)]="member.prefijo_idPrefijo" formControlName="prefijo_idPrefijo" name="prefijo_idPrefijo">
-                                        <mat-option [value]="prefijo.idPrefijo" *ngFor="let prefijo of prefijos">{{prefijo.nombre}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="flex-news mb-8">
-                            <div class="mr-32 full-width">
-                                <div class="text-category">
-                                    Cargo <span class="red-text">*</span>
-                                </div>
-                                <mat-form-field class="input-category">
-                                    <mat-select [(ngModel)]="member.tipoMiembro_idTipoMiembro" formControlName="tipoMiembro_idTipoMiembro" name="tipoMiembro_idTipoMiembro">
-                                        <mat-option [value]="tipoMiembro.idTipoMiembro" *ngFor="let tipoMiembro of tipoMiembros">{{tipoMiembro.nombreSingular}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                            <div class="full-width">
-                                <div class="text-category">
-                                    N° DNI / Pasaporte <span class="red-text">*</span>
-                                </div>
-                                <input [(ngModel)]="member.DNI" formControlName="DNI" name="DNI" [disabled]="edit" placeholder="Insertar DNI/Pasaporte"
-                                class="input-category" required>
-                            </div>
-                        </div>
-                        <div class="flex-news mb-8">
-                            <div class="mr-32 full-width">
-                                <div class="text-category">
-                                    Contraseña (mínimo 8 caracteres) <span class="red-text">*</span>
-                                </div>
-                                <mat-form-field class="input-category" [ngClass]="{'invalid-error':errPass}">
-                                    <mat-label></mat-label>
-                                    <input matInput [type]="hide ? 'password' : 'text'" [(ngModel)]="member.password" formControlName="password" name="password">
-                                    <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-                                    </button>
-                                </mat-form-field>
-                            </div>
-                            <div class="full-width">
-                                <div class="text-category">
-                                    Repetir contraseña <span class="red-text">*</span>
-                                </div>
-                                <mat-form-field class="input-category" [ngClass]="{'invalid-error':errPass}">
-                                    <mat-label></mat-label>
-                                    <input matInput [type]="hide2 ? 'password' : 'text'" formControlName="confirmPassword" name="confirmPassword">
-                                    <button mat-icon-button matSuffix (click)="hide2 = !hide2" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide2">
-                                    <mat-icon>{{hide2 ? 'visibility_off' : 'visibility'}}</mat-icon>
-                                    </button>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ml-24">
-                        <div class="text-category center">
-                            Imagen de perfil
-                        </div>
-                        <div class="img-div" *ngIf="!previewUrl && !member.foto">
-                            <img class="img-src" src="../../assets/img/upload.svg">
-                        </div>
-                        <div class="img-preview" *ngIf="previewUrl">
-                            <img class="img-set" src="{{previewUrl}}">
-                        </div>
-                        <div class="img-preview" *ngIf="member.foto && !previewUrl">
-                            <img class="img-set" src="{{url+'usuario/get-image-usuario/'+member.foto}}">
-                        </div>
-                        <div class="green-text mt-16">
-                            <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
-                            <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
-                            <input class="file_upload" type="file" #file
-                            accept="image/*"
-                            (change)="fileProgress($event)"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="full-width mb-16">
-                    <div class="text-category">
-                        Resumen profesional en español <span>({{member.resumenPro.length}}/500)</span>
-                    </div>
-                    <textarea [(ngModel)]="member.resumenPro" formControlName="resumenPro" name="resumenPro" autosize class="input-category" maxlength="500"></textarea>
-                </div>
-                <div class="full-width mb-16">
-                    <div class="text-category">
-                        Resumen profesional en inglés <span>({{member.resumenProEN.length}}/500)</span>
-                    </div>
-                    <textarea [(ngModel)]="member.resumenProEN" formControlName="resumenProEN" name="resumenProEN" autosize class="input-category" maxlength="500"></textarea>
-                </div>
-                <div class="full-width mb-16">
-                    <div class="text-category">
-                        ¿Coordinador? Tendrá acceso para manejar permisos de otros coordinadores, gestionar miembros y visualizar analíticas
-                    </div>
-                    <div class="boxed">
-                        <input type="radio" id="coordYes" name="coord" [checked]="member.tipoUsuario_idTipoUsuario==3" (click)="setCoord(3)">
-                        <label class="mr-16" for="coordYes">No</label>
-                        <input type="radio" id="coordNo" name="coord" [checked]="member.tipoUsuario_idTipoUsuario==2" (click)="setCoord(2)">
-                        <label for="coordNo">Sí</label>
-                    </div>
-                </div>
-                <div class="full-width mb-16">
-                    <div class="text-category">
-                        ¿Ad honorem? (¿Fallecido?) 
-                    </div>
-                    <div class="boxed">
-                        <input type="radio" id="fallecidoYes" name="fallecido" [checked]="member.estado==0 || member.estado==1" (click)="adHonorem(1)">
-                        <label class="mr-16" for="fallecidoYes">No</label>
-                        <input type="radio" id="fallecidoNo" name="fallecido" [checked]="member.estado==3" (click)="adHonorem(3)">
-                        <label for="fallecidoNo">Sí</label>
-                    </div>
-                </div>
-                <div class="full-width mb-16">
-                    <div class="text-category">
-                        ¿Miembro antiguo? (Ex-miembro)
-                    </div>
-                    <div class="boxed">
-                        <input type="radio" id="exMemberYes" name="ex" [checked]="member.estado==3 || member.estado==1" (click)="oldMember(1)">
-                        <label class="mr-16" for="exMemberYes">No</label>
-                        <input type="radio" id="exMemberNo" name="ex" [checked]="member.estado==0" (click)="oldMember(0)">
-                        <label for="exMemberNo">Sí</label>
-                    </div>
-                </div>
-                <div class="full-width mb-16">
-                    <div class="text-category">
-                        Permisos
-                    </div>
-                    <div>
-                        <mat-checkbox class="full-width block" [checked]="permisoNoticia" (change)="selectPermiso(1,$event.checked)">Gestionar noticias (visualizar, crear, editar o eliminar noticias)</mat-checkbox>
-                        <mat-checkbox class="full-width block" [checked]="permisoPublicacion" (change)="selectPermiso(3,$event.checked)">Gestionar publicaciones  (visualizar, crear, editar o eliminar miembros del grupo)</mat-checkbox>
-                        <mat-checkbox class="full-width block" [checked]="permisoProyecto" (change)="selectPermiso(2,$event.checked)">Gestionar proyectos  (visualizar, crear, editar o eliminar proyectos del grupo)</mat-checkbox>
-                        <mat-checkbox class="full-width block" [checked]="permisoContenido" (change)="selectPermiso(5,$event.checked)">Gestionar contenidos (modificar contenidos de la plataforma)</mat-checkbox>
-                    </div>
-                </div>
-            </form>
-            <div class="flex-news mt-24">
-                <div class="red-btn" *ngIf="edit">
-                    <div class="link link-set link-red" (click)="openEraser()">
-                        Eliminar miembro del grupo
-                    </div>
-                </div>
-                <div class="right" [ngClass]="{'btn-grey':!memberForm.valid,'black-btn':memberForm.valid}">
-                    <div class="link link-set" (click)="addMember()">
-                      {{button_text}}
-                    </div>
-                </div>
-            </div>
+  <div class="add-box">
+    <div class="member-detail-links">
+      <div class="flex-news">
+        <div class="flex-news back-div" (click)="return()">
+          <mat-icon class="back-icon"> arrow_back </mat-icon>
+          <div class="back-text">Volver</div>
         </div>
+        <div class="right obligatory-text"><span class="red-text">(*) </span>Campos obligatorios</div>
+      </div>
+      <form [formGroup]="memberForm">
+        <div class="flex-news mt-24">
+          <div class="full-width">
+            <div class="flex-news mb-8">
+              <div class="mr-32 full-width">
+                <div class="text-category">Primer nombre <span class="red-text">*</span></div>
+                <input
+                  [(ngModel)]="member.nombre"
+                  formControlName="nombre"
+                  name="nombre"
+                  class="input-category"
+                  placeholder="Insertar primer nombre"
+                  required
+                />
+              </div>
+              <div class="full-width">
+                <div class="text-category">Segundo nombre</div>
+                <input
+                  [(ngModel)]="member.segundoNombre"
+                  formControlName="segundoNombre"
+                  name="segundoNombre"
+                  placeholder="Insertar segundo nombre"
+                  class="input-category"
+                />
+              </div>
+            </div>
+            <div class="flex-news mb-8">
+              <div class="mr-32 full-width">
+                <div class="text-category">Apellido paterno <span class="red-text">*</span></div>
+                <input
+                  [(ngModel)]="member.apellidoPaterno"
+                  formControlName="apellidoPaterno"
+                  name="apellidoPaterno"
+                  class="input-category"
+                  placeholder="Inserar apellido paterno"
+                  required
+                />
+              </div>
+              <div class="full-width">
+                <div class="text-category">Apellido materno</div>
+                <input
+                  [(ngModel)]="member.apellidoMaterno"
+                  formControlName="apellidoMaterno"
+                  name="apellidoMaterno"
+                  placeholder="Insertar apellido materno"
+                  class="input-category"
+                />
+              </div>
+            </div>
+            <div class="flex-news mb-8">
+              <div class="mr-32 full-width">
+                <div class="text-category">Fecha de nacimiento</div>
+                <mat-form-field class="input-category">
+                  <mat-label></mat-label>
+                  <input
+                    matInput
+                    [(ngModel)]="member.fechaNacimientoDate"
+                    [matDatepicker]="dp"
+                    formControlName="fechaNacimiento"
+                    name="fechaNacimiento"
+                    placeholder="Insertar fecha de nacimiento"
+                  />
+                  <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                  <mat-datepicker #dp></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="full-width">
+                <div class="text-category">Correo electrónico <span class="red-text">*</span></div>
+                <input
+                  [(ngModel)]="member.correo"
+                  type="email"
+                  formControlName="correo"
+                  name="correo"
+                  placeholder="Insertar correo electrónico"
+                  class="input-category"
+                  required
+                  [ngClass]="{ 'invalid-error': errEmail }"
+                />
+              </div>
+            </div>
+            <div class="flex-news mb-8">
+              <div class="mr-32 full-width">
+                <div class="text-category">Género</div>
+                <mat-form-field class="input-category">
+                  <mat-select
+                    [(ngModel)]="member.genero_idGenero"
+                    formControlName="genero_idGenero"
+                    name="genero_idGenero"
+                  >
+                    <mat-option [value]="genero.idGenero" *ngFor="let genero of generos">{{
+                      genero.nombre
+                    }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="full-width">
+                <div class="text-category">Máximo nivel académico alcanzado</div>
+                <mat-form-field class="input-category">
+                  <mat-select
+                    [(ngModel)]="member.prefijo_idPrefijo"
+                    formControlName="prefijo_idPrefijo"
+                    name="prefijo_idPrefijo"
+                  >
+                    <mat-option [value]="prefijo.idPrefijo" *ngFor="let prefijo of prefijos">{{
+                      prefijo.nombre
+                    }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="flex-news mb-8">
+              <div class="mr-32 full-width">
+                <div class="text-category">Cargo <span class="red-text">*</span></div>
+                <mat-form-field class="input-category">
+                  <mat-select
+                    [(ngModel)]="member.tipoMiembro_idTipoMiembro"
+                    formControlName="tipoMiembro_idTipoMiembro"
+                    name="tipoMiembro_idTipoMiembro"
+                  >
+                    <mat-option [value]="tipoMiembro.idTipoMiembro" *ngFor="let tipoMiembro of tipoMiembros">{{
+                      tipoMiembro.nombreSingular
+                    }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="full-width">
+                <div class="text-category">N° DNI / Pasaporte <span class="red-text">*</span></div>
+                <input
+                  [(ngModel)]="member.DNI"
+                  formControlName="DNI"
+                  name="DNI"
+                  [disabled]="edit"
+                  placeholder="Insertar DNI/Pasaporte"
+                  class="input-category"
+                  required
+                />
+              </div>
+            </div>
+            <div class="flex-news mb-8">
+              <div class="mr-32 full-width">
+                <div class="text-category">Contraseña (mínimo 8 caracteres) <span class="red-text">*</span></div>
+                <mat-form-field class="input-category" [ngClass]="{ 'invalid-error': errPass }">
+                  <mat-label></mat-label>
+                  <input
+                    matInput
+                    [type]="hide ? 'password' : 'text'"
+                    [(ngModel)]="member.password"
+                    formControlName="password"
+                    name="password"
+                  />
+                  <button
+                    mat-icon-button
+                    matSuffix
+                    (click)="hide = !hide"
+                    [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="hide"
+                  >
+                    <mat-icon>{{ hide ? "visibility_off" : "visibility" }}</mat-icon>
+                  </button>
+                </mat-form-field>
+              </div>
+              <div class="full-width">
+                <div class="text-category">Repetir contraseña <span class="red-text">*</span></div>
+                <mat-form-field class="input-category" [ngClass]="{ 'invalid-error': errPass }">
+                  <mat-label></mat-label>
+                  <input
+                    matInput
+                    [type]="hide2 ? 'password' : 'text'"
+                    formControlName="confirmPassword"
+                    name="confirmPassword"
+                  />
+                  <button
+                    mat-icon-button
+                    matSuffix
+                    (click)="hide2 = !hide2"
+                    [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="hide2"
+                  >
+                    <mat-icon>{{ hide2 ? "visibility_off" : "visibility" }}</mat-icon>
+                  </button>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+          <div class="ml-24">
+            <div class="text-category center">Imagen de perfil</div>
+            <div class="img-div" *ngIf="!previewUrl && !member.foto">
+              <img class="img-src" src="../../assets/img/upload.svg" />
+            </div>
+            <div class="img-preview" *ngIf="previewUrl">
+              <img class="img-set" src="{{ previewUrl }}" />
+            </div>
+            <div class="img-preview" *ngIf="member.foto && !previewUrl">
+              <img class="img-set" src="{{ url + 'usuario/get-image-usuario/' + member.foto }}" />
+            </div>
+            <div class="green-text mt-16">
+              <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
+              <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
+              <input class="file_upload" type="file" #file accept="image/*" (change)="fileProgress($event)" />
+            </div>
+          </div>
+        </div>
+        <div class="full-width mb-16">
+          <div class="text-category">
+            Resumen profesional en español <span>({{ member.resumenPro.length }}/500)</span>
+          </div>
+          <textarea
+            [(ngModel)]="member.resumenPro"
+            formControlName="resumenPro"
+            name="resumenPro"
+            autosize
+            class="input-category"
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="full-width mb-16">
+          <div class="text-category">
+            Resumen profesional en inglés <span>({{ member.resumenProEN.length }}/500)</span>
+          </div>
+          <textarea
+            [(ngModel)]="member.resumenProEN"
+            formControlName="resumenProEN"
+            name="resumenProEN"
+            autosize
+            class="input-category"
+            maxlength="500"
+          ></textarea>
+        </div>
+        <div class="full-width mb-16">
+          <div class="text-category">
+            ¿Coordinador? Tendrá acceso para manejar permisos de otros coordinadores, gestionar miembros y visualizar
+            analíticas
+          </div>
+          <div class="boxed">
+            <input
+              type="radio"
+              id="coordYes"
+              name="coord"
+              [checked]="member.tipoUsuario_idTipoUsuario == 3"
+              (click)="setCoord(3)"
+            />
+            <label class="mr-16" for="coordYes">No</label>
+            <input
+              type="radio"
+              id="coordNo"
+              name="coord"
+              [checked]="member.tipoUsuario_idTipoUsuario == 2"
+              (click)="setCoord(2)"
+            />
+            <label for="coordNo">Sí</label>
+          </div>
+        </div>
+        <div class="full-width mb-16">
+          <div class="text-category">¿Ad honorem? (¿Fallecido?)</div>
+          <div class="boxed">
+            <input
+              type="radio"
+              id="fallecidoYes"
+              name="fallecido"
+              [checked]="member.estado == 0 || member.estado == 1"
+              (click)="adHonorem(1)"
+            />
+            <label class="mr-16" for="fallecidoYes">No</label>
+            <input
+              type="radio"
+              id="fallecidoNo"
+              name="fallecido"
+              [checked]="member.estado == 3"
+              (click)="adHonorem(3)"
+            />
+            <label for="fallecidoNo">Sí</label>
+          </div>
+        </div>
+        <div class="full-width mb-16">
+          <div class="text-category">¿Miembro antiguo? (Ex-miembro)</div>
+          <div class="boxed">
+            <input
+              type="radio"
+              id="exMemberYes"
+              name="ex"
+              [checked]="member.estado == 3 || member.estado == 1"
+              (click)="oldMember(1)"
+            />
+            <label class="mr-16" for="exMemberYes">No</label>
+            <input type="radio" id="exMemberNo" name="ex" [checked]="member.estado == 0" (click)="oldMember(0)" />
+            <label for="exMemberNo">Sí</label>
+          </div>
+        </div>
+        <div class="full-width mb-16">
+          <div class="text-category">Permisos</div>
+          <div>
+            <mat-checkbox
+              class="full-width block"
+              [checked]="permisoNoticia"
+              (change)="selectPermiso(1, $event.checked)"
+              >Gestionar noticias (visualizar, crear, editar o eliminar noticias)</mat-checkbox
+            >
+            <mat-checkbox
+              class="full-width block"
+              [checked]="permisoPublicacion"
+              (change)="selectPermiso(3, $event.checked)"
+              >Gestionar publicaciones (visualizar, crear, editar o eliminar miembros del grupo)</mat-checkbox
+            >
+            <mat-checkbox
+              class="full-width block"
+              [checked]="permisoProyecto"
+              (change)="selectPermiso(2, $event.checked)"
+              >Gestionar proyectos (visualizar, crear, editar o eliminar proyectos del grupo)</mat-checkbox
+            >
+            <mat-checkbox
+              class="full-width block"
+              [checked]="permisoContenido"
+              (change)="selectPermiso(5, $event.checked)"
+              >Gestionar contenidos (modificar contenidos de la plataforma)</mat-checkbox
+            >
+          </div>
+        </div>
+      </form>
+      <div class="flex-news mt-24">
+        <div class="red-btn" *ngIf="edit">
+          <div class="link link-set link-red" (click)="openEraser()">Eliminar miembro del grupo</div>
+        </div>
+        <div class="right" [ngClass]="{ 'btn-grey': !memberForm.valid, 'black-btn': memberForm.valid }">
+          <div class="link link-set" (click)="addMember()">
+            {{ button_text }}
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

@@ -1,200 +1,201 @@
-.plex-serif{
-    font-family: 'IBM Plex Serif', serif;
+.plex-serif {
+  font-family: "IBM Plex Serif", serif;
 }
 
-.plex-sans{
-    font-family: "IBM Plex Sans", serif;
+.plex-sans {
+  font-family: "IBM Plex Sans", serif;
 }
 
-::ng-deep .mat-drawer-inner-container{
-    overflow: hidden !important;
+::ng-deep .mat-drawer-inner-container {
+  overflow: hidden !important;
 }
 
-.middle{
-    margin-top: auto;
-    margin-bottom: auto;
+.middle {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
-.btn-sidemenu{
-    margin-left: 24px;
-    margin-right:8px;
+.btn-sidemenu {
+  margin-left: 24px;
+  margin-right: 8px;
 }
 
-.mdc-top-app-bar {  
-    background-color: white;
-    color: black;
+.mdc-top-app-bar {
+  background-color: white;
+  color: black;
 }
 
 .mdc-top-app-bar .mdc-top-app-bar__navigation-icon {
-    color: black;
+  color: black;
 }
 
-.mr-16{
-    margin-right: 16px;
+.mr-16 {
+  margin-right: 16px;
 }
 
-.dashboard-tool{
-    min-width: 1096px;
-    height: 64px;
-    box-shadow: 0 2px 5px 0 #e8e8e8;
-    background-color: #ffffff;
+.dashboard-tool {
+  min-width: 1096px;
+  height: 64px;
+  box-shadow: 0 2px 5px 0 #e8e8e8;
+  background-color: #ffffff;
 }
 
-.tool-text{
-    max-width: 600px;
-    font-size: 25px;
-    font-weight: bold;
-    letter-spacing: 0.3px;
-    color: #30393a;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.tool-text {
+  max-width: 600px;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+  color: #30393a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.dashboard-icon{
-    margin: 12px 12px 24px 16px;
-    width: 210px;
+.dashboard-icon {
+  margin: 12px 12px 24px 16px;
+  width: 210px;
 }
 
-.example-sidenav{
-    overflow-y: auto;
+.example-sidenav {
+  overflow-y: auto;
 }
 
-.user-div{
-    margin-right: 40px;
-    margin-top: auto;
-    margin-bottom: auto;
+.user-div {
+  margin-right: 40px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
-.user-img{
-    width: 36px;
-    height: 36px;
-    border-radius: 100px;
-    overflow: hidden;
+.user-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 100px;
+  overflow: hidden;
 }
 
-.img-css{
-    vertical-align: unset;
-    background-color: #c4c4c4;
-    width: inherit;
-    height: inherit;
-    object-fit: cover;
+.img-css {
+  vertical-align: unset;
+  background-color: #c4c4c4;
+  width: inherit;
+  height: inherit;
+  object-fit: cover;
 }
 
-.user-name{
-    font-size: 15px;
-    font-weight: bold;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
+.user-name {
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1.33;
+  letter-spacing: 0.3px;
+  color: #000000;
 }
 
-.user-email{
-    font-size: 13px;
-    line-height: 1;
-    letter-spacing: 0.3px;
-    color: #939393;
+.user-email {
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  color: #939393;
 }
 
-.ml-24{
-    margin-left: 24px;
-    margin-top: auto;
-    margin-bottom: auto;
+.ml-24 {
+  margin-left: 24px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
-::ng-deep .mat-menu-panel{
-    width: 222px !important;
-    border-radius: 4px;
-    border: solid 1px #e8e8e8;
-    background-color: #ffffff;
+::ng-deep .mat-menu-panel {
+  width: 222px !important;
+  border-radius: 4px;
+  border: solid 1px #e8e8e8;
+  background-color: #ffffff;
 }
 
-.mat-menu-item{
-    background-color: unset;
-    line-height: 1;
-    height: 28px;
-    padding: 8px 14px;
+.mat-menu-item {
+  background-color: unset;
+  line-height: 1;
+  height: 28px;
+  padding: 8px 14px;
 }
 
-.mat-menu-item:hover,.mat-menu-item:focus{
-    background-color: unset;
+.mat-menu-item:hover,
+.mat-menu-item:focus {
+  background-color: unset;
 }
 
-.active{
-    color: var(--deep-green);
-    background-color: rgba(3, 147, 0, 0.25);
+.active {
+  color: var(--deep-green);
+  background-color: rgba(3, 147, 0, 0.25);
 }
 
-.mdc-list{
-    height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+.mdc-list {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.active > .mdc-list-item__graphic{
-    color: var(--deep-green);
+.active > .mdc-list-item__graphic {
+  color: var(--deep-green);
 }
 
-.publish-news{
-    height: max-content;
-    margin-top: auto;
-    margin-bottom: auto;
-    border-radius: 4px;
-    border: solid 2px var(--true-green);
-    background-color: #ffffff;
-    line-height: 1;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--deep-green);
-    padding: 8px 8px 6px 8px;
-    margin-left: 16px;
+.publish-news {
+  height: max-content;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-radius: 4px;
+  border: solid 2px var(--true-green);
+  background-color: #ffffff;
+  line-height: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--deep-green);
+  padding: 8px 8px 6px 8px;
+  margin-left: 16px;
 }
 
-.bad-experience{
-    @extend .plex-sans;
-    font-size: 20px;
-    text-align: center;
-    letter-spacing: 0.3px;
+.bad-experience {
+  @extend .plex-sans;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0.3px;
 }
 
-.block-div{
-    padding-top: 102px;
-    padding-left: 40px;
-    padding-right: 40px;
-    text-align: center;
+.block-div {
+  padding-top: 102px;
+  padding-left: 40px;
+  padding-right: 40px;
+  text-align: center;
 }
 
-.btn-black-true{
-    text-align: center;
-    width: max-content;
-    cursor: pointer;
-    height: max-content;
-    background-color: unset;
-    border-radius: 4px;
-    padding: 10px 28px; 
-    border: solid 2px #000000;    
+.btn-black-true {
+  text-align: center;
+  width: max-content;
+  cursor: pointer;
+  height: max-content;
+  background-color: unset;
+  border-radius: 4px;
+  padding: 10px 28px;
+  border: solid 2px #000000;
 }
 
-.btn-text{
-    @extend .plex-sans;
-    font-weight: 600;
-    font-size: 13px;
-    text-align: center;
-    line-height: 1;
-    letter-spacing: 0.3px;
-    color: #000000;
+.btn-text {
+  @extend .plex-sans;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  color: #000000;
 }
 
-.anyway{
-    @extend .plex-sans;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 13px;
-    text-align: center;
-    letter-spacing: 0.3px;
-    color: #30393A;
+.anyway {
+  @extend .plex-sans;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  text-align: center;
+  letter-spacing: 0.3px;
+  color: #30393a;
 }
 
-.icon-bad{
-    width: 262px;
+.icon-bad {
+  width: 262px;
 }

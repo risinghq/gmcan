@@ -1,96 +1,96 @@
-import {Injectable} from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {GLOBAL} from './global';
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+
+import { GLOBAL } from "./global";
 
 @Injectable({
-	providedIn: 'root'
-  })
-export class EventoService{
-    public url: string;
-    languagelocal;
-    JWT_TOKEN = 'JWT_TOKEN';
+  providedIn: "root",
+})
+export class EventoService {
+  public url: string;
+  languagelocal;
+  JWT_TOKEN = "JWT_TOKEN";
 
-	constructor(public http: HttpClient){
+  constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
-    this.languagelocal=JSON.parse(localStorage.getItem("language")).locale;
-    }
-    
-  getEventoesAll(): any{
-    let headers = new HttpHeaders ({
-		  'Content-Type':'application/json'
-    });
-    if(this.languagelocal=="es"){
-      return this.http.get(this.url+'evento/get-evento',{headers:headers});
-    }else{
-      return this.http.get(this.url+'evento/get-evento-en',{headers:headers});
-    }
+    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
-  
-  getEvento(idEvento): any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json'
+
+  getEventoesAll(): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
     });
-    if(this.languagelocal=="es"){
-      return this.http.get(this.url+'evento/get-evento/'+idEvento,{headers:headers});        
-    }else{
-      return this.http.get(this.url+'evento/get-evento-en/'+idEvento,{headers:headers});        
+    if (this.languagelocal == "es") {
+      return this.http.get(this.url + "evento/get-evento", { headers: headers });
+    } else {
+      return this.http.get(this.url + "evento/get-evento-en", { headers: headers });
     }
   }
 
-  addEvento(evento):any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  getEvento(idEvento): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
     });
-    return this.http.post(this.url+'evento/post-evento/',evento,{headers:headers});
+    if (this.languagelocal == "es") {
+      return this.http.get(this.url + "evento/get-evento/" + idEvento, { headers: headers });
+    } else {
+      return this.http.get(this.url + "evento/get-evento-en/" + idEvento, { headers: headers });
+    }
   }
 
-  updateEvento(evento):any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  addEvento(evento): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.put(this.url+'evento/update-evento/',evento,{headers:headers});
+    return this.http.post(this.url + "evento/post-evento/", evento, { headers: headers });
   }
 
-  deleteEvento(idEvento):any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  updateEvento(evento): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.delete(this.url+'evento/delete-evento/'+idEvento,{headers:headers});
+    return this.http.put(this.url + "evento/update-evento/", evento, { headers: headers });
   }
 
-  getCiudades():any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  deleteEvento(idEvento): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.get(this.url+'evento/get-ciudad/',{headers:headers});        
+    return this.http.delete(this.url + "evento/delete-evento/" + idEvento, { headers: headers });
   }
 
-  getCiudadesEN():any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  getCiudades(): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.get(this.url+'evento/get-ciudad-en/',{headers:headers});        
+    return this.http.get(this.url + "evento/get-ciudad/", { headers: headers });
   }
 
-  getPais():any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  getCiudadesEN(): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.get(this.url+'evento/get-pais/',{headers:headers});        
+    return this.http.get(this.url + "evento/get-ciudad-en/", { headers: headers });
   }
 
-  getPaisEN():any{
-    let headers = new HttpHeaders ({
-      'Content-Type':'application/json',
-      'Authorization': 'Bearer '+ localStorage.getItem(this.JWT_TOKEN)
+  getPais(): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
-    return this.http.get(this.url+'evento/get-pais-en/',{headers:headers});        
+    return this.http.get(this.url + "evento/get-pais/", { headers: headers });
   }
 
+  getPaisEN(): any {
+    let headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
+    });
+    return this.http.get(this.url + "evento/get-pais-en/", { headers: headers });
+  }
 }

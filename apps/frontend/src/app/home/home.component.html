@@ -1,462 +1,582 @@
-<mat-progress-bar mode="determinate" [value]="progress" *ngIf="progress<100"></mat-progress-bar>
+<mat-progress-bar mode="determinate" [value]="progress" *ngIf="progress < 100"></mat-progress-bar>
 <div class="home-div primer-box">
-    <div class="center">
-        <div class="description-info">
-            {{info.quienesSomosResumen}}
-        </div>
-        <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">{{language.knowAboutUs}}</button>
+  <div class="center">
+    <div class="description-info">
+      {{ info.quienesSomosResumen }}
     </div>
-    <div class="numbers-div">
-        <div class="box mb-box-8" (click)="navigate('/home/members')">
-            <span class="counter" id="users">{{usuarios.length}}</span>
-            <span class="counter-text">{{language.members}}</span>
-        </div>
-        <div class="box mb-box-8" (click)="navigate('/home/publications')">
-            <span class="counter" id="articulos">{{articulos}}</span>
-            <span class="counter-text">{{language.articles}}</span>
-        </div>
-        <div class="box mb-box-8" (click)="navigate('/home/publications')">
-            <span class="counter" id="tesis">{{tesis}}</span>
-            <span class="counter-text">{{language.thesis}}</span>
-        </div>
-        <div class="box flex-news" (click)="navigate('/home/publications')">
-            <div class="counter ml-a" id="resumenes">{{resumenes}}</div>
-            <div class="counter-text auto">{{language.resumenes}}</div>
-        </div>
+    <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">
+      {{ language.knowAboutUs }}
+    </button>
+  </div>
+  <div class="numbers-div">
+    <div class="box mb-box-8" (click)="navigate('/home/members')">
+      <span class="counter" id="users">{{ usuarios.length }}</span>
+      <span class="counter-text">{{ language.members }}</span>
     </div>
-    <div class="center know-more" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-        {{language.knowAbout}} <span style="text-decoration: underline; cursor: pointer;" (click)="navigate('/home/about-us/lines-investigation')">{{language.linesminus}}</span>
+    <div class="box mb-box-8" (click)="navigate('/home/publications')">
+      <span class="counter" id="articulos">{{ articulos }}</span>
+      <span class="counter-text">{{ language.articles }}</span>
     </div>
+    <div class="box mb-box-8" (click)="navigate('/home/publications')">
+      <span class="counter" id="tesis">{{ tesis }}</span>
+      <span class="counter-text">{{ language.thesis }}</span>
+    </div>
+    <div class="box flex-news" (click)="navigate('/home/publications')">
+      <div class="counter ml-a" id="resumenes">{{ resumenes }}</div>
+      <div class="counter-text auto">{{ language.resumenes }}</div>
+    </div>
+  </div>
+  <div class="center know-more" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+    {{ language.knowAbout }}
+    <span
+      style="text-decoration: underline; cursor: pointer"
+      (click)="navigate('/home/about-us/lines-investigation')"
+      >{{ language.linesminus }}</span
+    >
+  </div>
 </div>
 <div class="home-div segundo-box">
-    <div class="grey-title" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-        {{language.knowAbout}}
-    </div>
-    <div class="black-title"[ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-        {{language.linesminus}}
-    </div>
-    <div class="row lines-investigation">
-        <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let linea of lineasInvestigacion">
-            <mat-card class="line-card center">
-                <div class="line-img-div">
-                    <img class="line-img" *ngIf="linea.foto" src="{{url+'lineasinvestigacion/get-image-lineainvestigacion/'+linea.foto}}">
-                    <img class="line-img" *ngIf="!linea.foto" src="../../assets/img/prop_estruc.jpg">
-                </div>
-                <div class="linea-title">
-                    {{linea.nombre}}
-                </div>
-                <div class="linea-text">
-                    {{linea.descripcion}}
-                </div>
-                <a class="linea-text-green" href="/home/about-us/lines-investigation">
-                    {{language.seeMore}}
-                </a>
-            </mat-card>
+  <div class="grey-title" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+    {{ language.knowAbout }}
+  </div>
+  <div class="black-title" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+    {{ language.linesminus }}
+  </div>
+  <div class="row lines-investigation">
+    <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let linea of lineasInvestigacion">
+      <mat-card class="line-card center">
+        <div class="line-img-div">
+          <img
+            class="line-img"
+            *ngIf="linea.foto"
+            src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + linea.foto }}"
+          />
+          <img class="line-img" *ngIf="!linea.foto" src="../../assets/img/prop_estruc.jpg" />
         </div>
-    </div>
-    <div class="grey-title">
-        {{language.knowAbout}}
-    </div>
-    <div class="flex-news">
-        <div class="black-title">
-            {{language.newsminus}}
+        <div class="linea-title">
+          {{ linea.nombre }}
         </div>
-        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/home/news')">
-            <a class="btn-text2">
-                {{language.seeNews}}
-            </a>
+        <div class="linea-text">
+          {{ linea.descripcion }}
         </div>
-    </div>
-    <div class="row mb-news">
-        <div class="col-lg-8 grid">
-            <div class="news-box display-sub-flex">
-                <div class="img-hover-zoom img-hover-zoom-s">
-                    <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada" *ngIf="!noticiaPrincipal.foto">
-                    <img class="main-img-news" src="{{url+'noticia/get-image-noticia/'+noticiaPrincipal.foto}}" alt="imagen" *ngIf="noticiaPrincipal.foto">
-                </div>
-                <div class="news-div mt-main" style="height: 100%;">
-                    <div class="flex-news mt-mb-flex">
-                        <div class="news-type">
-                            {{noticiaPrincipal.nombreTipoNoticia}}
-                        </div>
-                        <div class="news-date">
-                            {{noticiaPrincipal.fechaPublicacion}}
-                        </div>
-                    </div>
-                    <div class="main-news-title" (click)="detalleNoticia(noticiaPrincipal)">
-                        {{noticiaPrincipal.titulo}}
-                    </div>
-                    <div class="main-news-res" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                        {{noticiaPrincipal.resumen}}
-                    </div>
-                    <div class="news-author main-author">
-                        {{language.newsText[0].by}} {{noticiaPrincipal.autor}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="news-box" *ngFor="let noticia of noticias | slice:1:3; let i=index" [ngClass]="{'mb-other': i==0}">
-                <div class="img-hover-zoom" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                    <img class="other-img-news" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
-                </div>
-                <div class="flex-news">
-                    <div class="news-div mt-other full-width">
-                        <div class="flex-news mt-mb-flex">
-                            <div class="other-news-type">
-                                {{noticia.nombreTipoNoticia}}
-                            </div>
-                            <div class="other-news-date">
-                                {{noticia.fechaPublicacion}}
-                            </div>
-                        </div>
-                        <div class="other-news-title" (click)="detalleNoticia(noticia)">
-                            {{noticia.titulo}}
-                        </div>
-                        <div class="news-author">
-                            {{language.newsText[0].by}} {{noticia.autor}}
-                        </div>
-                    </div>
-                    <div class="img-hover-zoom ml-16 other-img-news-div" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-                        <img class="other-img-news" src="{{url+'noticia/get-image-noticia/'+noticia.foto}}" *ngIf="noticia.foto">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/news')"> 
-        <a class="btn-text2">
-            {{language.seeNews}}
+        <a class="linea-text-green" href="/home/about-us/lines-investigation">
+          {{ language.seeMore }}
         </a>
+      </mat-card>
     </div>
-    <div class="services-card">
-        <img class="services-icon" src="../../assets/img/bulb.svg">
-        <div class="mt-services about-text" id="services"></div>
-        <div class="btn-black align-center" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}"
-        (click)="navigate('/home/about-us/about')">
-            <a class="btn-text2">
-                {{language.knowMore}}
-            </a>
-        </div>
-    </div>
-    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/about-us/about')">
-        <a class="btn-text2">
-            {{language.knowMore}}
-        </a>
-    </div>
-    <div class="future-work">
-        <div class="interested-text">
-            {{language.interested}}
-        </div>
-        <div class="know-more-text">
-            {{language.knowWork}} <span style="text-decoration: underline; cursor: pointer;" (click)="navigate('/home/about-us/works')">{{language.knowWork2}}</span>
-        </div>
-        <div class="flex-news btn-knowmore">
-            <div class="btn-black btn-nm" style="margin-right: 8px !important;" (click)="navigate('/home/about-us/works')">
-                <a class="btn-text2">
-                    {{language.goTo}}
-                </a>
-            </div>
-            <div class="btn-black btn-nm" style="margin-left: 8px !important;" (click)="navigate('/home/join-us')">
-                <a class="btn-text2">
-                    {{language.join}}
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="grey-title mt-48">
-        {{language.knowAbout2}}
-    </div>
+  </div>
+  <div class="grey-title">
+    {{ language.knowAbout }}
+  </div>
+  <div class="flex-news">
     <div class="black-title">
-        {{language.methodsminus}}
+      {{ language.newsminus }}
     </div>
-    <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let metodo of metodos; let i = index">
-            <mat-card class="methods-card center">
-                <div class="method-title-div">
-                    <div class="method-title">
-                        {{metodo.nombre}}
-                    </div>
-                </div>
-                <div id="method{{i}}" class="linea-text method-text">
-                </div>
-                <a class="linea-text-green method-green" href="/home/about-us/methods">
-                    {{language.seeMore}}
-                </a>
-            </mat-card>
+    <div
+      class="btn-black"
+      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
+      (click)="navigate('/home/news')"
+    >
+      <a class="btn-text2">
+        {{ language.seeNews }}
+      </a>
+    </div>
+  </div>
+  <div class="row mb-news">
+    <div class="col-lg-8 grid">
+      <div class="news-box display-sub-flex">
+        <div class="img-hover-zoom img-hover-zoom-s">
+          <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada" *ngIf="!noticiaPrincipal.foto" />
+          <img
+            class="main-img-news"
+            src="{{ url + 'noticia/get-image-noticia/' + noticiaPrincipal.foto }}"
+            alt="imagen"
+            *ngIf="noticiaPrincipal.foto"
+          />
         </div>
-    </div>
-    <div class="grey-title mt-publications">
-        {{language.knowAbout}}
-    </div>
-    <div class="flex-news">
-        <div class="black-title">
-            {{language.publicationsminus}}
-        </div>
-        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/home/publications')">
-            <a class="btn-text2">
-                {{language.seePublications}}
-            </a>
-        </div>
-    </div>
-    <div class="publication-list">
-        <div class="publication flex-news" [ngClass]="{ 'notoppd' : i === 0, 'no-border':i+1==publicaciones.length}" *ngFor="let publicacion of publicaciones | slice: 0 : 5; let i = index;">
-            <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1,  
-                'publication-type-3' : publicacion.tipoPublicacion_idTipoPublicacion == 3 }"
-                *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 2">
-                    {{publicacion.tipoPublicacion}}
-                </div>
-                <div class="publication-type publication-type-2"
-                *ngIf="publicacion.tipoPublicacion_idTipoPublicacion == 2">
-                    {{publicacion.tipoTesis}}
-                </div>
-                <div class="flex-news flex-flow publication-mt">
-                    <div class="publication-date d-none d-md-block d-lg-block d-xl-block">
-                        {{publicacion.fecha}}
-                    </div>
-                    <div class="elipse d-none d-md-block d-lg-block d-xl-block">
-                    </div>
-                    <div class="publication-rev" *ngIf="publicacion.revista!=null && publicacion.revista!=''">
-                        {{publicacion.revista}} Vol. {{publicacion.nroRevista}} {{publicacion.universidad}}
-                    </div>
-                    <div class="publication-rev" *ngIf="publicacion.universidad!=null && publicacion.universidad!=''">
-                        {{publicacion.universidad}}
-                    </div>
-                    <div class="publication-rev" *ngIf="publicacion.evento!=null && publicacion.evento!=''">
-                        {{publicacion.evento}}
-                    </div>
-                    <div class="elipse d-none d-md-block d-lg-block d-xl-block" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
-                    </div>
-                    <div class="publication-rev" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
-                        {{publicacion.ciudad}}, {{publicacion.pais}}
-                    </div>
-                </div>
-                <div class="publication-rev line-1" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''">
-                    DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
-                </div>
-                <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
-                href="{{this.url+'publicacion/get-file-publicacion/'+publicacion.archivo}}" target="_blank"> 
-                    {{this.language.publicationsText[0].preview}}
-                </a>
-                <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
-                href="{{this.url+'publicacion/download-publicacion/'+publicacion.archivo}}">
-                    {{this.language.publicationsText[0].download}}
-                </a>
+        <div class="news-div mt-main" style="height: 100%">
+          <div class="flex-news mt-mb-flex">
+            <div class="news-type">
+              {{ noticiaPrincipal.nombreTipoNoticia }}
             </div>
-            <div class="col-lg-8 col-md-12 nopd">
-                <div>
-                    <div class="flex-news" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'flex'}">
-                        <div class="publication-type" [ngClass]="{ 'publication-type-1' : publicacion.tipoPublicacion_idTipoPublicacion == 1,  
-                        'publication-type-3' : publicacion.tipoPublicacion_idTipoPublicacion == 3 }"
-                        *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 2">
-                            {{publicacion.tipoPublicacion}}
-                        </div>
-                        <div class="publication-type publication-type-2"
-                        *ngIf="publicacion.tipoPublicacion_idTipoPublicacion == 2">
-                            {{publicacion.tipoTesis}}
-                        </div>
-                        <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                            {{publicacion.fecha}}
-                        </div>
-                    </div>
-                    <div class="flex-news">
-                        <div class="publication-title">
-                            {{publicacion.titulo}}
-                        </div>
-                    </div>
-                    <div class="flex-news publication-mt" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'flex'}">
-                        <div class="publication-date d-none d-md-block d-lg-block d-xl-block">
-                            {{publicacion.fecha}}
-                        </div>
-                        <div class="elipse d-none d-md-block d-lg-block d-xl-block">
-                        </div>
-                        <div class="publication-rev" *ngIf="publicacion.revista!=null && publicacion.revista!=''">
-                            {{publicacion.revista}} Vol. {{publicacion.nroRevista}} {{publicacion.universidad}}
-                        </div>
-                        <div class="publication-rev" *ngIf="publicacion.universidad!=null && publicacion.universidad!=''">
-                            {{publicacion.universidad}}
-                        </div>
-                        <div class="publication-rev" *ngIf="publicacion.evento!=null && publicacion.evento!=''">
-                            {{publicacion.evento}}
-                        </div>
-                        <div class="elipse d-none d-md-block d-lg-block d-xl-block" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
-                        </div>
-                        <div class="publication-rev" *ngIf="publicacion.ciudad!=null && publicacion.ciudad!=''">
-                            {{publicacion.ciudad}}, {{publicacion.pais}}
-                        </div>
-                    </div>
-                    <div class="publication-rev line-1" *ngIf="publicacion.DOI!=null && publicacion.DOI!=''" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'flex'}">
-                        DOI: <a class="publication-rev link-DOI" href="https://doi.org/{{publicacion.DOI}}" target="_blank">{{publicacion.DOI}}</a>
-                    </div>
-                    <div class="flex-news publication-mt" style="flex-flow: wrap;">
-                        <div class="publication-members" *ngFor="let usuario of publicacion.usuario">
-                            <div class="member-img-round">
-                                <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" alt="../../assets/img/user.png" *ngIf="usuario.foto">
-                                <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
-                            </div>
-                            <div class="member-name" (click)="profile(usuario)">
-                                {{usuario.nombreCompleto}}
-                            </div>
-                        </div>
-                        <div class="publication-authors" *ngFor="let autores of publicacion.autor">
-                            {{autores.nombreAutor}}
-                        </div>
-                    </div>
-                    <div class="abstract" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'flex'}">
-                        {{publicacion.resumen}}
-                    </div>
-                    <div class="flex-news mt-16" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'flex'}">
-                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3  && publicacion.archivo && publicacion.archivo!=''"
-                        href="{{this.url+'publicacion/get-file-publicacion/'+publicacion.archivo}}" target="_blank"> 
-                            {{this.language.publicationsText[0].preview}}
-                        </a>
-                        <a class="publication-green" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion!=3 && publicacion.archivo && publicacion.archivo!=''"
-                        href="{{this.url+'publicacion/download-publicacion/'+publicacion.archivo}}">
-                            {{this.language.publicationsText[0].download}}
-                        </a>
-                        <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="publication-abstract" 
-                        data-toggle="collapse" href="#publication{{i}}" role="button" 
-                        aria-expanded="false" aria-controls="publication">
-                            {{this.language.publicationsText[0].seeMore}}
-                        </a>
-                        <mat-icon class="publication-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
-                            keyboard_arrow_down
-                        </mat-icon>
-                    </div>
-                    <div class="collapse collapsed-resumen" id="publication{{i}}">
-                        <div class="abstract-title">
-                            {{this.language.publicationsText[0].abstract}}:
-                        </div>
-                        <div class="abstract">                                        
-                            {{publicacion.resumen}}
-                        </div>
-                    </div>
-                </div>
+            <div class="news-date">
+              {{ noticiaPrincipal.fechaPublicacion }}
             </div>
+          </div>
+          <div class="main-news-title" (click)="detalleNoticia(noticiaPrincipal)">
+            {{ noticiaPrincipal.titulo }}
+          </div>
+          <div class="main-news-res" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+            {{ noticiaPrincipal.resumen }}
+          </div>
+          <div class="news-author main-author">{{ language.newsText[0].by }} {{ noticiaPrincipal.autor }}</div>
         </div>
+      </div>
     </div>
-    <div class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/publications')">
+    <div class="col-lg-4">
+      <div
+        class="news-box"
+        *ngFor="let noticia of noticias | slice: 1 : 3; let i = index"
+        [ngClass]="{ 'mb-other': i == 0 }"
+      >
+        <div class="img-hover-zoom" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+          <img
+            class="other-img-news"
+            src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}"
+            *ngIf="noticia.foto"
+          />
+        </div>
+        <div class="flex-news">
+          <div class="news-div mt-other full-width">
+            <div class="flex-news mt-mb-flex">
+              <div class="other-news-type">
+                {{ noticia.nombreTipoNoticia }}
+              </div>
+              <div class="other-news-date">
+                {{ noticia.fechaPublicacion }}
+              </div>
+            </div>
+            <div class="other-news-title" (click)="detalleNoticia(noticia)">
+              {{ noticia.titulo }}
+            </div>
+            <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
+          </div>
+          <div
+            class="img-hover-zoom ml-16 other-img-news-div"
+            [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+          >
+            <img
+              class="other-img-news"
+              src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}"
+              *ngIf="noticia.foto"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-black" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }" (click)="navigate('/home/news')">
+    <a class="btn-text2">
+      {{ language.seeNews }}
+    </a>
+  </div>
+  <div class="services-card">
+    <img class="services-icon" src="../../assets/img/bulb.svg" />
+    <div class="mt-services about-text" id="services"></div>
+    <div
+      class="btn-black align-center"
+      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
+      (click)="navigate('/home/about-us/about')"
+    >
+      <a class="btn-text2">
+        {{ language.knowMore }}
+      </a>
+    </div>
+  </div>
+  <div
+    class="btn-black"
+    [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+    (click)="navigate('/home/about-us/about')"
+  >
+    <a class="btn-text2">
+      {{ language.knowMore }}
+    </a>
+  </div>
+  <div class="future-work">
+    <div class="interested-text">
+      {{ language.interested }}
+    </div>
+    <div class="know-more-text">
+      {{ language.knowWork }}
+      <span style="text-decoration: underline; cursor: pointer" (click)="navigate('/home/about-us/works')">{{
+        language.knowWork2
+      }}</span>
+    </div>
+    <div class="flex-news btn-knowmore">
+      <div class="btn-black btn-nm" style="margin-right: 8px !important" (click)="navigate('/home/about-us/works')">
         <a class="btn-text2">
-            {{language.seePublications}}
+          {{ language.goTo }}
         </a>
+      </div>
+      <div class="btn-black btn-nm" style="margin-left: 8px !important" (click)="navigate('/home/join-us')">
+        <a class="btn-text2">
+          {{ language.join }}
+        </a>
+      </div>
     </div>
-    <div class="grey-title mt-publications">
-        {{language.knowAbout2}}
-    </div>
-    <div class="flex-news">
-        <div class="black-title">
-            {{language.projectsminus}}
+  </div>
+  <div class="grey-title mt-48">
+    {{ language.knowAbout2 }}
+  </div>
+  <div class="black-title">
+    {{ language.methodsminus }}
+  </div>
+  <div class="row">
+    <div class="col-lg-4 col-md-6 col-sm-12" *ngFor="let metodo of metodos; let i = index">
+      <mat-card class="methods-card center">
+        <div class="method-title-div">
+          <div class="method-title">
+            {{ metodo.nombre }}
+          </div>
         </div>
-        <div class="btn-black" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}" (click)="navigate('/home/projects')">
-            <a class="btn-text2">
-                {{language.seeProjects}}
+        <div id="method{{ i }}" class="linea-text method-text"></div>
+        <a class="linea-text-green method-green" href="/home/about-us/methods">
+          {{ language.seeMore }}
+        </a>
+      </mat-card>
+    </div>
+  </div>
+  <div class="grey-title mt-publications">
+    {{ language.knowAbout }}
+  </div>
+  <div class="flex-news">
+    <div class="black-title">
+      {{ language.publicationsminus }}
+    </div>
+    <div
+      class="btn-black"
+      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
+      (click)="navigate('/home/publications')"
+    >
+      <a class="btn-text2">
+        {{ language.seePublications }}
+      </a>
+    </div>
+  </div>
+  <div class="publication-list">
+    <div
+      class="publication flex-news"
+      [ngClass]="{ notoppd: i === 0, 'no-border': i + 1 == publicaciones.length }"
+      *ngFor="let publicacion of publicaciones | slice: 0 : 5; let i = index"
+    >
+      <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+        <div
+          class="publication-type"
+          [ngClass]="{
+            'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
+            'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
+          }"
+          *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 2"
+        >
+          {{ publicacion.tipoPublicacion }}
+        </div>
+        <div class="publication-type publication-type-2" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion == 2">
+          {{ publicacion.tipoTesis }}
+        </div>
+        <div class="flex-news flex-flow publication-mt">
+          <div class="publication-date d-none d-md-block d-lg-block d-xl-block">
+            {{ publicacion.fecha }}
+          </div>
+          <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
+          <div class="publication-rev" *ngIf="publicacion.revista != null && publicacion.revista != ''">
+            {{ publicacion.revista }} Vol. {{ publicacion.nroRevista }}
+            {{ publicacion.universidad }}
+          </div>
+          <div class="publication-rev" *ngIf="publicacion.universidad != null && publicacion.universidad != ''">
+            {{ publicacion.universidad }}
+          </div>
+          <div class="publication-rev" *ngIf="publicacion.evento != null && publicacion.evento != ''">
+            {{ publicacion.evento }}
+          </div>
+          <div
+            class="elipse d-none d-md-block d-lg-block d-xl-block"
+            *ngIf="publicacion.ciudad != null && publicacion.ciudad != ''"
+          ></div>
+          <div class="publication-rev" *ngIf="publicacion.ciudad != null && publicacion.ciudad != ''">
+            {{ publicacion.ciudad }}, {{ publicacion.pais }}
+          </div>
+        </div>
+        <div class="publication-rev line-1" *ngIf="publicacion.DOI != null && publicacion.DOI != ''">
+          DOI:
+          <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank">{{
+            publicacion.DOI
+          }}</a>
+        </div>
+        <a
+          class="publication-green"
+          *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo != ''"
+          href="{{ this.url + 'publicacion/get-file-publicacion/' + publicacion.archivo }}"
+          target="_blank"
+        >
+          {{ this.language.publicationsText[0].preview }}
+        </a>
+        <a
+          class="publication-green"
+          *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo != ''"
+          href="{{ this.url + 'publicacion/download-publicacion/' + publicacion.archivo }}"
+        >
+          {{ this.language.publicationsText[0].download }}
+        </a>
+      </div>
+      <div class="col-lg-8 col-md-12 nopd">
+        <div>
+          <div class="flex-news" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+            <div
+              class="publication-type"
+              [ngClass]="{
+                'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
+                'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
+              }"
+              *ngIf="publicacion.tipoPublicacion_idTipoPublicacion != 2"
+            >
+              {{ publicacion.tipoPublicacion }}
+            </div>
+            <div class="publication-type publication-type-2" *ngIf="publicacion.tipoPublicacion_idTipoPublicacion == 2">
+              {{ publicacion.tipoTesis }}
+            </div>
+            <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
+              {{ publicacion.fecha }}
+            </div>
+          </div>
+          <div class="flex-news">
+            <div class="publication-title">
+              {{ publicacion.titulo }}
+            </div>
+          </div>
+          <div class="flex-news publication-mt" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+            <div class="publication-date d-none d-md-block d-lg-block d-xl-block">
+              {{ publicacion.fecha }}
+            </div>
+            <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
+            <div class="publication-rev" *ngIf="publicacion.revista != null && publicacion.revista != ''">
+              {{ publicacion.revista }} Vol. {{ publicacion.nroRevista }}
+              {{ publicacion.universidad }}
+            </div>
+            <div class="publication-rev" *ngIf="publicacion.universidad != null && publicacion.universidad != ''">
+              {{ publicacion.universidad }}
+            </div>
+            <div class="publication-rev" *ngIf="publicacion.evento != null && publicacion.evento != ''">
+              {{ publicacion.evento }}
+            </div>
+            <div
+              class="elipse d-none d-md-block d-lg-block d-xl-block"
+              *ngIf="publicacion.ciudad != null && publicacion.ciudad != ''"
+            ></div>
+            <div class="publication-rev" *ngIf="publicacion.ciudad != null && publicacion.ciudad != ''">
+              {{ publicacion.ciudad }}, {{ publicacion.pais }}
+            </div>
+          </div>
+          <div
+            class="publication-rev line-1"
+            *ngIf="publicacion.DOI != null && publicacion.DOI != ''"
+            [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }"
+          >
+            DOI:
+            <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank">{{
+              publicacion.DOI
+            }}</a>
+          </div>
+          <div class="flex-news publication-mt" style="flex-flow: wrap">
+            <div class="publication-members" *ngFor="let usuario of publicacion.usuario">
+              <div class="member-img-round">
+                <img
+                  class="member-img"
+                  src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                  alt="../../assets/img/user.png"
+                  *ngIf="usuario.foto"
+                />
+                <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
+              </div>
+              <div class="member-name" (click)="profile(usuario)">
+                {{ usuario.nombreCompleto }}
+              </div>
+            </div>
+            <div class="publication-authors" *ngFor="let autores of publicacion.autor">
+              {{ autores.nombreAutor }}
+            </div>
+          </div>
+          <div class="abstract" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'flex' }">
+            {{ publicacion.resumen }}
+          </div>
+          <div class="flex-news mt-16" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+            <a
+              class="publication-green"
+              *ngIf="
+                publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo != ''
+              "
+              href="{{ this.url + 'publicacion/get-file-publicacion/' + publicacion.archivo }}"
+              target="_blank"
+            >
+              {{ this.language.publicationsText[0].preview }}
             </a>
-        </div>
-    </div>
-    <div class="publication-list">
-        <div class="project flex-news" [ngClass]="{ 'notoppd' : i === 0, 'no-border':i+1==proyectos.length}" *ngFor="let proyecto of proyectos | slice: 0:5; let i = index">
-            <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">
-                <div class="project-code">
-                    {{proyecto.codigo}}
-                </div>
-                <div class="project-rev mt-8">
-                    <strong class="abstract-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
-                </div>
-                <div class="project-rev">                                     
-                    <strong class="abstract-title">
-                        {{this.language.projectsText[0].source}}:
-                    </strong>
-                    {{proyecto.fuenteFinanciamiento}}
-                </div>
-                <div class="project-rev">                                     
-                    <strong class="abstract-title">
-                        {{this.language.projectsText[0].amount}}:
-                    </strong>
-                    {{proyecto.moneda}} {{proyecto.montoFinanciado}}
-                </div>
-                <div class="project-rev">                                     
-                    <strong class="abstract-title">
-                        {{this.language.projectsText[0].dateStart}}:
-                    </strong>
-                    {{proyecto.fechaI}}
-                </div>
+            <a
+              class="publication-green"
+              *ngIf="
+                publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo != ''
+              "
+              href="{{ this.url + 'publicacion/download-publicacion/' + publicacion.archivo }}"
+            >
+              {{ this.language.publicationsText[0].download }}
+            </a>
+            <a
+              id="abstract{{ i }}"
+              [ngClass]="{ 'abstract-active': selectedItem === i }"
+              (click)="listClick($event, i)"
+              class="publication-abstract"
+              data-toggle="collapse"
+              href="#publication{{ i }}"
+              role="button"
+              aria-expanded="false"
+              aria-controls="publication"
+            >
+              {{ this.language.publicationsText[0].seeMore }}
+            </a>
+            <mat-icon
+              class="publication-abs-icon"
+              [ngClass]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
+            >
+              keyboard_arrow_down
+            </mat-icon>
+          </div>
+          <div class="collapse collapsed-resumen" id="publication{{ i }}">
+            <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
+            <div class="abstract">
+              {{ publicacion.resumen }}
             </div>
-            <div class="col-lg-8 col-md-12 nopd">
-                <div class="project-code" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-                    {{proyecto.codigo}}
-                </div>
-                <div class="flex-news">
-                    <div class="project-title">
-                        {{proyecto.titulo}}
-                    </div>
-                </div>
-                <div class="project-rev" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-                    <strong class="resp-title">{{this.language.projectsText[0].linesInvestigation}}: </strong>{{proyecto.lineasInvestigacion}}
-                </div>
-                <div class="project-pt">
-                    <div class="flex-news flex-flow">
-                        <strong class="resp-title">{{this.language.projectsText[0].responsable}}:</strong>
-                        <div class="project-members" *ngFor="let usuario of proyecto.usuario">
-                            <div class="member-img-round">
-                                <img class="member-img" src="{{url+'usuario/get-image-usuario/'+usuario.foto}}" *ngIf="usuario.foto">
-                                <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto">
-                            </div>
-                            <div class="member-name" (click)="profile(usuario)">
-                                {{usuario.nombreCompleto}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="abstract" [ngStyle]="{'display' : (screenWidth < 960) ? 'none' : 'block'}">                                     
-                        {{proyecto.descripcion}}
-                    </div>
-                    <div class="flex-news" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}">
-                        <a id="abstract{{i}}" [ngClass]="{ 'abstract-active' : selectedItem === i}" (click)="listClick($event, i)" class="project-abstract" 
-                        data-toggle="collapse" href="#project{{i}}" role="button" 
-                        aria-expanded="false" aria-controls="project">
-                            {{this.language.projectsText[0].seeMore}}
-                        </a>
-                        <mat-icon class="project-abs-icon" [ngClass]="{ 'abs-active' : selectedItem === i, 'abs-not-active' : selectedItem == -1}">
-                            keyboard_arrow_down
-                        </mat-icon>
-                    </div>
-                </div>
-                <div class="collapse collapsed-resumen project-mt" id="project{{i}}">                                        
-                    <div class="abstract mb-8">                                     
-                        <strong class="abstract-title">
-                            {{this.language.projectsText[0].description}}: 
-                        </strong>
-                        {{proyecto.descripcion}}
-                    </div>
-                    <div class="abstract mb-8">                                     
-                        <strong class="abstract-title">
-                            {{this.language.projectsText[0].source}}:
-                        </strong>
-                        {{proyecto.fuenteFinanciamiento}}
-                    </div>
-                    <div class="abstract mb-8">                                     
-                        <strong class="abstract-title">
-                            {{this.language.projectsText[0].amount}}:
-                        </strong>
-                        {{proyecto.montoFinanciado}}
-                    </div>
-                    <div class="abstract mb-8">                                     
-                        <strong class="abstract-title">
-                            {{this.language.projectsText[0].dateStart}}:
-                        </strong>
-                        {{proyecto.fechaI}}
-                    </div>
-                    <div class="abstract" *ngIf="proyecto.fechaF">
-                        <strong class="abstract-title">
-                            {{this.language.projectsText[0].dateEnd}}:
-                        </strong>
-                        {{proyecto.fechaF}}
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
-    <button mat-flat-button class="btn-black" [ngStyle]="{'display' : (screenWidth > 960) ? 'none' : 'block'}" (click)="navigate('/home/projects')">
-        {{language.seeProjects}}
-    </button>
+  </div>
+  <div
+    class="btn-black"
+    [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+    (click)="navigate('/home/publications')"
+  >
+    <a class="btn-text2">
+      {{ language.seePublications }}
+    </a>
+  </div>
+  <div class="grey-title mt-publications">
+    {{ language.knowAbout2 }}
+  </div>
+  <div class="flex-news">
+    <div class="black-title">
+      {{ language.projectsminus }}
+    </div>
+    <div
+      class="btn-black"
+      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
+      (click)="navigate('/home/projects')"
+    >
+      <a class="btn-text2">
+        {{ language.seeProjects }}
+      </a>
+    </div>
+  </div>
+  <div class="publication-list">
+    <div
+      class="project flex-news"
+      [ngClass]="{ notoppd: i === 0, 'no-border': i + 1 == proyectos.length }"
+      *ngFor="let proyecto of proyectos | slice: 0 : 5; let i = index"
+    >
+      <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+        <div class="project-code">
+          {{ proyecto.codigo }}
+        </div>
+        <div class="project-rev mt-8">
+          <strong class="abstract-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong
+          >{{ proyecto.lineasInvestigacion }}
+        </div>
+        <div class="project-rev">
+          <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+          {{ proyecto.fuenteFinanciamiento }}
+        </div>
+        <div class="project-rev">
+          <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+          {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
+        </div>
+        <div class="project-rev">
+          <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+          {{ proyecto.fechaI }}
+        </div>
+      </div>
+      <div class="col-lg-8 col-md-12 nopd">
+        <div class="project-code" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+          {{ proyecto.codigo }}
+        </div>
+        <div class="flex-news">
+          <div class="project-title">
+            {{ proyecto.titulo }}
+          </div>
+        </div>
+        <div class="project-rev" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+          <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong
+          >{{ proyecto.lineasInvestigacion }}
+        </div>
+        <div class="project-pt">
+          <div class="flex-news flex-flow">
+            <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+            <div class="project-members" *ngFor="let usuario of proyecto.usuario">
+              <div class="member-img-round">
+                <img
+                  class="member-img"
+                  src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                  *ngIf="usuario.foto"
+                />
+                <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
+              </div>
+              <div class="member-name" (click)="profile(usuario)">
+                {{ usuario.nombreCompleto }}
+              </div>
+            </div>
+          </div>
+          <div class="abstract" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+            {{ proyecto.descripcion }}
+          </div>
+          <div class="flex-news" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+            <a
+              id="abstract{{ i }}"
+              [ngClass]="{ 'abstract-active': selectedItem === i }"
+              (click)="listClick($event, i)"
+              class="project-abstract"
+              data-toggle="collapse"
+              href="#project{{ i }}"
+              role="button"
+              aria-expanded="false"
+              aria-controls="project"
+            >
+              {{ this.language.projectsText[0].seeMore }}
+            </a>
+            <mat-icon
+              class="project-abs-icon"
+              [ngClass]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
+            >
+              keyboard_arrow_down
+            </mat-icon>
+          </div>
+        </div>
+        <div class="collapse collapsed-resumen project-mt" id="project{{ i }}">
+          <div class="abstract mb-8">
+            <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+            {{ proyecto.descripcion }}
+          </div>
+          <div class="abstract mb-8">
+            <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+            {{ proyecto.fuenteFinanciamiento }}
+          </div>
+          <div class="abstract mb-8">
+            <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+            {{ proyecto.montoFinanciado }}
+          </div>
+          <div class="abstract mb-8">
+            <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+            {{ proyecto.fechaI }}
+          </div>
+          <div class="abstract" *ngIf="proyecto.fechaF">
+            <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+            {{ proyecto.fechaF }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    mat-flat-button
+    class="btn-black"
+    [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+    (click)="navigate('/home/projects')"
+  >
+    {{ language.seeProjects }}
+  </button>
 </div>

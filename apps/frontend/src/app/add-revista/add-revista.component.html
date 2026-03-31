@@ -1,39 +1,36 @@
 <div class="pad">
-    <div class="add-box">
-        <div class="member-detail-links">
-            <div class="flex-news">
-                <div class="flex-news back-div" (click)="return()">
-                    <mat-icon class="back-icon">
-                        arrow_back
-                    </mat-icon>
-                    <div class="back-text">
-                        Volver
-                    </div>
-                </div>
-                <div class="right obligatory-text">
-                    <span class="red-text">(*) </span>Campos obligatorios
-                </div>
-            </div>
-            <form [formGroup]="revistaForm"  class="flex-news mt-24 mb-32">
-                <div class="full-width">
-                    <div class="text-category">
-                        Nombre de revista <span class="red-text">*</span>
-                    </div>
-                    <input [(ngModel)]="revista.nombre" formControlName="nombre" name="nombre" class="input-category" placeholder="Insertar nombre de revista" required>
-                </div>
-            </form>
-            <div class="flex-news">
-                <div [ngClass]="{'btn-grey':!notCanDo,'red-btn':notCanDo}" *ngIf="edit">
-                    <div class="link link-set link-red" (click)="openEraser()">
-                      Eliminar revista
-                    </div>
-                </div>
-                <div class="right" [ngClass]="{'btn-grey':!revistaForm.valid,'black-btn':revistaForm.valid}">
-                    <div class="link link-set" (click)="submitRevista()">
-                      {{button_text}}
-                    </div>
-                </div>
-            </div>
+  <div class="add-box">
+    <div class="member-detail-links">
+      <div class="flex-news">
+        <div class="flex-news back-div" (click)="return()">
+          <mat-icon class="back-icon"> arrow_back </mat-icon>
+          <div class="back-text">Volver</div>
         </div>
+        <div class="right obligatory-text"><span class="red-text">(*) </span>Campos obligatorios</div>
+      </div>
+      <form [formGroup]="revistaForm" class="flex-news mt-24 mb-32">
+        <div class="full-width">
+          <div class="text-category">Nombre de revista <span class="red-text">*</span></div>
+          <input
+            [(ngModel)]="revista.nombre"
+            formControlName="nombre"
+            name="nombre"
+            class="input-category"
+            placeholder="Insertar nombre de revista"
+            required
+          />
+        </div>
+      </form>
+      <div class="flex-news">
+        <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }" *ngIf="edit">
+          <div class="link link-set link-red" (click)="openEraser()">Eliminar revista</div>
+        </div>
+        <div class="right" [ngClass]="{ 'btn-grey': !revistaForm.valid, 'black-btn': revistaForm.valid }">
+          <div class="link link-set" (click)="submitRevista()">
+            {{ button_text }}
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

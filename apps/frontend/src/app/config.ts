@@ -1,6 +1,6 @@
-import { environment } from '../environments/environment';
+import { environment } from "../environments/environment";
 
 export const config = {
   apiUrl: environment.apiUrl,
-  appUrl: environment.appUrl
+  appUrl: environment.appUrl,
 };

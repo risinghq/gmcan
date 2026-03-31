@@ -1,59 +1,73 @@
 <div class="login-div">
-    <div class="flex-news back-div" (click)="return()">
-        <mat-icon class="back-icon">
-            arrow_back
-        </mat-icon>
+  <div class="flex-news back-div" (click)="return()">
+    <mat-icon class="back-icon"> arrow_back </mat-icon>
+    <div class="back-text">
+      {{ language.backAll }}
+    </div>
+  </div>
+  <div class="login-card">
+    <img class="logo-icon" src="{{ grupoinfo.logoHeader }}" alt="logo" />
+    <form [formGroup]="loginForm" *ngIf="!recoverValue">
+      <div class="login-title">
+        {{ language.login }}
+      </div>
+      <input
+        class="input-email full-width"
+        placeholder="{{ language.loginText[0].email }}"
+        #correo
+        name="correo"
+        formControlName="correo"
+        autocomplete="off"
+        required
+      />
+      <input
+        class="input-password mt-input-16 full-width"
+        placeholder="{{ language.loginText[0].password }}"
+        #password
+        name="password"
+        formControlName="password"
+        autocomplete="off"
+        required
+        type="password"
+      />
+      <div (click)="login()" [ngClass]="{ 'btn-grey': loginForm.invalid, 'btn-black': !loginForm.invalid }">
+        <div class="link">
+          {{ language.loginText[0].login }}
+        </div>
+      </div>
+      <div class="forgot link" (click)="change()">
+        {{ language.loginText[0].forgot }}
+      </div>
+    </form>
+    <form [formGroup]="emailForm" *ngIf="recoverValue">
+      <div class="flex-news back-div recover-back" (click)="change()">
+        <mat-icon class="back-icon"> arrow_back </mat-icon>
         <div class="back-text">
-            {{language.backAll}}
-        </div>        
-    </div>
-    <div class="login-card">
-        <img  class="logo-icon" src="{{grupoinfo.logoHeader}}" alt="logo">
-        <form [formGroup]="loginForm" *ngIf="!recoverValue">
-            <div class="login-title">
-                {{language.login}}
-            </div>
-            <input class="input-email full-width" placeholder="{{language.loginText[0].email}}" #correo
-            name = "correo" formControlName="correo" autocomplete="off" required>
-            <input class="input-password mt-input-16 full-width" placeholder="{{language.loginText[0].password}}" #password
-            name = "password" formControlName="password" autocomplete="off" required type="password">
-            <div (click)="login()" [ngClass]="{'btn-grey':loginForm.invalid,'btn-black':!loginForm.invalid}">
-                <div class="link">
-                    {{language.loginText[0].login}}
-                </div>
-            </div>
-            <div class="forgot link" (click)="change()">
-                {{language.loginText[0].forgot}}
-            </div>
-        </form>
-        <form [formGroup]="emailForm" *ngIf="recoverValue">
-            <div class="flex-news back-div recover-back" (click)="change()">
-                <mat-icon class="back-icon">
-                    arrow_back
-                </mat-icon>
-                <div class="back-text">
-                    {{language.detailMemberText[0].back}}
-                </div>        
-            </div>
-            <div class="login-title recover-title">
-                Recuperar contraseña
-            </div>
-            <div class="login-subtitle">
-                Ingresa tu correo electrónico y te enviaremos un link para que puedas restaurar tu contraseña.
-            </div>
-            <input class="input-email full-width" placeholder="{{language.loginText[0].email}}" #correo
-            name = "correo" formControlName="correo" autocomplete="off" required>
-            <div (click)="recover()" [ngClass]="{'btn-grey':emailForm.invalid,'btn-black':!emailForm.invalid}">
-                <div class="link">
-                    Recuperar contraseña
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="error" *ngIf="error">
-        {{error}}
-    </div>
-    <div class="exito" *ngIf="exito">
-        {{exito}}
-    </div>
+          {{ language.detailMemberText[0].back }}
+        </div>
+      </div>
+      <div class="login-title recover-title">Recuperar contraseña</div>
+      <div class="login-subtitle">
+        Ingresa tu correo electrónico y te enviaremos un link para que puedas restaurar tu contraseña.
+      </div>
+      <input
+        class="input-email full-width"
+        placeholder="{{ language.loginText[0].email }}"
+        #correo
+        name="correo"
+        formControlName="correo"
+        autocomplete="off"
+        required
+      />
+      <div (click)="recover()" [ngClass]="{ 'btn-grey': emailForm.invalid, 'btn-black': !emailForm.invalid }">
+        <div class="link">Recuperar contraseña</div>
+      </div>
+    </form>
+  </div>
+  <div class="error" *ngIf="error">
+    {{ error }}
+  </div>
+  <div class="exito" *ngIf="exito">
+    {{ exito }}
+  </div>
 </div>

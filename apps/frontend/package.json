@@ -1,6 +1,21 @@
 {
   "name": "frontend",
   "version": "0.0.0",
+  "private": true,
+  "author": {
+    "name": "Renzo Vizarreta",
+    "email": "rvizarreta14@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "David Duran",
+      "email": "dadch1404@gmail.com"
+    },
+    {
+      "name": "Pedro Rojas",
+      "email": "pedro.rojas.f24@gmail.com"
+    }
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -10,7 +25,6 @@
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^21.2.6",
     "@angular/cdk": "^21.2.4",
@@ -54,25 +68,11 @@
     "typescript": "~5.9.0",
     "vitest": "^4.1.2"
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "trustedDependencies": [
     "@angular/cli",
     "core-js"
-  ],
-  "author": {
-    "name": "Renzo Vizarreta",
-    "email": "rvizarreta14@gmail.com"
-  },
-  "contributors": [
-    {
-      "name": "David Duran",
-      "email": "dadch1404@gmail.com"
-    },
-    {
-      "name": "Pedro Rojas",
-      "email": "pedro.rojas.f24@gmail.com"
-    }
-  ],
-  "engines": {
-    "node": ">=20.19.0"
-  }
+  ]
 }

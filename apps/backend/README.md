@@ -67,13 +67,13 @@ Cuando se solicite, ingresa la contraseña: `1234` (establecimos esta contraseñ
 
 Si este comando falla por permisos, usa una de estas alternativas:
 
-+ **Opción 1** - Usando sudo (recomendado):
+- **Opción 1** - Usando sudo (recomendado):
 
   ```bash
   sudo mysql -u root -p tesis < gmcan.sql
   ```
 
-+ **Opción 2** - Conexión TCP/IP:
+- **Opción 2** - Conexión TCP/IP:
 
   ```bash
   mysql -u root -p -h 127.0.0.1 tesis < gmcan.sql
@@ -82,7 +82,7 @@ Si este comando falla por permisos, usa una de estas alternativas:
 Para desarrollo local, la aplicación utiliza estas credenciales:
 
 | Campo      | Valor       |
-|------------|-------------|
+| ---------- | ----------- |
 | Usuario    | `root`      |
 | Contraseña | `1234`      |
 | Base datos | `tesis`     |
@@ -125,19 +125,19 @@ Deberías ver las tablas importadas desde `gmcan.sql`.
 
 Para tareas de desarrollo, estos comandos pueden serte útiles:
 
-+ Conectarse a MySQL (no necesitas hacer esto normalmente, ya que el backend se conecta automáticamente):
+- Conectarse a MySQL (no necesitas hacer esto normalmente, ya que el backend se conecta automáticamente):
 
   ```bash
   sudo mysql -u root -p
   ```
 
-+ Verificar estado del servicio:
+- Verificar estado del servicio:
 
   ```bash
   sudo systemctl status mysql.service
   ```
 
-+ Reiniciar MySQL si es necesario:
+- Reiniciar MySQL si es necesario:
 
   ```bash
   sudo systemctl restart mysql.service

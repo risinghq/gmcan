@@ -1,42 +1,63 @@
 <div class="about-div">
-    <div class="row">
-        <div class="col-lg-8 col-sm-6 col-12">
-            <div class="about-links">
-                <a class="about-link-active" href="/">{{language.home}}</a>
-                <mat-icon class="about-icon">
-                    arrow_right
-                </mat-icon>
-                <a class="about-link-active">{{language.aboutUs}}</a>
-                <mat-icon class="about-icon">
-                    arrow_right
-                </mat-icon>
-                <a class="about-link short-text">{{selectedCategory}}</a>
-            </div>
-            <router-outlet></router-outlet>
-        </div>
-        <div class="col-lg-4 col-sm-6 col-12">
-            <div class="about-categories">
-                <div class="about-category" routerLink="./about" (click)="selected(language.who)"
-                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-                    {{language.who}}
-                </div>
-                <div class="about-category" routerLink="./lines-investigation" (click)="selected(language.linesInvestigation)"
-                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-                    {{language.linesInvestigation}}
-                </div>
-                <div class="about-category" routerLink="./methods" (click)="selected(language.methods)"
-                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-                    {{language.methods}}
-                </div>
-                <div class="about-category" routerLink="./facilities-resources" (click)="selected(language.resources)"
-                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-                    {{language.resources}}
-                </div>
-                <div class="about-category" routerLink="./works" (click)="selected(language.futureWorks)"
-                routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-                    {{language.futureWorks}}
-                </div>
-            </div>
-        </div>
+  <div class="row">
+    <div class="col-lg-8 col-sm-6 col-12">
+      <div class="about-links">
+        <a class="about-link-active" href="/">{{ language.home }}</a>
+        <mat-icon class="about-icon"> arrow_right </mat-icon>
+        <a class="about-link-active">{{ language.aboutUs }}</a>
+        <mat-icon class="about-icon"> arrow_right </mat-icon>
+        <a class="about-link short-text">{{ selectedCategory }}</a>
+      </div>
+      <router-outlet></router-outlet>
     </div>
+    <div class="col-lg-4 col-sm-6 col-12">
+      <div class="about-categories">
+        <div
+          class="about-category"
+          routerLink="./about"
+          (click)="selected(language.who)"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ language.who }}
+        </div>
+        <div
+          class="about-category"
+          routerLink="./lines-investigation"
+          (click)="selected(language.linesInvestigation)"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ language.linesInvestigation }}
+        </div>
+        <div
+          class="about-category"
+          routerLink="./methods"
+          (click)="selected(language.methods)"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ language.methods }}
+        </div>
+        <div
+          class="about-category"
+          routerLink="./facilities-resources"
+          (click)="selected(language.resources)"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ language.resources }}
+        </div>
+        <div
+          class="about-category"
+          routerLink="./works"
+          (click)="selected(language.futureWorks)"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          {{ language.futureWorks }}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

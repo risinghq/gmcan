@@ -1,65 +1,59 @@
 <div class="login-div">
-    <div class="flex-news back-div" (click)="returnToLogin()">
-        <mat-icon class="back-icon">
-            arrow_back
-        </mat-icon>
-        <div class="back-text">
-            Volver a la página principal
-        </div>
+  <div class="flex-news back-div" (click)="returnToLogin()">
+    <mat-icon class="back-icon"> arrow_back </mat-icon>
+    <div class="back-text">Volver a la página principal</div>
+  </div>
+  <div class="login-card">
+    <img class="logo-icon" src="{{ grupoInfo.logoHeader }}" alt="logo" />
+
+    <div *ngIf="loading" class="loading-spinner" style="text-align: center; margin-top: 20px">
+      <p>Verificando...</p>
     </div>
-    <div class="login-card">
-        <img class="logo-icon" src="{{grupoInfo.logoHeader}}" alt="logo">
 
-        <div *ngIf="loading" class="loading-spinner" style="text-align: center; margin-top: 20px;">
-            <p>Verificando...</p>
-        </div>
+    <form [formGroup]="passwordForm" *ngIf="tokenValid && !success && !loading" (ngSubmit)="resetPassword()">
+      <div class="login-title recover-title">Establecer nueva contraseña</div>
+      <div class="login-subtitle">Tu nueva contraseña debe tener como mínimo 8 caracteres.</div>
 
-        <form [formGroup]="passwordForm" *ngIf="tokenValid && !success && !loading" (ngSubmit)="resetPassword()">
-            <div class="login-title recover-title">
-                Establecer nueva contraseña
-            </div>
-            <div class="login-subtitle">
-                Tu nueva contraseña debe tener como mínimo 8 caracteres.
-            </div>
+      <input
+        class="input-password mt-input-16 full-width"
+        placeholder="Nueva contraseña"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        required
+      />
+      <div *ngIf="hasError('password', 'required')" class="error-text">La contraseña es requerida.</div>
+      <div *ngIf="hasError('password', 'minlength')" class="error-text">
+        La contraseña debe tener al menos 8 caracteres.
+      </div>
 
-            <input class="input-password mt-input-16 full-width" placeholder="Nueva contraseña"
-                type="password" formControlName="password" autocomplete="new-password" required>
-            <div *ngIf="hasError('password', 'required')" class="error-text">
-                La contraseña es requerida.
-            </div>
-            <div *ngIf="hasError('password', 'minlength')" class="error-text">
-                La contraseña debe tener al menos 8 caracteres.
-            </div>
+      <input
+        class="input-password mt-input-16 full-width"
+        placeholder="Repetir contraseña"
+        type="password"
+        formControlName="confirmPassword"
+        autocomplete="new-password"
+        required
+      />
+      <div *ngIf="hasError('confirmPassword', 'required')" class="error-text">Debes confirmar la contraseña.</div>
+      <div *ngIf="passwordForm.hasError('passwordMismatch') && confirmPasswordControl.touched" class="error-text">
+        Las contraseñas no coinciden.
+      </div>
 
-            <input class="input-password mt-input-16 full-width" placeholder="Repetir contraseña"
-                type="password" formControlName="confirmPassword" autocomplete="new-password" required>
-            <div *ngIf="hasError('confirmPassword', 'required')" class="error-text">
-                Debes confirmar la contraseña.
-            </div>
-            <div *ngIf="passwordForm.hasError('passwordMismatch') && confirmPasswordControl.touched" class="error-text">
-                Las contraseñas no coinciden.
-            </div>
+      <button type="submit" class="btn-black" [class.btn-grey]="!isFormValid" [disabled]="!isFormValid">
+        <div class="link">Cambiar contraseña</div>
+      </button>
+    </form>
 
-            <button type="submit" class="btn-black" [class.btn-grey]="!isFormValid" [disabled]="!isFormValid">
-                <div class="link">
-                    Cambiar contraseña
-                </div>
-            </button>
-        </form>
-
-        <div *ngIf="success">
-            <div class="login-title succesful-title">
-                ¡Contraseña cambiada exitosamente!
-            </div>
-            <div (click)="returnToLogin()" class="btn-black">
-                <div class="link">
-                    Ir al inicio de sesión
-                </div>
-            </div>
-        </div>
-
-        <div class="error" *ngIf="error">
-            {{ error }}
-        </div>
+    <div *ngIf="success">
+      <div class="login-title succesful-title">¡Contraseña cambiada exitosamente!</div>
+      <div (click)="returnToLogin()" class="btn-black">
+        <div class="link">Ir al inicio de sesión</div>
+      </div>
     </div>
+
+    <div class="error" *ngIf="error">
+      {{ error }}
+    </div>
+  </div>
 </div>

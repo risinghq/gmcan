@@ -1,15 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, AbstractControl } from "@angular/forms";
 import { Router, ActivatedRoute } from "@angular/router";
-import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  AbstractControl,
-} from "@angular/forms";
-import { UsuarioService } from "../services/usuario.service";
-import { GrupoService } from "../services/grupo.service";
+
 import { Grupo } from "../models/grupo";
 import { GLOBAL } from "../services/global";
+import { GrupoService } from "../services/grupo.service";
+import { UsuarioService } from "../services/usuario.service";
 
 @Component({
   standalone: false,
@@ -38,7 +34,35 @@ export class ChangePassComponent implements OnInit {
     private grupoService: GrupoService,
   ) {
     this.url = GLOBAL.url;
-    this.grupoInfo= new Grupo(0,'','','','','','','','','','','','','','','','','','','','','','','','',null,null);
+    this.grupoInfo = new Grupo(
+      0,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      null,
+      null,
+    );
 
     this.passwordForm = this.fb.group(
       {
@@ -72,8 +96,7 @@ export class ChangePassComponent implements OnInit {
         if (res && res.length > 0) {
           this.grupoInfo = res[0];
           localStorage.setItem("grupoInfo", JSON.stringify(this.grupoInfo));
-          this.grupoInfo.logoHeader =
-            this.url + "grupo/get-image-grupo/" + this.grupoInfo.logoHeader;
+          this.grupoInfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoInfo.logoHeader;
         }
       },
       error: (error) => {
@@ -121,9 +144,7 @@ export class ChangePassComponent implements OnInit {
     });
   }
 
-  private passwordMatchValidator(
-    control: AbstractControl,
-  ): { [key: string]: any } | null {
+  private passwordMatchValidator(control: AbstractControl): { [key: string]: any } | null {
     const password = control.get("password");
     const confirmPassword = control.get("confirmPassword");
 
@@ -131,9 +152,7 @@ export class ChangePassComponent implements OnInit {
       return null;
     }
 
-    return password.value === confirmPassword.value
-      ? null
-      : { passwordMismatch: true };
+    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
   }
 
   public get passwordsMatch(): boolean {
@@ -173,8 +192,7 @@ export class ChangePassComponent implements OnInit {
       },
       error: (error) => {
         console.error("Password reset error:", error);
-        this.error =
-          "Error al cambiar la contraseña. Por favor intenta nuevamente.";
+        this.error = "Error al cambiar la contraseña. Por favor intenta nuevamente.";
       },
       complete: () => {
         this.loading = false;

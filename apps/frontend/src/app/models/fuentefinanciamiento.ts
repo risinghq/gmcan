@@ -1,6 +1,6 @@
-export class FuenteFinanciamiento{
-    constructor(
-        public idFuenteFinanciamiento: Number,
-        public nombre: String,
-    ){}
+export class FuenteFinanciamiento {
+  constructor(
+    public idFuenteFinanciamiento: Number,
+    public nombre: String,
+  ) {}
 }

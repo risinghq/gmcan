@@ -1,22 +1,22 @@
-import { CanDeactivate } from '@angular/router';
-import { Injectable } from '@angular/core';
-import { EditRevistaComponent } from '../edit-revista/edit-revista.component';
+import { Injectable } from "@angular/core";
+import { CanDeactivate } from "@angular/router";
+
+import { EditRevistaComponent } from "../edit-revista/edit-revista.component";
 
 @Injectable()
 export class EditRevistaGuard implements CanDeactivate<EditRevistaComponent> {
-
   canDeactivate(component: EditRevistaComponent) {
     let sessionEnd;
-    if(localStorage.getItem("sessionEnd")=='1'){
-      localStorage.setItem("sessionEnd",'0');
+    if (localStorage.getItem("sessionEnd") == "1") {
+      localStorage.setItem("sessionEnd", "0");
       sessionEnd = true;
-    }else{
-        sessionEnd = false;
+    } else {
+      sessionEnd = false;
     }
-    if(!component.agregar && !sessionEnd){
-        return component.canDeactivate();
-    }else{
-        return true;
+    if (!component.agregar && !sessionEnd) {
+      return component.canDeactivate();
+    } else {
+      return true;
     }
   }
 }
