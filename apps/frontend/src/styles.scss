@@ -96,7 +96,19 @@ input{
 .mat-drawer-container{
     background: unset;
 }
-@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap');
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+@import '@fontsource/ibm-plex-sans/300.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-serif/400.css';
+@import '@fontsource/ibm-plex-serif/400-italic.css';
+@import '@fontsource/ibm-plex-serif/500.css';
+@import '@fontsource/ibm-plex-serif/600.css';
+@import '@fontsource/ibm-plex-serif/700.css';
 @import 'bootstrap';
 @import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
 html, body { height: 100%   ;
