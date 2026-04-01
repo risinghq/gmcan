@@ -17,25 +17,29 @@
       "email": "pedro.rojas.f24@gmail.com"
     }
   ],
-  "main": "index.js",
+  "type": "module",
+  "main": "server.ts",
   "scripts": {
-    "start": "nodemon server.js",
-    "clean": "shx rm -rf node_modules/ && pnpm install",
+    "start": "tsx --watch server.ts",
     "lint": "oxlint",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",
+    "@libsql/client": "^0.17.2",
     "bcrypt": "^6.0.0",
     "hono": "^4.12.9",
     "jsonwebtoken": "^9.0.3",
-    "mysql": "^2.17.1",
-    "rand-token": "^1.0.1",
+    "kysely": "^0.28.15",
+    "kysely-libsql": "^0.7.1",
     "resend": "^6.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14",
-    "shx": "^0.4.0"
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^25.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.9.0"
   }
 }
