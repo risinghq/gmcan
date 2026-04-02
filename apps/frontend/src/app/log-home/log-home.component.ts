@@ -1,10 +1,25 @@
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { NgIf } from "@angular/common";
 import { Component, OnInit, Inject, HostListener } from "@angular/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatIconButton } from "@angular/material/button";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
+import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
+import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { Idle } from "@ng-idle/core";
 import { Keepalive } from "@ng-idle/keepalive";
 
+import { HomeComponent } from "../home/home.component";
 import { DialogData } from "../models/dialogdata";
 import { Grupo } from "../models/grupo";
 import { UsuarioFull } from "../models/usuarioFull";
@@ -17,10 +32,23 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service";
 
 @Component({
-  standalone: false,
   selector: "app-log-home",
   templateUrl: "./log-home.component.html",
   styleUrls: ["./log-home.component.scss"],
+  imports: [
+    MatDrawerContainer,
+    MatDrawer,
+    RouterLink,
+    RouterLinkActive,
+    NgIf,
+    MatIconButton,
+    MatIcon,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    RouterOutlet,
+    HomeComponent,
+  ],
 })
 export class LogHomeComponent implements OnInit {
   token;
@@ -327,9 +355,9 @@ export class LogHomeComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogIdle {
   constructor(
@@ -341,9 +369,9 @@ export class DialogIdle {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogLogOff {
   constructor(

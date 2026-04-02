@@ -1,12 +1,31 @@
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { NgClass, NgFor, NgIf } from "@angular/common";
 import { Component, OnInit, HostListener, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIconButton } from "@angular/material/button";
+import { MatCheckbox } from "@angular/material/checkbox";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from "@angular/material/dialog";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Params, Router, ActivatedRoute } from "@angular/router";
+import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
+import { HomeComponent } from "../home/home.component";
 import { DialogData } from "../models/dialogdata";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
@@ -25,11 +44,31 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service";
 
 @Component({
-  standalone: false,
   selector: "app-edit-member",
   templateUrl: "../add-member/add-member.component.html",
   styleUrls: ["./edit-member.component.scss"],
   providers: [provideNativeDateAdapter()],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    NgClass,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatIconButton,
+    NgIf,
+    AutosizeModule,
+    MatCheckbox,
+    HomeComponent,
+  ],
 })
 export class EditMemberComponent implements OnInit {
   url;
@@ -121,11 +160,11 @@ export class EditMemberComponent implements OnInit {
       let DNI = params["id"];
       this._usuarioService.getFullUser(DNI).subscribe((result) => {
         if (result.length > 0) {
-          this.memberForm.controls.DNI.disable();
+          this.memberForm.controls["DNI"].disable();
           this.member = result[0];
           this.oldEmail = this.member.correo;
           this.oldPassword = this.member.password;
-          this.memberForm.controls.confirmPassword.setValue(this.member.password);
+          this.memberForm.controls["confirmPassword"].setValue(this.member.password);
           var d = new Date(this.member.fechaNacimiento);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           this.member.fechaNacimientoDate = d;
@@ -139,7 +178,7 @@ export class EditMemberComponent implements OnInit {
           if (this.member.nombre.includes(" ")) {
             let string = this.member.nombre.split(" ");
             this.member.nombre = string[0];
-            this.memberForm.controls.segundoNombre.setValue(string[1]);
+            this.memberForm.controls["segundoNombre"].setValue(string[1]);
           }
           this.getCargo(this.member);
           this.getNivelAcademico(this.member);
@@ -284,9 +323,12 @@ export class EditMemberComponent implements OnInit {
       }
       this._usuarioService.verifyUser(this.member).subscribe((result) => {
         if (result.length == 0 || this.oldEmail == this.member.correo) {
-          if (this.member.password === this.memberForm.controls.confirmPassword.value) {
-            if (this.memberForm.controls.segundoNombre.value != "" && this.memberForm.controls.segundoNombre.value) {
-              this.member.nombre += " " + this.memberForm.controls.segundoNombre.value;
+          if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
+            if (
+              this.memberForm.controls["segundoNombre"].value != "" &&
+              this.memberForm.controls["segundoNombre"].value
+            ) {
+              this.member.nombre += " " + this.memberForm.controls["segundoNombre"].value;
             }
             if (this.adHono == 3) {
               this.member.estado = this.adHono;
@@ -434,34 +476,6 @@ export class EditMemberComponent implements OnInit {
     }
   }
 
-  private dialogRef: MatDialogRef<DialogReturn2>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogReturn2, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-
   private dialogRef2: MatDialogRef<DialogCancel5>;
 
   openEraser() {
@@ -524,23 +538,9 @@ export class EditMemberComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
-})
-export class DialogReturn2 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogReturn2>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogCancel5 {
   constructor(

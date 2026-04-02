@@ -1,7 +1,21 @@
+import { NgIf } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
 import { Router } from "@angular/router";
 
 import { UsuarioFull } from "../models/usuarioFull";
@@ -11,10 +25,26 @@ import { TipoMiembroService } from "../services/tipomiembro.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-miembros",
   templateUrl: "./miembros.component.html",
   styleUrls: ["./miembros.component.scss"],
+  imports: [
+    MatIcon,
+    NgIf,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+  ],
 })
 export class MiembrosComponent implements OnInit {
   displayedColumns: string[] = ["nombre", "apellidoPaterno", "apellidoMaterno", "grado", "cargo", "correo"];

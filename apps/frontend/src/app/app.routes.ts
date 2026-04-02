@@ -1,5 +1,4 @@
-import { NgModule } from "@angular/core";
-import { Routes, RouterModule } from "@angular/router";
+import { Routes } from "@angular/router";
 
 import { AboutUsComponent } from "./about-us/about-us.component";
 import { AboutComponent } from "./about/about.component";
@@ -42,36 +41,7 @@ import { EditUniversidadComponent } from "./edit-universidad/edit-universidad.co
 import { EventosComponent } from "./eventos/eventos.component";
 import { FacilitiesComponent } from "./facilities/facilities.component";
 import { GlobalSearchComponent } from "./global-search/global-search.component";
-import { AddArticleGuard } from "./guards/addarticle.guard";
-import { AddEquipoGuard } from "./guards/addequipo.guard";
-import { AddEventoGuard } from "./guards/addevento.guard";
-import { AddFuenteGuard } from "./guards/addfuente.guard";
-import { AddLineGuard } from "./guards/addline.guard";
-import { AddMethodGuard } from "./guards/addmethod.guard";
-import { AddNewsGuard } from "./guards/addnews.guard";
-import { AddProyectoGuard } from "./guards/addproyecto.guard";
-import { AddResumenGuard } from "./guards/addresumen.guard";
-import { AddRevistaGuard } from "./guards/addrevista.guard";
-import { AddSoftwareGuard } from "./guards/addsoftware.guard";
-import { AddTesisGuard } from "./guards/addtesis.guard";
-import { AddUniversidadGuard } from "./guards/adduniversidad.guard";
-import { AddMemberGuard } from "./guards/change-addmember-guard";
-import { EditMemberGuard } from "./guards/change-editmember-guard";
-import { DeactivateGuard } from "./guards/deactivate-guard";
-import { EditArticleGuard } from "./guards/editarticle.guard";
-import { EditCategoryGuard } from "./guards/editcategory.guard";
-import { EditEquipoGuard } from "./guards/editequipo.guard";
-import { EditEventoGuard } from "./guards/editevento.guard";
-import { EditFuenteGuard } from "./guards/editfuente.guard";
-import { EditLineGuard } from "./guards/editline.guard";
-import { EditMethodGuard } from "./guards/editmethod.guard";
-import { EditNewsGuard } from "./guards/editnews.guard";
-import { EditProyectoGuard } from "./guards/editproyecto.guard";
-import { EditResumenGuard } from "./guards/editresumen.guard";
-import { EditRevistaGuard } from "./guards/editrevista.guard";
-import { EditSoftwareGuard } from "./guards/editsoftware.guard";
-import { EditTesisGuard } from "./guards/edittesis.guard";
-import { EditUniversidadGuard } from "./guards/edituniversidad.guard";
+import { canDeactivateGuard } from "./guards/deactivate.guard";
 import { HomeComponent } from "./home/home.component";
 import { JoinUsComponent } from "./join-us/join-us.component";
 import { LandingComponent } from "./landing/landing.component";
@@ -96,7 +66,7 @@ import { PublicationComponent } from "./publication/publication.component";
 import { TesisComponent } from "./tesis/tesis.component";
 import { WorksComponent } from "./works/works.component";
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: "", pathMatch: "full", redirectTo: "home" },
   {
     path: "home",
@@ -133,77 +103,45 @@ const routes: Routes = [
       { path: "", component: DashboardComponent },
       { path: "miembros-activos", component: MiembrosComponent },
       { path: "miembros-antiguos", component: MiembrosComponent },
-      { path: "add-member", component: AddMemberComponent, canDeactivate: [AddMemberGuard] },
-      { path: "edit-member/:id", component: EditMemberComponent, canDeactivate: [EditMemberGuard] },
+      { path: "add-member", component: AddMemberComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-member/:id", component: EditMemberComponent, canDeactivate: [canDeactivateGuard] },
       { path: "publicaciones", component: PublicacionesComponent },
       { path: "proyectos-ejecucion", component: ProyectosComponent },
       { path: "proyectos-concluidos", component: ProyectosComponent },
-      { path: "add-project", component: AddProyectoComponent, canDeactivate: [AddProyectoGuard] },
-      {
-        path: "edit-project/:id",
-        component: EditProyectoComponent,
-        canDeactivate: [EditProyectoGuard],
-      },
-      { path: "add-fuente", component: AddFuenteComponent, canDeactivate: [AddFuenteGuard] },
-      { path: "edit-fuente/:id", component: EditFuenteComponent, canDeactivate: [EditFuenteGuard] },
+      { path: "add-project", component: AddProyectoComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-project/:id", component: EditProyectoComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-fuente", component: AddFuenteComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-fuente/:id", component: EditFuenteComponent, canDeactivate: [canDeactivateGuard] },
       { path: "noticias", component: NoticiasComponent },
-      { path: "add-news", component: AddNewsComponent, canDeactivate: [AddNewsGuard] },
-      { path: "edit-news/:id", component: EditNewsComponent, canDeactivate: [EditNewsGuard] },
-      { path: "add-category", component: AddCategoryComponent, canDeactivate: [DeactivateGuard] },
-      {
-        path: "edit-category/:id",
-        component: EditCategoryComponent,
-        canDeactivate: [EditCategoryGuard],
-      },
+      { path: "add-news", component: AddNewsComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-news/:id", component: EditNewsComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-category", component: AddCategoryComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-category/:id", component: EditCategoryComponent, canDeactivate: [canDeactivateGuard] },
       { path: "perfil", component: PerfilComponent },
       { path: "contenidos", component: ContenidosComponent },
-      { path: "add-linea", component: AddLineaComponent, canDeactivate: [AddLineGuard] },
-      { path: "edit-linea/:id", component: EditLineaComponent, canDeactivate: [EditLineGuard] },
-      { path: "add-method", component: AddMethodComponent, canDeactivate: [AddMethodGuard] },
-      { path: "edit-method/:id", component: EditMethodComponent, canDeactivate: [EditMethodGuard] },
-      { path: "add-equipo", component: AddEquipoComponent, canDeactivate: [AddEquipoGuard] },
-      { path: "edit-equipo/:id", component: EditEquipoComponent, canDeactivate: [EditEquipoGuard] },
-      { path: "add-software", component: AddSoftwareComponent, canDeactivate: [AddSoftwareGuard] },
-      {
-        path: "edit-software/:id",
-        component: EditSoftwareComponent,
-        canDeactivate: [EditSoftwareGuard],
-      },
+      { path: "add-linea", component: AddLineaComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-linea/:id", component: EditLineaComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-method", component: AddMethodComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-method/:id", component: EditMethodComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-equipo", component: AddEquipoComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-equipo/:id", component: EditEquipoComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-software", component: AddSoftwareComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-software/:id", component: EditSoftwareComponent, canDeactivate: [canDeactivateGuard] },
       { path: "articulos", component: ArticulosComponent },
-      { path: "add-article", component: AddArticleComponent, canDeactivate: [AddArticleGuard] },
-      {
-        path: "edit-article/:id",
-        component: EditArticleComponent,
-        canDeactivate: [EditArticleGuard],
-      },
-      { path: "add-revista", component: AddRevistaComponent, canDeactivate: [AddRevistaGuard] },
-      {
-        path: "edit-revista/:id",
-        component: EditRevistaComponent,
-        canDeactivate: [EditRevistaGuard],
-      },
+      { path: "add-article", component: AddArticleComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-article/:id", component: EditArticleComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-revista", component: AddRevistaComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-revista/:id", component: EditRevistaComponent, canDeactivate: [canDeactivateGuard] },
       { path: "tesis", component: TesisComponent },
-      { path: "add-thesis", component: AddTesisComponent, canDeactivate: [AddTesisGuard] },
-      { path: "edit-thesis/:id", component: EditTesisComponent, canDeactivate: [EditTesisGuard] },
-      {
-        path: "add-universidad",
-        component: AddUniversidadComponent,
-        canDeactivate: [AddUniversidadGuard],
-      },
-      {
-        path: "edit-universidad/:id",
-        component: EditUniversidadComponent,
-        canDeactivate: [EditUniversidadGuard],
-      },
+      { path: "add-thesis", component: AddTesisComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-thesis/:id", component: EditTesisComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-universidad", component: AddUniversidadComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-universidad/:id", component: EditUniversidadComponent, canDeactivate: [canDeactivateGuard] },
       { path: "eventos", component: EventosComponent },
-      { path: "add-resumen", component: AddResumenComponent, canDeactivate: [AddResumenGuard] },
-      {
-        path: "edit-resumen/:id",
-        component: EditResumenComponent,
-        canDeactivate: [EditResumenGuard],
-      },
-      { path: "add-evento", component: AddEventoComponent, canDeactivate: [AddEventoGuard] },
-      { path: "edit-evento/:id", component: EditEventoComponent, canDeactivate: [EditEventoGuard] },
+      { path: "add-resumen", component: AddResumenComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-resumen/:id", component: EditResumenComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "add-evento", component: AddEventoComponent, canDeactivate: [canDeactivateGuard] },
+      { path: "edit-evento/:id", component: EditEventoComponent, canDeactivate: [canDeactivateGuard] },
       { path: "my-articles", component: MyArticleComponent },
       { path: "my-thesis", component: MyThesisComponent },
       { path: "my-abstracts", component: MyResumenesComponent },
@@ -211,11 +149,6 @@ const routes: Routes = [
     ],
   },
   { path: "reset-password", component: ChangePassComponent },
+  { path: "mantenimiento", component: MantenimientoComponent },
   { path: "**", component: NotFoundComponent },
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}

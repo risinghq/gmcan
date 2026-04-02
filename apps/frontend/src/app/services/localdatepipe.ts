@@ -3,10 +3,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 import { SessionService } from "./session.service";
 
-@Pipe({
-  standalone: false,
-  name: "localDate",
-})
+@Pipe({ name: "localDate" })
 export class LocalDatePipe implements PipeTransform {
   constructor(private session: SessionService) {}
 

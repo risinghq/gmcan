@@ -1,18 +1,23 @@
+import { NgStyle } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
+import { AutosizeModule } from "ngx-autosize";
 
 import { EmailBody } from "../models/emailBody";
+import { NewsComponent } from "../news/news.component";
 import { EmailService } from "../services/email.service";
 import { GLOBAL } from "../services/global";
 
 @Component({
-  standalone: false,
   selector: "app-join-us",
   templateUrl: "./join-us.component.html",
   styleUrls: ["./join-us.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, MatButton, NewsComponent],
 })
 export class JoinUsComponent implements OnInit {
   public user: FormGroup;
@@ -53,10 +58,10 @@ export class JoinUsComponent implements OnInit {
 
   sendEmail() {
     if (!this.user.invalid) {
-      this.email.nombre = this.user.controls.nombre.value;
-      this.email.razon = this.user.controls.razon.value;
-      this.email.correo = this.user.controls.correo.value;
-      this.email.telefono = this.user.controls.telefono.value;
+      this.email.nombre = this.user.controls["nombre"].value;
+      this.email.razon = this.user.controls["razon"].value;
+      this.email.correo = this.user.controls["correo"].value;
+      this.email.telefono = this.user.controls["telefono"].value;
       this._emailService.sendMembershipApplication(this.email).subscribe((res) => {
         this.openDialog();
       });
@@ -80,9 +85,9 @@ export class JoinUsComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "exitoso-dialog",
   templateUrl: "../modals/email-exitoso.html",
+  imports: [NgStyle, MatButton],
 })
 export class EmailExitoso {
   public url;

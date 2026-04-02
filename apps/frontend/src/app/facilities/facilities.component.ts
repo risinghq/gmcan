@@ -1,4 +1,6 @@
+import { NgIf, NgFor, NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { MatChip } from "@angular/material/chips";
 import { Title } from "@angular/platform-browser";
 
 import { Equipo } from "../models/equipo";
@@ -10,10 +12,10 @@ import { GrupoService } from "../services/grupo.service";
 import { SoftwareService } from "../services/software.service";
 
 @Component({
-  standalone: false,
   selector: "app-facilities",
   templateUrl: "./facilities.component.html",
   styleUrls: ["./facilities.component.scss"],
+  imports: [NgIf, NgFor, NgClass, MatChip],
 })
 export class FacilitiesComponent implements OnInit {
   equipos: Array<Equipo>;

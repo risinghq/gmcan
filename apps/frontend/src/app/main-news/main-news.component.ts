@@ -1,10 +1,22 @@
-import { Location } from "@angular/common";
+import { Location, NgIf, NgStyle, NgFor, NgClass, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
+import { MatButton } from "@angular/material/button";
+import { MatIcon } from "@angular/material/icon";
+import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
+import { MatProgressBar } from "@angular/material/progress-bar";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
+import {
+  NgbPagination,
+  NgbPaginationPrevious,
+  NgbPaginationNumber,
+  NgbPaginationNext,
+} from "@ng-bootstrap/ng-bootstrap/pagination";
 
+import { HomeComponent } from "../home/home.component";
 import { Noticia } from "../models/noticia";
 import { TipoNoticia } from "../models/tiponoticia";
 import { GLOBAL } from "../services/global";
@@ -13,10 +25,28 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-main-news",
   templateUrl: "./main-news.component.html",
   styleUrls: ["./main-news.component.scss"],
+  imports: [
+    NgIf,
+    MatProgressBar,
+    MatIcon,
+    MatProgressSpinner,
+    MatButton,
+    MatMenuTrigger,
+    NgStyle,
+    MatMenu,
+    MatMenuItem,
+    NgFor,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    NgClass,
+    HomeComponent,
+    SlicePipe,
+  ],
 })
 export class MainNewsComponent implements OnInit {
   public noticias: Array<Noticia>;

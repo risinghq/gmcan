@@ -1,8 +1,21 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
 import { Router } from "@angular/router";
 
 import { Publicacion } from "../models/publicacion";
@@ -16,10 +29,26 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service";
 
 @Component({
-  standalone: false,
   selector: "app-my-article",
   templateUrl: "./my-article.component.html",
   styleUrls: ["./my-article.component.scss"],
+  imports: [
+    MatIcon,
+    NgIf,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+  ],
 })
 export class MyArticleComponent implements OnInit {
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];

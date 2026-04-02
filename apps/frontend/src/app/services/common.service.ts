@@ -208,6 +208,7 @@ export class CommonService {
     if (splitted[0] == "/dash") {
       return "<span>Página no encontrada</span>";
     }
+    return "";
   }
 
   setEndSession(value) {

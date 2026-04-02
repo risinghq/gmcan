@@ -1,14 +1,15 @@
 import { Component, OnInit } from "@angular/core";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { MatIcon } from "@angular/material/icon";
+import { Router, ActivatedRoute, Params, RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
 
 import { Grupo } from "../models/grupo";
 import { GrupoService } from "../services/grupo.service";
 
 @Component({
-  standalone: false,
   selector: "app-about",
   templateUrl: "./about.component.html",
   styleUrls: ["./about.component.scss"],
+  imports: [MatIcon, RouterOutlet, RouterLink, RouterLinkActive],
 })
 export class AboutComponent implements OnInit {
   public info: Grupo;

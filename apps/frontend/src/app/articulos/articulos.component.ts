@@ -1,8 +1,22 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 
 import { Publicacion } from "../models/publicacion";
@@ -16,10 +30,28 @@ import { RevistaService } from "../services/revista.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-articulos",
   templateUrl: "./articulos.component.html",
   styleUrls: ["./articulos.component.scss"],
+  imports: [
+    MatTabGroup,
+    MatTab,
+    MatIcon,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    NgIf,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+  ],
 })
 export class ArticulosComponent implements OnInit {
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];

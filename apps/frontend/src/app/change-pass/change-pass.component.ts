@@ -1,5 +1,7 @@
+import { NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, AbstractControl } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute } from "@angular/router";
 
 import { Grupo } from "../models/grupo";
@@ -8,10 +10,10 @@ import { GrupoService } from "../services/grupo.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-change-pass",
   templateUrl: "./change-pass.component.html",
   styleUrls: ["./change-pass.component.scss"],
+  imports: [MatIcon, NgIf, FormsModule, ReactiveFormsModule],
 })
 export class ChangePassComponent implements OnInit {
   public passwordForm: FormGroup;

@@ -1,7 +1,11 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf, NgStyle, NgFor, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
+import { MatButton } from "@angular/material/button";
+import { MatCard } from "@angular/material/card";
+import { MatIcon } from "@angular/material/icon";
+import { MatProgressBar } from "@angular/material/progress-bar";
 import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 
@@ -40,10 +44,10 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
 @Component({
-  standalone: false,
   selector: "app-home",
   templateUrl: "./home.component.html",
   styleUrls: ["./home.component.scss"],
+  imports: [NgIf, MatProgressBar, MatButton, NgStyle, NgFor, MatCard, NgClass, MatIcon, SlicePipe],
 })
 export class HomeComponent implements OnInit {
   public info: Grupo;

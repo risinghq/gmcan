@@ -1,13 +1,22 @@
-import { DatePipe } from "@angular/common";
+import { DatePipe, NgIf, NgFor, NgClass, SlicePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute, Params } from "@angular/router";
+import {
+  NgbPagination,
+  NgbPaginationPrevious,
+  NgbPaginationNumber,
+  NgbPaginationNext,
+} from "@ng-bootstrap/ng-bootstrap/pagination";
 
 import { Publicacion } from "../models/publicacion";
 import { TipoPublicacion } from "../models/tipopublicacion";
 import { UsuarioFull } from "../models/usuarioFull";
+import { NewsComponent } from "../news/news.component";
 import { AutorService } from "../services/autor.service";
 import { EventoService } from "../services/evento.service";
 import { GLOBAL } from "../services/global";
@@ -24,10 +33,22 @@ import { UniversidadService } from "../services/universidad.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-detail-member",
   templateUrl: "./detail-member.component.html",
   styleUrls: ["./detail-member.component.scss"],
+  imports: [
+    NgIf,
+    MatProgressSpinner,
+    MatIcon,
+    NgFor,
+    NgClass,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    NewsComponent,
+    SlicePipe,
+  ],
 })
 export class DetailMemberComponent implements OnInit {
   public usuario: UsuarioFull;

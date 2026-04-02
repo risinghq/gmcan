@@ -1,9 +1,16 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf, NgClass, NgFor, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder } from "@angular/forms";
+import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, Params } from "@angular/router";
+import {
+  NgbPagination,
+  NgbPaginationPrevious,
+  NgbPaginationNumber,
+  NgbPaginationNext,
+} from "@ng-bootstrap/ng-bootstrap/pagination";
 
 import { Noticia } from "../models/noticia";
 import { Proyecto } from "../models/proyecto";
@@ -30,10 +37,22 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
 @Component({
-  standalone: false,
   selector: "app-global-search",
   templateUrl: "./global-search.component.html",
   styleUrls: ["./global-search.component.scss"],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    NgIf,
+    NgClass,
+    NgFor,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    SlicePipe,
+  ],
 })
 export class GlobalSearchComponent implements OnInit {
   proyectos: Array<Proyecto>;
@@ -112,7 +131,7 @@ export class GlobalSearchComponent implements OnInit {
       this._route.params.forEach((params: Params) => {
         let nombre = params["id"];
         this.titleService.setTitle("GMCAN | " + nombre);
-        this.searchGlobalForm.controls.nombre.setValue(nombre);
+        this.searchGlobalForm.controls["nombre"].setValue(nombre);
         this.searchProyectos(nombre);
       });
     });

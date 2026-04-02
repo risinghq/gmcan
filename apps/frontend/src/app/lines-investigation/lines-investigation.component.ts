@@ -1,8 +1,15 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf, NgFor, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute, Params } from "@angular/router";
+import {
+  NgbPagination,
+  NgbPaginationPrevious,
+  NgbPaginationNumber,
+  NgbPaginationNext,
+} from "@ng-bootstrap/ng-bootstrap/pagination";
 
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
@@ -14,10 +21,20 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
 @Component({
-  standalone: false,
   selector: "app-lines-investigation",
   templateUrl: "./lines-investigation.component.html",
   styleUrls: ["./lines-investigation.component.scss"],
+  imports: [
+    NgIf,
+    NgFor,
+    NgClass,
+    MatIcon,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    SlicePipe,
+  ],
 })
 export class LinesInvestigationComponent implements OnInit {
   language;

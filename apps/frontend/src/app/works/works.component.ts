@@ -5,7 +5,6 @@ import { Grupo } from "../models/grupo";
 import { GrupoService } from "../services/grupo.service";
 
 @Component({
-  standalone: false,
   selector: "app-works",
   templateUrl: "./works.component.html",
   styleUrls: ["./works.component.scss"],

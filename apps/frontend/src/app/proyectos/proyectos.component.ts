@@ -1,8 +1,22 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf, NgFor } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 
 import { FuenteFinanciamiento } from "../models/fuentefinanciamiento";
@@ -14,10 +28,29 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
 @Component({
-  standalone: false,
   selector: "app-proyectos",
   templateUrl: "./proyectos.component.html",
   styleUrls: ["./proyectos.component.scss"],
+  imports: [
+    NgIf,
+    MatTabGroup,
+    MatTab,
+    MatIcon,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    NgFor,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+  ],
 })
 export class ProyectosComponent implements OnInit {
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];

@@ -1,9 +1,10 @@
-import { Location } from "@angular/common";
+import { Location, NgIf, NgFor, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { Router, ActivatedRoute, Params } from "@angular/router";
 
+import { HomeComponent } from "../home/home.component";
 import { Noticia } from "../models/noticia";
 import { TipoNoticia } from "../models/tiponoticia";
 import { GLOBAL } from "../services/global";
@@ -12,10 +13,10 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-news",
   templateUrl: "./news.component.html",
   styleUrls: ["./news.component.scss"],
+  imports: [NgIf, NgFor, HomeComponent, SlicePipe],
 })
 export class NewsComponent implements OnInit {
   public noticias: Array<Noticia>;

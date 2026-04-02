@@ -1,6 +1,21 @@
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { NgFor, NgIf, NgClass, AsyncPipe } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, FormControl } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { Observable } from "rxjs";
@@ -14,10 +29,24 @@ import { PublicacionService } from "../services/publicacion.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
 @Component({
-  standalone: false,
   selector: "app-edit-evento",
   templateUrl: "../add-evento/add-evento.component.html",
   styleUrls: ["../add-evento/add-evento.component.scss"],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatInput,
+    MatAutocompleteTrigger,
+    MatLabel,
+    MatAutocomplete,
+    NgFor,
+    MatOption,
+    NgIf,
+    NgClass,
+    AsyncPipe,
+  ],
 })
 export class EditEventoComponent implements OnInit {
   evento: Evento;
@@ -186,33 +215,6 @@ export class EditEventoComponent implements OnInit {
       verticalPosition: "top",
     });
   }
-  private dialogRef: MatDialogRef<DialogCancel11>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel11, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
 
   private dialogRef2: MatDialogRef<DialogErase5>;
 
@@ -252,23 +254,9 @@ export class EditEventoComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel11 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel11>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase5 {
   constructor(

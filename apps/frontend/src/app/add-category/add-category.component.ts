@@ -1,22 +1,22 @@
-import { Component, OnInit, Inject, HostListener } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { NgIf, NgClass } from "@angular/common";
+import { Component, OnInit, HostListener } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { DialogData } from "../models/dialogdata";
+import { HomeComponent } from "../home/home.component";
 import { TipoNoticia } from "../models/tiponoticia";
 import { CommonService } from "../services/common.service";
 import { SpaceValidator } from "../services/spacevalidator";
 import { TipoNoticiaService } from "../services/tiponoticia.service";
 
 @Component({
-  standalone: false,
   selector: "app-add-category",
   templateUrl: "./add-category.component.html",
   styleUrls: ["./add-category.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass, HomeComponent],
 })
 export class AddCategoryComponent implements OnInit {
   category: TipoNoticia;
@@ -46,21 +46,6 @@ export class AddCategoryComponent implements OnInit {
 
   ngOnInit() {}
 
-  private dialogRef: MatDialogRef<DialogCancel>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
   return() {
     this.agregar = false;
     this._commonService.setEndSession("0");
@@ -87,34 +72,7 @@ export class AddCategoryComponent implements OnInit {
     });
   }
 
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-
   edit;
 
   openEraser() {}
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
 }

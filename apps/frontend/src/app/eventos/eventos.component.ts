@@ -1,8 +1,22 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 
 import { Evento } from "../models/eventos";
@@ -16,10 +30,28 @@ import { PublicacionHasUsuarioService } from "../services/publicacionhasusuario.
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-eventos",
   templateUrl: "./eventos.component.html",
   styleUrls: ["./eventos.component.scss"],
+  imports: [
+    MatTabGroup,
+    MatTab,
+    MatIcon,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    NgIf,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+  ],
 })
 export class EventosComponent implements OnInit {
   eventos: Array<Evento>;

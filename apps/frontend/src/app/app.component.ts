@@ -1,6 +1,6 @@
 import { Component, Renderer2, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { ActivatedRoute, Router, NavigationEnd } from "@angular/router";
+import { ActivatedRoute, Router, NavigationEnd, RouterOutlet } from "@angular/router";
 import { filter } from "rxjs/operators";
 
 import { Languages } from "../app/models/languages";
@@ -11,10 +11,10 @@ import { SessionService } from "./services/session.service";
 declare const gtag: Function;
 
 @Component({
-  standalone: false,
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
+  imports: [RouterOutlet],
 })
 export class AppComponent {
   screenWidth: number;

@@ -1,20 +1,24 @@
-import { Location } from "@angular/common";
+import { Location, NgIf, NgFor } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 
 import { TipoMiembro } from "../models/tipomiembro";
 import { UsuarioFull } from "../models/usuarioFull";
+import { NewsComponent } from "../news/news.component";
 import { GLOBAL } from "../services/global";
 import { PrefijoService } from "../services/prefijo.service";
 import { TipoMiembroService } from "../services/tipomiembro.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-members",
   templateUrl: "./members.component.html",
   styleUrls: ["./members.component.scss"],
+  imports: [MatIcon, MatTabGroup, MatTab, NgIf, MatProgressSpinner, NgFor, NewsComponent],
 })
 export class MembersComponent implements OnInit {
   public cargado;

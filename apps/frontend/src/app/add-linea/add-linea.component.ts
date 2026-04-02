@@ -1,12 +1,12 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { NgIf, NgClass } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { AutosizeModule } from "ngx-autosize";
 
-import { DialogData } from "../models/dialogdata";
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
 import { CommonService } from "../services/common.service";
 import { GLOBAL } from "../services/global";
@@ -14,10 +14,10 @@ import { LineasInvestigacionService } from "../services/lineasinvestigacion.serv
 import { SpaceValidator } from "../services/spacevalidator";
 
 @Component({
-  standalone: false,
   selector: "app-add-linea",
   templateUrl: "./add-linea.component.html",
   styleUrls: ["./add-linea.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, AutosizeModule, NgClass],
 })
 export class AddLineaComponent implements OnInit {
   button_text = "Guardar línea";
@@ -101,47 +101,5 @@ export class AddLineaComponent implements OnInit {
     reader.onload = (_event) => {
       this.previewUrl = reader.result;
     };
-  }
-
-  private dialogRef: MatDialogRef<DialogCancel22>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel22, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel22 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel22>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
   }
 }

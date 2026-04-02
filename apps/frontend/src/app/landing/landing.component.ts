@@ -1,9 +1,14 @@
-import { Location } from "@angular/common";
+import { Location, NgStyle, NgIf, NgClass } from "@angular/common";
 import { Component, OnInit, Renderer2, HostListener } from "@angular/core";
-import { FormGroup, FormBuilder } from "@angular/forms";
+import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIcon } from "@angular/material/icon";
+import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
+import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/material/sidenav";
+import { MatToolbar } from "@angular/material/toolbar";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 
+import { HomeComponent } from "../home/home.component";
 import { Grupo } from "../models/grupo";
 import { Languages } from "../models/languages";
 import { GLOBAL } from "../services/global";
@@ -11,10 +16,28 @@ import { GrupoService } from "../services/grupo.service";
 import { SessionService } from "../services/session.service";
 
 @Component({
-  standalone: false,
   selector: "app-landing",
   templateUrl: "./landing.component.html",
   styleUrls: ["./landing.component.scss"],
+  imports: [
+    MatSidenavContainer,
+    MatSidenav,
+    MatIcon,
+    RouterLink,
+    RouterLinkActive,
+    MatSidenavContent,
+    NgStyle,
+    NgIf,
+    NgClass,
+    FormsModule,
+    ReactiveFormsModule,
+    MatToolbar,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    RouterOutlet,
+    HomeComponent,
+  ],
 })
 export class LandingComponent implements OnInit {
   screenWidth: number;

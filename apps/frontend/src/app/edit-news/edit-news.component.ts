@@ -1,15 +1,29 @@
-import { TitleCasePipe } from "@angular/common";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { TitleCasePipe, NgIf, NgFor, NgClass } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { FormControl } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatFormField, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { AutosizeModule } from "ngx-autosize";
 
 import { DialogData } from "../models/dialogdata";
 import { Languages } from "../models/languages";
@@ -24,11 +38,28 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-edit-news",
   templateUrl: "../add-news/add-news.component.html",
   styleUrls: ["../add-news/add-news.component.scss"],
   providers: [provideNativeDateAdapter()],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    NgIf,
+    MatFormField,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    MatSelect,
+    NgFor,
+    MatOption,
+    AutosizeModule,
+    CKEditorModule,
+    NgClass,
+  ],
 })
 export class EditNewsComponent implements OnInit {
   public Editor = ClassicEditor;
@@ -77,7 +108,7 @@ export class EditNewsComponent implements OnInit {
       this._noticiaService.getNoticiaFull(idNoticia).subscribe((result) => {
         if (result) {
           this.noticia = result;
-          this.newsForm.controls.cuerpo.setValue(this.noticia.cuerpo);
+          this.newsForm.controls["cuerpo"].setValue(this.noticia.cuerpo);
           var d = new Date(result.fechaPublicacion);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           this.noticia.fechaPublicacion = d;
@@ -290,34 +321,6 @@ export class EditNewsComponent implements OnInit {
     });
   }
 
-  private dialogRef: MatDialogRef<DialogCancel4>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel4, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-
   openSnackBar(value) {
     this._snackBar.open(value, null, {
       duration: 2000,
@@ -386,23 +389,9 @@ export class EditNewsComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel4 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel4>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogPublish3 {
   constructor(
@@ -414,9 +403,9 @@ export class DialogPublish3 {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogPublish2 {
   constructor(
@@ -428,10 +417,10 @@ export class DialogPublish2 {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-preview.html",
   styleUrls: ["../detail-news/detail-news.component.scss"],
+  imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview2 {
   url;
@@ -484,9 +473,9 @@ export class DialogPreview2 {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase2 {
   constructor(

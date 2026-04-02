@@ -1,13 +1,29 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
 import { Component, OnInit, Inject, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
+import { AutosizeModule } from "ngx-autosize";
 
 import { SobreNosotros } from "../models/aboutus";
 import { Equipo } from "../models/equipo";
@@ -26,10 +42,32 @@ import { MethodsService } from "../services/methods.service";
 import { SoftwareService } from "../services/software.service";
 
 @Component({
-  standalone: false,
   selector: "app-contenidos",
   templateUrl: "./contenidos.component.html",
   styleUrls: ["./contenidos.component.scss"],
+  imports: [
+    MatTabGroup,
+    MatTab,
+    NgIf,
+    FormsModule,
+    ReactiveFormsModule,
+    CKEditorModule,
+    MatIcon,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+    AutosizeModule,
+  ],
 })
 export class ContenidosComponent implements OnInit {
   public Editor = ClassicEditor;
@@ -625,10 +663,10 @@ export class ContenidosComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/about-us.html",
   styleUrls: ["../about-us/about-us.component.scss"],
+  imports: [MatDialogClose],
 })
 export class DialogPreview3 {
   url;
@@ -655,10 +693,10 @@ export class DialogPreview3 {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/trabajos-futuros.html",
   styleUrls: ["../works/works.component.scss"],
+  imports: [MatDialogClose],
 })
 export class DialogPreview6 {
   url;

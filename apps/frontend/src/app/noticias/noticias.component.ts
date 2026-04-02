@@ -1,8 +1,22 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgIf, NgClass } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatSort, MatSortHeader } from "@angular/material/sort";
+import {
+  MatTableDataSource,
+  MatTable,
+  MatColumnDef,
+  MatHeaderCellDef,
+  MatHeaderCell,
+  MatCellDef,
+  MatCell,
+  MatHeaderRowDef,
+  MatHeaderRow,
+  MatRowDef,
+  MatRow,
+} from "@angular/material/table";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { Noticia } from "../models/noticia";
@@ -12,10 +26,29 @@ import { NoticiaService } from "../services/noticia.service";
 import { TipoNoticiaService } from "../services/tiponoticia.service";
 import { UsuarioService } from "../services/usuario.service";
 @Component({
-  standalone: false,
   selector: "app-noticias",
   templateUrl: "./noticias.component.html",
   styleUrls: ["./noticias.component.scss"],
+  imports: [
+    MatTabGroup,
+    MatTab,
+    MatIcon,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatSortHeader,
+    MatCellDef,
+    MatCell,
+    NgIf,
+    NgClass,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatPaginator,
+  ],
 })
 export class NoticiasComponent implements OnInit {
   displayedColumns: string[] = ["titulo", "fechaPublicacion", "nombreTipoNoticia", "autor", "status"];

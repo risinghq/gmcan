@@ -1,11 +1,22 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgFor, NgIf, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIcon } from "@angular/material/icon";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute, Params } from "@angular/router";
+import {
+  NgbPagination,
+  NgbPaginationPrevious,
+  NgbPaginationNumber,
+  NgbPaginationNext,
+} from "@ng-bootstrap/ng-bootstrap/pagination";
 
+import { HomeComponent } from "../home/home.component";
 import { Proyecto } from "../models/proyecto";
+import { NewsComponent } from "../news/news.component";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
 import { GLOBAL } from "../services/global";
 import { GrupoService } from "../services/grupo.service";
@@ -17,10 +28,27 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
 @Component({
-  standalone: false,
   selector: "app-projects",
   templateUrl: "./projects.component.html",
   styleUrls: ["./projects.component.scss"],
+  imports: [
+    MatIcon,
+    MatTabGroup,
+    NgFor,
+    MatTab,
+    FormsModule,
+    ReactiveFormsModule,
+    NgIf,
+    MatProgressSpinner,
+    NgClass,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    NewsComponent,
+    HomeComponent,
+    SlicePipe,
+  ],
 })
 export class ProjectsComponent implements OnInit {
   public proyectos: Array<Proyecto>;

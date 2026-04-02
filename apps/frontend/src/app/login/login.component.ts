@@ -1,5 +1,7 @@
+import { NgIf, NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 
@@ -12,10 +14,10 @@ import { GrupoService } from "../services/grupo.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
+  imports: [MatIcon, NgIf, FormsModule, ReactiveFormsModule, NgClass],
 })
 export class LoginComponent implements OnInit {
   public grupoinfo: Grupo;
@@ -97,8 +99,8 @@ export class LoginComponent implements OnInit {
   login() {
     if (!this.loginForm.invalid) {
       let user = {
-        correo: this.loginForm.controls.correo.value,
-        password: this.loginForm.controls.password.value,
+        correo: this.loginForm.controls["correo"].value,
+        password: this.loginForm.controls["password"].value,
       };
       this.authService.login(user).subscribe((res) => {
         if (res.state == 1) {
@@ -126,7 +128,7 @@ export class LoginComponent implements OnInit {
       return;
     }
     let user = {
-      correo: this.emailForm.controls.correo.value,
+      correo: this.emailForm.controls["correo"].value,
     };
     this._emailService.sendPasswordReset(user).subscribe(
       (res) => {

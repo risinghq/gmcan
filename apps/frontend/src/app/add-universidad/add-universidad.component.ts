@@ -1,22 +1,21 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { NgIf, NgClass } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { DialogData } from "../models/dialogdata";
 import { Universidad } from "../models/universidad";
 import { CommonService } from "../services/common.service";
 import { SpaceValidator } from "../services/spacevalidator";
 import { UniversidadService } from "../services/universidad.service";
 
 @Component({
-  standalone: false,
   selector: "app-add-universidad",
   templateUrl: "./add-universidad.component.html",
   styleUrls: ["./add-universidad.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
 export class AddUniversidadComponent implements OnInit {
   universidad: Universidad;
@@ -66,48 +65,7 @@ export class AddUniversidadComponent implements OnInit {
       verticalPosition: "top",
     });
   }
-  private dialogRef: MatDialogRef<DialogCancel7>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel7, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
 
   openEraser() {}
   edit;
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel7 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel7>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
 }

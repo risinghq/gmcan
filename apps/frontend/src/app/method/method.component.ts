@@ -1,3 +1,4 @@
+import { NgFor, NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 
@@ -6,10 +7,10 @@ import { GLOBAL } from "../services/global";
 import { MethodsService } from "../services/methods.service";
 
 @Component({
-  standalone: false,
   selector: "app-method",
   templateUrl: "./method.component.html",
   styleUrls: ["./method.component.scss"],
+  imports: [NgFor, NgIf],
 })
 export class MethodComponent implements OnInit {
   language;

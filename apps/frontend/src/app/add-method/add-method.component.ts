@@ -1,13 +1,13 @@
+import { NgIf, NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { DialogData } from "../models/dialogdata";
 import { Languages } from "../models/languages";
 import { Method } from "../models/method";
 import { CommonService } from "../services/common.service";
@@ -16,10 +16,10 @@ import { MethodsService } from "../services/methods.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
 @Component({
-  standalone: false,
   selector: "app-add-method",
   templateUrl: "./add-method.component.html",
   styleUrls: ["./add-method.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, CKEditorModule, NgClass],
 })
 export class AddMethodComponent implements OnInit {
   public Editor = ClassicEditor;
@@ -105,34 +105,6 @@ export class AddMethodComponent implements OnInit {
     };
   }
 
-  private dialogRef: MatDialogRef<DialogCancel24>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel24, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-
   private previewDialog: MatDialogRef<DialogPreview4>;
 
   previewMethod(value) {
@@ -158,24 +130,10 @@ export class AddMethodComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel24 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel24>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/method-preview.html",
   styleUrls: ["../method/method.component.scss"],
+  imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview4 {
   url;

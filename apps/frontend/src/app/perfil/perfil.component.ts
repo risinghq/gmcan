@@ -1,10 +1,19 @@
+import { NgClass, NgFor, NgIf } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
 import { MatDialog } from "@angular/material/dialog";
+import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { AutosizeModule } from "ngx-autosize";
 
+import { HomeComponent } from "../home/home.component";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
@@ -17,11 +26,30 @@ import { TipoMiembroService } from "../services/tipomiembro.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-perfil",
   templateUrl: "./perfil.component.html",
   styleUrls: ["./perfil.component.scss"],
   providers: [provideNativeDateAdapter()],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    NgClass,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatIconButton,
+    MatIcon,
+    NgIf,
+    AutosizeModule,
+    HomeComponent,
+  ],
 })
 export class PerfilComponent implements OnInit {
   oldMem;
@@ -100,18 +128,18 @@ export class PerfilComponent implements OnInit {
     let user = this._usuarioService.getUserLogged();
     this._usuarioService.getFullUser(user.DNI).subscribe((result) => {
       if (result.length > 0) {
-        this.memberForm.controls.DNI.disable();
+        this.memberForm.controls["DNI"].disable();
         this.member = result[0];
         this.oldEmail = this.member.correo;
         this.oldPassword = this.member.password;
-        this.memberForm.controls.confirmPassword.setValue(this.member.password);
+        this.memberForm.controls["confirmPassword"].setValue(this.member.password);
         var d = new Date(this.member.fechaNacimiento);
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
         this.member.fechaNacimientoDate = d;
         if (this.member.nombre.includes(" ")) {
           let string = this.member.nombre.split(" ");
           this.member.nombre = string[0];
-          this.memberForm.controls.segundoNombre.setValue(string[1]);
+          this.memberForm.controls["segundoNombre"].setValue(string[1]);
         }
         this.getCargo(this.member);
         this.getNivelAcademico(this.member);
@@ -172,15 +200,15 @@ export class PerfilComponent implements OnInit {
         this.member.fechaNacimiento = null;
       }
       let miembroAGuardar = JSON.parse(JSON.stringify(this.member));
-      if (this.memberForm.controls.segundoNombre.value != "" && this.memberForm.controls.segundoNombre.value) {
-        miembroAGuardar.nombre += " " + this.memberForm.controls.segundoNombre.value;
+      if (this.memberForm.controls["segundoNombre"].value != "" && this.memberForm.controls["segundoNombre"].value) {
+        miembroAGuardar.nombre += " " + this.memberForm.controls["segundoNombre"].value;
       }
       if (this.oldMem != miembroAGuardar.estado.estado) {
         miembroAGuardar.estado = this.oldMem;
       }
       this._usuarioService.verifyUser(miembroAGuardar).subscribe((result) => {
         if (result.length == 0 || this.oldEmail == this.member.correo) {
-          if (this.member.password === this.memberForm.controls.confirmPassword.value) {
+          if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
             this._usuarioService.updateUser(miembroAGuardar).subscribe((res) => {
               if (res.status == 1) {
                 if (this.member.password != this.oldPassword) {

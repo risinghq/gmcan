@@ -1,22 +1,21 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { NgIf, NgClass } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatDialog } from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
-import { DialogData } from "../models/dialogdata";
 import { Revista } from "../models/revista";
 import { CommonService } from "../services/common.service";
 import { RevistaService } from "../services/revista.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
 @Component({
-  standalone: false,
   selector: "app-add-revista",
   templateUrl: "./add-revista.component.html",
   styleUrls: ["./add-revista.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
 export class AddRevistaComponent implements OnInit {
   revista: Revista;
@@ -66,47 +65,5 @@ export class AddRevistaComponent implements OnInit {
       horizontalPosition: "right",
       verticalPosition: "top",
     });
-  }
-
-  private dialogRef: MatDialogRef<DialogCancel6>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel6, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel6 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel6>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
   }
 }

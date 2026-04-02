@@ -1,9 +1,26 @@
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { NgFor, NgIf, NgClass, AsyncPipe } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
-import { FormBuilder, Validators, FormGroup, FormControl } from "@angular/forms";
+import { FormBuilder, Validators, FormGroup, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
+import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
 
@@ -24,11 +41,31 @@ import { UniversidadService } from "../services/universidad.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-edit-tesis",
   templateUrl: "../add-tesis/add-tesis.component.html",
   styleUrls: ["../add-tesis/add-tesis.component.scss"],
   providers: [provideNativeDateAdapter()],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    NgIf,
+    AutosizeModule,
+    NgClass,
+    AsyncPipe,
+  ],
 })
 export class EditTesisComponent implements OnInit {
   publicacion: Publicacion;
@@ -443,34 +480,6 @@ export class EditTesisComponent implements OnInit {
     this.fileData = <File>fileInput.target.files[0];
   }
 
-  private dialogRef: MatDialogRef<DialogCancel15>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel15, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-
   erasePublicacion() {
     this._publicacionhasautorService.deletePublicacionHasAutor(this.publicacion.idPublicacion).subscribe((result) => {
       if (result.status == 1) {
@@ -513,23 +522,9 @@ export class EditTesisComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel15 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel15>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase7 {
   constructor(

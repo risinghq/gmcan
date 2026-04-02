@@ -1,13 +1,20 @@
-import { Component, OnInit, Inject, HostListener } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import { NgClass, NgFor, NgIf } from "@angular/common";
+import { Component, OnInit, HostListener } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIconButton } from "@angular/material/button";
+import { MatCheckbox } from "@angular/material/checkbox";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
+import { MatDialog } from "@angular/material/dialog";
+import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { AutosizeModule } from "ngx-autosize";
 
-import { DialogData } from "../models/dialogdata";
+import { HomeComponent } from "../home/home.component";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
@@ -24,11 +31,31 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service";
 
 @Component({
-  standalone: false,
   selector: "app-add-member",
   templateUrl: "./add-member.component.html",
   styleUrls: ["./add-member.component.scss"],
   providers: [provideNativeDateAdapter()],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    NgClass,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatIconButton,
+    NgIf,
+    AutosizeModule,
+    MatCheckbox,
+    HomeComponent,
+  ],
 })
 export class AddMemberComponent implements OnInit {
   public memberForm: FormGroup;
@@ -176,9 +203,12 @@ export class AddMemberComponent implements OnInit {
       }
       this._usuarioService.verifyUser(this.member).subscribe((result) => {
         if (result.length == 0) {
-          if (this.member.password === this.memberForm.controls.confirmPassword.value) {
-            if (this.memberForm.controls.segundoNombre.value != "" && this.memberForm.controls.segundoNombre.value) {
-              this.member.nombre += " " + this.memberForm.controls.segundoNombre.value;
+          if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
+            if (
+              this.memberForm.controls["segundoNombre"].value != "" &&
+              this.memberForm.controls["segundoNombre"].value
+            ) {
+              this.member.nombre += " " + this.memberForm.controls["segundoNombre"].value;
             }
             if (this.adHono == 3) {
               this.member.estado = this.adHono;
@@ -278,34 +308,7 @@ export class AddMemberComponent implements OnInit {
     this._router.navigate(["dashboard/miembros-activos"]);
   }
 
-  private dialogRef: MatDialogRef<DialogReturn>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogReturn, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
   agregar;
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
 
   openEraser() {}
   edit;
@@ -313,18 +316,4 @@ export class AddMemberComponent implements OnInit {
   permisoPublicacion;
   permisoProyecto;
   permisoContenido;
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogReturn {
-  constructor(
-    public dialogRef: MatDialogRef<DialogReturn>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
 }

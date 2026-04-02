@@ -1,8 +1,20 @@
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { NgIf, NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
+import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
@@ -15,10 +27,10 @@ import { ProyectoService } from "../services/proyecto.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
 @Component({
-  standalone: false,
   selector: "app-edit-linea",
   templateUrl: "../add-linea/add-linea.component.html",
   styleUrls: ["../add-linea/add-linea.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, AutosizeModule, NgClass],
 })
 export class EditLineaComponent implements OnInit {
   button_text = "Actualizar información";
@@ -146,34 +158,6 @@ export class EditLineaComponent implements OnInit {
     }
   }
 
-  private dialogRef: MatDialogRef<DialogCancel23>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel23, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-
   private dialogRef2: MatDialogRef<DialogErase11>;
 
   openEraser() {
@@ -198,23 +182,9 @@ export class EditLineaComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel23 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel23>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase11 {
   constructor(

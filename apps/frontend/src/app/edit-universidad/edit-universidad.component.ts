@@ -1,10 +1,19 @@
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { NgIf, NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose,
+} from "@angular/material/dialog";
+import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 import { DialogData } from "../models/dialogdata";
 import { Universidad } from "../models/universidad";
@@ -14,10 +23,10 @@ import { SpaceValidator } from "../services/spacevalidator";
 import { UniversidadService } from "../services/universidad.service";
 
 @Component({
-  standalone: false,
   selector: "app-edit-universidad",
   templateUrl: "../add-universidad/add-universidad.component.html",
   styleUrls: ["../add-universidad/add-universidad.component.scss"],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
 export class EditUniversidadComponent implements OnInit {
   universidad: Universidad;
@@ -93,33 +102,6 @@ export class EditUniversidadComponent implements OnInit {
       verticalPosition: "top",
     });
   }
-  private dialogRef: MatDialogRef<DialogCancel10>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel10, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
 
   private dialogRef2: MatDialogRef<DialogErase4>;
 
@@ -159,23 +141,9 @@ export class EditUniversidadComponent implements OnInit {
 }
 
 @Component({
-  standalone: false,
   selector: "dialog-content-example-dialog",
   templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel10 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel10>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
+  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase4 {
   constructor(

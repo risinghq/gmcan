@@ -1,11 +1,14 @@
-import { DatePipe } from "@angular/common";
+import { DatePipe, NgIf } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
+import { MatIcon } from "@angular/material/icon";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Meta, Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute, Params } from "@angular/router";
 
 import { Noticia } from "../models/noticia";
 import { Usuario } from "../models/usuario";
+import { NewsComponent } from "../news/news.component";
 import { GLOBAL } from "../services/global";
 import { NoticiaService } from "../services/noticia.service";
 import { PreviousPageService } from "../services/previouspage.service";
@@ -13,10 +16,10 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-detail-news",
   templateUrl: "./detail-news.component.html",
   styleUrls: ["./detail-news.component.scss"],
+  imports: [NgIf, MatProgressSpinner, MatIcon, NewsComponent],
 })
 export class DetailNewsComponent implements OnInit {
   public noticia: Noticia;

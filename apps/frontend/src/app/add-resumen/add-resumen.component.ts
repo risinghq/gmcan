@@ -1,14 +1,21 @@
-import { Component, OnInit, Inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, FormControl } from "@angular/forms";
+import { NgFor, NgIf, NgClass, AsyncPipe } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
+import { MatDialog } from "@angular/material/dialog";
+import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
 
 import { Autor } from "../models/autores";
-import { DialogData } from "../models/dialogdata";
 import { Evento } from "../models/eventos";
 import { Publicacion } from "../models/publicacion";
 import { Usuario } from "../models/usuario";
@@ -23,11 +30,31 @@ import { SpaceValidator } from "../services/spacevalidator";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-add-resumen",
   templateUrl: "./add-resumen.component.html",
   styleUrls: ["./add-resumen.component.scss"],
   providers: [provideNativeDateAdapter()],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    NgIf,
+    AutosizeModule,
+    NgClass,
+    AsyncPipe,
+  ],
 })
 export class AddResumenComponent implements OnInit {
   publicacion: Publicacion;
@@ -347,47 +374,5 @@ export class AddResumenComponent implements OnInit {
       horizontalPosition: "right",
       verticalPosition: "top",
     });
-  }
-
-  private dialogRef: MatDialogRef<DialogCancel16>;
-
-  openDialog() {
-    this.dialogRef = this.dialog.open(DialogCancel16, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro que deseas volver sin guardar?",
-        text: "La información no se guardará",
-        cancel: "Sí, volver",
-        yes: "No, mantenerme aquí",
-      },
-    });
-  }
-
-  canDeactivate(): Observable<boolean> {
-    if (!this.agregar) {
-      this.openDialog();
-      return this.dialogRef.afterClosed().pipe(
-        map((result) => {
-          return result === true;
-        }),
-      );
-    } else {
-      return;
-    }
-  }
-}
-
-@Component({
-  standalone: false,
-  selector: "dialog-content-example-dialog",
-  templateUrl: "../modals/dialog-options.html",
-})
-export class DialogCancel16 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel16>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
-    dialogRef.disableClose = true;
   }
 }

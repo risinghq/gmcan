@@ -1,15 +1,25 @@
-import { DatePipe } from "@angular/common";
+import { DatePipe, NgIf, NgFor, NgClass, SlicePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder } from "@angular/forms";
+import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatIcon } from "@angular/material/icon";
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
+import {
+  NgbPagination,
+  NgbPaginationPrevious,
+  NgbPaginationNumber,
+  NgbPaginationNext,
+} from "@ng-bootstrap/ng-bootstrap/pagination";
 
 import { Autor } from "../models/autores";
 import { Publicacion } from "../models/publicacion";
 import { TipoPublicacion } from "../models/tipopublicacion";
 import { Usuario } from "../models/usuario";
+import { NewsComponent } from "../news/news.component";
 import { AutorService } from "../services/autor.service";
 import { EventoService } from "../services/evento.service";
 import { GLOBAL } from "../services/global";
@@ -26,10 +36,26 @@ import { UniversidadService } from "../services/universidad.service";
 import { UsuarioService } from "../services/usuario.service";
 
 @Component({
-  standalone: false,
   selector: "app-publication",
   templateUrl: "./publication.component.html",
   styleUrls: ["./publication.component.scss"],
+  imports: [
+    NgIf,
+    MatProgressSpinner,
+    MatIcon,
+    MatTabGroup,
+    NgFor,
+    MatTab,
+    FormsModule,
+    ReactiveFormsModule,
+    NgClass,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    NewsComponent,
+    SlicePipe,
+  ],
 })
 export class PublicationComponent implements OnInit {
   public previouslink;
@@ -300,7 +326,7 @@ export class PublicationComponent implements OnInit {
     this.publicaciones = [];
     this.allCharged = null;
     this.getPublicaciones(this.tipoPublicaciones[$event.index].idTipoPublicacion);
-    this.searchForm.controls.titulo.setValue("");
+    this.searchForm.controls["titulo"].setValue("");
   }
 
   /*  Búsqueda */

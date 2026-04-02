@@ -1,5 +1,7 @@
+import { NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from "@angular/router";
+import { BaseChartDirective } from "ng2-charts";
 
 import { Grupo } from "../models/grupo";
 import { AuthService } from "../services/auth.service";
@@ -11,10 +13,10 @@ import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service";
 
 @Component({
-  standalone: false,
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"],
+  imports: [NgIf, RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export class DashboardComponent implements OnInit {
   token;
