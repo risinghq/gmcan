@@ -1,90 +1,58 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import { checkToken } from "../auth/token_validation.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
+const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const Body = z.object({ nombre: z.string().optional(), nombreEN: z.string().optional() });
+const UpdateBody = z.object({
+  idUniversidad: z.number().int(),
+  nombre: z.string().optional(),
+  nombreEN: z.string().optional(),
+});
+const SearchBody = z.object({ nombre: z.string() });
 
 router.get("/get-universidad", async (c) => {
-  try {
-    const rows = await db.selectFrom("universidad").selectAll().execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db.selectFrom("universidad").selectAll().execute();
+  return c.json(rows);
 });
 
-router.get("/get-universidad/:id", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("universidad")
-      .selectAll()
-      .where("idUniversidad", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.get("/get-universidad/:id", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const rows = await db.selectFrom("universidad").selectAll().where("idUniversidad", "=", id).execute();
+  return c.json(rows);
 });
 
-router.post("/search-universidad", async (c) => {
-  try {
-    const body = await c.req.json();
-    const term = "%" + body.nombre + "%";
-    const rows = await db
-      .selectFrom("universidad")
-      .selectAll()
-      .where((eb) => eb.or([eb("nombre", "like", term), eb("nombreEN", "like", term)]))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.post("/search-universidad", zValidator("json", SearchBody), async (c) => {
+  const { nombre } = c.req.valid("json");
+  const term = `%${nombre}%`;
+  const rows = await db
+    .selectFrom("universidad")
+    .selectAll()
+    .where((eb) => eb.or([eb("nombre", "like", term), eb("nombreEN", "like", term)]))
+    .execute();
+  return c.json(rows);
 });
 
-router.post("/post-universidad", checkToken, async (c) => {
-  try {
-    const universidad = await c.req.json();
-    const result = await db
-      .insertInto("universidad")
-      .values({ nombre: universidad.nombre, nombreEN: universidad.nombreEN })
-      .executeTakeFirst();
-    return c.json({ idUniversidad: Number(result.insertId), message: "La universidad ha sido guardada" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.post("/post-universidad", checkToken, zValidator("json", Body), async (c) => {
+  const body = c.req.valid("json");
+  const result = await db.insertInto("universidad").values(body).executeTakeFirst();
+  return c.json({ idUniversidad: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-universidad/:id", checkToken, async (c) => {
-  try {
-    await db
-      .deleteFrom("universidad")
-      .where("idUniversidad", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json({ message: "Eliminada universidad" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.delete("/delete-universidad/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  await db.deleteFrom("universidad").where("idUniversidad", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
-router.put("/update-universidad", checkToken, async (c) => {
-  try {
-    const universidad = await c.req.json();
-    await db
-      .updateTable("universidad")
-      .set({ nombre: universidad.nombre, nombreEN: universidad.nombreEN })
-      .where("idUniversidad", "=", Number(universidad.idUniversidad))
-      .execute();
-    return c.json({ message: "La universidad ha sido actualizada" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.put("/update-universidad", checkToken, zValidator("json", UpdateBody), async (c) => {
+  const { idUniversidad, ...fields } = c.req.valid("json");
+  await db.updateTable("universidad").set(fields).where("idUniversidad", "=", idUniversidad).execute();
+  return c.json({ status: 1 });
 });
 
 export default router;

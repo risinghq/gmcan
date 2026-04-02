@@ -1,71 +1,42 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import { checkToken } from "../auth/token_validation.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
+const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const Body = z.object({ nombre: z.string().min(1) });
+const UpdateBody = z.object({ idTipoPermiso: z.number().int(), nombre: z.string().min(1) });
 
 router.get("/get-tipopermiso", checkToken, async (c) => {
-  try {
-    const rows = await db.selectFrom("tipopermiso").selectAll().execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db.selectFrom("tipopermiso").selectAll().execute();
+  return c.json(rows);
 });
 
-router.get("/get-tipopermiso/:id", checkToken, async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("tipopermiso")
-      .selectAll()
-      .where("idTipoPermiso", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.get("/get-tipopermiso/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const rows = await db.selectFrom("tipopermiso").selectAll().where("idTipoPermiso", "=", id).execute();
+  return c.json(rows);
 });
 
-router.post("/post-tipopermiso", checkToken, async (c) => {
-  try {
-    const tipopermiso = await c.req.json();
-    const result = await db.insertInto("tipopermiso").values({ nombre: tipopermiso.nombre }).executeTakeFirst();
-    return c.json({ idTipoPermiso: Number(result.insertId), message: "El tipo permiso ha sido guardado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.post("/post-tipopermiso", checkToken, zValidator("json", Body), async (c) => {
+  const { nombre } = c.req.valid("json");
+  const result = await db.insertInto("tipopermiso").values({ nombre }).executeTakeFirst();
+  return c.json({ idTipoPermiso: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-tipopermiso/:id", checkToken, async (c) => {
-  try {
-    await db
-      .deleteFrom("tipopermiso")
-      .where("idTipoPermiso", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json({ message: "Eliminado tipo permiso" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.delete("/delete-tipopermiso/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  await db.deleteFrom("tipopermiso").where("idTipoPermiso", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
-router.put("/update-tipopermiso", checkToken, async (c) => {
-  try {
-    const tipopermiso = await c.req.json();
-    await db
-      .updateTable("tipopermiso")
-      .set({ nombre: tipopermiso.nombre })
-      .where("idTipoPermiso", "=", Number(tipopermiso.idTipoPermiso))
-      .execute();
-    return c.json({ message: "El tipo permiso ha sido actualizado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.put("/update-tipopermiso", checkToken, zValidator("json", UpdateBody), async (c) => {
+  const { idTipoPermiso, nombre } = c.req.valid("json");
+  await db.updateTable("tipopermiso").set({ nombre }).where("idTipoPermiso", "=", idTipoPermiso).execute();
+  return c.json({ status: 1 });
 });
 
 export default router;

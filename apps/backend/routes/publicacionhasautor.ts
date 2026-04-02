@@ -1,78 +1,57 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import { checkToken } from "../auth/token_validation.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
+const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const SearchBody = z.object({ autores_idAutor: z.number().int() });
+const Body = z.object({
+  autor_idAutor: z.number().int(),
+  publicacion_idPublicacion: z.number().int(),
+  isPrincipal: z.number().int(),
+});
 
 router.get("/get-publicacionhasautor", async (c) => {
-  try {
-    const rows = await db.selectFrom("publicacion_has_autor").selectAll().execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db.selectFrom("publicacion_has_autor").selectAll().execute();
+  return c.json(rows);
 });
 
-router.get("/get-publicacionhasautor/:id", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("publicacion_has_autor")
-      .selectAll()
-      .where("publicacion_idPublicacion", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.get("/get-publicacionhasautor/:id", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const rows = await db
+    .selectFrom("publicacion_has_autor")
+    .selectAll()
+    .where("publicacion_idPublicacion", "=", id)
+    .execute();
+  return c.json(rows);
 });
 
-router.post("/search-publicacionhasautor", async (c) => {
-  try {
-    const publicacionhasautor = await c.req.json();
-    const rows = await db
-      .selectFrom("publicacion_has_autor")
-      .selectAll()
-      .where("autores_idAutor", "=", Number(publicacionhasautor.autores_idAutor))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.post("/search-publicacionhasautor", zValidator("json", SearchBody), async (c) => {
+  const { autores_idAutor } = c.req.valid("json");
+  const rows = await db
+    .selectFrom("publicacion_has_autor")
+    .selectAll()
+    .where("autores_idAutor", "=", autores_idAutor)
+    .execute();
+  return c.json(rows);
 });
 
-router.post("/post-publicacionhasautor", checkToken, async (c) => {
-  try {
-    const publicacionhasautor = await c.req.json();
-    await db
-      .insertInto("publicacion_has_autor")
-      .values({
-        autores_idAutor: publicacionhasautor.autor_idAutor,
-        publicacion_idPublicacion: publicacionhasautor.publicacion_idPublicacion,
-        isPrincipal: publicacionhasautor.isPrincipal,
-      })
-      .execute();
-    return c.json({ message: "El publicacion_has_autor ha sido guardada" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ status: 1, message: "La publicacion no existe" }, 500);
-  }
+router.post("/post-publicacionhasautor", checkToken, zValidator("json", Body), async (c) => {
+  const { autor_idAutor, publicacion_idPublicacion, isPrincipal } = c.req.valid("json");
+  await db
+    .insertInto("publicacion_has_autor")
+    .values({ autores_idAutor: autor_idAutor, publicacion_idPublicacion, isPrincipal })
+    .execute();
+  return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-publicacionhasautor/:id", checkToken, async (c) => {
-  try {
-    await db
-      .deleteFrom("publicacion_has_autor")
-      .where("publicacion_idPublicacion", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json({ status: 1, message: "Borrado exitosamente" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.delete("/delete-publicacionhasautor/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  await db.deleteFrom("publicacion_has_autor").where("publicacion_idPublicacion", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
 export default router;

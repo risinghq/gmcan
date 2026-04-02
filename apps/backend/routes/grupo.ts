@@ -1,318 +1,201 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import { checkToken } from "../auth/token_validation.js";
 import { db } from "../db/client.js";
+import { extractFirstFile, serveFile } from "../lib/upload.js";
 
 const router = new Hono();
+const IdParam = z.object({ id: z.coerce.number().int().positive() });
 
 router.get("/get-grupo", async (c) => {
-  try {
-    const rows = await db.selectFrom("grupo").selectAll().execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
-
-router.get("/get-grupo-en", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("grupo")
-      .select([
-        "idGrupo",
-        "quienesSomosResumenEN as quienesSomosResumen",
-        "direccion",
-        "correo",
-        "nombreGrupo2",
-        "trabajosFuturosEN as trabajosFuturos",
-        "telefono",
-        "logoHeader",
-        "logoFooter",
-      ])
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db.selectFrom("grupo").selectAll().execute();
+  return c.json(rows);
 });
 
 router.get("/get-grupo-facilidades", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("grupo")
-      .select(["facilidadesRecursos", "facilidadesRecursosEN", "facilidadesRecursosFoto", "idGrupo"])
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db
+    .selectFrom("grupo")
+    .select(["facilidadesRecursos", "facilidadesRecursosEN", "facilidadesRecursosFoto", "idGrupo"])
+    .execute();
+  return c.json(rows);
 });
 
 router.get("/get-grupo-trabajosfuturos", async (c) => {
-  try {
-    const rows = await db.selectFrom("grupo").select(["trabajosFuturos", "trabajosFuturosEN", "idGrupo"]).execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db.selectFrom("grupo").select(["trabajosFuturos", "trabajosFuturosEN", "idGrupo"]).execute();
+  return c.json(rows);
 });
 
-router.put("/update-grupo-facilidades", checkToken, async (c) => {
-  try {
-    const grupo = await c.req.json();
+router.put(
+  "/update-grupo-facilidades",
+  checkToken,
+  zValidator(
+    "json",
+    z.object({
+      idGrupo: z.number().int(),
+      facilidadesRecursos: z.string().optional(),
+      facilidadesRecursosEN: z.string().optional(),
+    }),
+  ),
+  async (c) => {
+    const { idGrupo, facilidadesRecursos, facilidadesRecursosEN } = c.req.valid("json");
     await db
       .updateTable("grupo")
-      .set({
-        facilidadesRecursos: grupo.facilidadesRecursos,
-        facilidadesRecursosEN: grupo.facilidadesRecursosEN,
-      })
-      .where("idGrupo", "=", Number(grupo.idGrupo))
+      .set({ facilidadesRecursos, facilidadesRecursosEN })
+      .where("idGrupo", "=", idGrupo)
       .execute();
-    return c.json({ status: 1, message: "El grupo ha sido actualizada" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
+    return c.json({ status: 1 });
+  },
+);
 
-router.put("/update-grupo-trabajosfuturos", checkToken, async (c) => {
-  try {
-    const grupo = await c.req.json();
+router.put(
+  "/update-grupo-trabajosfuturos",
+  checkToken,
+  zValidator(
+    "json",
+    z.object({
+      idGrupo: z.number().int(),
+      trabajosFuturos: z.string().optional(),
+      trabajosFuturosEN: z.string().optional(),
+    }),
+  ),
+  async (c) => {
+    const { idGrupo, trabajosFuturos, trabajosFuturosEN } = c.req.valid("json");
+    await db.updateTable("grupo").set({ trabajosFuturos, trabajosFuturosEN }).where("idGrupo", "=", idGrupo).execute();
+    return c.json({ status: 1 });
+  },
+);
+
+router.put(
+  "/update-grupo-info",
+  checkToken,
+  zValidator(
+    "json",
+    z.object({
+      idGrupo: z.number().int(),
+      correo: z.string().optional(),
+      telefono: z.string().optional(),
+    }),
+  ),
+  async (c) => {
+    const { idGrupo, correo, telefono } = c.req.valid("json");
+    await db.updateTable("grupo").set({ correo, telefono }).where("idGrupo", "=", idGrupo).execute();
+    return c.json({ status: 1 });
+  },
+);
+
+router.put(
+  "/update-grupo-seccionpresentacion",
+  checkToken,
+  zValidator(
+    "json",
+    z.object({
+      idGrupo: z.number().int(),
+      quienesSomosResumen: z.string(),
+      quienesSomosResumenEN: z.string(),
+    }),
+  ),
+  async (c) => {
+    const { idGrupo, quienesSomosResumen, quienesSomosResumenEN } = c.req.valid("json");
     await db
       .updateTable("grupo")
-      .set({
-        trabajosFuturos: grupo.trabajosFuturos,
-        trabajosFuturosEN: grupo.trabajosFuturosEN,
-      })
-      .where("idGrupo", "=", Number(grupo.idGrupo))
+      .set({ quienesSomosResumen, quienesSomosResumenEN })
+      .where("idGrupo", "=", idGrupo)
       .execute();
-    return c.json({ status: 1, message: "El grupo ha sido actualizado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
+    return c.json({ status: 1 });
+  },
+);
 
-router.put("/update-grupo-info", checkToken, async (c) => {
-  try {
-    const grupo = await c.req.json();
+router.put(
+  "/update-grupo-seccionpublicaciones",
+  checkToken,
+  zValidator(
+    "json",
+    z.object({
+      idGrupo: z.number().int(),
+      seccionPublicaciones: z.string().optional(),
+      seccionPublicacionesEN: z.string().optional(),
+    }),
+  ),
+  async (c) => {
+    const { idGrupo, seccionPublicaciones, seccionPublicacionesEN } = c.req.valid("json");
     await db
       .updateTable("grupo")
-      .set({
-        correo: grupo.correo,
-        telefono: grupo.telefono,
-      })
-      .where("idGrupo", "=", Number(grupo.idGrupo))
+      .set({ seccionPublicaciones, seccionPublicacionesEN })
+      .where("idGrupo", "=", idGrupo)
       .execute();
-    return c.json({ status: 1, message: "El grupo ha sido actualizado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
+    return c.json({ status: 1 });
+  },
+);
 
-router.put("/update-grupo-seccionpresentacion", checkToken, async (c) => {
-  try {
-    const grupo = await c.req.json();
+router.put(
+  "/update-grupo-seccionproyectos",
+  checkToken,
+  zValidator(
+    "json",
+    z.object({
+      idGrupo: z.number().int(),
+      seccionProyectos: z.string().optional(),
+      seccionProyectosEN: z.string().optional(),
+    }),
+  ),
+  async (c) => {
+    const { idGrupo, seccionProyectos, seccionProyectosEN } = c.req.valid("json");
     await db
       .updateTable("grupo")
-      .set({
-        quienesSomosResumen: grupo.quienesSomosResumen,
-        quienesSomosResumenEN: grupo.quienesSomosResumenEN,
-      })
-      .where("idGrupo", "=", Number(grupo.idGrupo))
+      .set({ seccionProyectos, seccionProyectosEN })
+      .where("idGrupo", "=", idGrupo)
       .execute();
-    return c.json({ status: 1, message: "El grupo ha sido actualizado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
+    return c.json({ status: 1 });
+  },
+);
 
-router.put("/update-grupo-seccionpublicaciones", checkToken, async (c) => {
-  try {
-    const grupo = await c.req.json();
-    await db
-      .updateTable("grupo")
-      .set({
-        seccionPublicaciones: grupo.seccionPublicaciones,
-        seccionPublicacionesEN: grupo.seccionPublicacionesEN,
-      })
-      .where("idGrupo", "=", Number(grupo.idGrupo))
-      .execute();
-    return c.json({ status: 1, message: "El grupo ha sido actualizado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
-
-router.put("/update-grupo-seccionproyectos", checkToken, async (c) => {
-  try {
-    const grupo = await c.req.json();
-    await db
-      .updateTable("grupo")
-      .set({
-        seccionProyectos: grupo.seccionProyectos,
-        seccionProyectosEN: grupo.seccionProyectosEN,
-      })
-      .where("idGrupo", "=", Number(grupo.idGrupo))
-      .execute();
-    return c.json({ status: 1, message: "El grupo ha sido actualizado" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
-
-router.put("/upload-image-facilidades/:id", checkToken, async (c) => {
+router.put("/upload-image-facilidades/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
-
-  const files: File[] = [];
-  for (const value of Object.values(body)) {
-    if (value instanceof File) files.push(value);
-    else if (Array.isArray(value)) files.push(...value.filter((v) => v instanceof File));
-  }
-
-  if (files.length > 0) {
-    const file = files[0];
-    const fotoName = file.name;
-    const file_ext = path.extname(file.name).slice(1).toLowerCase();
-    if (file_ext === "jpg" || file_ext === "png" || file_ext === "jpeg") {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync("./uploads/grupo/" + file.name, buffer);
-      try {
-        await db
-          .updateTable("grupo")
-          .set({ facilidadesRecursosFoto: fotoName })
-          .where("idGrupo", "=", Number(c.req.param("id")))
-          .execute();
-        return c.json({ message: "La foto de facilidades ha sido actualizado" });
-      } catch (err) {
-        console.log(err);
-        return c.json({ error: "Database error" }, 500);
-      }
-    } else {
-      return c.json({ message: "Extensión del archivo no válida solo SVG" });
-    }
-  } else {
-    return c.json({ message: "No has subido ninguna imagen" });
-  }
+  const file = extractFirstFile(body);
+  if (!file) return c.json({ error: "No file uploaded" }, 400);
+  const ext = path.extname(file.name).slice(1).toLowerCase();
+  if (!["jpg", "png", "jpeg"].includes(ext)) return c.json({ error: "Extensión del archivo no válida" }, 400);
+  fs.writeFileSync(`./uploads/grupo/${file.name}`, Buffer.from(await file.arrayBuffer()));
+  await db.updateTable("grupo").set({ facilidadesRecursosFoto: file.name }).where("idGrupo", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
-router.put("/upload-grupo-header/:id", checkToken, async (c) => {
+router.put("/upload-grupo-header/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
-
-  const files: File[] = [];
-  for (const value of Object.values(body)) {
-    if (value instanceof File) files.push(value);
-    else if (Array.isArray(value)) files.push(...value.filter((v) => v instanceof File));
-  }
-
-  if (files.length > 0) {
-    const file = files[0];
-    const fotoName = file.name;
-    const file_ext = path.extname(file.name).slice(1).toLowerCase();
-    if (file_ext === "png" || file_ext === "svg") {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync("./uploads/grupo/" + file.name, buffer);
-      try {
-        await db
-          .updateTable("grupo")
-          .set({ logoHeader: fotoName })
-          .where("idGrupo", "=", Number(c.req.param("id")))
-          .execute();
-        return c.json({ status: 1 });
-      } catch (err) {
-        console.log(err);
-        return c.json({ error: "Database error" }, 500);
-      }
-    } else {
-      return c.json({ message: "Extensión del archivo no válida" });
-    }
-  } else {
-    return c.json({ message: "No has subido ninguna imagen" });
-  }
+  const file = extractFirstFile(body);
+  if (!file) return c.json({ error: "No file uploaded" }, 400);
+  const ext = path.extname(file.name).slice(1).toLowerCase();
+  if (!["png", "svg"].includes(ext)) return c.json({ error: "Extensión del archivo no válida" }, 400);
+  fs.writeFileSync(`./uploads/grupo/${file.name}`, Buffer.from(await file.arrayBuffer()));
+  await db.updateTable("grupo").set({ logoHeader: file.name }).where("idGrupo", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
-router.put("/upload-grupo-footer/:id", checkToken, async (c) => {
+router.put("/upload-grupo-footer/:id", checkToken, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
-
-  const files: File[] = [];
-  for (const value of Object.values(body)) {
-    if (value instanceof File) files.push(value);
-    else if (Array.isArray(value)) files.push(...value.filter((v) => v instanceof File));
-  }
-
-  if (files.length > 0) {
-    const file = files[0];
-    const fotoName = file.name;
-    const file_ext = path.extname(file.name).slice(1).toLowerCase();
-    if (file_ext === "png" || file_ext === "svg") {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync("./uploads/grupo/" + file.name, buffer);
-      try {
-        await db
-          .updateTable("grupo")
-          .set({ logoFooter: fotoName })
-          .where("idGrupo", "=", Number(c.req.param("id")))
-          .execute();
-        return c.json({ status: 1 });
-      } catch (err) {
-        console.log(err);
-        return c.json({ error: "Database error" }, 500);
-      }
-    } else {
-      return c.json({ message: "Extensión del archivo no válida" });
-    }
-  } else {
-    return c.json({ message: "No has subido ninguna imagen" });
-  }
+  const file = extractFirstFile(body);
+  if (!file) return c.json({ error: "No file uploaded" }, 400);
+  const ext = path.extname(file.name).slice(1).toLowerCase();
+  if (!["png", "svg"].includes(ext)) return c.json({ error: "Extensión del archivo no válida" }, 400);
+  fs.writeFileSync(`./uploads/grupo/${file.name}`, Buffer.from(await file.arrayBuffer()));
+  await db.updateTable("grupo").set({ logoFooter: file.name }).where("idGrupo", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
 router.get("/get-image-grupo/:imageFile", async (c) => {
-  const imageFile = c.req.param("imageFile");
-  const path_file = "./uploads/grupo/" + imageFile;
-  if (fs.existsSync(path_file)) {
-    const data = await fs.promises.readFile(path_file);
-    const ext = path.extname(imageFile).slice(1).toLowerCase();
-    const mimeTypes: Record<string, string> = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      svg: "image/svg+xml",
-      pdf: "application/pdf",
-    };
-    return c.body(data, 200, { "Content-Type": mimeTypes[ext] ?? "application/octet-stream" });
-  } else {
-    return c.json({ message: "no existe la imagen" });
-  }
+  return serveFile(c, `./uploads/grupo/${c.req.param("imageFile")}`);
 });
 
 router.get("/get-image-facilidades/:imageFile", async (c) => {
-  const imageFile = c.req.param("imageFile");
-  const path_file = "./uploads/grupo/" + imageFile;
-  if (fs.existsSync(path_file)) {
-    const data = await fs.promises.readFile(path_file);
-    const ext = path.extname(imageFile).slice(1).toLowerCase();
-    const mimeTypes: Record<string, string> = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      svg: "image/svg+xml",
-      pdf: "application/pdf",
-    };
-    return c.body(data, 200, { "Content-Type": mimeTypes[ext] ?? "application/octet-stream" });
-  } else {
-    return c.json({ message: "no existe la imagen" });
-  }
+  return serveFile(c, `./uploads/grupo/${c.req.param("imageFile")}`);
 });
 
 export default router;

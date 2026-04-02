@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 import { bootstrap } from "./db/bootstrap.js";
+import { onError } from "./lib/handle.js";
 import AutorRoutes from "./routes/autor.js";
 import EmailRoutes from "./routes/email.js";
 import EquiposRoutes from "./routes/equipos.js";
@@ -38,6 +39,8 @@ import UsuarioHasProyectoRoutes from "./routes/usuariohasproyecto.js";
 await bootstrap();
 
 const app = new Hono();
+
+app.onError(onError);
 
 app.use(
   "*",

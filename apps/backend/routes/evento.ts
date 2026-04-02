@@ -1,127 +1,54 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import { db } from "../db/client.js";
 
 const router = new Hono();
+const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const Body = z.object({
+  nombre: z.string().min(1),
+  ciudad: z.string().optional(),
+  ciudadEN: z.string().optional(),
+  pais: z.string().optional(),
+  paisEN: z.string().optional(),
+});
+const UpdateBody = Body.extend({ idEvento: z.number().int() });
+const SearchBody = z.object({ nombre: z.string() });
 
 router.get("/get-evento", async (c) => {
-  try {
-    const rows = await db.selectFrom("evento").selectAll().execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+  const rows = await db.selectFrom("evento").selectAll().execute();
+  return c.json(rows);
 });
 
-router.get("/get-evento-en", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("evento")
-      .select(["idEvento", "nombre", (eb) => eb.ref("paisEN").as("pais"), (eb) => eb.ref("ciudadEN").as("ciudad")])
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.get("/get-evento/:id", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const rows = await db.selectFrom("evento").selectAll().where("idEvento", "=", id).execute();
+  return c.json(rows);
 });
 
-router.get("/get-evento/:id", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("evento")
-      .selectAll()
-      .where("idEvento", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.post("/search-eventos", zValidator("json", SearchBody), async (c) => {
+  const { nombre } = c.req.valid("json");
+  const rows = await db.selectFrom("evento").selectAll().where("nombre", "like", `%${nombre}%`).execute();
+  return c.json(rows);
 });
 
-router.get("/get-evento-en/:id", async (c) => {
-  try {
-    const rows = await db
-      .selectFrom("evento")
-      .select(["idEvento", "nombre", (eb) => eb.ref("paisEN").as("pais"), (eb) => eb.ref("ciudadEN").as("ciudad")])
-      .where("idEvento", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.post("/post-evento", zValidator("json", Body), async (c) => {
+  const body = c.req.valid("json");
+  await db.insertInto("evento").values(body).execute();
+  return c.json({ status: 1 }, 201);
 });
 
-router.post("/search-eventos", async (c) => {
-  try {
-    const evento = await c.req.json();
-    const rows = await db
-      .selectFrom("evento")
-      .selectAll()
-      .where("nombre", "like", "%" + evento.nombre + "%")
-      .execute();
-    return c.json(rows);
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.delete("/delete-evento/:id", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  await db.deleteFrom("evento").where("idEvento", "=", id).execute();
+  return c.json({ status: 1 });
 });
 
-router.post("/post-evento", async (c) => {
-  try {
-    const evento = await c.req.json();
-    await db
-      .insertInto("evento")
-      .values({
-        nombre: evento.nombre,
-        ciudad: evento.ciudad,
-        ciudadEN: evento.ciudadEN,
-        pais: evento.pais,
-        paisEN: evento.paisEN,
-      })
-      .execute();
-    return c.json({ status: 1, message: "La tipo noticia ha sido guardada" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
-
-router.delete("/delete-evento/:id", async (c) => {
-  try {
-    await db
-      .deleteFrom("evento")
-      .where("idEvento", "=", Number(c.req.param("id")))
-      .execute();
-    return c.json({ status: 1, message: "Eliminado tipo de noticia" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
-});
-
-router.put("/update-evento", async (c) => {
-  try {
-    const evento = await c.req.json();
-    await db
-      .updateTable("evento")
-      .set({
-        nombre: evento.nombre,
-        ciudad: evento.ciudad,
-        ciudadEN: evento.ciudadEN,
-        pais: evento.pais,
-        paisEN: evento.paisEN,
-      })
-      .where("idEvento", "=", Number(evento.idEvento))
-      .execute();
-    return c.json({ status: 1, message: "La evento ha sido actualizada" });
-  } catch (err) {
-    console.log(err);
-    return c.json({ error: "Database error" }, 500);
-  }
+router.put("/update-evento", zValidator("json", UpdateBody), async (c) => {
+  const { idEvento, ...fields } = c.req.valid("json");
+  await db.updateTable("evento").set(fields).where("idEvento", "=", idEvento).execute();
+  return c.json({ status: 1 });
 });
 
 export default router;
