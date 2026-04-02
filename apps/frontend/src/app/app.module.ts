@@ -7,7 +7,6 @@ import localePy from "@angular/common/locales/es-PY";
 import localePt from "@angular/common/locales/pt";
 import { NgModule, LOCALE_ID, provideZonelessChangeDetection } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MomentDateModule } from "@angular/material-moment-adapter";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -312,7 +311,6 @@ registerLocaleData(localeEsAr, "es-Ar");
     HttpClientModule,
     MatSnackBarModule,
     MatDatepickerModule,
-    MomentDateModule,
     MatSelectModule,
     MatSortModule,
     CKEditorModule,

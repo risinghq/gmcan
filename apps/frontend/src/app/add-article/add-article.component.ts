@@ -1,17 +1,12 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormControl } from "@angular/forms";
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from "@angular/material/core";
+import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import * as _moment from "moment";
-// tslint:disable-next-line:no-duplicate-imports
-import { default as _rollupMoment } from "moment";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 
-import { MY_FORMATS } from "../edit-news/edit-news.component";
 import { Autor } from "../models/autores";
 import { DialogData } from "../models/dialogdata";
 import { Publicacion } from "../models/publicacion";
@@ -27,25 +22,12 @@ import { RevistaService } from "../services/revista.service";
 import { SpaceValidator } from "../services/spacevalidator";
 import { UsuarioService } from "../services/usuario.service";
 
-const moment = _rollupMoment || _moment;
-
 @Component({
   standalone: false,
   selector: "app-add-article",
   templateUrl: "./add-article.component.html",
   styleUrls: ["./add-article.component.scss"],
-  providers: [
-    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
-    // application's root module. We provide it at the component level here, due to limitations of
-    // our example generation script.
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
+  providers: [provideNativeDateAdapter()],
 })
 export class AddArticleComponent implements OnInit {
   publicacion: Publicacion;
@@ -283,7 +265,7 @@ export class AddArticleComponent implements OnInit {
     this.revisarValues();
     if (this.publicacionForm.valid && this.selectedUser) {
       const momentDate = new Date(this.publicacion.fechaPublicacionDate); // Replace event.value with your date value
-      const formattedDate = moment(momentDate).format("YYYY-MM-DD");
+      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.publicacion.fechaPublicacion = formattedDate;
       this._publicacionService.addPublicacion(this.publicacion).subscribe((result) => {
         if (result.status == 1) {

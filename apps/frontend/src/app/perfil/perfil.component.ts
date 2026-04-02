@@ -1,16 +1,10 @@
 import { Component, OnInit, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from "@angular/material/core";
+import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import * as _moment from "moment";
-// tslint:disable-next-line:no-duplicate-imports
-import { default as _rollupMoment } from "moment";
-import moment from "moment";
 
-import { MY_FORMATS } from "../edit-news/edit-news.component";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
@@ -27,18 +21,7 @@ import { UsuarioService } from "../services/usuario.service";
   selector: "app-perfil",
   templateUrl: "./perfil.component.html",
   styleUrls: ["./perfil.component.scss"],
-  providers: [
-    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
-    // application's root module. We provide it at the component level here, due to limitations of
-    // our example generation script.
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
+  providers: [provideNativeDateAdapter()],
 })
 export class PerfilComponent implements OnInit {
   oldMem;
@@ -183,7 +166,7 @@ export class PerfilComponent implements OnInit {
     if (this.memberForm.valid) {
       if (this.member.fechaNacimientoDate) {
         const momentDate = new Date(this.member.fechaNacimientoDate); // Replace event.value with your date value
-        const formattedDate = moment(momentDate).format("YYYY-MM-DD");
+        const formattedDate = new Date(momentDate).toLocaleDateString("sv");
         this.member.fechaNacimiento = formattedDate;
       } else {
         this.member.fechaNacimiento = null;

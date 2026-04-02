@@ -1,17 +1,12 @@
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from "@angular/material/core";
+import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import * as _moment from "moment";
-// tslint:disable-next-line:no-duplicate-imports
-import { default as _rollupMoment } from "moment";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
 
-import { MY_FORMATS } from "../edit-news/edit-news.component";
 import { DialogData } from "../models/dialogdata";
 import { FuenteFinanciamiento } from "../models/fuentefinanciamiento";
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
@@ -28,25 +23,12 @@ import { SpaceValidator } from "../services/spacevalidator";
 import { UsuarioService } from "../services/usuario.service";
 import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
 
-const moment = _rollupMoment || _moment;
-
 @Component({
   standalone: false,
   selector: "app-add-proyecto",
   templateUrl: "./add-proyecto.component.html",
   styleUrls: ["./add-proyecto.component.scss"],
-  providers: [
-    // `MomentDateAdapter` can be automatically provided by importing `MomentDateModule` in your
-    // application's root module. We provide it at the component level here, due to limitations of
-    // our example generation script.
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-
-    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-  ],
+  providers: [provideNativeDateAdapter()],
 })
 export class AddProyectoComponent implements OnInit {
   terminado = false;
@@ -238,7 +220,7 @@ export class AddProyectoComponent implements OnInit {
     this.revisarValues();
     if (this.proyectoForm.valid && this.otrosAutores.length > 0 && this.otrosAutores[0].nombre != "") {
       const momentDate = new Date(this.proyecto.fechaInicio); // Replace event.value with your date value
-      const formattedDate = moment(momentDate).format("YYYY-MM-DD");
+      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.proyecto.fechaI = formattedDate;
       this.proyecto.fechaF = null;
       this._proyectoService.addProyecto(this.proyecto).subscribe((result) => {
