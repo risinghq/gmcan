@@ -20,8 +20,12 @@ export async function bootstrap() {
   // Detect schema drift by comparing expected columns against PRAGMA table_info
   const issues: string[] = [];
 
-  for (const [table, expectedCols] of Object.entries(EXPECTED_COLUMNS)) {
-    const result = await sql<PragmaColumn>`PRAGMA table_info(${sql.raw(table)})`.execute(db);
+  const entries = Object.entries(EXPECTED_COLUMNS);
+  const results = await Promise.all(
+    entries.map(([table]) => sql<PragmaColumn>`PRAGMA table_info(${sql.raw(table)})`.execute(db)),
+  );
+
+  for (const [[table, expectedCols], result] of entries.map((e, i) => [e, results[i]] as const)) {
     const actualCols = result.rows.map((r) => r.name);
 
     const missing = expectedCols.filter((col) => !actualCols.includes(col));
