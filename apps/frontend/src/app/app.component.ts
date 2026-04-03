@@ -1,14 +1,12 @@
 import { Component, Renderer2, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { ActivatedRoute, Router, NavigationEnd, RouterOutlet } from "@angular/router";
-import { filter } from "rxjs/operators";
+import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 
 import { Languages } from "../app/models/languages";
 import { Grupo } from "./models/grupo";
 import { GLOBAL } from "./services/global";
 import { GrupoService } from "./services/grupo.service";
 import { SessionService } from "./services/session.service";
-declare const gtag: Function;
 
 @Component({
   selector: "app-root",
@@ -34,13 +32,6 @@ export class AppComponent {
     public fb: FormBuilder,
     private router: Router,
   ) {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
-      /** START : Code to Track Page View  */
-      gtag("event", "page_view", {
-        page_path: event.urlAfterRedirects,
-      });
-      /** END */
-    });
     this.searchGlobalForm = this.fb.group({
       nombre: [""],
     });
