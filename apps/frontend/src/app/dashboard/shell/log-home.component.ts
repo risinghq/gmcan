@@ -34,7 +34,6 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
     MatMenu,
     MatMenuItem,
     RouterOutlet,
-    DialogIdle,
   ],
 })
 export default class LogHomeComponent implements OnInit {

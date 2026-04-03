@@ -22,7 +22,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [{ "glob": "**/*", "input": "public" }],
             "styles": ["node_modules/animate.css/animate.css", "src/styles.scss"],
             "security": {
               "allowedHosts": []
@@ -38,7 +38,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "15kb",
+                  "maximumWarning": "20kb",
                   "maximumError": "35kb"
                 }
               ],
@@ -76,9 +76,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "tsconfig.spec.json",
-            "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["node_modules/animate.css/animate.css", "src/styles.scss"]
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }

@@ -29,8 +29,7 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 .primer-box {
   background-size: cover;
   background-image:
-    radial-gradient(circle 300px at top right, rgba(0, 100, 0, 0.8), rgba(0, 0, 0, 0.9)),
-    url("../../assets/img/graphene.jpg");
+    radial-gradient(circle 300px at top right, rgba(0, 100, 0, 0.8), rgba(0, 0, 0, 0.9)), url("/img/graphene.jpg");
 }
 
 .counter {
