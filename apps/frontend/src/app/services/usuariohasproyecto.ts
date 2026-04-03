@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class UsuarioHasProyectoService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
@@ -35,7 +34,6 @@ export class UsuarioHasProyectoService {
   addUsuarioProyecto(proyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "usuariohasproyecto/post-usuariohasproyecto/", proyecto, {
       headers: headers,
@@ -45,7 +43,6 @@ export class UsuarioHasProyectoService {
   deleteUsuarioProyecto(idProyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "usuariohasproyecto/delete-usuariohasproyecto/" + idProyecto, {
       headers: headers,

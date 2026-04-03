@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class PublicacionService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -120,7 +119,6 @@ export class PublicacionService {
   addPublicacion(publicacion): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "publicacion/post-publicacion/", publicacion, {
       headers: headers,
@@ -130,7 +128,6 @@ export class PublicacionService {
   updatePublicacion(publicacion): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "publicacion/update-publicacion/", publicacion, {
       headers: headers,
@@ -140,7 +137,6 @@ export class PublicacionService {
   deletePublicacion(idPublicacion): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "publicacion/delete-publicacion/" + idPublicacion, {
       headers: headers,
@@ -150,9 +146,7 @@ export class PublicacionService {
   uploadPublicacionFile(fileData, id) {
     const formData = new FormData();
     formData.append("file", fileData, fileData.name);
-    let headers = new HttpHeaders({
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
-    });
+    let headers = new HttpHeaders({});
     return this.http.put(this.url + "publicacion/upload-publicacion-file/" + id, formData, {
       headers: headers,
     });

@@ -10,15 +10,13 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from "@angular/core";
-import { importProvidersFrom } from "@angular/core";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
 import { provideRouter } from "@angular/router";
-import { NgIdleKeepaliveModule } from "@ng-idle/keepalive";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
 import { routes } from "./app.routes";
 import { SessionService } from "./services/session.service";
-import { tokenInterceptor } from "./token.interceptor";
+import { authInterceptor } from "./token.interceptor";
 
 registerLocaleData(localePy, "es");
 registerLocaleData(localePt, "pt");
@@ -30,10 +28,9 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([tokenInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
     provideCharts(withDefaultRegisterables()),
-    importProvidersFrom(NgIdleKeepaliveModule.forRoot()),
     DatePipe,
     TitleCasePipe,
     {

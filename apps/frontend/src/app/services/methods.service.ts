@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class MethodsService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -41,7 +40,6 @@ export class MethodsService {
   addMetodo(metodo): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "metodo/post-metodo/", metodo, { headers: headers });
   }
@@ -49,7 +47,6 @@ export class MethodsService {
   updateMetodo(metodo): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "metodo/update-metodo/", metodo, { headers: headers });
   }
@@ -57,7 +54,6 @@ export class MethodsService {
   deleteMetodo(idMetodo): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "metodo/delete-metodo/" + idMetodo, { headers: headers });
   }
@@ -65,9 +61,7 @@ export class MethodsService {
   uploadMetodoFoto(fileData, id) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
-    });
+    let headers = new HttpHeaders({});
     return this.http.put(this.url + "metodo/upload-metodo-foto/" + id, formData, { headers });
   }
 }

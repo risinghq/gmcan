@@ -9,7 +9,6 @@ import { GLOBAL } from "./global";
 export class EventoService {
   public url: string;
   languagelocal;
-  JWT_TOKEN = "JWT_TOKEN";
 
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
@@ -41,7 +40,6 @@ export class EventoService {
   addEvento(evento): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "evento/post-evento/", evento, { headers: headers });
   }
@@ -49,7 +47,6 @@ export class EventoService {
   updateEvento(evento): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "evento/update-evento/", evento, { headers: headers });
   }
@@ -57,7 +54,6 @@ export class EventoService {
   deleteEvento(idEvento): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "evento/delete-evento/" + idEvento, { headers: headers });
   }
@@ -65,7 +61,6 @@ export class EventoService {
   getCiudades(): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.get(this.url + "evento/get-ciudad/", { headers: headers });
   }
@@ -73,7 +68,6 @@ export class EventoService {
   getCiudadesEN(): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.get(this.url + "evento/get-ciudad-en/", { headers: headers });
   }
@@ -81,7 +75,6 @@ export class EventoService {
   getPais(): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.get(this.url + "evento/get-pais/", { headers: headers });
   }
@@ -89,7 +82,6 @@ export class EventoService {
   getPaisEN(): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.get(this.url + "evento/get-pais-en/", { headers: headers });
   }

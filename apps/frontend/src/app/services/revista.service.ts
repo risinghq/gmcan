@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class RevistaService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
@@ -31,7 +30,6 @@ export class RevistaService {
   addRevista(revista): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "revista/post-revista/", revista, { headers: headers });
   }
@@ -39,7 +37,6 @@ export class RevistaService {
   updateRevista(revista): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "revista/update-revista/", revista, { headers: headers });
   }
@@ -47,7 +44,6 @@ export class RevistaService {
   deleteRevista(idRevista): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "revista/delete-revista/" + idRevista, { headers: headers });
   }

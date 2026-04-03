@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class EquipoService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
@@ -31,7 +30,6 @@ export class EquipoService {
   addEquipo(equipo): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "equipo/post-equipo/", equipo, { headers: headers });
   }
@@ -39,7 +37,6 @@ export class EquipoService {
   updateEquipo(equipo): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "equipo/update-equipo/", equipo, { headers: headers });
   }
@@ -47,7 +44,6 @@ export class EquipoService {
   deleteEquipo(idEquipo): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "equipo/delete-equipo/" + idEquipo, { headers: headers });
   }

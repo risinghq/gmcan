@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class FuenteFinanciamientoService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -36,7 +35,6 @@ export class FuenteFinanciamientoService {
   addFuenteFinanciamiento(fuenteFinanciamiento): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "fuentefinanciamiento/post-fuentefinanciamiento/", fuenteFinanciamiento, {
       headers: headers,
@@ -46,7 +44,6 @@ export class FuenteFinanciamientoService {
   updateFuenteFinanciamiento(fuenteFinanciamiento): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "fuentefinanciamiento/update-fuentefinanciamiento/", fuenteFinanciamiento, {
       headers: headers,
@@ -56,7 +53,6 @@ export class FuenteFinanciamientoService {
   deleteFuenteFinanciamiento(idFuente): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "fuentefinanciamiento/delete-fuentefinanciamiento/" + idFuente, {
       headers: headers,

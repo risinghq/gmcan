@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class AutorService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
@@ -31,7 +30,6 @@ export class AutorService {
   addAuthor(autor): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "autor/post-autor/", autor, { headers: headers });
   }

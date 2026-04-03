@@ -7,7 +7,6 @@ import { GLOBAL } from "./global";
   providedIn: "root",
 })
 export class UsuarioHasPermisoService {
-  JWT_TOKEN = "JWT_TOKEN";
   REFRESH_TOKEN = "REFRESH_TOKEN";
   public url: string;
 
@@ -18,7 +17,6 @@ export class UsuarioHasPermisoService {
   getUsuarioHasPermiso(DNI): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.get(this.url + "usuariohaspermiso/get-usuariohaspermiso/" + DNI, {
       headers: headers,
@@ -28,7 +26,6 @@ export class UsuarioHasPermisoService {
   addPermisoUsuario(permisoUser): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "usuariohaspermiso/post-usuariohaspermiso/", permisoUser, {
       headers: headers,
@@ -38,7 +35,6 @@ export class UsuarioHasPermisoService {
   deletePermisoUsuario(permisoUser): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "usuariohaspermiso/delete-usuariohaspermiso/" + permisoUser.usuario_DNI, {
       headers: headers,

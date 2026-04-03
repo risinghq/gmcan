@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class PublicacionHasAutorService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
@@ -36,7 +35,6 @@ export class PublicacionHasAutorService {
   addPublicacionHasAutor(autorPublicacion): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "publicacion-autor/post-publicacionhasautor/", autorPublicacion, {
       headers: headers,
@@ -46,7 +44,6 @@ export class PublicacionHasAutorService {
   deletePublicacionHasAutor(idAutorPublicacion): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "publicacion-autor/delete-publicacionhasautor/" + idAutorPublicacion, {
       headers: headers,

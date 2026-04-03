@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class MonedaService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {

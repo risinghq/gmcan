@@ -1,108 +1,45 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { of, Observable } from "rxjs";
-import { catchError, mapTo, tap } from "rxjs/operators";
+import { Observable, tap } from "rxjs";
 
 import { config } from "../config";
-import { Tokens } from "../models/tokens";
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable({ providedIn: "root" })
 export class AuthService {
-  JWT_TOKEN = "JWT_TOKEN";
-  REFRESH_TOKEN = "REFRESH_TOKEN";
-  loggedUser: string;
-  user;
+  private readonly USER_KEY = "user";
 
   constructor(private http: HttpClient) {}
 
   login(user: { correo: string; password: string }): Observable<any> {
     return this.http.post<any>(`${config.apiUrl}usuario/login`, user).pipe(
-      tap((tokens) => this.doLoginUser(tokens)),
-      catchError((error) => {
-        console.log(error);
-        return of(false);
+      tap((res) => {
+        if (res?.user) {
+          localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
+        }
       }),
     );
   }
 
-  logout() {
-    let language = JSON.parse(localStorage.getItem("language"));
-    let sessionEnd;
-    if (JSON.parse(localStorage.getItem("sessionEnd")) == "1") {
-      sessionEnd = 1;
+  logout(): Observable<void> {
+    return this.http.post<void>(`${config.apiUrl}usuario/logout`, {}).pipe(tap(() => this.clearLocalStorage()));
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem(this.USER_KEY);
+  }
+
+  getUser(): any {
+    try {
+      const u = localStorage.getItem(this.USER_KEY);
+      return u ? JSON.parse(u) : null;
+    } catch {
+      return null;
     }
+  }
+
+  clearLocalStorage(): void {
+    const language = localStorage.getItem("language");
     localStorage.clear();
-    localStorage.setItem("language", JSON.stringify(language));
-    if (sessionEnd == 1) {
-      localStorage.setItem("sessionEnd", "1");
-    }
-    return this.http
-      .post<any>(`${config.apiUrl}usuario/logout`, {
-        refreshToken: this.getRefreshToken(),
-      })
-      .pipe(
-        tap(() => this.doLogoutUser()),
-        mapTo(true),
-        catchError((error) => {
-          console.log(error);
-          return of(false);
-        }),
-      );
-  }
-
-  isLoggedIn() {
-    return !!this.getJwtToken();
-  }
-
-  refreshToken() {
-    return this.http
-      .post<any>(`${config.apiUrl}usuario/refresh`, {
-        refreshToken: this.getRefreshToken(),
-      })
-      .pipe(
-        tap((tokens: Tokens) => {
-          this.storeJwtToken(tokens.jwt);
-        }),
-      );
-  }
-
-  getJwtToken() {
-    return localStorage.getItem(this.JWT_TOKEN);
-  }
-
-  private doLoginUser(tokens: Tokens) {
-    this.storeTokens(tokens);
-  }
-
-  private doLogoutUser() {
-    this.loggedUser = null;
-    this.removeTokens();
-  }
-
-  private getRefreshToken() {
-    return localStorage.getItem(this.REFRESH_TOKEN);
-  }
-
-  private storeJwtToken(jwt: string) {
-    localStorage.setItem(this.JWT_TOKEN, jwt);
-  }
-
-  private storeTokens(tokens: Tokens) {
-    localStorage.setItem(this.JWT_TOKEN, tokens.jwt);
-    localStorage.setItem(this.REFRESH_TOKEN, tokens.refreshToken);
-    localStorage.setItem("user", JSON.stringify(tokens.user));
-  }
-
-  removeTokens() {
-    localStorage.removeItem(this.JWT_TOKEN);
-    localStorage.removeItem(this.REFRESH_TOKEN);
-    localStorage.removeItem("user");
-    localStorage.clear();
-  }
-
-  getUser() {
-    return localStorage.getItem("user");
+    if (language) localStorage.setItem("language", language);
   }
 }

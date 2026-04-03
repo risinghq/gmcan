@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class TipoNoticiaService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
   REFRESH_TOKEN = "REFRESH_TOKEN";
 
   languagelocal;
@@ -46,7 +45,6 @@ export class TipoNoticiaService {
   addCategory(category): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "tipo-noticia/post-tiponoticia", category, { headers });
   }
@@ -54,7 +52,6 @@ export class TipoNoticiaService {
   updateCategory(category): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "tipo-noticia/update-tiponoticia", category, { headers });
   }
@@ -62,7 +59,6 @@ export class TipoNoticiaService {
   deleteCategory(idCategory): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "tipo-noticia/delete-tiponoticia/" + idCategory, {
       headers,

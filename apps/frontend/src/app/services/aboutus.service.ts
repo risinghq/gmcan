@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class AboutUsService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -31,7 +30,6 @@ export class AboutUsService {
   updateDescripcion(sobrenosotros): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "sobrenosotros/update-descripciongrupo/", sobrenosotros, {
       headers: headers,
@@ -41,7 +39,6 @@ export class AboutUsService {
   updateObjetivos(sobrenosotros): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "sobrenosotros/update-objetivosgrupo/", sobrenosotros, {
       headers: headers,
@@ -51,7 +48,6 @@ export class AboutUsService {
   updateServicios(sobrenosotros): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "sobrenosotros/update-serviciosgrupo/", sobrenosotros, {
       headers: headers,
@@ -61,9 +57,7 @@ export class AboutUsService {
   uploadGrupoFoto(fileData, id) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
-    });
+    let headers = new HttpHeaders({});
     return this.http.put(this.url + "sobrenosotros/upload-sobrenosotros-foto/" + id, formData, {
       headers,
     });

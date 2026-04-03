@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class SoftwareService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -37,7 +36,6 @@ export class SoftwareService {
   addSoftware(software): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "software/post-software/", software, { headers: headers });
   }
@@ -45,7 +43,6 @@ export class SoftwareService {
   updateSoftware(software): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "software/update-software/", software, { headers: headers });
   }
@@ -53,7 +50,6 @@ export class SoftwareService {
   deleteSoftware(idSoftware): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "software/delete-software/" + idSoftware, {
       headers: headers,

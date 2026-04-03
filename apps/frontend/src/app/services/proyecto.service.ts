@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class ProyectoService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -85,7 +84,6 @@ export class ProyectoService {
   addProyecto(proyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "proyecto/post-proyecto/", proyecto, { headers: headers });
   }
@@ -93,7 +91,6 @@ export class ProyectoService {
   updateProyecto(proyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "proyecto/update-proyecto/", proyecto, { headers: headers });
   }
@@ -101,7 +98,6 @@ export class ProyectoService {
   deleteProyecto(idProyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "proyecto/delete-proyecto/" + idProyecto, {
       headers: headers,
@@ -111,7 +107,6 @@ export class ProyectoService {
   endProyecto(proyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "proyecto/end-proyecto/", proyecto, { headers: headers });
   }
@@ -119,7 +114,6 @@ export class ProyectoService {
   restartProyecto(proyecto): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "proyecto/restart-proyecto/", proyecto, { headers: headers });
   }

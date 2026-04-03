@@ -8,7 +8,6 @@ import { GLOBAL } from "./global";
 })
 export class NoticiaService {
   public url: string;
-  JWT_TOKEN = "JWT_TOKEN";
 
   languagelocal;
   constructor(public http: HttpClient) {
@@ -67,7 +66,6 @@ export class NoticiaService {
   addNews(noticia): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.post(this.url + "noticia/post-noticia", noticia, { headers });
   }
@@ -75,16 +73,13 @@ export class NoticiaService {
   uploadNoticiaFoto(fileData, id) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
-    });
+    let headers = new HttpHeaders({});
     return this.http.put(this.url + "noticia/upload-noticia-file/" + id, formData, { headers });
   }
 
   getNoticiaFull(idNoticia): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.get(this.url + "noticia/get-noticiafull/" + idNoticia, { headers: headers });
   }
@@ -92,7 +87,6 @@ export class NoticiaService {
   updateNoticia(noticia): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.put(this.url + "noticia/update-noticia", noticia, { headers });
   }
@@ -100,7 +94,6 @@ export class NoticiaService {
   deleteNoticia(idNoticia): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem(this.JWT_TOKEN),
     });
     return this.http.delete(this.url + "noticia/delete-noticia/" + idNoticia, { headers });
   }
