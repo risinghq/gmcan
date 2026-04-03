@@ -20,7 +20,7 @@
   "type": "module",
   "main": "server.ts",
   "scripts": {
-    "start": "tsx --watch server.ts",
+    "start": "node --env-file=.env --import=tsx server.ts",
     "lint": "oxlint",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
