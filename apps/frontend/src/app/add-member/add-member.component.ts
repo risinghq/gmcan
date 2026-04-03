@@ -14,7 +14,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { AutosizeModule } from "ngx-autosize";
 
-import { HomeComponent } from "../home/home.component";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
@@ -54,7 +53,6 @@ import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service"
     NgIf,
     AutosizeModule,
     MatCheckbox,
-    HomeComponent,
   ],
 })
 export class AddMemberComponent implements OnInit, HasUnsavedChanges {

@@ -8,7 +8,6 @@ import { MatToolbar } from "@angular/material/toolbar";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 
-import { HomeComponent } from "../home/home.component";
 import { Grupo } from "../models/grupo";
 import { Languages } from "../models/languages";
 import { GLOBAL } from "../services/global";
@@ -36,7 +35,6 @@ import { SessionService } from "../services/session.service";
     MatMenu,
     MatMenuItem,
     RouterOutlet,
-    HomeComponent,
   ],
 })
 export class LandingComponent implements OnInit {

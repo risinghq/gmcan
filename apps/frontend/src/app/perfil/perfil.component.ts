@@ -13,7 +13,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AutosizeModule } from "ngx-autosize";
 
-import { HomeComponent } from "../home/home.component";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
@@ -48,7 +47,6 @@ import { UsuarioService } from "../services/usuario.service";
     MatIcon,
     NgIf,
     AutosizeModule,
-    HomeComponent,
   ],
 })
 export class PerfilComponent implements OnInit {

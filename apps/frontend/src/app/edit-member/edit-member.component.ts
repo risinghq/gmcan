@@ -25,7 +25,6 @@ import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
-import { HomeComponent } from "../home/home.component";
 import { DialogData } from "../models/dialogdata";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
@@ -67,7 +66,6 @@ import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service"
     NgIf,
     AutosizeModule,
     MatCheckbox,
-    HomeComponent,
   ],
 })
 export class EditMemberComponent implements OnInit, HasUnsavedChanges {

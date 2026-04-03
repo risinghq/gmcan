@@ -6,7 +6,6 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 
-import { HomeComponent } from "../home/home.component";
 import { TipoNoticia } from "../models/tiponoticia";
 import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -16,7 +15,7 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
   selector: "app-add-category",
   templateUrl: "./add-category.component.html",
   styleUrls: ["./add-category.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass, HomeComponent],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
 export class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   category: TipoNoticia;

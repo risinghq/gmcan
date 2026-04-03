@@ -1,6 +1,6 @@
-@import "../publication/publication.component.scss";
-@import "../projects/projects.component.scss";
-@import "../news/news.component.scss";
+@use "../publication/publication.component.scss";
+@use "../projects/projects.component.scss";
+@use "../news/news.component.scss";
 
 .plex-serif {
   font-family: "IBM Plex Serif", serif;

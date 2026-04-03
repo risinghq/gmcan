@@ -14,7 +14,6 @@ import {
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 
-import { HomeComponent } from "../home/home.component";
 import { Proyecto } from "../models/proyecto";
 import { NewsComponent } from "../news/news.component";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
@@ -46,7 +45,6 @@ import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
     NgbPaginationNumber,
     NgbPaginationNext,
     NewsComponent,
-    HomeComponent,
     SlicePipe,
   ],
 })

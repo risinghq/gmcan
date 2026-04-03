@@ -17,7 +17,6 @@ import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 
-import { HomeComponent } from "../home/home.component";
 import { DialogData } from "../models/dialogdata";
 import { Grupo } from "../models/grupo";
 import { UsuarioFull } from "../models/usuarioFull";
@@ -45,7 +44,6 @@ import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service"
     MatMenu,
     MatMenuItem,
     RouterOutlet,
-    HomeComponent,
   ],
 })
 export class LogHomeComponent implements OnInit {

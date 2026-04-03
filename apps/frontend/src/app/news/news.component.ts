@@ -4,7 +4,6 @@ import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { Router, ActivatedRoute, Params } from "@angular/router";
 
-import { HomeComponent } from "../home/home.component";
 import { Noticia } from "../models/noticia";
 import { TipoNoticia } from "../models/tiponoticia";
 import { GLOBAL } from "../services/global";
@@ -16,7 +15,7 @@ import { UsuarioService } from "../services/usuario.service";
   selector: "app-news",
   templateUrl: "./news.component.html",
   styleUrls: ["./news.component.scss"],
-  imports: [NgIf, NgFor, HomeComponent, SlicePipe],
+  imports: [NgIf, NgFor, SlicePipe],
 })
 export class NewsComponent implements OnInit {
   public noticias: Array<Noticia>;

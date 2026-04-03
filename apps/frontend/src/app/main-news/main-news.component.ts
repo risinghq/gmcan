@@ -16,7 +16,6 @@ import {
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 
-import { HomeComponent } from "../home/home.component";
 import { Noticia } from "../models/noticia";
 import { TipoNoticia } from "../models/tiponoticia";
 import { GLOBAL } from "../services/global";
@@ -44,7 +43,6 @@ import { UsuarioService } from "../services/usuario.service";
     NgbPaginationNumber,
     NgbPaginationNext,
     NgClass,
-    HomeComponent,
     SlicePipe,
   ],
 })
