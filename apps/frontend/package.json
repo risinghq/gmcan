@@ -49,7 +49,6 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.5.1",
     "ckeditor5": "^47.0.0",
-    "hammerjs": "^2.0.8",
     "ng2-charts": "^10.0.0",
     "ngx-autosize": "^2.0.4",
     "rxjs": "^7.8.0",
