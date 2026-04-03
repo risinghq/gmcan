@@ -1,5 +1,5 @@
-@use "../add-category/add-category.component.scss";
-@use "../add-news/add-news.component.scss";
+@use "../shared/styles/add-category-base";
+@use "../shared/styles/add-news-base";
 
 ::ng-deep .mat-form-field-label {
   @extend .plex-sans;

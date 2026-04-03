@@ -1,0 +1,76 @@
+@use "./articulos-base";
+@use "./add-news-base";
+
+.plex-sans {
+  font-family: "IBM Plex Sans", serif;
+}
+
+::ng-deep .mat-tab-header {
+  width: 100% !important;
+}
+
+.grupal-img {
+  max-width: 423px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.img-set {
+  max-width: 423px;
+  object-fit: cover;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+.title {
+  @extend .plex-sans;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.3px;
+  color: #30393a;
+  border-bottom: 2px solid #30393a;
+  padding-bottom: 4px;
+}
+
+.green-text {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+}
+
+.text-category {
+  @extend .plex-sans;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 15px;
+  line-height: 20px;
+  letter-spacing: 0.2px;
+}
+
+.mb-12 {
+  margin-bottom: 12px;
+}
+
+.logo-preview,
+.grupal-logo {
+  width: max-content;
+  padding: 16px 24px;
+  border: 1px solid #b5b5b5;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.logo-preview-inverse {
+  @extend .logo-preview;
+  background: #30393a;
+  border: 1px solid #b5b5b5;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.img-logo {
+  width: 296px;
+}
