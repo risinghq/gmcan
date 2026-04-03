@@ -341,19 +341,15 @@ export class EditMemberComponent implements OnInit, HasUnsavedChanges {
             this._usuarioService.updateUser(this.member).subscribe((res) => {
               if (res.status == 1) {
                 if (this.member.password != this.oldPassword) {
-                  const token = this._usuarioService.getToken();
-                  if (token) {
-                    this._usuarioService
-                      .changePassword({
-                        password: this.member.password,
-                        correo: this.member.correo,
-                        token: token,
-                      })
-                      .subscribe((res) => {
-                        if (res) {
-                        }
-                      });
-                  }
+                  this._usuarioService
+                    .changePassword({
+                      password: this.member.password,
+                      correo: this.member.correo,
+                    })
+                    .subscribe((res) => {
+                      if (res) {
+                      }
+                    });
                 }
                 if (this.fileData) {
                   if (this.member.foto == null) {
