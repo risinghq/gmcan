@@ -1,6 +1,9 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "@app/*": ["src/app/*"]
+    },
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "noImplicitOverride": true,

@@ -12,10 +12,10 @@ import {
 } from "@angular/core";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
 import { provideRouter } from "@angular/router";
+import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
 import { routes } from "./app.routes";
-import { SessionService } from "./services/session.service";
 import { authInterceptor } from "./token.interceptor";
 
 registerLocaleData(localePy, "es");

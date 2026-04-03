@@ -1,0 +1,275 @@
+import { NgFor, NgIf, NgClass } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { provideNativeDateAdapter } from "@angular/material/core";
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
+import { MatDialog } from "@angular/material/dialog";
+import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatIcon } from "@angular/material/icon";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
+import { lineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import { Moneda } from "@app/shared/models/moneda";
+import { Proyecto } from "@app/shared/models/proyecto";
+import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { Usuario } from "@app/shared/models/usuario";
+import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
+import { GLOBAL } from "@app/shared/services/global";
+import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
+import { MonedaService } from "@app/shared/services/moneda.service";
+import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { SpaceValidator } from "@app/shared/services/spacevalidator";
+import { UsuarioService } from "@app/shared/services/usuario.service";
+import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
+import { AutosizeModule } from "ngx-autosize";
+
+@Component({
+  selector: "app-add-proyecto",
+  templateUrl: "./add-proyecto.component.html",
+  styleUrls: ["./add-proyecto.component.scss"],
+  providers: [provideNativeDateAdapter()],
+  imports: [
+    MatIcon,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    NgFor,
+    MatOption,
+    MatInput,
+    NgIf,
+    AutosizeModule,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    NgClass,
+  ],
+})
+export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
+  terminado = false;
+  edit = false;
+  button_text = "Guardar proyecto";
+  usuarios: Array<Usuario>;
+  lineasInvestigacion: Array<lineasInvestigacion>;
+  fuentesFinaciamiento: Array<FuenteFinanciamiento>;
+  proyecto: Proyecto;
+  proyectoForm: FormGroup;
+  monedas: Array<Moneda>;
+  url;
+
+  disableSelect;
+  openEraser() {}
+  projectEnd() {}
+
+  constructor(
+    public formBuilder: FormBuilder,
+    public _route: ActivatedRoute,
+    public _router: Router,
+    private _snackBar: MatSnackBar,
+    private _usuarioService: UsuarioService,
+    private _lineaInvestigacionService: LineasInvestigacionService,
+    private _fuenteFinanciamientoService: FuenteFinanciamientoService,
+    private _monedaService: MonedaService,
+    private _proyectoService: ProyectoService,
+    private _usuariohasproyecto: UsuarioHasProyectoService,
+    public dialog: MatDialog,
+  ) {
+    this.proyectoForm = this.formBuilder.group({
+      título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      títuloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      codigo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaInicio: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      lineasInvestigacion_idLineasInvestigacion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fuenteFinanciamiento_idFuenteFinanciamiento: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      moneda_idMoneda: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      montoFinanciado: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fechaFin: [""],
+    });
+    this.proyecto = new Proyecto(
+      null,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      1,
+      null,
+      null,
+      "",
+      null,
+      null,
+      "",
+      null,
+      null,
+      null,
+      null,
+      "",
+      null,
+      null,
+    );
+    this.url = GLOBAL.url;
+  }
+
+  ngOnInit() {
+    this.getLineaInvestigacion();
+  }
+
+  isDirty(): boolean {
+    return this.proyectoForm.dirty;
+  }
+
+  getLineaInvestigacion() {
+    this._lineaInvestigacionService.getLineasInvestigacion().subscribe((result) => {
+      if (result) {
+        this.lineasInvestigacion = result;
+        this.getFuenteFinanciamiento();
+      }
+    });
+  }
+
+  getFuenteFinanciamiento() {
+    this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result) => {
+      if (result) {
+        this.fuentesFinaciamiento = result;
+        this.getMoneda();
+      }
+    });
+  }
+
+  getMoneda() {
+    this._monedaService.getMonedas().subscribe((result) => {
+      if (result) {
+        this.monedas = result;
+        this.getUsuarios();
+      }
+    });
+  }
+
+  options: Array<any> = [];
+
+  return() {
+    this._router.navigate(["dashboard/proyectos-ejecucion"]);
+  }
+
+  openSnackBar() {
+    this._snackBar.open("Proyecto agregado exitosamente", null, {
+      duration: 2000,
+      horizontalPosition: "right",
+      verticalPosition: "top",
+    });
+  }
+
+  getUsuarios() {
+    this._usuarioService.getUsuarios().subscribe((result) => {
+      if (result) {
+        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        this.usuarios = result;
+        for (let index = 0; index < this.usuarios.length; index++) {
+          this.usuarios[index].nombre =
+            this.usuarios[index].nombre +
+            " " +
+            this.usuarios[index].apellidoPaterno +
+            " " +
+            this.usuarios[index].apellidoMaterno;
+          this.options.push(this.usuarios[index]);
+        }
+      }
+    });
+  }
+
+  otrosAutores: any[] = [
+    {
+      id: 1,
+      DNI: "",
+      nombre: "",
+      isAutor: true,
+    },
+  ];
+
+  addAnotherAuthor() {
+    this.otrosAutores.push({
+      id: this.otrosAutores.length + 1,
+      DNI: "",
+      nombre: "",
+      isAutor: true,
+    });
+  }
+
+  removeAnotherAuthor(i: number) {
+    if (i > 0) {
+      this.otrosAutores.splice(i, 1);
+    } else if (i == 0 && this.otrosAutores.length == 1) {
+      this.otrosAutores.splice(i, 1);
+      this.addAnotherAuthor();
+    } else {
+      this.otrosAutores.splice(i, 1);
+    }
+  }
+
+  selectUserAutor(evento, value, i) {
+    if (value == 1) {
+      if (evento.DNI) {
+        this.otrosAutores[i].DNI = evento.DNI;
+      } else {
+        this.otrosAutores[i].DNI = evento.DNI;
+        this.otrosAutores[i].isAutor = false;
+      }
+      this.otrosAutores[i].nombre = evento.nombre;
+    } else {
+      let index = this.options.findIndex((option) => option.nombre === evento.value);
+      if (this.options[index].DNI) {
+        this.otrosAutores[i].DNI = this.options[index].DNI;
+      } else {
+        this.otrosAutores[i].DNI = this.options[index].DNI;
+        this.otrosAutores[i].isAutor = false;
+      }
+      this.otrosAutores[i].nombre = this.options[index].nombre;
+    }
+  }
+
+  submitProyecto() {
+    this.revisarValues();
+    if (this.proyectoForm.valid && this.otrosAutores.length > 0 && this.otrosAutores[0].nombre != "") {
+      const momentDate = new Date(this.proyecto.fechaInicio); // Replace event.value with your date value
+      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
+      this.proyecto.fechaI = formattedDate;
+      this.proyecto.fechaF = null;
+      this._proyectoService.addProyecto(this.proyecto).subscribe((result) => {
+        if (result.status == 1) {
+          for (let index = 0; index < this.otrosAutores.length; index++) {
+            this.setAutores(this.otrosAutores[index], result.idProyecto);
+          }
+          this.proyectoForm.markAsPristine();
+          this.return();
+          this.openSnackBar();
+        }
+      });
+    }
+  }
+
+  setAutores(autor, idProyecto) {
+    let usuarioPublicacion = { usuario_DNI: autor.DNI, proyecto_idProyecto: idProyecto };
+    this._usuariohasproyecto.addUsuarioProyecto(usuarioPublicacion).subscribe((res) => {});
+  }
+
+  revisarValues() {
+    for (let index = 0; index < this.otrosAutores.length; index++) {
+      let found = this.options.findIndex((option) => option.nombre === this.otrosAutores[index].nombre);
+      if (found == -1) {
+        this.otrosAutores[index].DNI = null;
+        this.otrosAutores[index].isAutor = true;
+      }
+    }
+  }
+
+  button_text2 = "";
+}

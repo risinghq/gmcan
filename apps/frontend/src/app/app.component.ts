@@ -1,12 +1,11 @@
 import { Component, Renderer2, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
-
-import { Languages } from "../app/models/languages";
-import { Grupo } from "./models/grupo";
-import { GLOBAL } from "./services/global";
-import { GrupoService } from "./services/grupo.service";
-import { SessionService } from "./services/session.service";
+import { Grupo } from "@app/shared/models/grupo";
+import { Languages } from "@app/shared/models/languages";
+import { GLOBAL } from "@app/shared/services/global";
+import { GrupoService } from "@app/shared/services/grupo.service";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
   selector: "app-root",
@@ -14,7 +13,7 @@ import { SessionService } from "./services/session.service";
   styleUrls: ["./app.component.scss"],
   imports: [RouterOutlet],
 })
-export class AppComponent {
+export default class AppComponent {
   screenWidth: number;
   public grupoinfo: Grupo;
   public url;
