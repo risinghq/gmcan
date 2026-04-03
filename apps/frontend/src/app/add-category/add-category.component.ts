@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 
 import { HomeComponent } from "../home/home.component";
 import { TipoNoticia } from "../models/tiponoticia";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { SpaceValidator } from "../services/spacevalidator";
 import { TipoNoticiaService } from "../services/tiponoticia.service";
 
@@ -18,11 +18,10 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
   styleUrls: ["./add-category.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass, HomeComponent],
 })
-export class AddCategoryComponent implements OnInit {
+export class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   category: TipoNoticia;
   public categoryForm: FormGroup;
   button_text = "Agregar categoría";
-  agregar;
   notCanDo;
   constructor(
     public formBuilder: FormBuilder,
@@ -31,7 +30,6 @@ export class AddCategoryComponent implements OnInit {
     public dialog: MatDialog,
     public _tipoNoticiaService: TipoNoticiaService,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
   ) {
     this.categoryForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -46,9 +44,11 @@ export class AddCategoryComponent implements OnInit {
 
   ngOnInit() {}
 
+  isDirty(): boolean {
+    return this.categoryForm.dirty;
+  }
+
   return() {
-    this.agregar = false;
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/noticias"]);
   }
 
@@ -56,9 +56,9 @@ export class AddCategoryComponent implements OnInit {
     if (this.categoryForm.valid) {
       this._tipoNoticiaService.addCategory(this.category).subscribe((result) => {
         if (result.status == 1) {
+          this.categoryForm.markAsPristine();
           this.return();
           this.openSnackBar();
-          this.agregar = true;
         }
       });
     }

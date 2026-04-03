@@ -18,9 +18,9 @@ import { startWith, map } from "rxjs/operators";
 import { Autor } from "../models/autores";
 import { Evento } from "../models/eventos";
 import { Publicacion } from "../models/publicacion";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
 import { AutorService } from "../services/autor.service";
-import { CommonService } from "../services/common.service";
 import { EventoService } from "../services/evento.service";
 import { GLOBAL } from "../services/global";
 import { PublicacionService } from "../services/publicacion.service";
@@ -56,7 +56,7 @@ import { UsuarioService } from "../services/usuario.service";
     AsyncPipe,
   ],
 })
-export class AddResumenComponent implements OnInit {
+export class AddResumenComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Guardar resumen";
@@ -78,7 +78,6 @@ export class AddResumenComponent implements OnInit {
     private _autorService: AutorService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _eventoService: EventoService,
   ) {
     this.publicacionForm = this.formBuilder.group({
@@ -121,6 +120,10 @@ export class AddResumenComponent implements OnInit {
       "",
     );
     this.url = GLOBAL.url;
+  }
+
+  isDirty(): boolean {
+    return this.publicacionForm.dirty;
   }
 
   openEraser() {}
@@ -271,8 +274,6 @@ export class AddResumenComponent implements OnInit {
     }
   }
 
-  agregar;
-
   submitArticle() {
     this.revisarValues();
     if (this.publicacionForm.valid && this.selectedUser) {
@@ -290,7 +291,7 @@ export class AddResumenComponent implements OnInit {
           for (let index = 0; index < this.otrosAutores.length; index++) {
             this.setAutores(this.otrosAutores[index], index + 1, result.idPublicacion);
           }
-          this.agregar = true;
+          this.publicacionForm.markAsPristine();
           this.return();
           this.openSnackBar();
         }
@@ -364,7 +365,6 @@ export class AddResumenComponent implements OnInit {
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/" + localStorage.getItem("resumen-back")]);
   }
 

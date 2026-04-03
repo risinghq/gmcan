@@ -30,9 +30,9 @@ import { DialogData } from "../models/dialogdata";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { UsuarioFull } from "../models/usuarioFull";
 import { UsuarioPermiso } from "../models/usuariopermiso";
-import { CommonService } from "../services/common.service";
 import { GeneroService } from "../services/genero.service";
 import { GLOBAL } from "../services/global";
 import { NoticiaService } from "../services/noticia.service";
@@ -70,7 +70,7 @@ import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service"
     HomeComponent,
   ],
 })
-export class EditMemberComponent implements OnInit {
+export class EditMemberComponent implements OnInit, HasUnsavedChanges {
   url;
   public memberForm: FormGroup;
   member: UsuarioFull;
@@ -93,7 +93,6 @@ export class EditMemberComponent implements OnInit {
     public _usuarioPermisoService: UsuarioHasPermisoService,
     private _snackBar: MatSnackBar,
     public dialog: MatDialog,
-    private _commonService: CommonService,
     public _usuarioPublicacionService: PublicacionHasUsuarioService,
     public _noticiaService: NoticiaService,
   ) {
@@ -151,6 +150,10 @@ export class EditMemberComponent implements OnInit {
   ngOnInit() {
     this.listaPermisos = [];
     this.getUser();
+  }
+
+  isDirty(): boolean {
+    return this.memberForm.dirty;
   }
 
   oldPassword;
@@ -371,9 +374,8 @@ export class EditMemberComponent implements OnInit {
                     });
                   }
                 }
-                this.agregar = true;
-                this.eliminar = true;
                 this.openSnackBar("Miembro actualizado exitosamente", null);
+                this.memberForm.markAsPristine();
                 this.return();
               }
               this.setPermisos();
@@ -461,14 +463,7 @@ export class EditMemberComponent implements OnInit {
     });
   }
 
-  agregar;
-  eliminar;
-
   return() {
-    if (!this.eliminar) {
-      this.agregar = false;
-    }
-    this._commonService.setEndSession("0");
     if (localStorage.getItem("active-member") == "1") {
       this._router.navigate(["dashboard/miembros-activos"]);
     } else {
@@ -526,8 +521,7 @@ export class EditMemberComponent implements OnInit {
       });
     this._usuarioService.deleteUsuario({ DNI: String(this.member.DNI) }).subscribe((result) => {
       if (result.status == 1) {
-        this.eliminar = true;
-        this.agregar = true;
+        this.memberForm.markAsPristine();
         this.return();
         this.openSnackBar("Usuario eliminado exitosamente", null);
       } else {

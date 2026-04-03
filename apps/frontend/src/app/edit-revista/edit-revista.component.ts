@@ -17,7 +17,7 @@ import { ActivatedRoute, Router, Params } from "@angular/router";
 
 import { DialogData } from "../models/dialogdata";
 import { Revista } from "../models/revista";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { PublicacionService } from "../services/publicacion.service";
 import { RevistaService } from "../services/revista.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -28,7 +28,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["../add-revista/add-revista.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class EditRevistaComponent implements OnInit {
+export class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   revista: Revista;
   public revistaForm: FormGroup;
   button_text = "Actualizar revista";
@@ -41,7 +41,6 @@ export class EditRevistaComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _revistaService: RevistaService,
-    private _commonService: CommonService,
     private _publicacionService: PublicacionService,
   ) {
     this.revista = new Revista(null, "");
@@ -52,6 +51,10 @@ export class EditRevistaComponent implements OnInit {
 
   ngOnInit() {
     this.getRevista();
+  }
+
+  isDirty(): boolean {
+    return this.revistaForm.dirty;
   }
 
   getRevista() {
@@ -77,20 +80,17 @@ export class EditRevistaComponent implements OnInit {
     });
   }
 
-  agregar;
-
   submitRevista() {
     this._revistaService.updateRevista(this.revista).subscribe((result) => {
       if (result.status == 1) {
+        this.revistaForm.markAsPristine();
         this.return();
         this.openSnackBar("Revista actualizada exitosamente");
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/articulos"]);
   }
 
@@ -128,7 +128,7 @@ export class EditRevistaComponent implements OnInit {
     if (this.notCanDo) {
       this._revistaService.deleteRevista(this.revista.idRevista).subscribe((result) => {
         if (result.status == 1) {
-          this.agregar = true;
+          this.revistaForm.markAsPristine();
           this.return();
           this.openSnackBar("Revista eliminada exitosamente");
         } else {

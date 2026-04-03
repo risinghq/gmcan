@@ -28,9 +28,9 @@ import { Autor } from "../models/autores";
 import { DialogData } from "../models/dialogdata";
 import { Evento } from "../models/eventos";
 import { Publicacion } from "../models/publicacion";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
 import { AutorService } from "../services/autor.service";
-import { CommonService } from "../services/common.service";
 import { EventoService } from "../services/evento.service";
 import { GLOBAL } from "../services/global";
 import { PublicacionService } from "../services/publicacion.service";
@@ -66,7 +66,7 @@ import { UsuarioService } from "../services/usuario.service";
     AsyncPipe,
   ],
 })
-export class EditResumenComponent implements OnInit {
+export class EditResumenComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
@@ -90,7 +90,6 @@ export class EditResumenComponent implements OnInit {
     private _autorService: AutorService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _eventoService: EventoService,
   ) {
     this.publicacionForm = this.formBuilder.group({
@@ -135,7 +134,9 @@ export class EditResumenComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  agregar;
+  isDirty(): boolean {
+    return this.publicacionForm.dirty;
+  }
 
   ngOnInit() {
     this.getResumen();
@@ -416,7 +417,7 @@ export class EditResumenComponent implements OnInit {
       }
     }
     if (isPrincipal) {
-      this.agregar = true;
+      this.publicacionForm.markAsPristine();
       this.return();
       this.openSnackBar("Resumen actualizado exitosamente");
     }
@@ -485,7 +486,6 @@ export class EditResumenComponent implements OnInit {
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/" + localStorage.getItem("resumen-back")]);
   }
 
@@ -506,7 +506,7 @@ export class EditResumenComponent implements OnInit {
             if (result.status == 1) {
               this._publicacionService.deletePublicacion(this.publicacion.idPublicacion).subscribe((result) => {
                 if (result.status == 1) {
-                  this.agregar = true;
+                  this.publicacionForm.markAsPristine();
                   this.return();
                   this.openSnackBar("Resumen eliminado exitosamente");
                 }

@@ -7,7 +7,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { Equipo } from "../models/equipo";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { EquipoService } from "../services/equipo.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -17,7 +17,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["./add-equipo.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class AddEquipoComponent implements OnInit {
+export class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   equipo: Equipo;
   equipoForm: FormGroup;
   button_text = "Guardar equipo";
@@ -31,7 +31,6 @@ export class AddEquipoComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _equipoService: EquipoService,
   ) {
     this.equipo = new Equipo(null, "", "", "", "", "", 1, null, null);
@@ -46,11 +45,15 @@ export class AddEquipoComponent implements OnInit {
 
   ngOnInit() {}
 
+  isDirty(): boolean {
+    return this.equipoForm.dirty;
+  }
+
   submitEquipo() {
     if (this.equipoForm.valid) {
       this._equipoService.addEquipo(this.equipo).subscribe((res) => {
         if (res.status == 1) {
-          this.agregar = true;
+          this.equipoForm.markAsPristine();
           this.return();
           this.openSnackBar();
         }
@@ -58,10 +61,7 @@ export class AddEquipoComponent implements OnInit {
     }
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 

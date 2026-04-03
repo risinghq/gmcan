@@ -34,8 +34,8 @@ import { FuenteFinanciamiento } from "../models/fuentefinanciamiento";
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
 import { Moneda } from "../models/moneda";
 import { Proyecto } from "../models/proyecto";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
-import { CommonService } from "../services/common.service";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
 import { GLOBAL } from "../services/global";
 import { LineasInvestigacionService } from "../services/lineasinvestigacion.service";
@@ -69,7 +69,7 @@ import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
     NgClass,
   ],
 })
-export class EditProyectoComponent implements OnInit {
+export class EditProyectoComponent implements OnInit, HasUnsavedChanges {
   edit = true;
   terminado = false;
   button_text = "Actualizar información";
@@ -87,7 +87,6 @@ export class EditProyectoComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _usuarioService: UsuarioService,
     private _lineaInvestigacionService: LineasInvestigacionService,
     private _fuenteFinanciamientoService: FuenteFinanciamientoService,
@@ -162,6 +161,10 @@ export class EditProyectoComponent implements OnInit {
 
   ngOnInit() {
     this.getProyecto();
+  }
+
+  isDirty(): boolean {
+    return this.proyectoForm.dirty;
   }
 
   disableSelect;
@@ -272,10 +275,7 @@ export class EditProyectoComponent implements OnInit {
 
   options: Array<any> = [];
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     sessionStorage.setItem("oldProject", "0");
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
@@ -363,7 +363,7 @@ export class EditProyectoComponent implements OnInit {
               }
             }
           });
-          this.agregar = true;
+          this.proyectoForm.markAsPristine();
           this.return();
           this.openSnackBar("Proyecto actualizado exitosamente");
         }
@@ -376,7 +376,7 @@ export class EditProyectoComponent implements OnInit {
       this.proyecto.estado = 0;
       this._proyectoService.endProyecto(this.proyecto).subscribe((result) => {
         if (result.status == 1) {
-          this.agregar = true;
+          this.proyectoForm.markAsPristine();
           this.return();
           this.openSnackBar("Proyecto concluido exitosamente");
         }
@@ -385,7 +385,7 @@ export class EditProyectoComponent implements OnInit {
       this.proyecto.estado = 1;
       this._proyectoService.restartProyecto(this.proyecto).subscribe((result) => {
         if (result.status == 1) {
-          this.agregar = true;
+          this.proyectoForm.markAsPristine();
           this.return();
           this.openSnackBar("Proyecto reactivado exitosamente");
         }
@@ -413,7 +413,7 @@ export class EditProyectoComponent implements OnInit {
       if (result.status == 1) {
         this._proyectoService.deleteProyecto(this.proyecto.idProyecto).subscribe((result) => {
           if (result.status == 1) {
-            this.agregar = true;
+            this.proyectoForm.markAsPristine();
             this.return();
             this.openSnackBar("Proyecto eliminado exitosamente");
           }

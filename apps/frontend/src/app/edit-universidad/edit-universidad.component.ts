@@ -17,7 +17,7 @@ import { ActivatedRoute, Router, Params } from "@angular/router";
 
 import { DialogData } from "../models/dialogdata";
 import { Universidad } from "../models/universidad";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { PublicacionService } from "../services/publicacion.service";
 import { SpaceValidator } from "../services/spacevalidator";
 import { UniversidadService } from "../services/universidad.service";
@@ -28,7 +28,7 @@ import { UniversidadService } from "../services/universidad.service";
   styleUrls: ["../add-universidad/add-universidad.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class EditUniversidadComponent implements OnInit {
+export class EditUniversidadComponent implements OnInit, HasUnsavedChanges {
   universidad: Universidad;
   public universidadForm: FormGroup;
   button_text = "Guardar universidad";
@@ -41,7 +41,6 @@ export class EditUniversidadComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _universidadService: UniversidadService,
-    private _commonService: CommonService,
     private _publicacionService: PublicacionService,
   ) {
     this.universidad = new Universidad(null, "", "", null, null);
@@ -49,6 +48,10 @@ export class EditUniversidadComponent implements OnInit {
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
+  }
+
+  isDirty(): boolean {
+    return this.universidadForm.dirty;
   }
 
   ngOnInit() {
@@ -78,20 +81,17 @@ export class EditUniversidadComponent implements OnInit {
     });
   }
 
-  agregar;
-
   submitUniversidad() {
     this._universidadService.updateUniversidad(this.universidad).subscribe((result) => {
       if (result.status == 1) {
+        this.universidadForm.markAsPristine();
         this.return();
         this.openSnackBar("Universidad actualizada exitosamente");
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/tesis"]);
   }
 
@@ -129,7 +129,7 @@ export class EditUniversidadComponent implements OnInit {
     if (this.notCanDo) {
       this._universidadService.deleteUniversidad(this.universidad.idUniversidad).subscribe((result) => {
         if (result.status == 1) {
-          this.agregar = true;
+          this.universidadForm.markAsPristine();
           this.return();
           this.openSnackBar("Universidad eliminada exitosamente");
         } else {

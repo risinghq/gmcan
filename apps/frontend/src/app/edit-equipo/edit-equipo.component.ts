@@ -19,7 +19,7 @@ import { map } from "rxjs/operators";
 
 import { DialogData } from "../models/dialogdata";
 import { Equipo } from "../models/equipo";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { EquipoService } from "../services/equipo.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -29,7 +29,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["../add-equipo/add-equipo.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class EditEquipoComponent implements OnInit {
+export class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   edit = true;
   equipo: Equipo;
   equipoForm: FormGroup;
@@ -41,7 +41,6 @@ export class EditEquipoComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _equipoService: EquipoService,
   ) {
     this.equipo = new Equipo(null, "", "", "", "", "", 1, null, null);
@@ -56,6 +55,10 @@ export class EditEquipoComponent implements OnInit {
 
   ngOnInit() {
     this.getEvento();
+  }
+
+  isDirty(): boolean {
+    return this.equipoForm.dirty;
   }
 
   getEvento() {
@@ -74,7 +77,7 @@ export class EditEquipoComponent implements OnInit {
     if (this.equipoForm.valid) {
       this._equipoService.updateEquipo(this.equipo).subscribe((res) => {
         if (res.status == 1) {
-          this.agregar = true;
+          this.equipoForm.markAsPristine();
           this.return();
           this.openSnackBar("Equipo actualizado exitosamente");
         }
@@ -82,10 +85,7 @@ export class EditEquipoComponent implements OnInit {
     }
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 
@@ -120,7 +120,7 @@ export class EditEquipoComponent implements OnInit {
   eraseEquipo() {
     this._equipoService.deleteEquipo(this.equipo.idEquipo).subscribe((result) => {
       if (result.status == 1) {
-        this.agregar = true;
+        this.equipoForm.markAsPristine();
         this.return();
         this.openSnackBar("Equipo eliminado exitosamente");
       } else {

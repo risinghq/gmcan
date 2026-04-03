@@ -7,7 +7,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { Universidad } from "../models/universidad";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { SpaceValidator } from "../services/spacevalidator";
 import { UniversidadService } from "../services/universidad.service";
 
@@ -17,7 +17,7 @@ import { UniversidadService } from "../services/universidad.service";
   styleUrls: ["./add-universidad.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class AddUniversidadComponent implements OnInit {
+export class AddUniversidadComponent implements OnInit, HasUnsavedChanges {
   universidad: Universidad;
   public universidadForm: FormGroup;
   button_text = "Guardar universidad";
@@ -30,7 +30,6 @@ export class AddUniversidadComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _universidadService: UniversidadService,
-    private _commonService: CommonService,
   ) {
     this.universidad = new Universidad(null, "", "", null, null);
     this.universidadForm = this.formBuilder.group({
@@ -39,22 +38,23 @@ export class AddUniversidadComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  isDirty(): boolean {
+    return this.universidadForm.dirty;
+  }
 
-  agregar;
+  ngOnInit() {}
 
   submitUniversidad() {
     this._universidadService.addUniversidad(this.universidad).subscribe((result) => {
       if (result.status == 1) {
+        this.universidadForm.markAsPristine();
         this.return();
         this.openSnackBar();
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/tesis"]);
   }
 

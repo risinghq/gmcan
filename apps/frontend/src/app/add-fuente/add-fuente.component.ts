@@ -7,7 +7,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { FuenteFinanciamiento } from "../models/fuentefinanciamiento";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -17,7 +17,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["./add-fuente.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class AddFuenteComponent implements OnInit {
+export class AddFuenteComponent implements OnInit, HasUnsavedChanges {
   fuente: FuenteFinanciamiento;
   public fuenteForm: FormGroup;
   button_text = "Guardar fuente";
@@ -29,7 +29,6 @@ export class AddFuenteComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    private _commonService: CommonService,
   ) {
     this.fuente = new FuenteFinanciamiento(null, "");
     this.fuenteForm = this.formBuilder.group({
@@ -39,7 +38,10 @@ export class AddFuenteComponent implements OnInit {
 
   ngOnInit() {}
 
-  agregar;
+  isDirty(): boolean {
+    return this.fuenteForm.dirty;
+  }
+
   notCanDo;
   openEraser() {}
   edit;
@@ -47,15 +49,14 @@ export class AddFuenteComponent implements OnInit {
   submitFuente() {
     this._fuenteFinanciamientoService.addFuenteFinanciamiento(this.fuente).subscribe((result) => {
       if (result.status == 1) {
+        this.fuenteForm.markAsPristine();
         this.return();
         this.openSnackBar();
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 

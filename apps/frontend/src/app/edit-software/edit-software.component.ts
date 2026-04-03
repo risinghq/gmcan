@@ -18,7 +18,7 @@ import { AutosizeModule } from "ngx-autosize";
 
 import { DialogData } from "../models/dialogdata";
 import { Software } from "../models/software";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { SoftwareService } from "../services/software.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -28,7 +28,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["../add-software/add-software.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgIf, NgClass],
 })
-export class EditSoftwareComponent implements OnInit {
+export class EditSoftwareComponent implements OnInit, HasUnsavedChanges {
   edit = true;
   software: Software;
   softwareForm: FormGroup;
@@ -40,7 +40,6 @@ export class EditSoftwareComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _softwareService: SoftwareService,
   ) {
     this.software = new Software(null, "", "", "", "", 1, null, null);
@@ -54,6 +53,10 @@ export class EditSoftwareComponent implements OnInit {
 
   ngOnInit() {
     this.getSoftware();
+  }
+
+  isDirty(): boolean {
+    return this.softwareForm.dirty;
   }
 
   getSoftware() {
@@ -71,17 +74,14 @@ export class EditSoftwareComponent implements OnInit {
   submitSoftware() {
     this._softwareService.updateSoftware(this.software).subscribe((res) => {
       if (res.status == 1) {
-        this.agregar = true;
+        this.softwareForm.markAsPristine();
         this.return();
         this.openSnackBar("Software actualizado exitosamente");
       }
     });
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 
@@ -116,7 +116,7 @@ export class EditSoftwareComponent implements OnInit {
   eraseSoftware() {
     this._softwareService.deleteSoftware(this.software.idSoftware).subscribe((result) => {
       if (result.status == 1) {
-        this.agregar = true;
+        this.softwareForm.markAsPristine();
         this.return();
         this.openSnackBar("Software eliminado exitosamente");
       } else {

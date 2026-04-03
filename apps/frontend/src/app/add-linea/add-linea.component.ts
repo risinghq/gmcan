@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { AutosizeModule } from "ngx-autosize";
 
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { GLOBAL } from "../services/global";
 import { LineasInvestigacionService } from "../services/lineasinvestigacion.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -19,7 +19,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["./add-linea.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, AutosizeModule, NgClass],
 })
-export class AddLineaComponent implements OnInit {
+export class AddLineaComponent implements OnInit, HasUnsavedChanges {
   button_text = "Guardar línea";
   lineaInvestigacion: lineasInvestigacion;
   public lineaForm: FormGroup;
@@ -35,7 +35,6 @@ export class AddLineaComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _lineaInvestigacionService: LineasInvestigacionService,
   ) {
     this.lineaForm = this.formBuilder.group({
@@ -50,6 +49,10 @@ export class AddLineaComponent implements OnInit {
 
   ngOnInit() {}
 
+  isDirty(): boolean {
+    return this.lineaForm.dirty;
+  }
+
   submitLinea() {
     this._lineaInvestigacionService.addLinea(this.lineaInvestigacion).subscribe((result) => {
       if (result.status == 1) {
@@ -58,17 +61,14 @@ export class AddLineaComponent implements OnInit {
             .uploadLineaFoto(this.fileData, result.idLineasInvestigacion)
             .subscribe((res) => {});
         }
-        this.agregar = true;
+        this.lineaForm.markAsPristine();
         this.return();
         this.openSnackBar();
       }
     });
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 

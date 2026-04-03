@@ -18,9 +18,9 @@ import { map, startWith } from "rxjs/operators";
 import { Autor } from "../models/autores";
 import { Publicacion } from "../models/publicacion";
 import { Revista } from "../models/revista";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
 import { AutorService } from "../services/autor.service";
-import { CommonService } from "../services/common.service";
 import { GLOBAL } from "../services/global";
 import { PublicacionService } from "../services/publicacion.service";
 import { PublicacionHasAutorService } from "../services/publicacionhasautor.service";
@@ -56,7 +56,7 @@ import { UsuarioService } from "../services/usuario.service";
     AsyncPipe,
   ],
 })
-export class AddArticleComponent implements OnInit {
+export class AddArticleComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Guardar artículo";
@@ -78,7 +78,6 @@ export class AddArticleComponent implements OnInit {
     private _autorService: AutorService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _revistaService: RevistaService,
   ) {
     this.publicacionForm = this.formBuilder.group({
@@ -128,6 +127,10 @@ export class AddArticleComponent implements OnInit {
 
   ngOnInit() {
     this.getRevista();
+  }
+
+  isDirty(): boolean {
+    return this.publicacionForm.dirty;
   }
 
   myControl = new FormControl();
@@ -273,10 +276,7 @@ export class AddArticleComponent implements OnInit {
     }
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
   }
 
@@ -308,7 +308,7 @@ export class AddArticleComponent implements OnInit {
           for (let index = 0; index < this.otrosAutores.length; index++) {
             this.setAutores(this.otrosAutores[index], index + 1, result.idPublicacion);
           }
-          this.agregar = true;
+          this.publicacionForm.markAsPristine();
           this.return();
           this.openSnackBar();
         }

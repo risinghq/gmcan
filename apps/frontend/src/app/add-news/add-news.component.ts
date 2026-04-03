@@ -29,8 +29,8 @@ import { DialogData } from "../models/dialogdata";
 import { Languages } from "../models/languages";
 import { NoticiaFull } from "../models/noticiafull";
 import { TipoNoticia } from "../models/tiponoticia";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
-import { CommonService } from "../services/common.service";
 import { GLOBAL } from "../services/global";
 import { NoticiaService } from "../services/noticia.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -61,7 +61,7 @@ import { UsuarioService } from "../services/usuario.service";
     NgClass,
   ],
 })
-export class AddNewsComponent implements OnInit {
+export class AddNewsComponent implements OnInit, HasUnsavedChanges {
   public Editor = ClassicEditor;
   url;
   noticia: NoticiaFull;
@@ -79,7 +79,6 @@ export class AddNewsComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private _tipoNoticiaService: TipoNoticiaService,
     private _usuarioService: UsuarioService,
-    private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
       titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -100,6 +99,10 @@ export class AddNewsComponent implements OnInit {
     this.getCategorias();
   }
 
+  isDirty(): boolean {
+    return this.newsForm.dirty;
+  }
+
   getCategorias() {
     this._tipoNoticiaService.getTipoNoticia().subscribe((result) => {
       if (result) {
@@ -117,14 +120,10 @@ export class AddNewsComponent implements OnInit {
     });
   }
 
-  agregar;
-  eliminar;
-
   edit;
   openEraser() {}
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/noticias"]);
   }
 
@@ -157,7 +156,7 @@ export class AddNewsComponent implements OnInit {
         if (this.fileData) {
           this._noticiaService.uploadNoticiaFoto(this.fileData, result.rows).subscribe((res) => {});
         }
-        this.agregar = true;
+        this.newsForm.markAsPristine();
         this.return();
         this.openSnackBar();
       }

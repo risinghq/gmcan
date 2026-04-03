@@ -28,9 +28,9 @@ import { Autor } from "../models/autores";
 import { DialogData } from "../models/dialogdata";
 import { Publicacion } from "../models/publicacion";
 import { Universidad } from "../models/universidad";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
 import { AutorService } from "../services/autor.service";
-import { CommonService } from "../services/common.service";
 import { GLOBAL } from "../services/global";
 import { PublicacionService } from "../services/publicacion.service";
 import { PublicacionHasAutorService } from "../services/publicacionhasautor.service";
@@ -67,7 +67,7 @@ import { UsuarioService } from "../services/usuario.service";
     AsyncPipe,
   ],
 })
-export class EditTesisComponent implements OnInit {
+export class EditTesisComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
@@ -88,7 +88,6 @@ export class EditTesisComponent implements OnInit {
     private _autorService: AutorService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _universidadService: UniversidadService,
     private _tipotesisService: TipoTesisService,
   ) {
@@ -133,11 +132,14 @@ export class EditTesisComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  agregar;
   edit = true;
 
   ngOnInit() {
     this.getArticulo();
+  }
+
+  isDirty(): boolean {
+    return this.publicacionForm.dirty;
   }
 
   getArticulo() {
@@ -423,7 +425,7 @@ export class EditTesisComponent implements OnInit {
         this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
       }
     }
-    this.agregar = true;
+    this.publicacionForm.markAsPristine();
     this.return();
     this.openSnackBar("Artículo actualizado exitosamente");
   }
@@ -460,7 +462,6 @@ export class EditTesisComponent implements OnInit {
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/" + localStorage.getItem("thesis-back")]);
   }
 
@@ -489,7 +490,7 @@ export class EditTesisComponent implements OnInit {
             if (result.status == 1) {
               this._publicacionService.deletePublicacion(this.publicacion.idPublicacion).subscribe((result) => {
                 if (result.status == 1) {
-                  this.agregar = true;
+                  this.publicacionForm.markAsPristine();
                   this.return();
                   this.openSnackBar("Tesis eliminado exitosamente");
                 }

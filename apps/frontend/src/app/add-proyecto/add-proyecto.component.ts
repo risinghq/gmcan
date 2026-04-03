@@ -16,8 +16,8 @@ import { FuenteFinanciamiento } from "../models/fuentefinanciamiento";
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
 import { Moneda } from "../models/moneda";
 import { Proyecto } from "../models/proyecto";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
-import { CommonService } from "../services/common.service";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
 import { GLOBAL } from "../services/global";
 import { LineasInvestigacionService } from "../services/lineasinvestigacion.service";
@@ -51,7 +51,7 @@ import { UsuarioHasProyectoService } from "../services/usuariohasproyecto";
     NgClass,
   ],
 })
-export class AddProyectoComponent implements OnInit {
+export class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   terminado = false;
   edit = false;
   button_text = "Guardar proyecto";
@@ -72,7 +72,6 @@ export class AddProyectoComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _usuarioService: UsuarioService,
     private _lineaInvestigacionService: LineasInvestigacionService,
     private _fuenteFinanciamientoService: FuenteFinanciamientoService,
@@ -125,6 +124,10 @@ export class AddProyectoComponent implements OnInit {
     this.getLineaInvestigacion();
   }
 
+  isDirty(): boolean {
+    return this.proyectoForm.dirty;
+  }
+
   getLineaInvestigacion() {
     this._lineaInvestigacionService.getLineasInvestigacion().subscribe((result) => {
       if (result) {
@@ -154,10 +157,7 @@ export class AddProyectoComponent implements OnInit {
 
   options: Array<any> = [];
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
@@ -249,7 +249,7 @@ export class AddProyectoComponent implements OnInit {
           for (let index = 0; index < this.otrosAutores.length; index++) {
             this.setAutores(this.otrosAutores[index], result.idProyecto);
           }
-          this.agregar = true;
+          this.proyectoForm.markAsPristine();
           this.return();
           this.openSnackBar();
         }

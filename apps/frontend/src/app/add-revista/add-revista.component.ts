@@ -7,7 +7,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 
 import { Revista } from "../models/revista";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { RevistaService } from "../services/revista.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -17,7 +17,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["./add-revista.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class AddRevistaComponent implements OnInit {
+export class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   revista: Revista;
   public revistaForm: FormGroup;
   button_text = "Guardar revista";
@@ -29,7 +29,6 @@ export class AddRevistaComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _revistaService: RevistaService,
-    private _commonService: CommonService,
   ) {
     this.revista = new Revista(null, "");
     this.revistaForm = this.formBuilder.group({
@@ -39,7 +38,10 @@ export class AddRevistaComponent implements OnInit {
 
   ngOnInit() {}
 
-  agregar;
+  isDirty(): boolean {
+    return this.revistaForm.dirty;
+  }
+
   notCanDo;
   edit;
   openEraser() {}
@@ -47,15 +49,14 @@ export class AddRevistaComponent implements OnInit {
   submitRevista() {
     this._revistaService.addRevista(this.revista).subscribe((result) => {
       if (result.status == 1) {
+        this.revistaForm.markAsPristine();
         this.return();
         this.openSnackBar();
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/articulos"]);
   }
 

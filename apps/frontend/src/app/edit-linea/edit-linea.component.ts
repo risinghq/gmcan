@@ -20,7 +20,7 @@ import { map } from "rxjs/operators";
 
 import { DialogData } from "../models/dialogdata";
 import { lineasInvestigacion } from "../models/lineaInvestigacion";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { GLOBAL } from "../services/global";
 import { LineasInvestigacionService } from "../services/lineasinvestigacion.service";
 import { ProyectoService } from "../services/proyecto.service";
@@ -32,7 +32,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["../add-linea/add-linea.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, AutosizeModule, NgClass],
 })
-export class EditLineaComponent implements OnInit {
+export class EditLineaComponent implements OnInit, HasUnsavedChanges {
   button_text = "Actualizar información";
   lineaInvestigacion: lineasInvestigacion;
   public lineaForm: FormGroup;
@@ -45,7 +45,6 @@ export class EditLineaComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _lineaInvestigacionService: LineasInvestigacionService,
     private _proyectoService: ProyectoService,
   ) {
@@ -61,6 +60,10 @@ export class EditLineaComponent implements OnInit {
 
   ngOnInit() {
     this.getLinea();
+  }
+
+  isDirty(): boolean {
+    return this.lineaForm.dirty;
   }
 
   getLinea() {
@@ -97,17 +100,14 @@ export class EditLineaComponent implements OnInit {
             .uploadLineaFoto(this.fileData, this.lineaInvestigacion.idLineasInvestigacion)
             .subscribe((res) => {});
         }
-        this.agregar = true;
+        this.lineaForm.markAsPristine();
         this.return();
         this.openSnackBar("Linea de investigación actualizada exitosamente");
       }
     });
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 
@@ -148,7 +148,7 @@ export class EditLineaComponent implements OnInit {
     if (this.notCanDo) {
       this._lineaInvestigacionService.deleteLinea(this.lineaInvestigacion.idLineasInvestigacion).subscribe((result) => {
         if (result.status == 1) {
-          this.agregar = true;
+          this.lineaForm.markAsPristine();
           this.return();
           this.openSnackBar("Evento eliminado exitosamente");
         } else {

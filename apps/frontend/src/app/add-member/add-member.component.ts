@@ -18,9 +18,9 @@ import { HomeComponent } from "../home/home.component";
 import { Genero } from "../models/genero";
 import { Prefijo } from "../models/prefijo";
 import { TipoMiembro } from "../models/tipomiembro";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { UsuarioFull } from "../models/usuarioFull";
 import { UsuarioPermiso } from "../models/usuariopermiso";
-import { CommonService } from "../services/common.service";
 import { GeneroService } from "../services/genero.service";
 import { GLOBAL } from "../services/global";
 import { PermisoService } from "../services/permiso.service";
@@ -57,7 +57,7 @@ import { UsuarioHasPermisoService } from "../services/usuariohaspermiso.service"
     HomeComponent,
   ],
 })
-export class AddMemberComponent implements OnInit {
+export class AddMemberComponent implements OnInit, HasUnsavedChanges {
   public memberForm: FormGroup;
   member: UsuarioFull;
   generos: Array<Genero>;
@@ -82,7 +82,6 @@ export class AddMemberComponent implements OnInit {
     private _snackBar: MatSnackBar,
     public _router: Router,
     public dialog: MatDialog,
-    private _commonService: CommonService,
   ) {
     this.memberForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -135,6 +134,10 @@ export class AddMemberComponent implements OnInit {
   ngOnInit() {
     this.listaPermisos = [];
     this.getGenero();
+  }
+
+  isDirty(): boolean {
+    return this.memberForm.dirty;
   }
 
   getGenero() {
@@ -229,7 +232,7 @@ export class AddMemberComponent implements OnInit {
                   });
                 }
                 this.openSnackBar("Miembro agregado exitosamente", null);
-                this.agregar = true;
+                this.memberForm.markAsPristine();
                 this.return();
               }
             });
@@ -304,11 +307,8 @@ export class AddMemberComponent implements OnInit {
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/miembros-activos"]);
   }
-
-  agregar;
 
   openEraser() {}
   edit;

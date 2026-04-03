@@ -10,7 +10,7 @@ import { ClassicEditor } from "ckeditor5";
 
 import { Languages } from "../models/languages";
 import { Method } from "../models/method";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { GLOBAL } from "../services/global";
 import { MethodsService } from "../services/methods.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -21,7 +21,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["./add-method.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, CKEditorModule, NgClass],
 })
-export class AddMethodComponent implements OnInit {
+export class AddMethodComponent implements OnInit, HasUnsavedChanges {
   public Editor = ClassicEditor;
   button_text = "Guardar método";
   metodo: Method;
@@ -37,7 +37,6 @@ export class AddMethodComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _methodService: MethodsService,
   ) {
     this.methodForm = this.formBuilder.group({
@@ -52,6 +51,10 @@ export class AddMethodComponent implements OnInit {
 
   ngOnInit() {}
 
+  isDirty(): boolean {
+    return this.methodForm.dirty;
+  }
+
   submitMethod() {
     if (this.methodForm.valid) {
       this._methodService.addMetodo(this.metodo).subscribe((result) => {
@@ -59,7 +62,7 @@ export class AddMethodComponent implements OnInit {
           if (this.fileData) {
             this._methodService.uploadMetodoFoto(this.fileData, result.idMetodo).subscribe((res) => {});
           }
-          this.agregar = true;
+          this.methodForm.markAsPristine();
           this.return();
           this.openSnackBar();
         }
@@ -67,10 +70,7 @@ export class AddMethodComponent implements OnInit {
     }
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 

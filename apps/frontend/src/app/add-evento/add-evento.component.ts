@@ -13,7 +13,7 @@ import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
 
 import { Evento } from "../models/eventos";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { EventoService } from "../services/evento.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -37,7 +37,7 @@ import { SpaceValidator } from "../services/spacevalidator";
     AsyncPipe,
   ],
 })
-export class AddEventoComponent implements OnInit {
+export class AddEventoComponent implements OnInit, HasUnsavedChanges {
   evento: Evento;
   public eventoForm: FormGroup;
   button_text = "Guardar evento";
@@ -49,7 +49,6 @@ export class AddEventoComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _eventoService: EventoService,
-    private _commonService: CommonService,
   ) {
     this.evento = new Evento(null, "", "", "", "", "");
     this.eventoForm = this.formBuilder.group({
@@ -154,20 +153,21 @@ export class AddEventoComponent implements OnInit {
     });
   }
 
-  agregar;
+  isDirty(): boolean {
+    return this.eventoForm.dirty;
+  }
 
   submitEvento() {
     this._eventoService.addEvento(this.evento).subscribe((result) => {
       if (result.status == 1) {
+        this.eventoForm.markAsPristine();
         this.return();
         this.openSnackBar();
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/eventos"]);
   }
 

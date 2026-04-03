@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { AutosizeModule } from "ngx-autosize";
 
 import { Software } from "../models/software";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { SoftwareService } from "../services/software.service";
 import { SpaceValidator } from "../services/spacevalidator";
 
@@ -18,7 +18,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["./add-software.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgIf, NgClass],
 })
-export class AddSoftwareComponent implements OnInit {
+export class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   software: Software;
   softwareForm: FormGroup;
   button_text = "Guardar software";
@@ -32,7 +32,6 @@ export class AddSoftwareComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _softwareService: SoftwareService,
   ) {
     this.software = new Software(null, "", "", "", "", 1, null, null);
@@ -46,20 +45,21 @@ export class AddSoftwareComponent implements OnInit {
 
   ngOnInit() {}
 
+  isDirty(): boolean {
+    return this.softwareForm.dirty;
+  }
+
   submitSoftware() {
     this._softwareService.addSoftware(this.software).subscribe((res) => {
       if (res.status == 1) {
-        this.agregar = true;
+        this.softwareForm.markAsPristine();
         this.return();
         this.openSnackBar();
       }
     });
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 

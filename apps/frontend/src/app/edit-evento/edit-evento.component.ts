@@ -23,7 +23,7 @@ import { map, startWith } from "rxjs/operators";
 
 import { DialogData } from "../models/dialogdata";
 import { Evento } from "../models/eventos";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { EventoService } from "../services/evento.service";
 import { PublicacionService } from "../services/publicacion.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -48,7 +48,7 @@ import { SpaceValidator } from "../services/spacevalidator";
     AsyncPipe,
   ],
 })
-export class EditEventoComponent implements OnInit {
+export class EditEventoComponent implements OnInit, HasUnsavedChanges {
   evento: Evento;
   public eventoForm: FormGroup;
   button_text = "Actualizar evento";
@@ -61,7 +61,6 @@ export class EditEventoComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _eventoService: EventoService,
-    private _commonService: CommonService,
     private _publicacionService: PublicacionService,
   ) {
     this.evento = new Evento(null, "", "", "", "", "");
@@ -181,6 +180,10 @@ export class EditEventoComponent implements OnInit {
     });
   }
 
+  isDirty(): boolean {
+    return this.eventoForm.dirty;
+  }
+
   notCanDo;
 
   getPublicacionEvento(idEvento) {
@@ -191,20 +194,17 @@ export class EditEventoComponent implements OnInit {
     });
   }
 
-  agregar;
-
   submitEvento() {
     this._eventoService.updateEvento(this.evento).subscribe((result) => {
       if (result.status == 1) {
+        this.eventoForm.markAsPristine();
         this.return();
         this.openSnackBar("Evento actualizado exitosamente");
-        this.agregar = true;
       }
     });
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/eventos"]);
   }
 
@@ -242,7 +242,7 @@ export class EditEventoComponent implements OnInit {
     if (this.notCanDo) {
       this._eventoService.deleteEvento(this.evento.idEvento).subscribe((result) => {
         if (result.status == 1) {
-          this.agregar = true;
+          this.eventoForm.markAsPristine();
           this.return();
           this.openSnackBar("Evento eliminado exitosamente");
         } else {

@@ -29,8 +29,8 @@ import { DialogData } from "../models/dialogdata";
 import { Languages } from "../models/languages";
 import { NoticiaFull } from "../models/noticiafull";
 import { TipoNoticia } from "../models/tiponoticia";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { Usuario } from "../models/usuario";
-import { CommonService } from "../services/common.service";
 import { GLOBAL } from "../services/global";
 import { NoticiaService } from "../services/noticia.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -61,7 +61,7 @@ import { UsuarioService } from "../services/usuario.service";
     NgClass,
   ],
 })
-export class EditNewsComponent implements OnInit {
+export class EditNewsComponent implements OnInit, HasUnsavedChanges {
   public Editor = ClassicEditor;
   noticia: NoticiaFull;
   edit = true;
@@ -75,7 +75,6 @@ export class EditNewsComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private _tipoNoticiaService: TipoNoticiaService,
     private _usuarioService: UsuarioService,
-    private _commonService: CommonService,
   ) {
     this.newsForm = this.formBuilder.group({
       titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -101,6 +100,10 @@ export class EditNewsComponent implements OnInit {
   autores: Array<Usuario>;
   button_text;
   button_text2;
+
+  isDirty(): boolean {
+    return this.newsForm.dirty;
+  }
 
   getNews() {
     this._route.params.forEach((params: Params) => {
@@ -144,14 +147,7 @@ export class EditNewsComponent implements OnInit {
     });
   }
 
-  agregar;
-  eliminar;
-
   return() {
-    if (!this.eliminar) {
-      this.agregar = false;
-    }
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/noticias"]);
   }
 
@@ -196,8 +192,7 @@ export class EditNewsComponent implements OnInit {
         if (this.fileData) {
           this._noticiaService.uploadNoticiaFoto(this.fileData, this.noticia.idNoticia).subscribe((res) => {});
         }
-        this.eliminar = true;
-        this.agregar = true;
+        this.newsForm.markAsPristine();
         this.return();
         if (value == 1) {
           this.openSnackBar("Noticia publicada exitosamente");
@@ -377,8 +372,7 @@ export class EditNewsComponent implements OnInit {
   eraseNews() {
     this._noticiaService.deleteNoticia(this.noticia.idNoticia).subscribe((result) => {
       if (result.status == 1) {
-        this.eliminar = true;
-        this.agregar = true;
+        this.newsForm.markAsPristine();
         this.return();
         this.openSnackBar("Noticia eliminada exitosamente");
       } else {

@@ -20,7 +20,7 @@ import { ClassicEditor } from "ckeditor5";
 import { DialogData } from "../models/dialogdata";
 import { Languages } from "../models/languages";
 import { Method } from "../models/method";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { GLOBAL } from "../services/global";
 import { MethodsService } from "../services/methods.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -31,7 +31,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["../add-method/add-method.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, CKEditorModule, NgClass],
 })
-export class EditMethodComponent implements OnInit {
+export class EditMethodComponent implements OnInit, HasUnsavedChanges {
   public Editor = ClassicEditor;
   button_text = "Actualizar información";
   metodo: Method;
@@ -44,7 +44,6 @@ export class EditMethodComponent implements OnInit {
     public _router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
     private _methodService: MethodsService,
   ) {
     this.methodForm = this.formBuilder.group({
@@ -59,6 +58,10 @@ export class EditMethodComponent implements OnInit {
 
   ngOnInit() {
     this.getMethod();
+  }
+
+  isDirty(): boolean {
+    return this.methodForm.dirty;
   }
 
   getMethod() {
@@ -80,7 +83,7 @@ export class EditMethodComponent implements OnInit {
           if (this.fileData) {
             this._methodService.uploadMetodoFoto(this.fileData, this.metodo.idMetodo).subscribe((res) => {});
           }
-          this.agregar = true;
+          this.methodForm.markAsPristine();
           this.return();
           this.openSnackBar("Metódo actualizado exitosamente");
         }
@@ -88,10 +91,7 @@ export class EditMethodComponent implements OnInit {
     }
   }
 
-  agregar;
-
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/contenidos"]);
   }
 
@@ -108,7 +108,7 @@ export class EditMethodComponent implements OnInit {
   eraseMethod() {
     this._methodService.deleteMetodo(this.metodo.idMetodo).subscribe((res) => {
       if (res.status == 1) {
-        this.agregar = true;
+        this.methodForm.markAsPristine();
         this.return();
         this.openSnackBar("Metódo eliminado exitosamente");
       }

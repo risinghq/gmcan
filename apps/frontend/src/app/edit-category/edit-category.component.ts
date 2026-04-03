@@ -19,7 +19,7 @@ import { map } from "rxjs/operators";
 
 import { DialogData } from "../models/dialogdata";
 import { TipoNoticia } from "../models/tiponoticia";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { NoticiaService } from "../services/noticia.service";
 import { SpaceValidator } from "../services/spacevalidator";
 import { TipoNoticiaService } from "../services/tiponoticia.service";
@@ -30,14 +30,12 @@ import { TipoNoticiaService } from "../services/tiponoticia.service";
   styleUrls: ["../add-category/add-category.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class EditCategoryComponent implements OnInit {
+export class EditCategoryComponent implements OnInit, HasUnsavedChanges {
   category: TipoNoticia;
   public categoryForm: FormGroup;
   button_text = "Actualizar categoría";
   edit = true;
   idCategory;
-  agregar;
-  eliminar;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -47,7 +45,6 @@ export class EditCategoryComponent implements OnInit {
     public _tipoNoticiaService: TipoNoticiaService,
     public _noticiaService: NoticiaService,
     private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
   ) {
     this.categoryForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -85,11 +82,11 @@ export class EditCategoryComponent implements OnInit {
     });
   }
 
+  isDirty(): boolean {
+    return this.categoryForm.dirty;
+  }
+
   return() {
-    if (!this.eliminar) {
-      this.agregar = false;
-    }
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/noticias"]);
   }
 
@@ -97,6 +94,7 @@ export class EditCategoryComponent implements OnInit {
     if (this.categoryForm.valid) {
       this._tipoNoticiaService.updateCategory(this.category).subscribe((result) => {
         if (result.status == 1) {
+          this.categoryForm.markAsPristine();
           this.return();
           this.openSnackBar("Categoría actualizada exitosamente");
         }
@@ -140,8 +138,7 @@ export class EditCategoryComponent implements OnInit {
       if (result.length == 0) {
         this._tipoNoticiaService.deleteCategory(this.idCategory).subscribe((result) => {
           if (result.status == 1) {
-            this.eliminar = true;
-            this.agregar = true;
+            this.categoryForm.markAsPristine();
             this.return();
             this.openSnackBar("Categoría eliminada exitosamente");
           } else {

@@ -19,7 +19,7 @@ import { map } from "rxjs/operators";
 
 import { DialogData } from "../models/dialogdata";
 import { FuenteFinanciamiento } from "../models/fuentefinanciamiento";
-import { CommonService } from "../services/common.service";
+import { HasUnsavedChanges } from "../models/unsaved-changes";
 import { FuenteFinanciamientoService } from "../services/fuentefinanciamiento.service";
 import { ProyectoService } from "../services/proyecto.service";
 import { SpaceValidator } from "../services/spacevalidator";
@@ -30,7 +30,7 @@ import { SpaceValidator } from "../services/spacevalidator";
   styleUrls: ["../add-fuente/add-fuente.component.scss"],
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
 })
-export class EditFuenteComponent implements OnInit {
+export class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   fuente: FuenteFinanciamiento;
   public fuenteForm: FormGroup;
   button_text = "Actualizar información";
@@ -43,7 +43,6 @@ export class EditFuenteComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    private _commonService: CommonService,
     private _proyectoService: ProyectoService,
   ) {
     this.fuente = new FuenteFinanciamiento(null, "");
@@ -54,6 +53,10 @@ export class EditFuenteComponent implements OnInit {
 
   ngOnInit() {
     this.getFuente();
+  }
+
+  isDirty(): boolean {
+    return this.fuenteForm.dirty;
   }
 
   getFuente() {
@@ -79,22 +82,19 @@ export class EditFuenteComponent implements OnInit {
     });
   }
 
-  agregar;
-
   submitFuente() {
     if (this.fuenteForm.valid) {
       this._fuenteFinanciamientoService.updateFuenteFinanciamiento(this.fuente).subscribe((result) => {
         if (result.status == 1) {
+          this.fuenteForm.markAsPristine();
           this.return();
           this.openSnackBar("Fuente de financiamiento actualizada exitosamente");
-          this.agregar = true;
         }
       });
     }
   }
 
   return() {
-    this._commonService.setEndSession("0");
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
@@ -134,7 +134,7 @@ export class EditFuenteComponent implements OnInit {
         .deleteFuenteFinanciamiento(this.fuente.idFuenteFinanciamiento)
         .subscribe((result) => {
           if (result.status == 1) {
-            this.agregar = true;
+            this.fuenteForm.markAsPristine();
             this.return();
             this.openSnackBar("Fuente de financiamiento eliminada exitosamente");
           } else {
