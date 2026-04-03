@@ -3,13 +3,12 @@ import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { Router, ActivatedRoute, Params } from "@angular/router";
-
-import { Noticia } from "../models/noticia";
-import { TipoNoticia } from "../models/tiponoticia";
-import { GLOBAL } from "../services/global";
-import { NoticiaService } from "../services/noticia.service";
-import { TipoNoticiaService } from "../services/tiponoticia.service";
-import { UsuarioService } from "../services/usuario.service";
+import { Noticia } from "@app/shared/models/noticia";
+import { TipoNoticia } from "@app/shared/models/tiponoticia";
+import { GLOBAL } from "@app/shared/services/global";
+import { NoticiaService } from "@app/shared/services/noticia.service";
+import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
+import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
   selector: "app-news",

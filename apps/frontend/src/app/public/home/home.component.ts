@@ -41,8 +41,6 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 
-import { environment } from "../../environments/environment";
-
 @Component({
   selector: "app-home",
   templateUrl: "./home.component.html",
@@ -623,7 +621,7 @@ export default class HomeComponent implements OnInit {
   fbsharing(i) {
     const title = String(this.publicaciones[i].titulo);
     this.meta.updateTag({ name: "description", content: title });
-    const locationhref = `${environment.appUrl}/home`;
+    const locationhref = `${GLOBAL.appUrl}/home`;
 
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(locationhref)}`,

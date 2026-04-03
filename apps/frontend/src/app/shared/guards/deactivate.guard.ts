@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { CanDeactivateFn } from "@angular/router";
 import { map } from "rxjs/operators";
 
-import { ConfirmLeaveComponent } from "../modals/confirm-leave.component";
+import ConfirmLeaveComponent from "../modals/confirm-leave.component";
 import { HasUnsavedChanges } from "../models/unsaved-changes";
 
 export const canDeactivateGuard: CanDeactivateFn<HasUnsavedChanges> = (component) => {

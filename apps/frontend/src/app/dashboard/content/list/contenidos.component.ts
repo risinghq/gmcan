@@ -664,7 +664,7 @@ export default class ContenidosComponent implements OnInit {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/about-us.html",
-  styleUrls: ["../about-us/about-us.component.scss"],
+  styleUrls: ["../../../public/about/about-us/about-us.component.scss"],
   imports: [MatDialogClose],
 })
 export class DialogPreview3 {
@@ -694,7 +694,7 @@ export class DialogPreview3 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/trabajos-futuros.html",
-  styleUrls: ["../works/works.component.scss"],
+  styleUrls: ["../../../public/about/works/works.component.scss"],
   imports: [MatDialogClose],
 })
 export class DialogPreview6 {

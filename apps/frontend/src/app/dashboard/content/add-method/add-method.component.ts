@@ -131,7 +131,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
-  styleUrls: ["../method/method.component.scss"],
+  styleUrls: ["../../../public/about/method/method.component.scss"],
   imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview4 {

@@ -46,8 +46,8 @@ import { AutosizeModule } from "ngx-autosize";
 
 @Component({
   selector: "app-edit-proyecto",
-  templateUrl: "../add-proyecto/add-proyecto.component.html",
-  styleUrls: ["../add-proyecto/add-proyecto.component.scss"],
+  templateUrl: "../add/add-proyecto.component.html",
+  styleUrls: ["../add/add-proyecto.component.scss"],
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

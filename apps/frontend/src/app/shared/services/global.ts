@@ -1,4 +1,4 @@
-import { environment } from "../../environments/environment";
+import { environment } from "../../../environments/environment";
 
 export const GLOBAL = {
   get url(): string {
@@ -7,5 +7,8 @@ export const GLOBAL = {
       throw new Error("API URL not configured in environment");
     }
     return apiUrl;
+  },
+  get appUrl(): string {
+    return environment.appUrl;
   },
 };

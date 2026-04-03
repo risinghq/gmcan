@@ -1,5 +1,5 @@
-@use "../shared/styles/add-category-base";
-@use "../shared/styles/add-news-base";
+@use "../../../shared/styles/add-category-base";
+@use "../../../shared/styles/add-news-base";
 
 ::ng-deep .mat-form-field-label {
   @extend .plex-sans;

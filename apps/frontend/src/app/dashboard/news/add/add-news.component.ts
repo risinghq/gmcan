@@ -294,7 +294,7 @@ export class DialogPublish {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-preview.html",
-  styleUrls: ["../detail-news/detail-news.component.scss"],
+  styleUrls: ["../../../public/detail-news/detail-news.component.scss"],
   imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview {

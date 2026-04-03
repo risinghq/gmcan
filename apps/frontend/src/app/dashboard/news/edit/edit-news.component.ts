@@ -38,8 +38,8 @@ import { AutosizeModule } from "ngx-autosize";
 
 @Component({
   selector: "app-edit-news",
-  templateUrl: "../add-news/add-news.component.html",
-  styleUrls: ["../add-news/add-news.component.scss"],
+  templateUrl: "../add/add-news.component.html",
+  styleUrls: ["../add/add-news.component.scss"],
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,
@@ -412,7 +412,7 @@ export class DialogPublish2 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-preview.html",
-  styleUrls: ["../detail-news/detail-news.component.scss"],
+  styleUrls: ["../../../public/detail-news/detail-news.component.scss"],
   imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview2 {

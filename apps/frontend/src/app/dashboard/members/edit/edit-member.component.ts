@@ -43,7 +43,7 @@ import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-edit-member",
-  templateUrl: "../add-member/add-member.component.html",
+  templateUrl: "../add/add-member.component.html",
   styleUrls: ["./edit-member.component.scss"],
   providers: [provideNativeDateAdapter()],
   imports: [
