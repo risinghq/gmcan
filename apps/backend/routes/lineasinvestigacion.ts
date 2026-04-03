@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
@@ -43,19 +43,19 @@ router.post("/search-lineasinvestigacion", zValidator("json", SearchBody), async
   return c.json(rows);
 });
 
-router.post("/post-lineasinvestigacion", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-lineasinvestigacion", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   const result = await db.insertInto("lineasinvestigacion").values(body).executeTakeFirst();
   return c.json({ idLineasInvestigacion: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-lineasinvestigacion/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-lineasinvestigacion/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("lineasinvestigacion").where("idLineasInvestigacion", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-lineasinvestigacion", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-lineasinvestigacion", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idLineasInvestigacion, ...fields } = c.req.valid("json");
   await db
     .updateTable("lineasinvestigacion")
@@ -65,7 +65,7 @@ router.put("/update-lineasinvestigacion", checkToken, zValidator("json", UpdateB
   return c.json({ status: 1 });
 });
 
-router.put("/upload-lineainvestigacion-foto/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-lineainvestigacion-foto/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -27,13 +27,13 @@ router.get("/get-usuariohasproyectos/:id", zValidator("param", DniParam), async 
   return c.json(rows);
 });
 
-router.post("/post-usuariohasproyecto", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-usuariohasproyecto", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   await db.insertInto("usuario_has_proyecto").values(body).execute();
   return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-usuariohasproyecto/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-usuariohasproyecto/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("usuario_has_proyecto").where("proyecto_idProyecto", "=", id).execute();
   return c.json({ status: 1 });

@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
@@ -40,7 +40,7 @@ router.put(
 
 router.put(
   "/update-objetivosgrupo",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -62,7 +62,7 @@ router.put(
 
 router.put(
   "/update-serviciosgrupo",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -82,7 +82,7 @@ router.put(
   },
 );
 
-router.put("/upload-sobrenosotros-foto/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-sobrenosotros-foto/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

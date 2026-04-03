@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
@@ -49,7 +49,7 @@ router.get("/get-noticiatipo/:id", zValidator("param", IdParam), async (c) => {
   return c.json(rows);
 });
 
-router.get("/get-noticiafull/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.get("/get-noticiafull/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await db.selectFrom("noticia").selectAll().where("idNoticia", "=", id).executeTakeFirst();
   return c.json(row);
@@ -76,7 +76,7 @@ router.post("/search-noticia-global", zValidator("json", z.object({ nombre: z.st
   return c.json(rows);
 });
 
-router.post("/post-noticia", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-noticia", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   const result = await db.insertInto("noticia").values(body).executeTakeFirst();
   return c.json({ idNoticia: Number(result.insertId) }, 201);
@@ -94,7 +94,7 @@ router.put("/update-noticia", zValidator("json", UpdateBody), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/upload-noticia-file/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-noticia-file/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

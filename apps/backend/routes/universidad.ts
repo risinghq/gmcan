@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -37,19 +37,19 @@ router.post("/search-universidad", zValidator("json", SearchBody), async (c) => 
   return c.json(rows);
 });
 
-router.post("/post-universidad", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-universidad", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   const result = await db.insertInto("universidad").values(body).executeTakeFirst();
   return c.json({ idUniversidad: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-universidad/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-universidad/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("universidad").where("idUniversidad", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-universidad", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-universidad", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idUniversidad, ...fields } = c.req.valid("json");
   await db.updateTable("universidad").set(fields).where("idUniversidad", "=", idUniversidad).execute();
   return c.json({ status: 1 });

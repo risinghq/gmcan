@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -28,19 +28,19 @@ router.get("/get-equipo/:id", zValidator("param", IdParam), async (c) => {
   return c.json(rows);
 });
 
-router.post("/post-equipo", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-equipo", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   await db.insertInto("equipo").values(body).execute();
   return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-equipo/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-equipo/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("equipo").where("idEquipo", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-equipo", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-equipo", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idEquipo, ...fields } = c.req.valid("json");
   await db.updateTable("equipo").set(fields).where("idEquipo", "=", idEquipo).execute();
   return c.json({ status: 1 });

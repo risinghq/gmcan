@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -128,7 +128,7 @@ router.post(
   },
 );
 
-router.post("/post-proyecto", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-proyecto", checkSession, zValidator("json", Body), async (c) => {
   const { fechaI, fechaF, ...rest } = c.req.valid("json");
   const result = await db
     .insertInto("proyecto")
@@ -137,13 +137,13 @@ router.post("/post-proyecto", checkToken, zValidator("json", Body), async (c) =>
   return c.json({ idProyecto: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-proyecto/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-proyecto/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("proyecto").where("idProyecto", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-proyecto", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-proyecto", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idProyecto, fechaI, fechaF, ...rest } = c.req.valid("json");
   await db
     .updateTable("proyecto")
@@ -155,7 +155,7 @@ router.put("/update-proyecto", checkToken, zValidator("json", UpdateBody), async
 
 router.put(
   "/end-proyecto",
-  checkToken,
+  checkSession,
   zValidator("json", z.object({ idProyecto: z.number().int(), estado: z.number().int() })),
   async (c) => {
     const { idProyecto, estado } = c.req.valid("json");
@@ -167,7 +167,7 @@ router.put(
 
 router.put(
   "/restart-proyecto",
-  checkToken,
+  checkSession,
   zValidator("json", z.object({ idProyecto: z.number().int(), estado: z.number().int() })),
   async (c) => {
     const { idProyecto, estado } = c.req.valid("json");

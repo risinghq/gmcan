@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -28,19 +28,19 @@ router.post("/search-revistas", zValidator("json", SearchBody), async (c) => {
   return c.json(rows);
 });
 
-router.post("/post-revista", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-revista", checkSession, zValidator("json", Body), async (c) => {
   const { nombre } = c.req.valid("json");
   const result = await db.insertInto("revista").values({ nombre }).executeTakeFirst();
   return c.json({ idRevista: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-revista/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-revista/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("revista").where("idRevista", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-revista", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-revista", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idRevista, nombre } = c.req.valid("json");
   await db.updateTable("revista").set({ nombre }).where("idRevista", "=", idRevista).execute();
   return c.json({ status: 1 });

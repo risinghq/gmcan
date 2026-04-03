@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -24,7 +24,7 @@ router.get("/get-permiso", async (c) => {
   return c.json(rows);
 });
 
-router.post("/post-permiso", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-permiso", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   await db
     .insertInto("permiso")
@@ -33,13 +33,13 @@ router.post("/post-permiso", checkToken, zValidator("json", Body), async (c) => 
   return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-permiso/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-permiso/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("permiso").where("idPermiso", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-permiso", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-permiso", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idPermiso, ...fields } = c.req.valid("json");
   await db
     .updateTable("permiso")

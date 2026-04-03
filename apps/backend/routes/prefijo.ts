@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -24,19 +24,19 @@ router.get("/get-prefijo", async (c) => {
   return c.json(rows);
 });
 
-router.post("/post-prefijo", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-prefijo", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   await db.insertInto("prefijo").values(body).execute();
   return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-prefijo/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-prefijo/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("prefijo").where("idPrefijo", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-prefijo", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-prefijo", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idPrefijo, ...fields } = c.req.valid("json");
   await db.updateTable("prefijo").set(fields).where("idPrefijo", "=", idPrefijo).execute();
   return c.json({ status: 1 });

@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
@@ -32,7 +32,7 @@ router.get("/get-grupo-trabajosfuturos", async (c) => {
 
 router.put(
   "/update-grupo-facilidades",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -54,7 +54,7 @@ router.put(
 
 router.put(
   "/update-grupo-trabajosfuturos",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -72,7 +72,7 @@ router.put(
 
 router.put(
   "/update-grupo-info",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -90,7 +90,7 @@ router.put(
 
 router.put(
   "/update-grupo-seccionpresentacion",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -112,7 +112,7 @@ router.put(
 
 router.put(
   "/update-grupo-seccionpublicaciones",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -134,7 +134,7 @@ router.put(
 
 router.put(
   "/update-grupo-seccionproyectos",
-  checkToken,
+  checkSession,
   zValidator(
     "json",
     z.object({
@@ -154,7 +154,7 @@ router.put(
   },
 );
 
-router.put("/upload-image-facilidades/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-image-facilidades/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
@@ -166,7 +166,7 @@ router.put("/upload-image-facilidades/:id", checkToken, zValidator("param", IdPa
   return c.json({ status: 1 });
 });
 
-router.put("/upload-grupo-header/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-grupo-header/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
@@ -178,7 +178,7 @@ router.put("/upload-grupo-header/:id", checkToken, zValidator("param", IdParam),
   return c.json({ status: 1 });
 });
 
-router.put("/upload-grupo-footer/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-grupo-footer/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

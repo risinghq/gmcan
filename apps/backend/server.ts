@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
+import { getFrontendUrl } from "./config.js";
 import { bootstrap } from "./db/bootstrap.js";
 import { onError } from "./lib/handle.js";
 import AutorRoutes from "./routes/autor.js";
@@ -45,16 +46,9 @@ app.onError(onError);
 app.use(
   "*",
   cors({
-    origin: "*",
-    allowHeaders: [
-      "Authorization",
-      "X-API-KEY",
-      "Origin",
-      "X-Requested-With",
-      "Content-Type",
-      "Accept",
-      "Access-Control-Allow-Request-Method",
-    ],
+    origin: getFrontendUrl(),
+    credentials: true,
+    allowHeaders: ["Content-Type", "Accept"],
     allowMethods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
   }),
 );

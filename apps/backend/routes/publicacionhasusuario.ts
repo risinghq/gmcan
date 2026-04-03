@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -43,19 +43,19 @@ router.post(
   },
 );
 
-router.post("/post-publicacionhasusuario", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-publicacionhasusuario", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   await db.insertInto("publicacion_has_usuario").values(body).execute();
   return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-publicacionhasusuario/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-publicacionhasusuario/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("publicacion_has_usuario").where("publicacion_idPublicacion", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-publicacionhasusuario", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-publicacionhasusuario", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { usuario_DNI, publicacion_idPublicacion, ...fields } = c.req.valid("json");
   await db
     .updateTable("publicacion_has_usuario")

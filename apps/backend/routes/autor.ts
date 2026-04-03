@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -33,7 +33,7 @@ router.post("/search-autores", zValidator("json", SearchBody), async (c) => {
   return c.json(rows);
 });
 
-router.post("/post-autor", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-autor", checkSession, zValidator("json", Body), async (c) => {
   const { nombre } = c.req.valid("json");
   const result = await db.insertInto("autor").values({ nombre }).executeTakeFirst();
   return c.json({ idAutor: Number(result.insertId) }, 201);

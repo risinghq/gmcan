@@ -5,7 +5,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
@@ -31,25 +31,25 @@ router.get("/get-metodo/:id", zValidator("param", IdParam), async (c) => {
   return c.json(rows);
 });
 
-router.post("/post-metodo", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-metodo", checkSession, zValidator("json", Body), async (c) => {
   const body = c.req.valid("json");
   const result = await db.insertInto("metodo").values(body).executeTakeFirst();
   return c.json({ idMetodo: Number(result.insertId) }, 201);
 });
 
-router.delete("/delete-metodo/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-metodo/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("metodo").where("idMetodo", "=", id).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/update-metodo", checkToken, zValidator("json", UpdateBody), async (c) => {
+router.put("/update-metodo", checkSession, zValidator("json", UpdateBody), async (c) => {
   const { idMetodo, ...fields } = c.req.valid("json");
   await db.updateTable("metodo").set(fields).where("idMetodo", "=", idMetodo).execute();
   return c.json({ status: 1 });
 });
 
-router.put("/upload-metodo-foto/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.put("/upload-metodo-foto/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

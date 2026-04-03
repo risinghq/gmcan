@@ -123,7 +123,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "fechaActualizacion",
     "isPrincipal",
   ],
-  refresh_token: ["token", "userCorreo", "createdAt"],
+  session: ["id", "userDNI", "userCorreo", "expiresAt", "lastActive"],
   revista: ["idRevista", "nombre"],
   sobrenosotros: [
     "idSobreNosotros",
@@ -383,11 +383,13 @@ export async function createTables(db: Kysely<Database>) {
     .execute();
 
   await db.schema
-    .createTable("refresh_token")
+    .createTable("session")
     .ifNotExists()
-    .addColumn("token", "text", (c) => c.primaryKey().notNull())
+    .addColumn("id", "text", (c) => c.primaryKey().notNull())
+    .addColumn("userDNI", "text", (c) => c.notNull().references("usuario.DNI"))
     .addColumn("userCorreo", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("expiresAt", "text", (c) => c.notNull())
+    .addColumn("lastActive", "text", (c) => c.notNull())
     .execute();
 
   await db.schema

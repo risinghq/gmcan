@@ -310,10 +310,12 @@ export interface UsuarioHasPermisoTable {
   fechaActualizacion: DateString | null;
 }
 
-export interface RefreshTokenTable {
-  token: string;
+export interface SessionTable {
+  id: string;
+  userDNI: string;
   userCorreo: string;
-  createdAt: DateString;
+  expiresAt: DateString;
+  lastActive: DateString;
 }
 
 export interface Database {
@@ -347,5 +349,5 @@ export interface Database {
   usuario_has_grupo: UsuarioHasGrupoTable;
   usuario_has_proyecto: UsuarioHasProyectoTable;
   usuariohaspermiso: UsuarioHasPermisoTable;
-  refresh_token: RefreshTokenTable;
+  session: SessionTable;
 }

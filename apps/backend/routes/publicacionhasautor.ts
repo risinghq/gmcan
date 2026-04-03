@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { checkToken } from "../auth/token_validation.js";
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
 
 const router = new Hono();
@@ -39,7 +39,7 @@ router.post("/search-publicacionhasautor", zValidator("json", SearchBody), async
   return c.json(rows);
 });
 
-router.post("/post-publicacionhasautor", checkToken, zValidator("json", Body), async (c) => {
+router.post("/post-publicacionhasautor", checkSession, zValidator("json", Body), async (c) => {
   const { autor_idAutor, publicacion_idPublicacion, isPrincipal } = c.req.valid("json");
   await db
     .insertInto("publicacion_has_autor")
@@ -48,7 +48,7 @@ router.post("/post-publicacionhasautor", checkToken, zValidator("json", Body), a
   return c.json({ status: 1 }, 201);
 });
 
-router.delete("/delete-publicacionhasautor/:id", checkToken, zValidator("param", IdParam), async (c) => {
+router.delete("/delete-publicacionhasautor/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("publicacion_has_autor").where("publicacion_idPublicacion", "=", id).execute();
   return c.json({ status: 1 });
