@@ -1,11 +1,9 @@
-export class Usuario {
-  constructor(
-    public DNI: String,
-    public nombre: String,
-    public nombreCompleto: String,
-    public apellidoPaterno: String,
-    public apellidoMaterno: String,
-    public foto: String,
-    public isPrincipal,
-  ) {}
+export interface Usuario {
+  DNI?: string;
+  nombre?: string;
+  nombreCompleto?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  foto?: string;
+  isPrincipal?: boolean;
 }

@@ -15,7 +15,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Software } from "@app/shared/models/software";
+import type { Software } from "@app/shared/models/software";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { SoftwareService } from "@app/shared/services/software.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -41,7 +41,7 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
     private _snackBar: MatSnackBar,
     private _softwareService: SoftwareService,
   ) {
-    this.software = new Software(null, "", "", "", "", 1, null, null);
+    this.software = { idSoftware: 0, nombre: "", descripcion: "", descripcionEN: "", moreInfo: "", grupo_idGrupo: 1 };
     this.softwareForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -58,10 +58,10 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
     return this.softwareForm.dirty;
   }
 
-  getSoftware() {
+  getSoftware(): void {
     this._route.params.forEach((params: Params) => {
       let idSoftware = params["id"];
-      this._softwareService.getSoftwareId(idSoftware).subscribe((result) => {
+      this._softwareService.getSoftwareId(idSoftware).subscribe((result: Software[]) => {
         if (result.length > 0) {
           this.software = result[0];
           localStorage.setItem("softwareEdit", JSON.stringify(this.software.nombre));
@@ -70,8 +70,8 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
     });
   }
 
-  submitSoftware() {
-    this._softwareService.updateSoftware(this.software).subscribe((res) => {
+  submitSoftware(): void {
+    this._softwareService.updateSoftware(this.software).subscribe((res: any) => {
       if (res.status == 1) {
         this.softwareForm.markAsPristine();
         this.return();
@@ -80,21 +80,21 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/contenidos"]);
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogErase14>;
+  private dialogRef2?: MatDialogRef<DialogErase14>;
 
-  openEraser() {
+  openEraser(): void {
     this.dialogRef2 = this.dialog.open(DialogErase14, {
       width: "530px",
       id: "idleTimer",
@@ -105,15 +105,15 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
         yes: "No, cancelar",
       },
     });
-    this.dialogRef2.afterClosed().subscribe((result) => {
+    this.dialogRef2.afterClosed().subscribe((result: boolean) => {
       if (result) {
         this.eraseSoftware();
       }
     });
   }
 
-  eraseSoftware() {
-    this._softwareService.deleteSoftware(this.software.idSoftware).subscribe((result) => {
+  eraseSoftware(): void {
+    this._softwareService.deleteSoftware(this.software.idSoftware ?? 0).subscribe((result: any) => {
       if (result.status == 1) {
         this.softwareForm.markAsPristine();
         this.return();

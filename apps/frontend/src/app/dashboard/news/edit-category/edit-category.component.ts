@@ -15,13 +15,15 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { TipoNoticia } from "@app/shared/models/tiponoticia";
+import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+
+interface StatusResponse {
+  status?: number;
+}
 
 @Component({
   selector: "app-edit-category",
@@ -34,7 +36,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   public categoryForm: FormGroup;
   button_text = "Actualizar categoría";
   edit = true;
-  idCategory;
+  idCategory = 0;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -49,30 +51,31 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.category = new TipoNoticia(null, "", "");
+    this.category = { idtipoNoticia: 0, nombre: "", nombreEN: "" };
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getCategory();
   }
 
-  getCategory() {
+  getCategory(): void {
     this._route.params.forEach((params: Params) => {
-      this.idCategory = params["id"];
-      this._tipoNoticiaService.getTipoNews(this.idCategory).subscribe((result) => {
-        if (result[0]) {
-          this.category = result[0];
-          localStorage.setItem("categoryEdit", JSON.stringify(this.category.nombre));
+      this.idCategory = Number(params["id"] ?? 0);
+      this._tipoNoticiaService.getTipoNews(this.idCategory).subscribe((result: unknown) => {
+        const categories = result as TipoNoticia[];
+        if (categories[0]) {
+          this.category = categories[0];
+          localStorage.setItem("categoryEdit", JSON.stringify(this.category.nombre ?? ""));
         }
         this.getRelatedNews();
       });
     });
   }
 
-  notCanDo;
+  notCanDo = false;
 
-  getRelatedNews() {
-    this._noticiaService.getNoticiaTipo(this.idCategory).subscribe((result) => {
+  getRelatedNews(): void {
+    this._noticiaService.getNoticiaTipo(this.idCategory).subscribe((result: unknown[]) => {
       if (result.length > 0) {
         this.notCanDo = false;
       } else {
@@ -85,13 +88,13 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
     return this.categoryForm.dirty;
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/noticias"]);
   }
 
-  submitCategory() {
+  submitCategory(): void {
     if (this.categoryForm.valid) {
-      this._tipoNoticiaService.updateCategory(this.category).subscribe((result) => {
+      this._tipoNoticiaService.updateCategory(this.category).subscribe((result: StatusResponse) => {
         if (result.status == 1) {
           this.categoryForm.markAsPristine();
           this.return();
@@ -101,17 +104,17 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
     }
   }
 
-  openSnackBar(text) {
-    this._snackBar.open(text, null, {
+  openSnackBar(text: string): void {
+    this._snackBar.open(text, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  private dialogRef: MatDialogRef<DialogErase>;
+  private dialogRef?: MatDialogRef<DialogErase>;
 
-  openEraser() {
+  openEraser(): void {
     if (this.notCanDo) {
       this.dialogRef = this.dialog.open(DialogErase, {
         width: "530px",
@@ -124,7 +127,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
         },
       });
 
-      this.dialogRef.afterClosed().subscribe((result) => {
+      this.dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.eraseCategory();
         }
@@ -132,11 +135,11 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
     }
   }
 
-  eraseCategory() {
-    this._noticiaService.getNoticiaTipo(this.idCategory).subscribe((result) => {
-      if (result.length == 0) {
-        this._tipoNoticiaService.deleteCategory(this.idCategory).subscribe((result) => {
-          if (result.status == 1) {
+  eraseCategory(): void {
+    this._noticiaService.getNoticiaTipo(this.idCategory).subscribe((newsByCategory: unknown[]) => {
+      if (newsByCategory.length == 0) {
+        this._tipoNoticiaService.deleteCategory(this.idCategory).subscribe((deleteResponse: StatusResponse) => {
+          if (deleteResponse.status == 1) {
             this.categoryForm.markAsPristine();
             this.return();
             this.openSnackBar("Categoría eliminada exitosamente");

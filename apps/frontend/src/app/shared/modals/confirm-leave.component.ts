@@ -19,4 +19,6 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } fr
     </mat-dialog-actions>
   `,
 })
-export default class ConfirmLeaveComponent {}
+export default class ConfirmLeaveComponent {
+  readonly componentName = "ConfirmLeaveComponent";
+}

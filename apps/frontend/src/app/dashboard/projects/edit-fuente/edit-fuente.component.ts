@@ -15,13 +15,15 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
+import type { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+
+interface StatusResponse {
+  status?: number;
+}
 
 @Component({
   selector: "app-edit-fuente",
@@ -44,13 +46,13 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
     private _fuenteFinanciamientoService: FuenteFinanciamientoService,
     private _proyectoService: ProyectoService,
   ) {
-    this.fuente = new FuenteFinanciamiento(null, "");
+    this.fuente = { idFuenteFinanciamiento: 0, nombre: "" };
     this.fuenteForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getFuente();
   }
 
@@ -58,32 +60,34 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
     return this.fuenteForm.dirty;
   }
 
-  getFuente() {
+  getFuente(): void {
     this._route.params.forEach((params: Params) => {
-      let idFuente = params["id"];
-      this._fuenteFinanciamientoService.getFuenteFinanciamiento(idFuente).subscribe((result) => {
-        if (result.length > 0) {
-          this.fuente = result[0];
-          localStorage.setItem("fuenteEdit", JSON.stringify(this.fuente.nombre));
-          this.getFuenteProyecto(this.fuente);
-        }
-      });
+      const idFuente = Number(params["id"] ?? 0);
+      this._fuenteFinanciamientoService
+        .getFuenteFinanciamiento(idFuente)
+        .subscribe((result: FuenteFinanciamiento[]) => {
+          if (result.length > 0) {
+            this.fuente = result[0];
+            localStorage.setItem("fuenteEdit", JSON.stringify(this.fuente.nombre ?? ""));
+            this.getFuenteProyecto(this.fuente);
+          }
+        });
     });
   }
 
   notCanDo = false;
 
-  getFuenteProyecto(fuente) {
-    this._proyectoService.getProyectoFuente(fuente.idFuenteFinanciamiento).subscribe((result) => {
+  getFuenteProyecto(fuente: FuenteFinanciamiento): void {
+    this._proyectoService.getProyectoFuente(fuente.idFuenteFinanciamiento ?? 0).subscribe((result: unknown[]) => {
       if (result.length == 0) {
         this.notCanDo = true;
       }
     });
   }
 
-  submitFuente() {
+  submitFuente(): void {
     if (this.fuenteForm.valid) {
-      this._fuenteFinanciamientoService.updateFuenteFinanciamiento(this.fuente).subscribe((result) => {
+      this._fuenteFinanciamientoService.updateFuenteFinanciamiento(this.fuente).subscribe((result: StatusResponse) => {
         if (result.status == 1) {
           this.fuenteForm.markAsPristine();
           this.return();
@@ -93,21 +97,21 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogErase9>;
+  private dialogRef2?: MatDialogRef<DialogErase9>;
 
-  openEraser() {
+  openEraser(): void {
     if (this.notCanDo) {
       this.dialogRef2 = this.dialog.open(DialogErase9, {
         width: "530px",
@@ -119,7 +123,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
           yes: "No, cancelar",
         },
       });
-      this.dialogRef2.afterClosed().subscribe((result) => {
+      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.eraseNews();
         }
@@ -127,11 +131,11 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  eraseNews() {
+  eraseNews(): void {
     if (this.notCanDo) {
       this._fuenteFinanciamientoService
-        .deleteFuenteFinanciamiento(this.fuente.idFuenteFinanciamiento)
-        .subscribe((result) => {
+        .deleteFuenteFinanciamiento(this.fuente.idFuenteFinanciamiento ?? 0)
+        .subscribe((result: StatusResponse) => {
           if (result.status == 1) {
             this.fuenteForm.markAsPristine();
             this.return();

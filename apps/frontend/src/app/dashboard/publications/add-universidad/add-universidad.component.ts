@@ -5,10 +5,14 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Universidad } from "@app/shared/models/universidad";
+import type { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { UniversidadService } from "@app/shared/services/universidad.service";
+
+interface StatusResponse {
+  status?: number;
+}
 
 @Component({
   selector: "app-add-universidad",
@@ -20,7 +24,7 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   universidad: Universidad;
   public universidadForm: FormGroup;
   button_text = "Guardar universidad";
-  notCanDo;
+  notCanDo = false;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -30,7 +34,7 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
     private _snackBar: MatSnackBar,
     private _universidadService: UniversidadService,
   ) {
-    this.universidad = new Universidad(null, "", "", null, null);
+    this.universidad = { idUniversidad: 0, nombre: "", nombreEN: "" };
     this.universidadForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -43,8 +47,8 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
 
   ngOnInit() {}
 
-  submitUniversidad() {
-    this._universidadService.addUniversidad(this.universidad).subscribe((result) => {
+  submitUniversidad(): void {
+    this._universidadService.addUniversidad(this.universidad).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.universidadForm.markAsPristine();
         this.return();
@@ -53,12 +57,12 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/tesis"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Universidad agregada exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Universidad agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -66,5 +70,5 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   }
 
   openEraser() {}
-  edit;
+  edit = false;
 }

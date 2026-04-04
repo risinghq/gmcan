@@ -3,13 +3,15 @@ import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute, Params } from "@angular/router";
-import { lineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import { Router, ActivatedRoute } from "@angular/router";
+import { createLineasInvestigacion } from "@app/shared/models/factories";
+import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
 import { MonedaService } from "@app/shared/services/moneda.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 import {
@@ -36,16 +38,16 @@ import {
   ],
 })
 export default class LinesInvestigationComponent implements OnInit {
-  language;
+  language: any = {};
 
-  public lineasProyecto: Array<lineasInvestigacion>;
-  public page0;
-  public pageSize;
-  public page1;
-  public pageSize2;
-  public page2;
-  public pageSize3;
-  public url;
+  public lineasProyecto: Array<LineasInvestigacion>;
+  public page0 = 1;
+  public pageSize = 5;
+  public page1 = 1;
+  public pageSize2 = 5;
+  public page2 = 1;
+  public pageSize3 = 5;
+  public url = GLOBAL.url;
   constructor(
     private _lineasInvestigacionServices: LineasInvestigacionService,
     private _proyectoServices: ProyectoService,
@@ -58,42 +60,42 @@ export default class LinesInvestigationComponent implements OnInit {
     public _router: Router,
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
+    private _session: SessionService,
     private titleService: Title,
   ) {
     this.lineasProyecto = [];
-    this.lineasProyecto[0] = new lineasInvestigacion(null, "", "", null, "", "", null, null, null, [], 0);
-    this.lineasProyecto[1] = new lineasInvestigacion(null, "", "", null, "", "", null, null, null, [], 0);
-    this.lineasProyecto[2] = new lineasInvestigacion(null, "", "", null, "", "", null, null, null, [], 0);
+    this.lineasProyecto[0] = createLineasInvestigacion();
+    this.lineasProyecto[1] = createLineasInvestigacion();
+    this.lineasProyecto[2] = createLineasInvestigacion();
   }
 
-  ngOnInit() {
-    this.url = GLOBAL.url;
-    this.language = JSON.parse(localStorage.getItem("language"));
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     this.titleService.setTitle("GMCAN | " + this.language.linesInvestigation);
     this.getLineasInvestigacion();
-    this.page0 = 1;
-    this.pageSize = 5;
-    this.page1 = 1;
-    this.pageSize2 = 5;
-    this.page2 = 1;
-    this.pageSize3 = 5;
   }
 
-  selectedItem;
-  oldValue;
+  selectedItem = -1;
+  oldValue = -1;
 
-  listClick(event, newValue) {
+  listClick(_event: Event, newValue: number): void {
     this.oldValue = this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract" + newValue).innerText = this.language.linesInvestigationText[0].seeLess;
+    const current = document.getElementById("abstract" + newValue);
+    if (current) {
+      current.innerText = this.language.linesInvestigationText[0].seeLess;
+    }
     if (this.selectedItem == this.oldValue) {
       this.selectedItem = -1;
-      document.getElementById("abstract" + this.oldValue).innerText = this.language.linesInvestigationText[0].seeMore;
+      const previous = document.getElementById("abstract" + this.oldValue);
+      if (previous) {
+        previous.innerText = this.language.linesInvestigationText[0].seeMore;
+      }
     }
   }
 
-  getLineasInvestigacion() {
-    this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res) => {
+  getLineasInvestigacion(): void {
+    this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res: any) => {
       this.lineasProyecto = res;
       for (let index = 0; index < this.lineasProyecto.length; index++) {
         this.lineasProyecto[index].proyectos = [];
@@ -102,8 +104,8 @@ export default class LinesInvestigationComponent implements OnInit {
     });
   }
 
-  getProyectosLineas(lineaProyecto) {
-    this._proyectoServices.getProyectosLinea(lineaProyecto.idLineasInvestigacion, 1).subscribe((res) => {
+  getProyectosLineas(lineaProyecto: any): void {
+    this._proyectoServices.getProyectosLinea(lineaProyecto.idLineasInvestigacion ?? 0, 1).subscribe((res: any) => {
       lineaProyecto.proyectos = res;
       for (let index = 0; index < lineaProyecto.proyectos.length; index++) {
         this.fillProyecto(lineaProyecto.proyectos[index]);
@@ -111,12 +113,12 @@ export default class LinesInvestigationComponent implements OnInit {
     });
   }
 
-  fillProyecto(proyecto) {
-    var d = new Date(proyecto.fechaInicio);
+  fillProyecto(proyecto: any): void {
+    let d = new Date(proyecto.fechaInicio ?? "");
     if (String(d) != "Invalid Date") {
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es");
-      proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI);
+      proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+      proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
     }
     for (let index = 0; index < this.lineasProyecto.length; index++) {
       if (proyecto.lineasInvestigacion_idLineasInvestigacion === this.lineasProyecto[index].idLineasInvestigacion) {
@@ -128,8 +130,8 @@ export default class LinesInvestigationComponent implements OnInit {
       d = new Date(proyecto.fechaFin);
       if (String(d) != "Invalid Date") {
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        proyecto.fechaF = this.datePipe.transform(d, "MMMM, y", "es");
-        proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF);
+        proyecto.fechaF = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+        proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF ?? "");
       }
     }
     this.getUsuarioHasProyecto(proyecto);
@@ -137,26 +139,26 @@ export default class LinesInvestigationComponent implements OnInit {
     this.getMoneda(proyecto);
   }
 
-  getFuenteFinanciamiento(proyecto) {
+  getFuenteFinanciamiento(proyecto: any): void {
     this._fuenteFinanciamientoService
-      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento)
-      .subscribe((res) => {
+      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento ?? 0)
+      .subscribe((res: any) => {
         if (res.length > 0) {
           proyecto.fuenteFinanciamiento = res[0].nombre;
         }
       });
   }
 
-  getMoneda(proyecto) {
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res) => {
+  getMoneda(proyecto: any): void {
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda ?? 0).subscribe((res: any) => {
       if (res.length > 0) {
         proyecto.moneda = res[0].simbolo;
       }
     });
   }
 
-  getUsuarioHasProyecto(proyecto) {
-    this._usuarioHasProyectoService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res) => {
+  getUsuarioHasProyecto(proyecto: any): void {
+    this._usuarioHasProyectoService.getUsuarioHasProyectos(proyecto.idProyecto ?? 0).subscribe((res: any) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getUsuario(res[index].usuario_DNI, proyecto);
@@ -165,8 +167,8 @@ export default class LinesInvestigationComponent implements OnInit {
     });
   }
 
-  getUsuario(idUsuario, proyecto) {
-    this._usuarioService.getUser(idUsuario).subscribe((res) => {
+  getUsuario(idUsuario: string, proyecto: any): void {
+    this._usuarioService.getUser(idUsuario).subscribe((res: any) => {
       if (res) {
         res[0].nombre = res[0].nombre.slice(0, 1) + ".";
         proyecto.usuario.push(res[0]);
@@ -175,9 +177,9 @@ export default class LinesInvestigationComponent implements OnInit {
     });
   }
 
-  fillName(obj) {
+  fillName(obj: any): void {
     for (let index = 0; index < obj.usuario.length; index++) {
-      let first = obj.usuario[index].nombre.split(" ");
+      const first = (obj.usuario[index].nombre ?? "").split(" ");
       if (index == obj.usuario.length - 1) {
         obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
       } else {
@@ -186,7 +188,10 @@ export default class LinesInvestigationComponent implements OnInit {
     }
   }
 
-  profile(user) {
+  profile(user: any): void {
+    if (!user?.DNI) {
+      return;
+    }
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }

@@ -1,20 +1,16 @@
-import { Usuario } from "./usuario";
-
-export class Noticia {
-  constructor(
-    public idNoticia: Number,
-    public titulo: String,
-    public resumen: String,
-    public cuerpo: string,
-    public fechaPublicacion: string,
-    public estado: Number,
-    public status: string,
-    public fechaCreacion: Date,
-    public fechaActualizacion: Date,
-    public foto: String,
-    public autorPublicacion: String,
-    public tipoNoticia_idtipoNoticia: Number,
-    public nombreTipoNoticia: String,
-    public autor: String,
-  ) {}
+export interface Noticia {
+  idNoticia?: number;
+  titulo?: string;
+  resumen?: string;
+  cuerpo?: string;
+  fechaPublicacion?: string;
+  estado?: number;
+  status?: string;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
+  foto?: string;
+  autorPublicacion?: string;
+  tipoNoticia_idtipoNoticia?: number;
+  nombreTipoNoticia?: string;
+  autor?: string;
 }

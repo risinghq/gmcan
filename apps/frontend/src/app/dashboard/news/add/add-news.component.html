@@ -31,7 +31,7 @@
         <div class="full-width">
           <div class="full-width">
             <div class="text-category">
-              Título en español <span>({{ noticia.titulo.length }}/100) </span>
+              Título en español <span>({{ noticia.titulo?.length ?? 0 }}/100) </span>
               <span class="red-text">*</span>
             </div>
             <input
@@ -45,7 +45,7 @@
           </div>
           <div class="full-width">
             <div class="text-category">
-              Título en inglés <span>({{ noticia.tituloEN.length }}/100) </span>
+              Título en inglés <span>({{ noticia.tituloEN?.length ?? 0 }}/100) </span>
               <span class="red-text">*</span>
             </div>
             <input
@@ -114,7 +114,7 @@
       </div>
       <div class="full-width mb-32">
         <div class="text-category">
-          Resumen en español <span>({{ noticia.resumen.length }}/500) </span>
+          Resumen en español <span>({{ noticia.resumen?.length ?? 0 }}/500) </span>
           <span class="red-text">*</span>
         </div>
         <textarea
@@ -129,7 +129,7 @@
       </div>
       <div class="full-width mb-32">
         <div class="text-category">
-          Resumen en inglés <span>({{ noticia.resumenEN.length }}/500) </span>
+          Resumen en inglés <span>({{ noticia.resumenEN?.length ?? 0 }}/500) </span>
           <span class="red-text">*</span>
         </div>
         <textarea

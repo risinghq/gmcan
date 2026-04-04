@@ -13,6 +13,7 @@ import { Noticia } from "@app/shared/models/noticia";
 import { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { GLOBAL } from "@app/shared/services/global";
 import { NoticiaService } from "@app/shared/services/noticia.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import {
@@ -46,10 +47,10 @@ import {
   ],
 })
 export default class MainNewsComponent implements OnInit {
-  public noticias: Array<Noticia>;
-  public tiponoticias: Array<TipoNoticia>;
-  public screenWidth;
-  url;
+  public noticias: Noticia[] = [];
+  public tiponoticias: TipoNoticia[] = [];
+  public screenWidth: number;
+  url: string;
   constructor(
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
@@ -59,41 +60,43 @@ export default class MainNewsComponent implements OnInit {
     public location: Location,
     public _router: Router,
     public _usuarioService: UsuarioService,
+    private _session: SessionService,
     private titleService: Title,
   ) {
     this.screenWidth = window.innerWidth;
-    this.noticias = [];
     this.url = GLOBAL.url;
   }
-  numberShown;
+  numberShown = 5;
   @HostListener("window:resize", ["$event"])
-  onResize(event) {
+  onResize(_event: Event): void {
     this.screenWidth = window.innerWidth;
   }
   public categorySelected = -1;
-  public categoryNombre;
-  public page;
-  public pageSize;
-  language;
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  public categoryNombre = "";
+  public page = 1;
+  public pageSize = 10;
+  language: any = {};
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.categoryNombre = this.language.newsText[0].categoryTitle;
-    this.page = 1;
-    this.pageSize = 10;
     this.getTipoNoticias();
   }
 
   progress = 0;
   augment = 100 / 2;
-  allCharged;
+  allCharged: boolean | null = false;
 
-  getNoticia() {
-    this._noticiaService.getNoticias().subscribe((res) => {
+  getNoticia(): void {
+    this._noticiaService.getNoticias().subscribe((res: Noticia[]) => {
       if (res != null) {
         this.progress = this.progress + this.augment;
-        res.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        res.sort((a: Noticia, b: Noticia) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         this.noticias = res;
         for (let index = 0; index < this.noticias.length; index++) {
@@ -106,7 +109,9 @@ export default class MainNewsComponent implements OnInit {
           }
         }
         for (let index = 0; index < this.tiponoticias.length; index++) {
-          let found = res.findIndex((x) => x.tipoNoticia_idtipoNoticia === this.tiponoticias[index].idtipoNoticia);
+          const found = res.findIndex(
+            (x: Noticia) => x.tipoNoticia_idtipoNoticia === this.tiponoticias[index].idtipoNoticia,
+          );
           if (found == -1) {
             this.tiponoticias.splice(index, 1);
             index--;
@@ -118,45 +123,49 @@ export default class MainNewsComponent implements OnInit {
               this.noticias[index].nombreTipoNoticia = this.tiponoticias[j].nombre;
             }
           }
-          var d = new Date(this.noticias[index].fechaPublicacion);
+          const d = new Date(this.noticias[index].fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.noticias[index].fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es");
-          this.noticias[index].fechaPublicacion = this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
-          this.getUsuario(this.noticias[index].autorPublicacion, index);
+          this.noticias[index].fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? undefined;
+          this.noticias[index].fechaPublicacion = this.titlecasePipe.transform(
+            this.noticias[index].fechaPublicacion ?? "",
+          );
+          this.getUsuario(this.noticias[index].autorPublicacion ?? "", index);
           this.progress = this.progress + this.augment / this.noticias.length;
         }
       }
     });
   }
 
-  selectCategory(idtipoNoticia, nombre) {
+  selectCategory(idtipoNoticia: number, nombre: string): void {
     this.categorySelected = idtipoNoticia;
     this.categoryNombre = nombre;
     this.allCharged = null;
     this.getNoticia();
     this.page = 1;
   }
-  getTipoNoticias() {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res) => {
-      res.sort((a, b) => (a.nombre > b.nombre ? 1 : -1));
+  getTipoNoticias(): void {
+    this._tiponoticiaService.getTipoNoticia().subscribe((res: TipoNoticia[]) => {
+      res.sort((a: TipoNoticia, b: TipoNoticia) => ((a.nombre ?? "") > (b.nombre ?? "") ? 1 : -1));
       this.tiponoticias = res;
       this.getNoticia();
     });
   }
 
-  detalleNoticia(noticia) {
+  detalleNoticia(noticia: Noticia): void {
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll();
     this.getTipoNoticias();
   }
-  scroll() {
-    let el = document.getElementById("main-toolbar");
-    el.scrollIntoView({ behavior: "smooth" });
+  scroll(): void {
+    const el = document.getElementById("main-toolbar");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }
 
-  getUsuario(idUser, i) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
+  getUsuario(idUser: string, i: number): void {
+    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
       if (res[0] != undefined) {
         this.allCharged = true;
         if (this.noticias[i] != undefined) {

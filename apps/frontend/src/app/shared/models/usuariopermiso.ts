@@ -1,6 +1,4 @@
-export class UsuarioPermiso {
-  constructor(
-    public usuario_DNI: String,
-    public permiso_idPermiso: String,
-  ) {}
+export interface UsuarioPermiso {
+  usuario_DNI?: string;
+  permiso_idPermiso?: string;
 }

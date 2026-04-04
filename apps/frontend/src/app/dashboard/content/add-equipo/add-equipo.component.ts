@@ -5,7 +5,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Equipo } from "@app/shared/models/equipo";
+import type { Equipo } from "@app/shared/models/equipo";
+import { createEquipo } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { EquipoService } from "@app/shared/services/equipo.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -21,7 +22,7 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   equipoForm: FormGroup;
   button_text = "Guardar equipo";
 
-  edit;
+  edit = false;
   openEraser() {}
 
   constructor(
@@ -32,7 +33,7 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
     private _snackBar: MatSnackBar,
     private _equipoService: EquipoService,
   ) {
-    this.equipo = new Equipo(null, "", "", "", "", "", 1, null, null);
+    this.equipo = createEquipo();
     this.equipoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       cpu: [""],
@@ -48,9 +49,9 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
     return this.equipoForm.dirty;
   }
 
-  submitEquipo() {
+  submitEquipo(): void {
     if (this.equipoForm.valid) {
-      this._equipoService.addEquipo(this.equipo).subscribe((res) => {
+      this._equipoService.addEquipo(this.equipo).subscribe((res: any) => {
         if (res.status == 1) {
           this.equipoForm.markAsPristine();
           this.return();
@@ -60,12 +61,12 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/contenidos"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Equipo agregado exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Equipo agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

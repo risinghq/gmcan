@@ -1,7 +1,8 @@
 import { NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { SobreNosotros } from "@app/shared/models/aboutus";
+import type { SobreNosotros } from "@app/shared/models/aboutus";
+import { Languages } from "@app/shared/models/languages";
 import { AboutUsService } from "@app/shared/services/aboutus.service";
 import { GLOBAL } from "@app/shared/services/global";
 
@@ -12,8 +13,8 @@ import { GLOBAL } from "@app/shared/services/global";
   imports: [NgIf],
 })
 export default class AboutUsComponent implements OnInit {
-  url;
-  language;
+  url: string;
+  language: (typeof Languages)[number] = Languages[0];
 
   aboutus: SobreNosotros;
 
@@ -21,22 +22,41 @@ export default class AboutUsComponent implements OnInit {
     public aboutusService: AboutUsService,
     private titleService: Title,
   ) {
-    this.aboutus = new SobreNosotros(null, "", "", null, "", "", "", null, null);
+    this.aboutus = {
+      idSobreNosotros: 0,
+      quienesSomos: "",
+      quienesSomosEN: "",
+      foto: "",
+      objetivos: "",
+      objetivosEN: "",
+      servicios: "",
+      serviciosEN: "",
+      grupo_idGrupo: 0,
+    };
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  ngOnInit(): void {
+    this.language = JSON.parse(localStorage.getItem("language") ?? JSON.stringify(Languages[0]));
     this.getAboutUs();
     this.titleService.setTitle("GMCAN | " + this.language.who);
   }
 
-  getAboutUs() {
-    this.aboutusService.getAboutUsInfo().subscribe((res) => {
+  getAboutUs(): void {
+    this.aboutusService.getAboutUsInfo().subscribe((res: SobreNosotros[]) => {
       this.aboutus = res[0];
-      document.getElementById("services").innerHTML = this.aboutus.servicios;
-      document.getElementById("whoAre").innerHTML = this.aboutus.quienesSomos;
-      document.getElementById("objectives").innerHTML = this.aboutus.objetivos;
+      const services = document.getElementById("services");
+      const whoAre = document.getElementById("whoAre");
+      const objectives = document.getElementById("objectives");
+      if (services) {
+        services.innerHTML = this.aboutus.servicios ?? "";
+      }
+      if (whoAre) {
+        whoAre.innerHTML = this.aboutus.quienesSomos ?? "";
+      }
+      if (objectives) {
+        objectives.innerHTML = this.aboutus.objetivos ?? "";
+      }
     });
   }
 }

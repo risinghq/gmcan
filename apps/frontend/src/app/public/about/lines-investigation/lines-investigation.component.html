@@ -107,8 +107,8 @@
         <ngb-pagination
           [(page)]="page0"
           [pageSize]="pageSize"
-          [collectionSize]="lineasProyecto[0].proyectos.length"
-          *ngIf="lineasProyecto[0].proyectos.length > 5"
+          [collectionSize]="lineasProyecto[0].proyectos?.length ?? 0"
+          *ngIf="(lineasProyecto[0].proyectos?.length ?? 0) > 5"
         >
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
@@ -235,8 +235,8 @@
         <ngb-pagination
           [(page)]="page1"
           [pageSize]="pageSize"
-          [collectionSize]="lineasProyecto[1].proyectos.length"
-          *ngIf="lineasProyecto[1].proyectos.length > 5"
+          [collectionSize]="lineasProyecto[1].proyectos?.length ?? 0"
+          *ngIf="(lineasProyecto[1].proyectos?.length ?? 0) > 5"
         >
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
@@ -363,8 +363,8 @@
         <ngb-pagination
           [(page)]="page2"
           [pageSize]="pageSize"
-          [collectionSize]="lineasProyecto[2].proyectos.length"
-          *ngIf="lineasProyecto[2].proyectos.length > 5"
+          [collectionSize]="lineasProyecto[2].proyectos?.length ?? 0"
+          *ngIf="(lineasProyecto[2].proyectos?.length ?? 0) > 5"
         >
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">

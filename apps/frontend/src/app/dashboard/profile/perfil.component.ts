@@ -11,10 +11,11 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { createUsuarioFull } from "@app/shared/models/factories";
 import { Genero } from "@app/shared/models/genero";
 import { Prefijo } from "@app/shared/models/prefijo";
 import { TipoMiembro } from "@app/shared/models/tipomiembro";
-import { UsuarioFull } from "@app/shared/models/usuarioFull";
+import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { CommonService } from "@app/shared/services/common.service";
 import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -49,13 +50,13 @@ import { AutosizeModule } from "ngx-autosize";
   ],
 })
 export default class PerfilComponent implements OnInit {
-  oldMem;
-  url;
+  oldMem: number | null = null;
+  url: string;
   member: UsuarioFull;
   public memberForm: FormGroup;
-  tipoMiembros: Array<TipoMiembro>;
-  prefijos: Array<Prefijo>;
-  generos: Array<Genero>;
+  tipoMiembros: TipoMiembro[] = [];
+  prefijos: Prefijo[] = [];
+  generos: Genero[] = [];
   button_text = "Actualizar información";
 
   constructor(
@@ -86,55 +87,34 @@ export default class PerfilComponent implements OnInit {
       resumenPro: [""],
       resumenProEN: [""],
     });
-    this.member = new UsuarioFull(
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      0,
-      "",
-      "",
-      "",
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      "",
-      3,
-      "",
-      null,
-    );
+    this.member = createUsuarioFull();
     this.url = GLOBAL.url;
   }
 
   hide = true;
   hide2 = true;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getUser();
   }
 
-  getUser() {
-    let user = this._usuarioService.getUserLogged();
-    this._usuarioService.getFullUser(user.DNI).subscribe((result) => {
+  getUser(): void {
+    const user = this._usuarioService.getUserLogged();
+    if (!user?.DNI) {
+      return;
+    }
+    this._usuarioService.getFullUser(user.DNI).subscribe((result: UsuarioFull[]) => {
       if (result.length > 0) {
         this.memberForm.controls["DNI"].disable();
         this.member = result[0];
-        this.oldEmail = this.member.correo;
-        this.oldPassword = this.member.password;
+        this.oldEmail = this.member.correo ?? "";
+        this.oldPassword = this.member.password ?? "";
         this.memberForm.controls["confirmPassword"].setValue(this.member.password);
-        var d = new Date(this.member.fechaNacimiento);
+        const d = new Date(this.member.fechaNacimiento ?? new Date());
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
         this.member.fechaNacimientoDate = d;
-        if (this.member.nombre.includes(" ")) {
-          let string = this.member.nombre.split(" ");
+        if ((this.member.nombre ?? "").includes(" ")) {
+          const string = (this.member.nombre ?? "").split(" ");
           this.member.nombre = string[0];
           this.memberForm.controls["segundoNombre"].setValue(string[1]);
         }
@@ -144,33 +124,33 @@ export default class PerfilComponent implements OnInit {
     });
   }
 
-  getCargo(miembro) {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res) => {
+  getCargo(miembro: UsuarioFull): void {
+    this._tipoMiembroService.getTipoMiembros().subscribe((res: (TipoMiembro & { nombreSingular?: string })[]) => {
       if (res) {
         this.tipoMiembros = res;
-        let index = res.findIndex((x) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
-        if (index != -1) {
-          miembro.tipoMiembro = res[index].nombreSingular;
+        const index = res.findIndex((x: TipoMiembro) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
+        if (index !== -1) {
+          miembro.tipoMiembro = res[index].nombreSingular ?? "";
         }
       }
     });
   }
 
-  getNivelAcademico(miembro) {
-    this._prefijoService.getPrefijos().subscribe((res) => {
+  getNivelAcademico(miembro: UsuarioFull): void {
+    this._prefijoService.getPrefijos().subscribe((res: Prefijo[]) => {
       if (res) {
         this.prefijos = res;
-        let index = res.findIndex((x) => x.idPrefijo === miembro.prefijo_idPrefijo);
-        if (index != -1) {
-          miembro.prefijo = res[index].nombre;
+        const index = res.findIndex((x: Prefijo) => x.idPrefijo === miembro.prefijo_idPrefijo);
+        if (index !== -1) {
+          miembro.prefijo = res[index].nombre ?? "";
         }
-        this.getGenero(miembro);
+        this.getGenero();
       }
     });
   }
 
-  getGenero(miembro) {
-    this._generoService.getGeneros().subscribe((result) => {
+  getGenero(): void {
+    this._generoService.getGeneros().subscribe((result: Genero[]) => {
       if (result) {
         this.generos = result;
       }
@@ -181,62 +161,77 @@ export default class PerfilComponent implements OnInit {
     event.returnValue = false;
   }
 
-  errPass;
-  errEmail;
-  oldEmail;
+  errPass = false;
+  errEmail = false;
+  oldEmail = "";
 
-  oldPassword;
+  oldPassword = "";
 
-  actualizarUsuario() {
+  actualizarUsuario(): void {
     if (this.memberForm.valid) {
       if (this.member.fechaNacimientoDate) {
         const momentDate = new Date(this.member.fechaNacimientoDate); // Replace event.value with your date value
         const formattedDate = new Date(momentDate).toLocaleDateString("sv");
         this.member.fechaNacimiento = formattedDate;
       } else {
-        this.member.fechaNacimiento = null;
+        this.member.fechaNacimiento = undefined;
       }
-      let miembroAGuardar = JSON.parse(JSON.stringify(this.member));
+      const miembroAGuardar: UsuarioFull = JSON.parse(JSON.stringify(this.member));
       if (this.memberForm.controls["segundoNombre"].value != "" && this.memberForm.controls["segundoNombre"].value) {
-        miembroAGuardar.nombre += " " + this.memberForm.controls["segundoNombre"].value;
+        miembroAGuardar.nombre =
+          `${miembroAGuardar.nombre ?? ""} ${this.memberForm.controls["segundoNombre"].value}`.trim();
       }
-      if (this.oldMem != miembroAGuardar.estado.estado) {
+      if (this.oldMem !== null && this.oldMem !== miembroAGuardar.estado) {
         miembroAGuardar.estado = this.oldMem;
       }
-      this._usuarioService.verifyUser(miembroAGuardar).subscribe((result) => {
-        if (result.length == 0 || this.oldEmail == this.member.correo) {
+      this._usuarioService.verifyUser(miembroAGuardar).subscribe((result: unknown[]) => {
+        if (result.length === 0 || this.oldEmail === this.member.correo) {
           if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
-            this._usuarioService.updateUser(miembroAGuardar).subscribe((res) => {
-              if (res.status == 1) {
-                if (this.member.password != this.oldPassword) {
-                  this._usuarioService.changePassword(miembroAGuardar).subscribe((res) => {
-                    if (res) {
-                      this.errPass = false;
-                    }
-                  });
-                }
-                if (this.fileData) {
-                  if (this.member.foto == null) {
-                    this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((res) => {
-                      if (res) {
-                      }
-                    });
-                  } else {
-                    this._usuarioService.deleteImage(miembroAGuardar.foto).subscribe((res) => {
-                      if (res) {
-                      }
-                    });
-                    this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((res) => {
-                      if (res) {
-                      }
-                    });
+            this._usuarioService
+              .updateUser(miembroAGuardar)
+              .subscribe((updateResponse: { status?: number; user?: string }) => {
+                if (updateResponse.status === 1) {
+                  if (this.member.password !== this.oldPassword) {
+                    this._usuarioService
+                      .changePassword(miembroAGuardar as { password: string; correo: string })
+                      .subscribe((passwordResponse: unknown) => {
+                        if (passwordResponse) {
+                          this.errPass = false;
+                        }
+                      });
                   }
+                  if (this.fileData) {
+                    if (this.member.foto == null && updateResponse.user) {
+                      this._usuarioService
+                        .uploadUsuarioFoto(this.fileData, updateResponse.user)
+                        .subscribe((uploadResponse: unknown) => {
+                          if (uploadResponse) {
+                          }
+                        });
+                    } else {
+                      if (miembroAGuardar.foto) {
+                        this._usuarioService
+                          .deleteImage(miembroAGuardar.foto)
+                          .subscribe((deleteImageResponse: unknown) => {
+                            if (deleteImageResponse) {
+                            }
+                          });
+                      }
+                      if (updateResponse.user) {
+                        this._usuarioService
+                          .uploadUsuarioFoto(this.fileData, updateResponse.user)
+                          .subscribe((uploadResponse: unknown) => {
+                            if (uploadResponse) {
+                            }
+                          });
+                      }
+                    }
+                  }
+                  this._commonService.setReset(true);
+                  this.openSnackBar("Información actualizada exitosamente", undefined);
+                  this.getUser();
                 }
-                this._commonService.setReset(true);
-                this.openSnackBar("Información actualizada exitosamente", null);
-                this.getUser();
-              }
-            });
+              });
           } else {
             this.openSnackBar("Las contraseñas no coinciden", "err-snackbar");
             this.errPass = true;
@@ -250,41 +245,48 @@ export default class PerfilComponent implements OnInit {
     }
   }
 
-  fileData: File = null;
-  previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];
+  fileData: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: Event): void {
+    const input = fileInput.target as HTMLInputElement;
+    this.fileData = input.files?.[0] ?? null;
     this.preview();
   }
 
-  preview() {
+  preview(): void {
+    if (!this.fileData) {
+      this.previewUrl = null;
+      return;
+    }
+
     // Show preview
-    var mimeType = this.fileData.type;
+    const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
+    reader.addEventListener("load", () => {
       this.previewUrl = reader.result;
-    };
+    });
   }
 
-  agregar;
+  agregar = false;
 
-  openSnackBar(text, panel) {
-    this._snackBar.open(text, null, {
-      panelClass: [panel],
+  openSnackBar(text: string, panel?: string): void {
+    const panelClass = panel ? [panel] : [];
+    this._snackBar.open(text, undefined, {
+      panelClass,
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  oldMember(value) {
+  oldMember(value: number): void {
     this.oldMem = value;
   }
 }

@@ -9,7 +9,6 @@ import { GLOBAL } from "./global";
 export class MonedaService {
   public url: string;
 
-  languagelocal;
   constructor(public http: HttpClient) {
     this.url = GLOBAL.url;
   }
@@ -21,7 +20,7 @@ export class MonedaService {
     return this.http.get(this.url + "moneda/get-moneda", { headers: headers });
   }
 
-  getMoneda(idMoneda): any {
+  getMoneda(idMoneda: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

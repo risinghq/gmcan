@@ -13,7 +13,7 @@ export class UsuarioHasProyectoService {
     this.url = GLOBAL.url;
   }
 
-  getUsuarioHasProyectos(idProyecto): any {
+  getUsuarioHasProyectos(idProyecto: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -22,7 +22,7 @@ export class UsuarioHasProyectoService {
     });
   }
 
-  getUsuarioHasProyecto(dni): any {
+  getUsuarioHasProyecto(dni: string): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -31,7 +31,7 @@ export class UsuarioHasProyectoService {
     });
   }
 
-  addUsuarioProyecto(proyecto): any {
+  addUsuarioProyecto(proyecto: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -40,7 +40,7 @@ export class UsuarioHasProyectoService {
     });
   }
 
-  deleteUsuarioProyecto(idProyecto): any {
+  deleteUsuarioProyecto(idProyecto: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

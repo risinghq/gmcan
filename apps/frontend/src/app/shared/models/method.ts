@@ -1,11 +1,9 @@
-export class Method {
-  constructor(
-    public idMetodo: Number,
-    public nombre: String,
-    public nombreEN: String,
-    public descripcion: string,
-    public descripcionEN: string,
-    public foto: String,
-    public grupo_idGrupo: Number,
-  ) {}
+export interface Method {
+  idMetodo?: number;
+  nombre?: string;
+  nombreEN?: string;
+  descripcion?: string;
+  descripcionEN?: string;
+  foto?: string;
+  grupo_idGrupo?: number;
 }

@@ -28,7 +28,7 @@
         <div class="equipment-name mb-equipment">
           {{ equipo.nombre }}
         </div>
-        <mat-chip-list>
+        <mat-chip-set>
           <mat-chip class="equipo-chip"
             >CPU: <a class="equipo-chip-slick">{{ equipo.cpu }}</a></mat-chip
           >
@@ -41,7 +41,7 @@
           <mat-chip class="equipo-chip"
             >HD: <a class="equipo-chip-slick">{{ equipo.hd }}</a></mat-chip
           >
-        </mat-chip-list>
+        </mat-chip-set>
       </div>
     </div>
     <div class="equipment" *ngIf="equipos.length > 0">

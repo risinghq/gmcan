@@ -21,13 +21,14 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
-import { SobreNosotros } from "@app/shared/models/aboutus";
-import { Equipo } from "@app/shared/models/equipo";
-import { Grupo } from "@app/shared/models/grupo";
+import type { SobreNosotros } from "@app/shared/models/aboutus";
+import type { Equipo } from "@app/shared/models/equipo";
+import { createGrupo } from "@app/shared/models/factories";
+import type { Grupo } from "@app/shared/models/grupo";
 import { Languages } from "@app/shared/models/languages";
-import { lineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
-import { Method } from "@app/shared/models/method";
-import { Software } from "@app/shared/models/software";
+import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import type { Method } from "@app/shared/models/method";
+import type { Software } from "@app/shared/models/software";
 import { AboutUsService } from "@app/shared/services/aboutus.service";
 import { CommonService } from "@app/shared/services/common.service";
 import { EquipoService } from "@app/shared/services/equipo.service";
@@ -36,6 +37,7 @@ import { GrupoService } from "@app/shared/services/grupo.service";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { SoftwareService } from "@app/shared/services/software.service";
+import { TabStateService } from "@app/shared/services/tab-state.service";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
 import { AutosizeModule } from "ngx-autosize";
@@ -72,7 +74,7 @@ export default class ContenidosComponent implements OnInit {
   public Editor = ClassicEditor;
   displayedColumns: string[] = ["nombre"];
   displayedColumns2: string[] = ["nombre"];
-  url;
+  url: string;
   aboutUs: SobreNosotros;
   public descripcionForm: FormGroup;
   public objetivosForm: FormGroup;
@@ -83,11 +85,11 @@ export default class ContenidosComponent implements OnInit {
   presentacionForm: FormGroup;
   publicacionesForm: FormGroup;
   proyectosForm: FormGroup;
-  lineasInvestigaciones: Array<lineasInvestigacion>;
-  dataSource: MatTableDataSource<lineasInvestigacion>;
-  dataSource2: MatTableDataSource<Method>;
-  dataSource3: MatTableDataSource<Equipo>;
-  dataSource4: MatTableDataSource<Software>;
+  lineasInvestigaciones: Array<LineasInvestigacion> = [];
+  dataSource: MatTableDataSource<LineasInvestigacion> = new MatTableDataSource<LineasInvestigacion>([]);
+  dataSource2: MatTableDataSource<Method> = new MatTableDataSource<Method>([]);
+  dataSource3: MatTableDataSource<Equipo> = new MatTableDataSource<Equipo>([]);
+  dataSource4: MatTableDataSource<Software> = new MatTableDataSource<Software>([]);
   facilidadesRecursos: Grupo;
   trabajosFuturos: Grupo;
   informacionExtra: Grupo;
@@ -105,95 +107,22 @@ export default class ContenidosComponent implements OnInit {
     private _grupoService: GrupoService,
     private _equipoService: EquipoService,
     private _softwareService: SoftwareService,
+    private _tabState: TabStateService,
   ) {
-    this.aboutUs = new SobreNosotros(null, "", "", null, "", "", "", "", null);
-    this.facilidadesRecursos = new Grupo(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
-    this.trabajosFuturos = new Grupo(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
-    this.informacionExtra = new Grupo(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
+    this.aboutUs = {
+      idSobreNosotros: 0,
+      quienesSomos: "",
+      quienesSomosEN: "",
+      foto: "",
+      objetivos: "",
+      objetivosEN: "",
+      servicios: "",
+      serviciosEN: "",
+      grupo_idGrupo: 0,
+    };
+    this.facilidadesRecursos = createGrupo();
+    this.trabajosFuturos = createGrupo();
+    this.informacionExtra = createGrupo();
     this.descripcionForm = this.formBuilder.group({
       quienesSomos: ["", Validators.required],
       quienesSomosEN: ["", Validators.required],
@@ -239,24 +168,26 @@ export default class ContenidosComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  @ViewChild(MatPaginator, { static: true }) paginator2: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort2: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort2!: MatSort;
 
-  @ViewChild(MatPaginator, { static: true }) paginator3: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort3: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator3!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort3!: MatSort;
 
-  @ViewChild(MatPaginator, { static: true }) paginator4: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort4: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator4!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort4!: MatSort;
 
-  selectedTab = "0";
+  selectedTab = 0;
+  displayedNotFound = false;
+  displayedNotFound2 = false;
+  displayedNotFound3 = false;
+  displayedNotFound4 = false;
 
-  ngOnInit() {
-    if (sessionStorage.getItem("oldContenidos") != null) {
-      this.selectedTab = sessionStorage.getItem("oldContenidos");
-    }
+  ngOnInit(): void {
+    this.selectedTab = this._tabState.contenidosTab();
     this.getContenidos();
     this.getLineasInvestigación();
     this.getMetodos();
@@ -267,14 +198,16 @@ export default class ContenidosComponent implements OnInit {
     this.getInformaciónExtra();
   }
 
-  changedTab(event) {
-    sessionStorage.setItem("oldContenidos", event);
+  changedTab(event: number): void {
+    this._tabState.contenidosTab.set(event);
   }
 
-  getLineasInvestigación() {
-    this._lineasInvestigaciónService.getLineasInvestigacion().subscribe((res) => {
+  getLineasInvestigación(): void {
+    this._lineasInvestigaciónService.getLineasInvestigacion().subscribe((res: LineasInvestigacion[]) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre < a.nombre ? -1 : 0));
+        res.sort((a: LineasInvestigacion, b: LineasInvestigacion) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
+        );
         this.lineasInvestigaciones = res;
         this.dataSource = new MatTableDataSource(this.lineasInvestigaciones);
         this.dataSource.sort = this.sort;
@@ -283,50 +216,50 @@ export default class ContenidosComponent implements OnInit {
     });
   }
 
-  addLinea() {
+  addLinea(): void {
     this._router.navigate(["dashboard/add-linea"]);
   }
 
-  addMethod() {
+  addMethod(): void {
     this._router.navigate(["dashboard/add-method"]);
   }
 
-  addEquipo() {
+  addEquipo(): void {
     this._router.navigate(["dashboard/add-equipo"]);
   }
 
-  addSoftware() {
+  addSoftware(): void {
     this._router.navigate(["dashboard/add-software"]);
   }
 
-  editLinea(id) {
+  editLinea(id: number): void {
     this._router.navigate(["dashboard/edit-linea/" + id]);
   }
 
-  editMethod(id) {
+  editMethod(id: number): void {
     this._router.navigate(["dashboard/edit-method/" + id]);
   }
 
-  editEquipo(id) {
+  editEquipo(id: number): void {
     this._router.navigate(["dashboard/edit-equipo/" + id]);
   }
 
-  editSoftware(id) {
+  editSoftware(id: number): void {
     this._router.navigate(["dashboard/edit-software/" + id]);
   }
 
-  getMetodos() {
-    this._metodosService.getMethods().subscribe((res) => {
+  getMetodos(): void {
+    this._metodosService.getMethods().subscribe((res: Method[]) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre < a.nombre ? -1 : 0));
+        res.sort((a: Method, b: Method) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
+        );
         this.dataSource2 = new MatTableDataSource(res);
         this.dataSource2.sort = this.sort2;
         this.dataSource2.paginator = this.paginator2;
       }
     });
   }
-
-  displayedNotFound;
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -341,8 +274,6 @@ export default class ContenidosComponent implements OnInit {
     }
   }
 
-  displayedNotFound2;
-
   applyFilter2(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource2.filter = filterValue.trim().toLowerCase();
@@ -355,8 +286,6 @@ export default class ContenidosComponent implements OnInit {
       this.displayedNotFound2 = false;
     }
   }
-
-  displayedNotFound3;
 
   applyFilter3(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -371,8 +300,6 @@ export default class ContenidosComponent implements OnInit {
     }
   }
 
-  displayedNotFound4;
-
   applyFilter4(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource4.filter = filterValue.trim().toLowerCase();
@@ -386,93 +313,99 @@ export default class ContenidosComponent implements OnInit {
     }
   }
 
-  getFacilidadesyRecursos() {
-    this._grupoService.getFacilidadesRecursos().subscribe((res) => {
+  getFacilidadesyRecursos(): void {
+    this._grupoService.getFacilidadesRecursos().subscribe((res: Grupo[]) => {
       if (res.length > 0) {
         this.facilidadesRecursos = res[0];
       }
     });
   }
 
-  submitFacilidadesyRecursos() {
-    this._grupoService.updateRecursos(this.facilidadesRecursos).subscribe((res) => {
+  submitFacilidadesyRecursos(): void {
+    this._grupoService.updateRecursos(this.facilidadesRecursos).subscribe((res: any) => {
       if (res.status == 1) {
         if (this.fileData2) {
           this._grupoService
-            .uploadFacilidadesFoto(this.fileData2, this.facilidadesRecursos.idGrupo)
-            .subscribe((res) => {});
+            .uploadFacilidadesFoto(this.fileData2, this.facilidadesRecursos.idGrupo ?? 0)
+            .subscribe((_res: any) => {});
         }
         this.openSnackBar("Información actualizado exitosamente");
       }
     });
   }
 
-  getTrabajosFuturos() {
-    this._grupoService.getTrabajosFuturos().subscribe((res) => {
+  getTrabajosFuturos(): void {
+    this._grupoService.getTrabajosFuturos().subscribe((res: Grupo[]) => {
       if (res.length > 0) {
         this.trabajosFuturos = res[0];
       }
     });
   }
 
-  submitTrabajosFuturos() {
-    this._grupoService.updateTrabajosFuturos(this.trabajosFuturos).subscribe((res) => {
+  submitTrabajosFuturos(): void {
+    this._grupoService.updateTrabajosFuturos(this.trabajosFuturos).subscribe((res: any) => {
       if (res.status == 1) {
         this.openSnackBar("Información actualizado exitosamente");
       }
     });
   }
 
-  getInformaciónExtra() {
-    this._grupoService.getGrupoInfo().subscribe((res) => {
+  getInformaciónExtra(): void {
+    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
       if (res.length > 0) {
         this.informacionExtra = res[0];
       }
     });
   }
 
-  submitSeccionInfo() {
-    this._grupoService.updateSeccionInfo(this.informacionExtra).subscribe((res) => {
+  submitSeccionInfo(): void {
+    this._grupoService.updateSeccionInfo(this.informacionExtra).subscribe((res: any) => {
       if (res.status == 1) {
         if (this.fileData3) {
-          this._grupoService.uploadHeaderLogo(this.fileData3, this.informacionExtra.idGrupo).subscribe((res) => {});
+          this._grupoService
+            .uploadHeaderLogo(this.fileData3, this.informacionExtra.idGrupo ?? 0)
+            .subscribe((_res: any) => {});
         }
         if (this.fileData4) {
-          this._grupoService.uploadFooterLogo(this.fileData4, this.informacionExtra.idGrupo).subscribe((res) => {});
+          this._grupoService
+            .uploadFooterLogo(this.fileData4, this.informacionExtra.idGrupo ?? 0)
+            .subscribe((_res: any) => {});
         }
         this.openSnackBar("Información actualizado exitosamente");
       }
     });
   }
 
-  submitSeccionPresentacion() {
-    this._grupoService.updateSeccionPresentacion(this.informacionExtra).subscribe((res) => {
+  submitSeccionPresentacion(): void {
+    this._grupoService.updateSeccionPresentacion(this.informacionExtra).subscribe((res: any) => {
       if (res.status == 1) {
         this.openSnackBar("Información actualizado exitosamente");
       }
     });
   }
 
-  submitSeccionPublicaciones() {
-    this._grupoService.updateSeccionPublicaciones(this.informacionExtra).subscribe((res) => {
+  submitSeccionPublicaciones(): void {
+    this._grupoService.updateSeccionPublicaciones(this.informacionExtra).subscribe((res: any) => {
       if (res.status == 1) {
         this.openSnackBar("Información actualizado exitosamente");
       }
     });
   }
 
-  submitSeccionProyectos() {
-    this._grupoService.updateSeccionProyectos(this.informacionExtra).subscribe((res) => {
+  submitSeccionProyectos(): void {
+    this._grupoService.updateSeccionProyectos(this.informacionExtra).subscribe((res: any) => {
       if (res.status == 1) {
         this.openSnackBar("Información actualizado exitosamente");
       }
     });
   }
 
-  getEquipos() {
-    this._equipoService.getEquipos().subscribe((res) => {
+  getEquipos(): void {
+    this._equipoService.getEquipos().subscribe((res: Equipo[]) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre < a.nombre ? -1 : 0));
+        res.sort((a: Equipo, b: Equipo) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
+        );
         this.dataSource3 = new MatTableDataSource(res);
         this.dataSource3.sort = this.sort3;
         this.dataSource3.paginator = this.paginator3;
@@ -480,10 +413,12 @@ export default class ContenidosComponent implements OnInit {
     });
   }
 
-  getSoftware() {
-    this._softwareService.getSoftware().subscribe((res) => {
+  getSoftware(): void {
+    this._softwareService.getSoftware().subscribe((res: Software[]) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre < a.nombre ? -1 : 0));
+        res.sort((a: Software, b: Software) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
+        );
         this.dataSource4 = new MatTableDataSource(res);
         this.dataSource4.sort = this.sort4;
         this.dataSource4.paginator = this.paginator4;
@@ -491,73 +426,78 @@ export default class ContenidosComponent implements OnInit {
     });
   }
 
-  getContenidos() {
-    this._aboutService.getAboutUsInfo().subscribe((res) => {
+  getContenidos(): void {
+    this._aboutService.getAboutUsInfo().subscribe((res: SobreNosotros[]) => {
       if (res.length > 0) {
         this.aboutUs = res[0];
       }
     });
   }
 
-  submitQuienesSomos() {
-    this._aboutService.updateDescripcion(this.aboutUs).subscribe((res) => {
+  submitQuienesSomos(): void {
+    this._aboutService.updateDescripcion(this.aboutUs).subscribe((res: any) => {
       if (res.status == 1) {
         if (this.fileData) {
-          this._aboutService.uploadGrupoFoto(this.fileData, this.aboutUs.idSobreNosotros).subscribe((res) => {});
+          this._aboutService
+            .uploadGrupoFoto(this.fileData, this.aboutUs.idSobreNosotros ?? 0)
+            .subscribe((_res: any) => {});
         }
         this.openSnackBar("Contenido actualizado exitosamente");
       }
     });
   }
 
-  submitObjetivos() {
-    this._aboutService.updateObjetivos(this.aboutUs).subscribe((res) => {
+  submitObjetivos(): void {
+    this._aboutService.updateObjetivos(this.aboutUs).subscribe((res: any) => {
       if (res.status == 1) {
         this.openSnackBar("Contenido actualizado exitosamente");
       }
     });
   }
 
-  submitServicios() {
-    this._aboutService.updateServicios(this.aboutUs).subscribe((res) => {
+  submitServicios(): void {
+    this._aboutService.updateServicios(this.aboutUs).subscribe((res: any) => {
       if (res.status == 1) {
         this.openSnackBar("Contenido actualizado exitosamente");
       }
     });
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  fileData: File = null;
-  previewUrl: any = null;
-  fileData2: File = null;
-  previewUrl2: any = null;
-  fileData3: File = null;
-  previewUrl3: any = null;
-  fileData4: File = null;
-  previewUrl4: any = null;
-  fileProgress(fileInput: any, id) {
+  fileData: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  fileData2: File | null = null;
+  previewUrl2: string | ArrayBuffer | null = null;
+  fileData3: File | null = null;
+  previewUrl3: string | ArrayBuffer | null = null;
+  fileData4: File | null = null;
+  previewUrl4: string | ArrayBuffer | null = null;
+  fileProgress(fileInput: Event, id: number): void {
+    const target = fileInput.target as HTMLInputElement | null;
+    const file = target?.files?.[0] ?? null;
+    if (!file) return;
     switch (id) {
       case 1:
-        this.fileData = <File>fileInput.target.files[0];
+        this.fileData = file;
         this.preview(id);
         break;
       case 2:
-        this.fileData2 = <File>fileInput.target.files[0];
+        this.fileData2 = file;
         this.preview(id);
         break;
       case 3:
-        this.fileData3 = <File>fileInput.target.files[0];
+        this.fileData3 = file;
         this.preview(id);
         break;
       case 4:
-        this.fileData4 = <File>fileInput.target.files[0];
+        this.fileData4 = file;
         this.preview(id);
         break;
       default:
@@ -565,61 +505,65 @@ export default class ContenidosComponent implements OnInit {
     }
   }
 
-  preview(id) {
+  preview(id: number): void {
     switch (id) {
       case 1:
-        var mimeType = this.fileData.type;
+        if (!this.fileData) return;
+        const mimeType = this.fileData.type;
         if (mimeType.match(/image\/*/) == null) {
           return;
         }
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.readAsDataURL(this.fileData);
-        reader.onload = (_event) => {
+        reader.addEventListener("load", (_event) => {
           this.previewUrl = reader.result;
-        };
+        });
         break;
       case 2:
-        var mimeType = this.fileData2.type;
-        if (mimeType.match(/image\/*/) == null) {
+        if (!this.fileData2) return;
+        const mimeType2 = this.fileData2.type;
+        if (mimeType2.match(/image\/*/) == null) {
           return;
         }
-        var reader = new FileReader();
-        reader.readAsDataURL(this.fileData2);
-        reader.onload = (_event) => {
-          this.previewUrl2 = reader.result;
-        };
+        const reader2 = new FileReader();
+        reader2.readAsDataURL(this.fileData2);
+        reader2.addEventListener("load", (_event) => {
+          this.previewUrl2 = reader2.result;
+        });
         break;
       case 3:
-        var mimeType = this.fileData3.type;
-        if (mimeType.match(/image\/*/) == null) {
+        if (!this.fileData3) return;
+        const mimeType3 = this.fileData3.type;
+        if (mimeType3.match(/image\/*/) == null) {
           return;
         }
-        var reader = new FileReader();
-        reader.readAsDataURL(this.fileData3);
-        reader.onload = (_event) => {
-          this.previewUrl3 = reader.result;
-        };
+        const reader3 = new FileReader();
+        reader3.readAsDataURL(this.fileData3);
+        reader3.addEventListener("load", (_event) => {
+          this.previewUrl3 = reader3.result;
+        });
         break;
       case 4:
-        var mimeType = this.fileData4.type;
-        if (mimeType.match(/image\/*/) == null) {
+        if (!this.fileData4) return;
+        const mimeType4 = this.fileData4.type;
+        if (mimeType4.match(/image\/*/) == null) {
           return;
         }
-        var reader = new FileReader();
-        reader.readAsDataURL(this.fileData4);
-        reader.onload = (_event) => {
-          this.previewUrl4 = reader.result;
-        };
+        const reader4 = new FileReader();
+        reader4.readAsDataURL(this.fileData4);
+        reader4.addEventListener("load", (_event) => {
+          this.previewUrl4 = reader4.result;
+        });
         break;
       default:
         break;
     }
   }
 
-  private previewDialog: MatDialogRef<DialogPreview3>;
+  private previewDialog?: MatDialogRef<DialogPreview3>;
 
-  previewAboutUs(value) {
-    let aboutus = JSON.parse(JSON.stringify(this.aboutUs));
+  previewAboutUs(value: number): void {
+    const aboutus: SobreNosotros = JSON.parse(JSON.stringify(this.aboutUs));
     localStorage.setItem("langLocale", "0");
     if (value == 1) {
       aboutus.objetivos = aboutus.objetivosEN;
@@ -633,16 +577,13 @@ export default class ContenidosComponent implements OnInit {
       data: aboutus,
     });
 
-    this.previewDialog.afterClosed().subscribe((result) => {
-      if (!result) {
-      }
-    });
+    this.previewDialog.afterClosed().subscribe(() => {});
   }
 
-  private previewDialog2: MatDialogRef<DialogPreview6>;
+  private previewDialog2?: MatDialogRef<DialogPreview6>;
 
-  previewTrabajosFuturos(value) {
-    let aboutus = JSON.parse(JSON.stringify(this.trabajosFuturos));
+  previewTrabajosFuturos(value: number): void {
+    const aboutus: Grupo = JSON.parse(JSON.stringify(this.trabajosFuturos));
     localStorage.setItem("langLocale", "0");
     if (value == 1) {
       aboutus.trabajosFuturos = aboutus.trabajosFuturosEN;
@@ -654,10 +595,7 @@ export default class ContenidosComponent implements OnInit {
       data: aboutus,
     });
 
-    this.previewDialog.afterClosed().subscribe((result) => {
-      if (!result) {
-      }
-    });
+    this.previewDialog.afterClosed().subscribe(() => {});
   }
 }
 
@@ -668,26 +606,29 @@ export default class ContenidosComponent implements OnInit {
   imports: [MatDialogClose],
 })
 export class DialogPreview3 {
-  url;
-  language;
+  url: string;
+  language: (typeof Languages)[number] = Languages[0];
   constructor(
     public dialogRef: MatDialogRef<DialogPreview3>,
-    @Inject(MAT_DIALOG_DATA) public aboutus,
+    @Inject(MAT_DIALOG_DATA) public aboutus: SobreNosotros,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
   ) {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (localStorage.getItem("langLocale") == "0") {
       this.language = Languages[0];
     } else {
       this.language = Languages[1];
     }
-    document.getElementById("services").innerHTML = this.aboutus.servicios;
-    document.getElementById("whoAre").innerHTML = this.aboutus.quienesSomos;
-    document.getElementById("objectives").innerHTML = this.aboutus.objetivos;
+    const services = document.getElementById("services");
+    const whoAre = document.getElementById("whoAre");
+    const objectives = document.getElementById("objectives");
+    if (services) services.innerHTML = this.aboutus.servicios ?? "";
+    if (whoAre) whoAre.innerHTML = this.aboutus.quienesSomos ?? "";
+    if (objectives) objectives.innerHTML = this.aboutus.objetivos ?? "";
   }
 }
 
@@ -698,23 +639,26 @@ export class DialogPreview3 {
   imports: [MatDialogClose],
 })
 export class DialogPreview6 {
-  url;
-  language;
+  url: string;
+  language: (typeof Languages)[number] = Languages[0];
   constructor(
     public dialogRef: MatDialogRef<DialogPreview6>,
-    @Inject(MAT_DIALOG_DATA) public aboutus,
+    @Inject(MAT_DIALOG_DATA) public aboutus: Grupo,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
   ) {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (localStorage.getItem("langLocale") == "0") {
       this.language = Languages[0];
     } else {
       this.language = Languages[1];
     }
-    document.getElementById("works").innerHTML = this.aboutus.trabajosFuturos;
+    const works = document.getElementById("works");
+    if (works) {
+      works.innerHTML = this.aboutus.trabajosFuturos ?? "";
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -8,10 +9,16 @@ import { GLOBAL } from "./global";
 })
 export class UniversidadService {
   public url: string;
-  languagelocal;
-  constructor(public http: HttpClient) {
+
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getUniversidades(): any {
@@ -25,7 +32,7 @@ export class UniversidadService {
     }
   }
 
-  getUniversidad(idUniversidad) {
+  getUniversidad(idUniversidad: number) {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -40,7 +47,7 @@ export class UniversidadService {
     }
   }
 
-  addUniversidad(universidad): any {
+  addUniversidad(universidad: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -49,7 +56,7 @@ export class UniversidadService {
     });
   }
 
-  updateUniversidad(universidad): any {
+  updateUniversidad(universidad: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -58,7 +65,7 @@ export class UniversidadService {
     });
   }
 
-  deleteUniversidad(idUniversidad): any {
+  deleteUniversidad(idUniversidad: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

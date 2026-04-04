@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,10 +10,15 @@ import { GLOBAL } from "./global";
 export class ProyectoService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getProyecto(): any {
@@ -26,7 +32,7 @@ export class ProyectoService {
     }
   }
 
-  getProyectos(estado): any {
+  getProyectos(estado: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -37,7 +43,7 @@ export class ProyectoService {
     }
   }
 
-  getProyectosLinea(idLinea, estado): any {
+  getProyectosLinea(idLinea: number, estado: number): any {
     let body = { lineasInvestigacion_idLineasInvestigacion: idLinea, estado: estado };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -49,7 +55,7 @@ export class ProyectoService {
     }
   }
 
-  getProyectosId(idProyecto, estado): any {
+  getProyectosId(idProyecto: number, estado: number): any {
     let body = { idProyecto: idProyecto, estado: estado };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -61,7 +67,7 @@ export class ProyectoService {
     }
   }
 
-  getProject(idProyecto): any {
+  getProject(idProyecto: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -74,28 +80,28 @@ export class ProyectoService {
     }
   }
 
-  getProyectoFuente(idFuente): any {
+  getProyectoFuente(idFuente: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.get(this.url + "proyecto/get-proyectofuente/" + idFuente, { headers });
   }
 
-  addProyecto(proyecto): any {
+  addProyecto(proyecto: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "proyecto/post-proyecto/", proyecto, { headers: headers });
   }
 
-  updateProyecto(proyecto): any {
+  updateProyecto(proyecto: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.put(this.url + "proyecto/update-proyecto/", proyecto, { headers: headers });
   }
 
-  deleteProyecto(idProyecto): any {
+  deleteProyecto(idProyecto: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -104,14 +110,14 @@ export class ProyectoService {
     });
   }
 
-  endProyecto(proyecto): any {
+  endProyecto(proyecto: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.put(this.url + "proyecto/end-proyecto/", proyecto, { headers: headers });
   }
 
-  restartProyecto(proyecto): any {
+  restartProyecto(proyecto: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

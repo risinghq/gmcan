@@ -51,10 +51,10 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 })
 export default class MyArticleComponent implements OnInit {
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
-  dataSource: MatTableDataSource<Publicacion>;
+  dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
 
-  articulos: Array<Publicacion>;
-  url;
+  articulos: Publicacion[] = [];
+  url: string;
 
   constructor(
     public _router: Router,
@@ -71,39 +71,45 @@ export default class MyArticleComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getUserArticles();
   }
 
-  getUserArticles() {
-    let user = this._usuarioService.getUserLogged();
-    this.getPermisoHasUsuario(user.DNI);
-    this._publicacionhasusuarioService.searchPublicacionHasUsuario(user.DNI).subscribe((res) => {
-      if (res) {
-        this.articulos = [];
-        for (let index = 0; index < res.length; index++) {
-          this.getArticle(res[index].publicacion_idPublicacion);
+  getUserArticles(): void {
+    const user = this._usuarioService.getUserLogged();
+    this.getPermisoHasUsuario(user?.DNI ?? "");
+    this._publicacionhasusuarioService
+      .searchPublicacionHasUsuario(user?.DNI ?? "")
+      .subscribe((res: { publicacion_idPublicacion?: number }[]) => {
+        if (res) {
+          this.articulos = [];
+          for (let index = 0; index < res.length; index++) {
+            this.getArticle(res[index].publicacion_idPublicacion ?? 0);
+          }
         }
-      }
-    });
+      });
   }
 
-  getArticle(idPublicacion) {
-    this._publicacionService.getPublication(idPublicacion).subscribe((res) => {
+  getArticle(idPublicacion: number): void {
+    this._publicacionService.getPublication(idPublicacion).subscribe((res: Publicacion[]) => {
       if (res[0]) {
-        if (res[0].tipoPublicacion_idTipoPublicacion == 1) {
+        if (res[0].tipoPublicacion_idTipoPublicacion === 1) {
           this.articulos.push(res[0]);
-          this.articulos.sort((a, b) =>
-            a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+          this.articulos.sort((a: Publicacion, b: Publicacion) =>
+            (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+              ? 1
+              : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+                ? -1
+                : 0,
           );
           for (let index = 0; index < this.articulos.length; index++) {
-            var d = new Date(this.articulos[index].fechaPublicacion);
+            const d = new Date(this.articulos[index].fechaPublicacion ?? "");
             d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-            this.articulos[index].fecha = this.datePipe.transform(d, "MMMM, y", "es");
-            this.articulos[index].fecha = this.titlecasePipe.transform(this.articulos[index].fecha);
+            this.articulos[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+            this.articulos[index].fecha = this.titlecasePipe.transform(this.articulos[index].fecha ?? "");
             this.articulos[index].usuario = [];
             this.articulos[index].autor = [];
             this.getArticlesUsers(this.articulos[index]);
@@ -117,51 +123,56 @@ export default class MyArticleComponent implements OnInit {
     });
   }
 
-  getArticlesUsers(publicacion) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res) => {
-      if (res) {
-        let indexPrincipal = res.findIndex((x) => x.isPrincipal == 0);
-        if (indexPrincipal != -1) {
-          this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
+  getArticlesUsers(publicacion: Publicacion): void {
+    this._publicacionhasusuarioService
+      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
+      .subscribe((res: { isPrincipal?: number; usuario_DNI?: string }[]) => {
+        if (res) {
+          const indexPrincipal = res.findIndex((x: { isPrincipal?: number }) => x.isPrincipal === 0);
+          if (indexPrincipal !== -1) {
+            this.getUsuario(res[indexPrincipal].usuario_DNI ?? "", publicacion);
+          }
         }
-      }
-    });
+      });
   }
 
-  getUsuario(idUser, publicacion) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
-      if (res[0] != undefined) {
-        publicacion.usuario.push(res[0]);
-        publicacion.usuario[0].nombreCompleto =
-          publicacion.usuario[0].nombre +
-          " " +
-          publicacion.usuario[0].apellidoPaterno +
-          " " +
-          publicacion.usuario[0].apellidoMaterno;
-      }
-    });
-  }
-
-  getArticlesAuthors(publicacion) {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res) => {
-      if (res) {
-        let indexPrincipal = res.findIndex((x) => x.isPrincipal == 0);
-        if (indexPrincipal != -1) {
-          this.getAuthor(res[indexPrincipal].autores_idAutor, publicacion);
+  getUsuario(idUser: string, publicacion: Publicacion): void {
+    this._usuarioService
+      .getUser(idUser)
+      .subscribe((res: { nombre?: string; apellidoPaterno?: string; apellidoMaterno?: string }[]) => {
+        if (res[0] != undefined) {
+          const usuario = {
+            ...res[0],
+            nombreCompleto:
+              `${res[0].nombre ?? ""} ${res[0].apellidoPaterno ?? ""} ${res[0].apellidoMaterno ?? ""}`.trim(),
+          };
+          publicacion.usuario?.push(usuario);
         }
-      }
-    });
+      });
   }
 
-  getAuthor(idAuthor, publicacion) {
-    this._autorService.getAuthor(idAuthor).subscribe((res) => {
+  getArticlesAuthors(publicacion: Publicacion): void {
+    this._publicacionhasautorService
+      .getPublicacionHasAutor(publicacion.idPublicacion ?? 0)
+      .subscribe((res: { isPrincipal?: number; autores_idAutor?: number }[]) => {
+        if (res) {
+          const indexPrincipal = res.findIndex((x: { isPrincipal?: number }) => x.isPrincipal === 0);
+          if (indexPrincipal !== -1) {
+            this.getAuthor(res[indexPrincipal].autores_idAutor ?? 0, publicacion);
+          }
+        }
+      });
+  }
+
+  getAuthor(idAuthor: number, publicacion: Publicacion): void {
+    this._autorService.getAuthor(idAuthor).subscribe((res: unknown[]) => {
       if (res[0] != undefined) {
-        publicacion.autor.push(res[0]);
+        publicacion.autor?.push(res[0]);
       }
     });
   }
 
-  displayedNotFound;
+  displayedNotFound = false;
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -178,8 +189,8 @@ export default class MyArticleComponent implements OnInit {
 
   publicacionPermiso = false;
 
-  getPermisoHasUsuario(DNI) {
-    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res) => {
+  getPermisoHasUsuario(DNI: string): void {
+    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: { permiso_idPermiso?: number }[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           switch (res[index].permiso_idPermiso) {
@@ -194,21 +205,23 @@ export default class MyArticleComponent implements OnInit {
     });
   }
 
-  addArticle() {
+  addArticle(): void {
     localStorage.setItem("article-back", "my-articles");
     this._router.navigate(["dashboard/add-article/"]);
   }
 
-  editArticulo(id) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(id).subscribe((res) => {
-      if (res.length > 0) {
-        let user = this._usuarioService.getUserLogged();
-        let index = res.findIndex((res) => res.usuario_DNI === user.DNI);
-        if ((index != -1 && res[index].isPrincipal == 0) || this.publicacionPermiso) {
-          localStorage.setItem("article-back", "my-articles");
-          this._router.navigate(["dashboard/edit-article/" + id]);
+  editArticulo(id: number): void {
+    this._publicacionhasusuarioService
+      .getPublicacionHasUsuario(id)
+      .subscribe((res: { usuario_DNI?: string; isPrincipal?: number }[]) => {
+        if (res.length > 0) {
+          const user = this._usuarioService.getUserLogged();
+          const index = res.findIndex((item: { usuario_DNI?: string }) => item.usuario_DNI === user?.DNI);
+          if ((index !== -1 && res[index].isPrincipal === 0) || this.publicacionPermiso) {
+            localStorage.setItem("article-back", "my-articles");
+            this._router.navigate(["dashboard/edit-article/" + id]);
+          }
         }
-      }
-    });
+      });
   }
 }

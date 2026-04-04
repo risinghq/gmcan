@@ -13,7 +13,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Autor } from "@app/shared/models/autores";
 import { Evento } from "@app/shared/models/eventos";
-import { Publicacion } from "@app/shared/models/publicacion";
+import { createPublicacion } from "@app/shared/models/factories";
+import type { Publicacion } from "@app/shared/models/publicacion";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { AutorService } from "@app/shared/services/autor.service";
@@ -27,6 +28,16 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
+
+type ResumenAuthor = {
+  idAutor?: number | null;
+  DNI?: string | null;
+  nombre: string;
+  isAutor?: boolean;
+  foto?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+};
 
 @Component({
   selector: "app-add-resumen",
@@ -59,12 +70,12 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Guardar resumen";
-  evento: Array<Evento>;
-  autores: Array<Autor>;
-  usuarios: Array<Usuario>;
-  url;
-  tipoTesis;
-  selectedUser;
+  evento: Array<Evento> = [];
+  autores: Array<Autor> = [];
+  usuarios: Array<Usuario> = [];
+  url: string;
+  tipoTesis: string | null = null;
+  selectedUser: string | null = null;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -88,36 +99,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
       resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
-    this.publicacion = new Publicacion(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      "",
-      null,
-      null,
-      null,
-      null,
-      3,
-      "",
-      "",
-      null,
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      "",
-      "",
-      null,
-      "",
-      null,
-      "",
-    );
+    this.publicacion = createPublicacion();
     this.url = GLOBAL.url;
   }
 
@@ -126,23 +108,23 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   openEraser() {}
-  edit;
+  edit = false;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getEventos();
   }
 
-  myControl = new FormControl();
-  options: Array<any> = [];
-  filteredOptions: Observable<any>;
+  myControl = new FormControl<string>("");
+  options: Array<ResumenAuthor> = [];
+  filteredOptions!: Observable<Array<ResumenAuthor>>;
 
-  private _filter(value): any {
+  private _filter(value: string): Array<ResumenAuthor> {
     const filterValue = value.toLowerCase();
     return this.options.filter((option) => option.nombre.toLowerCase().includes(filterValue));
   }
 
-  getEventos() {
-    this._eventoService.getEventoesAll().subscribe((result) => {
+  getEventos(): void {
+    this._eventoService.getEventoesAll().subscribe((result: Evento[]) => {
       if (result) {
         this.evento = result;
         this.getUsuarios();
@@ -150,54 +132,54 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getAutores() {
-    this._autorService.getAutor().subscribe((result) => {
+  getAutores(): void {
+    this._autorService.getAutor().subscribe((result: Autor[]) => {
       if (result) {
-        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        result.sort((a: Autor, b: Autor) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
+        );
         this.autores = result;
         for (let index = 0; index < this.autores.length; index++) {
-          this.options.push(this.autores[index]);
+          this.options.push(this.autores[index] as ResumenAuthor);
         }
         this.filteredOptions = this.myControl.valueChanges.pipe(
           startWith(""),
-          map((value) => this._filter(value)),
+          map((value) => this._filter(value ?? "")),
         );
         this.setFilters();
       }
     });
   }
 
-  getUsuarios() {
-    this._usuarioService.getUsuarios().subscribe((result) => {
+  getUsuarios(): void {
+    this._usuarioService.getUsuarios().subscribe((result: Usuario[]) => {
       if (result) {
-        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        result.sort((a: Usuario, b: Usuario) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
+        );
         this.usuarios = result;
         for (let index = 0; index < this.usuarios.length; index++) {
           this.usuarios[index].nombre =
-            this.usuarios[index].nombre +
-            " " +
-            this.usuarios[index].apellidoPaterno +
-            " " +
-            this.usuarios[index].apellidoMaterno;
-          this.options.push(this.usuarios[index]);
+            `${this.usuarios[index].nombre ?? ""} ${this.usuarios[index].apellidoPaterno ?? ""} ${this.usuarios[index].apellidoMaterno ?? ""}`.trim();
+          this.options.push(this.usuarios[index] as ResumenAuthor);
         }
         this.getAutores();
       }
     });
   }
 
-  selectedUsers = [];
+  selectedUsers: ResumenAuthor[] = [];
 
-  selectUser(evento, value) {
+  selectUser(evento: ResumenAuthor | { value: string }, value: number): void {
     if (value == 1) {
-      this.myControl.setValue(evento.nombre);
+      this.myControl.setValue((evento as ResumenAuthor).nombre);
       if (this.selectedUsers.length != 0) {
-        this.selectedUsers[0] = evento;
+        this.selectedUsers[0] = evento as ResumenAuthor;
       } else {
-        this.selectedUsers.push(evento);
+        this.selectedUsers.push(evento as ResumenAuthor);
       }
     } else {
-      let index = this.options.findIndex((option) => option.nombre === evento.value);
+      let index = this.options.findIndex((option) => option.nombre === (evento as { value: string }).value);
       if (this.selectedUsers.length != 0) {
         this.selectedUsers[0] = this.options[index];
       } else {
@@ -212,32 +194,32 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
       idAutor: "",
       nombre: "",
       isAutor: true,
-      myControl: new FormControl(),
+      myControl: new FormControl<string>(""),
     },
   ];
 
-  setFilters() {
+  setFilters(): void {
     for (let index = 0; index < this.otrosAutores.length; index++) {
       this.otrosAutores[index].filteredOptions = this.otrosAutores[index].myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this._filter(value)),
+        map((value: string | null) => this._filter(value ?? "")),
       );
     }
   }
 
-  addAnotherAuthor() {
+  addAnotherAuthor(): void {
     this.otrosAutores.push({
       id: this.otrosAutores.length + 1,
       idAutor: "",
       nombre: "",
       isAutor: true,
-      myControl: new FormControl(),
+      myControl: new FormControl<string>(""),
     });
     this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
       this.otrosAutores.length - 1
     ].myControl.valueChanges.pipe(
       startWith(""),
-      map((value) => this._filter(value)),
+      map((value: string | null) => this._filter(value ?? "")),
     );
   }
 
@@ -252,7 +234,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectUserAutor(evento, value, i) {
+  selectUserAutor(evento: any, value: number, i: number): void {
     if (value == 1) {
       if (evento.idAutor) {
         this.otrosAutores[i].idAutor = evento.idAutor;
@@ -273,13 +255,13 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  submitArticle() {
+  submitArticle(): void {
     this.revisarValues();
     if (this.publicacionForm.valid && this.selectedUser) {
-      const momentDate = new Date(this.publicacion.fechaPublicacionDate); // Replace event.value with your date value
+      const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date()); // Replace event.value with your date value
       const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.publicacion.fechaPublicacion = formattedDate;
-      this._publicacionService.addPublicacion(this.publicacion).subscribe((result) => {
+      this._publicacionService.addPublicacion(this.publicacion).subscribe((result: any) => {
         if (result.status == 1) {
           if (this.selectedUsers.length > 0) {
             this.setAutores(this.selectedUsers[0], 0, result.idPublicacion);
@@ -298,18 +280,18 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  setAutores(autor, isPrincipal, idPublicacion) {
+  setAutores(autor: any, isPrincipal: number, idPublicacion: number): void {
     if (autor.nombre) {
       if (autor.idAutor == "" || (!autor.idAutor && !autor.DNI)) {
         let newAuthor = { nombre: autor.nombre };
-        this._autorService.addAuthor(newAuthor).subscribe((res) => {
+        this._autorService.addAuthor(newAuthor).subscribe((res: any) => {
           if (res) {
             let autorPublicacion = {
               autor_idAutor: res.idAutor,
               publicacion_idPublicacion: idPublicacion,
               isPrincipal: isPrincipal,
             };
-            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((_res: any) => {});
           }
         });
       } else if (autor.idAutor) {
@@ -320,14 +302,14 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((_res: any) => {});
         } else {
           let usuarioPublicacion = {
             usuario_DNI: autor.idAutor,
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
+          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((_res: any) => {});
         }
       } else if (autor.DNI) {
         let usuarioPublicacion = {
@@ -335,12 +317,12 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
           publicacion_idPublicacion: idPublicacion,
           isPrincipal: isPrincipal,
         };
-        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
+        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((_res: any) => {});
       }
     }
   }
 
-  revisarValues() {
+  revisarValues(): void {
     for (let index = 0; index < this.otrosAutores.length; index++) {
       let found = this.options.findIndex((option) => option.nombre === this.otrosAutores[index].nombre);
       if (found == -1) {
@@ -353,7 +335,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
       if (found == -1) {
         if (this.selectedUsers[index].idAutor) {
           this.selectedUsers[index].idAutor = null;
-        } else if (this.selectedUser[index].DNI) {
+        } else if (this.selectedUsers[index].DNI) {
           this.selectedUsers[index].DNI = null;
         }
       }
@@ -363,12 +345,12 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/" + localStorage.getItem("resumen-back")]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Publicación agregada exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Publicación agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

@@ -18,14 +18,16 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { Evento } from "@app/shared/models/eventos";
-import { Publicacion } from "@app/shared/models/publicacion";
+import type { Evento } from "@app/shared/models/eventos";
+import type { Publicacion } from "@app/shared/models/publicacion";
 import { AutorService } from "@app/shared/services/autor.service";
 import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
 import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
+import { SessionService } from "@app/shared/services/session.service";
+import { TabStateService } from "@app/shared/services/tab-state.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
@@ -53,21 +55,21 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   ],
 })
 export default class EventosComponent implements OnInit {
-  eventos: Array<Evento>;
-  resumenes: Array<Publicacion>;
-  url;
+  eventos: Evento[] = [];
+  resumenes: Publicacion[] = [];
+  url: string;
 
   displayedColumns: string[] = ["titulo", "primerAutor", "presentacion", "evento"];
   displayedColumns2: string[] = ["nombre", "pais", "ciudad"];
-  dataSource: MatTableDataSource<Publicacion>;
-  dataSource2: MatTableDataSource<Evento>;
+  dataSource = new MatTableDataSource<Publicacion>([]);
+  dataSource2 = new MatTableDataSource<Evento>([]);
 
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  @ViewChild(MatPaginator, { static: true }) paginator2: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort2: MatSort;
-  selectedTab;
+  @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort2!: MatSort;
+  selectedTab = 0;
 
   constructor(
     public _eventosService: EventoService,
@@ -79,28 +81,34 @@ export default class EventosComponent implements OnInit {
     private _publicacionhasautorService: PublicacionHasAutorService,
     private _usuarioService: UsuarioService,
     private _autorService: AutorService,
+    private _session: SessionService,
+    private _tabState: TabStateService,
   ) {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
-    this.selectedTab = sessionStorage.getItem("oldResumen");
+  ngOnInit(): void {
+    this.selectedTab = this._tabState.resumenTab();
     this.getEventos();
     this.getResumenes();
   }
 
-  getResumenes() {
-    this._publicacionService.getPublicaciones(3).subscribe((res) => {
+  getResumenes(): void {
+    this._publicacionService.getPublicaciones(3).subscribe((res: Publicacion[]) => {
       if (res) {
-        res.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        res.sort((a: Publicacion, b: Publicacion) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         this.resumenes = res;
         for (let index = 0; index < this.resumenes.length; index++) {
-          var d = new Date(this.resumenes[index].fechaPublicacion);
+          const d = new Date(this.resumenes[index].fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.resumenes[index].fecha = this.datePipe.transform(d, "MMMM, y", "es");
-          this.resumenes[index].fecha = this.titlecasePipe.transform(this.resumenes[index].fecha);
+          this.resumenes[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+          this.resumenes[index].fecha = this.titlecasePipe.transform(this.resumenes[index].fecha) ?? "";
           this.resumenes[index].usuario = [];
           this.resumenes[index].autor = [];
           this.getArticlesUsers(this.resumenes[index]);
@@ -114,28 +122,33 @@ export default class EventosComponent implements OnInit {
     });
   }
 
-  getSpeEvento(publicacion) {
-    this._eventosService.getEvento(publicacion.evento_idEvento).subscribe((res) => {
+  getSpeEvento(publicacion: Publicacion): void {
+    this._eventosService.getEvento(publicacion.evento_idEvento ?? 0).subscribe((res: Evento[]) => {
       if (res[0]) {
         publicacion.evento = res[0].nombre;
       }
     });
   }
 
-  getArticlesUsers(publicacion) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res) => {
-      if (res) {
-        let indexPrincipal = res.findIndex((x) => x.isPrincipal == 0);
-        if (indexPrincipal != -1) {
-          this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
+  getArticlesUsers(publicacion: Publicacion): void {
+    this._publicacionhasusuarioService
+      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
+      .subscribe((res: any[]) => {
+        if (res) {
+          const indexPrincipal = res.findIndex((x: any) => x.isPrincipal == 0);
+          if (indexPrincipal != -1) {
+            this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
+          }
         }
-      }
-    });
+      });
   }
 
-  getUsuario(idUser, publicacion) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
+  getUsuario(idUser: string, publicacion: Publicacion): void {
+    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
       if (res[0] != undefined) {
+        if (!publicacion.usuario) {
+          publicacion.usuario = [];
+        }
         publicacion.usuario.push(res[0]);
         publicacion.usuario[0].nombreCompleto =
           publicacion.usuario[0].nombre +
@@ -147,10 +160,10 @@ export default class EventosComponent implements OnInit {
     });
   }
 
-  getArticlesAuthors(publicacion) {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res) => {
+  getArticlesAuthors(publicacion: Publicacion): void {
+    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion ?? 0).subscribe((res: any[]) => {
       if (res) {
-        let indexPrincipal = res.findIndex((x) => x.isPrincipal == 0);
+        const indexPrincipal = res.findIndex((x: any) => x.isPrincipal == 0);
         if (indexPrincipal != -1) {
           this.getAuthor(res[indexPrincipal].autores_idAutor, publicacion);
         }
@@ -158,16 +171,19 @@ export default class EventosComponent implements OnInit {
     });
   }
 
-  getAuthor(idAuthor, publicacion) {
-    this._autorService.getAuthor(idAuthor).subscribe((res) => {
+  getAuthor(idAuthor: number, publicacion: Publicacion): void {
+    this._autorService.getAuthor(idAuthor).subscribe((res: any[]) => {
       if (res[0] != undefined) {
+        if (!publicacion.autor) {
+          publicacion.autor = [];
+        }
         publicacion.autor.push(res[0]);
       }
     });
   }
 
-  getEventos() {
-    this._eventosService.getEventoesAll().subscribe((res) => {
+  getEventos(): void {
+    this._eventosService.getEventoesAll().subscribe((res: Evento[]) => {
       if (res) {
         this.eventos = res;
         this.dataSource2 = new MatTableDataSource(this.eventos);
@@ -177,9 +193,9 @@ export default class EventosComponent implements OnInit {
     });
   }
 
-  displayedNotFound;
+  displayedNotFound = false;
 
-  applyFilter(event: Event) {
+  applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
     if (this.dataSource.paginator) {
@@ -192,9 +208,9 @@ export default class EventosComponent implements OnInit {
     }
   }
 
-  displayedNotFound2;
+  displayedNotFound2 = false;
 
-  applyFilter2(event: Event) {
+  applyFilter2(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource2.filter = filterValue.trim().toLowerCase();
     if (this.dataSource2.paginator) {
@@ -207,25 +223,25 @@ export default class EventosComponent implements OnInit {
     }
   }
 
-  changedTab(event) {
-    sessionStorage.setItem("oldResumen", event);
+  changedTab(event: number): void {
+    this._tabState.resumenTab.set(event);
   }
 
-  addResumen() {
-    localStorage.setItem("resumen-back", "eventos");
+  addResumen(): void {
+    this._session.setResumenBack("eventos");
     this._router.navigate(["dashboard/add-resumen"]);
   }
 
-  editResumen(id) {
-    localStorage.setItem("resumen-back", "eventos");
+  editResumen(id: number): void {
+    this._session.setResumenBack("eventos");
     this._router.navigate(["dashboard/edit-resumen/" + id]);
   }
 
-  addEvento() {
+  addEvento(): void {
     this._router.navigate(["dashboard/add-evento"]);
   }
 
-  editEvento(idEvento) {
+  editEvento(idEvento: number): void {
     this._router.navigate(["dashboard/edit-evento/" + idEvento]);
   }
 }

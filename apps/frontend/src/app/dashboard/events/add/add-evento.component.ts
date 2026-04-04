@@ -9,7 +9,7 @@ import { MatInput } from "@angular/material/input";
 import { MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Evento } from "@app/shared/models/eventos";
+import type { Evento } from "@app/shared/models/eventos";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { EventoService } from "@app/shared/services/evento.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -49,7 +49,7 @@ export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
     private _snackBar: MatSnackBar,
     private _eventoService: EventoService,
   ) {
-    this.evento = new Evento(null, "", "", "", "", "");
+    this.evento = { idEvento: 0, nombre: "", paisEN: "", pais: "", ciudad: "", ciudadEN: "" };
     this.eventoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       pais: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -59,37 +59,37 @@ export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  ciudadesControl = new FormControl();
+  ciudadesControl = new FormControl<string>("");
   ciudades: Array<any> = [];
-  filteredOptions: Observable<any>;
-  filteredOptions1: Observable<any>;
-  ciudadesENControl = new FormControl();
+  filteredOptions!: Observable<any>;
+  filteredOptions1!: Observable<any>;
+  ciudadesENControl = new FormControl<string>("");
   ciudadesEN: Array<any> = [];
-  filteredOptions2: Observable<any>;
-  paisControl = new FormControl();
+  filteredOptions2!: Observable<any>;
+  paisControl = new FormControl<string>("");
   pais: Array<any> = [];
-  filteredOptions3: Observable<any>;
-  paisENControl = new FormControl();
+  filteredOptions3!: Observable<any>;
+  paisENControl = new FormControl<string>("");
   paisEN: Array<any> = [];
 
-  private _filter(value): any {
+  private _filter(value: string): any {
     const filterValue = value.toLowerCase();
     return this.ciudades.filter((ciudad) => ciudad.ciudad.toLowerCase().includes(filterValue));
   }
-  private _filter1(value): any {
+  private _filter1(value: string): any {
     const filterValue1 = value.toLowerCase();
     return this.ciudadesEN.filter((ciudadEN) => ciudadEN.ciudadEN.toLowerCase().includes(filterValue1));
   }
-  private _filter2(value): any {
+  private _filter2(value: string): any {
     const filterValue2 = value.toLowerCase();
     return this.pais.filter((pais) => pais.pais.toLowerCase().includes(filterValue2));
   }
-  private _filter3(value): any {
+  private _filter3(value: string): any {
     const filterValue3 = value.toLowerCase();
     return this.paisEN.filter((paisEN) => paisEN.paisEN.toLowerCase().includes(filterValue3));
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getCiudad();
     this.getCiudadEN();
     this.getPais();
@@ -103,51 +103,51 @@ export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
   setFilters() {
     this.filteredOptions = this.ciudadesControl.valueChanges.pipe(
       startWith(""),
-      map((value) => this._filter(value)),
+      map((value) => this._filter(value ?? "")),
     );
   }
 
   setFilters1() {
     this.filteredOptions1 = this.ciudadesENControl.valueChanges.pipe(
       startWith(""),
-      map((value1) => this._filter1(value1)),
+      map((value1) => this._filter1(value1 ?? "")),
     );
   }
 
   setFilters2() {
     this.filteredOptions2 = this.paisControl.valueChanges.pipe(
       startWith(""),
-      map((value2) => this._filter2(value2)),
+      map((value2) => this._filter2(value2 ?? "")),
     );
   }
 
   setFilters3() {
     this.filteredOptions3 = this.paisENControl.valueChanges.pipe(
       startWith(""),
-      map((value3) => this._filter3(value3)),
+      map((value3) => this._filter3(value3 ?? "")),
     );
   }
 
-  getCiudad() {
-    this._eventoService.getCiudades().subscribe((res) => {
+  getCiudad(): void {
+    this._eventoService.getCiudades().subscribe((res: any[]) => {
       this.ciudades = res;
     });
   }
 
-  getCiudadEN() {
-    this._eventoService.getCiudadesEN().subscribe((res) => {
+  getCiudadEN(): void {
+    this._eventoService.getCiudadesEN().subscribe((res: any[]) => {
       this.ciudadesEN = res;
     });
   }
 
-  getPais() {
-    this._eventoService.getPais().subscribe((res) => {
+  getPais(): void {
+    this._eventoService.getPais().subscribe((res: any[]) => {
       this.pais = res;
     });
   }
 
-  getPaisEN() {
-    this._eventoService.getPaisEN().subscribe((res) => {
+  getPaisEN(): void {
+    this._eventoService.getPaisEN().subscribe((res: any[]) => {
       this.paisEN = res;
     });
   }
@@ -156,8 +156,8 @@ export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
     return this.eventoForm.dirty;
   }
 
-  submitEvento() {
-    this._eventoService.addEvento(this.evento).subscribe((result) => {
+  submitEvento(): void {
+    this._eventoService.addEvento(this.evento).subscribe((result: any) => {
       if (result.status == 1) {
         this.eventoForm.markAsPristine();
         this.return();
@@ -166,19 +166,19 @@ export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/eventos"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Evento agregado exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Evento agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  notCanDo;
+  notCanDo = false;
   openEraser() {}
-  edit;
+  edit = false;
 }

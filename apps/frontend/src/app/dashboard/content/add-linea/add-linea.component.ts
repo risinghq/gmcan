@@ -5,7 +5,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { lineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import { createLineasInvestigacion } from "@app/shared/models/factories";
+import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
@@ -20,13 +21,13 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   button_text = "Guardar línea";
-  lineaInvestigacion: lineasInvestigacion;
+  lineaInvestigacion: LineasInvestigacion;
   public lineaForm: FormGroup;
-  url;
+  url: string;
 
-  notCanDo;
+  notCanDo = false;
   openEraser() {}
-  edit;
+  edit = false;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -42,7 +43,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.lineaInvestigacion = new lineasInvestigacion(null, "", "", null, "", "", 1, null, null, null, null);
+    this.lineaInvestigacion = createLineasInvestigacion();
     this.url = GLOBAL.url;
   }
 
@@ -52,13 +53,13 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
     return this.lineaForm.dirty;
   }
 
-  submitLinea() {
-    this._lineaInvestigacionService.addLinea(this.lineaInvestigacion).subscribe((result) => {
+  submitLinea(): void {
+    this._lineaInvestigacionService.addLinea(this.lineaInvestigacion).subscribe((result: any) => {
       if (result.status == 1) {
         if (this.fileData) {
           this._lineaInvestigacionService
             .uploadLineaFoto(this.fileData, result.idLineasInvestigacion)
-            .subscribe((res) => {});
+            .subscribe((_res: any) => {});
         }
         this.lineaForm.markAsPristine();
         this.return();
@@ -67,38 +68,41 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/contenidos"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Línea de investigación agregada exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Línea de investigación agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  fileData: File = null;
-  previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];
+  fileData: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: Event): void {
+    const target = fileInput.target as HTMLInputElement | null;
+    this.fileData = target?.files?.[0] ?? null;
+    if (!this.fileData) return;
     this.preview();
   }
 
-  preview() {
+  preview(): void {
+    if (!this.fileData) return;
     // Show preview
-    var mimeType = this.fileData.type;
+    const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
+    reader.addEventListener("load", (_event) => {
       this.previewUrl = reader.result;
-    };
+    });
   }
 }

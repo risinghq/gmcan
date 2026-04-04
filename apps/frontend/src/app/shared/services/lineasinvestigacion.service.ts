@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,10 +10,15 @@ import { GLOBAL } from "./global";
 export class LineasInvestigacionService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getLineasInvestigacion(): any {
@@ -30,7 +36,7 @@ export class LineasInvestigacionService {
     }
   }
 
-  getLineasInvestigaciones(idLinea): any {
+  getLineasInvestigaciones(idLinea: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -45,7 +51,7 @@ export class LineasInvestigacionService {
     }
   }
 
-  getLineaInvestigacion(idLineasInvestigacion): any {
+  getLineaInvestigacion(idLineasInvestigacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -60,7 +66,7 @@ export class LineasInvestigacionService {
     }
   }
 
-  addLinea(linea): any {
+  addLinea(linea: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -69,7 +75,7 @@ export class LineasInvestigacionService {
     });
   }
 
-  updateLinea(linea): any {
+  updateLinea(linea: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -78,7 +84,7 @@ export class LineasInvestigacionService {
     });
   }
 
-  deleteLinea(idLinea): any {
+  deleteLinea(idLinea: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -87,7 +93,7 @@ export class LineasInvestigacionService {
     });
   }
 
-  uploadLineaFoto(fileData, id) {
+  uploadLineaFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});

@@ -3,5 +3,5 @@ export interface DialogData {
   text: string;
   yes: string;
   cancel: string;
-  timer;
+  timer?: number;
 }

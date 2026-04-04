@@ -1,10 +1,8 @@
-export class TipoPublicacion {
-  constructor(
-    public idTipoPublicacion: Number,
-    public nombre: String,
-    public nombreTab: String,
-    public fechaActualizacion: Date,
-    public fechaCreacion: Date,
-    public search: String,
-  ) {}
+export interface TipoPublicacion {
+  idTipoPublicacion?: number;
+  nombre?: string;
+  nombreTab?: string;
+  fechaActualizacion?: Date;
+  fechaCreacion?: Date;
+  search?: string;
 }

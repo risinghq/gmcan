@@ -6,7 +6,5 @@ import { Component, OnInit } from "@angular/core";
   styleUrls: ["./mantenimiento.component.scss"],
 })
 export default class MantenimientoComponent implements OnInit {
-  constructor() {}
-
   ngOnInit() {}
 }

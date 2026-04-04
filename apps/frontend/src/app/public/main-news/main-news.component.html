@@ -35,7 +35,7 @@
             <button
               mat-menu-item
               *ngFor="let tiponoticia of tiponoticias"
-              (click)="selectCategory(tiponoticia.idtipoNoticia, tiponoticia.nombre)"
+              (click)="selectCategory(tiponoticia.idtipoNoticia ?? 0, tiponoticia.nombre ?? '')"
             >
               {{ tiponoticia.nombre }}
             </button>
@@ -126,7 +126,7 @@
         class="category"
         [ngClass]="categorySelected == tiponoticia.idtipoNoticia ? 'active' : 'category'"
         *ngFor="let tiponoticia of tiponoticias"
-        (click)="selectCategory(tiponoticia.idtipoNoticia, tiponoticia.nombre)"
+        (click)="selectCategory(tiponoticia.idtipoNoticia ?? 0, tiponoticia.nombre ?? '')"
       >
         {{ tiponoticia.nombre }}
       </div>

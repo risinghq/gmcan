@@ -15,11 +15,15 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Revista } from "@app/shared/models/revista";
+import type { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+
+interface StatusResponse {
+  status?: number;
+}
 
 @Component({
   selector: "app-edit-revista",
@@ -42,13 +46,13 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
     private _revistaService: RevistaService,
     private _publicacionService: PublicacionService,
   ) {
-    this.revista = new Revista(null, "");
+    this.revista = { idRevista: 0, nombre: "" };
     this.revistaForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getRevista();
   }
 
@@ -56,31 +60,31 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
     return this.revistaForm.dirty;
   }
 
-  getRevista() {
+  getRevista(): void {
     this._route.params.forEach((params: Params) => {
-      let idRevista = params["id"];
-      this._revistaService.getRevista(idRevista).subscribe((result) => {
+      const idRevista = Number(params["id"] ?? 0);
+      this._revistaService.getRevista(idRevista).subscribe((result: Revista[]) => {
         if (result) {
           this.revista = result[0];
-          localStorage.setItem("revistaEdit", JSON.stringify(this.revista.nombre));
+          localStorage.setItem("revistaEdit", JSON.stringify(this.revista.nombre ?? ""));
           this.getPublicacionRevista(idRevista);
         }
       });
     });
   }
 
-  notCanDo;
+  notCanDo = false;
 
-  getPublicacionRevista(idRevista) {
-    this._publicacionService.getPublicacionesRevista(idRevista).subscribe((result) => {
+  getPublicacionRevista(idRevista: number): void {
+    this._publicacionService.getPublicacionesRevista(idRevista).subscribe((result: unknown[]) => {
       if (result.length == 0) {
         this.notCanDo = true;
       }
     });
   }
 
-  submitRevista() {
-    this._revistaService.updateRevista(this.revista).subscribe((result) => {
+  submitRevista(): void {
+    this._revistaService.updateRevista(this.revista).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.revistaForm.markAsPristine();
         this.return();
@@ -89,13 +93,13 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/articulos"]);
   }
 
-  private dialogRef2: MatDialogRef<DialogErase3>;
+  private dialogRef2?: MatDialogRef<DialogErase3>;
 
-  openEraser() {
+  openEraser(): void {
     if (this.notCanDo) {
       this.dialogRef2 = this.dialog.open(DialogErase3, {
         width: "530px",
@@ -107,7 +111,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
           yes: "No, cancelar",
         },
       });
-      this.dialogRef2.afterClosed().subscribe((result) => {
+      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.eraseNews();
         }
@@ -115,17 +119,17 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  eraseNews() {
+  eraseNews(): void {
     if (this.notCanDo) {
-      this._revistaService.deleteRevista(this.revista.idRevista).subscribe((result) => {
+      this._revistaService.deleteRevista(this.revista.idRevista ?? 0).subscribe((result: StatusResponse) => {
         if (result.status == 1) {
           this.revistaForm.markAsPristine();
           this.return();

@@ -12,11 +12,12 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
+import { createUsuarioFull } from "@app/shared/models/factories";
 import { Genero } from "@app/shared/models/genero";
 import { Prefijo } from "@app/shared/models/prefijo";
 import { TipoMiembro } from "@app/shared/models/tipomiembro";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { UsuarioFull } from "@app/shared/models/usuarioFull";
+import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { UsuarioPermiso } from "@app/shared/models/usuariopermiso";
 import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -27,6 +28,10 @@ import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { AutosizeModule } from "ngx-autosize";
+
+interface PermisoItem {
+  idPermiso?: number;
+}
 
 @Component({
   selector: "app-add-member",
@@ -57,14 +62,14 @@ import { AutosizeModule } from "ngx-autosize";
 export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   public memberForm: FormGroup;
   member: UsuarioFull;
-  generos: Array<Genero>;
-  tipoMiembros: Array<TipoMiembro>;
-  prefijos: Array<Prefijo>;
-  usuarioPermiso: UsuarioPermiso;
-  listaPermisos: Array<any>;
+  generos: Genero[] = [];
+  tipoMiembros: TipoMiembro[] = [];
+  prefijos: Prefijo[] = [];
+  usuarioPermiso: UsuarioPermiso = {} as UsuarioPermiso;
+  listaPermisos: Array<number> = [];
   hide = true;
   hide2 = true;
-  url;
+  url: string;
 
   button_text = "Registrar nuevo miembro";
 
@@ -97,39 +102,14 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
       resumenProEN: [""],
     });
     this.url = GLOBAL.url;
-    this.member = new UsuarioFull(
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      0,
-      "",
-      "",
-      "",
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      "",
-      3,
-      "",
-      null,
-    );
+    this.member = createUsuarioFull();
   }
 
   @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
     event.returnValue = false;
   }
 
-  ngOnInit() {
-    this.listaPermisos = [];
+  ngOnInit(): void {
     this.getGenero();
   }
 
@@ -137,8 +117,8 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     return this.memberForm.dirty;
   }
 
-  getGenero() {
-    this._generoService.getGeneros().subscribe((result) => {
+  getGenero(): void {
+    this._generoService.getGeneros().subscribe((result: Genero[]) => {
       if (result) {
         this.generos = result;
         this.getCargo();
@@ -146,8 +126,8 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getCargo() {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res) => {
+  getCargo(): void {
+    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembro[]) => {
       if (res) {
         this.tipoMiembros = res;
         this.getNivelAcademico();
@@ -155,8 +135,8 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getNivelAcademico() {
-    this._prefijoService.getPrefijos().subscribe((res) => {
+  getNivelAcademico(): void {
+    this._prefijoService.getPrefijos().subscribe((res: Prefijo[]) => {
       if (res) {
         this.prefijos = res;
         this.getPermisos();
@@ -164,8 +144,8 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getPermisos() {
-    this._permisosService.getPermisos().subscribe((res) => {
+  getPermisos(): void {
+    this._permisosService.getPermisos().subscribe((res: PermisoItem[]) => {
       if (res) {
       }
     });
@@ -173,23 +153,23 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   adHono = 0;
 
-  setCoord(value) {
+  setCoord(value: number): void {
     this.member.tipoUsuario_idTipoUsuario = value;
   }
 
-  adHonorem(value) {
+  adHonorem(value: number): void {
     this.adHono = value;
   }
 
   oldMem = 0;
-  oldMember(value) {
+  oldMember(value: number): void {
     this.oldMem = value;
   }
 
-  errPass;
-  errEmail;
+  errPass = false;
+  errEmail = false;
 
-  addMember() {
+  addMember(): void {
     if (this.memberForm.valid) {
       if (this.member.fechaNacimientoDate) {
         const momentDate = new Date(this.member.fechaNacimientoDate); // Replace event.value with your date value
@@ -199,9 +179,9 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
         this.member.fechaNacimiento = null;
       }
       if (this.member.prefijo_idPrefijo == 6) {
-        this.member.prefijo = null;
+        this.member.prefijo = undefined;
       }
-      this._usuarioService.verifyUser(this.member).subscribe((result) => {
+      this._usuarioService.verifyUser(this.member).subscribe((result: UsuarioFull[]) => {
         if (result.length == 0) {
           if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
             if (
@@ -217,18 +197,18 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
             } else {
               this.member.estado = 1;
             }
-            this._usuarioService.addUser(this.member).subscribe((res) => {
+            this._usuarioService.addUser(this.member).subscribe((res: { user?: string }) => {
               if (res.user) {
                 if (this.listaPermisos.length > 0) {
                   this.addPermisos(res.user);
                 }
                 if (this.fileData) {
-                  this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((res) => {
+                  this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((_res: unknown) => {
                     if (res) {
                     }
                   });
                 }
-                this.openSnackBar("Miembro agregado exitosamente", null);
+                this.openSnackBar("Miembro agregado exitosamente", undefined);
                 this.memberForm.markAsPristine();
                 this.return();
               }
@@ -246,57 +226,57 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  addPermisos(DNI) {
+  addPermisos(DNI: string): void {
     if (this.member.tipoUsuario_idTipoUsuario == 2) {
       this.listaPermisos.push(4);
       this.listaPermisos.push(6);
     }
     for (let index = 0; index < this.listaPermisos.length; index++) {
       let permiso = { usuario_DNI: DNI, permiso_idPermiso: this.listaPermisos[index] };
-      this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((res) => {
-        if (res) {
-        }
-      });
+      this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((_res: unknown) => {});
     }
   }
 
-  openSnackBar(text, panel) {
-    this._snackBar.open(text, null, {
-      panelClass: [panel],
+  openSnackBar(text: string, panel: string = ""): void {
+    this._snackBar.open(text, undefined, {
+      panelClass: panel ? panel : undefined,
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  fileData: File = null;
+  fileData: File | null = null;
   previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: any): void {
     this.fileData = <File>fileInput.target.files[0];
     this.preview();
   }
 
-  preview() {
+  preview(): void {
     // Show preview
-    var mimeType = this.fileData.type;
+    if (!this.fileData) {
+      return;
+    }
+    const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
+    reader.addEventListener("load", (_event: ProgressEvent<FileReader>) => {
       this.previewUrl = reader.result;
-    };
+    });
   }
 
-  selectPermiso(id, event) {
+  selectPermiso(id: number, event: boolean): void {
     if (event) {
       this.listaPermisos.push(id);
     } else {
-      let index = this.listaPermisos.findIndex((x) => x === id);
+      const index = this.listaPermisos.findIndex((x: number) => x === id);
       if (index != -1) {
         this.listaPermisos.splice(index, 1);
       }
@@ -308,9 +288,9 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   openEraser() {}
-  edit;
-  permisoNoticia;
-  permisoPublicacion;
-  permisoProyecto;
-  permisoContenido;
+  edit = false;
+  permisoNoticia = false;
+  permisoPublicacion = false;
+  permisoProyecto = false;
+  permisoContenido = false;
 }

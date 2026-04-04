@@ -15,12 +15,11 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Equipo } from "@app/shared/models/equipo";
+import type { Equipo } from "@app/shared/models/equipo";
+import { createEquipo } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { EquipoService } from "@app/shared/services/equipo.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-edit-equipo",
@@ -42,7 +41,7 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
     private _snackBar: MatSnackBar,
     private _equipoService: EquipoService,
   ) {
-    this.equipo = new Equipo(null, "", "", "", "", "", 1, null, null);
+    this.equipo = createEquipo();
     this.equipoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       cpu: [""],
@@ -60,10 +59,10 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
     return this.equipoForm.dirty;
   }
 
-  getEvento() {
+  getEvento(): void {
     this._route.params.forEach((params: Params) => {
       let idEquipo = params["id"];
-      this._equipoService.getEquipo(idEquipo).subscribe((result) => {
+      this._equipoService.getEquipo(idEquipo).subscribe((result: Equipo[]) => {
         if (result.length > 0) {
           this.equipo = result[0];
           localStorage.setItem("equipoEdit", JSON.stringify(this.equipo.nombre));
@@ -72,9 +71,9 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  submitEquipo() {
+  submitEquipo(): void {
     if (this.equipoForm.valid) {
-      this._equipoService.updateEquipo(this.equipo).subscribe((res) => {
+      this._equipoService.updateEquipo(this.equipo).subscribe((res: any) => {
         if (res.status == 1) {
           this.equipoForm.markAsPristine();
           this.return();
@@ -84,21 +83,21 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/contenidos"]);
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogErase13>;
+  private dialogRef2?: MatDialogRef<DialogErase13>;
 
-  openEraser() {
+  openEraser(): void {
     this.dialogRef2 = this.dialog.open(DialogErase13, {
       width: "530px",
       id: "idleTimer",
@@ -109,15 +108,15 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
         yes: "No, cancelar",
       },
     });
-    this.dialogRef2.afterClosed().subscribe((result) => {
+    this.dialogRef2.afterClosed().subscribe((result: boolean) => {
       if (result) {
         this.eraseEquipo();
       }
     });
   }
 
-  eraseEquipo() {
-    this._equipoService.deleteEquipo(this.equipo.idEquipo).subscribe((result) => {
+  eraseEquipo(): void {
+    this._equipoService.deleteEquipo(this.equipo.idEquipo ?? 0).subscribe((result: any) => {
       if (result.status == 1) {
         this.equipoForm.markAsPristine();
         this.return();

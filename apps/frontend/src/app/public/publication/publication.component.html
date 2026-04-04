@@ -101,7 +101,7 @@
                     {{ publicacion.ciudad }}, {{ publicacion.pais }}
                   </div>
                 </div>
-                <div class="publication-rev line-1" *ngIf="publicacion.DOI != null && publicacion.DOI != ''">
+                <div class="publication-rev line-1" *ngIf="publicacion.DOI != null">
                   DOI:
                   <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank">{{
                     publicacion.DOI

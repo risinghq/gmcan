@@ -9,14 +9,15 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Autor } from "@app/shared/models/autores";
-import { Grupo } from "@app/shared/models/grupo";
-import { lineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import { createGrupo, createNoticia } from "@app/shared/models/factories";
+import type { Grupo } from "@app/shared/models/grupo";
+import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
 import { Method } from "@app/shared/models/method";
-import { Noticia } from "@app/shared/models/noticia";
-import { Proyecto } from "@app/shared/models/proyecto";
-import { Publicacion } from "@app/shared/models/publicacion";
-import { TipoNoticia } from "@app/shared/models/tiponoticia";
-import { TipoPublicacion } from "@app/shared/models/tipopublicacion";
+import type { Noticia } from "@app/shared/models/noticia";
+import type { Proyecto } from "@app/shared/models/proyecto";
+import type { Publicacion } from "@app/shared/models/publicacion";
+import type { TipoNoticia } from "@app/shared/models/tiponoticia";
+import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import { Usuario } from "@app/shared/models/usuario";
 import { AboutUsService } from "@app/shared/services/aboutus.service";
 import { AutorService } from "@app/shared/services/autor.service";
@@ -34,6 +35,7 @@ import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasa
 import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { SearchService } from "@app/shared/services/search.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
 import { TipoTesisService } from "@app/shared/services/tipotesis.service";
@@ -55,10 +57,10 @@ export default class HomeComponent implements OnInit {
   public usuarios: Array<Usuario>;
   public noticias: Array<Noticia>;
   public noticiaPrincipal: Noticia;
-  public tipoPublicaciones: Array<TipoPublicacion>;
+  public tipoPublicaciones: Array<TipoPublicacion> = [];
   public tiponoticias: Array<TipoNoticia>;
-  public lineasInvestigacion: Array<lineasInvestigacion>;
-  public metodos: Array<Method>;
+  public lineasInvestigacion: Array<LineasInvestigacion> = [];
+  public metodos: Array<Method> = [];
   screenWidth: number;
   url;
   constructor(
@@ -89,39 +91,12 @@ export default class HomeComponent implements OnInit {
     public location: Location,
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
+    private _session: SessionService,
     public meta: Meta,
     private titleService: Title,
   ) {
-    this.info = new Grupo(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
-    this.noticiaPrincipal = new Noticia(null, "", "", "", "", 0, "", null, null, "", "", null, "", null);
+    this.info = createGrupo();
+    this.noticiaPrincipal = createNoticia();
     this.publicaciones = [];
     this.autores = [];
     this.noticias = [];
@@ -129,24 +104,20 @@ export default class HomeComponent implements OnInit {
     this.tiponoticias = [];
     this.usuarios = [];
     this.screenWidth = window.innerWidth;
-    window.onresize = () => {
-      // set screenWidth on screen size change
-      this.screenWidth = window.innerWidth;
-    };
     this.url = GLOBAL.url;
   }
 
   @HostListener("window:resize", ["$event"])
-  onResize(event) {
+  onResize(_event: Event): void {
     this.screenWidth = window.innerWidth;
   }
 
-  language;
+  language: any;
   progress = 0;
   augment = 100 / 10;
 
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     this.titleService.setTitle("GMCAN | UNMSM");
     this.getGrupoInfo();
     this.getTipoPublicacion();
@@ -159,10 +130,13 @@ export default class HomeComponent implements OnInit {
 
   llenado = false;
 
-  ngAfterViewChecked() {
+  ngAfterViewChecked(): void {
     if (this.metodos && !this.llenado) {
       for (let index = 0; index < this.metodos.length; index++) {
-        document.getElementById("method" + index).innerHTML = this.metodos[index].descripcion;
+        const methodEl = document.getElementById("method" + index);
+        if (methodEl) {
+          methodEl.innerHTML = this.metodos[index].descripcion ?? "";
+        }
       }
       this.llenado = true;
     }
@@ -170,25 +144,28 @@ export default class HomeComponent implements OnInit {
 
   /* Get Grupo */
 
-  getGrupoInfo() {
-    this._grupoService.getGrupoInfo().subscribe((res) => {
+  getGrupoInfo(): void {
+    this._grupoService.getGrupoInfo().subscribe((res: any) => {
       this.info = res[0];
       this.progress = this.progress + this.augment;
       this.getAboutUs();
     });
   }
 
-  getAboutUs() {
-    this.aboutusService.getAboutUsInfo().subscribe((res) => {
+  getAboutUs(): void {
+    this.aboutusService.getAboutUsInfo().subscribe((res: any) => {
       this.progress = this.progress + this.augment;
-      document.getElementById("services").innerHTML = res[0].servicios;
+      const servicesEl = document.getElementById("services");
+      if (servicesEl) {
+        servicesEl.innerHTML = res[0]?.servicios ?? "";
+      }
     });
   }
 
   /* Get Publicacion */
 
-  getTipoPublicacion() {
-    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res) => {
+  getTipoPublicacion(): void {
+    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res: any) => {
       if (res) {
         this.tipoPublicaciones = res;
         this.progress = this.progress + this.augment;
@@ -201,12 +178,16 @@ export default class HomeComponent implements OnInit {
   tesis = 0;
   articulos = 0;
 
-  getPublicaciones() {
-    this._publicacionesService.getPublicacion().subscribe((res) => {
+  getPublicaciones(): void {
+    this._publicacionesService.getPublicacion().subscribe((res: any) => {
       if (res.length > 0) {
         this.progress = this.progress + this.augment;
-        res.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        res.sort((a: any, b: any) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         this.publicaciones = res;
         for (let index = 0; index < this.publicaciones.length; index++) {
@@ -226,18 +207,20 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getPublicacionHasUsuario(publicacion) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
+  getPublicacionHasUsuario(publicacion: any): void {
+    this._publicacionhasusuarioService
+      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
+      .subscribe((res: any) => {
+        if (res.length > 0) {
+          for (let index = 0; index < res.length; index++) {
+            this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
+          }
         }
-      }
-    });
+      });
   }
 
-  getPublicacionHasAutor(publicacion) {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res) => {
+  getPublicacionHasAutor(publicacion: any): void {
+    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion ?? 0).subscribe((res: any) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getAutor(res[index].autores_idAutor, publicacion, res[index].isPrincipal);
@@ -246,8 +229,8 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getEvento(idEvento, publicacion) {
-    this._eventoService.getEvento(idEvento).subscribe((res) => {
+  getEvento(idEvento: number, publicacion: any): void {
+    this._eventoService.getEvento(idEvento).subscribe((res: any) => {
       if (res.length > 0) {
         publicacion.evento = res[0].nombre;
         publicacion.ciudad = res[0].ciudad;
@@ -256,8 +239,8 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getTipoTesis(publicacion) {
-    this._tipotesisService.getTiposTesis().subscribe((res) => {
+  getTipoTesis(publicacion: any): void {
+    this._tipotesisService.getTiposTesis().subscribe((res: any) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           if (publicacion.tipoTesis_idTipoTesis == res[index].idTipoTesis) {
@@ -270,14 +253,14 @@ export default class HomeComponent implements OnInit {
 
   /* Fill Publicacion */
 
-  fillPublicacion(publicacion) {
+  fillPublicacion(publicacion: any): void {
     publicacion.usuario = [];
     publicacion.autor = [];
-    var d = new Date(publicacion.fechaPublicacion);
+    const d = new Date(publicacion.fechaPublicacion ?? "");
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
     publicacion.fechaPublicacion = d;
-    publicacion.fecha = this.datePipe.transform(publicacion.fechaPublicacion, "MMMM y", "es");
-    publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha);
+    publicacion.fecha = this.datePipe.transform(publicacion.fechaPublicacion, "MMMM y", "es") ?? undefined;
+    publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha ?? "");
     publicacion.tipoPublicacion =
       this.tipoPublicaciones[
         this.tipoPublicaciones.findIndex((x) => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion)
@@ -286,24 +269,24 @@ export default class HomeComponent implements OnInit {
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
     this.getPublicacionHasUsuario(publicacion);
-    this.getEvento(publicacion.evento_idEvento, publicacion);
+    this.getEvento(publicacion.evento_idEvento ?? 0, publicacion);
     this.getTipoTesis(publicacion);
   }
 
   /* get Proyectos */
 
-  getProyectosHasUsuario(proyecto) {
-    this._proyectohasusuarioService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res) => {
+  getProyectosHasUsuario(proyecto: any): void {
+    this._proyectohasusuarioService.getUsuarioHasProyectos(proyecto.idProyecto ?? 0).subscribe((res: any) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, proyecto, null);
+          this.getUsuario(res[index].usuario_DNI, proyecto, 0);
         }
       }
     });
   }
 
-  getLineasInvestigacion(idLinea, index) {
-    this._lineasInvestigacionServices.getLineaInvestigacion(idLinea).subscribe((res) => {
+  getLineasInvestigacion(idLinea: number, index: number): void {
+    this._lineasInvestigacionServices.getLineaInvestigacion(idLinea).subscribe((res: any) => {
       if (res.length > 0) {
         if (this.proyectos[index] != undefined) {
           this.proyectos[index].lineasInvestigacion = res[0].nombre;
@@ -312,10 +295,12 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getProyectos() {
-    this._proyectoServices.getProyecto().subscribe((res) => {
+  getProyectos(): void {
+    this._proyectoServices.getProyecto().subscribe((res: any) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.fechaInicio < b.fechaInicio ? 1 : b.fechaInicio < a.fechaInicio ? -1 : 0));
+        res.sort((a: any, b: any) =>
+          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
+        );
         this.proyectos = res;
         this.progress = this.progress + this.augment;
         for (let index = 0; index < this.proyectos.length; index++) {
@@ -330,18 +315,18 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getFuenteFinanciamiento(proyecto) {
+  getFuenteFinanciamiento(proyecto: any): void {
     this._fuenteFinanciamientoService
-      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento)
-      .subscribe((res) => {
+      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento ?? 0)
+      .subscribe((res: any) => {
         if (res.length > 0) {
           proyecto.fuenteFinanciamiento = res[0].nombre;
         }
       });
   }
 
-  getMoneda(proyecto) {
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res) => {
+  getMoneda(proyecto: any): void {
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda ?? 0).subscribe((res: any) => {
       if (res.length > 0) {
         proyecto.moneda = res[0].simbolo;
       }
@@ -350,21 +335,21 @@ export default class HomeComponent implements OnInit {
 
   /* Fill Proyecto */
 
-  fillProyecto(proyecto, index) {
-    var d = new Date(proyecto.fechaInicio);
+  fillProyecto(proyecto: any, index: number): void {
+    let d = new Date(proyecto.fechaInicio ?? "");
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
     proyecto.fechaInicio = d;
-    proyecto.fechaI = this.datePipe.transform(proyecto.fechaInicio, "MMMM, y", "es");
-    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI);
+    proyecto.fechaI = this.datePipe.transform(proyecto.fechaInicio, "MMMM, y", "es") ?? undefined;
+    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
     proyecto.usuario = [];
     if (proyecto.fechaFin) {
       d = new Date(proyecto.fechaFin);
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
       proyecto.fechaFin = d;
-      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es");
-      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF);
+      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es") ?? undefined;
+      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF ?? "");
     }
-    this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion, index);
+    this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion ?? 0, index);
     this.getProyectosHasUsuario(proyecto);
     this.getFuenteFinanciamiento(proyecto);
     this.getMoneda(proyecto);
@@ -372,12 +357,16 @@ export default class HomeComponent implements OnInit {
 
   /* get Noticias */
 
-  getNoticias() {
-    this._noticiaService.getNoticias().subscribe((res) => {
+  getNoticias(): void {
+    this._noticiaService.getNoticias().subscribe((res: any) => {
       if (res != null) {
         this.progress = this.progress + this.augment;
-        res.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        res.sort((a: any, b: any) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         this.noticias = res;
         for (let index = 0; index < this.noticias.length; index++) {
@@ -396,8 +385,8 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getTipoNoticias() {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res) => {
+  getTipoNoticias(): void {
+    this._tiponoticiaService.getTipoNoticia().subscribe((res: any) => {
       this.progress = this.progress + this.augment;
       this.tiponoticias = res;
       this.getNoticias();
@@ -406,25 +395,25 @@ export default class HomeComponent implements OnInit {
 
   /* Fill Noticia */
 
-  fillNoticia(obj) {
+  fillNoticia(obj: any): void {
     for (let j = 0; j < this.tiponoticias.length; j++) {
       if (obj.tipoNoticia_idtipoNoticia === this.tiponoticias[j].idtipoNoticia) {
         obj.nombreTipoNoticia = this.tiponoticias[j].nombre;
       }
     }
-    var d = new Date(obj.fechaPublicacion);
+    const d = new Date(obj.fechaPublicacion ?? "");
     if (String(d) != "Invalid Date") {
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      obj.fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es");
-      obj.fechaPublicacion = this.titlecasePipe.transform(obj.fechaPublicacion);
+      obj.fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? undefined;
+      obj.fechaPublicacion = this.titlecasePipe.transform(obj.fechaPublicacion ?? "");
     }
     this.getUsuarioNoticia(obj);
   }
 
   /* get Lineas Investigacion */
 
-  getAllLineasInvestigacion() {
-    this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res) => {
+  getAllLineasInvestigacion(): void {
+    this._lineasInvestigacionServices.getLineasInvestigacion().subscribe((res: any) => {
       if (res) {
         this.progress = this.progress + this.augment;
         this.lineasInvestigacion = res;
@@ -434,8 +423,8 @@ export default class HomeComponent implements OnInit {
 
   /* get Metodos */
 
-  getMetodos() {
-    this._methodsService.getMethods().subscribe((res) => {
+  getMetodos(): void {
+    this._methodsService.getMethods().subscribe((res: any) => {
       if (res) {
         this.progress = this.progress + this.augment;
         this.metodos = res;
@@ -445,33 +434,35 @@ export default class HomeComponent implements OnInit {
 
   /*  Get Normal */
 
-  getUsuario(dni, obj, isPrincipal) {
-    this._usuarioService.getUser(dni).subscribe((res) => {
+  getUsuario(dni: string, obj: any, isPrincipal: number): void {
+    this._usuarioService.getUser(dni).subscribe((res: any) => {
       res[0].isPrincipal = isPrincipal;
       if (res) {
-        if (obj.usuario.findIndex((x) => x.DNI === res[0].DNI) == -1) {
+        if (obj.usuario.findIndex((x: any) => x.DNI === res[0].DNI) == -1) {
           res[0].nombre = res[0].nombre.slice(0, 1) + ".";
           obj.usuario.push(res[0]);
         }
-        obj.usuario.sort((a, b) => (a.isPrincipal > b.isPrincipal ? 1 : b.isPrincipal > a.isPrincipal ? -1 : 0));
+        obj.usuario.sort((a: any, b: any) =>
+          (a.isPrincipal ?? 0) > (b.isPrincipal ?? 0) ? 1 : (b.isPrincipal ?? 0) > (a.isPrincipal ?? 0) ? -1 : 0,
+        );
         this.fillName(obj);
       }
     });
   }
 
-  getUsuarioNoticia(obj) {
-    this._usuarioService.getUser(obj.autorPublicacion).subscribe((res) => {
+  getUsuarioNoticia(obj: any): void {
+    this._usuarioService.getUser(obj.autorPublicacion ?? "").subscribe((res: any) => {
       if (res[0] != undefined) {
         obj.autor = res[0].nombre + " " + res[0].apellidoPaterno;
       }
     });
   }
 
-  getAutor(idAutor, obj, isPrincipal) {
-    this._autorService.getAuthor(idAutor).subscribe((res) => {
+  getAutor(idAutor: number, obj: any, isPrincipal: number): void {
+    this._autorService.getAuthor(idAutor).subscribe((res: any) => {
       if (obj != undefined) {
         res[0].isPrincipal = isPrincipal;
-        if (obj.autor.findIndex((x) => x.idAutor === res[0].idAutor) == -1) {
+        if (obj.autor.findIndex((x: any) => x.idAutor === res[0].idAutor) == -1) {
           obj.autor.push(res[0]);
         }
         this.fillAuthName(obj);
@@ -479,8 +470,8 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getRevista(publicacion) {
-    this._revistaService.getRevista(publicacion.revista_idRevista).subscribe((res) => {
+  getRevista(publicacion: any): void {
+    this._revistaService.getRevista(publicacion.revista_idRevista ?? 0).subscribe((res: any) => {
       if (res) {
         if (res[0] != undefined) {
           publicacion.revista = res[0].nombre;
@@ -489,8 +480,8 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getUniversidad(publicacion) {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad).subscribe((res) => {
+  getUniversidad(publicacion: any): void {
+    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: any) => {
       if (res && res[0] != undefined) {
         publicacion.universidad = res[0].nombre;
       }
@@ -499,9 +490,9 @@ export default class HomeComponent implements OnInit {
 
   /* Fill Name */
 
-  fillName(obj) {
+  fillName(obj: { usuario: Array<any>; autor?: Array<any> }): void {
     for (let index = 0; index < obj.usuario.length; index++) {
-      let first = obj.usuario[index].nombre.split(" ");
+      const first = (obj.usuario[index].nombre ?? "").split(" ");
       if (obj.autor != undefined) {
         if (index == obj.usuario.length - 1 && obj.autor.length === 0) {
           obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
@@ -518,7 +509,7 @@ export default class HomeComponent implements OnInit {
     }
   }
 
-  fillAuthName(obj) {
+  fillAuthName(obj: { autor: Array<any> }): void {
     for (let index = 0; index < obj.autor.length; index++) {
       if (index == obj.autor.length - 1) {
         obj.autor[index].nombreAutor = obj.autor[index].nombre;
@@ -544,11 +535,15 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  publicationLink(value) {}
+  publicationLink(_value: unknown): void {}
 
   /* Animation counter */
-  steps;
-  counterFunc(endValue, durationMs, element) {
+  steps = 12;
+  counterFunc(endValue: number, durationMs: number, element: HTMLElement | null): void {
+    if (!element) {
+      return;
+    }
+    const target: HTMLElement = element;
     if (!this.steps) {
       this.steps = 12;
     }
@@ -564,7 +559,7 @@ export default class HomeComponent implements OnInit {
       currentSinValue += sinValueIncrement;
       currentValue += valueIncrement * Math.sin(currentSinValue) ** 2 * 2;
 
-      element.innerText = Math.abs(Math.floor(currentValue));
+      target.innerText = String(Math.abs(Math.floor(currentValue)));
 
       if (currentSinValue < Math.PI) {
         window.requestAnimationFrame(step);
@@ -574,7 +569,7 @@ export default class HomeComponent implements OnInit {
     step();
   }
 
-  startCounter() {
+  startCounter(): void {
     if (this.usuarios.length > 0 && this.resumenes > 0 && this.tesis > 0 && this.articulos > 0) {
       this.counterFunc(this.usuarios.length, 1000, document.getElementById("users"));
       this.counterFunc(this.resumenes, 1000, document.getElementById("resumenes"));
@@ -583,42 +578,56 @@ export default class HomeComponent implements OnInit {
     }
   }
 
-  navigate(route) {
+  navigate(route: string): void {
     this._router.navigate([route]);
   }
 
-  selectedItem;
-  oldValue;
+  selectedItem = -1;
+  oldValue = -1;
 
-  listClick(event, newValue) {
+  listClick(_event: Event, newValue: number): void {
     this.oldValue = this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract" + newValue).innerText = this.language.publicationsText[0].seeLess;
+    const current = document.getElementById("abstract" + newValue);
+    if (current) {
+      current.innerText = this.language.publicationsText[0].seeLess;
+    }
     if (this.selectedItem == this.oldValue) {
       this.selectedItem = -1;
-      document.getElementById("abstract" + this.oldValue).innerText = this.language.publicationsText[0].seeMore;
+      const previous = document.getElementById("abstract" + this.oldValue);
+      if (previous) {
+        previous.innerText = this.language.publicationsText[0].seeMore;
+      }
     }
   }
 
-  profile(user) {
+  profile(user: { DNI?: string }): void {
+    if (!user.DNI) {
+      return;
+    }
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
 
-  detalleNoticia(noticia) {
+  detalleNoticia(noticia: { idNoticia?: number }): void {
+    if (!noticia.idNoticia) {
+      return;
+    }
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
   }
 
-  scroll(el: HTMLElement) {
-    el.scrollIntoView({ behavior: "smooth" });
+  scroll(el: HTMLElement | null): void {
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }
 
   /* Hovers Publicaciones */
 
   /* Share Hover */
-  fbsharing(i) {
+  fbsharing(i: number): boolean {
     const title = String(this.publicaciones[i].titulo);
     this.meta.updateTag({ name: "description", content: title });
     const locationhref = `${GLOBAL.appUrl}/home`;
@@ -633,38 +642,36 @@ export default class HomeComponent implements OnInit {
 
   public fbicon = "../../assets/img/Facebook.svg";
   public twitter = "../../assets/img/twitter.svg";
-  mouseEnter(int, index) {
-    let element: any;
+  mouseEnter(int: number, index: number): void {
     switch (int) {
       case 1:
-        document.getElementById("fb" + index).setAttribute("src", "../../assets/img/Facebook2.svg");
+        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
         break;
       case 2:
-        document.getElementById("t" + index).setAttribute("src", "../../assets/img/twitter2.svg");
+        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
         break;
       case 3:
-        document.getElementById("fbl" + index).setAttribute("src", "../../assets/img/Facebook2.svg");
+        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
         break;
       case 4:
-        document.getElementById("tl" + index).setAttribute("src", "../../assets/img/twitter2.svg");
+        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
         break;
     }
   }
 
-  mouseLeave(int, index) {
-    let element: any;
+  mouseLeave(int: number, index: number): void {
     switch (int) {
       case 1:
-        document.getElementById("fb" + index).setAttribute("src", "../../assets/img/Facebook.svg");
+        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
         break;
       case 2:
-        document.getElementById("t" + index).setAttribute("src", "../../assets/img/twitter.svg");
+        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
         break;
       case 3:
-        document.getElementById("fbl" + index).setAttribute("src", "../../assets/img/Facebook.svg");
+        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
         break;
       case 4:
-        document.getElementById("tl" + index).setAttribute("src", "../../assets/img/twitter.svg");
+        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
         break;
     }
   }

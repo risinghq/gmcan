@@ -3,10 +3,12 @@ import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { Router, ActivatedRoute, Params } from "@angular/router";
-import { Noticia } from "@app/shared/models/noticia";
-import { TipoNoticia } from "@app/shared/models/tiponoticia";
+import { createNoticia } from "@app/shared/models/factories";
+import type { Noticia } from "@app/shared/models/noticia";
+import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { GLOBAL } from "@app/shared/services/global";
 import { NoticiaService } from "@app/shared/services/noticia.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
@@ -17,10 +19,10 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [NgIf, NgFor, SlicePipe],
 })
 export default class NewsComponent implements OnInit {
-  public noticias: Array<Noticia>;
+  public noticias: Noticia[] = [];
   public noticiaPrincipal: Noticia;
-  public tiponoticias: Array<TipoNoticia>;
-  url;
+  public tiponoticias: TipoNoticia[] = [];
+  url: string;
 
   constructor(
     public titlecasePipe: TitleCasePipe,
@@ -31,25 +33,25 @@ export default class NewsComponent implements OnInit {
     public location: Location,
     public _router: Router,
     public _usuarioService: UsuarioService,
+    private _session: SessionService,
   ) {
-    this.noticiaPrincipal = new Noticia(null, "", "", "", "", 0, "", null, null, "", "", null, "", null);
-    this.noticias = [];
+    this.noticiaPrincipal = createNoticia();
     this.url = GLOBAL.url;
   }
-  numberShown;
+  numberShown = 5;
   @HostListener("window:resize", ["$event"])
-  onResize(event) {
+  onResize(_event: Event): void {
     if (window.innerWidth >= 1300) {
       this.numberShown = 10;
     } else {
       this.numberShown = 5;
     }
   }
-  public title;
-  public idNoticiaE;
-  language;
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  public title = "";
+  public idNoticiaE = 0;
+  language: any = {};
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     if (window.innerWidth >= 1300) {
       this.numberShown = 10;
     } else {
@@ -61,17 +63,21 @@ export default class NewsComponent implements OnInit {
     });
     console.log(this.idNoticiaE);
   }
-  ngDoCheck() {
+  ngDoCheck(): void {
     this.title = this.language.news;
     if (this.location.path().slice(1, 12) === "detail-news") {
       this.title = this.language.moreNews;
     }
   }
-  getNoticia() {
-    this._noticiaService.getNoticias().subscribe((res) => {
+  getNoticia(): void {
+    this._noticiaService.getNoticias().subscribe((res: Noticia[]) => {
       if (res != null) {
-        res.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        res.sort((a: Noticia, b: Noticia) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         this.noticias = res;
         for (let index = 0; index < this.noticias.length; index++) {
@@ -85,27 +91,29 @@ export default class NewsComponent implements OnInit {
               this.noticias[index].nombreTipoNoticia = this.tiponoticias[j].nombre;
             }
           }
-          var d = new Date(this.noticias[index].fechaPublicacion);
+          const d = new Date(this.noticias[index].fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.noticias[index].fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es");
-          this.noticias[index].fechaPublicacion = this.titlecasePipe.transform(this.noticias[index].fechaPublicacion);
-          this.getUsuario(this.noticias[index].autorPublicacion, index);
+          this.noticias[index].fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? undefined;
+          this.noticias[index].fechaPublicacion = this.titlecasePipe.transform(
+            this.noticias[index].fechaPublicacion ?? "",
+          );
+          this.getUsuario(this.noticias[index].autorPublicacion ?? "", index);
         }
         this.noticiaPrincipal = this.noticias[0];
         this.noticias.splice(0, 1);
-        this.getUser(this.noticiaPrincipal.autorPublicacion);
+        this.getUser(this.noticiaPrincipal.autorPublicacion ?? "");
       }
     });
   }
-  getTipoNoticias() {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res) => {
+  getTipoNoticias(): void {
+    this._tiponoticiaService.getTipoNoticia().subscribe((res: TipoNoticia[]) => {
       this.tiponoticias = res;
       this.getNoticia();
     });
   }
 
-  getUsuario(idUser, i) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
+  getUsuario(idUser: string, i: number): void {
+    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
       if (res[0] != undefined) {
         if (this.noticias[i] != undefined) {
           this.noticias[i].autor = res[0].nombre + " " + res[0].apellidoPaterno;
@@ -113,8 +121,8 @@ export default class NewsComponent implements OnInit {
       }
     });
   }
-  getUser(idUser) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
+  getUser(idUser: string): void {
+    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
       if (res[0] != undefined) {
         if (this.noticiaPrincipal != undefined) {
           this.noticiaPrincipal.autor = res[0].nombre + " " + res[0].apellidoPaterno;
@@ -123,13 +131,15 @@ export default class NewsComponent implements OnInit {
     });
   }
 
-  detalleNoticia(noticia) {
+  detalleNoticia(noticia: Noticia): void {
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
     this.getTipoNoticias();
   }
-  scroll(el: HTMLElement) {
-    el.scrollIntoView({ behavior: "smooth" });
+  scroll(el: HTMLElement | null): void {
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }
 }

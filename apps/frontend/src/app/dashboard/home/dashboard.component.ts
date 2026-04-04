@@ -5,11 +5,21 @@ import { Grupo } from "@app/shared/models/grupo";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { PermisoService } from "@app/shared/services/permiso.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { BaseChartDirective } from "ng2-charts";
+
+interface CountTypeItem {
+  nombre?: string;
+  Total?: string;
+}
+
+interface UsuarioPermisoItem {
+  permiso_idPermiso?: number;
+}
 
 @Component({
   selector: "app-dashboard",
@@ -18,11 +28,11 @@ import { BaseChartDirective } from "ng2-charts";
   imports: [NgIf, RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export default class DashboardComponent implements OnInit {
-  token;
-  user;
-  screenWidth;
+  token: string | null = null;
+  user: any = null;
+  screenWidth = window.innerWidth;
   public url;
-  public grupoinfo: Grupo;
+  public grupoinfo: Grupo = { idGrupo: 0, nombre: "", nombreEN: "", logoHeader: "" } as Grupo;
   permisos = {
     noticiaPermiso: false,
     miembroPermiso: false,
@@ -31,7 +41,7 @@ export default class DashboardComponent implements OnInit {
     contenidoPermiso: false,
     analiticaPermiso: false,
   };
-  permisoUsuario;
+  permisoUsuario: UsuarioPermisoItem[] = [];
   constructor(
     public authService: AuthService,
     public _usuarioService: UsuarioService,
@@ -41,32 +51,33 @@ export default class DashboardComponent implements OnInit {
     public _router: Router,
     public _tipoMiembroService: TipoMiembroService,
     public _tipoPublicacionService: TipoPublicacionService,
+    private _session: SessionService,
   ) {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
-    this.user = JSON.parse(localStorage.getItem("user"));
+  ngOnInit(): void {
+    this.user = JSON.parse(localStorage.getItem("user") ?? "null");
     this.getPermiso();
     this.getGrupoInfo();
     this.getCountTypeMember();
   }
 
-  getGrupoInfo() {
-    this.grupoinfo = JSON.parse(localStorage.getItem("grupoInfo"));
+  getGrupoInfo(): void {
+    this.grupoinfo = this._session.getGrupoInfo();
     this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
   }
 
-  getPermiso() {
-    this._permisoService.getPermisos().subscribe((res) => {
+  getPermiso(): void {
+    this._permisoService.getPermisos().subscribe((res: unknown[]) => {
       if (res.length > 0) {
-        this.getPermisoHasUsuario(this.user.DNI);
+        this.getPermisoHasUsuario(String(this.user?.DNI ?? ""));
       }
     });
   }
 
-  getPermisoHasUsuario(DNI) {
-    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res) => {
+  getPermisoHasUsuario(DNI: string): void {
+    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: UsuarioPermisoItem[]) => {
       if (res.length > 0) {
         this.permisoUsuario = res;
         for (let index = 0; index < this.permisoUsuario.length; index++) {
@@ -100,15 +111,15 @@ export default class DashboardComponent implements OnInit {
   total = 0;
   total2 = 0;
 
-  getCountTypeMember() {
-    this._tipoMiembroService.getCountType().subscribe((res) => {
+  getCountTypeMember(): void {
+    this._tipoMiembroService.getCountType().subscribe((res: CountTypeItem[]) => {
       if (res.length > 0) {
-        const filler: Array<any> = [];
-        const filler2: Array<any> = [];
+        const filler: string[] = [];
+        const filler2: string[] = [];
         for (let index = 0; index < res.length; index++) {
-          filler2.push(res[index].nombre);
-          filler.push(res[index].Total);
-          this.total = this.total + parseInt(res[index].Total);
+          filler2.push(res[index].nombre ?? "");
+          filler.push(res[index].Total ?? "0");
+          this.total = this.total + parseInt(res[index].Total ?? "0", 10);
         }
         this.chartLabels = filler2;
         this.chartDatasets = [{ data: filler, label: "My First dataset" }];
@@ -117,17 +128,17 @@ export default class DashboardComponent implements OnInit {
     });
   }
 
-  getCountTypePublication() {
-    this._tipoPublicacionService.getCountType().subscribe((res) => {
+  getCountTypePublication(): void {
+    this._tipoPublicacionService.getCountType().subscribe((res: CountTypeItem[]) => {
       if (res.length > 0) {
-        const filler3: Array<any> = [];
-        const filler4: Array<any> = [];
+        const filler3: string[] = [];
+        const filler4: string[] = [];
         for (let index = 0; index < res.length; index++) {
-          filler4.push(res[index].nombre);
-          filler3.push(res[index].Total);
-          this.total2 = this.total2 + parseInt(res[index].Total);
+          filler4.push(res[index].nombre ?? "");
+          filler3.push(res[index].Total ?? "0");
+          this.total2 = this.total2 + parseInt(res[index].Total ?? "0", 10);
         }
-        filler3.push(0);
+        filler3.push("0");
         this.chartLabels2 = filler4;
         this.chartDatasets2 = [{ data: filler3, label: "Cantidad" }];
       }
@@ -160,13 +171,13 @@ export default class DashboardComponent implements OnInit {
     },
   ];
 
-  public chartLabels: Array<any> = [];
+  public chartLabels: string[] = [];
 
   public chartOptions: any = {
     responsive: true,
   };
-  public chartClicked(e: any): void {}
-  public chartHovered(e: any): void {}
+  public chartClicked(_e: any): void {}
+  public chartHovered(_e: any): void {}
 
   public chartType2: any = "bar";
 
@@ -194,12 +205,12 @@ export default class DashboardComponent implements OnInit {
     },
   ];
 
-  public chartLabels2: Array<any> = [];
+  public chartLabels2: string[] = [];
 
   public chartOptions2: any = {
     responsive: true,
     indexAxis: "y",
   };
-  public chartClicked2(e: any): void {}
-  public chartHovered2(e: any): void {}
+  public chartClicked2(_e: any): void {}
+  public chartHovered2(_e: any): void {}
 }

@@ -1,27 +1,25 @@
-export class UsuarioFull {
-  constructor(
-    public DNI: String,
-    public correo: string,
-    public nombre: String,
-    public password: string,
-    public segundoNombre: String,
-    public nombreCompleto: String,
-    public apellidoPaterno: String,
-    public apellidoMaterno: String,
-    public foto: String,
-    public estado: Number,
-    public active: String,
-    public resumenPro: String,
-    public resumenProEN: String,
-    public fechaActualizacion: Date,
-    public fechaCreacion: Date,
-    public fechaNacimiento: any,
-    public fechaNacimientoDate: Date,
-    public tipoMiembro_idTipoMiembro: Number,
-    public genero_idGenero: Number,
-    public tipoMiembro: String,
-    public tipoUsuario_idTipoUsuario: Number,
-    public prefijo: String,
-    public prefijo_idPrefijo: Number,
-  ) {}
+export interface UsuarioFull {
+  DNI?: string;
+  correo?: string;
+  nombre?: string;
+  password?: string;
+  segundoNombre?: string;
+  nombreCompleto?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  foto?: string;
+  estado?: number;
+  active?: string;
+  resumenPro?: string;
+  resumenProEN?: string;
+  fechaActualizacion?: Date;
+  fechaCreacion?: Date;
+  fechaNacimiento?: any;
+  fechaNacimientoDate?: Date;
+  tipoMiembro_idTipoMiembro?: number;
+  genero_idGenero?: number;
+  tipoMiembro?: string;
+  tipoUsuario_idTipoUsuario?: number;
+  prefijo?: string;
+  prefijo_idPrefijo?: number;
 }

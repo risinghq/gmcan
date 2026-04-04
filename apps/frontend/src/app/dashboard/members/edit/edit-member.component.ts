@@ -22,11 +22,9 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Params, Router, ActivatedRoute } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Genero } from "@app/shared/models/genero";
-import { Prefijo } from "@app/shared/models/prefijo";
-import { TipoMiembro } from "@app/shared/models/tipomiembro";
+import { createUsuarioFull } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { UsuarioFull } from "@app/shared/models/usuarioFull";
+import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { UsuarioPermiso } from "@app/shared/models/usuariopermiso";
 import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -38,8 +36,34 @@ import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { AutosizeModule } from "ngx-autosize";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+
+interface StatusResponse {
+  status?: number;
+  user?: number;
+}
+
+interface TipoMiembroOption {
+  idTipoMiembro?: number;
+  nombreSingular?: string;
+  nombre?: string;
+}
+
+interface PrefijoOption {
+  idPrefijo?: number;
+  nombre?: string;
+}
+
+interface GeneroOption {
+  idGenero?: number;
+  nombre?: string;
+}
+
+/*
+interface PermisoResponse {
+  permiso_idPermiso?: number;
+  usuario_DNI?: string;
+}
+*/
 
 @Component({
   selector: "app-edit-member",
@@ -68,15 +92,15 @@ import { map } from "rxjs/operators";
   ],
 })
 export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
-  url;
+  url: string;
   public memberForm: FormGroup;
-  member: UsuarioFull;
-  tipoMiembros: Array<TipoMiembro>;
-  prefijos: Array<Prefijo>;
-  generos: Array<Genero>;
-  listaPermisos: Array<any>;
+  member: UsuarioFull = createUsuarioFull();
+  tipoMiembros: TipoMiembroOption[] = [];
+  prefijos: PrefijoOption[] = [];
+  generos: GeneroOption[] = [];
+  listaPermisos: number[] = [];
   button_text = "Actualizar información";
-  permisosExistentes: Array<UsuarioPermiso>;
+  permisosExistentes: UsuarioPermiso[] = [];
   edit = false;
 
   constructor(
@@ -109,31 +133,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       resumenPro: [""],
       resumenProEN: [""],
     });
-    this.member = new UsuarioFull(
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      "",
-      "",
-      "",
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      "",
-      3,
-      "",
-      null,
-    );
+    this.member = createUsuarioFull();
     this.url = GLOBAL.url;
   }
 
@@ -144,8 +144,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     event.returnValue = false;
   }
 
-  ngOnInit() {
-    this.listaPermisos = [];
+  ngOnInit(): void {
     this.getUser();
   }
 
@@ -153,19 +152,19 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     return this.memberForm.dirty;
   }
 
-  oldPassword;
+  oldPassword = "";
 
-  getUser() {
+  getUser(): void {
     this._route.params.forEach((params: Params) => {
-      let DNI = params["id"];
-      this._usuarioService.getFullUser(DNI).subscribe((result) => {
+      const DNI = String(params["id"] ?? "");
+      this._usuarioService.getFullUser(DNI).subscribe((result: UsuarioFull[]) => {
         if (result.length > 0) {
           this.memberForm.controls["DNI"].disable();
           this.member = result[0];
-          this.oldEmail = this.member.correo;
-          this.oldPassword = this.member.password;
+          this.oldEmail = this.member.correo ?? "";
+          this.oldPassword = this.member.password ?? "";
           this.memberForm.controls["confirmPassword"].setValue(this.member.password);
-          var d = new Date(this.member.fechaNacimiento);
+          const d = new Date(this.member.fechaNacimiento ?? new Date());
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           this.member.fechaNacimientoDate = d;
           if (this.member.apellidoMaterno) {
@@ -175,10 +174,10 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
             this.member.nombreCompleto = this.member.nombre + " " + this.member.apellidoPaterno;
           }
           localStorage.setItem("miembroEdit", JSON.stringify(this.member.nombreCompleto));
-          if (this.member.nombre.includes(" ")) {
-            let string = this.member.nombre.split(" ");
-            this.member.nombre = string[0];
-            this.memberForm.controls["segundoNombre"].setValue(string[1]);
+          if ((this.member.nombre ?? "").includes(" ")) {
+            const parts = (this.member.nombre ?? "").split(" ");
+            this.member.nombre = parts[0] ?? "";
+            this.memberForm.controls["segundoNombre"].setValue(parts[1] ?? "");
           }
           this.getCargo(this.member);
           this.getNivelAcademico(this.member);
@@ -187,33 +186,33 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getCargo(miembro) {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res) => {
+  getCargo(miembro: UsuarioFull): void {
+    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembroOption[]) => {
       if (res) {
         this.tipoMiembros = res;
-        let index = res.findIndex((x) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
+        const index = res.findIndex((x: TipoMiembroOption) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
         if (index != -1) {
-          miembro.tipoMiembro = res[index].nombreSingular;
+          miembro.tipoMiembro = res[index].nombre ?? res[index].nombreSingular ?? "";
         }
       }
     });
   }
 
-  getNivelAcademico(miembro) {
-    this._prefijoService.getPrefijos().subscribe((res) => {
+  getNivelAcademico(miembro: UsuarioFull): void {
+    this._prefijoService.getPrefijos().subscribe((res: PrefijoOption[]) => {
       if (res) {
         this.prefijos = res;
-        let index = res.findIndex((x) => x.idPrefijo === miembro.prefijo_idPrefijo);
+        const index = res.findIndex((x: PrefijoOption) => x.idPrefijo === miembro.prefijo_idPrefijo);
         if (index != -1) {
-          miembro.prefijo = res[index].nombre;
+          miembro.prefijo = res[index].nombre ?? "";
         }
         this.getGenero(miembro);
       }
     });
   }
 
-  getGenero(miembro) {
-    this._generoService.getGeneros().subscribe((result) => {
+  getGenero(miembro: UsuarioFull): void {
+    this._generoService.getGeneros().subscribe((result: GeneroOption[]) => {
       if (result) {
         this.generos = result;
         this.getPermisos(miembro);
@@ -221,8 +220,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getPermisos(miembro) {
-    this._usuarioPermisoService.getUsuarioHasPermiso(miembro.DNI).subscribe((result) => {
+  getPermisos(miembro: UsuarioFull): void {
+    this._usuarioPermisoService.getUsuarioHasPermiso(miembro.DNI ?? "").subscribe((result: UsuarioPermiso[]) => {
       if (result) {
         this.permisosExistentes = result;
         this.validarPermisos(this.permisosExistentes);
@@ -231,8 +230,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getPublicaciones(miembro) {
-    this._usuarioPublicacionService.searchPublicacionHasUsuario(miembro.DNI).subscribe((result) => {
+  getPublicaciones(miembro: UsuarioFull): void {
+    this._usuarioPublicacionService.searchPublicacionHasUsuario(miembro.DNI ?? "").subscribe((result: unknown[]) => {
       if (result.length == 0) {
         this.edit = true;
       }
@@ -242,8 +241,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getNoticias(miembro) {
-    this._noticiaService.getNoticiaUsuario(miembro.DNI).subscribe((result) => {
+  getNoticias(miembro: UsuarioFull): void {
+    this._noticiaService.getNoticiaUsuario(miembro.DNI ?? "").subscribe((result: unknown[]) => {
       if (result.length == 0) {
         this.edit = true;
       } else {
@@ -252,29 +251,29 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  permisoNoticia;
-  permisoPublicacion;
-  permisoProyecto;
-  permisoContenido;
+  permisoNoticia = false;
+  permisoPublicacion = false;
+  permisoProyecto = false;
+  permisoContenido = false;
 
-  validarPermisos(permisos) {
+  validarPermisos(permisos: UsuarioPermiso[]): void {
     for (let index = 0; index < permisos.length; index++) {
-      switch (permisos[index].permiso_idPermiso) {
+      switch (Number(permisos[index].permiso_idPermiso ?? 0)) {
         case 1:
           this.permisoNoticia = true;
-          this.listaPermisos.push(permisos[index].permiso_idPermiso);
+          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
           break;
         case 3:
           this.permisoPublicacion = true;
-          this.listaPermisos.push(permisos[index].permiso_idPermiso);
+          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
           break;
         case 2:
           this.permisoProyecto = true;
-          this.listaPermisos.push(permisos[index].permiso_idPermiso);
+          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
           break;
         case 5:
           this.permisoContenido = true;
-          this.listaPermisos.push(permisos[index].permiso_idPermiso);
+          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
           break;
         default:
           break;
@@ -282,53 +281,54 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectPermiso(id, event) {
+  selectPermiso(id: number, event: boolean): void {
     if (event) {
       this.listaPermisos.push(id);
     } else {
-      let index = this.listaPermisos.findIndex((x) => x === id);
+      const index = this.listaPermisos.findIndex((x: number) => x === id);
       if (index != -1) {
         this.listaPermisos.splice(index, 1);
       }
     }
   }
 
-  adHono;
+  adHono = 0;
 
-  setCoord(value) {
+  setCoord(value: number): void {
     this.member.tipoUsuario_idTipoUsuario = value;
   }
 
-  adHonorem(value) {
+  adHonorem(value: number): void {
     this.adHono = value;
   }
 
-  oldMem;
-  oldMember(value) {
+  oldMem = 0;
+  oldMember(value: number): void {
     this.oldMem = value;
   }
 
-  errPass;
-  errEmail;
-  oldEmail;
+  errPass = false;
+  errEmail = false;
+  oldEmail = "";
 
-  addMember() {
+  addMember(): void {
     if (this.memberForm.valid) {
       if (this.member.fechaNacimientoDate) {
-        const momentDate = new Date(this.member.fechaNacimientoDate); // Replace event.value with your date value
+        const momentDate = new Date(this.member.fechaNacimientoDate);
         const formattedDate = new Date(momentDate).toLocaleDateString("sv");
         this.member.fechaNacimiento = formattedDate;
       } else {
-        this.member.fechaNacimiento = null;
+        this.member.fechaNacimiento = undefined;
       }
-      this._usuarioService.verifyUser(this.member).subscribe((result) => {
+      this._usuarioService.verifyUser(this.member).subscribe((result: UsuarioFull[]) => {
         if (result.length == 0 || this.oldEmail == this.member.correo) {
           if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
             if (
               this.memberForm.controls["segundoNombre"].value != "" &&
               this.memberForm.controls["segundoNombre"].value
             ) {
-              this.member.nombre += " " + this.memberForm.controls["segundoNombre"].value;
+              this.member.nombre =
+                `${this.member.nombre ?? ""} ${this.memberForm.controls["segundoNombre"].value}`.trim();
             }
             if (this.adHono == 3) {
               this.member.estado = this.adHono;
@@ -337,37 +337,41 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
             } else if (!this.member.estado) {
               this.member.estado = 1;
             }
-            this._usuarioService.updateUser(this.member).subscribe((res) => {
+            this._usuarioService.updateUser(this.member).subscribe((res: StatusResponse) => {
               if (res.status == 1) {
                 if (this.member.password != this.oldPassword) {
                   this._usuarioService
                     .changePassword({
-                      password: this.member.password,
-                      correo: this.member.correo,
+                      password: this.member.password ?? "",
+                      correo: this.member.correo ?? "",
                     })
-                    .subscribe((res) => {
-                      if (res) {
+                    .subscribe((passwordResult: unknown) => {
+                      if (passwordResult) {
                       }
                     });
                 }
                 if (this.fileData) {
                   if (this.member.foto == null) {
-                    this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((res) => {
-                      if (res) {
-                      }
-                    });
+                    this._usuarioService
+                      .uploadUsuarioFoto(this.fileData, String(res.user ?? ""))
+                      .subscribe((uploadResult: unknown) => {
+                        if (uploadResult) {
+                        }
+                      });
                   } else {
-                    this._usuarioService.deleteImage(String(this.member.foto)).subscribe((res) => {
-                      if (res) {
+                    this._usuarioService.deleteImage(String(this.member.foto)).subscribe((deleteResult: unknown) => {
+                      if (deleteResult) {
                       }
                     });
-                    this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((res) => {
-                      if (res) {
-                      }
-                    });
+                    this._usuarioService
+                      .uploadUsuarioFoto(this.fileData, String(res.user ?? ""))
+                      .subscribe((uploadResult: unknown) => {
+                        if (uploadResult) {
+                        }
+                      });
                   }
                 }
-                this.openSnackBar("Miembro actualizado exitosamente", null);
+                this.openSnackBar("Miembro actualizado exitosamente");
                 this.memberForm.markAsPristine();
                 this.return();
               }
@@ -386,8 +390,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  setPermisos() {
-    let permisoEx;
+  setPermisos(): void {
+    let permisoEx: UsuarioPermiso | undefined;
     if (this.permisosExistentes.length > 0) {
       permisoEx = this.permisosExistentes[0];
     }
@@ -396,60 +400,65 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       this.listaPermisos.push(6);
     }
     if (permisoEx) {
-      this._usuarioPermisoService.deletePermisoUsuario(permisoEx).subscribe((res) => {
-        if (res) {
-        }
-        for (let index = 0; index < this.listaPermisos.length; index++) {
-          let permiso = {
-            usuario_DNI: this.member.DNI,
-            permiso_idPermiso: this.listaPermisos[index],
-          };
-          this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((res) => {
-            if (res) {
-            }
-          });
-        }
-      });
+      this._usuarioPermisoService
+        .deletePermisoUsuario({ usuario_DNI: permisoEx.usuario_DNI ?? "" })
+        .subscribe((deleteResult: unknown) => {
+          if (deleteResult) {
+          }
+          for (let index = 0; index < this.listaPermisos.length; index++) {
+            let permiso = {
+              usuario_DNI: this.member.DNI ?? "",
+              permiso_idPermiso: this.listaPermisos[index],
+            };
+            this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((addResult: unknown) => {
+              if (addResult) {
+              }
+            });
+          }
+        });
     } else {
       for (let index = 0; index < this.listaPermisos.length; index++) {
         let permiso = {
-          usuario_DNI: this.member.DNI,
+          usuario_DNI: this.member.DNI ?? "",
           permiso_idPermiso: this.listaPermisos[index],
         };
-        this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((res) => {
-          if (res) {
+        this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((addResult: unknown) => {
+          if (addResult) {
           }
         });
       }
     }
   }
 
-  fileData: File = null;
+  fileData: File | null = null;
   previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: any): void {
     this.fileData = <File>fileInput.target.files[0];
     this.preview();
   }
 
-  preview() {
+  preview(): void {
     // Show preview
-    var mimeType = this.fileData.type;
+    if (!this.fileData) {
+      return;
+    }
+    const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
+    reader.addEventListener("load", (_event: ProgressEvent<FileReader>) => {
       this.previewUrl = reader.result;
-    };
+    });
   }
 
-  openSnackBar(text, panel) {
-    this._snackBar.open(text, null, {
-      panelClass: [panel],
+  openSnackBar(text: string, panel?: string): void {
+    this._snackBar.open(text, undefined, {
+      panelClass: panel ? [panel] : [],
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -464,9 +473,9 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  private dialogRef2: MatDialogRef<DialogCancel5>;
+  private dialogRef2?: MatDialogRef<DialogCancel5>;
 
-  openEraser() {
+  openEraser(): void {
     if (this.edit) {
       this.dialogRef2 = this.dialog.open(DialogCancel5, {
         width: "530px",
@@ -479,7 +488,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
         },
       });
 
-      this.dialogRef2.afterClosed().subscribe((result) => {
+      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.erasePermisos();
         }
@@ -487,13 +496,15 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  erasePermisos() {
-    let end;
+  erasePermisos(): void {
+    let end = false;
     for (let index = 0; index < this.permisosExistentes.length; index++) {
-      this._usuarioPermisoService.deletePermisoUsuario(this.permisosExistentes[index]).subscribe((result) => {
-        if (result) {
-        }
-      });
+      this._usuarioPermisoService
+        .deletePermisoUsuario({ usuario_DNI: this.permisosExistentes[index].usuario_DNI ?? "" })
+        .subscribe((deleteResult: unknown) => {
+          if (deleteResult) {
+          }
+        });
       if (index == this.permisosExistentes.length - 1) {
         end = true;
       }
@@ -506,19 +517,19 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  eraseUser() {
+  eraseUser(): void {
     if (this.member.foto)
-      this._usuarioService.deleteImage(String(this.member.foto)).subscribe((res) => {
-        if (res) {
+      this._usuarioService.deleteImage(String(this.member.foto)).subscribe((deleteImageResult: unknown) => {
+        if (deleteImageResult) {
         }
       });
-    this._usuarioService.deleteUsuario({ DNI: String(this.member.DNI) }).subscribe((result) => {
+    this._usuarioService.deleteUsuario({ DNI: String(this.member.DNI ?? "") }).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.memberForm.markAsPristine();
         this.return();
-        this.openSnackBar("Usuario eliminado exitosamente", null);
+        this.openSnackBar("Usuario eliminado exitosamente");
       } else {
-        this.openSnackBar("Hubo un problema al eliminar", null);
+        this.openSnackBar("Hubo un problema al eliminar");
       }
     });
   }

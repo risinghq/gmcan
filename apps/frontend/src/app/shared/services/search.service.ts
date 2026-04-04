@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,41 +10,46 @@ import { GLOBAL } from "./global";
 export class SearchService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
-    this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
   }
 
-  searchPublicaciones(nombre, id): any {
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
+    this.url = GLOBAL.url;
+  }
+
+  searchPublicaciones(nombre: string, id: number): any {
     let body = { titulo: nombre, tipoPublicacion_idTipoPublicacion: id };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "publicacion/search-publicaciones", body, { headers });
   }
-  searchAutores(nombre): any {
+  searchAutores(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "autor/search-autores", body, { headers });
   }
-  searchUsuarios(nombre): any {
+  searchUsuarios(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "usuario/search-usuarios", body, { headers });
   }
-  searchEventos(nombre): any {
+  searchEventos(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "evento/search-eventos", body, { headers });
   }
-  searchCiudades(nombre): any {
+  searchCiudades(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -54,14 +60,14 @@ export class SearchService {
       return this.http.post(this.url + "ciudad/search-ciudades-en", body, { headers });
     }
   }
-  searchPaises(nombre): any {
+  searchPaises(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "pais/search-paises", body, { headers });
   }
-  searchTipoTesis(nombre): any {
+  searchTipoTesis(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -72,7 +78,7 @@ export class SearchService {
       return this.http.post(this.url + "tipotesis/search-tipotesis-en", body, { headers });
     }
   }
-  searchProyectos(nombre, estado): any {
+  searchProyectos(nombre: string, estado: number): any {
     let body = { nombre: nombre, codigo: nombre, estado: estado };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -83,7 +89,7 @@ export class SearchService {
       return this.http.post(this.url + "proyecto/search-proyecto-en", body, { headers });
     }
   }
-  searchLineasInvestigacion(nombre): any {
+  searchLineasInvestigacion(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -99,7 +105,7 @@ export class SearchService {
     }
   }
 
-  searchUniversidad(nombre): any {
+  searchUniversidad(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -111,7 +117,7 @@ export class SearchService {
     }
   }
 
-  searchRevista(nombre): any {
+  searchRevista(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -119,7 +125,7 @@ export class SearchService {
     return this.http.post(this.url + "revista/search-revistas", body, { headers });
   }
 
-  searchPublicacionesGlobal(nombre): any {
+  searchPublicacionesGlobal(nombre: string): any {
     let body = { titulo: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -135,7 +141,7 @@ export class SearchService {
     }
   }
 
-  searchProyectosGlobal(nombre): any {
+  searchProyectosGlobal(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -147,7 +153,7 @@ export class SearchService {
     }
   }
 
-  searchNoticiasGlobal(nombre): any {
+  searchNoticiasGlobal(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -159,7 +165,7 @@ export class SearchService {
     }
   }
 
-  searchTipoNoticiasGlobal(nombre): any {
+  searchTipoNoticiasGlobal(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -173,7 +179,7 @@ export class SearchService {
     }
   }
 
-  searchUsuariosGlobal(nombre): any {
+  searchUsuariosGlobal(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",

@@ -1,9 +1,7 @@
-export class PublicacionHasAutor {
-  constructor(
-    public publicacion_idPublicacion: Number,
-    public usuario_idUsuario: Number,
-    public fechaCreacion: Date,
-    public fechaActualizacion: Date,
-    public isPrincipal: Number,
-  ) {}
+export interface PublicacionHasUsuario {
+  publicacion_idPublicacion?: number;
+  usuario_idUsuario?: number;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
+  isPrincipal?: number;
 }

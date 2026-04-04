@@ -6,7 +6,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Languages } from "@app/shared/models/languages";
-import { Method } from "@app/shared/models/method";
+import type { Method } from "@app/shared/models/method";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { MethodsService } from "@app/shared/services/methods.service";
@@ -25,10 +25,10 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   button_text = "Guardar método";
   metodo: Method;
   public methodForm: FormGroup;
-  url;
+  url: string;
 
   openEraser() {}
-  edit;
+  edit = false;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -44,7 +44,15 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.metodo = new Method(null, "", "", "", "", "", 1);
+    this.metodo = {
+      idMetodo: 0,
+      nombre: "",
+      nombreEN: "",
+      descripcion: "",
+      descripcionEN: "",
+      foto: "",
+      grupo_idGrupo: 1,
+    };
     this.url = GLOBAL.url;
   }
 
@@ -54,12 +62,12 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
     return this.methodForm.dirty;
   }
 
-  submitMethod() {
+  submitMethod(): void {
     if (this.methodForm.valid) {
-      this._methodService.addMetodo(this.metodo).subscribe((result) => {
+      this._methodService.addMetodo(this.metodo).subscribe((result: any) => {
         if (result.status == 1) {
           if (this.fileData) {
-            this._methodService.uploadMetodoFoto(this.fileData, result.idMetodo).subscribe((res) => {});
+            this._methodService.uploadMetodoFoto(this.fileData, result.idMetodo).subscribe((_res: any) => {});
           }
           this.methodForm.markAsPristine();
           this.return();
@@ -69,47 +77,50 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/contenidos"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Método agregado exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Método agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  fileData: File = null;
-  previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];
+  fileData: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: Event): void {
+    const target = fileInput.target as HTMLInputElement | null;
+    this.fileData = target?.files?.[0] ?? null;
+    if (!this.fileData) return;
     this.preview();
   }
 
-  preview() {
+  preview(): void {
+    if (!this.fileData) return;
     // Show preview
-    var mimeType = this.fileData.type;
+    const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
+    reader.addEventListener("load", (_event) => {
       this.previewUrl = reader.result;
-    };
+    });
   }
 
-  private previewDialog: MatDialogRef<DialogPreview4>;
+  private previewDialog?: MatDialogRef<DialogPreview4>;
 
-  previewMethod(value) {
-    let method = JSON.parse(JSON.stringify(this.metodo));
+  previewMethod(value: number): void {
+    const method: Method = JSON.parse(JSON.stringify(this.metodo));
     localStorage.setItem("langLocale", "0");
-    method.foto = this.previewUrl;
+    method.foto = typeof this.previewUrl === "string" ? this.previewUrl : "";
     if (value == 1) {
       method.nombre = method.nombreEN;
       method.descripcion = method.descripcionEN;
@@ -121,10 +132,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
       data: method,
     });
 
-    this.previewDialog.afterClosed().subscribe((result) => {
-      if (!result) {
-      }
-    });
+    this.previewDialog.afterClosed().subscribe(() => {});
   }
 }
 
@@ -135,21 +143,24 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview4 {
-  url;
-  language;
+  url: string;
+  language: (typeof Languages)[number] = Languages[0];
   constructor(
     public dialogRef: MatDialogRef<DialogPreview4>,
-    @Inject(MAT_DIALOG_DATA) public method,
+    @Inject(MAT_DIALOG_DATA) public method: Method,
   ) {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (localStorage.getItem("langLocale") == "0") {
       this.language = Languages[0];
     } else {
       this.language = Languages[1];
     }
-    document.getElementById("descripcion").innerHTML = this.method.descripcion;
+    const descripcion = document.getElementById("descripcion");
+    if (descripcion) {
+      descripcion.innerHTML = this.method.descripcion ?? "";
+    }
   }
 }

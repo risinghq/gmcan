@@ -3,9 +3,11 @@ import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute } from "@angular/router";
-import { Grupo } from "@app/shared/models/grupo";
+import { createGrupo } from "@app/shared/models/factories";
+import type { Grupo } from "@app/shared/models/grupo";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
@@ -33,37 +35,10 @@ export default class ChangePassComponent implements OnInit {
     private router: Router,
     private usuarioService: UsuarioService,
     private grupoService: GrupoService,
+    private session: SessionService,
   ) {
     this.url = GLOBAL.url;
-    this.grupoInfo = new Grupo(
-      0,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
+    this.grupoInfo = createGrupo();
 
     this.passwordForm = this.fb.group(
       {
@@ -83,24 +58,19 @@ export default class ChangePassComponent implements OnInit {
   }
 
   private initializeLanguage(): void {
-    try {
-      this.language = JSON.parse(localStorage.getItem("language") || "{}");
-    } catch (error) {
-      console.error("Error parsing language from localStorage:", error);
-      this.language = {};
-    }
+    this.language = this.session.getLanguageData<any>() ?? {};
   }
 
   private getGrupoInfo(): void {
     this.grupoService.getGrupoInfo().subscribe({
-      next: (res) => {
+      next: (res: Grupo[]) => {
         if (res && res.length > 0) {
           this.grupoInfo = res[0];
-          localStorage.setItem("grupoInfo", JSON.stringify(this.grupoInfo));
+          this.session.setGrupoInfo(this.grupoInfo);
           this.grupoInfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoInfo.logoHeader;
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error("Error getting grupo info:", error);
       },
     });
@@ -108,7 +78,7 @@ export default class ChangePassComponent implements OnInit {
 
   private extractAndVerifyToken(): void {
     this.route.queryParams.subscribe((params) => {
-      const token = params["token"];
+      const token = params["token"] as string | undefined;
 
       if (!token) {
         this.error = "Token de recuperación no válido o no encontrado en la URL.";
@@ -116,7 +86,7 @@ export default class ChangePassComponent implements OnInit {
       }
 
       this.resetToken = token;
-      this.verifyToken(this.resetToken);
+      this.verifyToken(token);
     });
   }
 
@@ -125,7 +95,7 @@ export default class ChangePassComponent implements OnInit {
     this.error = null;
 
     this.usuarioService.verifyResetToken({ token }).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         if (response.success) {
           this.tokenValid = true;
           this.userInfo = response.user;
@@ -134,7 +104,7 @@ export default class ChangePassComponent implements OnInit {
           this.tokenValid = false;
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error("Token verification error:", error);
         this.error = "Token inválido o expirado. Por favor, solicita un nuevo enlace.";
         this.tokenValid = false;
@@ -178,7 +148,7 @@ export default class ChangePassComponent implements OnInit {
     };
 
     this.usuarioService.resetPassword(resetData).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         if (response.success) {
           this.success = true;
           this.passwordForm.reset();
@@ -191,7 +161,7 @@ export default class ChangePassComponent implements OnInit {
           this.error = response.message || "Error al cambiar la contraseña";
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error("Password reset error:", error);
         this.error = "Error al cambiar la contraseña. Por favor intenta nuevamente.";
       },
@@ -205,12 +175,12 @@ export default class ChangePassComponent implements OnInit {
     this.router.navigate(["/login"]);
   }
 
-  public get passwordControl() {
-    return this.passwordForm.get("password");
+  public get passwordControl(): AbstractControl {
+    return this.passwordForm.get("password")!;
   }
 
-  public get confirmPasswordControl() {
-    return this.passwordForm.get("confirmPassword");
+  public get confirmPasswordControl(): AbstractControl {
+    return this.passwordForm.get("confirmPassword")!;
   }
 
   public hasError(controlName: string, errorType: string): boolean {

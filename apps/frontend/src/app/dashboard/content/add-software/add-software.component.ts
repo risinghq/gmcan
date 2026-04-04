@@ -5,7 +5,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Software } from "@app/shared/models/software";
+import type { Software } from "@app/shared/models/software";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { SoftwareService } from "@app/shared/services/software.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -23,7 +23,7 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   button_text = "Guardar software";
 
   openEraser() {}
-  edit;
+  edit = false;
 
   constructor(
     public formBuilder: FormBuilder,
@@ -33,7 +33,7 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
     private _snackBar: MatSnackBar,
     private _softwareService: SoftwareService,
   ) {
-    this.software = new Software(null, "", "", "", "", 1, null, null);
+    this.software = { idSoftware: 0, nombre: "", descripcion: "", descripcionEN: "", moreInfo: "", grupo_idGrupo: 1 };
     this.softwareForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -48,8 +48,8 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
     return this.softwareForm.dirty;
   }
 
-  submitSoftware() {
-    this._softwareService.addSoftware(this.software).subscribe((res) => {
+  submitSoftware(): void {
+    this._softwareService.addSoftware(this.software).subscribe((res: any) => {
       if (res.status == 1) {
         this.softwareForm.markAsPristine();
         this.return();
@@ -58,12 +58,12 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/contenidos"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Software agregado exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Software agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

@@ -23,7 +23,8 @@ import { ActivatedRoute, Router, Params } from "@angular/router";
 import { Autor } from "@app/shared/models/autores";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { Evento } from "@app/shared/models/eventos";
-import { Publicacion } from "@app/shared/models/publicacion";
+import { createPublicacion } from "@app/shared/models/factories";
+import type { Publicacion } from "@app/shared/models/publicacion";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { AutorService } from "@app/shared/services/autor.service";
@@ -32,12 +33,12 @@ import { GLOBAL } from "@app/shared/services/global";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
 import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
-
 @Component({
   selector: "app-edit-resumen",
   templateUrl: "../add-resumen/add-resumen.component.html",
@@ -69,12 +70,12 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
-  evento: Array<Evento>;
-  autores: Array<Autor>;
-  usuarios: Array<Usuario>;
-  url;
-  tipoTesis;
-  selectedUser;
+  evento: Array<Evento> = [];
+  autores: Array<Autor> = [];
+  usuarios: Array<Usuario> = [];
+  url: string;
+  tipoTesis: string | null = null;
+  selectedUser: string | null = null;
 
   edit = true;
 
@@ -90,6 +91,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _eventoService: EventoService,
+    private _session: SessionService,
   ) {
     this.publicacionForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -100,36 +102,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
       resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
-    this.publicacion = new Publicacion(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      "",
-      null,
-      null,
-      null,
-      null,
-      3,
-      "",
-      "",
-      null,
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      "",
-      "",
-      null,
-      "",
-      null,
-      "",
-    );
+    this.publicacion = createPublicacion();
     this.url = GLOBAL.url;
   }
 
@@ -137,14 +110,14 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     return this.publicacionForm.dirty;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getResumen();
   }
 
-  getResumen() {
+  getResumen(): void {
     this._route.params.forEach((params: Params) => {
       let idArticulo = params["id"];
-      this._publicacionService.getPublication(idArticulo).subscribe((result) => {
+      this._publicacionService.getPublication(idArticulo).subscribe((result: any[]) => {
         if (result) {
           this.publicacion = result[0];
           var d = new Date(result[0].fechaPublicacion);
@@ -159,8 +132,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getEventos() {
-    this._eventoService.getEventoesAll().subscribe((result) => {
+  getEventos(): void {
+    this._eventoService.getEventoesAll().subscribe((result: Evento[]) => {
       if (result) {
         this.evento = result;
         this.getUsuarios();
@@ -168,19 +141,19 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  myControl = new FormControl();
+  myControl = new FormControl<string>("");
   options: Array<any> = [];
-  filteredOptions: Observable<any>;
+  filteredOptions!: Observable<any>;
 
-  private _filter(value): any {
-    const filterValue = value.toLowerCase();
+  private _filter(value: unknown): any {
+    const filterValue = String(value ?? "").toLowerCase();
     return this.options.filter((option) => option.nombre.toLowerCase().includes(filterValue));
   }
 
-  selectedUsers = [];
+  selectedUsers: any[] = [];
 
-  getAutores() {
-    this._autorService.getAutor().subscribe((result) => {
+  getAutores(): void {
+    this._autorService.getAutor().subscribe((result: any[]) => {
       if (result) {
         result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
         this.autores = result;
@@ -189,14 +162,14 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
         }
         this.filteredOptions = this.myControl.valueChanges.pipe(
           startWith(""),
-          map((value) => this._filter(value)),
+          map((value) => this._filter(value ?? "")),
         );
       }
     });
   }
 
-  getUsuarios() {
-    this._usuarioService.getUsuarios().subscribe((result) => {
+  getUsuarios(): void {
+    this._usuarioService.getUsuarios().subscribe((result: any[]) => {
       if (result) {
         result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
         this.usuarios = result;
@@ -214,8 +187,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getAutoresPublicacion(idPublicacion) {
-    this._publicacionhasautorService.getPublicacionHasAutor(idPublicacion).subscribe((result) => {
+  getAutoresPublicacion(idPublicacion: number): void {
+    this._publicacionhasautorService.getPublicacionHasAutor(idPublicacion).subscribe((result: any[]) => {
       if (result) {
         for (let index = 0; index < result.length; index++) {
           this.getAutor(result[index].autores_idAutor, result[index].isPrincipal);
@@ -224,8 +197,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
       this.getUsuariosPublicacion(idPublicacion);
     });
   }
-  getUsuariosPublicacion(idPublicacion) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe((result) => {
+  getUsuariosPublicacion(idPublicacion: number): void {
+    this._publicacionhasusuarioService.getPublicacionHasUsuario(idPublicacion).subscribe((result: any[]) => {
       if (result) {
         for (let index = 0; index < result.length; index++) {
           this.getUsuario(result[index].usuario_DNI, result[index].isPrincipal);
@@ -234,8 +207,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getAutor(idAutor, isPrincipal) {
-    this._autorService.getAuthor(idAutor).subscribe((result) => {
+  getAutor(idAutor: number, isPrincipal: number): void {
+    this._autorService.getAuthor(idAutor).subscribe((result: any[]) => {
       if (result) {
         result[0].isPrincipal = isPrincipal;
         if (isPrincipal == 0) {
@@ -249,8 +222,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getUsuario(DNI, isPrincipal) {
-    this._usuarioService.getUser(DNI).subscribe((result) => {
+  getUsuario(DNI: string, isPrincipal: number): void {
+    this._usuarioService.getUser(DNI).subscribe((result: any[]) => {
       if (result) {
         result[0].nombre = result[0].nombre + " " + result[0].apellidoPaterno + " " + result[0].apellidoMaterno;
         result[0].isPrincipal = isPrincipal;
@@ -265,7 +238,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  setearOtrosAutores() {
+  setearOtrosAutores(): void {
     this.otrosAutores = [];
     this.autoresSeleccionados.sort((a, b) =>
       a.isPrincipal > b.isPrincipal ? 1 : b.isPrincipal > a.isPrincipal ? -1 : 0,
@@ -284,13 +257,13 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
         idAutor: idAutorSeleccionado,
         nombre: this.autoresSeleccionados[index].nombre,
         isAutor: isAutor,
-        myControl: new FormControl(),
+        myControl: new FormControl<string>(""),
       });
       this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
         this.otrosAutores.length - 1
       ].myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this._filter(value)),
+        map((value) => this._filter(typeof value === "string" ? value : "")),
       );
     }
     if (this.autoresSeleccionados.length == 0) {
@@ -299,28 +272,28 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
         idAutor: "",
         nombre: "",
         isAutor: true,
-        myControl: new FormControl(),
+        myControl: new FormControl<string>(""),
       });
     }
   }
 
-  autoresSeleccionados = [];
+  autoresSeleccionados: any[] = [];
 
-  otrosAutores: any[];
+  otrosAutores: any[] = [];
 
-  addAnotherAuthor() {
+  addAnotherAuthor(): void {
     this.otrosAutores.push({
       id: this.otrosAutores.length + 1,
       idAutor: "",
       nombre: "",
       isAutor: true,
-      myControl: new FormControl(),
+      myControl: new FormControl<string>(""),
     });
     this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
       this.otrosAutores.length - 1
     ].myControl.valueChanges.pipe(
       startWith(""),
-      map((value) => this._filter(value)),
+      map((value) => this._filter(typeof value === "string" ? value : "")),
     );
   }
 
@@ -335,52 +308,57 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  submitArticle() {
+  submitArticle(): void {
     this.revisarValues();
     if (this.publicacionForm.valid && this.selectedUser) {
-      const momentDate = new Date(this.publicacion.fechaPublicacionDate); // Replace event.value with your date value
+      const idPublicacion = Number(this.publicacion.idPublicacion ?? 0);
+      const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date()); // Replace event.value with your date value
       const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.publicacion.fechaPublicacion = formattedDate;
-      this._publicacionService.updatePublicacion(this.publicacion).subscribe((result) => {
-        if (result.status == 1) {
-          this._publicacionhasautorService
-            .deletePublicacionHasAutor(this.publicacion.idPublicacion)
-            .subscribe((result) => {
-              if (result.status == 1) {
-                this._publicacionhasusuarioService
-                  .deletePublicacionHasUsuario(this.publicacion.idPublicacion)
-                  .subscribe((result) => {
-                    if (result.status == 1) {
-                      if (this.selectedUsers.length > 0) {
-                        this.setAutores(this.selectedUsers[0], 0, this.publicacion.idPublicacion);
-                      } else {
-                        let autorNuevo = { nombre: this.selectedUser };
-                        this.setAutores(autorNuevo, 0, this.publicacion.idPublicacion);
-                      }
-                      for (let index = 0; index < this.otrosAutores.length; index++) {
-                        this.setAutores(this.otrosAutores[index], index + 1, this.publicacion.idPublicacion);
-                      }
-                    }
-                  });
-              }
-            });
+      this._publicacionService.updatePublicacion(this.publicacion).subscribe((updateResponse: any) => {
+        if (updateResponse.status == 1) {
+          this.clearPublicationRelations(idPublicacion, () => {
+            if (this.selectedUsers.length > 0) {
+              this.setAutores(this.selectedUsers[0], 0, idPublicacion);
+            } else {
+              let autorNuevo = { nombre: this.selectedUser };
+              this.setAutores(autorNuevo, 0, idPublicacion);
+            }
+            for (let index = 0; index < this.otrosAutores.length; index++) {
+              this.setAutores(this.otrosAutores[index], index + 1, idPublicacion);
+            }
+          });
         }
       });
     }
   }
 
-  setAutores(autor, isPrincipal, idPublicacion) {
+  private clearPublicationRelations(idPublicacion: number, onSuccess: () => void): void {
+    this._publicacionhasautorService.deletePublicacionHasAutor(idPublicacion).subscribe((authorDeleteResponse: any) => {
+      if (authorDeleteResponse.status == 1) {
+        this._publicacionhasusuarioService
+          .deletePublicacionHasUsuario(idPublicacion)
+          .subscribe((userDeleteResponse: any) => {
+            if (userDeleteResponse.status == 1) {
+              onSuccess();
+            }
+          });
+      }
+    });
+  }
+
+  setAutores(autor: any, isPrincipal: number, idPublicacion: number): void {
     if (autor.nombre) {
       if (autor.idAutor == "" || (!autor.idAutor && !autor.DNI)) {
         let newAuthor = { nombre: autor.nombre };
-        this._autorService.addAuthor(newAuthor).subscribe((res) => {
+        this._autorService.addAuthor(newAuthor).subscribe((res: any) => {
           if (res) {
             let autorPublicacion = {
               autor_idAutor: res.idAutor,
               publicacion_idPublicacion: idPublicacion,
               isPrincipal: isPrincipal,
             };
-            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((_res: any) => {});
           }
         });
       } else if (autor.idAutor) {
@@ -390,21 +368,21 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((_res: any) => {});
         } else if (autor.isAutor == undefined) {
           let autorPublicacion = {
             autor_idAutor: autor.idAutor,
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((_res: any) => {});
         } else {
           let usuarioPublicacion = {
             usuario_DNI: autor.idAutor,
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
+          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((_res: any) => {});
         }
       } else if (autor.DNI) {
         let usuarioPublicacion = {
@@ -412,7 +390,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
           publicacion_idPublicacion: idPublicacion,
           isPrincipal: isPrincipal,
         };
-        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
+        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((_res: any) => {});
       }
     }
     if (isPrincipal) {
@@ -422,7 +400,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectUser(evento, value) {
+  selectUser(evento: any, value: number): void {
     if (value == 1) {
       this.myControl.setValue(evento.nombre);
       if (this.selectedUsers.length != 0) {
@@ -440,7 +418,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectUserAutor(evento, value, i) {
+  selectUserAutor(evento: any, value: number, i: number): void {
     if (value == 1) {
       if (evento.idAutor) {
         this.otrosAutores[i].idAutor = evento.idAutor;
@@ -461,7 +439,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  revisarValues() {
+  revisarValues(): void {
     for (let index = 0; index < this.otrosAutores.length; index++) {
       let found = this.options.findIndex((option) => option.nombre === this.otrosAutores[index].nombre);
       if (found == -1) {
@@ -474,7 +452,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
       if (found == -1) {
         if (this.selectedUsers[index].idAutor) {
           this.selectedUsers[index].idAutor = null;
-        } else if (this.selectedUser[index].DNI) {
+        } else if (this.selectedUsers[index].DNI) {
           this.selectedUsers[index].DNI = null;
         }
       }
@@ -484,41 +462,34 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  return() {
-    this._router.navigate(["dashboard/" + localStorage.getItem("resumen-back")]);
+  return(): void {
+    this._router.navigate(["dashboard/" + this._session.getResumenBack()]);
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  erasePublicacion() {
-    this._publicacionhasautorService.deletePublicacionHasAutor(this.publicacion.idPublicacion).subscribe((result) => {
-      if (result.status == 1) {
-        this._publicacionhasusuarioService
-          .deletePublicacionHasUsuario(this.publicacion.idPublicacion)
-          .subscribe((result) => {
-            if (result.status == 1) {
-              this._publicacionService.deletePublicacion(this.publicacion.idPublicacion).subscribe((result) => {
-                if (result.status == 1) {
-                  this.publicacionForm.markAsPristine();
-                  this.return();
-                  this.openSnackBar("Resumen eliminado exitosamente");
-                }
-              });
-            }
-          });
-      }
+  erasePublicacion(): void {
+    const idPublicacion = Number(this.publicacion.idPublicacion ?? 0);
+    this.clearPublicationRelations(idPublicacion, () => {
+      this._publicacionService.deletePublicacion(idPublicacion).subscribe((deleteResponse: any) => {
+        if (deleteResponse.status == 1) {
+          this.publicacionForm.markAsPristine();
+          this.return();
+          this.openSnackBar("Resumen eliminado exitosamente");
+        }
+      });
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogErase8>;
+  private dialogRef2?: MatDialogRef<DialogErase8>;
 
-  openEraser() {
+  openEraser(): void {
     this.dialogRef2 = this.dialog.open(DialogErase8, {
       width: "530px",
       id: "idleTimer",
@@ -529,7 +500,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
         yes: "No, cancelar",
       },
     });
-    this.dialogRef2.afterClosed().subscribe((result) => {
+    this.dialogRef2.afterClosed().subscribe((result: boolean) => {
       if (result) {
         this.erasePublicacion();
       }

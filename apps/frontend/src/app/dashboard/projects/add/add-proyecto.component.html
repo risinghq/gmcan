@@ -44,7 +44,7 @@
           </div>
           <div class="full-width">
             <div class="text-category">Línea de investigación <span class="red-text">*</span></div>
-            <mat-form-field class="input-category" floatLabel="never">
+            <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar línea</mat-label>
               <mat-select
                 [(ngModel)]="proyecto.lineasInvestigacion_idLineasInvestigacion"
@@ -64,7 +64,7 @@
           <div class="text-category mb-0">Responsable(s) <span class="red-text">*</span></div>
           <div class="flex-flow flex-news mt-16">
             <section class="relative mr-80 mb-8" *ngFor="let otroAutor of otrosAutores; let i = index">
-              <mat-form-field class="input-category width-normal" floatLabel="never">
+              <mat-form-field class="input-category width-normal" floatLabel="auto">
                 <input
                   id="autorId"
                   class="text-autocomplete text-autocomplete-normal"
@@ -130,7 +130,7 @@
         <div class="flex-news mt-8">
           <div class="mr-32 full-width">
             <div class="text-category">Fuente de financiamiento <span class="red-text">*</span></div>
-            <mat-form-field class="input-category" floatLabel="never">
+            <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar fuente de financiamiento</mat-label>
               <mat-select
                 [(ngModel)]="proyecto.fuenteFinanciamiento_idFuenteFinanciamiento"
@@ -147,7 +147,7 @@
           </div>
           <div class="mr-32 width-128">
             <div class="text-category">Moneda <span class="red-text">*</span></div>
-            <mat-form-field class="input-category" floatLabel="never">
+            <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Tipo</mat-label>
               <mat-select
                 [(ngModel)]="proyecto.moneda_idMoneda"
@@ -174,7 +174,7 @@
         <div class="full-width flex-news">
           <div class="width-479 mr-26">
             <div class="text-category">Fecha de inicio <span class="red-text">*</span></div>
-            <mat-form-field class="input-category" floatLabel="never">
+            <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar fecha de inicio</mat-label>
               <input
                 matInput
@@ -189,7 +189,7 @@
           </div>
           <div class="width-479 mr-26" *ngIf="terminado">
             <div class="text-category">Fecha de fin <span class="red-text">*</span></div>
-            <mat-form-field class="input-category" floatLabel="never">
+            <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar fecha de fin</mat-label>
               <input
                 matInput

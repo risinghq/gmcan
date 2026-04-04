@@ -19,7 +19,7 @@ import { MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Evento } from "@app/shared/models/eventos";
+import type { Evento } from "@app/shared/models/eventos";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { EventoService } from "@app/shared/services/evento.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
@@ -62,7 +62,7 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     private _eventoService: EventoService,
     private _publicacionService: PublicacionService,
   ) {
-    this.evento = new Evento(null, "", "", "", "", "");
+    this.evento = { idEvento: 0, nombre: "", paisEN: "", pais: "", ciudad: "", ciudadEN: "" };
     this.eventoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       pais: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -72,32 +72,32 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  ciudadesControl = new FormControl();
+  ciudadesControl = new FormControl<string>("");
   ciudades: Array<any> = [];
-  filteredOptions: Observable<any>;
-  filteredOptions1: Observable<any>;
-  ciudadesENControl = new FormControl();
+  filteredOptions!: Observable<any>;
+  filteredOptions1!: Observable<any>;
+  ciudadesENControl = new FormControl<string>("");
   ciudadesEN: Array<any> = [];
-  filteredOptions2: Observable<any>;
-  paisControl = new FormControl();
+  filteredOptions2!: Observable<any>;
+  paisControl = new FormControl<string>("");
   pais: Array<any> = [];
-  filteredOptions3: Observable<any>;
-  paisENControl = new FormControl();
+  filteredOptions3!: Observable<any>;
+  paisENControl = new FormControl<string>("");
   paisEN: Array<any> = [];
 
-  private _filter(value): any {
+  private _filter(value: string): any {
     const filterValue = value.toLowerCase();
     return this.ciudades.filter((ciudad) => ciudad.ciudad.toLowerCase().includes(filterValue));
   }
-  private _filter1(value): any {
+  private _filter1(value: string): any {
     const filterValue1 = value.toLowerCase();
     return this.ciudadesEN.filter((ciudadEN) => ciudadEN.ciudadEN.toLowerCase().includes(filterValue1));
   }
-  private _filter2(value): any {
+  private _filter2(value: string): any {
     const filterValue2 = value.toLowerCase();
     return this.pais.filter((pais) => pais.pais.toLowerCase().includes(filterValue2));
   }
-  private _filter3(value): any {
+  private _filter3(value: string): any {
     const filterValue3 = value.toLowerCase();
     return this.paisEN.filter((paisEN) => paisEN.paisEN.toLowerCase().includes(filterValue3));
   }
@@ -105,56 +105,56 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   setFilters() {
     this.filteredOptions = this.ciudadesControl.valueChanges.pipe(
       startWith(""),
-      map((value) => this._filter(value)),
+      map((value) => this._filter(value ?? "")),
     );
   }
 
   setFilters1() {
     this.filteredOptions1 = this.ciudadesENControl.valueChanges.pipe(
       startWith(""),
-      map((value1) => this._filter1(value1)),
+      map((value1) => this._filter1(value1 ?? "")),
     );
   }
 
   setFilters2() {
     this.filteredOptions2 = this.paisControl.valueChanges.pipe(
       startWith(""),
-      map((value2) => this._filter2(value2)),
+      map((value2) => this._filter2(value2 ?? "")),
     );
   }
 
   setFilters3() {
     this.filteredOptions3 = this.paisENControl.valueChanges.pipe(
       startWith(""),
-      map((value3) => this._filter3(value3)),
+      map((value3) => this._filter3(value3 ?? "")),
     );
   }
 
-  getCiudad() {
-    this._eventoService.getCiudades().subscribe((res) => {
+  getCiudad(): void {
+    this._eventoService.getCiudades().subscribe((res: any[]) => {
       this.ciudades = res;
     });
   }
 
-  getCiudadEN() {
-    this._eventoService.getCiudadesEN().subscribe((res) => {
+  getCiudadEN(): void {
+    this._eventoService.getCiudadesEN().subscribe((res: any[]) => {
       this.ciudadesEN = res;
     });
   }
 
-  getPais() {
-    this._eventoService.getPais().subscribe((res) => {
+  getPais(): void {
+    this._eventoService.getPais().subscribe((res: any[]) => {
       this.pais = res;
     });
   }
 
-  getPaisEN() {
-    this._eventoService.getPaisEN().subscribe((res) => {
+  getPaisEN(): void {
+    this._eventoService.getPaisEN().subscribe((res: any[]) => {
       this.paisEN = res;
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getEvento();
     this.getCiudad();
     this.getCiudadEN();
@@ -166,10 +166,10 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     this.setFilters3();
   }
 
-  getEvento() {
+  getEvento(): void {
     this._route.params.forEach((params: Params) => {
       let idEvento = params["id"];
-      this._eventoService.getEvento(idEvento).subscribe((result) => {
+      this._eventoService.getEvento(idEvento).subscribe((result: Evento[]) => {
         if (result) {
           this.evento = result[0];
           localStorage.setItem("eventoEdit", JSON.stringify(this.evento.nombre));
@@ -183,18 +183,18 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     return this.eventoForm.dirty;
   }
 
-  notCanDo;
+  notCanDo = false;
 
-  getPublicacionEvento(idEvento) {
-    this._publicacionService.getPublicacionesEvento(idEvento).subscribe((result) => {
+  getPublicacionEvento(idEvento: number): void {
+    this._publicacionService.getPublicacionesEvento(idEvento).subscribe((result: any[]) => {
       if (result.length == 0) {
         this.notCanDo = true;
       }
     });
   }
 
-  submitEvento() {
-    this._eventoService.updateEvento(this.evento).subscribe((result) => {
+  submitEvento(): void {
+    this._eventoService.updateEvento(this.evento).subscribe((result: any) => {
       if (result.status == 1) {
         this.eventoForm.markAsPristine();
         this.return();
@@ -203,21 +203,21 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/eventos"]);
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogErase5>;
+  private dialogRef2?: MatDialogRef<DialogErase5>;
 
-  openEraser() {
+  openEraser(): void {
     if (this.notCanDo) {
       this.dialogRef2 = this.dialog.open(DialogErase5, {
         width: "530px",
@@ -229,7 +229,7 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
           yes: "No, cancelar",
         },
       });
-      this.dialogRef2.afterClosed().subscribe((result) => {
+      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.eraseNews();
         }
@@ -237,9 +237,9 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  eraseNews() {
+  eraseNews(): void {
     if (this.notCanDo) {
-      this._eventoService.deleteEvento(this.evento.idEvento).subscribe((result) => {
+      this._eventoService.deleteEvento(this.evento.idEvento ?? 0).subscribe((result: any) => {
         if (result.status == 1) {
           this.eventoForm.markAsPristine();
           this.return();

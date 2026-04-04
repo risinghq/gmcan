@@ -1,17 +1,15 @@
 import { Proyecto } from "./proyecto";
 
-export class lineasInvestigacion {
-  constructor(
-    public idLineasInvestigacion: Number,
-    public nombre: String,
-    public nombreEN: String,
-    public foto: String,
-    public descripcion: String,
-    public descripcionEN: String,
-    public grupo_idGrupo: Number,
-    public fechaCreacion: Date,
-    public fechaActualizacion: Date,
-    public proyectos: Array<Proyecto>,
-    public page: Number,
-  ) {}
+export interface LineasInvestigacion {
+  idLineasInvestigacion?: number;
+  nombre?: string;
+  nombreEN?: string;
+  foto?: string;
+  descripcion?: string;
+  descripcionEN?: string;
+  grupo_idGrupo?: number;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
+  proyectos?: Proyecto[];
+  page?: number;
 }

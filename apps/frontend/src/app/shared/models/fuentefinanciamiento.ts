@@ -1,6 +1,4 @@
-export class FuenteFinanciamiento {
-  constructor(
-    public idFuenteFinanciamiento: Number,
-    public nombre: String,
-  ) {}
+export interface FuenteFinanciamiento {
+  idFuenteFinanciamiento?: number;
+  nombre?: string;
 }

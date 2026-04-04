@@ -22,6 +22,7 @@ import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasa
 import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { SearchService } from "@app/shared/services/search.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
 import { TipoTesisService } from "@app/shared/services/tipotesis.service";
@@ -54,18 +55,18 @@ import {
   ],
 })
 export default class GlobalSearchComponent implements OnInit {
-  proyectos: Array<Proyecto>;
-  publicaciones: Array<Publicacion>;
-  miembros: Array<UsuarioFull>;
-  noticias: Array<Noticia>;
-  tipoPublicaciones: Array<TipoPublicacion>;
-  tiponoticias: Array<TipoNoticia>;
-  language;
+  proyectos: Proyecto[] = [];
+  publicaciones: Publicacion[] = [];
+  miembros: UsuarioFull[] = [];
+  noticias: Noticia[] = [];
+  tipoPublicaciones: TipoPublicacion[] = [];
+  tiponoticias: TipoNoticia[] = [];
+  language: any = {};
   public searchGlobalForm: FormGroup;
   page1 = 1;
   pageSize = 5;
   page2 = 1;
-  public url;
+  public url: string;
 
   constructor(
     public titlecasePipe: TitleCasePipe,
@@ -89,6 +90,7 @@ export default class GlobalSearchComponent implements OnInit {
     public _publicacionesService: PublicacionService,
     public _tipoPublicacionService: TipoPublicacionService,
     public fb: FormBuilder,
+    private _session: SessionService,
     public location: Location,
     private titleService: Title,
   ) {
@@ -98,21 +100,21 @@ export default class GlobalSearchComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  public previouslink;
+  public previouslink: string | null = null;
 
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     this.findGlobal();
     this.previouslink = sessionStorage.getItem("previous-page");
   }
 
   /* globalSearch */
 
-  searchGlobal(value) {
+  searchGlobal(value: string): void {
     this._router.navigate(["/home/search/" + value]);
     this.ngOnInit();
   }
-  findGlobal() {
+  findGlobal(): void {
     this.publicaciones = [];
     this.proyectos = [];
     this.noticias = [];
@@ -122,8 +124,8 @@ export default class GlobalSearchComponent implements OnInit {
     this.getTipoNoticias();
   }
 
-  getTipoPublicacion() {
-    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res) => {
+  getTipoPublicacion(): void {
+    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res: TipoPublicacion[]) => {
       if (res) {
         this.tipoPublicaciones = res;
       }
@@ -136,10 +138,12 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchProyectos(nombre) {
-    this._searchService.searchProyectosGlobal(nombre).subscribe((res) => {
+  searchProyectos(nombre: string): void {
+    this._searchService.searchProyectosGlobal(nombre).subscribe((res: Proyecto[]) => {
       if (res) {
-        res.sort((a, b) => (a.fechaInicio < b.fechaInicio ? 1 : b.fechaInicio < a.fechaInicio ? -1 : 0));
+        res.sort((a: Proyecto, b: Proyecto) =>
+          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
+        );
         this.proyectos = res;
         for (let index = 0; index < this.proyectos.length; index++) {
           this.fillProyecto(this.proyectos[index], index);
@@ -150,8 +154,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchLineasInvestigacion(nombre) {
-    this._searchService.searchLineasInvestigacion(nombre).subscribe((res) => {
+  searchLineasInvestigacion(nombre: string): void {
+    this._searchService.searchLineasInvestigacion(nombre).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getProyectoLinea(res[index].idLineasInvestigacion);
@@ -160,8 +164,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchUsuarios(nombre) {
-    this._searchService.searchUsuariosGlobal(nombre).subscribe((res) => {
+  searchUsuarios(nombre: string): void {
+    this._searchService.searchUsuariosGlobal(nombre).subscribe((res: UsuarioFull[]) => {
       if (res.length > 0) {
         this.miembros = res;
         for (let index = 0; index < this.miembros.length; index++) {
@@ -174,12 +178,16 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchNoticias(nombre) {
-    this._searchService.searchNoticiasGlobal(nombre).subscribe((res) => {
+  searchNoticias(nombre: string): void {
+    this._searchService.searchNoticiasGlobal(nombre).subscribe((res: Noticia[]) => {
       if (res.length > 0) {
         this.noticias = res;
-        this.noticias.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        this.noticias.sort((a: Noticia, b: Noticia) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         for (let index = 0; index < this.noticias.length; index++) {
           if (this.noticias[index].estado == 1) {
@@ -194,19 +202,19 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchTipoNoticia(nombre) {
-    this._searchService.searchTipoNoticiasGlobal(nombre).subscribe((res) => {
+  searchTipoNoticia(nombre: string): void {
+    this._searchService.searchTipoNoticiasGlobal(nombre).subscribe((res: TipoNoticia[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
-          this.getNoticiasTipo(res[index].idtipoNoticia);
+          this.getNoticiasTipo(res[index].idtipoNoticia ?? 0);
         }
       }
       this.searchPublicaciones(nombre);
     });
   }
 
-  searchPublicaciones(nombre) {
-    this._searchService.searchPublicacionesGlobal(nombre).subscribe((res) => {
+  searchPublicaciones(nombre: string): void {
+    this._searchService.searchPublicacionesGlobal(nombre).subscribe((res: Publicacion[]) => {
       if (res.length > 0) {
         this.publicaciones = res;
         for (let index = 0; index < this.publicaciones.length; index++) {
@@ -217,8 +225,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchAutores(nombre) {
-    this._searchService.searchAutores(nombre).subscribe((res) => {
+  searchAutores(nombre: string): void {
+    this._searchService.searchAutores(nombre).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getAutorHasPublicacion(res[index].idAutor);
@@ -228,8 +236,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchEventos(nombre) {
-    this._searchService.searchEventos(nombre).subscribe((res) => {
+  searchEventos(nombre: string): void {
+    this._searchService.searchEventos(nombre).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getPublicacionEvento(res[index].idEvento);
@@ -239,8 +247,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  searchRevista(nombre) {
-    this._searchService.searchRevista(nombre).subscribe((res) => {
+  searchRevista(nombre: string): void {
+    this._searchService.searchRevista(nombre).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getPublicacionRevista(res[index].idRevista);
@@ -251,18 +259,20 @@ export default class GlobalSearchComponent implements OnInit {
 
   /* Get Publicacion */
 
-  getPublicacionHasUsuario(publicacion) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
+  getPublicacionHasUsuario(publicacion: Publicacion): void {
+    this._publicacionhasusuarioService
+      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
+      .subscribe((res: any[]) => {
+        if (res.length > 0) {
+          for (let index = 0; index < res.length; index++) {
+            this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
+          }
         }
-      }
-    });
+      });
   }
 
-  getUsuarioHasPublicacion(obj) {
-    this._publicacionhasusuarioService.searchPublicacionHasUsuario(obj.DNI).subscribe((res) => {
+  getUsuarioHasPublicacion(obj: UsuarioFull): void {
+    this._publicacionhasusuarioService.searchPublicacionHasUsuario(obj.DNI ?? "").subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getPublicacion(res[index].publicacion_idPublicacion);
@@ -271,8 +281,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getPublicacionHasAutor(publicacion) {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res) => {
+  getPublicacionHasAutor(publicacion: Publicacion): void {
+    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion ?? 0).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getAutor(res[index].autores_idAutor, publicacion);
@@ -281,8 +291,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getAutorHasPublicacion(id) {
-    this._publicacionhasautorService.searchPublicacionHasAutor(id).subscribe((res) => {
+  getAutorHasPublicacion(id: number): void {
+    this._publicacionhasautorService.searchPublicacionHasAutor(id).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getPublicacion(res[index].publicacion_idPublicacion);
@@ -291,12 +301,12 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getPublicacionCiudad(idCiudad) {
-    this._publicacionesService.getPublicacionesCiudad(idCiudad).subscribe((res) => {
+  getPublicacionCiudad(idCiudad: number): void {
+    this._publicacionesService.getPublicacionesCiudad(idCiudad).subscribe((res: Publicacion[]) => {
       if (res.length > 0) {
         if (this.publicaciones) {
           for (let index = 0; index < res.length; index++) {
-            if (this.publicaciones.findIndex((x) => x.idPublicacion === res[index].idPublicacion) == -1) {
+            if (this.publicaciones.findIndex((x: Publicacion) => x.idPublicacion === res[index].idPublicacion) == -1) {
               this.publicaciones.push(res[index]);
             }
           }
@@ -310,12 +320,12 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getPublicacionEvento(idEvento) {
-    this._publicacionesService.getPublicacionesEvento(idEvento).subscribe((res) => {
+  getPublicacionEvento(idEvento: number): void {
+    this._publicacionesService.getPublicacionesEvento(idEvento).subscribe((res: Publicacion[]) => {
       if (res.length > 0) {
         if (this.publicaciones) {
           for (let index = 0; index < res.length; index++) {
-            if (this.publicaciones.findIndex((x) => x.idPublicacion === res[index].idPublicacion) == -1) {
+            if (this.publicaciones.findIndex((x: Publicacion) => x.idPublicacion === res[index].idPublicacion) == -1) {
               this.publicaciones.push(res[index]);
             }
           }
@@ -329,12 +339,12 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getPublicacionRevista(idRevista) {
-    this._publicacionesService.getPublicacionesRevista(idRevista).subscribe((res) => {
+  getPublicacionRevista(idRevista: number): void {
+    this._publicacionesService.getPublicacionesRevista(idRevista).subscribe((res: Publicacion[]) => {
       if (res.length > 0) {
         if (this.publicaciones) {
           for (let index = 0; index < res.length; index++) {
-            if (this.publicaciones.findIndex((x) => x.idPublicacion === res[index].idPublicacion) == -1) {
+            if (this.publicaciones.findIndex((x: Publicacion) => x.idPublicacion === res[index].idPublicacion) == -1) {
               this.publicaciones.push(res[index]);
             }
           }
@@ -348,8 +358,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getEvento(idEvento, publicacion) {
-    this._eventoService.getEvento(idEvento).subscribe((res) => {
+  getEvento(idEvento: number, publicacion: Publicacion): void {
+    this._eventoService.getEvento(idEvento).subscribe((res: any[]) => {
       if (res.length > 0) {
         publicacion.evento = res[0].nombre;
         publicacion.ciudad = res[0].ciudad;
@@ -358,8 +368,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getTipoTesis(publicacion) {
-    this._tipotesisService.getTiposTesis().subscribe((res) => {
+  getTipoTesis(publicacion: Publicacion): void {
+    this._tipotesisService.getTiposTesis().subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           if (publicacion.tipoTesis_idTipoTesis == res[index].idTipoTesis) {
@@ -370,8 +380,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getPublicacion(idPublicacion) {
-    this._publicacionesService.getPublication(idPublicacion).subscribe((res) => {
+  getPublicacion(idPublicacion: number): void {
+    this._publicacionesService.getPublication(idPublicacion).subscribe((res: Publicacion[]) => {
       if (res.length > 0) {
         if (this.publicaciones) {
           if (this.publicaciones.findIndex((x) => x.idPublicacion === res[0].idPublicacion) == -1) {
@@ -389,13 +399,13 @@ export default class GlobalSearchComponent implements OnInit {
 
   /* Fill Publicacion */
 
-  fillPublicacion(publicacion) {
+  fillPublicacion(publicacion: Publicacion): void {
     publicacion.usuario = [];
     publicacion.autor = [];
-    var d = new Date(publicacion.fechaPublicacion);
+    const d = new Date(publicacion.fechaPublicacion ?? "");
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    publicacion.fecha = this.datePipe.transform(d, "MMMM y", "es");
-    publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha);
+    publicacion.fecha = this.datePipe.transform(d, "MMMM y", "es") ?? undefined;
+    publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha ?? "");
     publicacion.tipoPublicacion =
       this.tipoPublicaciones[
         this.tipoPublicaciones.findIndex((x) => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion)
@@ -404,13 +414,13 @@ export default class GlobalSearchComponent implements OnInit {
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
     this.getPublicacionHasUsuario(publicacion);
-    this.getEvento(publicacion.evento_idEvento, publicacion);
+    this.getEvento(publicacion.evento_idEvento ?? 0, publicacion);
     this.getTipoTesis(publicacion);
   }
 
   /* get Proyectos */
-  getUsuariosHasProyecto(user) {
-    this._proyectohasusuarioService.getUsuarioHasProyecto(user.DNI).subscribe((res) => {
+  getUsuariosHasProyecto(user: UsuarioFull): void {
+    this._proyectohasusuarioService.getUsuarioHasProyecto(user.DNI ?? "").subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getProyectos(res[index].proyecto_idProyecto);
@@ -419,18 +429,18 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getProyectosHasUsuario(proyecto) {
-    this._proyectohasusuarioService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res) => {
+  getProyectosHasUsuario(proyecto: Proyecto): void {
+    this._proyectohasusuarioService.getUsuarioHasProyectos(proyecto.idProyecto ?? 0).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, proyecto, null);
+          this.getUsuario(res[index].usuario_DNI, proyecto, 0);
         }
       }
     });
   }
 
-  getLineasInvestigacion(idLinea, index) {
-    this._lineasInvestigacionServices.getLineaInvestigacion(idLinea).subscribe((res) => {
+  getLineasInvestigacion(idLinea: number, index: number): void {
+    this._lineasInvestigacionServices.getLineaInvestigacion(idLinea).subscribe((res: any[]) => {
       if (res.length > 0) {
         if (this.proyectos[index] != undefined) {
           this.proyectos[index].lineasInvestigacion = res[0].nombre;
@@ -439,11 +449,11 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getProyectos(idProyecto) {
-    this._proyectoServices.getProyectosId(idProyecto, 1).subscribe((res) => {
+  getProyectos(idProyecto: number): void {
+    this._proyectoServices.getProyectosId(idProyecto, 1).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
-          if (this.proyectos.findIndex((x) => x.idProyecto === res[index].idProyecto) == -1) {
+          if (this.proyectos.findIndex((x: Proyecto) => x.idProyecto === res[index].idProyecto) == -1) {
             this.proyectos.push(res[index]);
           }
         }
@@ -454,11 +464,11 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getProyectoLinea(idLineasInvestigacion) {
-    this._proyectoServices.getProyectosLinea(idLineasInvestigacion, 1).subscribe((res) => {
+  getProyectoLinea(idLineasInvestigacion: number): void {
+    this._proyectoServices.getProyectosLinea(idLineasInvestigacion, 1).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
-          if (this.proyectos.findIndex((x) => x.idProyecto === res[index].idProyecto) == -1) {
+          if (this.proyectos.findIndex((x: Proyecto) => x.idProyecto === res[index].idProyecto) == -1) {
             this.proyectos.push(res[index]);
           }
         }
@@ -471,39 +481,43 @@ export default class GlobalSearchComponent implements OnInit {
 
   /* Fill Proyecto */
 
-  fillProyecto(proyecto, index) {
-    proyecto.fechaI = this.datePipe.transform(proyecto.fechaInicio, "MMMM, y", "es");
-    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI);
+  fillProyecto(proyecto: Proyecto, index: number): void {
+    proyecto.fechaI = this.datePipe.transform(proyecto.fechaInicio ?? "", "MMMM, y", "es") ?? undefined;
+    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
     proyecto.usuario = [];
     if (proyecto.fechaFin) {
-      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es");
-      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF);
+      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es") ?? undefined;
+      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF ?? "");
     }
-    this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion, index);
+    this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion ?? 0, index);
     this.getProyectosHasUsuario(proyecto);
   }
 
   /* get Noticias */
 
-  getTipoNoticias() {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res) => {
+  getTipoNoticias(): void {
+    this._tiponoticiaService.getTipoNoticia().subscribe((res: TipoNoticia[]) => {
       this.tiponoticias = res;
     });
   }
 
-  getNoticiasTipo(id) {
-    this._noticiaService.getNoticiaTipo(id).subscribe((res) => {
+  getNoticiasTipo(id: number): void {
+    this._noticiaService.getNoticiaTipo(id).subscribe((res: Noticia[]) => {
       if (res.length > 0) {
         if (this.noticias) {
           for (let index = 0; index < res.length; index++) {
-            if (this.noticias.findIndex((x) => x.idNoticia === res[index].idNoticia) == -1) {
+            if (this.noticias.findIndex((x: Noticia) => x.idNoticia === res[index].idNoticia) == -1) {
               this.noticias.push(res[index]);
             }
           }
         } else {
           this.noticias = res;
-          this.noticias.sort((a, b) =>
-            a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+          this.noticias.sort((a: Noticia, b: Noticia) =>
+            (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+              ? 1
+              : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+                ? -1
+                : 0,
           );
         }
         for (let index = 0; index < this.noticias.length; index++) {
@@ -518,19 +532,23 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getUsuarioHasNoticia(usuario) {
-    this._noticiaService.getNoticiaUsuario(usuario.DNI).subscribe((res) => {
+  getUsuarioHasNoticia(usuario: UsuarioFull): void {
+    this._noticiaService.getNoticiaUsuario(usuario.DNI ?? "").subscribe((res: Noticia[]) => {
       if (res.length > 0) {
         if (this.noticias) {
           for (let index = 0; index < res.length; index++) {
-            if (this.noticias.findIndex((x) => x.idNoticia === res[index].idNoticia) == -1) {
+            if (this.noticias.findIndex((x: Noticia) => x.idNoticia === res[index].idNoticia) == -1) {
               this.noticias.push(res[index]);
             }
           }
         } else {
           this.noticias = res;
-          this.noticias.sort((a, b) =>
-            a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+          this.noticias.sort((a: Noticia, b: Noticia) =>
+            (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+              ? 1
+              : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+                ? -1
+                : 0,
           );
         }
         for (let index = 0; index < this.noticias.length; index++) {
@@ -547,51 +565,53 @@ export default class GlobalSearchComponent implements OnInit {
 
   /* Fill Noticia */
 
-  fillNoticia(obj) {
+  fillNoticia(obj: Noticia): void {
     for (let j = 0; j < this.tiponoticias.length; j++) {
       if (obj.tipoNoticia_idtipoNoticia === this.tiponoticias[j].idtipoNoticia) {
         obj.nombreTipoNoticia = this.tiponoticias[j].nombre;
       }
     }
-    var d = new Date(obj.fechaPublicacion);
+    const d = new Date(obj.fechaPublicacion ?? "");
     if (String(d) != "Invalid Date") {
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      obj.fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es");
-      obj.fechaPublicacion = this.titlecasePipe.transform(obj.fechaPublicacion);
+      obj.fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? undefined;
+      obj.fechaPublicacion = this.titlecasePipe.transform(obj.fechaPublicacion ?? "");
     }
     this.getUsuarioNoticia(obj);
   }
 
   /*  Get Normal */
 
-  getUsuario(idUser, obj, isPrincipal) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
+  getUsuario(idUser: string, obj: any, isPrincipal: number): void {
+    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
       if (res[0] != undefined) {
         res[0].nombre = res[0].nombre.slice(0, 1) + ".";
         res[0].isPrincipal = isPrincipal;
         if (obj != undefined) {
-          if (obj.usuario.findIndex((x) => x.DNI === res[0].DNI) == -1) {
+          if (obj.usuario.findIndex((x: any) => x.DNI === res[0].DNI) == -1) {
             obj.usuario.push(res[0]);
           }
-          obj.usuario.sort((a, b) => (a.isPrincipal > b.isPrincipal ? 1 : b.isPrincipal > a.isPrincipal ? -1 : 0));
+          obj.usuario.sort((a: any, b: any) =>
+            (a.isPrincipal ?? 0) > (b.isPrincipal ?? 0) ? 1 : (b.isPrincipal ?? 0) > (a.isPrincipal ?? 0) ? -1 : 0,
+          );
           this.fillName(obj);
         }
       }
     });
   }
 
-  getUsuarioNoticia(obj) {
-    this._usuarioService.getUser(obj.autorPublicacion).subscribe((res) => {
+  getUsuarioNoticia(obj: Noticia): void {
+    this._usuarioService.getUser(obj.autorPublicacion ?? "").subscribe((res: any[]) => {
       if (res[0] != undefined) {
         obj.autor = res[0].nombre + " " + res[0].apellidoPaterno;
       }
     });
   }
 
-  getAutor(idAutor, obj) {
-    this._autorService.getAuthor(idAutor).subscribe((res) => {
+  getAutor(idAutor: number, obj: any): void {
+    this._autorService.getAuthor(idAutor).subscribe((res: any[]) => {
       if (obj != undefined) {
-        if (obj.autor.findIndex((x) => x.idAutor === res[0].idAutor) == -1) {
+        if (obj.autor.findIndex((x: any) => x.idAutor === res[0].idAutor) == -1) {
           obj.autor.push(res[0]);
         }
         this.fillAuthName(obj);
@@ -599,8 +619,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getRevista(publicacion) {
-    this._revistaService.getRevista(publicacion.revista_idRevista).subscribe((res) => {
+  getRevista(publicacion: Publicacion): void {
+    this._revistaService.getRevista(publicacion.revista_idRevista ?? 0).subscribe((res: any[]) => {
       if (res) {
         if (res[0] != undefined) {
           publicacion.revista = res[0].nombre;
@@ -609,8 +629,8 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  getUniversidad(publicacion) {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad).subscribe((res) => {
+  getUniversidad(publicacion: Publicacion): void {
+    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: any) => {
       if (res && res[0] != undefined) {
         publicacion.universidad = res[0].nombre;
       }
@@ -619,9 +639,9 @@ export default class GlobalSearchComponent implements OnInit {
 
   /* Fill Name */
 
-  fillName(obj) {
+  fillName(obj: any): void {
     for (let index = 0; index < obj.usuario.length; index++) {
-      let first = obj.usuario[index].nombre.split(" ");
+      const first = (obj.usuario[index].nombre ?? "").split(" ");
       if (obj.autor != undefined) {
         if (index == obj.usuario.length - 1 && obj.autor.length === 0) {
           obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
@@ -638,7 +658,7 @@ export default class GlobalSearchComponent implements OnInit {
     }
   }
 
-  fillAuthName(obj) {
+  fillAuthName(obj: any): void {
     for (let index = 0; index < obj.autor.length; index++) {
       if (index == obj.autor.length - 1) {
         obj.autor[index].nombreAutor = obj.autor[index].nombre;
@@ -653,66 +673,78 @@ export default class GlobalSearchComponent implements OnInit {
   /* Share Hover */
   public fbicon = "../../assets/img/Facebook.svg";
   public twitter = "../../assets/img/twitter.svg";
-  mouseEnter(int, index) {
-    let element: any;
+  mouseEnter(int: number, index: number): void {
     switch (int) {
       case 1:
-        document.getElementById("fb" + index).setAttribute("src", "../../assets/img/Facebook2.svg");
+        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
         break;
       case 2:
-        document.getElementById("t" + index).setAttribute("src", "../../assets/img/twitter2.svg");
+        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
         break;
       case 3:
-        document.getElementById("fbl" + index).setAttribute("src", "../../assets/img/Facebook2.svg");
+        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
         break;
       case 4:
-        document.getElementById("tl" + index).setAttribute("src", "../../assets/img/twitter2.svg");
+        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
         break;
     }
   }
 
-  mouseLeave(int, index) {
-    let element: any;
+  mouseLeave(int: number, index: number): void {
     switch (int) {
       case 1:
-        document.getElementById("fb" + index).setAttribute("src", "../../assets/img/Facebook.svg");
+        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
         break;
       case 2:
-        document.getElementById("t" + index).setAttribute("src", "../../assets/img/twitter.svg");
+        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
         break;
       case 3:
-        document.getElementById("fbl" + index).setAttribute("src", "../../assets/img/Facebook.svg");
+        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
         break;
       case 4:
-        document.getElementById("tl" + index).setAttribute("src", "../../assets/img/twitter.svg");
+        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
         break;
     }
   }
 
-  selectedItem;
-  oldValue;
+  selectedItem = -1;
+  oldValue = -1;
 
-  listClick(event, newValue) {
+  listClick(_event: Event, newValue: number): void {
     this.oldValue = this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract" + newValue).innerText = this.language.publicationsText[0].seeLess;
+    const current = document.getElementById("abstract" + newValue);
+    if (current) {
+      current.innerText = this.language.publicationsText[0].seeLess;
+    }
     if (this.selectedItem == this.oldValue) {
       this.selectedItem = -1;
-      document.getElementById("abstract" + this.oldValue).innerText = this.language.publicationsText[0].seeMore;
+      const previous = document.getElementById("abstract" + this.oldValue);
+      if (previous) {
+        previous.innerText = this.language.publicationsText[0].seeMore;
+      }
     }
   }
 
-  scroll() {
-    let el = document.getElementById("main-toolbar");
-    el.scrollIntoView({ behavior: "smooth" });
+  scroll(): void {
+    const el = document.getElementById("main-toolbar");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }
 
-  profile(user) {
+  profile(user: { DNI?: string }): void {
+    if (!user.DNI) {
+      return;
+    }
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
 
-  detalleNoticia(noticia) {
+  detalleNoticia(noticia: { idNoticia?: number }): void {
+    if (!noticia.idNoticia) {
+      return;
+    }
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
   }
@@ -729,7 +761,7 @@ export default class GlobalSearchComponent implements OnInit {
   memberExpanded = true;
   newsExpanded = true;
 
-  toggleRotation(caso) {
+  toggleRotation(caso: number): void {
     switch (caso) {
       case 1:
         this.publicationExpanded = !this.publicationExpanded;

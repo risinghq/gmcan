@@ -6,19 +6,19 @@ import { GLOBAL } from "../services/global";
   providedIn: "root",
 })
 export class UploadService {
-  public url: String;
+  public url: string;
   constructor() {
     this.url = GLOBAL.url;
   }
 
-  makeFileRequest(url: string, params: Array<string>, files: Array<File>, token: string, name: string) {
-    return new Promise(function (resolve, reject) {
-      var frmData: any = new FormData();
-      var xhr = new XMLHttpRequest();
-      for (var i = 0; i < files.length; i++) {
+  makeFileRequest(url: string, _params: Array<string>, files: Array<File>, token: string, _name: string) {
+    return new Promise((resolve, reject) => {
+      const frmData = new FormData();
+      const xhr = new XMLHttpRequest();
+      for (let i = 0; i < files.length; i++) {
         frmData.set("file", files[0]);
       }
-      xhr.onreadystatechange = function () {
+      xhr.addEventListener("readystatechange", () => {
         if (xhr.readyState == 4) {
           if (xhr.status == 200) {
             resolve(JSON.parse(xhr.response));
@@ -26,7 +26,7 @@ export class UploadService {
             reject(xhr.response);
           }
         }
-      };
+      });
       xhr.open("POST", url, true);
       xhr.setRequestHeader("Authorization", token);
       xhr.send(frmData);

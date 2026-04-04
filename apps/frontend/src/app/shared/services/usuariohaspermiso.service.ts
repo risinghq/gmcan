@@ -14,7 +14,7 @@ export class UsuarioHasPermisoService {
     this.url = GLOBAL.url;
   }
 
-  getUsuarioHasPermiso(DNI): any {
+  getUsuarioHasPermiso(DNI: string): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -23,7 +23,7 @@ export class UsuarioHasPermisoService {
     });
   }
 
-  addPermisoUsuario(permisoUser): any {
+  addPermisoUsuario(permisoUser: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -32,7 +32,7 @@ export class UsuarioHasPermisoService {
     });
   }
 
-  deletePermisoUsuario(permisoUser): any {
+  deletePermisoUsuario(permisoUser: { usuario_DNI: string }): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,10 +10,15 @@ import { GLOBAL } from "./global";
 export class MethodsService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getMethods(): any {
@@ -26,7 +32,7 @@ export class MethodsService {
     }
   }
 
-  getMethod(idNoticia): any {
+  getMethod(idNoticia: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -37,28 +43,28 @@ export class MethodsService {
     }
   }
 
-  addMetodo(metodo): any {
+  addMetodo(metodo: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "metodo/post-metodo/", metodo, { headers: headers });
   }
 
-  updateMetodo(metodo): any {
+  updateMetodo(metodo: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.put(this.url + "metodo/update-metodo/", metodo, { headers: headers });
   }
 
-  deleteMetodo(idMetodo): any {
+  deleteMetodo(idMetodo: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.delete(this.url + "metodo/delete-metodo/" + idMetodo, { headers: headers });
   }
 
-  uploadMetodoFoto(fileData, id) {
+  uploadMetodoFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});

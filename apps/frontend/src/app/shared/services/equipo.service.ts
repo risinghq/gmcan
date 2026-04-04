@@ -20,28 +20,28 @@ export class EquipoService {
     return this.http.get(this.url + "equipo/get-equipo", { headers: headers });
   }
 
-  getEquipo(idEquipo): any {
+  getEquipo(idEquipo: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.get(this.url + "equipo/get-equipo/" + idEquipo, { headers: headers });
   }
 
-  addEquipo(equipo): any {
+  addEquipo(equipo: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "equipo/post-equipo/", equipo, { headers: headers });
   }
 
-  updateEquipo(equipo): any {
+  updateEquipo(equipo: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.put(this.url + "equipo/update-equipo/", equipo, { headers: headers });
   }
 
-  deleteEquipo(idEquipo): any {
+  deleteEquipo(idEquipo: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

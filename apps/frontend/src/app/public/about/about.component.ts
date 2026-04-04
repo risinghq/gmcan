@@ -1,7 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { Router, ActivatedRoute, Params, RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
-import { Grupo } from "@app/shared/models/grupo";
+import { Router, ActivatedRoute, RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
+import { createGrupo } from "@app/shared/models/factories";
+import type { Grupo } from "@app/shared/models/grupo";
+import { Languages } from "@app/shared/models/languages";
 import { GrupoService } from "@app/shared/services/grupo.service";
 
 @Component({
@@ -17,47 +19,19 @@ export default class AboutComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
   ) {
-    this.info = new Grupo(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
+    this.info = createGrupo();
   }
 
-  selectedCategory;
+  selectedCategory = "";
 
-  language;
+  language: (typeof Languages)[number] = Languages[0];
 
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  ngOnInit(): void {
+    this.language = JSON.parse(localStorage.getItem("language") ?? JSON.stringify(Languages[0]));
     this.verifyRoutes(this._router.url);
   }
 
-  verifyRoutes(route) {
+  verifyRoutes(route: string): void {
     switch (route) {
       case "/home/about-us/about":
         this.selectedCategory = this.language.who;
@@ -79,7 +53,7 @@ export default class AboutComponent implements OnInit {
     }
   }
 
-  selected(element) {
+  selected(element: string): void {
     this.selectedCategory = element;
   }
 }

@@ -22,19 +22,43 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
+import { createNoticiaFull } from "@app/shared/models/factories";
 import { Languages } from "@app/shared/models/languages";
-import { NoticiaFull } from "@app/shared/models/noticiafull";
-import { TipoNoticia } from "@app/shared/models/tiponoticia";
+import type { NoticiaFull } from "@app/shared/models/noticiafull";
+import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { GLOBAL } from "@app/shared/services/global";
 import { NoticiaService } from "@app/shared/services/noticia.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
 import { AutosizeModule } from "ngx-autosize";
+
+interface StatusResponse {
+  status?: number;
+}
+
+interface NewsPreviewUser {
+  nombre: string | null;
+  apellidoPaterno: string | null;
+  apellidoMaterno: string | null;
+  foto: string | null;
+}
+
+interface NewsPreviewData {
+  language: number;
+  titulo: string | null;
+  resumen: string | null;
+  foto: string;
+  nombreTipoNoticia: string | null;
+  usuario: NewsPreviewUser;
+  cuerpo: string | null;
+  fechaPublicacion: string | Date | undefined;
+}
 
 @Component({
   selector: "app-edit-news",
@@ -74,6 +98,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     private _snackBar: MatSnackBar,
     private _tipoNoticiaService: TipoNoticiaService,
     private _usuarioService: UsuarioService,
+    private _session: SessionService,
   ) {
     this.newsForm = this.formBuilder.group({
       titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -86,36 +111,36 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       autorPublicacion: [null, [Validators.required]],
       tipoNoticia_idtipoNoticia: ["", [Validators.required]],
     });
-    this.noticia = new NoticiaFull(null, "", "", "", "", "", "", null, "", null, null, null, null, "", "", null);
+    this.noticia = createNoticiaFull();
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getNews();
   }
-  url;
+  url: string;
   public newsForm: FormGroup;
-  categorias: Array<TipoNoticia>;
-  autores: Array<Usuario>;
-  button_text;
-  button_text2;
+  categorias: TipoNoticia[] = [];
+  autores: Usuario[] = [];
+  button_text = "";
+  button_text2 = "";
 
   isDirty(): boolean {
     return this.newsForm.dirty;
   }
 
-  getNews() {
+  getNews(): void {
     this._route.params.forEach((params: Params) => {
-      let idNoticia = params["id"];
-      this._noticiaService.getNoticiaFull(idNoticia).subscribe((result) => {
+      const idNoticia = Number(params["id"] ?? 0);
+      this._noticiaService.getNoticiaFull(idNoticia).subscribe((result: NoticiaFull) => {
         if (result) {
           this.noticia = result;
           this.newsForm.controls["cuerpo"].setValue(this.noticia.cuerpo);
-          var d = new Date(result.fechaPublicacion);
+          const d = new Date(result.fechaPublicacion ?? new Date());
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.noticia.fechaPublicacion = d;
-          this.noticia.fechaPublicacionDate = this.noticia.fechaPublicacion;
-          sessionStorage.setItem("noticiaPublicada", JSON.stringify(this.noticia.estado));
+          this.noticia.fechaPublicacion = d.toISOString();
+          this.noticia.fechaPublicacionDate = d;
+          this._session.setNoticiaPublicada((this.noticia.estado ?? 0) === 1);
           this.getCategorias();
           if (this.noticia.estado == 0) {
             this.button_text = "Publicar noticia";
@@ -129,8 +154,8 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getCategorias() {
-    this._tipoNoticiaService.getTipoNoticia().subscribe((result) => {
+  getCategorias(): void {
+    this._tipoNoticiaService.getTipoNoticia().subscribe((result: TipoNoticia[]) => {
       if (result) {
         this.categorias = result;
       }
@@ -138,23 +163,23 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getAuthors() {
-    this._usuarioService.getUsuario().subscribe((result) => {
+  getAuthors(): void {
+    this._usuarioService.getUsuario().subscribe((result: Usuario[]) => {
       if (result) {
         this.autores = result;
       }
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/noticias"]);
   }
 
-  submitCategory(value) {
+  submitCategory(value: number): void {
     this.noticia.estado = value;
   }
 
-  submitNews(value) {
+  submitNews(value: number): void {
     if (value == 1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
       this.publishDialog(value);
     } else if (value == 0) {
@@ -166,7 +191,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  publish(value) {
+  publish(value: number): void {
     if (value == 1 && this.newsForm.valid && (this.noticia.foto || this.fileData)) {
       this.publishMethod(value);
     } else if (value == 0) {
@@ -174,22 +199,24 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  publishMethod(value) {
+  publishMethod(value: number): void {
     this.noticia.estado = value;
     if (this.noticia.fechaPublicacionDate) {
-      const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
+      const momentDate = new Date(this.noticia.fechaPublicacionDate);
       const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.noticia.fechaPublicacion = formattedDate;
     } else {
-      this.noticia.fechaPublicacion = null;
+      this.noticia.fechaPublicacion = undefined;
     }
     if (!this.noticia.autorPublicacion) {
-      this.noticia.autorPublicacion = null;
+      this.noticia.autorPublicacion = undefined;
     }
-    this._noticiaService.updateNoticia(this.noticia).subscribe((result) => {
+    this._noticiaService.updateNoticia(this.noticia).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         if (this.fileData) {
-          this._noticiaService.uploadNoticiaFoto(this.fileData, this.noticia.idNoticia).subscribe((res) => {});
+          this._noticiaService
+            .uploadNoticiaFoto(this.fileData, this.noticia.idNoticia ?? 0)
+            .subscribe((_res: unknown) => {});
         }
         this.newsForm.markAsPristine();
         this.return();
@@ -202,12 +229,14 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  private previewDialog: MatDialogRef<DialogPreview2>;
+  private previewDialog?: MatDialogRef<DialogPreview2>;
 
-  previewNews(value) {
-    let indexCat = this.categorias.findIndex((x) => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia);
-    let indexAut = this.autores.findIndex((x) => x.DNI == this.noticia.autorPublicacion);
-    let noticiaPreview = {
+  previewNews(value: number): void {
+    const indexCat = this.categorias.findIndex(
+      (x: TipoNoticia) => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia,
+    );
+    const indexAut = this.autores.findIndex((x: Usuario) => x.DNI == this.noticia.autorPublicacion);
+    let noticiaPreview: NewsPreviewData = {
       language: value,
       titulo: null,
       resumen: null,
@@ -226,24 +255,24 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       noticiaPreview = this.previewUrl;
     }
     if (indexCat != -1) {
-      noticiaPreview.nombreTipoNoticia = this.categorias[indexCat].nombre;
+      noticiaPreview.nombreTipoNoticia = this.categorias[indexCat].nombre ?? null;
     }
     if (indexAut != -1) {
-      noticiaPreview.usuario.nombre = this.autores[indexAut].nombre;
-      noticiaPreview.usuario.apellidoPaterno = this.autores[indexAut].apellidoPaterno;
-      noticiaPreview.usuario.apellidoMaterno = this.autores[indexAut].apellidoMaterno;
-      noticiaPreview.usuario.foto = this.autores[indexAut].foto;
+      noticiaPreview.usuario.nombre = this.autores[indexAut].nombre ?? null;
+      noticiaPreview.usuario.apellidoPaterno = this.autores[indexAut].apellidoPaterno ?? null;
+      noticiaPreview.usuario.apellidoMaterno = this.autores[indexAut].apellidoMaterno ?? null;
+      noticiaPreview.usuario.foto = this.autores[indexAut].foto ?? null;
     }
     switch (value) {
       case 0:
-        noticiaPreview.titulo = this.noticia.titulo;
-        noticiaPreview.resumen = this.noticia.resumen;
-        noticiaPreview.cuerpo = this.noticia.cuerpo;
+        noticiaPreview.titulo = this.noticia.titulo ?? null;
+        noticiaPreview.resumen = this.noticia.resumen ?? null;
+        noticiaPreview.cuerpo = this.noticia.cuerpo ?? null;
         break;
       case 1:
-        noticiaPreview.titulo = this.noticia.tituloEN;
-        noticiaPreview.resumen = this.noticia.resumenEN;
-        noticiaPreview.cuerpo = this.noticia.cuerpoEN;
+        noticiaPreview.titulo = this.noticia.tituloEN ?? null;
+        noticiaPreview.resumen = this.noticia.resumenEN ?? null;
+        noticiaPreview.cuerpo = this.noticia.cuerpoEN ?? null;
         break;
       default:
         break;
@@ -254,15 +283,15 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       data: noticiaPreview,
     });
 
-    this.previewDialog.afterClosed().subscribe((result) => {
+    this.previewDialog.afterClosed().subscribe((result: boolean) => {
       if (!result) {
       }
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogPublish2>;
+  private dialogRef2?: MatDialogRef<DialogPublish2>;
 
-  publishDialog(value) {
+  publishDialog(value: number): void {
     if (this.noticia.estado == 1) {
       this.dialogRef2 = this.dialog.open(DialogPublish2, {
         width: "530px",
@@ -287,16 +316,16 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       });
     }
 
-    this.dialogRef2.afterClosed().subscribe((result) => {
+    this.dialogRef2.afterClosed().subscribe((result: boolean) => {
       if (!result) {
         this.publish(value);
       }
     });
   }
 
-  private dialogRef3: MatDialogRef<DialogPublish3>;
+  private dialogRef3?: MatDialogRef<DialogPublish3>;
 
-  notPublishDialog(value) {
+  notPublishDialog(value: number): void {
     this.dialogRef3 = this.dialog.open(DialogPublish3, {
       width: "530px",
       id: "idleTimer",
@@ -308,15 +337,15 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       },
     });
 
-    this.dialogRef3.afterClosed().subscribe((result) => {
+    this.dialogRef3.afterClosed().subscribe((result: boolean) => {
       if (result) {
         this.publish(value);
       }
     });
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -325,32 +354,35 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 
   date = new FormControl(new Date());
 
-  fileData: File = null;
+  fileData: File | null = null;
   previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: any): void {
     this.fileData = <File>fileInput.target.files[0];
     this.preview();
   }
 
-  preview() {
+  preview(): void {
     // Show preview
-    var mimeType = this.fileData.type;
+    if (!this.fileData) {
+      return;
+    }
+    const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
     }
 
-    var reader = new FileReader();
+    const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
+    reader.addEventListener("load", (_event: ProgressEvent<FileReader>) => {
       this.previewUrl = reader.result;
-    };
+    });
   }
 
-  private dialogRef5: MatDialogRef<DialogErase2>;
+  private dialogRef5?: MatDialogRef<DialogErase2>;
 
-  openEraser() {
+  openEraser(): void {
     this.dialogRef5 = this.dialog.open(DialogErase2, {
       width: "530px",
       id: "idleTimer",
@@ -361,15 +393,15 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
         yes: "No, cancelar",
       },
     });
-    this.dialogRef5.afterClosed().subscribe((result) => {
+    this.dialogRef5.afterClosed().subscribe((result: boolean) => {
       if (result) {
         this.eraseNews();
       }
     });
   }
 
-  eraseNews() {
-    this._noticiaService.deleteNoticia(this.noticia.idNoticia).subscribe((result) => {
+  eraseNews(): void {
+    this._noticiaService.deleteNoticia(this.noticia.idNoticia ?? 0).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.newsForm.markAsPristine();
         this.return();
@@ -416,33 +448,36 @@ export class DialogPublish2 {
   imports: [NgIf, MatDialogClose],
 })
 export class DialogPreview2 {
-  url;
-  language;
-  dia;
-  mes;
-  anio;
-  datere: Date;
+  url: string;
+  language: any = null;
+  dia: string = "";
+  mes: string = "";
+  anio: string = "";
+  datere: Date = new Date();
   constructor(
     public dialogRef: MatDialogRef<DialogPreview2>,
-    @Inject(MAT_DIALOG_DATA) public noticia,
+    @Inject(MAT_DIALOG_DATA) public noticia: NewsPreviewData,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
   ) {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.language = Languages[this.noticia.language];
-    document.getElementById("newsBody").innerHTML = this.noticia.cuerpo;
+    const newsBody = document.getElementById("newsBody");
+    if (newsBody) {
+      newsBody.innerHTML = this.noticia.cuerpo ?? "";
+    }
     this.datere = new Date(String(this.noticia.fechaPublicacion));
-    this.dia = this.datePipe.transform(this.datere, "dd");
-    this.mes = this.datePipe.transform(this.datere, "MMMM");
-    this.anio = this.datePipe.transform(this.datere, "y");
+    this.dia = this.datePipe.transform(this.datere, "dd") ?? "";
+    this.mes = this.datePipe.transform(this.datere, "MMMM") ?? "";
+    this.anio = this.datePipe.transform(this.datere, "y") ?? "";
   }
 
   public fbicon = "../../assets/img/Facebook.svg";
   public twitter = "../../assets/img/twitter.svg";
-  mouseEnter(int) {
+  mouseEnter(int: number): void {
     switch (int) {
       case 1:
         this.fbicon = "../../assets/img/Facebook2.svg";
@@ -453,7 +488,7 @@ export class DialogPreview2 {
     }
   }
 
-  mouseLeave(int) {
+  mouseLeave(int: number): void {
     switch (int) {
       case 1:
         this.fbicon = "../../assets/img/Facebook.svg";

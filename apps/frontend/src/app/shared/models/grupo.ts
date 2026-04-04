@@ -1,31 +1,29 @@
-export class Grupo {
-  constructor(
-    public idGrupo: Number,
-    public quienesSomosResumen: String,
-    public quienesSomosResumenEN: String,
-    public quienesSomos: String,
-    public quienesSomosEN: String,
-    public direccion: String,
-    public correo: String,
-    public nombreGrupo: String,
-    public nombreGrupo2: String,
-    public objetivos: String,
-    public lineasInvestigacion: String,
-    public telefono: String,
-    public servicios: string,
-    public facilidadesRecursosFoto: string,
-    public facilidadesRecursos: string,
-    public facilidadesRecursosEN: string,
-    public trabajosFuturos: string,
-    public trabajosFuturosEN: string,
-    public seccionPublicaciones: string,
-    public seccionPublicacionesEN: string,
-    public seccionProyectos: string,
-    public seccionProyectosEN: string,
-    public foto: String,
-    public logoFooter: String,
-    public logoHeader: String,
-    public fechaCreacion: Date,
-    public fechaActualizacion: Date,
-  ) {}
+export interface Grupo {
+  idGrupo?: number;
+  quienesSomosResumen?: string;
+  quienesSomosResumenEN?: string;
+  quienesSomos?: string;
+  quienesSomosEN?: string;
+  direccion?: string;
+  correo?: string;
+  nombreGrupo?: string;
+  nombreGrupo2?: string;
+  objetivos?: string;
+  lineasInvestigacion?: string;
+  telefono?: string;
+  servicios?: string;
+  facilidadesRecursosFoto?: string;
+  facilidadesRecursos?: string;
+  facilidadesRecursosEN?: string;
+  trabajosFuturos?: string;
+  trabajosFuturosEN?: string;
+  seccionPublicaciones?: string;
+  seccionPublicacionesEN?: string;
+  seccionProyectos?: string;
+  seccionProyectosEN?: string;
+  foto?: string;
+  logoFooter?: string;
+  logoHeader?: string;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
 }

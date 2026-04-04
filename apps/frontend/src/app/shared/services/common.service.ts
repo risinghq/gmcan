@@ -4,12 +4,19 @@ import { Injectable } from "@angular/core";
   providedIn: "root",
 })
 export class CommonService {
-  public url: string;
+  private getStorageLabel(key: string): string {
+    const stored = localStorage.getItem(key);
+    if (!stored) {
+      return "";
+    }
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return stored;
+    }
+  }
 
-  languagelocal;
-  constructor() {}
-
-  defineTitle(value) {
+  defineTitle(value: string): string {
     let splitted = value.split("ews/", 2);
     switch (value) {
       case "/dashboard":
@@ -82,13 +89,13 @@ export class CommonService {
         if (localStorage.getItem("active-member") == "1") {
           return (
             '<span>Miembros Activos </span><span class="grey-title">- ' +
-            JSON.parse(localStorage.getItem("miembroEdit")) +
+            this.getStorageLabel("miembroEdit") +
             "</span>"
           );
         } else {
           return (
             '<span>Miembros Antiguos </span><span class="grey-title">- ' +
-            JSON.parse(localStorage.getItem("miembroEdit")) +
+            this.getStorageLabel("miembroEdit") +
             "</span>"
           );
         }
@@ -98,53 +105,37 @@ export class CommonService {
     if (splitted[0] == "/dashboard/edit-cate") {
       return (
         '<span>Noticias </span><span class="grey-title">- Categoria: ' +
-        JSON.parse(localStorage.getItem("categoryEdit")) +
+        this.getStorageLabel("categoryEdit") +
         "</span>"
       );
     }
     splitted = value.split("vista/", 2);
     if (splitted[0] == "/dashboard/edit-re") {
-      return (
-        '<span>Artículos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("revistaEdit")) +
-        "</span>"
-      );
+      return '<span>Artículos </span><span class="grey-title">- ' + this.getStorageLabel("revistaEdit") + "</span>";
     }
     splitted = value.split("versidad/", 2);
     if (splitted[0] == "/dashboard/edit-uni") {
-      return (
-        '<span>Tesis </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("universidadEdit")) +
-        "</span>"
-      );
+      return '<span>Tesis </span><span class="grey-title">- ' + this.getStorageLabel("universidadEdit") + "</span>";
     }
     splitted = value.split("ento/", 2);
     if (splitted[0] == "/dashboard/edit-ev") {
       return (
-        '<span>Resúmenes de eventos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("eventoEdit")) +
-        "</span>"
+        '<span>Resúmenes de eventos </span><span class="grey-title">- ' + this.getStorageLabel("eventoEdit") + "</span>"
       );
     }
     splitted = value.split("ticle/", 2);
     if (splitted[0] == "/dashboard/edit-ar") {
-      return (
-        '<span>Artículos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("articleEdit")) +
-        "</span>"
-      );
+      return '<span>Artículos </span><span class="grey-title">- ' + this.getStorageLabel("articleEdit") + "</span>";
     }
     splitted = value.split("hesis/", 2);
     if (splitted[0] == "/dashboard/edit-t") {
-      return (
-        '<span>Tesis </span><span class="grey-title">- ' + JSON.parse(localStorage.getItem("thesisEdit")) + "</span>"
-      );
+      return '<span>Tesis </span><span class="grey-title">- ' + this.getStorageLabel("thesisEdit") + "</span>";
     }
     splitted = value.split("sumen/", 2);
     if (splitted[0] == "/dashboard/edit-re") {
       return (
         '<span>Resúmenes de eventos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("resumenEdit")) +
+        this.getStorageLabel("resumenEdit") +
         "</span>"
       );
     }
@@ -152,7 +143,7 @@ export class CommonService {
     if (splitted[0] == "/dashboard/edit-fu") {
       return (
         '<span>Proyectos en ejecución </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("fuenteEdit")) +
+        this.getStorageLabel("fuenteEdit") +
         "</span>"
       );
     }
@@ -160,7 +151,7 @@ export class CommonService {
     if (splitted[0] == "/dashboard/edit-fu") {
       return (
         '<span>Proyectos en ejecución </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("fuenteEdit")) +
+        this.getStorageLabel("fuenteEdit") +
         "</span>"
       );
     }
@@ -168,41 +159,25 @@ export class CommonService {
     if (splitted[0] == "/dashboard/edit-l") {
       return (
         '<span>Contenidos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("lineaInvestigacionEdit")) +
+        this.getStorageLabel("lineaInvestigacionEdit") +
         "</span>"
       );
     }
     splitted = value.split("thod/", 2);
     if (splitted[0] == "/dashboard/edit-me") {
-      return (
-        '<span>Contenidos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("metodoEdit")) +
-        "</span>"
-      );
+      return '<span>Contenidos </span><span class="grey-title">- ' + this.getStorageLabel("metodoEdit") + "</span>";
     }
     splitted = value.split("quipo/", 2);
     if (splitted[0] == "/dashboard/edit-e") {
-      return (
-        '<span>Contenidos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("equipoEdit")) +
-        "</span>"
-      );
+      return '<span>Contenidos </span><span class="grey-title">- ' + this.getStorageLabel("equipoEdit") + "</span>";
     }
     splitted = value.split("tware/", 2);
     if (splitted[0] == "/dashboard/edit-sof") {
-      return (
-        '<span>Software </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("softwareEdit")) +
-        "</span>"
-      );
+      return '<span>Software </span><span class="grey-title">- ' + this.getStorageLabel("softwareEdit") + "</span>";
     }
     splitted = value.split("ject/", 2);
     if (splitted[0] == "/dashboard/edit-pro") {
-      return (
-        '<span>Proyectos </span><span class="grey-title">- ' +
-        JSON.parse(localStorage.getItem("proyectoEdit")) +
-        "</span>"
-      );
+      return '<span>Proyectos </span><span class="grey-title">- ' + this.getStorageLabel("proyectoEdit") + "</span>";
     }
     splitted = value.split("board/", 2);
     if (splitted[0] == "/dash") {
@@ -211,17 +186,13 @@ export class CommonService {
     return "";
   }
 
-  setEndSession(value) {
-    localStorage.setItem("sessionEnd", value);
-  }
+  reset = false;
 
-  reset;
-
-  setReset(value) {
+  setReset(value: boolean): void {
     this.reset = value;
   }
 
-  getReset() {
+  getReset(): boolean {
     return this.reset;
   }
 }

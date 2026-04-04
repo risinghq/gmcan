@@ -12,7 +12,8 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Autor } from "@app/shared/models/autores";
-import { Publicacion } from "@app/shared/models/publicacion";
+import { createPublicacion } from "@app/shared/models/factories";
+import type { Publicacion } from "@app/shared/models/publicacion";
 import { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
@@ -27,6 +28,37 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
+
+interface AuthorOption {
+  idAutor?: number | string | null;
+  DNI?: string | null;
+  nombre?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  foto?: string;
+  isPrincipal?: number | boolean;
+  isAutor?: boolean;
+  value?: string;
+}
+
+interface AutorFormItem {
+  id: number;
+  idAutor: number | string | null;
+  nombre: string;
+  isAutor?: boolean;
+  DNI?: string | null;
+  myControl: FormControl<string>;
+  filteredOptions?: Observable<AuthorOption[]>;
+}
+
+interface AddPublicacionResponse {
+  status?: number;
+  idPublicacion?: number;
+}
+
+interface AddAuthorResponse {
+  idAutor?: number;
+}
 
 @Component({
   selector: "app-add-article",
@@ -59,12 +91,12 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Guardar artículo";
-  revista: Array<Revista>;
-  autores: Array<Autor>;
-  usuarios: Array<Usuario>;
-  url;
+  revista: Revista[] = [];
+  autores: Autor[] = [];
+  usuarios: Usuario[] = [];
+  url: string;
 
-  selectedUser;
+  selectedUser = "";
 
   constructor(
     public formBuilder: FormBuilder,
@@ -89,42 +121,14 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
       resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
-    this.publicacion = new Publicacion(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      "",
-      null,
-      null,
-      null,
-      null,
-      1,
-      "",
-      "",
-      null,
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      "",
-      "",
-      null,
-      "",
-      null,
-      "",
-    );
+    this.publicacion = createPublicacion();
+    this.publicacion.tipoPublicacion_idTipoPublicacion = 1;
     this.url = GLOBAL.url;
   }
 
-  edit;
+  edit = false;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getRevista();
   }
 
@@ -132,19 +136,19 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     return this.publicacionForm.dirty;
   }
 
-  myControl = new FormControl();
-  options: Array<any> = [];
-  filteredOptions: Observable<any>;
+  myControl = new FormControl<string>("", { nonNullable: true });
+  options: AuthorOption[] = [];
+  filteredOptions!: Observable<AuthorOption[]>;
 
-  private _filter(value): any {
+  private _filter(value: string): AuthorOption[] {
     const filterValue = value.toLowerCase();
-    return this.options.filter((option) => option.nombre.toLowerCase().includes(filterValue));
+    return this.options.filter((option: AuthorOption) => (option.nombre ?? "").toLowerCase().includes(filterValue));
   }
 
-  openEraser() {}
+  openEraser(): void {}
 
-  getRevista() {
-    this._revistaService.getRevistas().subscribe((result) => {
+  getRevista(): void {
+    this._revistaService.getRevistas().subscribe((result: Revista[]) => {
       if (result) {
         this.revista = result;
         this.getUsuarios();
@@ -152,35 +156,39 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getAutores() {
-    this._autorService.getAutor().subscribe((result) => {
+  getAutores(): void {
+    this._autorService.getAutor().subscribe((result: Autor[]) => {
       if (result) {
-        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        result.sort((a: Autor, b: Autor) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
+        );
         this.autores = result;
         for (let index = 0; index < this.autores.length; index++) {
           this.options.push(this.autores[index]);
         }
         this.filteredOptions = this.myControl.valueChanges.pipe(
           startWith(""),
-          map((value) => this._filter(value)),
+          map((value: string) => this._filter(value)),
         );
         this.setFilters();
       }
     });
   }
 
-  getUsuarios() {
-    this._usuarioService.getUsuarios().subscribe((result) => {
+  getUsuarios(): void {
+    this._usuarioService.getUsuarios().subscribe((result: Usuario[]) => {
       if (result) {
-        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        result.sort((a: Usuario, b: Usuario) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
+        );
         this.usuarios = result;
         for (let index = 0; index < this.usuarios.length; index++) {
           this.usuarios[index].nombre =
-            this.usuarios[index].nombre +
+            (this.usuarios[index].nombre ?? "") +
             " " +
-            this.usuarios[index].apellidoPaterno +
+            (this.usuarios[index].apellidoPaterno ?? "") +
             " " +
-            this.usuarios[index].apellidoMaterno;
+            (this.usuarios[index].apellidoMaterno ?? "");
           this.options.push(this.usuarios[index]);
         }
         this.getAutores();
@@ -188,19 +196,22 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  selectedUsers = [];
+  selectedUsers: AuthorOption[] = [];
 
-  selectUser(evento, value) {
-    if (value == 1) {
-      this.myControl.setValue(evento.nombre);
-      if (this.selectedUsers.length != 0) {
+  selectUser(evento: AuthorOption, value: number): void {
+    if (value === 1) {
+      this.myControl.setValue(evento.nombre ?? "");
+      if (this.selectedUsers.length !== 0) {
         this.selectedUsers[0] = evento;
       } else {
         this.selectedUsers.push(evento);
       }
     } else {
-      let index = this.options.findIndex((option) => option.nombre === evento.value);
-      if (this.selectedUsers.length != 0) {
+      const index = this.options.findIndex((option: AuthorOption) => option.nombre === evento.value);
+      if (index === -1) {
+        return;
+      }
+      if (this.selectedUsers.length !== 0) {
         this.selectedUsers[0] = this.options[index];
       } else {
         this.selectedUsers.push(this.options[index]);
@@ -208,38 +219,38 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  otrosAutores: any[] = [
+  otrosAutores: AutorFormItem[] = [
     {
       id: 1,
-      idAutor: "",
+      idAutor: null,
       nombre: "",
       isAutor: true,
-      myControl: new FormControl(),
+      myControl: new FormControl<string>("", { nonNullable: true }),
     },
   ];
 
-  setFilters() {
+  setFilters(): void {
     for (let index = 0; index < this.otrosAutores.length; index++) {
       this.otrosAutores[index].filteredOptions = this.otrosAutores[index].myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this._filter(value)),
+        map((value: string) => this._filter(value)),
       );
     }
   }
 
-  addAnotherAuthor() {
+  addAnotherAuthor(): void {
     this.otrosAutores.push({
       id: this.otrosAutores.length + 1,
-      idAutor: "",
+      idAutor: null,
       nombre: "",
       isAutor: true,
-      myControl: new FormControl(),
+      myControl: new FormControl<string>("", { nonNullable: true }),
     });
     this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
       this.otrosAutores.length - 1
     ].myControl.valueChanges.pipe(
       startWith(""),
-      map((value) => this._filter(value)),
+      map((value: string) => this._filter(value)),
     );
   }
 
@@ -254,54 +265,57 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectUserAutor(evento, value, i) {
-    if (value == 1) {
+  selectUserAutor(evento: AuthorOption, value: number, i: number): void {
+    if (value === 1) {
       if (evento.idAutor) {
         this.otrosAutores[i].idAutor = evento.idAutor;
       } else {
-        this.otrosAutores[i].idAutor = evento.DNI;
+        this.otrosAutores[i].idAutor = evento.DNI ?? "";
         this.otrosAutores[i].isAutor = false;
       }
-      this.otrosAutores[i].nombre = evento.nombre;
+      this.otrosAutores[i].nombre = evento.nombre ?? "";
     } else {
-      let index = this.options.findIndex((option) => option.nombre === evento.value);
+      const index = this.options.findIndex((option: AuthorOption) => option.nombre === evento.value);
+      if (index === -1) {
+        return;
+      }
       if (this.options[index].idAutor) {
         this.otrosAutores[i].idAutor = this.options[index].idAutor;
       } else {
-        this.otrosAutores[i].idAutor = this.options[index].DNI;
+        this.otrosAutores[i].idAutor = this.options[index].DNI ?? "";
         this.otrosAutores[i].isAutor = false;
       }
-      this.otrosAutores[i].nombre = this.options[index].nombre;
+      this.otrosAutores[i].nombre = this.options[index].nombre ?? "";
     }
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Publicación agregada exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Publicación agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  submitArticle() {
+  submitArticle(): void {
     this.revisarValues();
     if (this.publicacionForm.valid && this.selectedUser) {
-      const momentDate = new Date(this.publicacion.fechaPublicacionDate); // Replace event.value with your date value
+      const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date()); // Replace event.value with your date value
       const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.publicacion.fechaPublicacion = formattedDate;
-      this._publicacionService.addPublicacion(this.publicacion).subscribe((result) => {
-        if (result.status == 1) {
+      this._publicacionService.addPublicacion(this.publicacion).subscribe((result: AddPublicacionResponse) => {
+        if (result.status === 1 && result.idPublicacion != null) {
           if (this.fileData) {
-            this._publicacionService.uploadPublicacionFile(this.fileData, result.idPublicacion).subscribe((res) => {});
+            this._publicacionService.uploadPublicacionFile(this.fileData, result.idPublicacion).subscribe(() => {});
           }
           if (this.selectedUsers.length > 0) {
             this.setAutores(this.selectedUsers[0], 0, result.idPublicacion);
           } else {
-            let autorNuevo = { nombre: this.selectedUser };
+            const autorNuevo: AuthorOption = { nombre: this.selectedUser };
             this.setAutores(autorNuevo, 0, result.idPublicacion);
           }
           for (let index = 0; index < this.otrosAutores.length; index++) {
@@ -315,68 +329,70 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  setAutores(autor, isPrincipal, idPublicacion) {
+  setAutores(autor: AuthorOption | AutorFormItem, isPrincipal: number, idPublicacion: number): void {
     if (autor.nombre) {
-      if (autor.idAutor == "" || (!autor.idAutor && !autor.DNI)) {
-        let newAuthor = { nombre: autor.nombre };
-        this._autorService.addAuthor(newAuthor).subscribe((res) => {
+      if (autor.idAutor == null || autor.idAutor === "" || (!autor.idAutor && !autor.DNI)) {
+        const newAuthor = { nombre: autor.nombre };
+        this._autorService.addAuthor(newAuthor).subscribe((res: AddAuthorResponse) => {
           if (res) {
-            let autorPublicacion = {
+            const autorPublicacion = {
               autor_idAutor: res.idAutor,
               publicacion_idPublicacion: idPublicacion,
               isPrincipal: isPrincipal,
             };
-            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(() => {});
           }
         });
       } else if (autor.idAutor) {
         if (autor.isAutor) {
-          let autorPublicacion = {
-            autor_idAutor: autor.idAutor,
+          const autorPublicacion = {
+            autor_idAutor: Number(autor.idAutor ?? 0),
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
-        } else if (autor.isAutor == undefined) {
-          let autorPublicacion = {
-            autor_idAutor: autor.idAutor,
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(() => {});
+        } else if (autor.isAutor === undefined) {
+          const autorPublicacion = {
+            autor_idAutor: Number(autor.idAutor ?? 0),
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe((res) => {});
+          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(() => {});
         } else {
-          let usuarioPublicacion = {
-            usuario_DNI: autor.idAutor,
+          const usuarioPublicacion = {
+            usuario_DNI: String(autor.idAutor),
             publicacion_idPublicacion: idPublicacion,
             isPrincipal: isPrincipal,
           };
-          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
+          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(() => {});
         }
       } else if (autor.DNI) {
-        let usuarioPublicacion = {
+        const usuarioPublicacion = {
           usuario_DNI: autor.DNI,
           publicacion_idPublicacion: idPublicacion,
           isPrincipal: isPrincipal,
         };
-        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe((res) => {});
+        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(() => {});
       }
     }
   }
 
-  revisarValues() {
+  revisarValues(): void {
     for (let index = 0; index < this.otrosAutores.length; index++) {
-      let found = this.options.findIndex((option) => option.nombre === this.otrosAutores[index].nombre);
-      if (found == -1) {
+      const found = this.options.findIndex((option: AuthorOption) => option.nombre === this.otrosAutores[index].nombre);
+      if (found === -1) {
         this.otrosAutores[index].idAutor = null;
         this.otrosAutores[index].isAutor = true;
       }
     }
     for (let index = 0; index < this.selectedUsers.length; index++) {
-      let found = this.options.findIndex((option) => option.nombre === this.selectedUsers[index].nombre);
-      if (found == -1) {
+      const found = this.options.findIndex(
+        (option: AuthorOption) => option.nombre === this.selectedUsers[index].nombre,
+      );
+      if (found === -1) {
         if (this.selectedUsers[index].idAutor) {
           this.selectedUsers[index].idAutor = null;
-        } else if (this.selectedUser[index].DNI) {
+        } else if (this.selectedUsers[index].DNI) {
           this.selectedUsers[index].DNI = null;
         }
       }
@@ -386,11 +402,12 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  fileData: File = null;
-  previewUrl: any = null;
-  fileUploadProgress: string = null;
-  uploadedFilePath: string = null;
-  fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];
+  fileData: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  fileUploadProgress: string | null = null;
+  uploadedFilePath: string | null = null;
+  fileProgress(fileInput: Event): void {
+    const input = fileInput.target as HTMLInputElement;
+    this.fileData = input.files?.[0] ?? null;
   }
 }

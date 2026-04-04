@@ -25,6 +25,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
 import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
+import { TabStateService } from "@app/shared/services/tab-state.service";
 import { TipoTesisService } from "@app/shared/services/tipotesis.service";
 import { UniversidadService } from "@app/shared/services/universidad.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
@@ -57,12 +58,12 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 export default class TesisComponent implements OnInit {
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
   displayedColumns2: string[] = ["nombre"];
-  dataSource: MatTableDataSource<Publicacion>;
-  dataSource2: MatTableDataSource<Universidad>;
-  tesis: Array<Publicacion>;
-  url;
+  dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
+  dataSource2: MatTableDataSource<Universidad> = new MatTableDataSource<Universidad>([]);
+  tesis: Publicacion[] = [];
+  url: string;
 
-  universidades: Array<Universidad>;
+  universidades: Universidad[] = [];
 
   constructor(
     public _router: Router,
@@ -75,36 +76,41 @@ export default class TesisComponent implements OnInit {
     private _usuarioService: UsuarioService,
     private _autorService: AutorService,
     private _tipoTesisService: TipoTesisService,
+    private _tabState: TabStateService,
   ) {
     this.url = GLOBAL.url;
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  @ViewChild(MatPaginator, { static: true }) paginator2: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort2: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort2!: MatSort;
 
-  selectedTab;
+  selectedTab = 0;
 
-  ngOnInit() {
-    this.selectedTab = sessionStorage.getItem("oldThesis");
+  ngOnInit(): void {
+    this.selectedTab = this._tabState.thesisTab();
     this.getUniversidad();
     this.getThesis();
   }
 
-  getThesis() {
-    this._publicacionService.getPublicaciones(2).subscribe((res) => {
+  getThesis(): void {
+    this._publicacionService.getPublicaciones(2).subscribe((res: Publicacion[]) => {
       if (res) {
-        res.sort((a, b) =>
-          a.fechaPublicacion < b.fechaPublicacion ? 1 : b.fechaPublicacion < a.fechaPublicacion ? -1 : 0,
+        res.sort((a: Publicacion, b: Publicacion) =>
+          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
+            ? 1
+            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
+              ? -1
+              : 0,
         );
         this.tesis = res;
         for (let index = 0; index < this.tesis.length; index++) {
-          var d = new Date(this.tesis[index].fechaPublicacion);
+          const d = new Date(this.tesis[index].fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.tesis[index].fecha = this.datePipe.transform(d, "MMMM, y", "es");
-          this.tesis[index].fecha = this.titlecasePipe.transform(this.tesis[index].fecha);
+          this.tesis[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+          this.tesis[index].fecha = this.titlecasePipe.transform(this.tesis[index].fecha ?? "");
           this.tesis[index].usuario = [];
           this.tesis[index].autor = [];
           this.getThesisUsers(this.tesis[index]);
@@ -119,61 +125,73 @@ export default class TesisComponent implements OnInit {
     });
   }
 
-  getTipoThesis(publicacion) {
-    this._tipoTesisService.getTipoTesis(publicacion.tipoTesis_idTipoTesis).subscribe((res) => {
-      if (res) {
-        publicacion.tipoTesis = res[0].nombre;
+  getTipoThesis(publicacion: Publicacion): void {
+    this._tipoTesisService.getTipoTesis(publicacion.tipoTesis_idTipoTesis ?? 0).subscribe((res: unknown) => {
+      const data = res as { nombre?: string }[];
+      if (data) {
+        publicacion.tipoTesis = data[0]?.nombre ?? "";
       }
     });
   }
 
-  getThesisUsers(publicacion) {
-    this._publicacionhasusuarioService.getPublicacionHasUsuario(publicacion.idPublicacion).subscribe((res) => {
-      if (res) {
-        for (let index = 0; index < res.length; index++) {
-          this.getUsuario(res[index].usuario_DNI, publicacion);
+  getThesisUsers(publicacion: Publicacion): void {
+    this._publicacionhasusuarioService
+      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
+      .subscribe((res: { usuario_DNI?: string }[]) => {
+        if (res) {
+          for (let index = 0; index < res.length; index++) {
+            this.getUsuario(res[index].usuario_DNI ?? "", publicacion);
+          }
         }
+      });
+  }
+
+  getSpeUniversidad(publicacion: Publicacion): void {
+    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: unknown) => {
+      const data = res as { nombre?: string }[];
+      if (data) {
+        publicacion.universidad = data[0]?.nombre ?? "";
       }
     });
   }
 
-  getSpeUniversidad(publicacion) {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad).subscribe((res) => {
-      if (res) {
-        publicacion.universidad = res[0].nombre;
-      }
-    });
-  }
-
-  getUsuario(idUser, publicacion) {
-    this._usuarioService.getUser(idUser).subscribe((res) => {
-      if (res[0] != undefined) {
-        res[0].nombreCompleto = res[0].nombre + " " + res[0].apellidoPaterno + " " + res[0].apellidoMaterno;
-        publicacion.usuario.push(res[0]);
-      }
-    });
-  }
-
-  getThesisAuthors(publicacion) {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion).subscribe((res) => {
-      if (res) {
-        for (let index = 0; index < res.length; index++) {
-          this.getAuthor(res[index].autores_idAutor, publicacion);
+  getUsuario(idUser: string, publicacion: Publicacion): void {
+    this._usuarioService
+      .getUser(idUser)
+      .subscribe((res: { nombre?: string; apellidoPaterno?: string; apellidoMaterno?: string }[]) => {
+        if (res[0] != undefined) {
+          const usuario = {
+            ...res[0],
+            nombreCompleto:
+              `${res[0].nombre ?? ""} ${res[0].apellidoPaterno ?? ""} ${res[0].apellidoMaterno ?? ""}`.trim(),
+          };
+          publicacion.usuario?.push(usuario);
         }
-      }
-    });
+      });
   }
 
-  getAuthor(idAuthor, publicacion) {
-    this._autorService.getAuthor(idAuthor).subscribe((res) => {
+  getThesisAuthors(publicacion: Publicacion): void {
+    this._publicacionhasautorService
+      .getPublicacionHasAutor(publicacion.idPublicacion ?? 0)
+      .subscribe((res: { autores_idAutor?: number }[]) => {
+        if (res) {
+          for (let index = 0; index < res.length; index++) {
+            this.getAuthor(res[index].autores_idAutor ?? 0, publicacion);
+          }
+        }
+      });
+  }
+
+  getAuthor(idAuthor: number, publicacion: Publicacion): void {
+    this._autorService.getAuthor(idAuthor).subscribe((res: unknown[]) => {
       if (res[0] != undefined) {
-        publicacion.autor.push(res[0]);
+        publicacion.autor?.push(res[0]);
       }
     });
   }
 
-  getUniversidad() {
-    this._universidadService.getUniversidades().subscribe((res) => {
+  getUniversidad(): void {
+    this._universidadService.getUniversidades().subscribe((res: Universidad[]) => {
       if (res) {
         this.universidades = res;
         this.dataSource2 = new MatTableDataSource(this.universidades);
@@ -183,7 +201,7 @@ export default class TesisComponent implements OnInit {
     });
   }
 
-  displayedNotFound;
+  displayedNotFound = false;
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -198,7 +216,7 @@ export default class TesisComponent implements OnInit {
     }
   }
 
-  displayedNotFound2;
+  displayedNotFound2 = false;
 
   applyFilter2(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -213,25 +231,25 @@ export default class TesisComponent implements OnInit {
     }
   }
 
-  changedTab(event) {
-    sessionStorage.setItem("oldThesis", event);
+  changedTab(event: number): void {
+    this._tabState.thesisTab.set(event);
   }
 
-  addThesis() {
+  addThesis(): void {
     localStorage.setItem("thesis-back", "tesis");
     this._router.navigate(["dashboard/add-thesis"]);
   }
 
-  editThesis(id) {
+  editThesis(id: number): void {
     localStorage.setItem("thesis-back", "tesis");
     this._router.navigate(["dashboard/edit-thesis/" + id]);
   }
 
-  addUniversidad() {
+  addUniversidad(): void {
     this._router.navigate(["dashboard/add-universidad"]);
   }
 
-  editUniversidad(idUniversidad) {
+  editUniversidad(idUniversidad: number): void {
     this._router.navigate(["dashboard/edit-universidad/" + idUniversidad]);
   }
 }

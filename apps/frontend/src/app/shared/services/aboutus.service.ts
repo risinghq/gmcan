@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,17 +10,21 @@ import { GLOBAL } from "./global";
 export class AboutUsService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getAboutUsInfo(): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
     if (this.languagelocal == "es") {
       return this.http.get(this.url + "sobrenosotros/get-sobrenosotros", { headers: headers });
     } else {
@@ -27,7 +32,7 @@ export class AboutUsService {
     }
   }
 
-  updateDescripcion(sobrenosotros): any {
+  updateDescripcion(sobrenosotros: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -36,7 +41,7 @@ export class AboutUsService {
     });
   }
 
-  updateObjetivos(sobrenosotros): any {
+  updateObjetivos(sobrenosotros: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -45,7 +50,7 @@ export class AboutUsService {
     });
   }
 
-  updateServicios(sobrenosotros): any {
+  updateServicios(sobrenosotros: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -54,7 +59,7 @@ export class AboutUsService {
     });
   }
 
-  uploadGrupoFoto(fileData, id) {
+  uploadGrupoFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});

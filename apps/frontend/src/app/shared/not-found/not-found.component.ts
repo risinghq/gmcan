@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
   selector: "app-not-found",
@@ -7,17 +8,20 @@ import { Router } from "@angular/router";
   styleUrls: ["./not-found.component.scss"],
 })
 export default class NotFoundComponent implements OnInit {
-  button_text;
-  dashboard;
-  constructor(public _router: Router) {}
+  button_text = "";
+  dashboard = false;
+  constructor(
+    public _router: Router,
+    private _session: SessionService,
+  ) {}
 
-  language;
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  language: any = {};
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     this.setTexts();
   }
 
-  setTexts() {
+  setTexts(): void {
     if (window.location.href.includes("dashboard")) {
       this.button_text = "Volver al dashboard";
       this.dashboard = true;
@@ -26,7 +30,7 @@ export default class NotFoundComponent implements OnInit {
     }
   }
 
-  navigate() {
+  navigate(): void {
     if (this.dashboard) {
       this._router.navigate(["/dashboard"]);
     } else {

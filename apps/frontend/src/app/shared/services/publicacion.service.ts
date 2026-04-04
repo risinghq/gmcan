@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,10 +10,15 @@ import { GLOBAL } from "./global";
 export class PublicacionService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getPublicacion(): any {
@@ -26,7 +32,7 @@ export class PublicacionService {
     }
   }
 
-  getPublicaciones(idTipoPublicacion): any {
+  getPublicaciones(idTipoPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -41,7 +47,7 @@ export class PublicacionService {
     }
   }
 
-  getPublication(idPublicacion): any {
+  getPublication(idPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -56,7 +62,7 @@ export class PublicacionService {
     }
   }
 
-  getPublicacionesCiudad(idCiudad): any {
+  getPublicacionesCiudad(idCiudad: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -71,7 +77,7 @@ export class PublicacionService {
     }
   }
 
-  getPublicacionesEvento(idEvento): any {
+  getPublicacionesEvento(idEvento: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -86,7 +92,7 @@ export class PublicacionService {
     }
   }
 
-  getPublicacionesUniversidad(idUniversidad): any {
+  getPublicacionesUniversidad(idUniversidad: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -101,7 +107,7 @@ export class PublicacionService {
     }
   }
 
-  getPublicacionesRevista(idRevista): any {
+  getPublicacionesRevista(idRevista: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -116,7 +122,7 @@ export class PublicacionService {
     }
   }
 
-  addPublicacion(publicacion): any {
+  addPublicacion(publicacion: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -125,7 +131,7 @@ export class PublicacionService {
     });
   }
 
-  updatePublicacion(publicacion): any {
+  updatePublicacion(publicacion: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -134,7 +140,7 @@ export class PublicacionService {
     });
   }
 
-  deletePublicacion(idPublicacion): any {
+  deletePublicacion(idPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -143,7 +149,7 @@ export class PublicacionService {
     });
   }
 
-  uploadPublicacionFile(fileData, id) {
+  uploadPublicacionFile(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("file", fileData, fileData.name);
     let headers = new HttpHeaders({});

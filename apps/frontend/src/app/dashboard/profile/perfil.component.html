@@ -122,7 +122,7 @@
                     name="tipoMiembro_idTipoMiembro"
                   >
                     <mat-option [value]="tipoMiembro.idTipoMiembro" *ngFor="let tipoMiembro of tipoMiembros">{{
-                      tipoMiembro.nombreSingular
+                      tipoMiembro.nombre
                     }}</mat-option>
                   </mat-select>
                 </mat-form-field>
@@ -206,7 +206,7 @@
         </div>
         <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional en español <span>({{ member.resumenPro.length }}/500)</span>
+            Resumen profesional en español <span>({{ member.resumenPro?.length ?? 0 }}/500)</span>
           </div>
           <textarea
             [(ngModel)]="member.resumenPro"
@@ -219,7 +219,7 @@
         </div>
         <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional en inglés <span>({{ member.resumenProEN.length }}/500)</span>
+            Resumen profesional en inglés <span>({{ member.resumenProEN?.length ?? 0 }}/500)</span>
           </div>
           <textarea
             [(ngModel)]="member.resumenProEN"

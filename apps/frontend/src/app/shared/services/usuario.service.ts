@@ -4,6 +4,7 @@ import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 
 import { GLOBAL } from "./global";
+import { SessionService } from "./session.service";
 
 export interface ResetTokenData {
   token: string;
@@ -27,7 +28,10 @@ export class UsuarioService {
   public url: string;
   private readonly USER_KEY = "user";
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
   }
 
@@ -45,7 +49,7 @@ export class UsuarioService {
 
   logout(): void {
     localStorage.removeItem(this.USER_KEY);
-    localStorage.removeItem("grupoInfo");
+    this._session.clearGrupoInfo();
   }
 
   verifyResetToken(data: ResetTokenData): Observable<ApiResponse> {

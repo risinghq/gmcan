@@ -10,10 +10,11 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { createProyecto } from "@app/shared/models/factories";
 import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
-import { lineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
 import { Moneda } from "@app/shared/models/moneda";
-import { Proyecto } from "@app/shared/models/proyecto";
+import type { Proyecto } from "@app/shared/models/proyecto";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
@@ -25,6 +26,26 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 import { AutosizeModule } from "ngx-autosize";
+
+interface UserOption {
+  DNI?: string | null;
+  nombre?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  foto?: string;
+}
+
+interface AutorProyectoItem {
+  id: number;
+  DNI: string | null;
+  nombre: string;
+  isAutor: boolean;
+}
+
+interface AddProyectoResponse {
+  status?: number;
+  idProyecto?: number;
+}
 
 @Component({
   selector: "app-add-proyecto",
@@ -54,15 +75,15 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   terminado = false;
   edit = false;
   button_text = "Guardar proyecto";
-  usuarios: Array<Usuario>;
-  lineasInvestigacion: Array<lineasInvestigacion>;
-  fuentesFinaciamiento: Array<FuenteFinanciamiento>;
+  usuarios: Usuario[] = [];
+  lineasInvestigacion: LineasInvestigacion[] = [];
+  fuentesFinaciamiento: FuenteFinanciamiento[] = [];
   proyecto: Proyecto;
   proyectoForm: FormGroup;
-  monedas: Array<Moneda>;
-  url;
+  monedas: Moneda[] = [];
+  url: string;
 
-  disableSelect;
+  disableSelect = false;
   openEraser() {}
   projectEnd() {}
 
@@ -92,34 +113,11 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
       montoFinanciado: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaFin: [""],
     });
-    this.proyecto = new Proyecto(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      1,
-      null,
-      null,
-      "",
-      null,
-      null,
-      "",
-      null,
-      null,
-      null,
-      null,
-      "",
-      null,
-      null,
-    );
+    this.proyecto = createProyecto();
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getLineaInvestigacion();
   }
 
@@ -127,8 +125,8 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     return this.proyectoForm.dirty;
   }
 
-  getLineaInvestigacion() {
-    this._lineaInvestigacionService.getLineasInvestigacion().subscribe((result) => {
+  getLineaInvestigacion(): void {
+    this._lineaInvestigacionService.getLineasInvestigacion().subscribe((result: LineasInvestigacion[]) => {
       if (result) {
         this.lineasInvestigacion = result;
         this.getFuenteFinanciamiento();
@@ -136,8 +134,8 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getFuenteFinanciamiento() {
-    this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result) => {
+  getFuenteFinanciamiento(): void {
+    this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result: FuenteFinanciamiento[]) => {
       if (result) {
         this.fuentesFinaciamiento = result;
         this.getMoneda();
@@ -145,8 +143,8 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getMoneda() {
-    this._monedaService.getMonedas().subscribe((result) => {
+  getMoneda(): void {
+    this._monedaService.getMonedas().subscribe((result: Moneda[]) => {
       if (result) {
         this.monedas = result;
         this.getUsuarios();
@@ -154,51 +152,53 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  options: Array<any> = [];
+  options: UserOption[] = [];
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Proyecto agregado exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Proyecto agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  getUsuarios() {
-    this._usuarioService.getUsuarios().subscribe((result) => {
+  getUsuarios(): void {
+    this._usuarioService.getUsuarios().subscribe((result: Usuario[]) => {
       if (result) {
-        result.sort((a, b) => (a.nombre > b.nombre ? 1 : b.nombre > a.nombre ? -1 : 0));
+        result.sort((a: Usuario, b: Usuario) =>
+          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
+        );
         this.usuarios = result;
         for (let index = 0; index < this.usuarios.length; index++) {
           this.usuarios[index].nombre =
-            this.usuarios[index].nombre +
+            (this.usuarios[index].nombre ?? "") +
             " " +
-            this.usuarios[index].apellidoPaterno +
+            (this.usuarios[index].apellidoPaterno ?? "") +
             " " +
-            this.usuarios[index].apellidoMaterno;
+            (this.usuarios[index].apellidoMaterno ?? "");
           this.options.push(this.usuarios[index]);
         }
       }
     });
   }
 
-  otrosAutores: any[] = [
+  otrosAutores: AutorProyectoItem[] = [
     {
       id: 1,
-      DNI: "",
+      DNI: null,
       nombre: "",
       isAutor: true,
     },
   ];
 
-  addAnotherAuthor() {
+  addAnotherAuthor(): void {
     this.otrosAutores.push({
       id: this.otrosAutores.length + 1,
-      DNI: "",
+      DNI: null,
       nombre: "",
       isAutor: true,
     });
@@ -215,38 +215,43 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectUserAutor(evento, value, i) {
+  selectUserAutor(evento: UserOption | { value?: string }, value: number, i: number): void {
     if (value == 1) {
-      if (evento.DNI) {
-        this.otrosAutores[i].DNI = evento.DNI;
+      const selected = evento as UserOption;
+      if (selected.DNI) {
+        this.otrosAutores[i].DNI = selected.DNI;
       } else {
-        this.otrosAutores[i].DNI = evento.DNI;
+        this.otrosAutores[i].DNI = selected.DNI ?? null;
         this.otrosAutores[i].isAutor = false;
       }
-      this.otrosAutores[i].nombre = evento.nombre;
+      this.otrosAutores[i].nombre = selected.nombre ?? "";
     } else {
-      let index = this.options.findIndex((option) => option.nombre === evento.value);
+      const typedEvent = evento as { value?: string };
+      const index = this.options.findIndex((option: UserOption) => option.nombre === typedEvent.value);
+      if (index === -1) {
+        return;
+      }
       if (this.options[index].DNI) {
-        this.otrosAutores[i].DNI = this.options[index].DNI;
+        this.otrosAutores[i].DNI = this.options[index].DNI ?? null;
       } else {
-        this.otrosAutores[i].DNI = this.options[index].DNI;
+        this.otrosAutores[i].DNI = this.options[index].DNI ?? null;
         this.otrosAutores[i].isAutor = false;
       }
-      this.otrosAutores[i].nombre = this.options[index].nombre;
+      this.otrosAutores[i].nombre = this.options[index].nombre ?? "";
     }
   }
 
-  submitProyecto() {
+  submitProyecto(): void {
     this.revisarValues();
     if (this.proyectoForm.valid && this.otrosAutores.length > 0 && this.otrosAutores[0].nombre != "") {
-      const momentDate = new Date(this.proyecto.fechaInicio); // Replace event.value with your date value
+      const momentDate = new Date(this.proyecto.fechaInicio ?? new Date());
       const formattedDate = new Date(momentDate).toLocaleDateString("sv");
       this.proyecto.fechaI = formattedDate;
-      this.proyecto.fechaF = null;
-      this._proyectoService.addProyecto(this.proyecto).subscribe((result) => {
+      this.proyecto.fechaF = undefined;
+      this._proyectoService.addProyecto(this.proyecto).subscribe((result: AddProyectoResponse) => {
         if (result.status == 1) {
           for (let index = 0; index < this.otrosAutores.length; index++) {
-            this.setAutores(this.otrosAutores[index], result.idProyecto);
+            this.setAutores(this.otrosAutores[index], result.idProyecto ?? 0);
           }
           this.proyectoForm.markAsPristine();
           this.return();
@@ -256,14 +261,14 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  setAutores(autor, idProyecto) {
-    let usuarioPublicacion = { usuario_DNI: autor.DNI, proyecto_idProyecto: idProyecto };
-    this._usuariohasproyecto.addUsuarioProyecto(usuarioPublicacion).subscribe((res) => {});
+  setAutores(autor: AutorProyectoItem, idProyecto: number): void {
+    const usuarioPublicacion = { usuario_DNI: autor.DNI ?? "", proyecto_idProyecto: idProyecto };
+    this._usuariohasproyecto.addUsuarioProyecto(usuarioPublicacion).subscribe((_res: unknown) => {});
   }
 
-  revisarValues() {
+  revisarValues(): void {
     for (let index = 0; index < this.otrosAutores.length; index++) {
-      let found = this.options.findIndex((option) => option.nombre === this.otrosAutores[index].nombre);
+      const found = this.options.findIndex((option: UserOption) => option.nombre === this.otrosAutores[index].nombre);
       if (found == -1) {
         this.otrosAutores[index].DNI = null;
         this.otrosAutores[index].isAutor = true;

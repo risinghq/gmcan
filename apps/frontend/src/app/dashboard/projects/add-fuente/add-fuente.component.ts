@@ -5,7 +5,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
+import type { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -29,7 +29,7 @@ export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {
     private _snackBar: MatSnackBar,
     private _fuenteFinanciamientoService: FuenteFinanciamientoService,
   ) {
-    this.fuente = new FuenteFinanciamiento(null, "");
+    this.fuente = { idFuenteFinanciamiento: 0, nombre: "" };
     this.fuenteForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
@@ -41,12 +41,12 @@ export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {
     return this.fuenteForm.dirty;
   }
 
-  notCanDo;
+  notCanDo = false;
   openEraser() {}
-  edit;
+  edit = false;
 
-  submitFuente() {
-    this._fuenteFinanciamientoService.addFuenteFinanciamiento(this.fuente).subscribe((result) => {
+  submitFuente(): void {
+    this._fuenteFinanciamientoService.addFuenteFinanciamiento(this.fuente).subscribe((result: { status?: number }) => {
       if (result.status == 1) {
         this.fuenteForm.markAsPristine();
         this.return();
@@ -55,12 +55,12 @@ export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
-  openSnackBar() {
-    this._snackBar.open("Fuente agregada exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Fuente agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

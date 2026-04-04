@@ -1,6 +1,4 @@
-export class Revista {
-  constructor(
-    public idRevista: Number,
-    public nombre: String,
-  ) {}
+export interface Revista {
+  idRevista?: number;
+  nombre?: string;
 }

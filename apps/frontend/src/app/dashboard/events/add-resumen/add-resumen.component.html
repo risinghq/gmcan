@@ -23,7 +23,7 @@
         <div class="flex-news mt-8">
           <div class="full-width mr-32">
             <div class="text-category">Evento <span class="red-text">*</span></div>
-            <mat-form-field class="input-category" floatLabel="never">
+            <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar evento</mat-label>
               <mat-select
                 [(ngModel)]="publicacion.evento_idEvento"
@@ -39,7 +39,7 @@
           <div class="full-width">
             <div class="full-width">
               <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
-              <mat-form-field class="input-category" floatLabel="never">
+              <mat-form-field class="input-category" floatLabel="auto">
                 <mat-label>Seleccionar fecha</mat-label>
                 <input
                   matInput
@@ -72,7 +72,7 @@
             el mismo formato en que se escriben los nombres en un artículo científico
           </div>
           <div class="mt-16 relative">
-            <mat-form-field class="input-category width-normal" floatLabel="never">
+            <mat-form-field class="input-category width-normal" floatLabel="auto">
               <input
                 class="text-autocomplete"
                 type="text"
@@ -139,7 +139,7 @@
               *ngFor="let otroAutor of otrosAutores; let i = index"
               style="width: max-content"
             >
-              <mat-form-field class="input-category width-normal" floatLabel="never">
+              <mat-form-field class="input-category width-normal" floatLabel="auto">
                 <input
                   class="text-autocomplete"
                   type="text"

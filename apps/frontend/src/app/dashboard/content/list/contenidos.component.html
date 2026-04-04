@@ -1,6 +1,6 @@
 <mat-tab-group class="noticias-div" [(selectedIndex)]="selectedTab" (selectedIndexChange)="changedTab($event)">
   <mat-tab label="¿Quiénes Somos?">
-    <div *ngIf="selectedTab == '0'">
+    <div *ngIf="selectedTab === 0">
       <div class="title mb-16">Descripción del grupo</div>
       <form [formGroup]="descripcionForm">
         <div class="mb-24">
@@ -119,7 +119,7 @@
     </div>
   </mat-tab>
   <mat-tab label="Líneas de investigación">
-    <div *ngIf="selectedTab == '1'">
+    <div *ngIf="selectedTab === 1">
       <div class="flex-news mb-16">
         <div class="search-news">
           <input class="input-search-text" (keyup)="applyFilter($event)" placeholder="Buscar línea por nombre" />
@@ -145,7 +145,7 @@
     </div>
   </mat-tab>
   <mat-tab label="Métodos">
-    <div *ngIf="selectedTab == '2'">
+    <div *ngIf="selectedTab === 2">
       <div class="flex-news mb-16">
         <div class="search-news">
           <input class="input-search-text" (keyup)="applyFilter2($event)" placeholder="Buscar línea por nombre" />
@@ -171,7 +171,7 @@
     </div>
   </mat-tab>
   <mat-tab label="Facilidades y recursos">
-    <div *ngIf="selectedTab == '3'">
+    <div *ngIf="selectedTab === 3">
       <div class="title mb-16">Descripción de las facilidades y recursos</div>
       <form [formGroup]="facilidadesRecursosForm">
         <div class="mb-24">
@@ -279,7 +279,7 @@
     </div>
   </mat-tab>
   <mat-tab label="Trabajos futuros">
-    <form [formGroup]="trabajosFuturosForm" *ngIf="selectedTab == '4'">
+    <form [formGroup]="trabajosFuturosForm" *ngIf="selectedTab === 4">
       <div class="full-width mb-24">
         <div class="flex-news">
           <div class="text-category">Descripción en español <span class="red-text">*</span></div>
@@ -310,7 +310,7 @@
     </form>
   </mat-tab>
   <mat-tab label="Otros">
-    <div *ngIf="selectedTab == '5'">
+    <div *ngIf="selectedTab === 5">
       <form [formGroup]="footerForm">
         <div class="flex-news">
           <div class="mb-24 mr-32 full-width">

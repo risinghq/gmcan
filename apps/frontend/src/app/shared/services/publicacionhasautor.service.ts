@@ -13,7 +13,7 @@ export class PublicacionHasAutorService {
     this.url = GLOBAL.url;
   }
 
-  getPublicacionHasAutor(idPublicacion): any {
+  getPublicacionHasAutor(idPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -22,7 +22,7 @@ export class PublicacionHasAutorService {
     });
   }
 
-  searchPublicacionHasAutor(id): any {
+  searchPublicacionHasAutor(id: number): any {
     let body = { autores_idAutor: id };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export class PublicacionHasAutorService {
     });
   }
 
-  addPublicacionHasAutor(autorPublicacion): any {
+  addPublicacionHasAutor(autorPublicacion: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -41,7 +41,7 @@ export class PublicacionHasAutorService {
     });
   }
 
-  deletePublicacionHasAutor(idAutorPublicacion): any {
+  deletePublicacionHasAutor(idAutorPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

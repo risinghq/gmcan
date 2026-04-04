@@ -13,7 +13,7 @@ export class PublicacionHasUsuarioService {
     this.url = GLOBAL.url;
   }
 
-  getPublicacionHasUsuario(idPublicacion): any {
+  getPublicacionHasUsuario(idPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -22,7 +22,7 @@ export class PublicacionHasUsuarioService {
     });
   }
 
-  searchPublicacionHasUsuario(DNI): any {
+  searchPublicacionHasUsuario(DNI: string): any {
     let body = { usuario_DNI: DNI };
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
@@ -32,7 +32,7 @@ export class PublicacionHasUsuarioService {
     });
   }
 
-  addPublicacionHasUsuario(autorPublicacion): any {
+  addPublicacionHasUsuario(autorPublicacion: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -41,7 +41,7 @@ export class PublicacionHasUsuarioService {
     });
   }
 
-  deletePublicacionHasUsuario(idAutorPublicacion): any {
+  deletePublicacionHasUsuario(idAutorPublicacion: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

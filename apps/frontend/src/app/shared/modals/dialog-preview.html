@@ -20,8 +20,8 @@
           {{noticia.usuario.nombre}} {{noticia.usuario.apellidoPaterno}} {{noticia.usuario.apellidoMaterno}}
         </div>
         <div class="news-date">
-          {{language.detailNewsText[0].written1}} {{dia}} {{language.detailNewsText[0].written2}} {{mes}}
-          {{language.detailNewsText[0].written3}} {{anio}}
+          {{language?.detailNewsText?.[0]?.written1}} {{dia}} {{language?.detailNewsText?.[0]?.written2}} {{mes}}
+          {{language?.detailNewsText?.[0]?.written3}} {{anio}}
         </div>
       </div>
     </div>

@@ -15,7 +15,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Universidad } from "@app/shared/models/universidad";
+import type { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -42,7 +42,7 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     private _universidadService: UniversidadService,
     private _publicacionService: PublicacionService,
   ) {
-    this.universidad = new Universidad(null, "", "", null, null);
+    this.universidad = { idUniversidad: 0, nombre: "", nombreEN: "" };
     this.universidadForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -53,36 +53,37 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     return this.universidadForm.dirty;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.getUniversidad();
   }
 
-  notCanDo;
+  notCanDo = false;
 
-  getUniversidad() {
+  getUniversidad(): void {
     this._route.params.forEach((params: Params) => {
-      let idUniversidad = params["id"];
-      this._universidadService.getUniversidad(idUniversidad).subscribe((result) => {
-        if (result) {
-          this.universidad = result[0];
-          localStorage.setItem("universidadEdit", JSON.stringify(this.universidad.nombre));
+      const idUniversidad = Number(params["id"] ?? 0);
+      this._universidadService.getUniversidad(idUniversidad).subscribe((result: unknown) => {
+        const universidades = result as Universidad[];
+        if (universidades) {
+          this.universidad = universidades[0];
+          localStorage.setItem("universidadEdit", JSON.stringify(this.universidad.nombre ?? ""));
           this.getPublicacionUniversidad(idUniversidad);
         }
       });
     });
   }
 
-  getPublicacionUniversidad(idUniversidad) {
-    this._publicacionService.getPublicacionesUniversidad(idUniversidad).subscribe((result) => {
-      if (result.length == 0) {
+  getPublicacionUniversidad(idUniversidad: number): void {
+    this._publicacionService.getPublicacionesUniversidad(idUniversidad).subscribe((result: unknown[]) => {
+      if (result.length === 0) {
         this.notCanDo = true;
       }
     });
   }
 
-  submitUniversidad() {
-    this._universidadService.updateUniversidad(this.universidad).subscribe((result) => {
-      if (result.status == 1) {
+  submitUniversidad(): void {
+    this._universidadService.updateUniversidad(this.universidad).subscribe((result: { status?: number }) => {
+      if (result.status === 1) {
         this.universidadForm.markAsPristine();
         this.return();
         this.openSnackBar("Universidad actualizada exitosamente");
@@ -90,21 +91,21 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     });
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/tesis"]);
   }
 
-  openSnackBar(value) {
-    this._snackBar.open(value, null, {
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  private dialogRef2: MatDialogRef<DialogErase4>;
+  private dialogRef2?: MatDialogRef<DialogErase4>;
 
-  openEraser() {
+  openEraser(): void {
     if (this.notCanDo) {
       this.dialogRef2 = this.dialog.open(DialogErase4, {
         width: "530px",
@@ -116,7 +117,7 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
           yes: "No, cancelar",
         },
       });
-      this.dialogRef2.afterClosed().subscribe((result) => {
+      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
           this.eraseNews();
         }
@@ -124,17 +125,19 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     }
   }
 
-  eraseNews() {
+  eraseNews(): void {
     if (this.notCanDo) {
-      this._universidadService.deleteUniversidad(this.universidad.idUniversidad).subscribe((result) => {
-        if (result.status == 1) {
-          this.universidadForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Universidad eliminada exitosamente");
-        } else {
-          this.openSnackBar("Hubo un problema al eliminar");
-        }
-      });
+      this._universidadService
+        .deleteUniversidad(this.universidad.idUniversidad ?? 0)
+        .subscribe((result: { status?: number }) => {
+          if (result.status === 1) {
+            this.universidadForm.markAsPristine();
+            this.return();
+            this.openSnackBar("Universidad eliminada exitosamente");
+          } else {
+            this.openSnackBar("Hubo un problema al eliminar");
+          }
+        });
     }
   }
 }

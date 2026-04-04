@@ -1,7 +1,5 @@
-export class TipoNoticia {
-  constructor(
-    public idtipoNoticia: Number,
-    public nombre: String,
-    public nombreEN: String,
-  ) {}
+export interface TipoNoticia {
+  idtipoNoticia?: number;
+  nombre?: string;
+  nombreEN?: string;
 }

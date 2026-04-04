@@ -23,6 +23,16 @@ import { PrefijoService } from "@app/shared/services/prefijo.service";
 import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
+interface TipoMiembroOption {
+  idTipoMiembro?: number;
+  nombreSingular?: string;
+}
+
+interface PrefijoOption {
+  idPrefijo?: number;
+  nombre?: string;
+}
+
 @Component({
   selector: "app-miembros",
   templateUrl: "./miembros.component.html",
@@ -47,9 +57,9 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 })
 export default class MiembrosComponent implements OnInit {
   displayedColumns: string[] = ["nombre", "apellidoPaterno", "apellidoMaterno", "grado", "cargo", "correo"];
-  miembros: Array<UsuarioFull>;
-  dataSource: MatTableDataSource<UsuarioFull>;
-  url;
+  miembros: UsuarioFull[] = [];
+  dataSource = new MatTableDataSource<UsuarioFull>([]);
+  url: string;
   constructor(
     public _usuarioService: UsuarioService,
     public _tipoMiembroService: TipoMiembroService,
@@ -59,15 +69,14 @@ export default class MiembrosComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit() {
-    this.miembros = [];
+  ngOnInit(): void {
     this.obtainingValue();
   }
-  canAdd;
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  canAdd = false;
+  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort!: MatSort;
 
-  obtainingValue() {
+  obtainingValue(): void {
     if (window.location.href.includes("activos")) {
       localStorage.setItem("active-member", "1");
       this.getMiembrosActivos(1);
@@ -80,11 +89,15 @@ export default class MiembrosComponent implements OnInit {
     }
   }
 
-  getMiembrosActivos(value) {
-    this._usuarioService.getUsersActive(value).subscribe((res) => {
+  getMiembrosActivos(value: number): void {
+    this._usuarioService.getUsersActive(String(value)).subscribe((res: UsuarioFull[]) => {
       if (res.length > 0) {
-        res.sort((a, b) =>
-          a.apellidoPaterno < b.apellidoPaterno ? 1 : b.apellidoPaterno < a.apellidoPaterno ? -1 : 0,
+        res.sort((a: UsuarioFull, b: UsuarioFull) =>
+          (a.apellidoPaterno ?? "") < (b.apellidoPaterno ?? "")
+            ? 1
+            : (b.apellidoPaterno ?? "") < (a.apellidoPaterno ?? "")
+              ? -1
+              : 0,
         );
         for (let index = 0; index < res.length; index++) {
           this.miembros.push(res[index]);
@@ -100,30 +113,30 @@ export default class MiembrosComponent implements OnInit {
     });
   }
 
-  getCargo(miembro) {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res) => {
+  getCargo(miembro: UsuarioFull): void {
+    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembroOption[]) => {
       if (res) {
-        let index = res.findIndex((x) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
+        const index = res.findIndex((x: TipoMiembroOption) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
         if (index != -1) {
-          miembro.tipoMiembro = res[index].nombreSingular;
+          miembro.tipoMiembro = res[index].nombreSingular ?? "";
         }
       }
     });
   }
 
-  getGrado(miembro) {
-    this._prefijoService.getPrefijos().subscribe((res) => {
+  getGrado(miembro: UsuarioFull): void {
+    this._prefijoService.getPrefijos().subscribe((res: PrefijoOption[]) => {
       if (res) {
-        let index = res.findIndex((x) => x.idPrefijo === miembro.prefijo_idPrefijo);
+        const index = res.findIndex((x: PrefijoOption) => x.idPrefijo === miembro.prefijo_idPrefijo);
         if (index != -1) {
-          miembro.prefijo = res[index].nombre;
+          miembro.prefijo = res[index].nombre ?? "";
         }
       }
     });
   }
 
-  displayedNotFound;
-  applyFilter(event: Event) {
+  displayedNotFound = false;
+  applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
     if (this.dataSource.paginator) {
@@ -136,12 +149,12 @@ export default class MiembrosComponent implements OnInit {
     }
   }
 
-  addMember() {
+  addMember(): void {
     this._router.navigate(["dashboard/add-member"]);
   }
 
-  editMember(id) {
-    let user = this._usuarioService.getUserLogged();
+  editMember(id: string): void {
+    const user = this._usuarioService.getUserLogged();
     if (user.DNI == id) {
       this._router.navigate(["dashboard/perfil"]);
     } else {

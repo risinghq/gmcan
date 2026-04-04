@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,10 +10,15 @@ import { GLOBAL } from "./global";
 export class NoticiaService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
   }
 
   getNoticias(): any {
@@ -26,7 +32,7 @@ export class NoticiaService {
     }
   }
 
-  getNoticia(idNoticia) {
+  getNoticia(idNoticia: number) {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -37,7 +43,7 @@ export class NoticiaService {
     }
   }
 
-  getNoticiaTipo(idTipo): any {
+  getNoticiaTipo(idTipo: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -48,7 +54,7 @@ export class NoticiaService {
     }
   }
 
-  getNoticiaUsuario(idUsuario): any {
+  getNoticiaUsuario(idUsuario: string): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -63,35 +69,35 @@ export class NoticiaService {
     }
   }
 
-  addNews(noticia): any {
+  addNews(noticia: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.post(this.url + "noticia/post-noticia", noticia, { headers });
   }
 
-  uploadNoticiaFoto(fileData, id) {
+  uploadNoticiaFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
     return this.http.put(this.url + "noticia/upload-noticia-file/" + id, formData, { headers });
   }
 
-  getNoticiaFull(idNoticia): any {
+  getNoticiaFull(idNoticia: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.get(this.url + "noticia/get-noticiafull/" + idNoticia, { headers: headers });
   }
 
-  updateNoticia(noticia): any {
+  updateNoticia(noticia: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.put(this.url + "noticia/update-noticia", noticia, { headers });
   }
 
-  deleteNoticia(idNoticia): any {
+  deleteNoticia(idNoticia: number): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

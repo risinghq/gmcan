@@ -1,12 +1,15 @@
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class PreviousPageService {
-  language = JSON.parse(localStorage.getItem("language"));
-  getPreviousPage(param) {
-    if (this.language.locale == "es") {
+  constructor(private _session: SessionService) {}
+
+  getPreviousPage(param: string): string {
+    const locale = this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+    if (locale == "es") {
       if (param && param.includes("search")) {
         return "Resultados de Búsqueda";
       }

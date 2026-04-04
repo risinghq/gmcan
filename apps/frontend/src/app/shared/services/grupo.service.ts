@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,14 +10,15 @@ import { GLOBAL } from "./global";
 export class GrupoService {
   public url: string;
 
-  languagelocal;
-  constructor(public http: HttpClient) {
+  private get languagelocal(): string {
+    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+  }
+
+  constructor(
+    public http: HttpClient,
+    private _session: SessionService,
+  ) {
     this.url = GLOBAL.url;
-    if (JSON.parse(localStorage.getItem("language"))) {
-      this.languagelocal = JSON.parse(localStorage.getItem("language")).locale;
-    } else {
-      this.languagelocal = "es";
-    }
   }
 
   getGrupoInfo(): any {
@@ -29,10 +31,7 @@ export class GrupoService {
       return this.http.get(this.url + "grupo/get-grupo-en", { headers: headers });
     }
   }
-  getGrupoImage(imageFile) {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
+  getGrupoImage(imageFile: string) {
     return this.http.get(this.url + "grupo/get-image-grupo/" + imageFile, { responseType: "text" });
   }
 
@@ -43,7 +42,7 @@ export class GrupoService {
     return this.http.get(this.url + "grupo/get-grupo-facilidades", { headers: headers });
   }
 
-  updateRecursos(facilidades): any {
+  updateRecursos(facilidades: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -52,7 +51,7 @@ export class GrupoService {
     });
   }
 
-  uploadFacilidadesFoto(fileData, id): any {
+  uploadFacilidadesFoto(fileData: File, id: number): any {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
@@ -66,7 +65,7 @@ export class GrupoService {
     return this.http.get(this.url + "grupo/get-grupo-trabajosfuturos", { headers: headers });
   }
 
-  updateTrabajosFuturos(trabajos): any {
+  updateTrabajosFuturos(trabajos: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -75,28 +74,28 @@ export class GrupoService {
     });
   }
 
-  uploadHeaderLogo(fileData, id): any {
+  uploadHeaderLogo(fileData: File, id: number): any {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
     return this.http.put(this.url + "grupo/upload-grupo-header/" + id, formData, { headers });
   }
 
-  uploadFooterLogo(fileData, id): any {
+  uploadFooterLogo(fileData: File, id: number): any {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
     return this.http.put(this.url + "grupo/upload-grupo-footer/" + id, formData, { headers });
   }
 
-  updateSeccionInfo(grupo): any {
+  updateSeccionInfo(grupo: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
     return this.http.put(this.url + "grupo/update-grupo-info", grupo, { headers: headers });
   }
 
-  updateSeccionPresentacion(grupo): any {
+  updateSeccionPresentacion(grupo: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -105,7 +104,7 @@ export class GrupoService {
     });
   }
 
-  updateSeccionPublicaciones(seccionpublicaciones): any {
+  updateSeccionPublicaciones(seccionpublicaciones: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });
@@ -114,7 +113,7 @@ export class GrupoService {
     });
   }
 
-  updateSeccionProyectos(seccionproyectos): any {
+  updateSeccionProyectos(seccionproyectos: unknown): any {
     let headers = new HttpHeaders({
       "Content-Type": "application/json",
     });

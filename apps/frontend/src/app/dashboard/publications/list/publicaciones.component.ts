@@ -6,7 +6,5 @@ import { Component, OnInit } from "@angular/core";
   styleUrls: ["./publicaciones.component.scss"],
 })
 export default class PublicacionesComponent implements OnInit {
-  constructor() {}
-
   ngOnInit() {}
 }

@@ -7,7 +7,8 @@ import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/mat
 import { MatToolbar } from "@angular/material/toolbar";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
-import { Grupo } from "@app/shared/models/grupo";
+import { createGrupo } from "@app/shared/models/factories";
+import type { Grupo } from "@app/shared/models/grupo";
 import { Languages } from "@app/shared/models/languages";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
@@ -39,11 +40,11 @@ import { SessionService } from "@app/shared/services/session.service";
 export default class LandingComponent implements OnInit {
   screenWidth: number;
   public grupoinfo: Grupo;
-  public url;
+  public url: string;
   enteredButton = false;
   isMatMenuOpen = false;
-  prevButtonTrigger;
-  language;
+  prevButtonTrigger = false;
+  language: any;
   public searchGlobalForm: FormGroup;
   public searchGlobalForm2: FormGroup;
   constructor(
@@ -63,97 +64,72 @@ export default class LandingComponent implements OnInit {
       nombre1: [""],
     });
     this.language = Languages[this.lanSelected];
-    if (JSON.parse(localStorage.getItem("lanId"))) {
-      this.language = Languages[JSON.parse(localStorage.getItem("lanId"))];
-      this.lanSelected = JSON.parse(localStorage.getItem("lanId"));
+    const storedLanId = this.session.getLanguageId();
+    if (storedLanId) {
+      this.language = Languages[storedLanId];
+      this.lanSelected = storedLanId;
     }
     this.url = GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
-    this.grupoinfo = new Grupo(
-      null,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      null,
-      null,
-    );
+    this.grupoinfo = createGrupo();
   }
 
   @HostListener("window:resize", ["$event"])
-  onResize(event) {
+  onResize(_event: Event): void {
     this.screenWidth = window.innerWidth;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.titleService.setTitle("GMCAN | UNMSM");
     this.getGrupoInfo();
-    localStorage.setItem("language", JSON.stringify(this.language));
+    this.session.setLanguageData(this.language);
   }
 
   lanSelected = 0;
 
-  lanSelect(number) {
+  lanSelect(number: number): void {
     this.lanSelected = number;
-    localStorage.setItem("language", JSON.stringify(Languages[this.lanSelected]));
-    localStorage.setItem("lanId", JSON.stringify(number));
+    this.session.setLanguageData(Languages[this.lanSelected]);
+    this.session.setLanguageId(number);
     window.location.reload();
   }
 
-  getGrupoInfo() {
-    this._grupoService.getGrupoInfo().subscribe((res) => {
+  getGrupoInfo(): void {
+    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
       this.grupoinfo = res[0];
-      localStorage.setItem("grupoInfo", JSON.stringify(this.grupoinfo));
+      this.session.setGrupoInfo(this.grupoinfo);
       this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
       this.grupoinfo.logoFooter = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoFooter;
     });
   }
   inputExpand = false;
-  expandInput() {
+  expandInput(): void {
     this.inputExpand = !this.inputExpand;
     if (this.inputExpand) {
-      document.getElementById("inputExpand").setAttribute("class", "search-top-input search-top-input-decompressed");
-      document.getElementById("formExpand").setAttribute("class", "full-width");
+      document.getElementById("inputExpand")?.setAttribute("class", "search-top-input search-top-input-decompressed");
+      document.getElementById("formExpand")?.setAttribute("class", "full-width");
     } else {
-      document.getElementById("inputExpand").setAttribute("class", "search-top-input search-top-input-compressed");
-      document.getElementById("formExpand").setAttribute("class", "");
+      document.getElementById("inputExpand")?.setAttribute("class", "search-top-input search-top-input-compressed");
+      document.getElementById("formExpand")?.setAttribute("class", "");
     }
   }
 
   /* globalSearch */
 
-  searchGlobal(value) {
+  searchGlobal(value: string): void {
     window.location.href = "/home/search/" + value;
   }
 
-  loginLink() {
+  loginLink(): void {
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/login"]);
   }
 
-  scroll() {
-    let el = document.getElementById("main-toolbar");
-    el.scrollIntoView({ behavior: "smooth" });
+  scroll(): void {
+    const el = document.getElementById("main-toolbar");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }
 }

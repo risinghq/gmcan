@@ -6,7 +6,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Proyecto } from "@app/shared/models/proyecto";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
@@ -16,6 +16,7 @@ import { LineasInvestigacionService } from "@app/shared/services/lineasinvestiga
 import { MonedaService } from "@app/shared/services/moneda.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
 import { SearchService } from "@app/shared/services/search.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 import {
@@ -48,12 +49,12 @@ import {
   ],
 })
 export default class ProjectsComponent implements OnInit {
-  public proyectos: Array<Proyecto>;
-  public tipoProyectos: Array<String>;
-  allCharged;
+  public proyectos: Proyecto[] = [];
+  public tipoProyectos: string[] = [];
+  allCharged: boolean | null = false;
   public searchForm: FormGroup;
-  public url;
-  infoText;
+  public url: string = GLOBAL.url;
+  infoText = "";
 
   constructor(
     public fb: FormBuilder,
@@ -70,24 +71,25 @@ export default class ProjectsComponent implements OnInit {
     public _fuenteFinanciamientoService: FuenteFinanciamientoService,
     public _monedaService: MonedaService,
     public _grupoService: GrupoService,
+    private _session: SessionService,
     private titleService: Title,
   ) {
     this.searchForm = this.fb.group({
       titulo: [""],
     });
   }
-  language;
-  public page;
-  public pageSize;
-  screenWidth;
-  searchText;
+  language: any = {};
+  public page = 1;
+  public pageSize = 5;
+  screenWidth = 0;
+  searchText = "";
   @HostListener("window:resize", ["$event"])
-  onResize(event) {
+  onResize(_event: Event): void {
     this.screenWidth = window.innerWidth;
     this.setSearchText();
   }
-  ngOnInit() {
-    this.language = JSON.parse(localStorage.getItem("language"));
+  ngOnInit(): void {
+    this.language = this._session.getLanguageData<any>() ?? {};
     this.titleService.setTitle("GMCAN | " + this.language.projects);
     this.screenWidth = window.innerWidth;
     this.url = GLOBAL.url;
@@ -99,22 +101,22 @@ export default class ProjectsComponent implements OnInit {
     this.getGrupo();
   }
 
-  ngDoCheck() {
+  ngDoCheck(): void {
     if (this.tipoProyectos) {
       this.tipoProyectos[0] = this.language.projectsText[0].projectsType1;
       this.tipoProyectos[1] = this.language.projectsText[0].projectsType2;
     }
   }
 
-  getGrupo() {
-    this._grupoService.getGrupoInfo().subscribe((res) => {
+  getGrupo(): void {
+    this._grupoService.getGrupoInfo().subscribe((res: any[]) => {
       if (res.length > 0) {
         this.infoText = res[0].seccionProyectos;
       }
     });
   }
 
-  setSearchText() {
+  setSearchText(): void {
     this.searchText = this.language.projectsText[0].placeholderMobile;
     if (this.screenWidth > 960) {
       this.searchText = this.language.projectsText[0].placeholder;
@@ -122,7 +124,7 @@ export default class ProjectsComponent implements OnInit {
   }
 
   /* Request Publicaciones at Tab Change */
-  changeTab($event) {
+  changeTab($event: { index: number }): void {
     let estado = 0;
     if ($event.index == 0) {
       estado = 1;
@@ -132,16 +134,19 @@ export default class ProjectsComponent implements OnInit {
     this.getProyectos(estado);
   }
 
-  scroll() {
-    let el = document.getElementById("main-toolbar");
-    el.scrollIntoView({ behavior: "smooth" });
+  scroll(): void {
+    const el = document.getElementById("main-toolbar");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }
 
-  getProyectos(estado) {
-    this._proyectoServices.getProyectos(estado).subscribe((res) => {
+  getProyectos(estado: number): void {
+    this._proyectoServices.getProyectos(estado).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.fechaInicio < b.fechaInicio ? 1 : b.fechaInicio < a.fechaInicio ? -1 : 0));
-        this.tipoProyectos = [];
+        res.sort((a: Proyecto, b: Proyecto) =>
+          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
+        );
         this.proyectos = res;
         this.tipoProyectos.push(this.language.projectsText[0].projectsType1);
         this.tipoProyectos.push(this.language.projectsText[0].projectsType2);
@@ -153,8 +158,8 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  getLineasInvestigacion(idLinea, index) {
-    this._lineasInvestigacionServices.getLineaInvestigacion(idLinea).subscribe((res) => {
+  getLineasInvestigacion(idLinea: number, index: number): void {
+    this._lineasInvestigacionServices.getLineaInvestigacion(idLinea).subscribe((res: any[]) => {
       if (res.length > 0) {
         if (this.proyectos[index] != undefined) {
           this.proyectos[index].lineasInvestigacion = res[0].nombre;
@@ -162,59 +167,65 @@ export default class ProjectsComponent implements OnInit {
       }
     });
   }
-  selectedItem;
-  oldValue;
+  selectedItem = -1;
+  oldValue = -1;
 
-  listClick(event, newValue) {
+  listClick(_event: Event, newValue: number): void {
     this.oldValue = this.selectedItem;
     this.selectedItem = newValue;
-    document.getElementById("abstract" + newValue).innerText = this.language.projectsText[0].seeLess;
+    const current = document.getElementById("abstract" + newValue);
+    if (current) {
+      current.innerText = this.language.projectsText[0].seeLess;
+    }
     if (this.selectedItem == this.oldValue) {
       this.selectedItem = -1;
-      document.getElementById("abstract" + this.oldValue).innerText = this.language.projectsText[0].seeMore;
+      const previous = document.getElementById("abstract" + this.oldValue);
+      if (previous) {
+        previous.innerText = this.language.projectsText[0].seeMore;
+      }
     }
   }
 
   /* Fill proyecto data */
 
-  fillProyecto(proyecto, index) {
-    var d = new Date(proyecto.fechaInicio);
+  fillProyecto(proyecto: Proyecto, index: number): void {
+    let d = new Date(proyecto.fechaInicio ?? new Date());
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es");
-    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI);
+    proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es") ?? undefined;
+    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
     proyecto.usuario = [];
     if (proyecto.fechaFin) {
       d = new Date(proyecto.fechaFin);
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es");
-      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF);
+      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es") ?? undefined;
+      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF ?? "");
     }
-    this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion, index);
+    this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion ?? 0, index);
     this.getUsuarioHasProyecto(proyecto);
     this.getFuenteFinanciamiento(proyecto);
     this.getMoneda(proyecto);
   }
 
-  getFuenteFinanciamiento(proyecto) {
+  getFuenteFinanciamiento(proyecto: Proyecto): void {
     this._fuenteFinanciamientoService
-      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento)
-      .subscribe((res) => {
+      .getFuenteFinanciamiento(proyecto.fuenteFinanciamiento_idFuenteFinanciamiento ?? 0)
+      .subscribe((res: any[]) => {
         if (res.length > 0) {
           proyecto.fuenteFinanciamiento = res[0].nombre;
         }
       });
   }
 
-  getMoneda(proyecto) {
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda).subscribe((res) => {
+  getMoneda(proyecto: Proyecto): void {
+    this._monedaService.getMoneda(proyecto.moneda_idMoneda ?? 0).subscribe((res: any[]) => {
       if (res.length > 0) {
         proyecto.moneda = res[0].simbolo;
       }
     });
   }
 
-  getUsuarioHasProyecto(proyecto) {
-    this._usuarioHasProyectoService.getUsuarioHasProyectos(proyecto.idProyecto).subscribe((res) => {
+  getUsuarioHasProyecto(proyecto: Proyecto): void {
+    this._usuarioHasProyectoService.getUsuarioHasProyectos(proyecto.idProyecto ?? 0).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getUsuario(res[index].usuario_DNI, proyecto);
@@ -223,10 +234,10 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  getUsuario(idUsuario, proyecto) {
-    this._usuarioService.getUser(idUsuario).subscribe((res) => {
+  getUsuario(idUsuario: string, proyecto: Proyecto): void {
+    this._usuarioService.getUser(idUsuario).subscribe((res: any[]) => {
       if (res) {
-        if (proyecto.usuario.findIndex((x) => x.DNI === res[0].DNI) == -1) {
+        if (proyecto.usuario?.findIndex((x: any) => x.DNI === res[0].DNI) == -1) {
           res[0].nombre = res[0].nombre.slice(0, 1) + ".";
           proyecto.usuario.push(res[0]);
           this.fillName(proyecto);
@@ -235,9 +246,12 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  fillName(obj) {
+  fillName(obj: Proyecto): void {
+    if (!obj.usuario) {
+      return;
+    }
     for (let index = 0; index < obj.usuario.length; index++) {
-      let first = obj.usuario[index].nombre.split(" ");
+      const first = (obj.usuario[index].nombre ?? "").split(" ");
       if (index == obj.usuario.length - 1) {
         obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
       } else {
@@ -246,19 +260,22 @@ export default class ProjectsComponent implements OnInit {
     }
   }
 
-  profile(user) {
+  profile(user: { DNI?: string }): void {
+    if (!user.DNI) {
+      return;
+    }
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
 
   /* Search Methods */
 
-  getProyectoLinea(idLineaInvestigacion, estado) {
-    this._proyectoServices.getProyectosLinea(idLineaInvestigacion, estado).subscribe((res) => {
+  getProyectoLinea(idLineaInvestigacion: number, estado: number): void {
+    this._proyectoServices.getProyectosLinea(idLineaInvestigacion, estado).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
         if (this.proyectos) {
           for (let index = 0; index < res.length; index++) {
-            if (this.proyectos.findIndex((x) => x.idProyecto === res[index].idProyecto) == -1) {
+            if (this.proyectos.findIndex((x: Proyecto) => x.idProyecto === res[index].idProyecto) == -1) {
               this.proyectos.push(res[index]);
             }
           }
@@ -274,13 +291,15 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  getProyectoId(idProyecto, estado) {
-    this._proyectoServices.getProyectosId(idProyecto, estado).subscribe((res) => {
+  getProyectoId(idProyecto: number, estado: number): void {
+    this._proyectoServices.getProyectosId(idProyecto, estado).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
-        res.sort((a, b) => (a.fechaInicio < b.fechaInicio ? 1 : b.fechaInicio < a.fechaInicio ? -1 : 0));
+        res.sort((a: Proyecto, b: Proyecto) =>
+          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
+        );
         if (this.proyectos) {
           for (let index = 0; index < res.length; index++) {
-            if (this.proyectos.findIndex((x) => x.idProyecto === res[index].idProyecto) == -1) {
+            if (this.proyectos.findIndex((x: Proyecto) => x.idProyecto === res[index].idProyecto) == -1) {
               this.proyectos.push(res[index]);
             }
           }
@@ -296,7 +315,7 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  search(nombre, index) {
+  search(nombre: string, index: number): void {
     this.proyectos = [];
     let estado = 0;
     this.allCharged = null;
@@ -310,8 +329,8 @@ export default class ProjectsComponent implements OnInit {
     }
   }
 
-  searchProyectos(nombre, estado) {
-    this._searchService.searchProyectos(nombre, estado).subscribe((res) => {
+  searchProyectos(nombre: string, estado: number): void {
+    this._searchService.searchProyectos(nombre, estado).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
         this.proyectos = res;
         for (let index = 0; index < this.proyectos.length; index++) {
@@ -326,8 +345,8 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  searchLineasInvestigacion(nombre, estado) {
-    this._searchService.searchLineasInvestigacion(nombre).subscribe((res) => {
+  searchLineasInvestigacion(nombre: string, estado: number): void {
+    this._searchService.searchLineasInvestigacion(nombre).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getProyectoLinea(res[index].idLineasInvestigacion, estado);
@@ -337,8 +356,8 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  searchResponsables(nombre, estado) {
-    this._searchService.searchUsuarios(nombre).subscribe((res) => {
+  searchResponsables(nombre: string, estado: number): void {
+    this._searchService.searchUsuarios(nombre).subscribe((res: any[]) => {
       this.allCharged = true;
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
@@ -348,8 +367,8 @@ export default class ProjectsComponent implements OnInit {
     });
   }
 
-  getUsuarioHasProyectoId(DNI, estado) {
-    this._usuarioHasProyectoService.getUsuarioHasProyecto(DNI).subscribe((res) => {
+  getUsuarioHasProyectoId(DNI: string, estado: number): void {
+    this._usuarioHasProyectoService.getUsuarioHasProyecto(DNI).subscribe((res: any[]) => {
       if (res.length > 0) {
         for (let index = 0; index < res.length; index++) {
           this.getProyectoId(res[index].proyecto_idProyecto, estado);

@@ -1,8 +1,6 @@
-export class Prefijo {
-  constructor(
-    public idPrefijo: Number,
-    public nombre: String,
-    public fechaCreacion: Date,
-    public fechaActualizacion: Date,
-  ) {}
+export interface Prefijo {
+  idPrefijo?: number;
+  nombre?: string;
+  fechaCreacion?: Date;
+  fechaActualizacion?: Date;
 }

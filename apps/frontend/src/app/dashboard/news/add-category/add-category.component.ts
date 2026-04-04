@@ -5,7 +5,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { TipoNoticia } from "@app/shared/models/tiponoticia";
+import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
@@ -20,7 +20,7 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   category: TipoNoticia;
   public categoryForm: FormGroup;
   button_text = "Agregar categoría";
-  notCanDo;
+  notCanDo = false;
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
@@ -33,26 +33,26 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.category = new TipoNoticia(null, "", "");
+    this.category = { idtipoNoticia: 0, nombre: "", nombreEN: "" };
   }
 
   @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
     event.returnValue = false;
   }
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
   isDirty(): boolean {
     return this.categoryForm.dirty;
   }
 
-  return() {
+  return(): void {
     this._router.navigate(["dashboard/noticias"]);
   }
 
-  submitCategory() {
+  submitCategory(): void {
     if (this.categoryForm.valid) {
-      this._tipoNoticiaService.addCategory(this.category).subscribe((result) => {
+      this._tipoNoticiaService.addCategory(this.category).subscribe((result: { status?: number }) => {
         if (result.status == 1) {
           this.categoryForm.markAsPristine();
           this.return();
@@ -62,15 +62,15 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  openSnackBar() {
-    this._snackBar.open("Categoría agregada exitosamente", null, {
+  openSnackBar(): void {
+    this._snackBar.open("Categoría agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
     });
   }
 
-  edit;
+  edit = false;
 
   openEraser() {}
 }

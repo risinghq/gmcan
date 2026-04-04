@@ -123,7 +123,7 @@
                   {{ publicacion.ciudad }}, {{ publicacion.pais }}
                 </div>
               </div>
-              <div class="publication-rev line-1" *ngIf="publicacion.DOI != null && publicacion.DOI != ''">
+              <div class="publication-rev line-1" *ngIf="publicacion.DOI != null">
                 DOI:
                 <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank">{{
                   publicacion.DOI
@@ -378,7 +378,11 @@
             <div class="not-found-1" *ngIf="miembros.length == 0">
               {{ language.noResultsMembers }}
             </div>
-            <div class="flex-news" [ngClass]="{ 'mb-24': i + 1 != miembros.length }" *ngFor="let miembro of miembros">
+            <div
+              class="flex-news"
+              [ngClass]="{ 'mb-24': i + 1 != miembros.length }"
+              *ngFor="let miembro of miembros; let i = index"
+            >
               <div class="miembro-img-div">
                 <img
                   class="member-img"
