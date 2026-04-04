@@ -1,6 +1,6 @@
 import { TitleCasePipe, DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -47,6 +47,23 @@ import {
   ],
 })
 export default class ProjectsComponent implements OnInit {
+  fb = inject(FormBuilder);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  private _proyectoServices = inject(ProyectoService);
+  private _lineasInvestigacionServices = inject(LineasInvestigacionService);
+  private _usuarioHasProyectoService = inject(UsuarioHasProyectoService);
+  private _usuarioService = inject(UsuarioService);
+  location = inject(Location);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _searchService = inject(SearchService);
+  _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  _monedaService = inject(MonedaService);
+  _grupoService = inject(GrupoService);
+  private _session = inject(SessionService);
+  private titleService = inject(Title);
+
   public proyectos: Proyecto[] = [];
   public tipoProyectos: string[] = [];
   allCharged: boolean | null = false;
@@ -54,24 +71,7 @@ export default class ProjectsComponent implements OnInit {
   public url: string = GLOBAL.url;
   infoText = "";
 
-  constructor(
-    public fb: FormBuilder,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    private _proyectoServices: ProyectoService,
-    private _lineasInvestigacionServices: LineasInvestigacionService,
-    private _usuarioHasProyectoService: UsuarioHasProyectoService,
-    private _usuarioService: UsuarioService,
-    public location: Location,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _searchService: SearchService,
-    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    public _monedaService: MonedaService,
-    public _grupoService: GrupoService,
-    private _session: SessionService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.searchForm = this.fb.group({
       titulo: [""],
     });

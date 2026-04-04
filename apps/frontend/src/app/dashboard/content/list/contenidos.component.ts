@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, Inject, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -70,6 +70,20 @@ import { AutosizeModule } from "ngx-autosize";
   ],
 })
 export default class ContenidosComponent implements OnInit {
+  private _aboutService = inject(AboutUsService);
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _commonService = inject(CommonService);
+  private _lineasInvestigaciónService = inject(LineasInvestigacionService);
+  private _metodosService = inject(MethodsService);
+  private _grupoService = inject(GrupoService);
+  private _equipoService = inject(EquipoService);
+  private _softwareService = inject(SoftwareService);
+  private _tabState = inject(TabStateService);
+
   public Editor = ClassicEditor;
   displayedColumns: string[] = ["nombre"];
   displayedColumns2: string[] = ["nombre"];
@@ -93,21 +107,7 @@ export default class ContenidosComponent implements OnInit {
   trabajosFuturos: Grupo;
   informacionExtra: Grupo;
 
-  constructor(
-    private _aboutService: AboutUsService,
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _commonService: CommonService,
-    private _lineasInvestigaciónService: LineasInvestigacionService,
-    private _metodosService: MethodsService,
-    private _grupoService: GrupoService,
-    private _equipoService: EquipoService,
-    private _softwareService: SoftwareService,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.aboutUs = {
       idSobreNosotros: 0,
       quienesSomos: "",
@@ -605,14 +605,14 @@ export default class ContenidosComponent implements OnInit {
   imports: [MatDialogClose],
 })
 export class DialogPreview3 {
+  dialogRef = inject<MatDialogRef<DialogPreview3>>(MatDialogRef);
+  aboutus = inject<SobreNosotros>(MAT_DIALOG_DATA);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+
   url: string;
   language: (typeof Languages)[number] = Languages[0];
-  constructor(
-    public dialogRef: MatDialogRef<DialogPreview3>,
-    @Inject(MAT_DIALOG_DATA) public aboutus: SobreNosotros,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 
@@ -638,14 +638,14 @@ export class DialogPreview3 {
   imports: [MatDialogClose],
 })
 export class DialogPreview6 {
+  dialogRef = inject<MatDialogRef<DialogPreview6>>(MatDialogRef);
+  aboutus = inject<Grupo>(MAT_DIALOG_DATA);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+
   url: string;
   language: (typeof Languages)[number] = Languages[0];
-  constructor(
-    public dialogRef: MatDialogRef<DialogPreview6>,
-    @Inject(MAT_DIALOG_DATA) public aboutus: Grupo,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

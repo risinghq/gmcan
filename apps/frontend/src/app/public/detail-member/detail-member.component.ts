@@ -1,7 +1,7 @@
 import { DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
@@ -49,6 +49,25 @@ import {
   ],
 })
 export default class DetailMemberComponent implements OnInit {
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _usuarioService = inject(UsuarioService);
+  _publicacionAutoresService = inject(PublicacionAutoresService);
+  _publicacionService = inject(PublicacionService);
+  _revistaService = inject(RevistaService);
+  _universidadService = inject(UniversidadService);
+  _previousService = inject(PreviousPageService);
+  _prefijoService = inject(PrefijoService);
+  _tipoMiembroService = inject(TipoMiembroService);
+  _tipoPublicacionService = inject(TipoPublicacionService);
+  _tipotesisService = inject(TipoTesisService);
+  _eventoService = inject(EventoService);
+  private _session = inject(SessionService);
+  location = inject(Location);
+  private titleService = inject(Title);
+
   public usuario: UsuarioFull;
   public publicaciones: Array<Publicacion> = [];
   public tipoPublicaciones: Array<TipoPublicacion> = [];
@@ -58,26 +77,7 @@ export default class DetailMemberComponent implements OnInit {
   public url: string;
   page = 1;
   pageSize = 5;
-  constructor(
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _usuarioService: UsuarioService,
-    public _publicacionAutoresService: PublicacionAutoresService,
-    public _publicacionService: PublicacionService,
-    public _revistaService: RevistaService,
-    public _universidadService: UniversidadService,
-    public _previousService: PreviousPageService,
-    public _prefijoService: PrefijoService,
-    public _tipoMiembroService: TipoMiembroService,
-    public _tipoPublicacionService: TipoPublicacionService,
-    public _tipotesisService: TipoTesisService,
-    public _eventoService: EventoService,
-    private _session: SessionService,
-    public location: Location,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
     this.usuario = createUsuarioFull();
   }

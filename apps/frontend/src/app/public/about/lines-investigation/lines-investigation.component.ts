@@ -1,6 +1,6 @@
 import { TitleCasePipe, DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
@@ -28,6 +28,20 @@ import {
   imports: [NgClass, MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe],
 })
 export default class LinesInvestigationComponent implements OnInit {
+  private _lineasInvestigacionServices = inject(LineasInvestigacionService);
+  private _proyectoServices = inject(ProyectoService);
+  private _usuarioHasProyectoService = inject(UsuarioHasProyectoService);
+  private _usuarioService = inject(UsuarioService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  location = inject(Location);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  _monedaService = inject(MonedaService);
+  private _session = inject(SessionService);
+  private titleService = inject(Title);
+
   language: any = {};
 
   public lineasProyecto: Array<LineasInvestigacion>;
@@ -38,21 +52,7 @@ export default class LinesInvestigationComponent implements OnInit {
   public page2 = 1;
   public pageSize3 = 5;
   public url = GLOBAL.url;
-  constructor(
-    private _lineasInvestigacionServices: LineasInvestigacionService,
-    private _proyectoServices: ProyectoService,
-    private _usuarioHasProyectoService: UsuarioHasProyectoService,
-    private _usuarioService: UsuarioService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public location: Location,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    public _monedaService: MonedaService,
-    private _session: SessionService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.lineasProyecto = [];
     this.lineasProyecto[0] = createLineasInvestigacion();
     this.lineasProyecto[1] = createLineasInvestigacion();

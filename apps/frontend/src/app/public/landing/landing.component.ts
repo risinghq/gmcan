@@ -1,5 +1,5 @@
 import { Location, NgStyle, NgClass } from "@angular/common";
-import { Component, OnInit, Renderer2, HostListener } from "@angular/core";
+import { Component, OnInit, Renderer2, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
@@ -37,6 +37,15 @@ import { SessionService } from "@app/shared/services/session.service";
   ],
 })
 export default class LandingComponent implements OnInit {
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private ren = inject(Renderer2);
+  _grupoService = inject(GrupoService);
+  private session = inject(SessionService);
+  fb = inject(FormBuilder);
+  location = inject(Location);
+  private titleService = inject(Title);
+
   screenWidth: number;
   public grupoinfo: Grupo;
   public url: string;
@@ -46,16 +55,7 @@ export default class LandingComponent implements OnInit {
   language: any;
   public searchGlobalForm: FormGroup;
   public searchGlobalForm2: FormGroup;
-  constructor(
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private ren: Renderer2,
-    public _grupoService: GrupoService,
-    private session: SessionService,
-    public fb: FormBuilder,
-    public location: Location,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.searchGlobalForm = this.fb.group({
       nombre: [""],
     });

@@ -1,14 +1,14 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Observable, tap } from "rxjs";
 
 import { GLOBAL } from "./global";
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-  private readonly USER_KEY = "user";
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private readonly USER_KEY = "user";
 
   login(user: { correo: string; password: string }): Observable<any> {
     return this.http.post<any>(`${GLOBAL.url}usuario/login`, user).pipe(

@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
 import { Title } from "@angular/platform-browser";
 import { Equipo } from "@app/shared/models/equipo";
@@ -18,6 +18,11 @@ import { SoftwareService } from "@app/shared/services/software.service";
   imports: [NgClass, MatChipSet, MatChip],
 })
 export default class FacilitiesComponent implements OnInit {
+  _equipoService = inject(EquipoService);
+  _softwareService = inject(SoftwareService);
+  _grupoService = inject(GrupoService);
+  private titleService = inject(Title);
+
   equipos: Equipo[] = [];
   software: Software[] = [];
   url: string;
@@ -28,12 +33,7 @@ export default class FacilitiesComponent implements OnInit {
 
   public page2 = 1;
 
-  constructor(
-    public _equipoService: EquipoService,
-    public _softwareService: SoftwareService,
-    public _grupoService: GrupoService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
     this.grupo = createGrupo();
   }

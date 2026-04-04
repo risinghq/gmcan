@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { Languages } from "@app/shared/models/languages";
 import { Method } from "@app/shared/models/method";
@@ -12,15 +12,15 @@ import { MethodsService } from "@app/shared/services/methods.service";
   imports: [],
 })
 export default class MethodComponent implements OnInit {
+  _methodService = inject(MethodsService);
+  private titleService = inject(Title);
+
   language: (typeof Languages)[number] = Languages[0];
   url: string;
 
   methods: Method[] = [];
 
-  constructor(
-    public _methodService: MethodsService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

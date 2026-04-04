@@ -1,4 +1,4 @@
-import { Component, Renderer2, HostListener } from "@angular/core";
+import { Component, Renderer2, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { createGrupo } from "@app/shared/models/factories";
@@ -15,6 +15,14 @@ import { SessionService } from "@app/shared/services/session.service";
   imports: [RouterOutlet],
 })
 export default class AppComponent {
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private ren = inject(Renderer2);
+  _grupoService = inject(GrupoService);
+  private session = inject(SessionService);
+  fb = inject(FormBuilder);
+  private router = inject(Router);
+
   screenWidth: number;
   public grupoinfo: Grupo;
   public url: string;
@@ -24,15 +32,7 @@ export default class AppComponent {
   language: (typeof Languages)[number];
   lanSelected = 0;
   public searchGlobalForm: FormGroup;
-  constructor(
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private ren: Renderer2,
-    public _grupoService: GrupoService,
-    private session: SessionService,
-    public fb: FormBuilder,
-    private router: Router,
-  ) {
+  constructor() {
     this.searchGlobalForm = this.fb.group({
       nombre: [""],
     });

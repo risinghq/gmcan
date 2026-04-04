@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -18,6 +18,13 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _equipoService = inject(EquipoService);
+
   equipo: Equipo;
   equipoForm: FormGroup;
   button_text = "Guardar equipo";
@@ -25,14 +32,7 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   edit = false;
   openEraser() {}
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _equipoService: EquipoService,
-  ) {
+  constructor() {
     this.equipo = createEquipo();
     this.equipoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

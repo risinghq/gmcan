@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -17,18 +17,18 @@ import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  _tipoNoticiaService = inject(TipoNoticiaService);
+  private _snackBar = inject(MatSnackBar);
+
   category: TipoNoticia;
   public categoryForm: FormGroup;
   button_text = "Agregar categoría";
   notCanDo = false;
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    public _tipoNoticiaService: TipoNoticiaService,
-    private _snackBar: MatSnackBar,
-  ) {
+  constructor() {
     this.categoryForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

@@ -1,11 +1,11 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class PreviousPageService {
-  constructor(private _session: SessionService) {}
+  private _session = inject(SessionService);
 
   getPreviousPage(param: string): string {
     const locale = this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";

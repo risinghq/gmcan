@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import {
   AbstractControl,
   FormBuilder,
@@ -89,6 +89,19 @@ interface StatusResponse {
   ],
 })
 export default class EditProyectoComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private _snackBar = inject(MatSnackBar);
+  private _usuarioService = inject(UsuarioService);
+  private _lineaInvestigacionService = inject(LineasInvestigacionService);
+  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  private _monedaService = inject(MonedaService);
+  private _proyectoService = inject(ProyectoService);
+  private _usuariohasproyecto = inject(UsuarioHasProyectoService);
+  dialog = inject(MatDialog);
+  private _tabState = inject(TabStateService);
+
   edit = true;
   terminado = false;
   button_text = "Actualizar información";
@@ -101,20 +114,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   monedas: Moneda[] = [];
   url: string;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private _snackBar: MatSnackBar,
-    private _usuarioService: UsuarioService,
-    private _lineaInvestigacionService: LineasInvestigacionService,
-    private _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    private _monedaService: MonedaService,
-    private _proyectoService: ProyectoService,
-    private _usuariohasproyecto: UsuarioHasProyectoService,
-    public dialog: MatDialog,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.proyectoForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       títuloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -470,10 +470,12 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase10 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase10>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase10>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

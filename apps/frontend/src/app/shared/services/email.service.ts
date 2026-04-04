@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 import { GLOBAL } from "./global";
@@ -26,12 +26,14 @@ export interface PasswordResetRequest {
   providedIn: "root",
 })
 export class EmailService {
+  private http = inject(HttpClient);
+
   private readonly url: string;
   private readonly headers = new HttpHeaders({
     "Content-Type": "application/json",
   });
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

@@ -1,5 +1,5 @@
 import { NgClass, AsyncPipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -58,6 +58,16 @@ interface TipoTesisItem {
   ],
 })
 export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private _publicacionService = inject(PublicacionService);
+  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _universidadService = inject(UniversidadService);
+  private _tipotesisService = inject(TipoTesisService);
+
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Guardar tesis";
@@ -72,17 +82,7 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
 
   fileData: File | null = null;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private _publicacionService: PublicacionService,
-    private _publicacionAutoresService: PublicacionAutoresService,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _universidadService: UniversidadService,
-    private _tipotesisService: TipoTesisService,
-  ) {
+  constructor() {
     this.publicacionForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaPublicacionDate: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

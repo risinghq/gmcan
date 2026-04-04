@@ -1,7 +1,7 @@
 import { DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -53,6 +53,26 @@ import {
   ],
 })
 export default class PublicationComponent implements OnInit {
+  fb = inject(FormBuilder);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _previousService = inject(PreviousPageService);
+  _tipoPublicacionService = inject(TipoPublicacionService);
+  _publicacionService = inject(PublicacionService);
+  _revistaService = inject(RevistaService);
+  _publicacionAutoresService = inject(PublicacionAutoresService);
+  _usuarioService = inject(UsuarioService);
+  _universidadService = inject(UniversidadService);
+  _searchService = inject(SearchService);
+  _eventoService = inject(EventoService);
+  _tipotesisService = inject(TipoTesisService);
+  location = inject(Location);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _grupoService = inject(GrupoService);
+  private _session = inject(SessionService);
+  private titleService = inject(Title);
+
   public previouslink: string | null = null;
   public previouspage = "";
   public tipoPublicaciones: TipoPublicacion[];
@@ -65,27 +85,7 @@ export default class PublicationComponent implements OnInit {
   public url: string;
   infoText = "";
 
-  constructor(
-    public fb: FormBuilder,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _previousService: PreviousPageService,
-    public _tipoPublicacionService: TipoPublicacionService,
-    public _publicacionService: PublicacionService,
-    public _revistaService: RevistaService,
-    public _publicacionAutoresService: PublicacionAutoresService,
-    public _usuarioService: UsuarioService,
-    public _universidadService: UniversidadService,
-    public _searchService: SearchService,
-    public _eventoService: EventoService,
-    public _tipotesisService: TipoTesisService,
-    public location: Location,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _grupoService: GrupoService,
-    private _session: SessionService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.tipoPublicaciones = [];
     this.searchForm = this.fb.group({
       titulo: [""],

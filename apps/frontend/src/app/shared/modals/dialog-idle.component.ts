@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, Inject } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import {
   MatDialogActions,
   MatDialogClose,
@@ -16,10 +16,12 @@ import { DialogData } from "@app/shared/models/dialogdata";
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogIdle {
-  constructor(
-    public dialogRef: MatDialogRef<DialogIdle>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogIdle>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

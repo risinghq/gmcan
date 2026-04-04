@@ -1,6 +1,6 @@
 import { TitleCasePipe, DatePipe, NgStyle, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
 import { MatCard } from "@angular/material/card";
@@ -47,6 +47,35 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
   imports: [MatProgressBar, MatButton, NgStyle, MatCard, NgClass, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
+  _grupoService = inject(GrupoService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _searchService = inject(SearchService);
+  _publicacionAutoresService = inject(PublicacionAutoresService);
+  _proyectohasusuarioService = inject(UsuarioHasProyectoService);
+  _usuarioService = inject(UsuarioService);
+  _revistaService = inject(RevistaService);
+  _universidadService = inject(UniversidadService);
+  _lineasInvestigacionServices = inject(LineasInvestigacionService);
+  _proyectoServices = inject(ProyectoService);
+  _tiponoticiaService = inject(TipoNoticiaService);
+  _noticiaService = inject(NoticiaService);
+  _eventoService = inject(EventoService);
+  _tipotesisService = inject(TipoTesisService);
+  _publicacionesService = inject(PublicacionService);
+  _tipoPublicacionService = inject(TipoPublicacionService);
+  fb = inject(FormBuilder);
+  _methodsService = inject(MethodsService);
+  aboutusService = inject(AboutUsService);
+  location = inject(Location);
+  _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  _monedaService = inject(MonedaService);
+  private _session = inject(SessionService);
+  meta = inject(Meta);
+  private titleService = inject(Title);
+
   public info: Grupo;
   public publicaciones: Array<Publicacion>;
   proyectos: Array<Proyecto>;
@@ -59,36 +88,7 @@ export default class HomeComponent implements OnInit {
   public usuarios: Array<Usuario> = [];
   screenWidth: number;
   url;
-  constructor(
-    public _grupoService: GrupoService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _searchService: SearchService,
-    public _publicacionAutoresService: PublicacionAutoresService,
-    public _proyectohasusuarioService: UsuarioHasProyectoService,
-    public _usuarioService: UsuarioService,
-    public _revistaService: RevistaService,
-    public _universidadService: UniversidadService,
-    public _lineasInvestigacionServices: LineasInvestigacionService,
-    public _proyectoServices: ProyectoService,
-    public _tiponoticiaService: TipoNoticiaService,
-    public _noticiaService: NoticiaService,
-    public _eventoService: EventoService,
-    public _tipotesisService: TipoTesisService,
-    public _publicacionesService: PublicacionService,
-    public _tipoPublicacionService: TipoPublicacionService,
-    public fb: FormBuilder,
-    public _methodsService: MethodsService,
-    public aboutusService: AboutUsService,
-    public location: Location,
-    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    public _monedaService: MonedaService,
-    private _session: SessionService,
-    public meta: Meta,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.info = createGrupo();
     this.noticiaPrincipal = createNoticia();
     this.publicaciones = [];

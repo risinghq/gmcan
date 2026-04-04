@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -20,6 +20,13 @@ import { AutosizeModule } from "ngx-autosize";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
 })
 export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _lineaInvestigacionService = inject(LineasInvestigacionService);
+
   button_text = "Guardar línea";
   lineaInvestigacion: LineasInvestigacion;
   public lineaForm: FormGroup;
@@ -29,14 +36,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
   edit = false;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _lineaInvestigacionService: LineasInvestigacionService,
-  ) {
+  constructor() {
     this.lineaForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

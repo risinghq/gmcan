@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -51,6 +51,15 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
   ],
 })
 export default class EventosComponent implements OnInit {
+  _eventosService = inject(EventoService);
+  _router = inject(Router);
+  private _publicacionService = inject(PublicacionService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  private _session = inject(SessionService);
+  private _tabState = inject(TabStateService);
+
   eventos: Evento[] = [];
   resumenes: Publicacion[] = [];
   url: string;
@@ -67,16 +76,7 @@ export default class EventosComponent implements OnInit {
   @ViewChild(MatSort, { static: true }) sort2!: MatSort;
   selectedTab = 0;
 
-  constructor(
-    public _eventosService: EventoService,
-    public _router: Router,
-    private _publicacionService: PublicacionService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    private _publicacionAutoresService: PublicacionAutoresService,
-    private _session: SessionService,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
@@ -11,12 +11,12 @@ import { GrupoService } from "@app/shared/services/grupo.service";
   styleUrls: ["./works.component.scss"],
 })
 export default class WorksComponent implements OnInit {
+  _grupoService = inject(GrupoService);
+  private titleService = inject(Title);
+
   public info: Grupo;
   language: (typeof Languages)[number] = Languages[0];
-  constructor(
-    public _grupoService: GrupoService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.info = createGrupo();
   }
 

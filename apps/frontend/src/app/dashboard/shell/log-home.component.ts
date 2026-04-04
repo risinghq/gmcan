@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -37,6 +37,19 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
   ],
 })
 export default class LogHomeComponent implements OnInit {
+  _authService = inject(AuthService);
+  _usuarioService = inject(UsuarioService);
+  _permisoService = inject(PermisoService);
+  _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private router = inject(Router);
+  private _commonService = inject(CommonService);
+  private _grupoService = inject(GrupoService);
+  private _session = inject(SessionService);
+  private titleService = inject(Title);
+
   token: string | null = null;
   user: UsuarioFull;
   screenWidth: number;
@@ -54,20 +67,7 @@ export default class LogHomeComponent implements OnInit {
   title = "Dashboard";
   permisoUsuario: { permiso_idPermiso?: number }[] = [];
 
-  constructor(
-    public _authService: AuthService,
-    public _usuarioService: UsuarioService,
-    public _permisoService: PermisoService,
-    public _usuarioHasPermisoService: UsuarioHasPermisoService,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private router: Router,
-    private _commonService: CommonService,
-    private _grupoService: GrupoService,
-    private _session: SessionService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.screenWidth = window.innerWidth;
     this.enterAny = this.screenWidth < 960;
     this.url = GLOBAL.url;

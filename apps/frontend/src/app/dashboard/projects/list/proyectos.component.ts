@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -51,6 +51,15 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
   ],
 })
 export default class ProyectosComponent implements OnInit {
+  _router = inject(Router);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  _proyectoService = inject(ProyectoService);
+  _proyectohasusuarioService = inject(UsuarioHasProyectoService);
+  _usuarioService = inject(UsuarioService);
+  private _tabState = inject(TabStateService);
+
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
   displayedColumns2: string[] = ["nombre"];
   dataSource: MatTableDataSource<Proyecto> = new MatTableDataSource<Proyecto>([]);
@@ -60,16 +69,7 @@ export default class ProyectosComponent implements OnInit {
   url: string;
   selectedTab = 0;
 
-  constructor(
-    public _router: Router,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    public _proyectoService: ProyectoService,
-    public _proyectohasusuarioService: UsuarioHasProyectoService,
-    public _usuarioService: UsuarioService,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

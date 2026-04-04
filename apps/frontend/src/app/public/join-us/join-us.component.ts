@@ -1,5 +1,5 @@
 import { NgStyle } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -21,17 +21,17 @@ import { AutosizeModule } from "ngx-autosize";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, MatButton, NewsComponent],
 })
 export default class JoinUsComponent implements OnInit {
+  fb = inject(FormBuilder);
+  _emailService = inject(EmailService);
+  dialog = inject(MatDialog);
+  _router = inject(Router);
+  private _session = inject(SessionService);
+  private titleService = inject(Title);
+
   public user: FormGroup;
   public validation = true;
   public email: EmailBody = createEmailBody();
-  constructor(
-    public fb: FormBuilder,
-    public _emailService: EmailService,
-    public dialog: MatDialog,
-    public _router: Router,
-    private _session: SessionService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.user = this.fb.group({
       nombre: ["", Validators.required],
       razon: ["", Validators.required],
@@ -98,17 +98,17 @@ export default class JoinUsComponent implements OnInit {
   imports: [NgStyle, MatButton],
 })
 export class EmailExitoso {
+  dialogRef = inject<MatDialogRef<EmailExitoso>>(MatDialogRef);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private _session = inject(SessionService);
+
   public url: string;
   grupoLogo = "";
   grupoInfo: any = {};
   screenWidth: number;
   language: any = {};
-  constructor(
-    public dialogRef: MatDialogRef<EmailExitoso>,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private _session: SessionService,
-  ) {
+  constructor() {
     this.language = this._session.getLanguageData<any>() ?? {};
     this.screenWidth = window.innerWidth;
     this.url = GLOBAL.url;

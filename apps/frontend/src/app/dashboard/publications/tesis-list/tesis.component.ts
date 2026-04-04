@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -51,6 +51,15 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
   ],
 })
 export default class TesisComponent implements OnInit {
+  _router = inject(Router);
+  _universidadService = inject(UniversidadService);
+  private _publicacionService = inject(PublicacionService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  private _tipoTesisService = inject(TipoTesisService);
+  private _tabState = inject(TabStateService);
+
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
   displayedColumns2: string[] = ["nombre"];
   dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
@@ -60,16 +69,7 @@ export default class TesisComponent implements OnInit {
 
   universidades: Universidad[] = [];
 
-  constructor(
-    public _router: Router,
-    public _universidadService: UniversidadService,
-    private _publicacionService: PublicacionService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    private _publicacionAutoresService: PublicacionAutoresService,
-    private _tipoTesisService: TipoTesisService,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

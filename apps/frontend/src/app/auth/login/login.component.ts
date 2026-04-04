@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
@@ -21,6 +21,16 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class LoginComponent implements OnInit {
+  _usuarioService = inject(UsuarioService);
+  _grupoService = inject(GrupoService);
+  fb = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _emailService = inject(EmailService);
+  authService = inject(AuthService);
+  private session = inject(SessionService);
+  private titleService = inject(Title);
+
   public grupoinfo: Grupo;
   public url: string;
   public loginForm: FormGroup;
@@ -29,17 +39,7 @@ export default class LoginComponent implements OnInit {
   error: string | null = null;
   exito: string | null = null;
   language: (typeof Languages)[number] = Languages[0];
-  constructor(
-    public _usuarioService: UsuarioService,
-    public _grupoService: GrupoService,
-    public fb: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _emailService: EmailService,
-    public authService: AuthService,
-    private session: SessionService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.loginForm = this.fb.group({
       correo: ["", [Validators.required, Validators.email]],
       password: ["", Validators.required],

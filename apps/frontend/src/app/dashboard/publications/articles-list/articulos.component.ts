@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -50,6 +50,14 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
   ],
 })
 export default class ArticulosComponent implements OnInit {
+  _router = inject(Router);
+  _revistasService = inject(RevistaService);
+  private _publicacionService = inject(PublicacionService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  private _tabState = inject(TabStateService);
+
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
   displayedColumns2: string[] = ["nombre"];
   dataSource = new MatTableDataSource<Publicacion>([]);
@@ -59,15 +67,7 @@ export default class ArticulosComponent implements OnInit {
   articulos: Publicacion[] = [];
   url: string;
 
-  constructor(
-    public _router: Router,
-    public _revistasService: RevistaService,
-    private _publicacionService: PublicacionService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    private _publicacionAutoresService: PublicacionAutoresService,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

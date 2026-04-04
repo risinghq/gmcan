@@ -1,6 +1,6 @@
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Meta, Title } from "@angular/platform-browser";
@@ -23,24 +23,24 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [MatProgressSpinner, MatIcon, NewsComponent],
 })
 export default class DetailNewsComponent implements OnInit {
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _noticiaService = inject(NoticiaService);
+  _tipoNoticiaService = inject(TipoNoticiaService);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _previousService = inject(PreviousPageService);
+  _usuarioService = inject(UsuarioService);
+  private _session = inject(SessionService);
+  meta = inject(Meta);
+  private titleService = inject(Title);
+
   public noticia: Noticia;
   public previouspage = "";
   public previouslink: string | null = null;
   public usuario: Usuario;
   url: string;
-  constructor(
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _noticiaService: NoticiaService,
-    public _tipoNoticiaService: TipoNoticiaService,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _previousService: PreviousPageService,
-    public _usuarioService: UsuarioService,
-    private _session: SessionService,
-    public meta: Meta,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.noticia = createNoticia();
     this.usuario = {
       DNI: "",

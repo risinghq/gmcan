@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute, RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
 import { createGrupo } from "@app/shared/models/factories";
@@ -13,12 +13,12 @@ import { GrupoService } from "@app/shared/services/grupo.service";
   imports: [MatIcon, RouterOutlet, RouterLink, RouterLinkActive],
 })
 export default class AboutComponent implements OnInit {
+  _grupoService = inject(GrupoService);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+
   public info: Grupo;
-  constructor(
-    public _grupoService: GrupoService,
-    public _route: ActivatedRoute,
-    public _router: Router,
-  ) {
+  constructor() {
     this.info = createGrupo();
   }
 

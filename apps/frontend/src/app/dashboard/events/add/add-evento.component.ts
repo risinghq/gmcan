@@ -1,5 +1,5 @@
 import { NgClass, AsyncPipe } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { MatDialog } from "@angular/material/dialog";
@@ -35,18 +35,18 @@ import { map, startWith } from "rxjs/operators";
   ],
 })
 export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _eventoService = inject(EventoService);
+
   evento: Evento;
   public eventoForm: FormGroup;
   button_text = "Guardar evento";
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _eventoService: EventoService,
-  ) {
+  constructor() {
     this.evento = { idEvento: 0, nombre: "", paisEN: "", pais: "", ciudad: "", ciudadEN: "" };
     this.eventoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

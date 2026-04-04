@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -21,6 +21,13 @@ import { ClassicEditor } from "ckeditor5";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule, NgClass],
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _methodService = inject(MethodsService);
+
   public Editor = ClassicEditor;
   button_text = "Guardar método";
   metodo: Method;
@@ -30,14 +37,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
   edit = false;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _methodService: MethodsService,
-  ) {
+  constructor() {
     this.methodForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -143,12 +143,12 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogClose],
 })
 export class DialogPreview4 {
+  dialogRef = inject<MatDialogRef<DialogPreview4>>(MatDialogRef);
+  method = inject<Method>(MAT_DIALOG_DATA);
+
   url: string;
   language: (typeof Languages)[number] = Languages[0];
-  constructor(
-    public dialogRef: MatDialogRef<DialogPreview4>,
-    @Inject(MAT_DIALOG_DATA) public method: Method,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

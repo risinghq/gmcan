@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 
@@ -25,13 +25,13 @@ export interface ApiResponse {
 
 @Injectable({ providedIn: "root" })
 export class UsuarioService {
+  private http = inject(HttpClient);
+  private _session = inject(SessionService);
+
   public url: string;
   private readonly USER_KEY = "user";
 
-  constructor(
-    private http: HttpClient,
-    private _session: SessionService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

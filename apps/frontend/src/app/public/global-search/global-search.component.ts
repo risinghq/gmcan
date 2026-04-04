@@ -1,6 +1,6 @@
 import { TitleCasePipe, DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
@@ -51,6 +51,29 @@ import {
   ],
 })
 export default class GlobalSearchComponent implements OnInit {
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _searchService = inject(SearchService);
+  _publicacionAutoresService = inject(PublicacionAutoresService);
+  _proyectohasusuarioService = inject(UsuarioHasProyectoService);
+  _usuarioService = inject(UsuarioService);
+  _revistaService = inject(RevistaService);
+  _universidadService = inject(UniversidadService);
+  _lineasInvestigacionServices = inject(LineasInvestigacionService);
+  _proyectoServices = inject(ProyectoService);
+  _tiponoticiaService = inject(TipoNoticiaService);
+  _noticiaService = inject(NoticiaService);
+  _eventoService = inject(EventoService);
+  _tipotesisService = inject(TipoTesisService);
+  _publicacionesService = inject(PublicacionService);
+  _tipoPublicacionService = inject(TipoPublicacionService);
+  fb = inject(FormBuilder);
+  private _session = inject(SessionService);
+  location = inject(Location);
+  private titleService = inject(Title);
+
   proyectos: Proyecto[] = [];
   publicaciones: Publicacion[] = [];
   miembros: UsuarioFull[] = [];
@@ -64,30 +87,7 @@ export default class GlobalSearchComponent implements OnInit {
   page2 = 1;
   public url: string;
 
-  constructor(
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _searchService: SearchService,
-    public _publicacionAutoresService: PublicacionAutoresService,
-    public _proyectohasusuarioService: UsuarioHasProyectoService,
-    public _usuarioService: UsuarioService,
-    public _revistaService: RevistaService,
-    public _universidadService: UniversidadService,
-    public _lineasInvestigacionServices: LineasInvestigacionService,
-    public _proyectoServices: ProyectoService,
-    public _tiponoticiaService: TipoNoticiaService,
-    public _noticiaService: NoticiaService,
-    public _eventoService: EventoService,
-    public _tipotesisService: TipoTesisService,
-    public _publicacionesService: PublicacionService,
-    public _tipoPublicacionService: TipoPublicacionService,
-    public fb: FormBuilder,
-    private _session: SessionService,
-    public location: Location,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.searchGlobalForm = this.fb.group({
       nombre: [""],
     });

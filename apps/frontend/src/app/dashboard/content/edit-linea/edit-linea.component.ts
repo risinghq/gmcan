@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -31,21 +31,21 @@ import { AutosizeModule } from "ngx-autosize";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
 })
 export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _lineaInvestigacionService = inject(LineasInvestigacionService);
+  private _proyectoService = inject(ProyectoService);
+
   button_text = "Actualizar información";
   lineaInvestigacion: LineasInvestigacion;
   public lineaForm: FormGroup;
   url: string;
   edit = true;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _lineaInvestigacionService: LineasInvestigacionService,
-    private _proyectoService: ProyectoService,
-  ) {
+  constructor() {
     this.lineaForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -192,10 +192,12 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase11 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase11>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase11>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

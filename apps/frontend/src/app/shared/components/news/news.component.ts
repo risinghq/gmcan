@@ -1,7 +1,7 @@
 import { Location, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { Router, ActivatedRoute, Params } from "@angular/router";
 import { createNoticia } from "@app/shared/models/factories";
 import type { Noticia } from "@app/shared/models/noticia";
@@ -19,22 +19,22 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [SlicePipe],
 })
 export default class NewsComponent implements OnInit {
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _noticiaService = inject(NoticiaService);
+  _route = inject(ActivatedRoute);
+  _tiponoticiaService = inject(TipoNoticiaService);
+  location = inject(Location);
+  _router = inject(Router);
+  _usuarioService = inject(UsuarioService);
+  private _session = inject(SessionService);
+
   public noticias: Noticia[] = [];
   public noticiaPrincipal: Noticia;
   public tiponoticias: TipoNoticia[] = [];
   url: string;
 
-  constructor(
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _noticiaService: NoticiaService,
-    public _route: ActivatedRoute,
-    public _tiponoticiaService: TipoNoticiaService,
-    public location: Location,
-    public _router: Router,
-    public _usuarioService: UsuarioService,
-    private _session: SessionService,
-  ) {
+  constructor() {
     this.noticiaPrincipal = createNoticia();
     this.url = GLOBAL.url;
   }

@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass, AsyncPipe } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -63,6 +63,16 @@ import { startWith, map } from "rxjs/operators";
   ],
 })
 export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private _publicacionService = inject(PublicacionService);
+  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _eventoService = inject(EventoService);
+  private _session = inject(SessionService);
+
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
@@ -80,17 +90,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   // Co-authors
   otrosAutores: AuthorFormRow[] = [];
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private _publicacionService: PublicacionService,
-    private _publicacionAutoresService: PublicacionAutoresService,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _eventoService: EventoService,
-    private _session: SessionService,
-  ) {
+  constructor() {
     this.publicacionForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaPublicacionDate: ["", [Validators.required]],
@@ -343,10 +343,12 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase8 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase8>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase8>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

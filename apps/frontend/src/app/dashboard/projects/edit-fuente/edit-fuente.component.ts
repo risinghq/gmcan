@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -32,20 +32,20 @@ interface StatusResponse {
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  private _proyectoService = inject(ProyectoService);
+
   fuente: FuenteFinanciamiento;
   public fuenteForm: FormGroup;
   button_text = "Actualizar información";
   edit = true;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    private _proyectoService: ProyectoService,
-  ) {
+  constructor() {
     this.fuente = { idFuenteFinanciamiento: 0, nombre: "" };
     this.fuenteForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -154,10 +154,12 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase9 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase9>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase9>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

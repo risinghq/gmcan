@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import type { SobreNosotros } from "@app/shared/models/aboutus";
 import { Languages } from "@app/shared/models/languages";
@@ -12,15 +12,15 @@ import { GLOBAL } from "@app/shared/services/global";
   imports: [],
 })
 export default class AboutUsComponent implements OnInit {
+  aboutusService = inject(AboutUsService);
+  private titleService = inject(Title);
+
   url: string;
   language: (typeof Languages)[number] = Languages[0];
 
   aboutus: SobreNosotros;
 
-  constructor(
-    public aboutusService: AboutUsService,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.aboutus = {
       idSobreNosotros: 0,
       quienesSomos: "",

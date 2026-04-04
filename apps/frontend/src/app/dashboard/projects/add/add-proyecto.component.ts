@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -70,6 +70,18 @@ interface AddProyectoResponse {
   ],
 })
 export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private _snackBar = inject(MatSnackBar);
+  private _usuarioService = inject(UsuarioService);
+  private _lineaInvestigacionService = inject(LineasInvestigacionService);
+  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  private _monedaService = inject(MonedaService);
+  private _proyectoService = inject(ProyectoService);
+  private _usuariohasproyecto = inject(UsuarioHasProyectoService);
+  dialog = inject(MatDialog);
+
   terminado = false;
   edit = false;
   button_text = "Guardar proyecto";
@@ -85,19 +97,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
   projectEnd() {}
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private _snackBar: MatSnackBar,
-    private _usuarioService: UsuarioService,
-    private _lineaInvestigacionService: LineasInvestigacionService,
-    private _fuenteFinanciamientoService: FuenteFinanciamientoService,
-    private _monedaService: MonedaService,
-    private _proyectoService: ProyectoService,
-    private _usuariohasproyecto: UsuarioHasProyectoService,
-    public dialog: MatDialog,
-  ) {
+  constructor() {
     this.proyectoForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       títuloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

@@ -1,5 +1,5 @@
 import { Location } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
@@ -21,22 +21,22 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [MatIcon, MatTabGroup, MatTab, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent implements OnInit {
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _usuarioService = inject(UsuarioService);
+  _prefijoService = inject(PrefijoService);
+  _tipoMiembroService = inject(TipoMiembroService);
+  private _session = inject(SessionService);
+  location = inject(Location);
+  private titleService = inject(Title);
+
   public cargado = false;
   public usuarios: UsuarioFull[] = [];
   public usuariosNoActivos: UsuarioFull[] = [];
   public tipoMiembros: TipoMiembro[] = [];
   public url: string;
   language: any = {};
-  constructor(
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _usuarioService: UsuarioService,
-    public _prefijoService: PrefijoService,
-    public _tipoMiembroService: TipoMiembroService,
-    private _session: SessionService,
-    public location: Location,
-    private titleService: Title,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

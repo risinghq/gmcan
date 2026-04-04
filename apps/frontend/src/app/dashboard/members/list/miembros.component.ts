@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -54,16 +54,16 @@ interface PrefijoOption {
   ],
 })
 export default class MiembrosComponent implements OnInit {
+  _usuarioService = inject(UsuarioService);
+  _tipoMiembroService = inject(TipoMiembroService);
+  _prefijoService = inject(PrefijoService);
+  _router = inject(Router);
+
   displayedColumns: string[] = ["nombre", "apellidoPaterno", "apellidoMaterno", "grado", "cargo", "correo"];
   miembros: UsuarioFull[] = [];
   dataSource = new MatTableDataSource<UsuarioFull>([]);
   url: string;
-  constructor(
-    public _usuarioService: UsuarioService,
-    public _tipoMiembroService: TipoMiembroService,
-    public _prefijoService: PrefijoService,
-    public _router: Router,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

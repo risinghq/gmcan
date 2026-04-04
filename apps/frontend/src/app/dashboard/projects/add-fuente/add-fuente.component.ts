@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -17,18 +17,18 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+
   fuente: FuenteFinanciamiento;
   public fuenteForm: FormGroup;
   button_text = "Guardar fuente";
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _fuenteFinanciamientoService: FuenteFinanciamientoService,
-  ) {
+  constructor() {
     this.fuente = { idFuenteFinanciamiento: 0, nombre: "" };
     this.fuenteForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],

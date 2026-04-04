@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener, Inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { MatCheckbox } from "@angular/material/checkbox";
@@ -90,6 +90,19 @@ interface PermisoResponse {
   ],
 })
 export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _usuarioService = inject(UsuarioService);
+  _tipoMiembroService = inject(TipoMiembroService);
+  _prefijoService = inject(PrefijoService);
+  _generoService = inject(GeneroService);
+  _usuarioPermisoService = inject(UsuarioHasPermisoService);
+  private _snackBar = inject(MatSnackBar);
+  dialog = inject(MatDialog);
+  _publicacionAutoresService = inject(PublicacionAutoresService);
+  _noticiaService = inject(NoticiaService);
+
   url: string;
   public memberForm: FormGroup;
   member: UsuarioFull = createUsuarioFull();
@@ -101,20 +114,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   permisosExistentes: UsuarioPermiso[] = [];
   edit = false;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _usuarioService: UsuarioService,
-    public _tipoMiembroService: TipoMiembroService,
-    public _prefijoService: PrefijoService,
-    public _generoService: GeneroService,
-    public _usuarioPermisoService: UsuarioHasPermisoService,
-    private _snackBar: MatSnackBar,
-    public dialog: MatDialog,
-    public _publicacionAutoresService: PublicacionAutoresService,
-    public _noticiaService: NoticiaService,
-  ) {
+  constructor() {
     this.memberForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       segundoNombre: [""],
@@ -539,10 +539,12 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogCancel5 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogCancel5>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogCancel5>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

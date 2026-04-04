@@ -1,7 +1,7 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { TitleCasePipe, NgClass } from "@angular/common";
 import { DatePipe } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { FormControl } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -81,6 +81,15 @@ interface NewsPreviewData {
   ],
 })
 export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  _noticiaService = inject(NoticiaService);
+  private _snackBar = inject(MatSnackBar);
+  private _tipoNoticiaService = inject(TipoNoticiaService);
+  private _usuarioService = inject(UsuarioService);
+
   public Editor = ClassicEditor;
   url: string;
   noticia: NoticiaFull;
@@ -89,16 +98,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   autores: Usuario[] = [];
   button_text = "Publicar noticia";
   button_text2 = "Guardar sin publicar";
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    public _noticiaService: NoticiaService,
-    private _snackBar: MatSnackBar,
-    private _tipoNoticiaService: TipoNoticiaService,
-    private _usuarioService: UsuarioService,
-  ) {
+  constructor() {
     this.newsForm = this.formBuilder.group({
       titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       tituloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -311,10 +311,12 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogPublish {
-  constructor(
-    public dialogRef: MatDialogRef<DialogPublish>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogPublish>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }
@@ -326,18 +328,18 @@ export class DialogPublish {
   imports: [MatDialogClose],
 })
 export class DialogPreview {
+  dialogRef = inject<MatDialogRef<DialogPreview>>(MatDialogRef);
+  noticia = inject<NewsPreviewData>(MAT_DIALOG_DATA);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+
   url: string;
   language: (typeof Languages)[number] | undefined;
   dia = "";
   mes = "";
   anio = "";
   datere: Date = new Date();
-  constructor(
-    public dialogRef: MatDialogRef<DialogPreview>,
-    @Inject(MAT_DIALOG_DATA) public noticia: NewsPreviewData,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import type { AuthorOption, PublicationAuthor, SaveAuthorEntry } from "@app/shared/models/author";
 import { Observable } from "rxjs";
 
@@ -7,9 +7,9 @@ import { GLOBAL } from "./global";
 
 @Injectable({ providedIn: "root" })
 export class PublicacionAutoresService {
-  private readonly base = GLOBAL.url + "publicacion-autores";
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private readonly base = GLOBAL.url + "publicacion-autores";
 
   /** Autocomplete pool: registered users + past external author names */
   search(q = ""): Observable<AuthorOption[]> {

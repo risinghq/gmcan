@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -32,21 +32,21 @@ interface StatusResponse {
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class EditCategoryComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  _tipoNoticiaService = inject(TipoNoticiaService);
+  _noticiaService = inject(NoticiaService);
+  private _snackBar = inject(MatSnackBar);
+
   category: TipoNoticia;
   public categoryForm: FormGroup;
   button_text = "Actualizar categoría";
   edit = true;
   idCategory = 0;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    public _tipoNoticiaService: TipoNoticiaService,
-    public _noticiaService: NoticiaService,
-    private _snackBar: MatSnackBar,
-  ) {
+  constructor() {
     this.categoryForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -158,10 +158,12 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }

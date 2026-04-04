@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -31,20 +31,20 @@ import { ClassicEditor } from "ckeditor5";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule, NgClass],
 })
 export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _methodService = inject(MethodsService);
+
   public Editor = ClassicEditor;
   button_text = "Actualizar información";
   metodo: Method;
   public methodForm: FormGroup;
   url: string;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _methodService: MethodsService,
-  ) {
+  constructor() {
     this.methodForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -198,10 +198,12 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase12 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase12>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase12>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }
@@ -213,12 +215,12 @@ export class DialogErase12 {
   imports: [MatDialogClose],
 })
 export class DialogPreview5 {
+  dialogRef = inject<MatDialogRef<DialogPreview5>>(MatDialogRef);
+  method = inject<Method>(MAT_DIALOG_DATA);
+
   url: string;
   language: (typeof Languages)[number] = Languages[0];
-  constructor(
-    public dialogRef: MatDialogRef<DialogPreview5>,
-    @Inject(MAT_DIALOG_DATA) public method: Method,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

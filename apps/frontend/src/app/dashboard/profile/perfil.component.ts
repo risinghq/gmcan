@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -48,6 +48,17 @@ import { AutosizeModule } from "ngx-autosize";
   ],
 })
 export default class PerfilComponent implements OnInit {
+  formBuilder = inject(FormBuilder);
+  _usuarioService = inject(UsuarioService);
+  _tipoMiembroService = inject(TipoMiembroService);
+  _prefijoService = inject(PrefijoService);
+  _generoService = inject(GeneroService);
+  private _snackBar = inject(MatSnackBar);
+  dialog = inject(MatDialog);
+  private _commonService = inject(CommonService);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+
   oldMem: number | null = null;
   url: string;
   member: UsuarioFull;
@@ -57,18 +68,7 @@ export default class PerfilComponent implements OnInit {
   generos: Genero[] = [];
   button_text = "Actualizar información";
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _usuarioService: UsuarioService,
-    public _tipoMiembroService: TipoMiembroService,
-    public _prefijoService: PrefijoService,
-    public _generoService: GeneroService,
-    private _snackBar: MatSnackBar,
-    public dialog: MatDialog,
-    private _commonService: CommonService,
-    public _route: ActivatedRoute,
-    public _router: Router,
-  ) {
+  constructor() {
     this.memberForm = this.formBuilder.group({
       nombre: ["", Validators.required],
       segundoNombre: [""],

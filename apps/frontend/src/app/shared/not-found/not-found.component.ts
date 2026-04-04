@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -8,12 +8,11 @@ import { SessionService } from "@app/shared/services/session.service";
   styleUrls: ["./not-found.component.scss"],
 })
 export default class NotFoundComponent implements OnInit {
+  _router = inject(Router);
+  private _session = inject(SessionService);
+
   button_text = "";
   dashboard = false;
-  constructor(
-    public _router: Router,
-    private _session: SessionService,
-  ) {}
 
   language: any = {};
   ngOnInit(): void {

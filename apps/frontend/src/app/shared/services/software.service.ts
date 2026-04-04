@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
@@ -8,16 +8,16 @@ import { GLOBAL } from "./global";
   providedIn: "root",
 })
 export class SoftwareService {
+  http = inject(HttpClient);
+  private _session = inject(SessionService);
+
   public url: string;
 
   private get languagelocal(): string {
     return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
   }
 
-  constructor(
-    public http: HttpClient,
-    private _session: SessionService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

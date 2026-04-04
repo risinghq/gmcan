@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { Grupo } from "@app/shared/models/grupo";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -27,6 +27,16 @@ interface UsuarioPermisoItem {
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export default class DashboardComponent implements OnInit {
+  authService = inject(AuthService);
+  _usuarioService = inject(UsuarioService);
+  _permisoService = inject(PermisoService);
+  _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  _tipoMiembroService = inject(TipoMiembroService);
+  _tipoPublicacionService = inject(TipoPublicacionService);
+  private _session = inject(SessionService);
+
   token: string | null = null;
   user: any = null;
   screenWidth = window.innerWidth;
@@ -41,17 +51,7 @@ export default class DashboardComponent implements OnInit {
     analiticaPermiso: false,
   };
   permisoUsuario: UsuarioPermisoItem[] = [];
-  constructor(
-    public authService: AuthService,
-    public _usuarioService: UsuarioService,
-    public _permisoService: PermisoService,
-    public _usuarioHasPermisoService: UsuarioHasPermisoService,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public _tipoMiembroService: TipoMiembroService,
-    public _tipoPublicacionService: TipoPublicacionService,
-    private _session: SessionService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

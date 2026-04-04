@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { MatCheckbox } from "@angular/material/checkbox";
@@ -58,6 +58,17 @@ interface PermisoItem {
   ],
 })
 export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _usuarioService = inject(UsuarioService);
+  _generoService = inject(GeneroService);
+  _tipoMiembroService = inject(TipoMiembroService);
+  _prefijoService = inject(PrefijoService);
+  _permisosService = inject(PermisoService);
+  _usuarioPermisoService = inject(UsuarioHasPermisoService);
+  private _snackBar = inject(MatSnackBar);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+
   public memberForm: FormGroup;
   member: UsuarioFull;
   generos: Genero[] = [];
@@ -71,18 +82,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   button_text = "Registrar nuevo miembro";
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _usuarioService: UsuarioService,
-    public _generoService: GeneroService,
-    public _tipoMiembroService: TipoMiembroService,
-    public _prefijoService: PrefijoService,
-    public _permisosService: PermisoService,
-    public _usuarioPermisoService: UsuarioHasPermisoService,
-    private _snackBar: MatSnackBar,
-    public _router: Router,
-    public dialog: MatDialog,
-  ) {
+  constructor() {
     this.memberForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       segundoNombre: [""],

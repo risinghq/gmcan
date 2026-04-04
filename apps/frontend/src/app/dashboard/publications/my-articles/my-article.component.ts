@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -47,22 +47,22 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
   ],
 })
 export default class MyArticleComponent implements OnInit {
+  _router = inject(Router);
+  _revistasService = inject(RevistaService);
+  private _publicacionService = inject(PublicacionService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  private _usuarioService = inject(UsuarioService);
+  _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
+
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
   dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
 
   articulos: Publicacion[] = [];
   url: string;
 
-  constructor(
-    public _router: Router,
-    public _revistasService: RevistaService,
-    private _publicacionService: PublicacionService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    private _publicacionAutoresService: PublicacionAutoresService,
-    private _usuarioService: UsuarioService,
-    public _usuarioHasPermisoService: UsuarioHasPermisoService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

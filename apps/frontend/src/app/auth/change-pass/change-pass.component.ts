@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute } from "@angular/router";
@@ -16,6 +16,13 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class ChangePassComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private usuarioService = inject(UsuarioService);
+  private grupoService = inject(GrupoService);
+  private session = inject(SessionService);
+
   public passwordForm: FormGroup;
   public grupoInfo: Grupo;
   public url: string;
@@ -28,14 +35,7 @@ export default class ChangePassComponent implements OnInit {
   public userInfo: any = null;
   public tokenValid = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private usuarioService: UsuarioService,
-    private grupoService: GrupoService,
-    private session: SessionService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
     this.grupoInfo = createGrupo();
 

@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe, NgClass } from "@angular/common";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -59,6 +59,15 @@ interface NoticiaResponse extends Noticia {
   ],
 })
 export default class NoticiasComponent implements OnInit {
+  _noticiaService = inject(NoticiaService);
+  _usuarioService = inject(UsuarioService);
+  _tiponoticiaService = inject(TipoNoticiaService);
+  titlecasePipe = inject(TitleCasePipe);
+  datePipe = inject(DatePipe);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  private _tabState = inject(TabStateService);
+
   displayedColumns: string[] = ["titulo", "fechaPublicacion", "nombreTipoNoticia", "autor", "status"];
   displayedColumns2: string[] = ["nombre"];
   dataSource = new MatTableDataSource<NoticiaResponse>([]);
@@ -80,16 +89,7 @@ export default class NoticiasComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort2!: MatSort;
 
-  constructor(
-    public _noticiaService: NoticiaService,
-    public _usuarioService: UsuarioService,
-    public _tiponoticiaService: TipoNoticiaService,
-    public titlecasePipe: TitleCasePipe,
-    public datePipe: DatePipe,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    private _tabState: TabStateService,
-  ) {
+  constructor() {
     this.url = GLOBAL.url;
   }
 

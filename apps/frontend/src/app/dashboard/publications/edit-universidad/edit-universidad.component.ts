@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
-import { Component, OnInit, Inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -28,20 +28,20 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
   imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class EditUniversidadComponent implements OnInit, HasUnsavedChanges {
+  formBuilder = inject(FormBuilder);
+  _route = inject(ActivatedRoute);
+  _router = inject(Router);
+  dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
+  private _universidadService = inject(UniversidadService);
+  private _publicacionService = inject(PublicacionService);
+
   universidad: Universidad;
   public universidadForm: FormGroup;
   button_text = "Guardar universidad";
   edit = true;
 
-  constructor(
-    public formBuilder: FormBuilder,
-    public _route: ActivatedRoute,
-    public _router: Router,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private _universidadService: UniversidadService,
-    private _publicacionService: PublicacionService,
-  ) {
+  constructor() {
     this.universidad = { idUniversidad: 0, nombre: "", nombreEN: "" };
     this.universidadForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -148,10 +148,12 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase4 {
-  constructor(
-    public dialogRef: MatDialogRef<DialogErase4>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {
+  dialogRef = inject<MatDialogRef<DialogErase4>>(MatDialogRef);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const dialogRef = this.dialogRef;
+
     dialogRef.disableClose = true;
   }
 }
