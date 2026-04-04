@@ -58,12 +58,7 @@
           <div class="text-category">Descripcion en español <span class="red-text">*</span></div>
           <div class="green-text top-auto right plex-sans" (click)="previewMethod(0)">Vista Previa</div>
         </div>
-        <ckeditor
-          [editor]="Editor"
-          [(ngModel)]="metodo.descripcion"
-          formControlName="descripcion"
-          name="descripcion"
-        ></ckeditor>
+        <ckeditor [editor]="Editor" [(ngModel)]="metodo.descripcion" formControlName="descripcion" name="descripcion" />
       </div>
       <div class="full-width mb-32">
         <div class="flex-news">
@@ -75,7 +70,7 @@
           [(ngModel)]="metodo.descripcionEN"
           formControlName="descripcionEN"
           name="descripcionEN"
-        ></ckeditor>
+        />
       </div>
       <div class="flex-news">
         @if (edit) {
@@ -83,7 +78,7 @@
             <div class="link link-set link-red" (click)="openEraser()">Eliminar método</div>
           </div>
         }
-        <div class="right" [ngClass]="{ 'btn-grey': !methodForm.valid, 'black-btn': methodForm.valid }">
+        <div class="right" [class]="{ 'btn-grey': !methodForm.valid, 'black-btn': methodForm.valid }">
           <div class="link link-set" (click)="submitMethod()">
             {{ button_text }}
           </div>

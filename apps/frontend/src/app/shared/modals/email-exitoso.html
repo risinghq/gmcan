@@ -1,6 +1,6 @@
 <div class="bb">
   <img class="logo-nav logo-modal" src="{{grupoLogo}}" alt="logo" />
-  <div class="email-text right" [ngStyle]="{'display' : (screenWidth > 960) ? 'block' : 'none'}">
+  <div class="email-text right" [style.display]="(screenWidth > 960) ? 'block' : 'none'">
     {{language.joinUsModal[0].succesful}}
   </div>
 </div>

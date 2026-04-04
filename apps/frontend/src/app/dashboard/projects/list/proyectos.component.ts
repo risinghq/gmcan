@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild, inject } from "@angular/core";
+import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -73,11 +73,11 @@ export default class ProyectosComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly matSort = viewChild.required(MatSort);
 
-  @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort2!: MatSort;
+  readonly paginator2 = viewChild.required(MatPaginator);
+  readonly sort2 = viewChild.required(MatSort);
 
   ejecucion = false;
 
@@ -100,8 +100,8 @@ export default class ProyectosComponent implements OnInit {
         );
         this.fuenteFinanciamientos = res;
         this.dataSource2 = new MatTableDataSource(this.fuenteFinanciamientos);
-        this.dataSource2.sort = this.sort;
-        this.dataSource2.paginator = this.paginator;
+        this.dataSource2.sort = this.matSort();
+        this.dataSource2.paginator = this.paginator();
       }
     });
   }
@@ -118,8 +118,8 @@ export default class ProyectosComponent implements OnInit {
         );
         this.proyectos = res;
         this.dataSource = new MatTableDataSource(this.proyectos);
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.matSort();
+        this.dataSource.paginator = this.paginator();
         for (let index = 0; index < this.proyectos.length; index++) {
           this.fillProyecto(this.proyectos[index]);
         }

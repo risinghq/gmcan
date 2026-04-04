@@ -33,8 +33,8 @@
                   formControlName="fechaPublicacionDate"
                   name="fechaPublicacionDate"
                 />
-                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-                <mat-datepicker #dp></mat-datepicker>
+                <mat-datepicker-toggle matSuffix [for]="dp" />
+                <mat-datepicker #dp />
               </mat-form-field>
             </div>
           </div>
@@ -266,7 +266,7 @@
         }
         <div
           class="right"
-          [ngClass]="{
+          [class]="{
             'btn-grey': !publicacionForm.valid,
             'black-btn': publicacionForm.valid && selectedUser,
           }"

@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -25,7 +24,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-edit-equipo",
   templateUrl: "../add-equipo/add-equipo.component.html",
   styleUrls: ["../add-equipo/add-equipo.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

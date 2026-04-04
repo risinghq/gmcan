@@ -66,7 +66,7 @@
         <td
           mat-cell
           *matCellDef="let row"
-          [ngClass]="{ 'on-status': row.estado == 1, 'off-status': row.estado == 0 }"
+          [class]="{ 'on-status': row.estado == 1, 'off-status': row.estado == 0 }"
           (click)="editNews(row.idNoticia)"
         >
           {{ row.status }}
@@ -76,7 +76,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound" />
     @if (displayedNotFound) {
       <span class="plex-sans">No se encontraron resultados</span>
     }
@@ -104,7 +104,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2" />
     @if (displayedNotFound2) {
       <span class="plex-sans">No se encontraron resultados</span>
     }

@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgStyle, NgClass, SlicePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
@@ -44,7 +44,7 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
   selector: "app-home",
   templateUrl: "./home.component.html",
   styleUrls: ["./home.component.scss"],
-  imports: [MatProgressBar, MatButton, NgStyle, MatCard, NgClass, MatIcon, SlicePipe],
+  imports: [MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
   _grupoService = inject(GrupoService);

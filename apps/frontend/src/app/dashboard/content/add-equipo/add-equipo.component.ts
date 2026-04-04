@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -15,7 +14,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-equipo",
   templateUrl: "./add-equipo.component.html",
   styleUrls: ["./add-equipo.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

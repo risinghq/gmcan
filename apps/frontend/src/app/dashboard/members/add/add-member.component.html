@@ -61,7 +61,7 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Fecha de nacimiento</div>
                 <mat-form-field class="input-category">
-                  <mat-label></mat-label>
+                  <mat-label />
                   <input
                     matInput
                     [(ngModel)]="member.fechaNacimientoDate"
@@ -70,8 +70,8 @@
                     name="fechaNacimiento"
                     placeholder="Insertar fecha de nacimiento"
                   />
-                  <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-                  <mat-datepicker #dp></mat-datepicker>
+                  <mat-datepicker-toggle matSuffix [for]="dp" />
+                  <mat-datepicker #dp />
                 </mat-form-field>
               </div>
               <div class="full-width">
@@ -84,7 +84,7 @@
                   placeholder="Insertar correo electrónico"
                   class="input-category"
                   required
-                  [ngClass]="{ 'invalid-error': errEmail }"
+                  [class.invalid-error]="errEmail"
                 />
               </div>
             </div>
@@ -149,8 +149,8 @@
             <div class="flex-news mb-8">
               <div class="mr-32 full-width">
                 <div class="text-category">Contraseña (mínimo 8 caracteres) <span class="red-text">*</span></div>
-                <mat-form-field class="input-category" [ngClass]="{ 'invalid-error': errPass }">
-                  <mat-label></mat-label>
+                <mat-form-field class="input-category" [class.invalid-error]="errPass">
+                  <mat-label />
                   <input
                     matInput
                     [type]="hide ? 'password' : 'text'"
@@ -171,8 +171,8 @@
               </div>
               <div class="full-width">
                 <div class="text-category">Repetir contraseña <span class="red-text">*</span></div>
-                <mat-form-field class="input-category" [ngClass]="{ 'invalid-error': errPass }">
-                  <mat-label></mat-label>
+                <mat-form-field class="input-category" [class.invalid-error]="errPass">
+                  <mat-label />
                   <input
                     matInput
                     [type]="hide2 ? 'password' : 'text'"
@@ -342,7 +342,7 @@
             <div class="link link-set link-red" (click)="openEraser()">Eliminar miembro del grupo</div>
           </div>
         }
-        <div class="right" [ngClass]="{ 'btn-grey': !memberForm.valid, 'black-btn': memberForm.valid }">
+        <div class="right" [class]="{ 'btn-grey': !memberForm.valid, 'black-btn': memberForm.valid }">
           <div class="link link-set" (click)="addMember()">
             {{ button_text }}
           </div>

@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -25,7 +24,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-edit-software",
   templateUrl: "../add-software/add-software.component.html",
   styleUrls: ["../add-software/add-software.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

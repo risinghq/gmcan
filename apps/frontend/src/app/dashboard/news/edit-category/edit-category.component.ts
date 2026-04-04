@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -29,7 +28,7 @@ interface StatusResponse {
   selector: "app-edit-category",
   templateUrl: "../add-category/add-category.component.html",
   styleUrls: ["../add-category/add-category.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditCategoryComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

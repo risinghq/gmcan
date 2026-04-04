@@ -60,7 +60,7 @@
               <div class="flex-news">
                 <a
                   id="abstract{{ i }}"
-                  [ngClass]="{ 'abstract-active': selectedItem === i }"
+                  [class.abstract-active]="selectedItem === i"
                   (click)="listClick($event, i)"
                   class="project-abstract"
                   data-toggle="collapse"
@@ -73,7 +73,7 @@
                 </a>
                 <mat-icon
                   class="project-abs-icon"
-                  [ngClass]="{
+                  [class]="{
                     'abs-active': selectedItem === i,
                     'abs-not-active': selectedItem == -1,
                   }"
@@ -193,7 +193,7 @@
               <div class="flex-news">
                 <a
                   id="abstract{{ i }}"
-                  [ngClass]="{ 'abstract-active': selectedItem === i }"
+                  [class.abstract-active]="selectedItem === i"
                   (click)="listClick($event, i)"
                   class="project-abstract"
                   data-toggle="collapse"
@@ -206,7 +206,7 @@
                 </a>
                 <mat-icon
                   class="project-abs-icon"
-                  [ngClass]="{
+                  [class]="{
                     'abs-active': selectedItem === i,
                     'abs-not-active': selectedItem == -1,
                   }"
@@ -326,7 +326,7 @@
               <div class="flex-news">
                 <a
                   id="abstract{{ i }}"
-                  [ngClass]="{ 'abstract-active': selectedItem === i }"
+                  [class.abstract-active]="selectedItem === i"
                   (click)="listClick($event, i)"
                   class="project-abstract"
                   data-toggle="collapse"
@@ -339,7 +339,7 @@
                 </a>
                 <mat-icon
                   class="project-abs-icon"
-                  [ngClass]="{
+                  [class]="{
                     'abs-active': selectedItem === i,
                     'abs-not-active': selectedItem == -1,
                   }"

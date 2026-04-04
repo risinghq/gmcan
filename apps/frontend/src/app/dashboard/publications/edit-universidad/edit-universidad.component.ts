@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -25,7 +24,7 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
   selector: "app-edit-universidad",
   templateUrl: "../add-universidad/add-universidad.component.html",
   styleUrls: ["../add-universidad/add-universidad.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditUniversidadComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

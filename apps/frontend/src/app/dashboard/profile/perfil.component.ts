@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
@@ -39,7 +38,6 @@ import { AutosizeModule } from "ngx-autosize";
     MatDatepickerToggle,
     MatSuffix,
     MatDatepicker,
-    NgClass,
     MatSelect,
     MatOption,
     MatIconButton,

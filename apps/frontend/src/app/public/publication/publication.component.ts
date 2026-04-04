@@ -1,4 +1,4 @@
-import { DatePipe, NgClass, SlicePipe } from "@angular/common";
+import { DatePipe, SlicePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
@@ -43,7 +43,6 @@ import {
     MatTab,
     FormsModule,
     ReactiveFormsModule,
-    NgClass,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,

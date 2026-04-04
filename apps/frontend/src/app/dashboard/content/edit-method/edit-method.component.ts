@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -28,7 +27,7 @@ import { ClassicEditor } from "ckeditor5";
   selector: "app-edit-method",
   templateUrl: "../add-method/add-method.component.html",
   styleUrls: ["../add-method/add-method.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
 })
 export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

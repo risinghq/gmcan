@@ -54,7 +54,7 @@
                 aria-expanded="true"
                 aria-controls="collapsePublication"
                 (click)="toggleRotation(1)"
-                [ngClass]="{
+                [class]="{
                   'abs-active': publicationExpanded,
                   'abs-not-active': !publicationExpanded,
                 }"
@@ -78,7 +78,7 @@
                     @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
                       <div
                         class="publication-type"
-                        [ngClass]="{
+                        [class]="{
                           'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
                           'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
                         }"
@@ -193,7 +193,7 @@
                     }
                     <a
                       id="abstract{{ i }}"
-                      [ngClass]="{ 'abstract-active': selectedItem === i }"
+                      [class.abstract-active]="selectedItem === i"
                       (click)="listClick($event, i)"
                       class="publication-abstract"
                       data-toggle="collapse"
@@ -206,7 +206,7 @@
                     </a>
                     <mat-icon
                       class="publication-abs-icon"
-                      [ngClass]="{
+                      [class]="{
                         'abs-active': selectedItem === i,
                         'abs-not-active': selectedItem == -1,
                       }"
@@ -259,7 +259,7 @@
                 aria-expanded="true"
                 aria-controls="collapseProjects"
                 (click)="toggleRotation(2)"
-                [ngClass]="{ 'abs-active': projectExpanded, 'abs-not-active': !projectExpanded }"
+                [class]="{ 'abs-active': projectExpanded, 'abs-not-active': !projectExpanded }"
               >
                 keyboard_arrow_down
               </mat-icon>
@@ -310,7 +310,7 @@
                     <div class="flex-news">
                       <a
                         id="abstract{{ i }}"
-                        [ngClass]="{ 'abstract-active': selectedItem === i }"
+                        [class.abstract-active]="selectedItem === i"
                         (click)="listClick($event, i)"
                         class="project-abstract"
                         data-toggle="collapse"
@@ -323,7 +323,7 @@
                       </a>
                       <mat-icon
                         class="project-abs-icon"
-                        [ngClass]="{
+                        [class]="{
                           'abs-active': selectedItem === i,
                           'abs-not-active': selectedItem == -1,
                         }"
@@ -397,7 +397,7 @@
                 aria-expanded="true"
                 aria-controls="collapseMembers"
                 (click)="toggleRotation(3)"
-                [ngClass]="{ 'abs-active': memberExpanded, 'abs-not-active': !memberExpanded }"
+                [class]="{ 'abs-active': memberExpanded, 'abs-not-active': !memberExpanded }"
               >
                 keyboard_arrow_down
               </mat-icon>
@@ -409,7 +409,7 @@
                 </div>
               }
               @for (miembro of miembros; track miembro; let i = $index) {
-                <div class="flex-news" [ngClass]="{ 'mb-24': i + 1 != miembros.length }">
+                <div class="flex-news" [class.mb-24]="i + 1 != miembros.length">
                   <div class="miembro-img-div">
                     @if (miembro.foto) {
                       <img
@@ -454,7 +454,7 @@
                 aria-expanded="true"
                 aria-controls="collapseNews"
                 (click)="toggleRotation(4)"
-                [ngClass]="{ 'abs-active': newsExpanded, 'abs-not-active': !newsExpanded }"
+                [class]="{ 'abs-active': newsExpanded, 'abs-not-active': !newsExpanded }"
               >
                 keyboard_arrow_down
               </mat-icon>

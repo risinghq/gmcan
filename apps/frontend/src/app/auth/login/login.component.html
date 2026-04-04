@@ -31,7 +31,7 @@
           required
           type="password"
         />
-        <div (click)="login()" [ngClass]="{ 'btn-grey': loginForm.invalid, 'btn-black': !loginForm.invalid }">
+        <div (click)="login()" [class]="{ 'btn-grey': loginForm.invalid, 'btn-black': !loginForm.invalid }">
           <div class="link">
             {{ language.loginText[0].login }}
           </div>
@@ -62,7 +62,7 @@
           autocomplete="off"
           required
         />
-        <div (click)="recover()" [ngClass]="{ 'btn-grey': emailForm.invalid, 'btn-black': !emailForm.invalid }">
+        <div (click)="recover()" [class]="{ 'btn-grey': emailForm.invalid, 'btn-black': !emailForm.invalid }">
           <div class="link">Recuperar contraseña</div>
         </div>
       </form>

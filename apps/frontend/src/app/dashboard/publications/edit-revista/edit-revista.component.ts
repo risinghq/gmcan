@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -29,7 +28,7 @@ interface StatusResponse {
   selector: "app-edit-revista",
   templateUrl: "../add-revista/add-revista.component.html",
   styleUrls: ["../add-revista/add-revista.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

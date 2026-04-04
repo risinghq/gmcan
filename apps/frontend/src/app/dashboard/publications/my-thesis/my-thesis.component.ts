@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild, inject } from "@angular/core";
+import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -69,8 +69,8 @@ export default class MyThesisComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly matSort = viewChild.required(MatSort);
 
   selectedTab: string | null = null;
   ngOnInit(): void {
@@ -113,8 +113,8 @@ export default class MyThesisComponent implements OnInit {
           );
         }
         this.dataSource = new MatTableDataSource(this.tesis);
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.matSort();
+        this.dataSource.paginator = this.paginator();
       }
     });
   }

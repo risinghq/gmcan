@@ -1,10 +1,7 @@
 @if (progress < 100) {
-  <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+  <mat-progress-bar mode="determinate" [value]="progress" />
 }
 <div class="main-news-div">
-  <!-- <div *ngIf="!cargado">
-  <mat-spinner ></mat-spinner>
-</div> -->
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="main-news-links">
@@ -15,7 +12,7 @@
       <div class="news-list-div">
         @if (!allCharged) {
           <div class="spinner-pad">
-            <mat-spinner class="auto mb-8"></mat-spinner>
+            <mat-spinner class="auto mb-8" />
             <div class="loading-text center">Cargando</div>
           </div>
         }
@@ -28,7 +25,7 @@
               mat-button
               class="right"
               [matMenuTriggerFor]="menu"
-              [ngStyle]="{ display: screenWidth < 960 ? 'block' : 'none' }"
+              [style.display]="screenWidth < 960 ? 'block' : 'none'"
             >
               {{ categoryNombre }}
               <mat-icon> keyboard_arrow_down </mat-icon>
@@ -57,7 +54,7 @@
               <div class="news flex-news">
                 <div
                   class="img-hover-zoom-2 img-div-zoom right pl-24"
-                  [ngStyle]="{ display: screenWidth < 960 ? 'block' : 'none' }"
+                  [style.display]="screenWidth < 960 ? 'block' : 'none'"
                 >
                   @if (!noticia.foto) {
                     <img class="news-img" src="../../assets/img/grupal.jpg" />
@@ -83,10 +80,7 @@
                   </div>
                   <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
                 </div>
-                <div
-                  class="img-hover-zoom-2 img-div-zoom pl-24"
-                  [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
-                >
+                <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
                   @if (!noticia.foto) {
                     <img class="news-img" src="../../assets/img/grupal.jpg" />
                   }
@@ -121,7 +115,7 @@
         }
       </div>
     </div>
-    <div class="col-lg-4 col-sm-6 col-12" [ngStyle]="{ display: screenWidth > 960 ? 'block' : 'none' }">
+    <div class="col-lg-4 col-sm-6 col-12" [style.display]="screenWidth > 960 ? 'block' : 'none'">
       <div class="category-title">
         {{ language.newsText[0].categoryTitle }}
       </div>

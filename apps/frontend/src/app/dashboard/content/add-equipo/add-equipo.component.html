@@ -40,7 +40,7 @@
             <div class="link link-set link-red" (click)="openEraser()">Eliminar equipo</div>
           </div>
         }
-        <div class="right" [ngClass]="{ 'btn-grey': !equipoForm.valid, 'black-btn': equipoForm.valid }">
+        <div class="right" [class]="{ 'btn-grey': !equipoForm.valid, 'black-btn': equipoForm.valid }">
           <div class="link link-set" (click)="submitEquipo()">
             {{ button_text }}
           </div>

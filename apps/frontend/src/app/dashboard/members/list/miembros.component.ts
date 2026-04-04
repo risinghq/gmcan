@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from "@angular/core";
+import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -71,8 +71,8 @@ export default class MiembrosComponent implements OnInit {
     this.obtainingValue();
   }
   canAdd = false;
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly matSort = viewChild.required(MatSort);
 
   obtainingValue(): void {
     if (window.location.href.includes("activos")) {
@@ -101,8 +101,8 @@ export default class MiembrosComponent implements OnInit {
           this.miembros.push(res[index]);
         }
         this.dataSource = new MatTableDataSource(this.miembros);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator();
+        this.dataSource.sort = this.matSort();
         for (let index = 0; index < this.miembros.length; index++) {
           this.getCargo(this.miembros[index]);
           this.getGrado(this.miembros[index]);

@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, ViewChild, inject } from "@angular/core";
+import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -167,17 +167,17 @@ export default class ContenidosComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly matSort = viewChild.required(MatSort);
 
-  @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort2!: MatSort;
+  readonly paginator2 = viewChild.required(MatPaginator);
+  readonly sort2 = viewChild.required(MatSort);
 
-  @ViewChild(MatPaginator, { static: true }) paginator3!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort3!: MatSort;
+  readonly paginator3 = viewChild.required(MatPaginator);
+  readonly sort3 = viewChild.required(MatSort);
 
-  @ViewChild(MatPaginator, { static: true }) paginator4!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort4!: MatSort;
+  readonly paginator4 = viewChild.required(MatPaginator);
+  readonly sort4 = viewChild.required(MatSort);
 
   selectedTab = 0;
   displayedNotFound = false;
@@ -209,8 +209,8 @@ export default class ContenidosComponent implements OnInit {
         );
         this.lineasInvestigaciones = res;
         this.dataSource = new MatTableDataSource(this.lineasInvestigaciones);
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.matSort();
+        this.dataSource.paginator = this.paginator();
       }
     });
   }
@@ -254,8 +254,8 @@ export default class ContenidosComponent implements OnInit {
           (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
         );
         this.dataSource2 = new MatTableDataSource(res);
-        this.dataSource2.sort = this.sort2;
-        this.dataSource2.paginator = this.paginator2;
+        this.dataSource2.sort = this.sort2();
+        this.dataSource2.paginator = this.paginator2();
       }
     });
   }
@@ -406,8 +406,8 @@ export default class ContenidosComponent implements OnInit {
           (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
         );
         this.dataSource3 = new MatTableDataSource(res);
-        this.dataSource3.sort = this.sort3;
-        this.dataSource3.paginator = this.paginator3;
+        this.dataSource3.sort = this.sort3();
+        this.dataSource3.paginator = this.paginator3();
       }
     });
   }
@@ -419,8 +419,8 @@ export default class ContenidosComponent implements OnInit {
           (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
         );
         this.dataSource4 = new MatTableDataSource(res);
-        this.dataSource4.sort = this.sort4;
-        this.dataSource4.paginator = this.paginator4;
+        this.dataSource4.sort = this.sort4();
+        this.dataSource4.paginator = this.paginator4();
       }
     });
   }

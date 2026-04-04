@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
 import { Title } from "@angular/platform-browser";
@@ -15,7 +14,7 @@ import { SoftwareService } from "@app/shared/services/software.service";
   selector: "app-facilities",
   templateUrl: "./facilities.component.html",
   styleUrls: ["./facilities.component.scss"],
-  imports: [NgClass, MatChipSet, MatChip],
+  imports: [MatChipSet, MatChip],
 })
 export default class FacilitiesComponent implements OnInit {
   _equipoService = inject(EquipoService);

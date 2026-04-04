@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
@@ -18,7 +17,7 @@ import { ClassicEditor } from "ckeditor5";
   selector: "app-add-method",
   templateUrl: "./add-method.component.html",
   styleUrls: ["./add-method.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

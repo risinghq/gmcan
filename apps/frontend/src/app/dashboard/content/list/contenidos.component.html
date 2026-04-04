@@ -45,7 +45,7 @@
               [(ngModel)]="aboutUs.quienesSomos"
               formControlName="quienesSomos"
               name="quienesSomos"
-            ></ckeditor>
+            />
           </div>
           <div class="full-width mb-24">
             <div class="flex-news">
@@ -57,7 +57,7 @@
               [(ngModel)]="aboutUs.quienesSomosEN"
               formControlName="quienesSomosEN"
               name="quienesSomosEN"
-            ></ckeditor>
+            />
           </div>
           <div class="right black-btn mb-12">
             <div class="link link-set" (click)="submitQuienesSomos()">Actualizar información</div>
@@ -70,12 +70,7 @@
               <div class="text-category">Objetivos en español <span class="red-text">*</span></div>
               <div class="green-text right plex-sans" (click)="previewAboutUs(0)">Vista Previa</div>
             </div>
-            <ckeditor
-              [editor]="Editor"
-              [(ngModel)]="aboutUs.objetivos"
-              formControlName="objetivos"
-              name="objetivos"
-            ></ckeditor>
+            <ckeditor [editor]="Editor" [(ngModel)]="aboutUs.objetivos" formControlName="objetivos" name="objetivos" />
           </div>
           <div class="full-width mb-24">
             <div class="flex-news">
@@ -87,7 +82,7 @@
               [(ngModel)]="aboutUs.objetivosEN"
               formControlName="objetivosEN"
               name="objetivosEN"
-            ></ckeditor>
+            />
           </div>
           <div class="right black-btn mb-12">
             <div class="link link-set" (click)="submitObjetivos()">Actualizar información</div>
@@ -100,12 +95,7 @@
               <div class="text-category">Servicios en español <span class="red-text">*</span></div>
               <div class="green-text right plex-sans" (click)="previewAboutUs(0)">Vista Previa</div>
             </div>
-            <ckeditor
-              [editor]="Editor"
-              [(ngModel)]="aboutUs.servicios"
-              formControlName="servicios"
-              name="servicios"
-            ></ckeditor>
+            <ckeditor [editor]="Editor" [(ngModel)]="aboutUs.servicios" formControlName="servicios" name="servicios" />
           </div>
           <div class="full-width mb-24">
             <div class="flex-news">
@@ -117,7 +107,7 @@
               [(ngModel)]="aboutUs.serviciosEN"
               formControlName="serviciosEN"
               name="serviciosEN"
-            ></ckeditor>
+            />
           </div>
           <div class="right black-btn mb-12">
             <div class="link link-set" (click)="submitServicios()">Actualizar información</div>
@@ -148,7 +138,7 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound"></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound" />
         @if (displayedNotFound) {
           <span class="plex-sans">No se encontraron resultados</span>
         }
@@ -177,7 +167,7 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2"></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2" />
         @if (displayedNotFound2) {
           <span class="plex-sans">No se encontraron resultados</span>
         }
@@ -271,7 +261,7 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound3"></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound3" />
         @if (displayedNotFound3) {
           <span class="plex-sans">No se encontraron resultados</span>
         }
@@ -295,7 +285,7 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound4"></mat-paginator>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound4" />
         @if (displayedNotFound4) {
           <span class="plex-sans">No se encontraron resultados</span>
         }
@@ -315,7 +305,7 @@
             [(ngModel)]="trabajosFuturos.trabajosFuturos"
             formControlName="trabajosFuturos"
             name="trabajosFuturos"
-          ></ckeditor>
+          />
         </div>
         <div class="full-width mb-24">
           <div class="flex-news">
@@ -327,7 +317,7 @@
             [(ngModel)]="trabajosFuturos.trabajosFuturosEN"
             formControlName="trabajosFuturosEN"
             name="trabajosFuturosEN"
-          ></ckeditor>
+          />
         </div>
         <div class="right black-btn mb-12">
           <div class="link link-set" (click)="submitTrabajosFuturos()">Actualizar información</div>

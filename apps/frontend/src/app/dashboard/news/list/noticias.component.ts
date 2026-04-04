@@ -1,5 +1,5 @@
-import { TitleCasePipe, DatePipe, NgClass } from "@angular/common";
-import { Component, OnInit, ViewChild, inject } from "@angular/core";
+import { TitleCasePipe, DatePipe } from "@angular/common";
+import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -50,7 +50,6 @@ interface NoticiaResponse extends Noticia {
     MatSortHeader,
     MatCellDef,
     MatCell,
-    NgClass,
     MatHeaderRowDef,
     MatHeaderRow,
     MatRowDef,
@@ -83,11 +82,11 @@ export default class NoticiasComponent implements OnInit {
     this.selectedTab = this._tabState.newsTab();
   }
 
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly matSort = viewChild.required(MatSort);
 
-  @ViewChild(MatPaginator, { static: true }) paginator2!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort2!: MatSort;
+  readonly paginator2 = viewChild.required(MatPaginator);
+  readonly sort2 = viewChild.required(MatSort);
 
   constructor() {
     this.url = GLOBAL.url;
@@ -110,8 +109,8 @@ export default class NoticiasComponent implements OnInit {
         );
         this.noticias = res;
         this.dataSource = new MatTableDataSource(this.noticias);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator();
+        this.dataSource.sort = this.matSort();
         for (let index = 0; index < this.noticias.length; index++) {
           for (let j = 0; j < this.tiponoticias.length; j++) {
             if (this.noticias[index].tipoNoticia_idtipoNoticia === this.tiponoticias[j].idtipoNoticia) {
@@ -139,8 +138,8 @@ export default class NoticiasComponent implements OnInit {
       res.sort((a: TipoNoticia, b: TipoNoticia) => ((a.nombre ?? "") > (b.nombre ?? "") ? 1 : -1));
       this.tiponoticias = res;
       this.dataSource2 = new MatTableDataSource(this.tiponoticias);
-      this.dataSource2.sort = this.sort2;
-      this.dataSource2.paginator = this.paginator2;
+      this.dataSource2.sort = this.sort2();
+      this.dataSource2.paginator = this.paginator2();
       this.getNoticia();
     });
   }

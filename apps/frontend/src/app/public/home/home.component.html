@@ -1,5 +1,5 @@
 @if (progress < 100) {
-  <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+  <mat-progress-bar mode="determinate" [value]="progress" />
 }
 <div class="home-div primer-box">
   <div class="center">
@@ -28,7 +28,7 @@
       <div class="counter-text auto">{{ language.resumenes }}</div>
     </div>
   </div>
-  <div class="center know-more" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+  <div class="center know-more" [style.display]="screenWidth < 960 ? 'none' : 'block'">
     {{ language.knowAbout }}
     <span
       style="text-decoration: underline; cursor: pointer"
@@ -38,10 +38,10 @@
   </div>
 </div>
 <div class="home-div segundo-box">
-  <div class="grey-title" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+  <div class="grey-title" [style.display]="screenWidth > 960 ? 'none' : 'block'">
     {{ language.knowAbout }}
   </div>
-  <div class="black-title" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+  <div class="black-title" [style.display]="screenWidth > 960 ? 'none' : 'block'">
     {{ language.linesminus }}
   </div>
   <div class="row lines-investigation">
@@ -79,11 +79,7 @@
     <div class="black-title">
       {{ language.newsminus }}
     </div>
-    <div
-      class="btn-black"
-      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
-      (click)="navigate('/home/news')"
-    >
+    <div class="btn-black" [style.display]="screenWidth < 960 ? 'none' : 'block'" (click)="navigate('/home/news')">
       <a class="btn-text2">
         {{ language.seeNews }}
       </a>
@@ -116,7 +112,7 @@
           <div class="main-news-title" (click)="detalleNoticia(noticiaPrincipal)">
             {{ noticiaPrincipal.titulo }}
           </div>
-          <div class="main-news-res" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+          <div class="main-news-res" [style.display]="screenWidth < 960 ? 'none' : 'block'">
             {{ noticiaPrincipal.resumen }}
           </div>
           <div class="news-author main-author">{{ language.newsText[0].by }} {{ noticiaPrincipal.autor }}</div>
@@ -125,8 +121,8 @@
     </div>
     <div class="col-lg-4">
       @for (noticia of noticias | slice: 1 : 3; track noticia; let i = $index) {
-        <div class="news-box" [ngClass]="{ 'mb-other': i == 0 }">
-          <div class="img-hover-zoom" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+        <div class="news-box" [class.mb-other]="i == 0">
+          <div class="img-hover-zoom" [style.display]="screenWidth < 960 ? 'none' : 'block'">
             @if (noticia.foto) {
               <img class="other-img-news" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
             }
@@ -146,10 +142,7 @@
               </div>
               <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
             </div>
-            <div
-              class="img-hover-zoom ml-16 other-img-news-div"
-              [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
-            >
+            <div class="img-hover-zoom ml-16 other-img-news-div" [style.display]="screenWidth > 960 ? 'none' : 'block'">
               @if (noticia.foto) {
                 <img class="other-img-news" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
               }
@@ -159,7 +152,7 @@
       }
     </div>
   </div>
-  <div class="btn-black" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }" (click)="navigate('/home/news')">
+  <div class="btn-black" [style.display]="screenWidth > 960 ? 'none' : 'block'" (click)="navigate('/home/news')">
     <a class="btn-text2">
       {{ language.seeNews }}
     </a>
@@ -169,7 +162,7 @@
     <div class="mt-services about-text" id="services"></div>
     <div
       class="btn-black align-center"
-      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
+      [style.display]="screenWidth < 960 ? 'none' : 'block'"
       (click)="navigate('/home/about-us/about')"
     >
       <a class="btn-text2">
@@ -179,7 +172,7 @@
   </div>
   <div
     class="btn-black"
-    [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+    [style.display]="screenWidth > 960 ? 'none' : 'block'"
     (click)="navigate('/home/about-us/about')"
   >
     <a class="btn-text2">
@@ -241,7 +234,7 @@
     </div>
     <div
       class="btn-black"
-      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
+      [style.display]="screenWidth < 960 ? 'none' : 'block'"
       (click)="navigate('/home/publications')"
     >
       <a class="btn-text2">
@@ -251,12 +244,12 @@
   </div>
   <div class="publication-list">
     @for (publicacion of publicaciones | slice: 0 : 5; track publicacion; let i = $index) {
-      <div class="publication flex-news" [ngClass]="{ notoppd: i === 0, 'no-border': i + 1 == publicaciones.length }">
-        <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+      <div class="publication flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == publicaciones.length }">
+        <div class="col-lg-4 col-md-12 nopd" [style.display]="screenWidth < 960 ? 'none' : 'block'">
           @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
             <div
               class="publication-type"
-              [ngClass]="{
+              [class]="{
                 'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
                 'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
               }"
@@ -325,11 +318,11 @@
         </div>
         <div class="col-lg-8 col-md-12 nopd">
           <div>
-            <div class="flex-news" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+            <div class="flex-news" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
               @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
                 <div
                   class="publication-type"
-                  [ngClass]="{
+                  [class]="{
                     'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
                     'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
                   }"
@@ -351,7 +344,7 @@
                 {{ publicacion.titulo }}
               </div>
             </div>
-            <div class="flex-news publication-mt" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+            <div class="flex-news publication-mt" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
               <div class="publication-date d-none d-md-block d-lg-block d-xl-block">
                 {{ publicacion.fecha }}
               </div>
@@ -380,7 +373,7 @@
               }
             </div>
             @if (publicacion.DOI != null) {
-              <div class="publication-rev line-1" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+              <div class="publication-rev line-1" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
                 DOI:
                 <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank">{{
                   publicacion.DOI
@@ -411,10 +404,10 @@
                 }
               }
             </div>
-            <div class="abstract" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'flex' }">
+            <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">
               {{ publicacion.resumen }}
             </div>
-            <div class="flex-news mt-16" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'flex' }">
+            <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
               @if (
                 publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo != ""
               ) {
@@ -438,7 +431,7 @@
               }
               <a
                 id="abstract{{ i }}"
-                [ngClass]="{ 'abstract-active': selectedItem === i }"
+                [class.abstract-active]="selectedItem === i"
                 (click)="listClick($event, i)"
                 class="publication-abstract"
                 data-toggle="collapse"
@@ -451,7 +444,7 @@
               </a>
               <mat-icon
                 class="publication-abs-icon"
-                [ngClass]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
+                [class]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
               >
                 keyboard_arrow_down
               </mat-icon>
@@ -469,7 +462,7 @@
   </div>
   <div
     class="btn-black"
-    [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+    [style.display]="screenWidth > 960 ? 'none' : 'block'"
     (click)="navigate('/home/publications')"
   >
     <a class="btn-text2">
@@ -483,11 +476,7 @@
     <div class="black-title">
       {{ language.projectsminus }}
     </div>
-    <div
-      class="btn-black"
-      [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }"
-      (click)="navigate('/home/projects')"
-    >
+    <div class="btn-black" [style.display]="screenWidth < 960 ? 'none' : 'block'" (click)="navigate('/home/projects')">
       <a class="btn-text2">
         {{ language.seeProjects }}
       </a>
@@ -495,8 +484,8 @@
   </div>
   <div class="publication-list">
     @for (proyecto of proyectos | slice: 0 : 5; track proyecto; let i = $index) {
-      <div class="project flex-news" [ngClass]="{ notoppd: i === 0, 'no-border': i + 1 == proyectos.length }">
-        <div class="col-lg-4 col-md-12 nopd" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+      <div class="project flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == proyectos.length }">
+        <div class="col-lg-4 col-md-12 nopd" [style.display]="screenWidth < 960 ? 'none' : 'block'">
           <div class="project-code">
             {{ proyecto.codigo }}
           </div>
@@ -518,7 +507,7 @@
           </div>
         </div>
         <div class="col-lg-8 col-md-12 nopd">
-          <div class="project-code" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+          <div class="project-code" [style.display]="screenWidth > 960 ? 'none' : 'block'">
             {{ proyecto.codigo }}
           </div>
           <div class="flex-news">
@@ -526,7 +515,7 @@
               {{ proyecto.titulo }}
             </div>
           </div>
-          <div class="project-rev" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+          <div class="project-rev" [style.display]="screenWidth > 960 ? 'none' : 'block'">
             <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong
             >{{ proyecto.lineasInvestigacion }}
           </div>
@@ -549,13 +538,13 @@
                 </div>
               }
             </div>
-            <div class="abstract" [ngStyle]="{ display: screenWidth < 960 ? 'none' : 'block' }">
+            <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'block'">
               {{ proyecto.descripcion }}
             </div>
-            <div class="flex-news" [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }">
+            <div class="flex-news" [style.display]="screenWidth > 960 ? 'none' : 'block'">
               <a
                 id="abstract{{ i }}"
-                [ngClass]="{ 'abstract-active': selectedItem === i }"
+                [class.abstract-active]="selectedItem === i"
                 (click)="listClick($event, i)"
                 class="project-abstract"
                 data-toggle="collapse"
@@ -568,7 +557,7 @@
               </a>
               <mat-icon
                 class="project-abs-icon"
-                [ngClass]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
+                [class]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
               >
                 keyboard_arrow_down
               </mat-icon>
@@ -605,7 +594,7 @@
   <button
     mat-flat-button
     class="btn-black"
-    [ngStyle]="{ display: screenWidth > 960 ? 'none' : 'block' }"
+    [style.display]="screenWidth > 960 ? 'none' : 'block'"
     (click)="navigate('/home/projects')"
   >
     {{ language.seeProjects }}

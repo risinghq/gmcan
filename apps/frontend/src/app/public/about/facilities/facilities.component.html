@@ -24,7 +24,7 @@
     @if (equipos.length > 0) {
       <div>
         @for (equipo of equipos; track equipo; let i = $index) {
-          <div class="publication" [ngClass]="{ 'no-border': i + 1 == equipos.length }">
+          <div class="publication" [class.no-border]="i + 1 == equipos.length">
             <div class="equipment-name mb-equipment">
               {{ equipo.nombre }}
             </div>
@@ -54,7 +54,7 @@
     @if (software.length > 0) {
       <div>
         @for (soft of software; track soft; let i = $index) {
-          <div class="publication" [ngClass]="{ 'no-border': i + 1 == software.length }">
+          <div class="publication" [class.no-border]="i + 1 == software.length">
             <div class="equipment-name mb-8">
               {{ soft.nombre }}
             </div>

@@ -87,14 +87,14 @@
     </div>
   </mat-sidenav>
   <mat-sidenav-content>
-    <div class="search-top full-width" [ngStyle]="{ display: screenWidth > 1050 ? 'none' : 'inline-flex' }">
+    <div class="search-top full-width" [style.display]="screenWidth > 1050 ? 'none' : 'inline-flex'">
       @if (!inputExpand) {
         <div class="languages">
-          <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 1 }" (click)="lanSelect(1)">
+          <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
             <div class="fitter">EN</div>
             <img class="flag" src="../../assets/img/usa.jpg" />
           </div>
-          <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 0 }" (click)="lanSelect(0)">
+          <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
             <div class="fitter">ES</div>
             <img class="flag" src="../../assets/img/spain.png" />
           </div>
@@ -120,7 +120,7 @@
       <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
         <img class="logo-nav" src="{{ grupoinfo.logoHeader }}" alt="logo" />
       </div>
-      <div class="full-width ml-16" [ngStyle]="{ display: screenWidth < 1050 ? 'none' : 'block' }">
+      <div class="full-width ml-16" [style.display]="screenWidth < 1050 ? 'none' : 'block'">
         <div class="top-bar-div">
           <form class="input-search-toolbar full-width" [formGroup]="searchGlobalForm">
             <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
@@ -135,11 +135,11 @@
             />
           </form>
           <div class="languages mr-12">
-            <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 1 }" (click)="lanSelect(1)">
+            <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
               <div class="fitter">EN</div>
               <img class="flag" src="../../assets/img/usa.jpg" />
             </div>
-            <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 0 }" (click)="lanSelect(0)">
+            <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
               <div class="fitter">ES</div>
               <img class="flag" src="../../assets/img/spain.png" />
             </div>
@@ -251,12 +251,12 @@
           </div>
         </div>
       </div>
-      <div class="right menu-text" [ngStyle]="{ display: screenWidth > 1050 ? 'none' : 'block' }">Menú</div>
-      <div [ngStyle]="{ display: screenWidth > 1024 ? 'none' : 'block' }">
+      <div class="right menu-text" [style.display]="screenWidth > 1050 ? 'none' : 'block'">Menú</div>
+      <div [style.display]="screenWidth > 1024 ? 'none' : 'block'">
         <mat-icon class="center-vertical carousel-icon" (click)="sidenav.open()" style="color: black"> menu </mat-icon>
       </div>
     </mat-toolbar>
-    <router-outlet></router-outlet>
+    <router-outlet />
     <footer class="footer-div text-white">
       <div class="footer-flex">
         <div class="flex-news">

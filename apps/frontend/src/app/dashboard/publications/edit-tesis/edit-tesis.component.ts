@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass, AsyncPipe } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, Validators, FormGroup, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
@@ -63,7 +63,6 @@ interface TipoTesisItem {
     MatAutocompleteTrigger,
     MatAutocomplete,
     AutosizeModule,
-    NgClass,
     AsyncPipe,
   ],
 })

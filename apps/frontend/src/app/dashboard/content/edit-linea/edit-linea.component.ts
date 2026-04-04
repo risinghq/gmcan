@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -28,7 +27,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-edit-linea",
   templateUrl: "../add-linea/add-linea.component.html",
   styleUrls: ["../add-linea/add-linea.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

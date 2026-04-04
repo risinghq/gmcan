@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import {
   AbstractControl,
@@ -85,7 +84,6 @@ interface StatusResponse {
     MatDatepickerToggle,
     MatSuffix,
     MatDatepicker,
-    NgClass,
   ],
 })
 export default class EditProyectoComponent implements OnInit, HasUnsavedChanges {

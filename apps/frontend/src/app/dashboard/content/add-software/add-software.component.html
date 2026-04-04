@@ -46,7 +46,7 @@
             <div class="link link-set link-red" (click)="openEraser()">Eliminar software</div>
           </div>
         }
-        <div class="right" [ngClass]="{ 'btn-grey': !softwareForm.valid, 'black-btn': softwareForm.valid }">
+        <div class="right" [class]="{ 'btn-grey': !softwareForm.valid, 'black-btn': softwareForm.valid }">
           <div class="link link-set" (click)="submitSoftware()">
             {{ button_text }}
           </div>

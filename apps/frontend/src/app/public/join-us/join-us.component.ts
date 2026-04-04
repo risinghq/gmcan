@@ -1,4 +1,3 @@
-import { NgStyle } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
@@ -95,7 +94,7 @@ export default class JoinUsComponent implements OnInit {
 @Component({
   selector: "exitoso-dialog",
   templateUrl: "../../shared/modals/email-exitoso.html",
-  imports: [NgStyle, MatButton],
+  imports: [MatButton],
 })
 export class EmailExitoso {
   dialogRef = inject<MatDialogRef<EmailExitoso>>(MatDialogRef);

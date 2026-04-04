@@ -1,4 +1,4 @@
-import { Location, NgStyle, NgClass, SlicePipe } from "@angular/common";
+import { Location, NgClass, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
@@ -33,7 +33,6 @@ import {
     MatProgressSpinner,
     MatButton,
     MatMenuTrigger,
-    NgStyle,
     MatMenu,
     MatMenuItem,
     NgbPagination,

@@ -1,7 +1,7 @@
 <div class="publication-div">
   @if (!cargado) {
     <div>
-      <mat-spinner></mat-spinner>
+      <mat-spinner />
     </div>
   }
   @if (cargado) {
@@ -43,7 +43,7 @@
                 </form>
                 @if (!allCharged) {
                   <div class="spinner-pad">
-                    <mat-spinner class="auto mb-8"></mat-spinner>
+                    <mat-spinner class="auto mb-8" />
                     <div class="loading-text center">Cargando</div>
                   </div>
                 }
@@ -64,7 +64,7 @@
                           @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
                             <div
                               class="publication-type"
-                              [ngClass]="{
+                              [class]="{
                                 'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
                                 'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
                               }"
@@ -179,7 +179,7 @@
                           }
                           <a
                             id="abstract{{ i }}"
-                            [ngClass]="{ 'abstract-active': selectedItem === i }"
+                            [class.abstract-active]="selectedItem === i"
                             (click)="listClick($event, i)"
                             class="publication-abstract"
                             data-toggle="collapse"
@@ -192,7 +192,7 @@
                           </a>
                           <mat-icon
                             class="publication-abs-icon"
-                            [ngClass]="{
+                            [class]="{
                               'abs-active': selectedItem === i,
                               'abs-not-active': selectedItem == -1,
                             }"
@@ -237,7 +237,7 @@
         </div>
       </div>
       <div class="col-lg-4 col-sm-6 col-12">
-        <app-news></app-news>
+        <app-news />
       </div>
     </div>
   }

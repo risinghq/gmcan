@@ -65,7 +65,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound" />
     @if (displayedNotFound) {
       <span class="plex-sans">No se encontraron resultados</span>
     }
@@ -105,7 +105,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2" />
     @if (displayedNotFound2) {
       <span class="plex-sans">No se encontraron resultados</span>
     }

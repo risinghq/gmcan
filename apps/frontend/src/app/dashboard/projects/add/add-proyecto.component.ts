@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -66,7 +65,6 @@ interface AddProyectoResponse {
     MatDatepickerToggle,
     MatSuffix,
     MatDatepicker,
-    NgClass,
   ],
 })
 export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {

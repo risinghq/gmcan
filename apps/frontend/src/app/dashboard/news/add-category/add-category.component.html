@@ -34,11 +34,11 @@
       </form>
       <div class="flex-news">
         @if (edit) {
-          <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
+          <div [class]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
             <div class="link link-set link-red" (click)="openEraser()">Eliminar categoría</div>
           </div>
         }
-        <div class="right" [ngClass]="{ 'btn-grey': !categoryForm.valid, 'black-btn': categoryForm.valid }">
+        <div class="right" [class]="{ 'btn-grey': !categoryForm.valid, 'black-btn': categoryForm.valid }">
           <div class="link link-set" (click)="submitCategory()">
             {{ button_text }}
           </div>

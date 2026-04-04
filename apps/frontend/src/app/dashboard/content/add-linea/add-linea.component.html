@@ -86,11 +86,11 @@
       </div>
       <div class="flex-news">
         @if (edit) {
-          <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
+          <div [class]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
             <div class="link link-set link-red" (click)="openEraser()">Eliminar línea</div>
           </div>
         }
-        <div class="right" [ngClass]="{ 'btn-grey': !lineaForm.valid, 'black-btn': lineaForm.valid }">
+        <div class="right" [class]="{ 'btn-grey': !lineaForm.valid, 'black-btn': lineaForm.valid }">
           <div class="link link-set" (click)="submitLinea()">
             {{ button_text }}
           </div>

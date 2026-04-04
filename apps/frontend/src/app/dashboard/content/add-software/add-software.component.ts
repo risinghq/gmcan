@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -15,7 +14,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-add-software",
   templateUrl: "./add-software.component.html",
   styleUrls: ["./add-software.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

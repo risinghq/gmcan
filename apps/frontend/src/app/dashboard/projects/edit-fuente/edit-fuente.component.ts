@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -29,7 +28,7 @@ interface StatusResponse {
   selector: "app-edit-fuente",
   templateUrl: "../add-fuente/add-fuente.component.html",
   styleUrls: ["../add-fuente/add-fuente.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

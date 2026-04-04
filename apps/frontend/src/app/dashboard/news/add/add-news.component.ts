@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { TitleCasePipe, NgClass } from "@angular/common";
+import { TitleCasePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -77,7 +77,6 @@ interface NewsPreviewData {
     MatOption,
     AutosizeModule,
     CKEditorModule,
-    NgClass,
   ],
 })
 export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
