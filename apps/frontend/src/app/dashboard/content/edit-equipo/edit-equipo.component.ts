@@ -23,7 +23,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 @Component({
   selector: "app-edit-equipo",
   templateUrl: "../add-equipo/add-equipo.component.html",
-  styleUrls: ["../add-equipo/add-equipo.component.scss"],
+  styleUrl: "../add-equipo/add-equipo.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {

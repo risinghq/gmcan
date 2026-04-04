@@ -27,7 +27,7 @@ interface StatusResponse {
 @Component({
   selector: "app-edit-fuente",
   templateUrl: "../add-fuente/add-fuente.component.html",
-  styleUrls: ["../add-fuente/add-fuente.component.scss"],
+  styleUrl: "../add-fuente/add-fuente.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {

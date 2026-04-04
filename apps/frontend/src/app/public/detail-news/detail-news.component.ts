@@ -19,7 +19,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 @Component({
   selector: "app-detail-news",
   templateUrl: "./detail-news.component.html",
-  styleUrls: ["./detail-news.component.scss"],
+  styleUrl: "./detail-news.component.scss",
   imports: [MatProgressSpinner, MatIcon, NewsComponent],
 })
 export default class DetailNewsComponent implements OnInit {

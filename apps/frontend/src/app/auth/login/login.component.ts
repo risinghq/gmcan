@@ -16,7 +16,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
-  styleUrls: ["./login.component.scss"],
+  styleUrl: "./login.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class LoginComponent implements OnInit {

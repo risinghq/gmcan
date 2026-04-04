@@ -23,7 +23,7 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
 @Component({
   selector: "app-edit-universidad",
   templateUrl: "../add-universidad/add-universidad.component.html",
-  styleUrls: ["../add-universidad/add-universidad.component.scss"],
+  styleUrl: "../add-universidad/add-universidad.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditUniversidadComponent implements OnInit, HasUnsavedChanges {

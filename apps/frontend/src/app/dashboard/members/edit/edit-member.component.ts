@@ -67,7 +67,7 @@ interface PermisoResponse {
 @Component({
   selector: "app-edit-member",
   templateUrl: "../add/add-member.component.html",
-  styleUrls: ["./edit-member.component.scss"],
+  styleUrl: "./edit-member.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

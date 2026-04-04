@@ -27,7 +27,7 @@ interface StatusResponse {
 @Component({
   selector: "app-edit-category",
   templateUrl: "../add-category/add-category.component.html",
-  styleUrls: ["../add-category/add-category.component.scss"],
+  styleUrl: "../add-category/add-category.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditCategoryComponent implements OnInit, HasUnsavedChanges {

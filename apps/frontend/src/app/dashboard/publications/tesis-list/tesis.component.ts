@@ -30,7 +30,7 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
 @Component({
   selector: "app-tesis",
   templateUrl: "./tesis.component.html",
-  styleUrls: ["./tesis.component.scss"],
+  styleUrl: "./tesis.component.scss",
   imports: [
     MatTabGroup,
     MatTab,

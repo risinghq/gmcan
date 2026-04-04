@@ -19,7 +19,7 @@ import { map, startWith } from "rxjs/operators";
 @Component({
   selector: "app-add-evento",
   templateUrl: "./add-evento.component.html",
-  styleUrls: ["./add-evento.component.scss"],
+  styleUrl: "./add-evento.component.scss",
   imports: [
     MatIcon,
     FormsModule,

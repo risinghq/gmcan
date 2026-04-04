@@ -24,7 +24,7 @@ import {
 @Component({
   selector: "app-lines-investigation",
   templateUrl: "./lines-investigation.component.html",
-  styleUrls: ["./lines-investigation.component.scss"],
+  styleUrl: "./lines-investigation.component.scss",
   imports: [MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe],
 })
 export default class LinesInvestigationComponent implements OnInit {

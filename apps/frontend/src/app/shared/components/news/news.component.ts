@@ -15,7 +15,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 @Component({
   selector: "app-news",
   templateUrl: "./news.component.html",
-  styleUrls: ["./news.component.scss"],
+  styleUrl: "./news.component.scss",
   imports: [SlicePipe],
 })
 export default class NewsComponent implements OnInit {

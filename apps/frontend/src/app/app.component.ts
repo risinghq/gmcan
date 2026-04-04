@@ -11,7 +11,7 @@ import { SessionService } from "@app/shared/services/session.service";
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"],
+  styleUrl: "./app.component.scss",
   imports: [RouterOutlet],
 })
 export default class AppComponent {

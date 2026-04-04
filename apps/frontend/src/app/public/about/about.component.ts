@@ -9,7 +9,7 @@ import { GrupoService } from "@app/shared/services/grupo.service";
 @Component({
   selector: "app-about",
   templateUrl: "./about.component.html",
-  styleUrls: ["./about.component.scss"],
+  styleUrl: "./about.component.scss",
   imports: [MatIcon, RouterOutlet, RouterLink, RouterLinkActive],
 })
 export default class AboutComponent implements OnInit {

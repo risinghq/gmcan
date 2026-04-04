@@ -23,7 +23,7 @@ import { AutosizeModule } from "ngx-autosize";
 @Component({
   selector: "app-edit-software",
   templateUrl: "../add-software/add-software.component.html",
-  styleUrls: ["../add-software/add-software.component.scss"],
+  styleUrl: "../add-software/add-software.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges {

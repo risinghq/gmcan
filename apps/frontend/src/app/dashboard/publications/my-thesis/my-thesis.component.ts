@@ -30,7 +30,7 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 @Component({
   selector: "app-my-thesis",
   templateUrl: "./my-thesis.component.html",
-  styleUrls: ["./my-thesis.component.scss"],
+  styleUrl: "./my-thesis.component.scss",
   imports: [
     MatIcon,
     MatTable,

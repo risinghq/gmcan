@@ -12,7 +12,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 @Component({
   selector: "app-change-pass",
   templateUrl: "./change-pass.component.html",
-  styleUrls: ["./change-pass.component.scss"],
+  styleUrl: "./change-pass.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class ChangePassComponent implements OnInit {

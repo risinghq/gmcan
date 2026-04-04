@@ -61,7 +61,7 @@ interface NewsPreviewData {
 @Component({
   selector: "app-add-news",
   templateUrl: "./add-news.component.html",
-  styleUrls: ["./add-news.component.scss"],
+  styleUrl: "./add-news.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,
@@ -323,7 +323,7 @@ export class DialogPublish {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-preview.html",
-  styleUrls: ["../../../public/detail-news/detail-news.component.scss"],
+  styleUrl: "../../../public/detail-news/detail-news.component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview {

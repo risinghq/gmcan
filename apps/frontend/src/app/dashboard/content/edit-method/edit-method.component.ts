@@ -26,7 +26,7 @@ import { ClassicEditor } from "ckeditor5";
 @Component({
   selector: "app-edit-method",
   templateUrl: "../add-method/add-method.component.html",
-  styleUrls: ["../add-method/add-method.component.scss"],
+  styleUrl: "../add-method/add-method.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
 })
 export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
@@ -210,7 +210,7 @@ export class DialogErase12 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
-  styleUrls: ["../../../public/about/method/method.component.scss"],
+  styleUrl: "../../../public/about/method/method.component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview5 {

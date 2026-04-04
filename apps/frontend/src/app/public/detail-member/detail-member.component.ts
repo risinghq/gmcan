@@ -35,7 +35,7 @@ import {
 @Component({
   selector: "app-detail-member",
   templateUrl: "./detail-member.component.html",
-  styleUrls: ["./detail-member.component.scss"],
+  styleUrl: "./detail-member.component.scss",
   imports: [
     MatProgressSpinner,
     MatIcon,

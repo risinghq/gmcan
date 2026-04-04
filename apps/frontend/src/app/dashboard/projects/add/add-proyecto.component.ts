@@ -49,7 +49,7 @@ interface AddProyectoResponse {
 @Component({
   selector: "app-add-proyecto",
   templateUrl: "./add-proyecto.component.html",
-  styleUrls: ["./add-proyecto.component.scss"],
+  styleUrl: "./add-proyecto.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

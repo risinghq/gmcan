@@ -23,7 +23,7 @@ interface UsuarioPermisoItem {
 @Component({
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
-  styleUrls: ["./dashboard.component.scss"],
+  styleUrl: "./dashboard.component.scss",
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export default class DashboardComponent implements OnInit {

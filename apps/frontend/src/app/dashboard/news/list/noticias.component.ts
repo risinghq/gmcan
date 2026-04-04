@@ -37,7 +37,7 @@ interface NoticiaResponse extends Noticia {
 @Component({
   selector: "app-noticias",
   templateUrl: "./noticias.component.html",
-  styleUrls: ["./noticias.component.scss"],
+  styleUrl: "./noticias.component.scss",
   imports: [
     MatTabGroup,
     MatTab,

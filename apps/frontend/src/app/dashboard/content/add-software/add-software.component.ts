@@ -13,7 +13,7 @@ import { AutosizeModule } from "ngx-autosize";
 @Component({
   selector: "app-add-software",
   templateUrl: "./add-software.component.html",
-  styleUrls: ["./add-software.component.scss"],
+  styleUrl: "./add-software.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {

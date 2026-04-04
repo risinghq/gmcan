@@ -28,7 +28,7 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 @Component({
   selector: "app-my-article",
   templateUrl: "./my-article.component.html",
-  styleUrls: ["./my-article.component.scss"],
+  styleUrl: "./my-article.component.scss",
   imports: [
     MatIcon,
     MatTable,

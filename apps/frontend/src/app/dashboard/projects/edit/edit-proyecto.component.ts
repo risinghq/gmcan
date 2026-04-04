@@ -68,7 +68,7 @@ interface StatusResponse {
 @Component({
   selector: "app-edit-proyecto",
   templateUrl: "../add/add-proyecto.component.html",
-  styleUrls: ["../add/add-proyecto.component.scss"],
+  styleUrl: "../add/add-proyecto.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

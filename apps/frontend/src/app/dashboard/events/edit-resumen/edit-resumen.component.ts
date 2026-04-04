@@ -40,7 +40,7 @@ import { startWith, map } from "rxjs/operators";
 @Component({
   selector: "app-edit-resumen",
   templateUrl: "../add-resumen/add-resumen.component.html",
-  styleUrls: ["../add-resumen/add-resumen.component.scss"],
+  styleUrl: "../add-resumen/add-resumen.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

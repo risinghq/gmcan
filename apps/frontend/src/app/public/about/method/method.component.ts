@@ -8,7 +8,7 @@ import { MethodsService } from "@app/shared/services/methods.service";
 @Component({
   selector: "app-method",
   templateUrl: "./method.component.html",
-  styleUrls: ["./method.component.scss"],
+  styleUrl: "./method.component.scss",
   imports: [],
 })
 export default class MethodComponent implements OnInit {

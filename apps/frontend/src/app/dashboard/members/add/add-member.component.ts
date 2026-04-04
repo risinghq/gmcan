@@ -35,7 +35,7 @@ interface PermisoItem {
 @Component({
   selector: "app-add-member",
   templateUrl: "./add-member.component.html",
-  styleUrls: ["./add-member.component.scss"],
+  styleUrl: "./add-member.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

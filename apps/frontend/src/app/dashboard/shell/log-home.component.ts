@@ -22,7 +22,7 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 @Component({
   selector: "app-log-home",
   templateUrl: "./log-home.component.html",
-  styleUrls: ["./log-home.component.scss"],
+  styleUrl: "./log-home.component.scss",
   imports: [
     MatDrawerContainer,
     MatDrawer,

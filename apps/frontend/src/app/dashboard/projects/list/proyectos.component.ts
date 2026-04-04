@@ -30,7 +30,7 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
 @Component({
   selector: "app-proyectos",
   templateUrl: "./proyectos.component.html",
-  styleUrls: ["./proyectos.component.scss"],
+  styleUrl: "./proyectos.component.scss",
   imports: [
     MatTabGroup,
     MatTab,

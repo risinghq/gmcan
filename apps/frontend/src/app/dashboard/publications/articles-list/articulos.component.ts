@@ -29,7 +29,7 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
 @Component({
   selector: "app-articulos",
   templateUrl: "./articulos.component.html",
-  styleUrls: ["./articulos.component.scss"],
+  styleUrl: "./articulos.component.scss",
   imports: [
     MatTabGroup,
     MatTab,

@@ -45,7 +45,7 @@ import { AutosizeModule } from "ngx-autosize";
 @Component({
   selector: "app-contenidos",
   templateUrl: "./contenidos.component.html",
-  styleUrls: ["./contenidos.component.scss"],
+  styleUrl: "./contenidos.component.scss",
   imports: [
     MatTabGroup,
     MatTab,
@@ -601,7 +601,7 @@ export default class ContenidosComponent implements OnInit {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/about-us.html",
-  styleUrls: ["../../../public/about/about-us/about-us.component.scss"],
+  styleUrl: "../../../public/about/about-us/about-us.component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview3 {
@@ -634,7 +634,7 @@ export class DialogPreview3 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/trabajos-futuros.html",
-  styleUrls: ["../../../public/about/works/works.component.scss"],
+  styleUrl: "../../../public/about/works/works.component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview6 {

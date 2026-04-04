@@ -27,7 +27,7 @@ interface StatusResponse {
 @Component({
   selector: "app-edit-revista",
   templateUrl: "../add-revista/add-revista.component.html",
-  styleUrls: ["../add-revista/add-revista.component.scss"],
+  styleUrl: "../add-revista/add-revista.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {

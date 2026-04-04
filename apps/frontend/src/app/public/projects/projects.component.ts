@@ -29,7 +29,7 @@ import {
 @Component({
   selector: "app-projects",
   templateUrl: "./projects.component.html",
-  styleUrls: ["./projects.component.scss"],
+  styleUrl: "./projects.component.scss",
   imports: [
     MatIcon,
     MatTabGroup,

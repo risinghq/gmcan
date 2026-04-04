@@ -12,7 +12,7 @@ import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 @Component({
   selector: "app-add-category",
   templateUrl: "./add-category.component.html",
-  styleUrls: ["./add-category.component.scss"],
+  styleUrl: "./add-category.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {

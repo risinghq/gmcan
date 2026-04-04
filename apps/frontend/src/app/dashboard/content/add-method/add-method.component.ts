@@ -16,7 +16,7 @@ import { ClassicEditor } from "ckeditor5";
 @Component({
   selector: "app-add-method",
   templateUrl: "./add-method.component.html",
-  styleUrls: ["./add-method.component.scss"],
+  styleUrl: "./add-method.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
@@ -138,7 +138,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
-  styleUrls: ["../../../public/about/method/method.component.scss"],
+  styleUrl: "../../../public/about/method/method.component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview4 {

@@ -16,7 +16,7 @@ interface StatusResponse {
 @Component({
   selector: "app-add-universidad",
   templateUrl: "./add-universidad.component.html",
-  styleUrls: ["./add-universidad.component.scss"],
+  styleUrl: "./add-universidad.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddUniversidadComponent implements OnInit, HasUnsavedChanges {

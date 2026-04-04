@@ -12,7 +12,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 @Component({
   selector: "app-add-revista",
   templateUrl: "./add-revista.component.html",
-  styleUrls: ["./add-revista.component.scss"],
+  styleUrl: "./add-revista.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {

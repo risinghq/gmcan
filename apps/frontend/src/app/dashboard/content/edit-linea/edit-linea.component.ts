@@ -26,7 +26,7 @@ import { AutosizeModule } from "ngx-autosize";
 @Component({
   selector: "app-edit-linea",
   templateUrl: "../add-linea/add-linea.component.html",
-  styleUrls: ["../add-linea/add-linea.component.scss"],
+  styleUrl: "../add-linea/add-linea.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class EditLineaComponent implements OnInit, HasUnsavedChanges {

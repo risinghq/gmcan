@@ -17,7 +17,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 @Component({
   selector: "app-members",
   templateUrl: "./members.component.html",
-  styleUrls: ["./members.component.scss"],
+  styleUrl: "./members.component.scss",
   imports: [MatIcon, MatTabGroup, MatTab, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent implements OnInit {

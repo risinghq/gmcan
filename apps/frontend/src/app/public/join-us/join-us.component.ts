@@ -16,7 +16,7 @@ import { AutosizeModule } from "ngx-autosize";
 @Component({
   selector: "app-join-us",
   templateUrl: "./join-us.component.html",
-  styleUrls: ["./join-us.component.scss"],
+  styleUrl: "./join-us.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, MatButton, NewsComponent],
 })
 export default class JoinUsComponent implements OnInit {

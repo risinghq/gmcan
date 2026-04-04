@@ -12,7 +12,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 @Component({
   selector: "app-add-fuente",
   templateUrl: "./add-fuente.component.html",
-  styleUrls: ["./add-fuente.component.scss"],
+  styleUrl: "./add-fuente.component.scss",
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {

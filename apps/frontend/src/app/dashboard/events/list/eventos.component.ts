@@ -30,7 +30,7 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
 @Component({
   selector: "app-eventos",
   templateUrl: "./eventos.component.html",
-  styleUrls: ["./eventos.component.scss"],
+  styleUrl: "./eventos.component.scss",
   imports: [
     MatTabGroup,
     MatTab,

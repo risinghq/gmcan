@@ -26,7 +26,7 @@ import { AutosizeModule } from "ngx-autosize";
 @Component({
   selector: "app-perfil",
   templateUrl: "./perfil.component.html",
-  styleUrls: ["./perfil.component.scss"],
+  styleUrl: "./perfil.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     FormsModule,

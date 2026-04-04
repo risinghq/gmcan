@@ -35,7 +35,7 @@ interface PrefijoOption {
 @Component({
   selector: "app-miembros",
   templateUrl: "./miembros.component.html",
-  styleUrls: ["./miembros.component.scss"],
+  styleUrl: "./miembros.component.scss",
   imports: [
     MatIcon,
     MatTable,

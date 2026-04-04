@@ -35,7 +35,7 @@ import {
 @Component({
   selector: "app-publication",
   templateUrl: "./publication.component.html",
-  styleUrls: ["./publication.component.scss"],
+  styleUrl: "./publication.component.scss",
   imports: [
     MatProgressSpinner,
     MatIcon,

@@ -13,7 +13,7 @@ import { SoftwareService } from "@app/shared/services/software.service";
 @Component({
   selector: "app-facilities",
   templateUrl: "./facilities.component.html",
-  styleUrls: ["./facilities.component.scss"],
+  styleUrl: "./facilities.component.scss",
   imports: [MatChipSet, MatChip],
 })
 export default class FacilitiesComponent implements OnInit {

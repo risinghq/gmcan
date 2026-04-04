@@ -8,7 +8,7 @@ import { GrupoService } from "@app/shared/services/grupo.service";
 @Component({
   selector: "app-works",
   templateUrl: "./works.component.html",
-  styleUrls: ["./works.component.scss"],
+  styleUrl: "./works.component.scss",
 })
 export default class WorksComponent implements OnInit {
   _grupoService = inject(GrupoService);

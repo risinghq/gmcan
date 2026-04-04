@@ -17,7 +17,7 @@ import { SessionService } from "@app/shared/services/session.service";
 @Component({
   selector: "app-landing",
   templateUrl: "./landing.component.html",
-  styleUrls: ["./landing.component.scss"],
+  styleUrl: "./landing.component.scss",
   imports: [
     MatSidenavContainer,
     MatSidenav,

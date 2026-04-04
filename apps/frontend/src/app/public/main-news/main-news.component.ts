@@ -26,7 +26,7 @@ import {
 @Component({
   selector: "app-main-news",
   templateUrl: "./main-news.component.html",
-  styleUrls: ["./main-news.component.scss"],
+  styleUrl: "./main-news.component.scss",
   imports: [
     MatProgressBar,
     MatIcon,

@@ -29,7 +29,7 @@ import { map, startWith } from "rxjs/operators";
 @Component({
   selector: "app-add-article",
   templateUrl: "./add-article.component.html",
-  styleUrls: ["./add-article.component.scss"],
+  styleUrl: "./add-article.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

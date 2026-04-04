@@ -45,7 +45,7 @@ interface TipoTesisItem {
 @Component({
   selector: "app-edit-tesis",
   templateUrl: "../add-tesis/add-tesis.component.html",
-  styleUrls: ["../add-tesis/add-tesis.component.scss"],
+  styleUrl: "../add-tesis/add-tesis.component.scss",
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,

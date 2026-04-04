@@ -8,7 +8,7 @@ import { GLOBAL } from "@app/shared/services/global";
 @Component({
   selector: "app-about-us",
   templateUrl: "./about-us.component.html",
-  styleUrls: ["./about-us.component.scss"],
+  styleUrl: "./about-us.component.scss",
   imports: [],
 })
 export default class AboutUsComponent implements OnInit {

@@ -43,7 +43,7 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
 @Component({
   selector: "app-home",
   templateUrl: "./home.component.html",
-  styleUrls: ["./home.component.scss"],
+  styleUrl: "./home.component.scss",
   imports: [MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
