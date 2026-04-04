@@ -1,4 +1,3 @@
-import { NgIf } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -39,7 +38,6 @@ interface PrefijoOption {
   styleUrls: ["./miembros.component.scss"],
   imports: [
     MatIcon,
-    NgIf,
     MatTable,
     MatSort,
     MatColumnDef,

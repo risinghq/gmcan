@@ -1,4 +1,4 @@
-import { DatePipe, NgIf } from "@angular/common";
+import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
@@ -20,7 +20,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   selector: "app-detail-news",
   templateUrl: "./detail-news.component.html",
   styleUrls: ["./detail-news.component.scss"],
-  imports: [NgIf, MatProgressSpinner, MatIcon, NewsComponent],
+  imports: [MatProgressSpinner, MatIcon, NewsComponent],
 })
 export default class DetailNewsComponent implements OnInit {
   public noticia: Noticia;

@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgIf, NgFor } from "@angular/common";
+import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -32,7 +32,6 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
   templateUrl: "./proyectos.component.html",
   styleUrls: ["./proyectos.component.scss"],
   imports: [
-    NgIf,
     MatTabGroup,
     MatTab,
     MatIcon,
@@ -44,7 +43,6 @@ import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyec
     MatSortHeader,
     MatCellDef,
     MatCell,
-    NgFor,
     MatHeaderRowDef,
     MatHeaderRow,
     MatRowDef,

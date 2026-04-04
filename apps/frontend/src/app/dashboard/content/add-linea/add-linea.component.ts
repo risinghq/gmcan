@@ -1,4 +1,4 @@
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -17,7 +17,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-add-linea",
   templateUrl: "./add-linea.component.html",
   styleUrls: ["./add-linea.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, AutosizeModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
 })
 export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   button_text = "Guardar línea";

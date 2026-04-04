@@ -1,4 +1,4 @@
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
@@ -18,7 +18,7 @@ import { ClassicEditor } from "ckeditor5";
   selector: "app-add-method",
   templateUrl: "./add-method.component.html",
   styleUrls: ["./add-method.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, CKEditorModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule, NgClass],
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   public Editor = ClassicEditor;
@@ -140,7 +140,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
   styleUrls: ["../../../public/about/method/method.component.scss"],
-  imports: [NgIf, MatDialogClose],
+  imports: [MatDialogClose],
 })
 export class DialogPreview4 {
   url: string;

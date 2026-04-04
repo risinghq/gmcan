@@ -1,4 +1,4 @@
-import { DatePipe, NgIf, NgFor, NgClass, SlicePipe } from "@angular/common";
+import { DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
@@ -37,10 +37,8 @@ import {
   templateUrl: "./detail-member.component.html",
   styleUrls: ["./detail-member.component.scss"],
   imports: [
-    NgIf,
     MatProgressSpinner,
     MatIcon,
-    NgFor,
     NgClass,
     NgbPagination,
     NgbPaginationPrevious,

@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -59,10 +59,8 @@ interface AddProyectoResponse {
     MatFormField,
     MatLabel,
     MatSelect,
-    NgFor,
     MatOption,
     MatInput,
-    NgIf,
     AutosizeModule,
     MatDatepickerInput,
     MatDatepickerToggle,

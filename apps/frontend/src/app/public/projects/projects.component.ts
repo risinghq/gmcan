@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgFor, NgIf, NgClass, SlicePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -33,11 +33,9 @@ import {
   imports: [
     MatIcon,
     MatTabGroup,
-    NgFor,
     MatTab,
     FormsModule,
     ReactiveFormsModule,
-    NgIf,
     MatProgressSpinner,
     NgClass,
     NgbPagination,

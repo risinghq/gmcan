@@ -1,4 +1,4 @@
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -18,7 +18,7 @@ interface StatusResponse {
   selector: "app-add-universidad",
   templateUrl: "./add-universidad.component.html",
   styleUrls: ["./add-universidad.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddUniversidadComponent implements OnInit, HasUnsavedChanges {
   universidad: Universidad;

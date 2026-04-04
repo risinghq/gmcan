@@ -22,9 +22,11 @@
         </div>
       </form>
       <div class="flex-news">
-        <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar revista</div>
-        </div>
+        @if (edit) {
+          <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar revista</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !revistaForm.valid, 'black-btn': revistaForm.valid }">
           <div class="link link-set" (click)="submitRevista()">
             {{ button_text }}

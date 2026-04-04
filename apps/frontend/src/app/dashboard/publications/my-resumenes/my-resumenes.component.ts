@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
+import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -33,7 +33,6 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
   styleUrls: ["./my-resumenes.component.scss"],
   imports: [
     MatIcon,
-    NgIf,
     MatTable,
     MatSort,
     MatColumnDef,

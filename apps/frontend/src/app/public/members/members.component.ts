@@ -1,4 +1,4 @@
-import { Location, NgIf, NgFor } from "@angular/common";
+import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -18,7 +18,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   selector: "app-members",
   templateUrl: "./members.component.html",
   styleUrls: ["./members.component.scss"],
-  imports: [MatIcon, MatTabGroup, MatTab, NgIf, MatProgressSpinner, NgFor, NewsComponent],
+  imports: [MatIcon, MatTabGroup, MatTab, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent implements OnInit {
   public cargado = false;

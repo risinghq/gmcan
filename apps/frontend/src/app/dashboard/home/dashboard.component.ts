@@ -1,4 +1,3 @@
-import { NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { Grupo } from "@app/shared/models/grupo";
@@ -25,7 +24,7 @@ interface UsuarioPermisoItem {
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"],
-  imports: [NgIf, RouterLink, RouterLinkActive, BaseChartDirective],
+  imports: [RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export default class DashboardComponent implements OnInit {
   token: string | null = null;

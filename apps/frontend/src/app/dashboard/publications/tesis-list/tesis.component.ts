@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgFor, NgIf } from "@angular/common";
+import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -43,8 +43,6 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
     MatSortHeader,
     MatCellDef,
     MatCell,
-    NgFor,
-    NgIf,
     MatHeaderRowDef,
     MatHeaderRow,
     MatRowDef,

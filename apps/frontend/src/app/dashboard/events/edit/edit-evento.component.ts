@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgFor, NgIf, NgClass, AsyncPipe } from "@angular/common";
+import { NgClass, AsyncPipe } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
@@ -40,9 +40,7 @@ import { map, startWith } from "rxjs/operators";
     MatAutocompleteTrigger,
     MatLabel,
     MatAutocomplete,
-    NgFor,
     MatOption,
-    NgIf,
     NgClass,
     AsyncPipe,
   ],
@@ -255,7 +253,7 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase5 {
   constructor(

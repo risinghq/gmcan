@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { TitleCasePipe, NgIf, NgFor, NgClass } from "@angular/common";
+import { TitleCasePipe, NgClass } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -69,7 +69,6 @@ interface NewsPreviewData {
     MatIcon,
     FormsModule,
     ReactiveFormsModule,
-    NgIf,
     MatFormField,
     MatInput,
     MatDatepickerInput,
@@ -77,7 +76,6 @@ interface NewsPreviewData {
     MatSuffix,
     MatDatepicker,
     MatSelect,
-    NgFor,
     MatOption,
     AutosizeModule,
     CKEditorModule,
@@ -416,7 +414,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogPublish3 {
   constructor(
@@ -430,7 +428,7 @@ export class DialogPublish3 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogPublish2 {
   constructor(
@@ -445,7 +443,7 @@ export class DialogPublish2 {
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-preview.html",
   styleUrls: ["../../../public/detail-news/detail-news.component.scss"],
-  imports: [NgIf, MatDialogClose],
+  imports: [MatDialogClose],
 })
 export class DialogPreview2 {
   url: string;
@@ -503,7 +501,7 @@ export class DialogPreview2 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase2 {
   constructor(

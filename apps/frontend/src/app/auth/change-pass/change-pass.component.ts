@@ -1,4 +1,3 @@
-import { NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
@@ -14,7 +13,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   selector: "app-change-pass",
   templateUrl: "./change-pass.component.html",
   styleUrls: ["./change-pass.component.scss"],
-  imports: [MatIcon, NgIf, FormsModule, ReactiveFormsModule],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class ChangePassComponent implements OnInit {
   public passwordForm: FormGroup;

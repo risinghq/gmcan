@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -25,7 +25,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-edit-equipo",
   templateUrl: "../add-equipo/add-equipo.component.html",
   styleUrls: ["../add-equipo/add-equipo.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   edit = true;
@@ -131,7 +131,7 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase13 {
   constructor(

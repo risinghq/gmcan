@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgClass, AsyncPipe } from "@angular/common";
+import { NgClass, AsyncPipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
@@ -44,7 +44,6 @@ interface TipoTesisItem {
     MatFormField,
     MatLabel,
     MatSelect,
-    NgFor,
     MatOption,
     MatInput,
     MatDatepickerInput,
@@ -53,7 +52,6 @@ interface TipoTesisItem {
     MatDatepicker,
     MatAutocompleteTrigger,
     MatAutocomplete,
-    NgIf,
     AutosizeModule,
     NgClass,
     AsyncPipe,

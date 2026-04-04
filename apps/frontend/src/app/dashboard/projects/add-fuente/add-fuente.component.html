@@ -22,9 +22,11 @@
         </div>
       </form>
       <div class="flex-news">
-        <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar fuente</div>
-        </div>
+        @if (edit) {
+          <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar fuente</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !fuenteForm.valid, 'black-btn': fuenteForm.valid }">
           <div class="link link-set" (click)="submitFuente()">
             {{ button_text }}

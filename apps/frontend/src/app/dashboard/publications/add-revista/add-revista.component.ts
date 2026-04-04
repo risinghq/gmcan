@@ -1,4 +1,4 @@
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -14,7 +14,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-revista",
   templateUrl: "./add-revista.component.html",
   styleUrls: ["./add-revista.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   revista: Revista;

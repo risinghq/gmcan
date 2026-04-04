@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -29,7 +29,7 @@ interface StatusResponse {
   selector: "app-edit-fuente",
   templateUrl: "../add-fuente/add-fuente.component.html",
   styleUrls: ["../add-fuente/add-fuente.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   fuente: FuenteFinanciamiento;
@@ -151,7 +151,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase9 {
   constructor(

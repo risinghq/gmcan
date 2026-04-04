@@ -1,4 +1,4 @@
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -14,7 +14,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-fuente",
   templateUrl: "./add-fuente.component.html",
   styleUrls: ["./add-fuente.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {
   fuente: FuenteFinanciamiento;

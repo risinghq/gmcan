@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -28,7 +28,7 @@ import { ClassicEditor } from "ckeditor5";
   selector: "app-edit-method",
   templateUrl: "../add-method/add-method.component.html",
   styleUrls: ["../add-method/add-method.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, CKEditorModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule, NgClass],
 })
 export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   public Editor = ClassicEditor;
@@ -195,7 +195,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase12 {
   constructor(
@@ -210,7 +210,7 @@ export class DialogErase12 {
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
   styleUrls: ["../../../public/about/method/method.component.scss"],
-  imports: [NgIf, MatDialogClose],
+  imports: [MatDialogClose],
 })
 export class DialogPreview5 {
   url: string;

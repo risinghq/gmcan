@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -25,7 +25,7 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
   selector: "app-edit-universidad",
   templateUrl: "../add-universidad/add-universidad.component.html",
   styleUrls: ["../add-universidad/add-universidad.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class EditUniversidadComponent implements OnInit, HasUnsavedChanges {
   universidad: Universidad;
@@ -145,7 +145,7 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase4 {
   constructor(

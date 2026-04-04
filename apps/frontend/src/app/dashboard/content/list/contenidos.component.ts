@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
+import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, Inject, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
@@ -49,7 +49,6 @@ import { AutosizeModule } from "ngx-autosize";
   imports: [
     MatTabGroup,
     MatTab,
-    NgIf,
     FormsModule,
     ReactiveFormsModule,
     CKEditorModule,

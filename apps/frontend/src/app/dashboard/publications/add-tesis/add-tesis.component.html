@@ -30,9 +30,9 @@
                 formControlName="tipoTesis_idTipoTesis"
                 name="tipoTesis_idTipoTesis"
               >
-                <mat-option [value]="tipoTesis.idTipoTesis" *ngFor="let tipoTesis of tipoTesis">{{
-                  tipoTesis.nombre
-                }}</mat-option>
+                @for (tipoTesis of tipoTesis; track tipoTesis) {
+                  <mat-option [value]="tipoTesis.idTipoTesis">{{ tipoTesis.nombre }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
@@ -63,9 +63,9 @@
                 formControlName="universidad_idUniversidad"
                 name="universidad_idUniversidad"
               >
-                <mat-option [value]="universidad.idUniversidad" *ngFor="let universidad of universidad">{{
-                  universidad.nombre
-                }}</mat-option>
+                @for (universidad of universidad; track universidad) {
+                  <mat-option [value]="universidad.idUniversidad">{{ universidad.nombre }}</mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
@@ -77,64 +77,62 @@
             Recuerda colocar cada nombre en el mismo formato en que se escriben los nombres en un artículo científico.
           </div>
           <div class="flex-flow flex-news mt-16">
-            <section
-              class="relative mr-80 mb-8"
-              *ngFor="let otroAutor of otrosAutores; let i = index"
-              style="width: max-content"
-            >
-              <mat-form-field class="input-category width-normal" floatLabel="auto">
-                <input
-                  class="text-autocomplete"
-                  type="text"
-                  matInput
-                  [formControl]="otroAutor.myControl"
-                  [matAutocomplete]="auto"
-                  [(ngModel)]="otroAutor.nombre"
-                />
-                <mat-label>Seleccionar autor</mat-label>
-                <mat-autocomplete
-                  (optionSelected)="selectUserAutor($event.option, 0, i)"
-                  autoActiveFirstOption
-                  #auto="matAutocomplete"
-                >
-                  <mat-option
-                    class="mdc-list-item"
-                    *ngFor="let option of otroAutor.filteredOptions | async"
-                    [value]="option.nombre"
+            @for (otroAutor of otrosAutores; track otroAutor; let i = $index) {
+              <section class="relative mr-80 mb-8" style="width: max-content">
+                <mat-form-field class="input-category width-normal" floatLabel="auto">
+                  <input
+                    class="text-autocomplete"
+                    type="text"
+                    matInput
+                    [formControl]="otroAutor.myControl"
+                    [matAutocomplete]="auto"
+                    [(ngModel)]="otroAutor.nombre"
+                  />
+                  <mat-label>Seleccionar autor</mat-label>
+                  <mat-autocomplete
+                    (optionSelected)="selectUserAutor($event.option, 0, i)"
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
                   >
-                    <img
-                      class="mdc-list-item__graphic mr-12 img-user"
-                      src="../../assets/img/user.png"
-                      *ngIf="option.kind === 'registered' && !option.foto"
-                    />
-                    <img
-                      class="mdc-list-item__graphic mr-12 img-user"
-                      src="{{ url + 'usuario/get-image-usuario/' + option.foto }}"
-                      *ngIf="option.foto"
-                    />
-                    <span class="mdc-list-item__text">{{ option.nombre }}</span>
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-              <mat-form-field class="input-category selector-users-input">
-                <mat-select (selectionChange)="selectUserAutor($event.value, 1, i)">
-                  <mat-option class="mdc-list-item" [value]="option" *ngFor="let option of options">
-                    <img
-                      class="mdc-list-item__graphic mr-12 img-user"
-                      src="../../assets/img/user.png"
-                      *ngIf="option.kind === 'registered' && !option.foto"
-                    />
-                    <img
-                      class="mdc-list-item__graphic mr-12 img-user"
-                      src="{{ url + 'usuario/get-image-usuario/' + option.foto }}"
-                      *ngIf="option.foto"
-                    />
-                    <span class="mdc-list-item__text">{{ option.nombre }}</span>
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-icon class="erase-icon" *ngIf="otroAutor.nombre" (click)="removeAnotherAuthor(i)">clear</mat-icon>
-            </section>
+                    @for (option of otroAutor.filteredOptions | async; track option) {
+                      <mat-option class="mdc-list-item" [value]="option.nombre">
+                        @if (option.kind === "registered" && !option.foto) {
+                          <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
+                        }
+                        @if (option.foto) {
+                          <img
+                            class="mdc-list-item__graphic mr-12 img-user"
+                            src="{{ url + 'usuario/get-image-usuario/' + option.foto }}"
+                          />
+                        }
+                        <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                      </mat-option>
+                    }
+                  </mat-autocomplete>
+                </mat-form-field>
+                <mat-form-field class="input-category selector-users-input">
+                  <mat-select (selectionChange)="selectUserAutor($event.value, 1, i)">
+                    @for (option of options; track option) {
+                      <mat-option class="mdc-list-item" [value]="option">
+                        @if (option.kind === "registered" && !option.foto) {
+                          <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
+                        }
+                        @if (option.foto) {
+                          <img
+                            class="mdc-list-item__graphic mr-12 img-user"
+                            src="{{ url + 'usuario/get-image-usuario/' + option.foto }}"
+                          />
+                        }
+                        <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                @if (otroAutor.nombre) {
+                  <mat-icon class="erase-icon" (click)="removeAnotherAuthor(i)">clear</mat-icon>
+                }
+              </section>
+            }
             <div class="green-text plex-sans mb-8" (click)="addAnotherAuthor()">Agregar autor</div>
           </div>
         </div>
@@ -165,13 +163,23 @@
           <div class="flex-news">
             <div class="gray-box flex-news mr-16">
               <img class="upload-icon mr-16" src="../../assets/img/upload.svg" />
-              <span class="gray-pdf plex-sans" *ngIf="!fileData && !publicacion.archivo">PDF</span>
-              <span class="gray-pdf plex-sans" *ngIf="fileData">{{ fileData.name }}</span>
-              <span class="gray-pdf plex-sans" *ngIf="!fileData && publicacion.archivo">{{ publicacion.archivo }}</span>
+              @if (!fileData && !publicacion.archivo) {
+                <span class="gray-pdf plex-sans">PDF</span>
+              }
+              @if (fileData) {
+                <span class="gray-pdf plex-sans">{{ fileData.name }}</span>
+              }
+              @if (!fileData && publicacion.archivo) {
+                <span class="gray-pdf plex-sans">{{ publicacion.archivo }}</span>
+              }
             </div>
             <div class="green-text">
-              <span class="plex-sans" *ngIf="!fileData && !publicacion.archivo">Seleccionar PDF</span>
-              <span class="plex-sans" *ngIf="fileData || publicacion.archivo">Cambiar</span>
+              @if (!fileData && !publicacion.archivo) {
+                <span class="plex-sans">Seleccionar PDF</span>
+              }
+              @if (fileData || publicacion.archivo) {
+                <span class="plex-sans">Cambiar</span>
+              }
               <input
                 class="file_upload"
                 type="file"
@@ -185,9 +193,11 @@
         </div>
       </form>
       <div class="flex-news">
-        <div class="red-btn" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar tesis</div>
-        </div>
+        @if (edit) {
+          <div class="red-btn">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar tesis</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !publicacionForm.valid, 'black-btn': publicacionForm.valid }">
           <div class="link link-set" (click)="submitArticle()">
             {{ button_text }}

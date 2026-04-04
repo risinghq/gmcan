@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgIf, NgClass } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgClass } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -50,7 +50,6 @@ interface NoticiaResponse extends Noticia {
     MatSortHeader,
     MatCellDef,
     MatCell,
-    NgIf,
     NgClass,
     MatHeaderRowDef,
     MatHeaderRow,

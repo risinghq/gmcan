@@ -15,65 +15,83 @@
         </div>
         <mat-tab-group>
           <mat-tab label="{{ language.membersText[0].memberActual }}">
-            <div class="spinner-pad" *ngIf="!allCharged">
-              <mat-spinner class="auto mb-8"></mat-spinner>
-              <div class="loading-text center">Cargando</div>
-            </div>
-            <div class="members-container" *ngIf="allCharged">
-              <div class="member-type-container" *ngFor="let tipoMiembro of tipoMiembros">
-                <div class="member-type-title" *ngIf="(tipoMiembro.miembros?.length ?? 0) > 0">
-                  {{ tipoMiembro.nombre }}
-                </div>
-                <div class="row" *ngIf="(tipoMiembro.miembros?.length ?? 0) > 0">
-                  <div class="col-12 col-sm-6" *ngFor="let miembro of tipoMiembro.miembros">
-                    <div class="flex-news member-mt">
-                      <div class="member-img-div">
-                        <img class="member-img" src="{{ miembro.foto }}" alt="foto" />
-                      </div>
-                      <div class="member-text">
-                        <div class="member-name full-width">
-                          {{ miembro.prefijo }} {{ miembro.nombre }} {{ miembro.apellidoPaterno }}
-                          {{ miembro.apellidoMaterno }}
-                        </div>
-                        <div class="member-email">
-                          <mat-icon class="email-icon"> email </mat-icon>
-                          {{ miembro.correo }}
-                        </div>
-                        <div class="member-profile" (click)="profile(miembro)">
-                          {{ language.membersText[0].seeProfile }}
-                          <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            @if (!allCharged) {
+              <div class="spinner-pad">
+                <mat-spinner class="auto mb-8"></mat-spinner>
+                <div class="loading-text center">Cargando</div>
               </div>
-            </div>
+            }
+            @if (allCharged) {
+              <div class="members-container">
+                @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
+                  <div class="member-type-container">
+                    @if ((tipoMiembro.miembros?.length ?? 0) > 0) {
+                      <div class="member-type-title">
+                        {{ tipoMiembro.nombre }}
+                      </div>
+                    }
+                    @if ((tipoMiembro.miembros?.length ?? 0) > 0) {
+                      <div class="row">
+                        @for (miembro of tipoMiembro.miembros; track miembro) {
+                          <div class="col-12 col-sm-6">
+                            <div class="flex-news member-mt">
+                              <div class="member-img-div">
+                                <img class="member-img" src="{{ miembro.foto }}" alt="foto" />
+                              </div>
+                              <div class="member-text">
+                                <div class="member-name full-width">
+                                  {{ miembro.prefijo }} {{ miembro.nombre }} {{ miembro.apellidoPaterno }}
+                                  {{ miembro.apellidoMaterno }}
+                                </div>
+                                <div class="member-email">
+                                  <mat-icon class="email-icon"> email </mat-icon>
+                                  {{ miembro.correo }}
+                                </div>
+                                <div class="member-profile" (click)="profile(miembro)">
+                                  {{ language.membersText[0].seeProfile }}
+                                  <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
           </mat-tab>
           <mat-tab label="{{ language.membersText[0].memberOld }}">
             <div class="row member-type-container">
-              <div class="col-12 col-sm-6" *ngFor="let usuario of usuariosNoActivos">
-                <div class="flex-news member-mt">
-                  <div class="member-img-div">
-                    <img class="member-img" src="../../assets/img/user.png" />
-                  </div>
-                  <div class="member-text full-width">
-                    <div class="member-name">
-                      {{ usuario.prefijo }} {{ usuario.nombre }} {{ usuario.apellidoPaterno }}
-                      {{ usuario.apellidoMaterno }}
+              @for (usuario of usuariosNoActivos; track usuario) {
+                <div class="col-12 col-sm-6">
+                  <div class="flex-news member-mt">
+                    <div class="member-img-div">
+                      <img class="member-img" src="../../assets/img/user.png" />
                     </div>
-                    <div class="member-email cursive" *ngIf="usuario.estado === 3">In memoriam</div>
-                    <div class="member-email" *ngIf="usuario.estado != 3">
-                      <mat-icon class="email-icon"> email </mat-icon>
-                      {{ usuario.correo }}
-                    </div>
-                    <div class="member-profile" (click)="profile(usuario)">
-                      {{ language.membersText[0].seeProfile }}
-                      <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                    <div class="member-text full-width">
+                      <div class="member-name">
+                        {{ usuario.prefijo }} {{ usuario.nombre }} {{ usuario.apellidoPaterno }}
+                        {{ usuario.apellidoMaterno }}
+                      </div>
+                      @if (usuario.estado === 3) {
+                        <div class="member-email cursive">In memoriam</div>
+                      }
+                      @if (usuario.estado != 3) {
+                        <div class="member-email">
+                          <mat-icon class="email-icon"> email </mat-icon>
+                          {{ usuario.correo }}
+                        </div>
+                      }
+                      <div class="member-profile" (click)="profile(usuario)">
+                        {{ language.membersText[0].seeProfile }}
+                        <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           </mat-tab>
         </mat-tab-group>

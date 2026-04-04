@@ -1,4 +1,3 @@
-import { NgIf } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -29,7 +28,6 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
     MatDrawer,
     RouterLink,
     RouterLinkActive,
-    NgIf,
     MatIconButton,
     MatIcon,
     MatMenuTrigger,

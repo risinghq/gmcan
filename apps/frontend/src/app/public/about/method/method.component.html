@@ -1,14 +1,18 @@
 <div class="card-methods">
   <div class="methods-text-div">
-    <div *ngFor="let method of methods; let i = index">
-      <div class="methods-img-div">
-        <img class="methods-img" src="{{ url + 'metodo/get-image-metodo/' + method.foto }}" *ngIf="method.foto" />
+    @for (method of methods; track method; let i = $index) {
+      <div>
+        <div class="methods-img-div">
+          @if (method.foto) {
+            <img class="methods-img" src="{{ url + 'metodo/get-image-metodo/' + method.foto }}" />
+          }
+        </div>
+        <div class="methods-title">
+          {{ method.nombre }}
+        </div>
+        <div class="methods-sub-divi"></div>
+        <div id="descripcion{{ i }}" class="methods-text"></div>
       </div>
-      <div class="methods-title">
-        {{ method.nombre }}
-      </div>
-      <div class="methods-sub-divi"></div>
-      <div id="descripcion{{ i }}" class="methods-text"></div>
-    </div>
+    }
   </div>
 </div>

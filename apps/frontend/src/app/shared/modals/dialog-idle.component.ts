@@ -1,5 +1,4 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgIf } from "@angular/common";
 import { Component, Inject } from "@angular/core";
 import {
   MatDialogActions,
@@ -14,7 +13,7 @@ import { DialogData } from "@app/shared/models/dialogdata";
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "./dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogIdle {
   constructor(

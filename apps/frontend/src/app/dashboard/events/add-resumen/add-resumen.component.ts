@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgClass, AsyncPipe } from "@angular/common";
+import { NgClass, AsyncPipe } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
@@ -39,7 +39,6 @@ import { startWith, map } from "rxjs/operators";
     MatFormField,
     MatLabel,
     MatSelect,
-    NgFor,
     MatOption,
     MatInput,
     MatDatepickerInput,
@@ -48,7 +47,6 @@ import { startWith, map } from "rxjs/operators";
     MatDatepicker,
     MatAutocompleteTrigger,
     MatAutocomplete,
-    NgIf,
     AutosizeModule,
     NgClass,
     AsyncPipe,

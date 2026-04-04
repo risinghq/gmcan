@@ -1,4 +1,4 @@
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -14,7 +14,7 @@ import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
   selector: "app-add-category",
   templateUrl: "./add-category.component.html",
   styleUrls: ["./add-category.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgClass],
 })
 export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   category: TipoNoticia;

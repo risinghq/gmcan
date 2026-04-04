@@ -1,6 +1,8 @@
 <div class="card-detail scroll">
   <div class="news-title-div">
-    <img class="detail-img" src="{{noticia.foto}}" *ngIf="noticia.foto" />
+    @if (noticia.foto) {
+    <img class="detail-img" src="{{noticia.foto}}" />
+    }
     <div class="news-title">{{noticia.titulo}}</div>
   </div>
   <div class="detail-text-div">
@@ -8,11 +10,9 @@
     <div class="flex-news other-div"></div>
     <div class="autor-div">
       <div class="autor-img-div">
-        <img
-          class="autor-img"
-          src="{{url+'usuario/get-image-usuario/'+noticia.usuario.foto}}"
-          *ngIf="noticia.usuario.foto"
-        />
+        @if (noticia.usuario.foto) {
+        <img class="autor-img" src="{{url+'usuario/get-image-usuario/'+noticia.usuario.foto}}" />
+        }
       </div>
       <div class="autor-text">
         <div class="news-type">{{noticia.nombreTipoNoticia}}</div>

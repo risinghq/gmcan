@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { Languages } from "@app/shared/models/languages";
@@ -10,7 +9,7 @@ import { MethodsService } from "@app/shared/services/methods.service";
   selector: "app-method",
   templateUrl: "./method.component.html",
   styleUrls: ["./method.component.scss"],
-  imports: [NgFor, NgIf],
+  imports: [],
 })
 export default class MethodComponent implements OnInit {
   language: (typeof Languages)[number] = Languages[0];

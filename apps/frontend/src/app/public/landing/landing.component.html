@@ -88,16 +88,18 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="search-top full-width" [ngStyle]="{ display: screenWidth > 1050 ? 'none' : 'inline-flex' }">
-      <div class="languages" *ngIf="!inputExpand">
-        <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 1 }" (click)="lanSelect(1)">
-          <div class="fitter">EN</div>
-          <img class="flag" src="../../assets/img/usa.jpg" />
+      @if (!inputExpand) {
+        <div class="languages">
+          <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 1 }" (click)="lanSelect(1)">
+            <div class="fitter">EN</div>
+            <img class="flag" src="../../assets/img/usa.jpg" />
+          </div>
+          <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 0 }" (click)="lanSelect(0)">
+            <div class="fitter">ES</div>
+            <img class="flag" src="../../assets/img/spain.png" />
+          </div>
         </div>
-        <div class="language flex-news" [ngClass]="{ 'active-language': lanSelected == 0 }" (click)="lanSelect(0)">
-          <div class="fitter">ES</div>
-          <img class="flag" src="../../assets/img/spain.png" />
-        </div>
-      </div>
+      }
       <form id="formExpand" [formGroup]="searchGlobalForm2">
         <input
           id="inputExpand"
@@ -259,8 +261,12 @@
       <div class="footer-flex">
         <div class="flex-news">
           <div class="link-logo-div" (click)="scroll()" routerLink="/">
-            <img class="img-logo-white" *ngIf="!grupoinfo.logoFooter" src="../assets/img/logoWhite.png" />
-            <img class="img-logo-white" *ngIf="grupoinfo.logoFooter" src="{{ grupoinfo.logoFooter }}" />
+            @if (!grupoinfo.logoFooter) {
+              <img class="img-logo-white" src="../assets/img/logoWhite.png" />
+            }
+            @if (grupoinfo.logoFooter) {
+              <img class="img-logo-white" src="{{ grupoinfo.logoFooter }}" />
+            }
           </div>
           <div class="link-logo-div">
             <img class="img-logo-white" src="../../assets/img/logoUNMSM.png" />
@@ -339,9 +345,11 @@
                 </div>
               </div>
               <div class="flex-news">
-                <div class="footer-icon-div ml-footer" *ngIf="grupoinfo.telefono && grupoinfo.telefono != ''">
-                  <img class="footer-icon" src="../assets/img/phone.svg" />
-                </div>
+                @if (grupoinfo.telefono && grupoinfo.telefono != "") {
+                  <div class="footer-icon-div ml-footer">
+                    <img class="footer-icon" src="../assets/img/phone.svg" />
+                  </div>
+                }
                 <div class="footer-text" style="display: flex">
                   <div class="footer-direction footer-email">
                     {{ grupoinfo.telefono }}

@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgIf, NgFor, NgClass, SlicePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe, NgClass, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
@@ -25,17 +25,7 @@ import {
   selector: "app-lines-investigation",
   templateUrl: "./lines-investigation.component.html",
   styleUrls: ["./lines-investigation.component.scss"],
-  imports: [
-    NgIf,
-    NgFor,
-    NgClass,
-    MatIcon,
-    NgbPagination,
-    NgbPaginationPrevious,
-    NgbPaginationNumber,
-    NgbPaginationNext,
-    SlicePipe,
-  ],
+  imports: [NgClass, MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe],
 })
 export default class LinesInvestigationComponent implements OnInit {
   language: any = {};

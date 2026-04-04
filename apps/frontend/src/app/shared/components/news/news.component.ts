@@ -1,4 +1,4 @@
-import { Location, NgIf, NgFor, SlicePipe } from "@angular/common";
+import { Location, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
@@ -16,7 +16,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   selector: "app-news",
   templateUrl: "./news.component.html",
   styleUrls: ["./news.component.scss"],
-  imports: [NgIf, NgFor, SlicePipe],
+  imports: [SlicePipe],
 })
 export default class NewsComponent implements OnInit {
   public noticias: Noticia[] = [];

@@ -1,4 +1,4 @@
-import { Location, NgIf, NgStyle, NgFor, NgClass, SlicePipe } from "@angular/common";
+import { Location, NgStyle, NgClass, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
@@ -28,7 +28,6 @@ import {
   templateUrl: "./main-news.component.html",
   styleUrls: ["./main-news.component.scss"],
   imports: [
-    NgIf,
     MatProgressBar,
     MatIcon,
     MatProgressSpinner,
@@ -37,7 +36,6 @@ import {
     NgStyle,
     MatMenu,
     MatMenuItem,
-    NgFor,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,

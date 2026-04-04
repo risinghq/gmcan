@@ -3,11 +3,9 @@
     {{ title }}
   </div>
   <div class="img-hover-zoom">
-    <img
-      class="card-img-div"
-      src="{{ url + 'noticia/get-image-noticia/' + noticiaPrincipal.foto }}"
-      *ngIf="noticiaPrincipal.foto"
-    />
+    @if (noticiaPrincipal.foto) {
+      <img class="card-img-div" src="{{ url + 'noticia/get-image-noticia/' + noticiaPrincipal.foto }}" />
+    }
   </div>
   <div class="card-text-div card-text-div-3">
     <div class="flex-news flex-news-3">
@@ -24,29 +22,28 @@
     <div class="news-author">{{ language.newsText[0].by }} {{ noticiaPrincipal.autor }}</div>
   </div>
   <div class="other-news-div">
-    <div class="other-news flex-news" *ngFor="let noticia of noticias | slice: 0 : numberShown; let i = index">
-      <div class="other-news-text-div full-width pr-16">
-        <div class="flex-news flex-news-2">
-          <div class="news-type">
-            {{ noticia.nombreTipoNoticia }}
+    @for (noticia of noticias | slice: 0 : numberShown; track noticia; let i = $index) {
+      <div class="other-news flex-news">
+        <div class="other-news-text-div full-width pr-16">
+          <div class="flex-news flex-news-2">
+            <div class="news-type">
+              {{ noticia.nombreTipoNoticia }}
+            </div>
+            <div class="other-news-date">
+              {{ noticia.fechaPublicacion }}
+            </div>
           </div>
-          <div class="other-news-date">
-            {{ noticia.fechaPublicacion }}
+          <div class="other-news-text-2" (click)="detalleNoticia(noticia)">
+            {{ noticia.titulo }}
           </div>
+          <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
         </div>
-        <div class="other-news-text-2" (click)="detalleNoticia(noticia)">
-          {{ noticia.titulo }}
+        <div class="img-hover-zoom-2 img-div-zoom">
+          @if (noticia.foto) {
+            <img class="other-news-img" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" alt="nada" />
+          }
         </div>
-        <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
       </div>
-      <div class="img-hover-zoom-2 img-div-zoom">
-        <img
-          class="other-news-img"
-          src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}"
-          alt="nada"
-          *ngIf="noticia.foto"
-        />
-      </div>
-    </div>
+    }
   </div>
 </div>

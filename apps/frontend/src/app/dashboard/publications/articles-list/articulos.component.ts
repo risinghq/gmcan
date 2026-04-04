@@ -1,4 +1,4 @@
-import { TitleCasePipe, DatePipe, NgIf } from "@angular/common";
+import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -42,7 +42,6 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
     MatSortHeader,
     MatCellDef,
     MatCell,
-    NgIf,
     MatHeaderRowDef,
     MatHeaderRow,
     MatRowDef,

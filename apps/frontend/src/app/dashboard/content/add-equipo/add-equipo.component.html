@@ -35,9 +35,11 @@
         </div>
       </form>
       <div class="flex-news">
-        <div class="red-btn" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar equipo</div>
-        </div>
+        @if (edit) {
+          <div class="red-btn">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar equipo</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !equipoForm.valid, 'black-btn': equipoForm.valid }">
           <div class="link link-set" (click)="submitEquipo()">
             {{ button_text }}

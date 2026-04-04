@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
@@ -41,11 +41,9 @@ import { AutosizeModule } from "ngx-autosize";
     MatDatepicker,
     NgClass,
     MatSelect,
-    NgFor,
     MatOption,
     MatIconButton,
     MatIcon,
-    NgIf,
     AutosizeModule,
   ],
 })

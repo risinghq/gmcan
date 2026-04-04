@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
@@ -28,7 +28,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-edit-linea",
   templateUrl: "../add-linea/add-linea.component.html",
   styleUrls: ["../add-linea/add-linea.component.scss"],
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, NgIf, AutosizeModule, NgClass],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, NgClass],
 })
 export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   button_text = "Actualizar información";
@@ -189,7 +189,7 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase11 {
   constructor(

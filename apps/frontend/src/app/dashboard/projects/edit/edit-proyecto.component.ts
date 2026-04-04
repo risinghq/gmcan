@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { NgFor, NgIf, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, Inject } from "@angular/core";
 import {
   AbstractControl,
@@ -78,10 +78,8 @@ interface StatusResponse {
     MatFormField,
     MatLabel,
     MatSelect,
-    NgFor,
     MatOption,
     MatInput,
-    NgIf,
     AutosizeModule,
     MatDatepickerInput,
     MatDatepickerToggle,
@@ -469,7 +467,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
-  imports: [MatDialogTitle, NgIf, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase10 {
   constructor(

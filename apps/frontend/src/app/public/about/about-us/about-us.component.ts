@@ -1,4 +1,3 @@
-import { NgIf } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import type { SobreNosotros } from "@app/shared/models/aboutus";
@@ -10,7 +9,7 @@ import { GLOBAL } from "@app/shared/services/global";
   selector: "app-about-us",
   templateUrl: "./about-us.component.html",
   styleUrls: ["./about-us.component.scss"],
-  imports: [NgIf],
+  imports: [],
 })
 export default class AboutUsComponent implements OnInit {
   url: string;

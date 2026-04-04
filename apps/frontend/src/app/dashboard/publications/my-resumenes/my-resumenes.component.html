@@ -8,9 +8,11 @@
       />
       <mat-icon class="icon-search-toolbar">search</mat-icon>
     </div>
-    <div class="center btn-black" *ngIf="publicacionPermiso" (click)="addResumen()">
-      <a class="link"> Agregar resumen </a>
-    </div>
+    @if (publicacionPermiso) {
+      <div class="center btn-black" (click)="addResumen()">
+        <a class="link"> Agregar resumen </a>
+      </div>
+    }
   </div>
   <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
     <!-- ID Column -->
@@ -24,18 +26,25 @@
     <ng-container matColumnDef="primerAutor">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Primer autor</th>
       <td mat-cell *matCellDef="let row" (click)="editResumen(row.idPublicacion)">
-        <div class="flex-news" *ngIf="row.autor && row.autor.length != 0">
-          <div class="member-img-round mr-8" *ngIf="row.autor[0].kind === 'registered'">
-            <img
-              class="member-img"
-              src="{{ url + 'usuario/get-image-usuario/' + row.autor[0].foto }}"
-              alt="../../assets/img/user.png"
-              *ngIf="row.autor[0].foto"
-            />
-            <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!row.autor[0].foto" />
+        @if (row.autor && row.autor.length != 0) {
+          <div class="flex-news">
+            @if (row.autor[0].kind === "registered") {
+              <div class="member-img-round mr-8">
+                @if (row.autor[0].foto) {
+                  <img
+                    class="member-img"
+                    src="{{ url + 'usuario/get-image-usuario/' + row.autor[0].foto }}"
+                    alt="../../assets/img/user.png"
+                  />
+                }
+                @if (!row.autor[0].foto) {
+                  <img class="member-img" src="../../assets/img/user.png" alt="" />
+                }
+              </div>
+            }
+            {{ row.autor[0].nombre }}
           </div>
-          {{ row.autor[0].nombre }}
-        </div>
+        }
       </td>
     </ng-container>
 
@@ -58,5 +67,7 @@
   </table>
 
   <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound"></mat-paginator>
-  <span class="plex-sans" *ngIf="displayedNotFound">No se encontraron resultados</span>
+  @if (displayedNotFound) {
+    <span class="plex-sans">No se encontraron resultados</span>
+  }
 </div>

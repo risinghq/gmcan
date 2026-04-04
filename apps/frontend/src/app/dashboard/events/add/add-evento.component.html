@@ -38,9 +38,11 @@
               />
               <mat-label>Escriba el país</mat-label>
               <mat-autocomplete autoActiveFirstOption #pais="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions2 | async" [value]="option.pais">
-                  {{ option.pais }}
-                </mat-option>
+                @for (option of filteredOptions2 | async; track option) {
+                  <mat-option [value]="option.pais">
+                    {{ option.pais }}
+                  </mat-option>
+                }
               </mat-autocomplete>
             </mat-form-field>
           </div>
@@ -61,9 +63,11 @@
               />
               <mat-label>Escriba el país</mat-label>
               <mat-autocomplete autoActiveFirstOption #paisEN="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions3 | async" [value]="option.paisEN">
-                  {{ option.paisEN }}
-                </mat-option>
+                @for (option of filteredOptions3 | async; track option) {
+                  <mat-option [value]="option.paisEN">
+                    {{ option.paisEN }}
+                  </mat-option>
+                }
               </mat-autocomplete>
             </mat-form-field>
           </div>
@@ -85,9 +89,11 @@
               />
               <mat-label>Escriba la ciudad</mat-label>
               <mat-autocomplete autoActiveFirstOption #ciudad="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option.ciudad">
-                  {{ option.ciudad }}
-                </mat-option>
+                @for (option of filteredOptions | async; track option) {
+                  <mat-option [value]="option.ciudad">
+                    {{ option.ciudad }}
+                  </mat-option>
+                }
               </mat-autocomplete>
             </mat-form-field>
           </div>
@@ -107,18 +113,22 @@
               />
               <mat-label>Escriba la ciudad</mat-label>
               <mat-autocomplete autoActiveFirstOption #ciudadEN="matAutocomplete">
-                <mat-option *ngFor="let option of filteredOptions1 | async" [value]="option.ciudadEN">
-                  {{ option.ciudadEN }}
-                </mat-option>
+                @for (option of filteredOptions1 | async; track option) {
+                  <mat-option [value]="option.ciudadEN">
+                    {{ option.ciudadEN }}
+                  </mat-option>
+                }
               </mat-autocomplete>
             </mat-form-field>
           </div>
         </div>
       </form>
       <div class="flex-news">
-        <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar evento</div>
-        </div>
+        @if (edit) {
+          <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar evento</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !eventoForm.valid, 'black-btn': eventoForm.valid }">
           <div class="link link-set" (click)="submitEvento()">
             {{ button_text }}

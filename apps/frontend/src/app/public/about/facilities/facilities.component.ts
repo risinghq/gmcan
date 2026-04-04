@@ -1,4 +1,4 @@
-import { NgIf, NgFor, NgClass } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
 import { Title } from "@angular/platform-browser";
@@ -15,7 +15,7 @@ import { SoftwareService } from "@app/shared/services/software.service";
   selector: "app-facilities",
   templateUrl: "./facilities.component.html",
   styleUrls: ["./facilities.component.scss"],
-  imports: [NgIf, NgFor, NgClass, MatChipSet, MatChip],
+  imports: [NgClass, MatChipSet, MatChip],
 })
 export default class FacilitiesComponent implements OnInit {
   equipos: Equipo[] = [];

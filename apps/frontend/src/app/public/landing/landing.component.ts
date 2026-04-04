@@ -1,4 +1,4 @@
-import { Location, NgStyle, NgIf, NgClass } from "@angular/common";
+import { Location, NgStyle, NgClass } from "@angular/common";
 import { Component, OnInit, Renderer2, HostListener } from "@angular/core";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
@@ -26,7 +26,6 @@ import { SessionService } from "@app/shared/services/session.service";
     RouterLinkActive,
     MatSidenavContent,
     NgStyle,
-    NgIf,
     NgClass,
     FormsModule,
     ReactiveFormsModule,

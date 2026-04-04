@@ -97,9 +97,9 @@
                     formControlName="genero_idGenero"
                     name="genero_idGenero"
                   >
-                    <mat-option [value]="genero.idGenero" *ngFor="let genero of generos">{{
-                      genero.nombre
-                    }}</mat-option>
+                    @for (genero of generos; track genero) {
+                      <mat-option [value]="genero.idGenero">{{ genero.nombre }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -111,9 +111,9 @@
                     formControlName="prefijo_idPrefijo"
                     name="prefijo_idPrefijo"
                   >
-                    <mat-option [value]="prefijo.idPrefijo" *ngFor="let prefijo of prefijos">{{
-                      prefijo.nombre
-                    }}</mat-option>
+                    @for (prefijo of prefijos; track prefijo) {
+                      <mat-option [value]="prefijo.idPrefijo">{{ prefijo.nombre }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -127,9 +127,9 @@
                     formControlName="tipoMiembro_idTipoMiembro"
                     name="tipoMiembro_idTipoMiembro"
                   >
-                    <mat-option [value]="tipoMiembro.idTipoMiembro" *ngFor="let tipoMiembro of tipoMiembros">{{
-                      tipoMiembro.nombre
-                    }}</mat-option>
+                    @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
+                      <mat-option [value]="tipoMiembro.idTipoMiembro">{{ tipoMiembro.nombre }}</mat-option>
+                    }
                   </mat-select>
                 </mat-form-field>
               </div>
@@ -194,18 +194,28 @@
           </div>
           <div class="ml-24">
             <div class="text-category center">Imagen de perfil</div>
-            <div class="img-div" *ngIf="!previewUrl && !member.foto">
-              <img class="img-src" src="../../assets/img/upload.svg" />
-            </div>
-            <div class="img-preview" *ngIf="previewUrl">
-              <img class="img-set" src="{{ previewUrl }}" />
-            </div>
-            <div class="img-preview" *ngIf="member.foto && !previewUrl">
-              <img class="img-set" src="{{ url + 'usuario/get-image-usuario/' + member.foto }}" />
-            </div>
+            @if (!previewUrl && !member.foto) {
+              <div class="img-div">
+                <img class="img-src" src="../../assets/img/upload.svg" />
+              </div>
+            }
+            @if (previewUrl) {
+              <div class="img-preview">
+                <img class="img-set" src="{{ previewUrl }}" />
+              </div>
+            }
+            @if (member.foto && !previewUrl) {
+              <div class="img-preview">
+                <img class="img-set" src="{{ url + 'usuario/get-image-usuario/' + member.foto }}" />
+              </div>
+            }
             <div class="green-text mt-16">
-              <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
-              <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
+              @if (!previewUrl) {
+                <span class="plex-sans">Insertar imagen</span>
+              }
+              @if (previewUrl) {
+                <span class="plex-sans">Cambiar imagen</span>
+              }
               <input class="file_upload" type="file" #file accept="image/*" (change)="fileProgress($event)" />
             </div>
           </div>
@@ -327,9 +337,11 @@
         </div>
       </form>
       <div class="flex-news mt-24">
-        <div class="red-btn" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar miembro del grupo</div>
-        </div>
+        @if (edit) {
+          <div class="red-btn">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar miembro del grupo</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !memberForm.valid, 'black-btn': memberForm.valid }">
           <div class="link link-set" (click)="addMember()">
             {{ button_text }}

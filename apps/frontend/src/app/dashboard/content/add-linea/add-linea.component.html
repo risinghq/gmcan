@@ -33,21 +33,31 @@
         </div>
         <div class="">
           <div class="text-category">Imagen <span class="red-text">*</span></div>
-          <div class="img-preview" *ngIf="previewUrl">
-            <img class="img-set" src="{{ previewUrl }}" />
-          </div>
-          <div class="news-img" *ngIf="!previewUrl && !lineaInvestigacion.foto">
-            <img class="icon-upload" src="../../assets/img/upload.svg" />
-          </div>
-          <div class="img-preview" *ngIf="lineaInvestigacion.foto && !previewUrl">
-            <img
-              class="img-set"
-              src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineaInvestigacion.foto }}"
-            />
-          </div>
+          @if (previewUrl) {
+            <div class="img-preview">
+              <img class="img-set" src="{{ previewUrl }}" />
+            </div>
+          }
+          @if (!previewUrl && !lineaInvestigacion.foto) {
+            <div class="news-img">
+              <img class="icon-upload" src="../../assets/img/upload.svg" />
+            </div>
+          }
+          @if (lineaInvestigacion.foto && !previewUrl) {
+            <div class="img-preview">
+              <img
+                class="img-set"
+                src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineaInvestigacion.foto }}"
+              />
+            </div>
+          }
           <div class="green-text mt-16">
-            <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
-            <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
+            @if (!previewUrl) {
+              <span class="plex-sans">Insertar imagen</span>
+            }
+            @if (previewUrl) {
+              <span class="plex-sans">Cambiar imagen</span>
+            }
             <input class="file_upload" type="file" #file accept="image/*" required (change)="fileProgress($event)" />
           </div>
         </div>
@@ -75,9 +85,11 @@
         ></textarea>
       </div>
       <div class="flex-news">
-        <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar línea</div>
-        </div>
+        @if (edit) {
+          <div [ngClass]="{ 'btn-grey': !notCanDo, 'red-btn': notCanDo }">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar línea</div>
+          </div>
+        }
         <div class="right" [ngClass]="{ 'btn-grey': !lineaForm.valid, 'black-btn': lineaForm.valid }">
           <div class="link link-set" (click)="submitLinea()">
             {{ button_text }}

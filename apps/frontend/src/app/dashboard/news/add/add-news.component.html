@@ -13,18 +13,28 @@
       <div class="flex-news full-width mb-32">
         <div class="mr-32">
           <div class="text-category">Imagen de portada <span class="red-text">*</span></div>
-          <div class="img-preview" *ngIf="previewUrl">
-            <img class="img-set" src="{{ previewUrl }}" />
-          </div>
-          <div class="news-img" *ngIf="!previewUrl && !noticia.foto">
-            <img src="../../assets/img/upload.svg" />
-          </div>
-          <div class="img-preview" *ngIf="noticia.foto && !previewUrl">
-            <img class="img-set" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
-          </div>
+          @if (previewUrl) {
+            <div class="img-preview">
+              <img class="img-set" src="{{ previewUrl }}" />
+            </div>
+          }
+          @if (!previewUrl && !noticia.foto) {
+            <div class="news-img">
+              <img src="../../assets/img/upload.svg" />
+            </div>
+          }
+          @if (noticia.foto && !previewUrl) {
+            <div class="img-preview">
+              <img class="img-set" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
+            </div>
+          }
           <div class="green-text mt-16">
-            <span class="plex-sans" *ngIf="!previewUrl">Insertar imagen</span>
-            <span class="plex-sans" *ngIf="previewUrl">Cambiar imagen</span>
+            @if (!previewUrl) {
+              <span class="plex-sans">Insertar imagen</span>
+            }
+            @if (previewUrl) {
+              <span class="plex-sans">Cambiar imagen</span>
+            }
             <input class="file_upload" type="file" #file accept="image/*" required (change)="fileProgress($event)" />
           </div>
         </div>
@@ -81,9 +91,9 @@
                   formControlName="tipoNoticia_idtipoNoticia"
                   name="tipoNoticia_idtipoNoticia"
                 >
-                  <mat-option [value]="categoria.idtipoNoticia" *ngFor="let categoria of categorias">{{
-                    categoria.nombre
-                  }}</mat-option>
+                  @for (categoria of categorias; track categoria) {
+                    <mat-option [value]="categoria.idtipoNoticia">{{ categoria.nombre }}</mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
             </div>
@@ -96,17 +106,22 @@
                 formControlName="autorPublicacion"
                 name="autorPublicacion"
               >
-                <mat-option [value]="autor.DNI" class="mdc-list-item" *ngFor="let autor of autores">
-                  <img class="mdc-list-item__graphic img-user" src="../../assets/img/user.png" *ngIf="!autor.foto" />
-                  <img
-                    class="mdc-list-item__graphic img-user"
-                    src="{{ url + 'usuario/get-image-usuario/' + autor.foto }}"
-                    *ngIf="autor.foto"
-                  />
-                  <span class="mdc-list-item__text"
-                    >{{ autor.nombre }} {{ autor.apellidoPaterno }} {{ autor.apellidoMaterno }}</span
-                  >
-                </mat-option>
+                @for (autor of autores; track autor) {
+                  <mat-option [value]="autor.DNI" class="mdc-list-item">
+                    @if (!autor.foto) {
+                      <img class="mdc-list-item__graphic img-user" src="../../assets/img/user.png" />
+                    }
+                    @if (autor.foto) {
+                      <img
+                        class="mdc-list-item__graphic img-user"
+                        src="{{ url + 'usuario/get-image-usuario/' + autor.foto }}"
+                      />
+                    }
+                    <span class="mdc-list-item__text"
+                      >{{ autor.nombre }} {{ autor.apellidoPaterno }} {{ autor.apellidoMaterno }}</span
+                    >
+                  </mat-option>
+                }
               </mat-select>
             </mat-form-field>
           </div>
@@ -162,9 +177,11 @@
         ></ckeditor>
       </div>
       <div class="flex-news">
-        <div class="red-btn" *ngIf="edit">
-          <div class="link link-set link-red" (click)="openEraser()">Eliminar noticia</div>
-        </div>
+        @if (edit) {
+          <div class="red-btn">
+            <div class="link link-set link-red" (click)="openEraser()">Eliminar noticia</div>
+          </div>
+        }
         <div class="right pd-8 mr-16">
           <div class="link link-set" (click)="submitNews(0)">
             {{ button_text2 }}
