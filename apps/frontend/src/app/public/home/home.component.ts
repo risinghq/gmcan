@@ -8,7 +8,6 @@ import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { PublicationAuthor } from "@app/shared/models/author";
 import { createGrupo, createNoticia } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
