@@ -143,7 +143,7 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
       this.options = allAuthors;
 
       this._publicacionAutoresService.getForPublication(idPublicacion).subscribe((authors) => {
-        const sorted = authors.sort((a, b) => a.isPrincipal - b.isPrincipal);
+        const sorted = authors.toSorted((a, b) => a.isPrincipal - b.isPrincipal);
         this.otrosAutores = sorted.map((a, i) => {
           const row: AuthorFormRow = {
             id: i + 1,

@@ -159,7 +159,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
           this.myControl.setValue(principal.nombre);
         }
 
-        const coAuthors = authors.filter((a) => a.isPrincipal > 0).sort((a, b) => a.isPrincipal - b.isPrincipal);
+        const coAuthors = authors.filter((a) => a.isPrincipal > 0).toSorted((a, b) => a.isPrincipal - b.isPrincipal);
         this.otrosAutores = coAuthors.map((a, i) => {
           const row: AuthorFormRow = {
             id: i + 1,

@@ -15,10 +15,10 @@
     "moduleResolution": "bundler",
     "module": "preserve",
     "importHelpers": true,
-    "target": "ES2022",
+    "target": "ES2023",
     "isolatedModules": true,
     "skipLibCheck": true,
-    "lib": ["ES2022", "dom"]
+    "lib": ["ES2023", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
