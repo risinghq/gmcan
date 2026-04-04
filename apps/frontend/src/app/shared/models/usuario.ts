@@ -5,5 +5,5 @@ export interface Usuario {
   apellidoPaterno?: string;
   apellidoMaterno?: string;
   foto?: string;
-  isPrincipal?: boolean;
+  isPrincipal?: number;
 }

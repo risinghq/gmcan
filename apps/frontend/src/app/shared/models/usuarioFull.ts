@@ -14,7 +14,7 @@ export interface UsuarioFull {
   resumenProEN?: string;
   fechaActualizacion?: Date;
   fechaCreacion?: Date;
-  fechaNacimiento?: any;
+  fechaNacimiento?: string | null;
   fechaNacimientoDate?: Date;
   tipoMiembro_idTipoMiembro?: number;
   genero_idGenero?: number;

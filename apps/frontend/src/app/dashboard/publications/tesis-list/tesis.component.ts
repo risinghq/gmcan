@@ -20,15 +20,12 @@ import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import { Publicacion } from "@app/shared/models/publicacion";
 import { Universidad } from "@app/shared/models/universidad";
-import { AutorService } from "@app/shared/services/autor.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { TipoTesisService } from "@app/shared/services/tipotesis.service";
 import { UniversidadService } from "@app/shared/services/universidad.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
   selector: "app-tesis",
@@ -71,10 +68,7 @@ export default class TesisComponent implements OnInit {
     private _publicacionService: PublicacionService,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
-    private _usuarioService: UsuarioService,
-    private _autorService: AutorService,
+    private _publicacionAutoresService: PublicacionAutoresService,
     private _tipoTesisService: TipoTesisService,
     private _tabState: TabStateService,
   ) {
@@ -111,9 +105,7 @@ export default class TesisComponent implements OnInit {
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           this.tesis[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
           this.tesis[index].fecha = this.titlecasePipe.transform(this.tesis[index].fecha ?? "");
-          this.tesis[index].usuario = [];
           this.tesis[index].autor = [];
-          this.getThesisUsers(this.tesis[index]);
           this.getThesisAuthors(this.tesis[index]);
           this.getTipoThesis(this.tesis[index]);
           this.getSpeUniversidad(this.tesis[index]);
@@ -134,16 +126,10 @@ export default class TesisComponent implements OnInit {
     });
   }
 
-  getThesisUsers(publicacion: Publicacion): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: { usuario_DNI?: string }[]) => {
-        if (res) {
-          for (let index = 0; index < res.length; index++) {
-            this.getUsuario(res[index].usuario_DNI ?? "", publicacion);
-          }
-        }
-      });
+  getThesisAuthors(publicacion: Publicacion): void {
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
+    });
   }
 
   getSpeUniversidad(publicacion: Publicacion): void {
@@ -151,41 +137,6 @@ export default class TesisComponent implements OnInit {
       const data = res as { nombre?: string }[];
       if (data) {
         publicacion.universidad = data[0]?.nombre ?? "";
-      }
-    });
-  }
-
-  getUsuario(idUser: string, publicacion: Publicacion): void {
-    this._usuarioService
-      .getUser(idUser)
-      .subscribe((res: { nombre?: string; apellidoPaterno?: string; apellidoMaterno?: string }[]) => {
-        if (res[0] != undefined) {
-          const usuario = {
-            ...res[0],
-            nombreCompleto:
-              `${res[0].nombre ?? ""} ${res[0].apellidoPaterno ?? ""} ${res[0].apellidoMaterno ?? ""}`.trim(),
-          };
-          publicacion.usuario?.push(usuario);
-        }
-      });
-  }
-
-  getThesisAuthors(publicacion: Publicacion): void {
-    this._publicacionhasautorService
-      .getPublicacionHasAutor(publicacion.idPublicacion ?? 0)
-      .subscribe((res: { autores_idAutor?: number }[]) => {
-        if (res) {
-          for (let index = 0; index < res.length; index++) {
-            this.getAuthor(res[index].autores_idAutor ?? 0, publicacion);
-          }
-        }
-      });
-  }
-
-  getAuthor(idAuthor: number, publicacion: Publicacion): void {
-    this._autorService.getAuthor(idAuthor).subscribe((res: unknown[]) => {
-      if (res[0] != undefined) {
-        publicacion.autor?.push(res[0]);
       }
     });
   }

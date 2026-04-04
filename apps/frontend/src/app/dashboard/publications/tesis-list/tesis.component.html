@@ -32,22 +32,17 @@
       <ng-container matColumnDef="autores">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor(es)</th>
         <td mat-cell *matCellDef="let row" (click)="editThesis(row.idPublicacion)">
-          <div class="flex-news" *ngFor="let usuario of row.usuario">
-            <div class="member-img-round mr-8">
+          <div class="flex-news" *ngFor="let autor of row.autor">
+            <div class="member-img-round mr-8" *ngIf="autor.kind === 'registered'">
               <img
                 class="member-img"
-                src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                src="{{ url + 'usuario/get-image-usuario/' + autor.foto }}"
                 alt="../../assets/img/user.png"
-                *ngIf="usuario.foto"
+                *ngIf="autor.foto"
               />
-              <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
+              <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!autor.foto" />
             </div>
-            <div>
-              {{ usuario.nombreCompleto }}
-            </div>
-          </div>
-          <div class="flex-news" *ngFor="let autor of row.autor">
-            {{ autor.nombre }}
+            <div>{{ autor.nombre }}</div>
           </div>
         </td>
       </ng-container>

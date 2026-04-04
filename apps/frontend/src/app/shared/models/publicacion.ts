@@ -1,14 +1,12 @@
-import { Autor } from "./autores";
-import { Usuario } from "./usuario";
+import type { PublicationAuthor } from "./author";
 
 export interface Publicacion {
   idPublicacion?: number;
   titulo?: string;
   archivo?: string;
-  autores?: string;
   resumen?: string;
   resumenEN?: string;
-  DOI?: number;
+  DOI?: string;
   fecha?: string;
   fechaPublicacionDate?: Date;
   fechaPublicacion?: string;
@@ -21,8 +19,7 @@ export interface Publicacion {
   revista_idRevista?: number;
   universidad_idUniversidad?: number;
   universidad?: string;
-  autor?: Autor[];
-  usuario?: Usuario[];
+  autor?: PublicationAuthor[];
   ciudad_idCiudad?: number;
   ciudad?: string;
   pais?: string;

@@ -28,13 +28,6 @@ export class SearchService {
     });
     return this.http.post(this.url + "publicacion/search-publicaciones", body, { headers });
   }
-  searchAutores(nombre: string): any {
-    let body = { nombre: nombre };
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "autor/search-autores", body, { headers });
-  }
   searchUsuarios(nombre: string): any {
     let body = { nombre: nombre };
     let headers = new HttpHeaders({

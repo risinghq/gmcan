@@ -1,7 +1,7 @@
 import { registerLocaleData } from "@angular/common";
 import localeEnglish from "@angular/common/locales/en";
 import localeSpanish from "@angular/common/locales/es";
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 
@@ -14,7 +14,6 @@ import type { Grupo } from "@app/shared/models/grupo";
 export class SessionService {
   private _locale = "es-Ar";
 
-  // ===== LOCALE =====
   set locale(value: string) {
     this._locale = value;
   }
@@ -43,7 +42,7 @@ export class SessionService {
     }
   }
 
-  // ===== LANGUAGE ID (0-based index) =====
+  // Language ID
   setLanguageId(id: number): void {
     localStorage.setItem("lanId", JSON.stringify(id));
   }
@@ -58,7 +57,7 @@ export class SessionService {
     }
   }
 
-  // ===== LANGUAGE OBJECT (full language data) =====
+  // Language object (cached to avoid unnecessary API calls on every page)
   setLanguageData<T>(data: T): void {
     localStorage.setItem("language", JSON.stringify(data));
   }
@@ -77,14 +76,12 @@ export class SessionService {
     }
   }
 
-  // ===== GRUPO INFO =====
+  // Research group info (cached to avoid unnecessary API calls on every page)
   setGrupoInfo(grupo: Grupo): void {
     localStorage.setItem("grupoInfo", JSON.stringify(grupo));
   }
 
-  /**
-   * Get cached grupo info. Returns the parsed object or empty default.
-   */
+  /** Get cached grupo info. Returns the parsed object or empty default. */
   getGrupoInfo(): Grupo {
     const stored = localStorage.getItem("grupoInfo");
     if (!stored) return createGrupo();
@@ -95,16 +92,25 @@ export class SessionService {
     }
   }
 
-  // ===== SESSION END FLAG =====
-  setSessionEnd(value: boolean): void {
-    localStorage.setItem("sessionEnd", value ? "1" : "0");
+  clearGrupoInfo(): void {
+    localStorage.removeItem("grupoInfo");
   }
 
-  getSessionEnd(): boolean {
-    return localStorage.getItem("sessionEnd") === "1";
+  // Session ending flag (used by the deactivate guard to allow programmatic logouts to navigate through)
+  private readonly _sessionEnding = signal(false);
+  readonly sessionEnding = this._sessionEnding.asReadonly();
+
+  /** Call before programmatic logout so the deactivate guard allows navigation. */
+  beginSessionEnd(): void {
+    this._sessionEnding.set(true);
   }
 
-  // ===== PREVIOUS PAGE (for navigation history) =====
+  /** Called by the deactivate guard once it has allowed the navigation through. */
+  acknowledgeSessionEnd(): void {
+    this._sessionEnding.set(false);
+  }
+
+  // Back navigation: previous page
   setPreviousPage(path: string): void {
     sessionStorage.setItem("previous-page", path);
   }
@@ -113,7 +119,24 @@ export class SessionService {
     return sessionStorage.getItem("previous-page");
   }
 
-  // ===== SESSION CLEANUP =====
+  // Back navigation: summary pages
+  setResumenBack(path: string): void {
+    localStorage.setItem("resumen-back", path);
+  }
+
+  getResumenBack(): string | null {
+    return localStorage.getItem("resumen-back");
+  }
+
+  // Published news flag (used to trigger news refresh on home page after publishing a news item)
+  private readonly _noticiaPublicada = signal(false);
+  readonly noticiaPublicada = this._noticiaPublicada.asReadonly();
+
+  setNoticiaPublicada(published: boolean): void {
+    this._noticiaPublicada.set(published);
+  }
+
+  // Session clearing methods
   clearSession(): void {
     sessionStorage.clear();
   }

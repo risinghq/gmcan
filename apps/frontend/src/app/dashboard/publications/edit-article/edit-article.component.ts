@@ -20,52 +20,21 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router, Params } from "@angular/router";
-import { Autor } from "@app/shared/models/autores";
+import type { AuthorOption, SaveAuthorEntry } from "@app/shared/models/author";
+import type { AuthorFormRow } from "@app/shared/models/author-form";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createPublicacion } from "@app/shared/models/factories";
 import type { Publicacion } from "@app/shared/models/publicacion";
 import { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { Usuario } from "@app/shared/models/usuario";
-import { AutorService } from "@app/shared/services/autor.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
-import { map } from "rxjs/internal/operators/map";
-import { startWith } from "rxjs/internal/operators/startWith";
-
-interface AuthorOption {
-  idAutor?: number | string | null;
-  DNI?: string | null;
-  nombre?: string;
-  apellidoPaterno?: string;
-  apellidoMaterno?: string;
-  foto?: string;
-  isPrincipal?: number | boolean;
-  isAutor?: boolean;
-  value?: string;
-}
-
-interface AutorFormItem {
-  id: number;
-  idAutor: number | string | null;
-  nombre: string;
-  isAutor?: boolean;
-  DNI?: string | null;
-  myControl: FormControl<string>;
-  filteredOptions?: Observable<AuthorOption[]>;
-}
-
-interface StatusResponse {
-  status?: number;
-  idAutor?: number;
-}
+import { map, startWith } from "rxjs/operators";
 
 @Component({
   selector: "app-edit-article",
@@ -99,21 +68,28 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
   revista: Revista[] = [];
-  autores: Autor[] = [];
-  usuarios: Usuario[] = [];
   url: string;
+  edit = true;
 
+  // Principal author
   selectedUser = "";
+  principalAuthor: AuthorOption | null = null;
+  myControl = new FormControl<string>("", { nonNullable: true });
+  options: AuthorOption[] = [];
+  filteredOptions!: Observable<AuthorOption[]>;
+
+  // Co-authors
+  otrosAutores: AuthorFormRow[] = [];
+
+  // File upload
+  fileData: File | null = null;
 
   constructor(
     public formBuilder: FormBuilder,
     public _route: ActivatedRoute,
     public _router: Router,
     private _publicacionService: PublicacionService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _usuarioService: UsuarioService,
-    private _autorService: AutorService,
+    private _publicacionAutoresService: PublicacionAutoresService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private _revistaService: RevistaService,
@@ -133,425 +109,207 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
     this.url = GLOBAL.url;
   }
 
-  ngOnInit(): void {
-    this.getArticulo();
-  }
-
   isDirty(): boolean {
     return this.publicacionForm.dirty;
+  }
+
+  ngOnInit(): void {
+    this.getArticulo();
   }
 
   getArticulo(): void {
     this._route.params.forEach((params: Params) => {
       const idArticulo = Number(params["id"] ?? 0);
-      this._publicacionService.getPublication(idArticulo).subscribe((result: Publicacion[]) => {
+      this._publicacionService.getPublication(idArticulo).subscribe((result: any[]) => {
         if (result) {
           this.publicacion = result[0];
           const d = new Date(result[0].fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           this.publicacion.fechaPublicacionDate = d;
-          localStorage.setItem("articleEdit", JSON.stringify(this.publicacion.titulo ?? ""));
-          this.getRevista();
-          this.getAutoresPublicacion(idArticulo);
+          this.getRevista(idArticulo);
         }
       });
     });
   }
 
-  getRevista(): void {
+  getRevista(idPublicacion: number): void {
     this._revistaService.getRevistas().subscribe((result: Revista[]) => {
       if (result) {
         this.revista = result;
-        this.getUsuarios();
+        this.loadAuthors(idPublicacion);
       }
     });
   }
 
-  myControl = new FormControl<string>("", { nonNullable: true });
-  options: AuthorOption[] = [];
-  filteredOptions!: Observable<AuthorOption[]>;
-
-  private _filter(value: string): AuthorOption[] {
-    const filterValue = value.toLowerCase();
-    return this.options.filter((option: AuthorOption) => (option.nombre ?? "").toLowerCase().includes(filterValue));
-  }
-
-  selectedUsers: AuthorOption[] = [];
-
-  getAutores(): void {
-    this._autorService.getAutor().subscribe((result: Autor[]) => {
-      if (result) {
-        result.sort((a: Autor, b: Autor) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
-        );
-        this.autores = result;
-        for (let index = 0; index < this.autores.length; index++) {
-          this.options.push(this.autores[index]);
-        }
-        this.filteredOptions = this.myControl.valueChanges.pipe(
-          startWith(""),
-          map((value: string) => this._filter(value)),
-        );
-      }
-    });
-  }
-
-  getUsuarios(): void {
-    this._usuarioService.getUsuarios().subscribe((result: Usuario[]) => {
-      if (result) {
-        result.sort((a: Usuario, b: Usuario) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
-        );
-        this.usuarios = result;
-        for (let index = 0; index < this.usuarios.length; index++) {
-          this.usuarios[index].nombre =
-            (this.usuarios[index].nombre ?? "") +
-            " " +
-            (this.usuarios[index].apellidoPaterno ?? "") +
-            " " +
-            (this.usuarios[index].apellidoMaterno ?? "");
-          this.options.push(this.usuarios[index]);
-        }
-        this.getAutores();
-      }
-    });
-  }
-
-  getAutoresPublicacion(idPublicacion: number): void {
-    this._publicacionhasautorService
-      .getPublicacionHasAutor(idPublicacion)
-      .subscribe((result: { autores_idAutor?: number; isPrincipal?: number }[]) => {
-        if (result) {
-          for (let index = 0; index < result.length; index++) {
-            this.getAutor(result[index].autores_idAutor ?? 0, result[index].isPrincipal ?? 0);
-          }
-        }
-        this.getUsuariosPublicacion(idPublicacion);
-      });
-  }
-  getUsuariosPublicacion(idPublicacion: number): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(idPublicacion)
-      .subscribe((result: { usuario_DNI?: string; isPrincipal?: number }[]) => {
-        if (result) {
-          for (let index = 0; index < result.length; index++) {
-            this.getUsuario(result[index].usuario_DNI ?? "", result[index].isPrincipal ?? 0);
-          }
-        }
-      });
-  }
-
-  getAutor(idAutor: number, isPrincipal: number): void {
-    this._autorService.getAuthor(idAutor).subscribe((result: Autor[]) => {
-      if (result && result[0]) {
-        const autorSeleccionado: AuthorOption = { ...result[0], isPrincipal };
-        if (isPrincipal === 0) {
-          this.selectedUsers.push(autorSeleccionado);
-          this.myControl.setValue(autorSeleccionado.nombre ?? "");
-        } else {
-          this.autoresSeleccionados.push(autorSeleccionado);
-        }
-      }
-      this.setearOtrosAutores();
-    });
-  }
-
-  getUsuario(DNI: string, isPrincipal: number): void {
-    this._usuarioService.getUser(DNI).subscribe((result: Usuario[]) => {
-      if (result && result[0]) {
-        const usuarioSeleccionado: AuthorOption = {
-          ...result[0],
-          nombre:
-            `${result[0].nombre ?? ""} ${result[0].apellidoPaterno ?? ""} ${result[0].apellidoMaterno ?? ""}`.trim(),
-          isPrincipal,
-        };
-        if (isPrincipal === 0) {
-          this.selectedUsers.push(usuarioSeleccionado);
-          this.myControl.setValue(usuarioSeleccionado.nombre ?? "");
-        } else {
-          this.autoresSeleccionados.push(usuarioSeleccionado);
-        }
-        this.setearOtrosAutores();
-      }
-    });
-  }
-
-  setearOtrosAutores(): void {
-    this.otrosAutores = [];
-    this.autoresSeleccionados.sort((a: AuthorOption, b: AuthorOption) =>
-      (a.isPrincipal ?? 0) > (b.isPrincipal ?? 0) ? 1 : (b.isPrincipal ?? 0) > (a.isPrincipal ?? 0) ? -1 : 0,
-    );
-    for (let index = 0; index < this.autoresSeleccionados.length; index++) {
-      let idAutorSeleccionado: number | string | null;
-      let isAutor = true;
-      if (this.autoresSeleccionados[index].idAutor) {
-        idAutorSeleccionado = this.autoresSeleccionados[index].idAutor ?? null;
-      } else {
-        idAutorSeleccionado = this.autoresSeleccionados[index].DNI ?? "";
-        isAutor = false;
-      }
-      this.otrosAutores.push({
-        id: this.otrosAutores.length + 1,
-        idAutor: idAutorSeleccionado,
-        nombre: this.autoresSeleccionados[index].nombre ?? "",
-        isAutor: isAutor,
-        myControl: new FormControl<string>("", { nonNullable: true }),
-      });
-      this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
-        this.otrosAutores.length - 1
-      ].myControl.valueChanges.pipe(
+  loadAuthors(idPublicacion: number): void {
+    this._publicacionAutoresService.search().subscribe((allAuthors) => {
+      this.options = allAuthors;
+      this.filteredOptions = this.myControl.valueChanges.pipe(
         startWith(""),
-        map((value: string) => this._filter(value)),
+        map((value) => this.filterAuthors(value)),
+      );
+
+      this._publicacionAutoresService.getForPublication(idPublicacion).subscribe((authors) => {
+        const principal = authors.find((a) => a.isPrincipal === 0);
+        if (principal) {
+          this.selectedUser = principal.nombre;
+          this.principalAuthor = {
+            kind: principal.kind,
+            nombre: principal.nombre,
+            DNI: principal.DNI,
+            foto: principal.foto,
+          };
+          this.myControl.setValue(principal.nombre);
+        }
+
+        const coAuthors = authors.filter((a) => a.isPrincipal > 0).sort((a, b) => a.isPrincipal - b.isPrincipal);
+        this.otrosAutores = coAuthors.map((a, i) => {
+          const row: AuthorFormRow = {
+            id: i + 1,
+            nombre: a.nombre,
+            option: { kind: a.kind, nombre: a.nombre, DNI: a.DNI, foto: a.foto },
+            myControl: new FormControl<string>(a.nombre, { nonNullable: true }),
+          };
+          row.filteredOptions = row.myControl.valueChanges.pipe(
+            startWith(""),
+            map((v) => this.filterAuthors(v)),
+          );
+          return row;
+        });
+
+        if (this.otrosAutores.length === 0) {
+          this.otrosAutores = [this.newCoAuthorRow()];
+          this.setupCoAuthorFilters();
+        }
+      });
+    });
+  }
+
+  private filterAuthors(value: string): AuthorOption[] {
+    const lower = value.toLowerCase();
+    return this.options.filter((o) => o.nombre.toLowerCase().includes(lower));
+  }
+
+  private newCoAuthorRow(): AuthorFormRow {
+    return {
+      id: this.otrosAutores.length + 1,
+      nombre: "",
+      option: null,
+      myControl: new FormControl<string>("", { nonNullable: true }),
+    };
+  }
+
+  private setupCoAuthorFilters(): void {
+    for (const row of this.otrosAutores) {
+      row.filteredOptions = row.myControl.valueChanges.pipe(
+        startWith(""),
+        map((v) => this.filterAuthors(v)),
       );
     }
-    if (this.autoresSeleccionados.length === 0) {
-      this.otrosAutores.push({
-        id: 1,
-        idAutor: null,
-        nombre: "",
-        isAutor: true,
-        myControl: new FormControl<string>("", { nonNullable: true }),
-      });
+  }
+
+  selectUser(evento: AuthorOption | { value: string }, value: number): void {
+    if (value === 1) {
+      const author = evento as AuthorOption;
+      this.myControl.setValue(author.nombre);
+      this.selectedUser = author.nombre;
+      this.principalAuthor = author;
+    } else {
+      const nombre = (evento as { value: string }).value;
+      this.principalAuthor = this.options.find((o) => o.nombre === nombre) ?? null;
     }
   }
 
-  autoresSeleccionados: AuthorOption[] = [];
-
-  otrosAutores: AutorFormItem[] = [];
-
-  addAnotherAuthor(): void {
-    this.otrosAutores.push({
-      id: this.otrosAutores.length + 1,
-      idAutor: null,
-      nombre: "",
-      isAutor: true,
-      myControl: new FormControl<string>("", { nonNullable: true }),
-    });
-    this.otrosAutores[this.otrosAutores.length - 1].filteredOptions = this.otrosAutores[
-      this.otrosAutores.length - 1
-    ].myControl.valueChanges.pipe(
-      startWith(""),
-      map((value: string) => this._filter(value)),
-    );
+  selectUserAutor(evento: AuthorOption | { value: string }, value: number, i: number): void {
+    if (value === 1) {
+      const author = evento as AuthorOption;
+      this.otrosAutores[i].option = author;
+      this.otrosAutores[i].nombre = author.nombre;
+      this.otrosAutores[i].myControl.setValue(author.nombre);
+    } else {
+      const nombre = (evento as { value: string }).value;
+      const author = this.options.find((o) => o.nombre === nombre) ?? null;
+      this.otrosAutores[i].option = author;
+      this.otrosAutores[i].nombre = author?.nombre ?? nombre;
+    }
   }
 
-  removeAnotherAuthor(i: number) {
-    if (i > 0) {
-      this.otrosAutores.splice(i, 1);
-    } else if (i == 0 && this.otrosAutores.length == 1) {
-      this.otrosAutores.splice(i, 1);
-      this.addAnotherAuthor();
+  addAnotherAuthor(): void {
+    const row = this.newCoAuthorRow();
+    row.filteredOptions = row.myControl.valueChanges.pipe(
+      startWith(""),
+      map((v) => this.filterAuthors(v)),
+    );
+    this.otrosAutores.push(row);
+  }
+
+  removeAnotherAuthor(i: number): void {
+    if (this.otrosAutores.length === 1) {
+      this.otrosAutores[0] = this.newCoAuthorRow();
+      this.otrosAutores[0].filteredOptions = this.otrosAutores[0].myControl.valueChanges.pipe(
+        startWith(""),
+        map((v) => this.filterAuthors(v)),
+      );
     } else {
       this.otrosAutores.splice(i, 1);
     }
   }
 
   submitArticle(): void {
-    this.revisarValues();
-    if (this.publicacionForm.valid && this.selectedUser) {
-      const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date()); // Replace event.value with your date value
-      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
-      this.publicacion.fechaPublicacion = formattedDate;
-      this._publicacionService.updatePublicacion(this.publicacion).subscribe((updateResponse: StatusResponse) => {
-        if (updateResponse.status === 1) {
-          if (this.fileData) {
-            this._publicacionService
-              .uploadPublicacionFile(this.fileData, this.publicacion.idPublicacion ?? 0)
-              .subscribe(() => {});
-          }
-          this._publicacionhasautorService
-            .deletePublicacionHasAutor(this.publicacion.idPublicacion ?? 0)
-            .subscribe((deleteAuthorResponse: StatusResponse) => {
-              if (deleteAuthorResponse.status === 1) {
-                this._publicacionhasusuarioService
-                  .deletePublicacionHasUsuario(this.publicacion.idPublicacion ?? 0)
-                  .subscribe((deleteUserResponse: StatusResponse) => {
-                    if (deleteUserResponse.status === 1) {
-                      if (this.selectedUsers.length > 0) {
-                        this.setAutores(this.selectedUsers[0], 0, this.publicacion.idPublicacion ?? 0);
-                      } else {
-                        const autorNuevo: AuthorOption = { nombre: this.selectedUser };
-                        this.setAutores(autorNuevo, 0, this.publicacion.idPublicacion ?? 0);
-                      }
-                      for (let index = 0; index < this.otrosAutores.length; index++) {
-                        this.setAutores(this.otrosAutores[index], index + 1, this.publicacion.idPublicacion ?? 0);
-                      }
-                    }
-                  });
-              }
-            });
-        }
-      });
-    }
-  }
+    if (!this.publicacionForm.valid || !this.selectedUser) return;
 
-  setAutores(autor: AuthorOption | AutorFormItem, isPrincipal: number, idPublicacion: number): void {
-    if (autor.nombre) {
-      if (autor.idAutor == null || autor.idAutor === "" || (!autor.idAutor && !autor.DNI)) {
-        const newAuthor = { nombre: autor.nombre };
-        this._autorService.addAuthor(newAuthor).subscribe((res: StatusResponse) => {
-          if (res) {
-            const autorPublicacion = {
-              autor_idAutor: res.idAutor ?? 0,
-              publicacion_idPublicacion: idPublicacion,
-              isPrincipal: isPrincipal,
-            };
-            this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(() => {});
-          }
+    const idPublicacion = this.publicacion.idPublicacion ?? 0;
+    const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
+    this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
+
+    this._publicacionService.updatePublicacion(this.publicacion).subscribe((updateResponse: any) => {
+      if (updateResponse.status === 1) {
+        if (this.fileData) {
+          this._publicacionService.uploadPublicacionFile(this.fileData, idPublicacion).subscribe(() => {});
+        }
+        this._publicacionAutoresService.saveForPublication(idPublicacion, this.buildSaveList()).subscribe(() => {
+          this.publicacionForm.markAsPristine();
+          this.return();
+          this.openSnackBar("Artículo actualizado exitosamente");
         });
-      } else if (autor.idAutor) {
-        if (autor.isAutor) {
-          const autorPublicacion = {
-            autor_idAutor: Number(autor.idAutor ?? 0),
-            publicacion_idPublicacion: idPublicacion,
-            isPrincipal: isPrincipal,
-          };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(() => {});
-        } else if (autor.isAutor === undefined) {
-          const autorPublicacion = {
-            autor_idAutor: Number(autor.idAutor ?? 0),
-            publicacion_idPublicacion: idPublicacion,
-            isPrincipal: isPrincipal,
-          };
-          this._publicacionhasautorService.addPublicacionHasAutor(autorPublicacion).subscribe(() => {});
-        } else {
-          const usuarioPublicacion = {
-            usuario_DNI: String(autor.idAutor),
-            publicacion_idPublicacion: idPublicacion,
-            isPrincipal: isPrincipal,
-          };
-          this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(() => {});
-        }
-      } else if (autor.DNI) {
-        const usuarioPublicacion = {
-          usuario_DNI: autor.DNI,
-          publicacion_idPublicacion: idPublicacion,
-          isPrincipal: isPrincipal,
-        };
-        this._publicacionhasusuarioService.addPublicacionHasUsuario(usuarioPublicacion).subscribe(() => {});
       }
-    }
-    if (isPrincipal) {
-      this.publicacionForm.markAsPristine();
-      this.return();
-      this.openSnackBar("Artículo actualizado exitosamente");
-    }
-  }
-
-  selectUser(evento: AuthorOption, value: number): void {
-    if (value === 1) {
-      this.myControl.setValue((evento as AuthorOption).nombre ?? "");
-      if (this.selectedUsers.length !== 0) {
-        this.selectedUsers[0] = evento;
-      } else {
-        this.selectedUsers.push(evento);
-      }
-    } else {
-      const index = this.options.findIndex((option: AuthorOption) => option.nombre === evento.value);
-      if (index === -1) {
-        return;
-      }
-      if (this.selectedUsers.length !== 0) {
-        this.selectedUsers[0] = this.options[index];
-      } else {
-        this.selectedUsers.push(this.options[index]);
-      }
-    }
-  }
-
-  selectUserAutor(evento: AuthorOption, value: number, i: number): void {
-    if (value === 1) {
-      const item = evento as AuthorOption;
-      if (item.idAutor) {
-        this.otrosAutores[i].idAutor = item.idAutor;
-      } else {
-        this.otrosAutores[i].idAutor = item.DNI ?? "";
-        this.otrosAutores[i].isAutor = false;
-      }
-      this.otrosAutores[i].nombre = item.nombre ?? "";
-    } else {
-      const index = this.options.findIndex((option: AuthorOption) => option.nombre === evento.value);
-      if (index === -1) {
-        return;
-      }
-      if (this.options[index].idAutor) {
-        this.otrosAutores[i].idAutor = this.options[index].idAutor;
-      } else {
-        this.otrosAutores[i].idAutor = this.options[index].DNI ?? "";
-        this.otrosAutores[i].isAutor = false;
-      }
-      this.otrosAutores[i].nombre = this.options[index].nombre ?? "";
-    }
-  }
-
-  revisarValues(): void {
-    for (let index = 0; index < this.otrosAutores.length; index++) {
-      const found = this.options.findIndex((option: AuthorOption) => option.nombre === this.otrosAutores[index].nombre);
-      if (found === -1) {
-        this.otrosAutores[index].idAutor = null;
-        this.otrosAutores[index].isAutor = true;
-      }
-    }
-    for (let index = 0; index < this.selectedUsers.length; index++) {
-      const found = this.options.findIndex(
-        (option: AuthorOption) => option.nombre === this.selectedUsers[index].nombre,
-      );
-      if (found === -1) {
-        if (this.selectedUsers[index].idAutor) {
-          this.selectedUsers[index].idAutor = null;
-        } else if (this.selectedUsers[index].DNI) {
-          this.selectedUsers[index].DNI = null;
-        }
-      }
-      if (this.selectedUser != this.selectedUsers[index].nombre) {
-        this.selectedUsers.splice(index, 1);
-      }
-    }
-  }
-
-  return(): void {
-    this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
-  }
-
-  openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
-      duration: 2000,
-      horizontalPosition: "right",
-      verticalPosition: "top",
     });
   }
 
-  fileData: File | null = null;
-  previewUrl: string | ArrayBuffer | null = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
-  fileProgress(fileInput: Event): void {
-    const input = fileInput.target as HTMLInputElement;
-    this.fileData = input.files?.[0] ?? null;
+  private buildSaveList(): SaveAuthorEntry[] {
+    const entries: SaveAuthorEntry[] = [];
+
+    const resolvedPrincipal = this.principalAuthor?.nombre === this.selectedUser ? this.principalAuthor : null;
+    if (resolvedPrincipal?.kind === "registered" && resolvedPrincipal.DNI) {
+      entries.push({ kind: "registered", DNI: resolvedPrincipal.DNI, isPrincipal: 0 });
+    } else {
+      entries.push({ kind: "external", nombre: this.selectedUser, isPrincipal: 0 });
+    }
+
+    this.otrosAutores.forEach((row, i) => {
+      if (!row.nombre) return;
+      const opt = row.option?.nombre === row.nombre ? row.option : null;
+      if (opt?.kind === "registered" && opt.DNI) {
+        entries.push({ kind: "registered", DNI: opt.DNI, isPrincipal: i + 1 });
+      } else {
+        entries.push({ kind: "external", nombre: row.nombre, isPrincipal: i + 1 });
+      }
+    });
+
+    return entries;
   }
 
   erasePublicacion(): void {
-    this._publicacionhasautorService
-      .deletePublicacionHasAutor(this.publicacion.idPublicacion ?? 0)
-      .subscribe((deleteAuthorResponse: StatusResponse) => {
-        if (deleteAuthorResponse.status === 1) {
-          this._publicacionhasusuarioService
-            .deletePublicacionHasUsuario(this.publicacion.idPublicacion ?? 0)
-            .subscribe((deleteUserResponse: StatusResponse) => {
-              if (deleteUserResponse.status === 1) {
-                this._publicacionService
-                  .deletePublicacion(this.publicacion.idPublicacion ?? 0)
-                  .subscribe((deletePublicationResponse: StatusResponse) => {
-                    if (deletePublicationResponse.status === 1) {
-                      this.publicacionForm.markAsPristine();
-                      this.return();
-                      this.openSnackBar("Artículo eliminado exitosamente");
-                    }
-                  });
-              }
-            });
+    const idPublicacion = this.publicacion.idPublicacion ?? 0;
+    this._publicacionAutoresService.saveForPublication(idPublicacion, []).subscribe(() => {
+      this._publicacionService.deletePublicacion(idPublicacion).subscribe((deleteResponse: any) => {
+        if (deleteResponse.status === 1) {
+          this.publicacionForm.markAsPristine();
+          this.return();
+          this.openSnackBar("Artículo eliminado exitosamente");
         }
       });
+    });
   }
 
   private dialogRef2?: MatDialogRef<DialogErase6>;
@@ -573,7 +331,23 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       }
     });
   }
-  edit = true;
+
+  return(): void {
+    this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
+  }
+
+  openSnackBar(value: string): void {
+    this._snackBar.open(value, undefined, {
+      duration: 2000,
+      horizontalPosition: "right",
+      verticalPosition: "top",
+    });
+  }
+
+  fileProgress(fileInput: Event): void {
+    const input = fileInput.target as HTMLInputElement;
+    this.fileData = input.files?.[0] ?? null;
+  }
 }
 
 @Component({

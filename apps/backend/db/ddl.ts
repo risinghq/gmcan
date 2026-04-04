@@ -5,7 +5,6 @@ import type { Database } from "./schema.js";
 // Used by bootstrap to detect schema drift.
 // Keep in sync with createTables below.
 export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
-  autor: ["idAutor", "nombre", "fechaCreacion", "fechaActualizacion"],
   equipo: ["idEquipo", "nombre", "cpu", "gpu", "ram", "hd", "grupo_idGrupo", "fechaCreacion", "fechaActualizacion"],
   evento: ["idEvento", "nombre", "ciudad", "pais", "ciudadEN", "paisEN"],
   fuentefinanciamiento: ["idFuenteFinanciamiento", "nombre"],
@@ -109,20 +108,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "evento_idEvento",
     "tipoTesis_idTipoTesis",
   ],
-  publicacion_has_autor: [
-    "autores_idAutor",
-    "publicacion_idPublicacion",
-    "fechaCreacion",
-    "fechaActualizacion",
-    "isPrincipal",
-  ],
-  publicacion_has_usuario: [
-    "publicacion_idPublicacion",
-    "usuario_DNI",
-    "fechaCreacion",
-    "fechaActualizacion",
-    "isPrincipal",
-  ],
+  publicacion_has_autor: ["idPublicacionHasAutor", "publicacion_idPublicacion", "isPrincipal", "nombre", "usuario_DNI"],
   session: ["id", "userDNI", "userCorreo", "expiresAt", "lastActive"],
   revista: ["idRevista", "nombre"],
   sobrenosotros: [
@@ -278,15 +264,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nombre", "text", (c) => c.notNull())
     .addColumn("fechaCreacion", "text", (c) => c.notNull())
     .addColumn("fechaActualizacion", "text", (c) => c.notNull())
-    .execute();
-
-  await db.schema
-    .createTable("autor")
-    .ifNotExists()
-    .addColumn("idAutor", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("nombre", "text", (c) => c.notNull())
-    .addColumn("fechaCreacion", "text")
-    .addColumn("fechaActualizacion", "text")
     .execute();
 
   await db.schema
@@ -532,21 +509,11 @@ export async function createTables(db: Kysely<Database>) {
   await db.schema
     .createTable("publicacion_has_autor")
     .ifNotExists()
-    .addColumn("autores_idAutor", "integer", (c) => c.notNull().references("autor.idAutor"))
+    .addColumn("idPublicacionHasAutor", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("publicacion_idPublicacion", "integer", (c) => c.notNull().references("publicacion.idPublicacion"))
-    .addColumn("fechaCreacion", "text")
-    .addColumn("fechaActualizacion", "text")
     .addColumn("isPrincipal", "integer", (c) => c.notNull())
-    .execute();
-
-  await db.schema
-    .createTable("publicacion_has_usuario")
-    .ifNotExists()
-    .addColumn("publicacion_idPublicacion", "integer", (c) => c.notNull().references("publicacion.idPublicacion"))
-    .addColumn("usuario_DNI", "text", (c) => c.notNull().references("usuario.DNI"))
-    .addColumn("fechaCreacion", "text")
-    .addColumn("fechaActualizacion", "text")
-    .addColumn("isPrincipal", "integer", (c) => c.notNull())
+    .addColumn("nombre", "text")
+    .addColumn("usuario_DNI", "text", (c) => c.references("usuario.DNI"))
     .execute();
 
   await db.schema

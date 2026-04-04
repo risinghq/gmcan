@@ -105,7 +105,7 @@
                     <img
                       class="mdc-list-item__graphic mr-12 img-user"
                       src="../../assets/img/user.png"
-                      *ngIf="!option.foto && option.apellidoPaterno"
+                      *ngIf="option.kind === 'registered' && !option.foto"
                     />
                     <img
                       class="mdc-list-item__graphic mr-12 img-user"
@@ -122,7 +122,7 @@
                     <img
                       class="mdc-list-item__graphic mr-12 img-user"
                       src="../../assets/img/user.png"
-                      *ngIf="!option.foto && option.apellidoPaterno"
+                      *ngIf="option.kind === 'registered' && !option.foto"
                     />
                     <img
                       class="mdc-list-item__graphic mr-12 img-user"

@@ -8,7 +8,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Autor } from "@app/shared/models/autores";
+import type { PublicationAuthor } from "@app/shared/models/author";
 import { createGrupo, createNoticia } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
@@ -20,7 +20,6 @@ import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import { Usuario } from "@app/shared/models/usuario";
 import { AboutUsService } from "@app/shared/services/aboutus.service";
-import { AutorService } from "@app/shared/services/autor.service";
 import { EventoService } from "@app/shared/services/evento.service";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -30,9 +29,8 @@ import { MethodsService } from "@app/shared/services/methods.service";
 import { MonedaService } from "@app/shared/services/moneda.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { SearchService } from "@app/shared/services/search.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -53,14 +51,13 @@ export default class HomeComponent implements OnInit {
   public info: Grupo;
   public publicaciones: Array<Publicacion>;
   proyectos: Array<Proyecto>;
-  public autores: Array<Autor>;
-  public usuarios: Array<Usuario>;
   public noticias: Array<Noticia>;
   public noticiaPrincipal: Noticia;
   public tipoPublicaciones: Array<TipoPublicacion> = [];
   public tiponoticias: Array<TipoNoticia>;
   public lineasInvestigacion: Array<LineasInvestigacion> = [];
   public metodos: Array<Method> = [];
+  public usuarios: Array<Usuario> = [];
   screenWidth: number;
   url;
   constructor(
@@ -70,11 +67,9 @@ export default class HomeComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     public _searchService: SearchService,
-    public _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    public _publicacionhasautorService: PublicacionHasAutorService,
+    public _publicacionAutoresService: PublicacionAutoresService,
     public _proyectohasusuarioService: UsuarioHasProyectoService,
     public _usuarioService: UsuarioService,
-    public _autorService: AutorService,
     public _revistaService: RevistaService,
     public _universidadService: UniversidadService,
     public _lineasInvestigacionServices: LineasInvestigacionService,
@@ -98,11 +93,9 @@ export default class HomeComponent implements OnInit {
     this.info = createGrupo();
     this.noticiaPrincipal = createNoticia();
     this.publicaciones = [];
-    this.autores = [];
     this.noticias = [];
     this.proyectos = [];
     this.tiponoticias = [];
-    this.usuarios = [];
     this.screenWidth = window.innerWidth;
     this.url = GLOBAL.url;
   }
@@ -207,28 +200,6 @@ export default class HomeComponent implements OnInit {
     });
   }
 
-  getPublicacionHasUsuario(publicacion: any): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: any) => {
-        if (res.length > 0) {
-          for (let index = 0; index < res.length; index++) {
-            this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
-          }
-        }
-      });
-  }
-
-  getPublicacionHasAutor(publicacion: any): void {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion ?? 0).subscribe((res: any) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getAutor(res[index].autores_idAutor, publicacion, res[index].isPrincipal);
-        }
-      }
-    });
-  }
-
   getEvento(idEvento: number, publicacion: any): void {
     this._eventoService.getEvento(idEvento).subscribe((res: any) => {
       if (res.length > 0) {
@@ -254,7 +225,6 @@ export default class HomeComponent implements OnInit {
   /* Fill Publicacion */
 
   fillPublicacion(publicacion: any): void {
-    publicacion.usuario = [];
     publicacion.autor = [];
     const d = new Date(publicacion.fechaPublicacion ?? "");
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
@@ -265,10 +235,11 @@ export default class HomeComponent implements OnInit {
       this.tipoPublicaciones[
         this.tipoPublicaciones.findIndex((x) => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion)
       ].nombre;
-    this.getPublicacionHasAutor(publicacion);
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
+    });
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
-    this.getPublicacionHasUsuario(publicacion);
     this.getEvento(publicacion.evento_idEvento ?? 0, publicacion);
     this.getTipoTesis(publicacion);
   }
@@ -445,7 +416,11 @@ export default class HomeComponent implements OnInit {
         obj.usuario.sort((a: any, b: any) =>
           (a.isPrincipal ?? 0) > (b.isPrincipal ?? 0) ? 1 : (b.isPrincipal ?? 0) > (a.isPrincipal ?? 0) ? -1 : 0,
         );
-        this.fillName(obj);
+        for (let i = 0; i < obj.usuario.length; i++) {
+          const first = (obj.usuario[i].nombre ?? "").split(" ");
+          obj.usuario[i].nombreCompleto =
+            first[0] + " " + obj.usuario[i].apellidoPaterno + (i < obj.usuario.length - 1 ? "," : "");
+        }
       }
     });
   }
@@ -454,18 +429,6 @@ export default class HomeComponent implements OnInit {
     this._usuarioService.getUser(obj.autorPublicacion ?? "").subscribe((res: any) => {
       if (res[0] != undefined) {
         obj.autor = res[0].nombre + " " + res[0].apellidoPaterno;
-      }
-    });
-  }
-
-  getAutor(idAutor: number, obj: any, isPrincipal: number): void {
-    this._autorService.getAuthor(idAutor).subscribe((res: any) => {
-      if (obj != undefined) {
-        res[0].isPrincipal = isPrincipal;
-        if (obj.autor.findIndex((x: any) => x.idAutor === res[0].idAutor) == -1) {
-          obj.autor.push(res[0]);
-        }
-        this.fillAuthName(obj);
       }
     });
   }
@@ -486,37 +449,6 @@ export default class HomeComponent implements OnInit {
         publicacion.universidad = res[0].nombre;
       }
     });
-  }
-
-  /* Fill Name */
-
-  fillName(obj: { usuario: Array<any>; autor?: Array<any> }): void {
-    for (let index = 0; index < obj.usuario.length; index++) {
-      const first = (obj.usuario[index].nombre ?? "").split(" ");
-      if (obj.autor != undefined) {
-        if (index == obj.usuario.length - 1 && obj.autor.length === 0) {
-          obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
-        } else {
-          obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno + ",";
-        }
-      } else {
-        if (index == obj.usuario.length - 1) {
-          obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno;
-        } else {
-          obj.usuario[index].nombreCompleto = first[0] + " " + obj.usuario[index].apellidoPaterno + ",";
-        }
-      }
-    }
-  }
-
-  fillAuthName(obj: { autor: Array<any> }): void {
-    for (let index = 0; index < obj.autor.length; index++) {
-      if (index == obj.autor.length - 1) {
-        obj.autor[index].nombreAutor = obj.autor[index].nombre;
-      } else {
-        obj.autor[index].nombreAutor = obj.autor[index].nombre + ",";
-      }
-    }
   }
 
   /* getUsuarios */

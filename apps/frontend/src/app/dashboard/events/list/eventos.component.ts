@@ -20,15 +20,12 @@ import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import type { Evento } from "@app/shared/models/eventos";
 import type { Publicacion } from "@app/shared/models/publicacion";
-import { AutorService } from "@app/shared/services/autor.service";
 import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
   selector: "app-eventos",
@@ -77,10 +74,7 @@ export default class EventosComponent implements OnInit {
     private _publicacionService: PublicacionService,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
-    private _usuarioService: UsuarioService,
-    private _autorService: AutorService,
+    private _publicacionAutoresService: PublicacionAutoresService,
     private _session: SessionService,
     private _tabState: TabStateService,
   ) {
@@ -104,16 +98,14 @@ export default class EventosComponent implements OnInit {
               : 0,
         );
         this.resumenes = res;
-        for (let index = 0; index < this.resumenes.length; index++) {
-          const d = new Date(this.resumenes[index].fechaPublicacion ?? "");
+        for (const resumen of this.resumenes) {
+          const d = new Date(resumen.fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.resumenes[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          this.resumenes[index].fecha = this.titlecasePipe.transform(this.resumenes[index].fecha) ?? "";
-          this.resumenes[index].usuario = [];
-          this.resumenes[index].autor = [];
-          this.getArticlesUsers(this.resumenes[index]);
-          this.getArticlesAuthors(this.resumenes[index]);
-          this.getSpeEvento(this.resumenes[index]);
+          resumen.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+          resumen.fecha = this.titlecasePipe.transform(resumen.fecha) ?? "";
+          resumen.autor = [];
+          this.getAuthors(resumen);
+          this.getSpeEvento(resumen);
         }
         this.dataSource = new MatTableDataSource(this.resumenes);
         this.dataSource.sort = this.sort;
@@ -130,55 +122,9 @@ export default class EventosComponent implements OnInit {
     });
   }
 
-  getArticlesUsers(publicacion: Publicacion): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: any[]) => {
-        if (res) {
-          const indexPrincipal = res.findIndex((x: any) => x.isPrincipal == 0);
-          if (indexPrincipal != -1) {
-            this.getUsuario(res[indexPrincipal].usuario_DNI, publicacion);
-          }
-        }
-      });
-  }
-
-  getUsuario(idUser: string, publicacion: Publicacion): void {
-    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
-      if (res[0] != undefined) {
-        if (!publicacion.usuario) {
-          publicacion.usuario = [];
-        }
-        publicacion.usuario.push(res[0]);
-        publicacion.usuario[0].nombreCompleto =
-          publicacion.usuario[0].nombre +
-          " " +
-          publicacion.usuario[0].apellidoPaterno +
-          " " +
-          publicacion.usuario[0].apellidoMaterno;
-      }
-    });
-  }
-
-  getArticlesAuthors(publicacion: Publicacion): void {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion ?? 0).subscribe((res: any[]) => {
-      if (res) {
-        const indexPrincipal = res.findIndex((x: any) => x.isPrincipal == 0);
-        if (indexPrincipal != -1) {
-          this.getAuthor(res[indexPrincipal].autores_idAutor, publicacion);
-        }
-      }
-    });
-  }
-
-  getAuthor(idAuthor: number, publicacion: Publicacion): void {
-    this._autorService.getAuthor(idAuthor).subscribe((res: any[]) => {
-      if (res[0] != undefined) {
-        if (!publicacion.autor) {
-          publicacion.autor = [];
-        }
-        publicacion.autor.push(res[0]);
-      }
+  getAuthors(publicacion: Publicacion): void {
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
     });
   }
 

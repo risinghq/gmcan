@@ -30,7 +30,7 @@ import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { PrefijoService } from "@app/shared/services/prefijo.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
@@ -114,7 +114,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     public _usuarioPermisoService: UsuarioHasPermisoService,
     private _snackBar: MatSnackBar,
     public dialog: MatDialog,
-    public _usuarioPublicacionService: PublicacionHasUsuarioService,
+    public _publicacionAutoresService: PublicacionAutoresService,
     public _noticiaService: NoticiaService,
   ) {
     this.memberForm = this.formBuilder.group({
@@ -231,7 +231,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   getPublicaciones(miembro: UsuarioFull): void {
-    this._usuarioPublicacionService.searchPublicacionHasUsuario(miembro.DNI ?? "").subscribe((result: unknown[]) => {
+    this._publicacionAutoresService.getByUser(miembro.DNI ?? "").subscribe((result) => {
       if (result.length == 0) {
         this.edit = true;
       }

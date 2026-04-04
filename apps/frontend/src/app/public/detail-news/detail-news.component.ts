@@ -49,7 +49,7 @@ export default class DetailNewsComponent implements OnInit {
       apellidoPaterno: "",
       apellidoMaterno: "",
       foto: "",
-      isPrincipal: false,
+      isPrincipal: 0,
     };
     this.url = GLOBAL.url;
   }

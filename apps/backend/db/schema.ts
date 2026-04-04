@@ -3,13 +3,6 @@ import type { Generated } from "kysely";
 // All dates stored as ISO strings (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
 type DateString = string;
 
-export interface AutorTable {
-  idAutor: Generated<number>;
-  nombre: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
 export interface EquipoTable {
   idEquipo: Generated<number>;
   nombre: string;
@@ -165,19 +158,11 @@ export interface PublicacionTable {
 }
 
 export interface PublicacionHasAutorTable {
-  autores_idAutor: number;
+  idPublicacionHasAutor: Generated<number>;
   publicacion_idPublicacion: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
   isPrincipal: number;
-}
-
-export interface PublicacionHasUsuarioTable {
-  publicacion_idPublicacion: number;
-  usuario_DNI: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-  isPrincipal: number;
+  nombre: string | null; // external authors only
+  usuario_DNI: string | null; // registered users only
 }
 
 export interface RevistaTable {
@@ -319,7 +304,6 @@ export interface SessionTable {
 }
 
 export interface Database {
-  autor: AutorTable;
   equipo: EquipoTable;
   evento: EventoTable;
   fuentefinanciamiento: FuenteFinanciamientoTable;
@@ -334,7 +318,6 @@ export interface Database {
   proyecto: ProyectoTable;
   publicacion: PublicacionTable;
   publicacion_has_autor: PublicacionHasAutorTable;
-  publicacion_has_usuario: PublicacionHasUsuarioTable;
   revista: RevistaTable;
   sobrenosotros: SobreNosotrosTable;
   software: SoftwareTable;

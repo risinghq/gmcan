@@ -1,4 +1,3 @@
-import { Autor } from "./autores";
 import { Usuario } from "./usuario";
 
 export interface Proyecto {
@@ -23,5 +22,4 @@ export interface Proyecto {
   moneda_idMoneda?: number;
   moneda?: string;
   usuario?: Usuario[];
-  autor?: Autor[];
 }

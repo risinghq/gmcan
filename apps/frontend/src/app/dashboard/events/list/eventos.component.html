@@ -25,19 +25,16 @@
       <ng-container matColumnDef="primerAutor">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Primer autor</th>
         <td mat-cell *matCellDef="let row" (click)="editResumen(row.idPublicacion)">
-          <div class="flex-news" *ngIf="row.usuario.length != 0">
-            <div class="member-img-round mr-8">
+          <div class="flex-news" *ngIf="row.autor && row.autor.length != 0">
+            <div class="member-img-round mr-8" *ngIf="row.autor[0].kind === 'registered'">
               <img
                 class="member-img"
-                src="{{ url + 'usuario/get-image-usuario/' + row.usuario[0].foto }}"
+                src="{{ url + 'usuario/get-image-usuario/' + row.autor[0].foto }}"
                 alt="../../assets/img/user.png"
-                *ngIf="row.usuario[0].foto"
+                *ngIf="row.autor[0].foto"
               />
-              <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!row.usuario[0].foto" />
+              <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!row.autor[0].foto" />
             </div>
-            {{ row.usuario[0].nombreCompleto }}
-          </div>
-          <div *ngIf="row.usuario.length == 0 && row.autor.length != 0">
             {{ row.autor[0].nombre }}
           </div>
         </td>

@@ -108,23 +108,23 @@
                   }}</a>
                 </div>
                 <div class="flex-news publication-mt" style="flex-flow: wrap">
-                  <div class="publication-members" *ngFor="let usuario of publicacion.usuario">
-                    <div class="member-img-round">
-                      <img
-                        class="member-img"
-                        src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
-                        alt="../../assets/img/user.png"
-                        *ngIf="usuario.foto"
-                      />
-                      <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!usuario.foto" />
+                  <ng-container *ngFor="let autor of publicacion.autor; let last = last">
+                    <div class="publication-members" *ngIf="autor.kind === 'registered'">
+                      <div class="member-img-round">
+                        <img
+                          class="member-img"
+                          src="{{ url + 'usuario/get-image-usuario/' + autor.foto }}"
+                          alt="../../assets/img/user.png"
+                          *ngIf="autor.foto"
+                        />
+                        <img class="member-img" src="../../assets/img/user.png" alt="" *ngIf="!autor.foto" />
+                      </div>
+                      <div class="member-name" (click)="profile(autor)">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
                     </div>
-                    <div class="member-name" (click)="profile(usuario)">
-                      {{ usuario.nombreCompleto }}
+                    <div class="publication-authors" *ngIf="autor.kind === 'external'">
+                      {{ autor.nombre }}{{ !last ? "," : "" }}
                     </div>
-                  </div>
-                  <div class="publication-authors" *ngFor="let autores of publicacion.autor">
-                    {{ autores.nombreAutor }}
-                  </div>
+                  </ng-container>
                 </div>
                 <div class="flex-news mt-16">
                   <a

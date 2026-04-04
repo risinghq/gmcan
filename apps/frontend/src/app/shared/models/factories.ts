@@ -63,7 +63,6 @@ export function createProyecto(): Proyecto {
     moneda_idMoneda: 0,
     moneda: "",
     usuario: [],
-    autor: [],
   };
 }
 
@@ -86,10 +85,10 @@ export function createPublicacion(): Publicacion {
     idPublicacion: 0,
     titulo: "",
     archivo: "",
-    autores: "",
+
     resumen: "",
     resumenEN: "",
-    DOI: 0,
+    DOI: "",
     fecha: "",
     fechaPublicacionDate: undefined,
     fechaPublicacion: "",
@@ -103,7 +102,6 @@ export function createPublicacion(): Publicacion {
     universidad_idUniversidad: 0,
     universidad: "",
     autor: [],
-    usuario: [],
     ciudad_idCiudad: 0,
     ciudad: "",
     pais: "",

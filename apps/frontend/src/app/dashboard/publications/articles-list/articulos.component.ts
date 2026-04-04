@@ -18,28 +18,13 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { Autor } from "@app/shared/models/autores";
 import { Publicacion } from "@app/shared/models/publicacion";
 import { Revista } from "@app/shared/models/revista";
-import { Usuario } from "@app/shared/models/usuario";
-import { AutorService } from "@app/shared/services/autor.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-
-interface PublicacionUsuarioRel {
-  isPrincipal?: number;
-  usuario_DNI?: string;
-}
-
-interface PublicacionAutorRel {
-  isPrincipal?: number;
-  autores_idAutor?: number;
-}
 
 @Component({
   selector: "app-articulos",
@@ -81,10 +66,7 @@ export default class ArticulosComponent implements OnInit {
     private _publicacionService: PublicacionService,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
-    private _usuarioService: UsuarioService,
-    private _autorService: AutorService,
+    private _publicacionAutoresService: PublicacionAutoresService,
     private _tabState: TabStateService,
   ) {
     this.url = GLOBAL.url;
@@ -114,15 +96,13 @@ export default class ArticulosComponent implements OnInit {
               : 0,
         );
         this.articulos = res;
-        for (let index = 0; index < this.articulos.length; index++) {
-          const d = new Date(this.articulos[index].fechaPublicacion ?? new Date());
+        for (const articulo of this.articulos) {
+          const d = new Date(articulo.fechaPublicacion ?? new Date());
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.articulos[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          this.articulos[index].fecha = this.titlecasePipe.transform(this.articulos[index].fecha) ?? "";
-          this.articulos[index].usuario = [];
-          this.articulos[index].autor = [];
-          this.getArticlesUsers(this.articulos[index]);
-          this.getArticlesAuthors(this.articulos[index]);
+          articulo.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+          articulo.fecha = this.titlecasePipe.transform(articulo.fecha) ?? "";
+          articulo.autor = [];
+          this.getAuthors(articulo);
         }
         this.dataSource = new MatTableDataSource(this.articulos);
         this.dataSource.sort = this.sort;
@@ -131,57 +111,9 @@ export default class ArticulosComponent implements OnInit {
     });
   }
 
-  getArticlesUsers(publicacion: Publicacion): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: PublicacionUsuarioRel[]) => {
-        if (res) {
-          const indexPrincipal = res.findIndex((x: PublicacionUsuarioRel) => x.isPrincipal == 0);
-          if (indexPrincipal != -1) {
-            this.getUsuario(res[indexPrincipal].usuario_DNI ?? "", publicacion);
-          }
-        }
-      });
-  }
-
-  getUsuario(idUser: string, publicacion: Publicacion): void {
-    this._usuarioService.getUser(idUser).subscribe((res: Usuario[]) => {
-      if (res[0] != undefined) {
-        if (!publicacion.usuario) {
-          publicacion.usuario = [];
-        }
-        publicacion.usuario.push(res[0]);
-        publicacion.usuario[0].nombreCompleto =
-          (publicacion.usuario[0].nombre ?? "") +
-          " " +
-          (publicacion.usuario[0].apellidoPaterno ?? "") +
-          " " +
-          (publicacion.usuario[0].apellidoMaterno ?? "");
-      }
-    });
-  }
-
-  getArticlesAuthors(publicacion: Publicacion): void {
-    this._publicacionhasautorService
-      .getPublicacionHasAutor(publicacion.idPublicacion ?? 0)
-      .subscribe((res: PublicacionAutorRel[]) => {
-        if (res) {
-          const indexPrincipal = res.findIndex((x: PublicacionAutorRel) => x.isPrincipal == 0);
-          if (indexPrincipal != -1) {
-            this.getAuthor(res[indexPrincipal].autores_idAutor ?? 0, publicacion);
-          }
-        }
-      });
-  }
-
-  getAuthor(idAuthor: number, publicacion: Publicacion): void {
-    this._autorService.getAuthor(idAuthor).subscribe((res: Autor[]) => {
-      if (res[0] != undefined) {
-        if (!publicacion.autor) {
-          publicacion.autor = [];
-        }
-        publicacion.autor.push(res[0]);
-      }
+  getAuthors(publicacion: Publicacion): void {
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
     });
   }
 

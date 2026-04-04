@@ -18,11 +18,9 @@ import {
 } from "@angular/material/table";
 import { Router } from "@angular/router";
 import { Publicacion } from "@app/shared/models/publicacion";
-import { AutorService } from "@app/shared/services/autor.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { TipoTesisService } from "@app/shared/services/tipotesis.service";
 import { UniversidadService } from "@app/shared/services/universidad.service";
@@ -64,10 +62,8 @@ export default class MyThesisComponent implements OnInit {
     private _publicacionService: PublicacionService,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
+    private _publicacionAutoresService: PublicacionAutoresService,
     private _usuarioService: UsuarioService,
-    private _autorService: AutorService,
     public _usuarioHasPermisoService: UsuarioHasPermisoService,
     private _universidadService: UniversidadService,
     private _tipoTesisService: TipoTesisService,
@@ -84,18 +80,16 @@ export default class MyThesisComponent implements OnInit {
   }
 
   getUserArticles(): void {
-    let user = this._usuarioService.getUserLogged();
+    const user = this._usuarioService.getUserLogged();
     this.getPermisoHasUsuario(user.DNI ?? "");
-    this._publicacionhasusuarioService
-      .searchPublicacionHasUsuario(user.DNI ?? "")
-      .subscribe((res: { publicacion_idPublicacion?: number }[]) => {
-        if (res) {
-          this.tesis = [];
-          for (let index = 0; index < res.length; index++) {
-            this.getThesis(res[index].publicacion_idPublicacion ?? 0);
-          }
+    this._publicacionAutoresService.getByUser(user.DNI ?? "").subscribe((res) => {
+      if (res) {
+        this.tesis = [];
+        for (const item of res) {
+          this.getThesis(item.publicacion_idPublicacion);
         }
-      });
+      }
+    });
   }
 
   getThesis(idPublicacion: number): void {
@@ -103,18 +97,15 @@ export default class MyThesisComponent implements OnInit {
       if (res[0]) {
         if (res[0].tipoPublicacion_idTipoPublicacion === 2) {
           this.tesis.push(res[0]);
-          const d = new Date(this.tesis[this.tesis.length - 1].fechaPublicacion ?? "");
+          const last = this.tesis[this.tesis.length - 1];
+          const d = new Date(last.fechaPublicacion ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.tesis[this.tesis.length - 1].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          this.tesis[this.tesis.length - 1].fecha = this.titlecasePipe.transform(
-            this.tesis[this.tesis.length - 1].fecha ?? "",
-          );
-          this.tesis[this.tesis.length - 1].usuario = [];
-          this.tesis[this.tesis.length - 1].autor = [];
-          this.getThesisUsers(this.tesis[this.tesis.length - 1]);
-          this.getThesisAuthors(this.tesis[this.tesis.length - 1]);
-          this.getTipoThesis(this.tesis[this.tesis.length - 1]);
-          this.getSpeUniversidad(this.tesis[this.tesis.length - 1]);
+          last.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+          last.fecha = this.titlecasePipe.transform(last.fecha ?? "");
+          last.autor = [];
+          this.getAuthors(last);
+          this.getTipoThesis(last);
+          this.getSpeUniversidad(last);
           this.tesis.sort((a: Publicacion, b: Publicacion) =>
             (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
               ? 1
@@ -139,18 +130,6 @@ export default class MyThesisComponent implements OnInit {
     });
   }
 
-  getThesisUsers(publicacion: Publicacion): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: { usuario_DNI?: string }[]) => {
-        if (res) {
-          for (let index = 0; index < res.length; index++) {
-            this.getUsuario(res[index].usuario_DNI ?? "", publicacion);
-          }
-        }
-      });
-  }
-
   getSpeUniversidad(publicacion: Publicacion): void {
     this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: unknown) => {
       const data = res as { nombre?: string }[];
@@ -160,38 +139,9 @@ export default class MyThesisComponent implements OnInit {
     });
   }
 
-  getUsuario(idUser: string, publicacion: Publicacion): void {
-    this._usuarioService
-      .getUser(idUser)
-      .subscribe((res: { nombre?: string; apellidoPaterno?: string; apellidoMaterno?: string }[]) => {
-        if (res[0] != undefined) {
-          const usuario = {
-            ...res[0],
-            nombreCompleto:
-              `${res[0].nombre ?? ""} ${res[0].apellidoPaterno ?? ""} ${res[0].apellidoMaterno ?? ""}`.trim(),
-          };
-          publicacion.usuario?.push(usuario);
-        }
-      });
-  }
-
-  getThesisAuthors(publicacion: Publicacion): void {
-    this._publicacionhasautorService
-      .getPublicacionHasAutor(publicacion.idPublicacion ?? 0)
-      .subscribe((res: { autores_idAutor?: number }[]) => {
-        if (res) {
-          for (let index = 0; index < res.length; index++) {
-            this.getAuthor(res[index].autores_idAutor ?? 0, publicacion);
-          }
-        }
-      });
-  }
-
-  getAuthor(idAuthor: number, publicacion: Publicacion): void {
-    this._autorService.getAuthor(idAuthor).subscribe((res: unknown[]) => {
-      if (res[0] != undefined) {
-        publicacion.autor?.push(res[0]);
-      }
+  getAuthors(publicacion: Publicacion): void {
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
     });
   }
 
@@ -215,13 +165,9 @@ export default class MyThesisComponent implements OnInit {
   getPermisoHasUsuario(DNI: string): void {
     this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: { permiso_idPermiso?: number }[]) => {
       if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          switch (res[index].permiso_idPermiso) {
-            case 3:
-              this.publicacionPermiso = true;
-              break;
-            default:
-              break;
+        for (const permiso of res) {
+          if (permiso.permiso_idPermiso === 3) {
+            this.publicacionPermiso = true;
           }
         }
       }
@@ -234,17 +180,13 @@ export default class MyThesisComponent implements OnInit {
   }
 
   editThesis(id: number): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(id)
-      .subscribe((res: { usuario_DNI?: string; isPrincipal?: number }[]) => {
-        if (res.length > 0) {
-          let user = this._usuarioService.getUserLogged();
-          let index = res.findIndex((item: { usuario_DNI?: string }) => item.usuario_DNI === user.DNI);
-          if (index !== -1 && res[index].isPrincipal === 0) {
-            localStorage.setItem("thesis-back", "my-thesis");
-            this._router.navigate(["dashboard/edit-thesis/" + id]);
-          }
-        }
-      });
+    this._publicacionAutoresService.getForPublication(id).subscribe((authors) => {
+      const user = this._usuarioService.getUserLogged();
+      const isPrincipal = authors.some((a) => a.kind === "registered" && a.DNI === user.DNI && a.isPrincipal === 0);
+      if (isPrincipal || this.publicacionPermiso) {
+        localStorage.setItem("thesis-back", "my-thesis");
+        this._router.navigate(["dashboard/edit-thesis/" + id]);
+      }
+    });
   }
 }

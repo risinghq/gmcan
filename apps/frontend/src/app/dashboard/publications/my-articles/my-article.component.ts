@@ -18,11 +18,9 @@ import {
 } from "@angular/material/table";
 import { Router } from "@angular/router";
 import { Publicacion } from "@app/shared/models/publicacion";
-import { AutorService } from "@app/shared/services/autor.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
@@ -62,10 +60,8 @@ export default class MyArticleComponent implements OnInit {
     private _publicacionService: PublicacionService,
     public titlecasePipe: TitleCasePipe,
     public datePipe: DatePipe,
-    private _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    private _publicacionhasautorService: PublicacionHasAutorService,
+    private _publicacionAutoresService: PublicacionAutoresService,
     private _usuarioService: UsuarioService,
-    private _autorService: AutorService,
     public _usuarioHasPermisoService: UsuarioHasPermisoService,
   ) {
     this.url = GLOBAL.url;
@@ -81,16 +77,14 @@ export default class MyArticleComponent implements OnInit {
   getUserArticles(): void {
     const user = this._usuarioService.getUserLogged();
     this.getPermisoHasUsuario(user?.DNI ?? "");
-    this._publicacionhasusuarioService
-      .searchPublicacionHasUsuario(user?.DNI ?? "")
-      .subscribe((res: { publicacion_idPublicacion?: number }[]) => {
-        if (res) {
-          this.articulos = [];
-          for (let index = 0; index < res.length; index++) {
-            this.getArticle(res[index].publicacion_idPublicacion ?? 0);
-          }
+    this._publicacionAutoresService.getByUser(user?.DNI ?? "").subscribe((res) => {
+      if (res) {
+        this.articulos = [];
+        for (const item of res) {
+          this.getArticle(item.publicacion_idPublicacion);
         }
-      });
+      }
+    });
   }
 
   getArticle(idPublicacion: number): void {
@@ -105,15 +99,13 @@ export default class MyArticleComponent implements OnInit {
                 ? -1
                 : 0,
           );
-          for (let index = 0; index < this.articulos.length; index++) {
-            const d = new Date(this.articulos[index].fechaPublicacion ?? "");
+          for (const articulo of this.articulos) {
+            const d = new Date(articulo.fechaPublicacion ?? "");
             d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-            this.articulos[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-            this.articulos[index].fecha = this.titlecasePipe.transform(this.articulos[index].fecha ?? "");
-            this.articulos[index].usuario = [];
-            this.articulos[index].autor = [];
-            this.getArticlesUsers(this.articulos[index]);
-            this.getArticlesAuthors(this.articulos[index]);
+            articulo.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
+            articulo.fecha = this.titlecasePipe.transform(articulo.fecha ?? "");
+            articulo.autor = [];
+            this.getAuthors(articulo);
           }
         }
         this.dataSource = new MatTableDataSource(this.articulos);
@@ -123,52 +115,9 @@ export default class MyArticleComponent implements OnInit {
     });
   }
 
-  getArticlesUsers(publicacion: Publicacion): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: { isPrincipal?: number; usuario_DNI?: string }[]) => {
-        if (res) {
-          const indexPrincipal = res.findIndex((x: { isPrincipal?: number }) => x.isPrincipal === 0);
-          if (indexPrincipal !== -1) {
-            this.getUsuario(res[indexPrincipal].usuario_DNI ?? "", publicacion);
-          }
-        }
-      });
-  }
-
-  getUsuario(idUser: string, publicacion: Publicacion): void {
-    this._usuarioService
-      .getUser(idUser)
-      .subscribe((res: { nombre?: string; apellidoPaterno?: string; apellidoMaterno?: string }[]) => {
-        if (res[0] != undefined) {
-          const usuario = {
-            ...res[0],
-            nombreCompleto:
-              `${res[0].nombre ?? ""} ${res[0].apellidoPaterno ?? ""} ${res[0].apellidoMaterno ?? ""}`.trim(),
-          };
-          publicacion.usuario?.push(usuario);
-        }
-      });
-  }
-
-  getArticlesAuthors(publicacion: Publicacion): void {
-    this._publicacionhasautorService
-      .getPublicacionHasAutor(publicacion.idPublicacion ?? 0)
-      .subscribe((res: { isPrincipal?: number; autores_idAutor?: number }[]) => {
-        if (res) {
-          const indexPrincipal = res.findIndex((x: { isPrincipal?: number }) => x.isPrincipal === 0);
-          if (indexPrincipal !== -1) {
-            this.getAuthor(res[indexPrincipal].autores_idAutor ?? 0, publicacion);
-          }
-        }
-      });
-  }
-
-  getAuthor(idAuthor: number, publicacion: Publicacion): void {
-    this._autorService.getAuthor(idAuthor).subscribe((res: unknown[]) => {
-      if (res[0] != undefined) {
-        publicacion.autor?.push(res[0]);
-      }
+  getAuthors(publicacion: Publicacion): void {
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
     });
   }
 
@@ -192,13 +141,9 @@ export default class MyArticleComponent implements OnInit {
   getPermisoHasUsuario(DNI: string): void {
     this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: { permiso_idPermiso?: number }[]) => {
       if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          switch (res[index].permiso_idPermiso) {
-            case 3:
-              this.publicacionPermiso = true;
-              break;
-            default:
-              break;
+        for (const permiso of res) {
+          if (permiso.permiso_idPermiso === 3) {
+            this.publicacionPermiso = true;
           }
         }
       }
@@ -211,17 +156,13 @@ export default class MyArticleComponent implements OnInit {
   }
 
   editArticulo(id: number): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(id)
-      .subscribe((res: { usuario_DNI?: string; isPrincipal?: number }[]) => {
-        if (res.length > 0) {
-          const user = this._usuarioService.getUserLogged();
-          const index = res.findIndex((item: { usuario_DNI?: string }) => item.usuario_DNI === user?.DNI);
-          if ((index !== -1 && res[index].isPrincipal === 0) || this.publicacionPermiso) {
-            localStorage.setItem("article-back", "my-articles");
-            this._router.navigate(["dashboard/edit-article/" + id]);
-          }
-        }
-      });
+    this._publicacionAutoresService.getForPublication(id).subscribe((authors) => {
+      const user = this._usuarioService.getUserLogged();
+      const isPrincipal = authors.some((a) => a.kind === "registered" && a.DNI === user?.DNI && a.isPrincipal === 0);
+      if (isPrincipal || this.publicacionPermiso) {
+        localStorage.setItem("article-back", "my-articles");
+        this._router.navigate(["dashboard/edit-article/" + id]);
+      }
+    });
   }
 }

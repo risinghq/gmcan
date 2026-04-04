@@ -11,15 +11,13 @@ import { Publicacion } from "@app/shared/models/publicacion";
 import { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import { UsuarioFull } from "@app/shared/models/usuarioFull";
-import { AutorService } from "@app/shared/services/autor.service";
 import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { PublicacionHasAutorService } from "@app/shared/services/publicacionhasautor.service";
-import { PublicacionHasUsuarioService } from "@app/shared/services/publicacionhasusuario.service";
 import { RevistaService } from "@app/shared/services/revista.service";
 import { SearchService } from "@app/shared/services/search.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -74,11 +72,9 @@ export default class GlobalSearchComponent implements OnInit {
     public _route: ActivatedRoute,
     public _router: Router,
     public _searchService: SearchService,
-    public _publicacionhasusuarioService: PublicacionHasUsuarioService,
-    public _publicacionhasautorService: PublicacionHasAutorService,
+    public _publicacionAutoresService: PublicacionAutoresService,
     public _proyectohasusuarioService: UsuarioHasProyectoService,
     public _usuarioService: UsuarioService,
-    public _autorService: AutorService,
     public _revistaService: RevistaService,
     public _universidadService: UniversidadService,
     public _lineasInvestigacionServices: LineasInvestigacionService,
@@ -217,20 +213,18 @@ export default class GlobalSearchComponent implements OnInit {
     this._searchService.searchPublicacionesGlobal(nombre).subscribe((res: Publicacion[]) => {
       if (res.length > 0) {
         this.publicaciones = res;
-        for (let index = 0; index < this.publicaciones.length; index++) {
-          this.fillPublicacion(this.publicaciones[index]);
+        for (const pub of this.publicaciones) {
+          this.fillPublicacion(pub);
         }
       }
-      this.searchAutores(nombre);
+      this.searchByAuthors(nombre);
     });
   }
 
-  searchAutores(nombre: string): void {
-    this._searchService.searchAutores(nombre).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getAutorHasPublicacion(res[index].idAutor);
-        }
+  searchByAuthors(nombre: string): void {
+    this._publicacionAutoresService.searchPublications(nombre).subscribe((res) => {
+      for (const item of res) {
+        this.getPublicacion(item.publicacion_idPublicacion);
       }
       this.searchEventos(nombre);
     });
@@ -257,46 +251,12 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  /* Get Publicacion */
-
-  getPublicacionHasUsuario(publicacion: Publicacion): void {
-    this._publicacionhasusuarioService
-      .getPublicacionHasUsuario(publicacion.idPublicacion ?? 0)
-      .subscribe((res: any[]) => {
-        if (res.length > 0) {
-          for (let index = 0; index < res.length; index++) {
-            this.getUsuario(res[index].usuario_DNI, publicacion, res[index].isPrincipal);
-          }
-        }
-      });
-  }
+  /* Get publication data */
 
   getUsuarioHasPublicacion(obj: UsuarioFull): void {
-    this._publicacionhasusuarioService.searchPublicacionHasUsuario(obj.DNI ?? "").subscribe((res: any[]) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getPublicacion(res[index].publicacion_idPublicacion);
-        }
-      }
-    });
-  }
-
-  getPublicacionHasAutor(publicacion: Publicacion): void {
-    this._publicacionhasautorService.getPublicacionHasAutor(publicacion.idPublicacion ?? 0).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getAutor(res[index].autores_idAutor, publicacion);
-        }
-      }
-    });
-  }
-
-  getAutorHasPublicacion(id: number): void {
-    this._publicacionhasautorService.searchPublicacionHasAutor(id).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getPublicacion(res[index].publicacion_idPublicacion);
-        }
+    this._publicacionAutoresService.getByUser(obj.DNI ?? "").subscribe((res) => {
+      for (const item of res) {
+        this.getPublicacion(item.publicacion_idPublicacion);
       }
     });
   }
@@ -397,23 +357,25 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  /* Fill Publicacion */
+  /* Fill publication data */
 
   fillPublicacion(publicacion: Publicacion): void {
-    publicacion.usuario = [];
     publicacion.autor = [];
     const d = new Date(publicacion.fechaPublicacion ?? "");
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
     publicacion.fecha = this.datePipe.transform(d, "MMMM y", "es") ?? undefined;
     publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha ?? "");
-    publicacion.tipoPublicacion =
-      this.tipoPublicaciones[
-        this.tipoPublicaciones.findIndex((x) => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion)
-      ].nombre;
-    this.getPublicacionHasAutor(publicacion);
+    const tipoIdx = this.tipoPublicaciones.findIndex(
+      (x) => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion,
+    );
+    if (tipoIdx !== -1) {
+      publicacion.tipoPublicacion = this.tipoPublicaciones[tipoIdx].nombre;
+    }
+    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
+      publicacion.autor = authors;
+    });
     this.getUniversidad(publicacion);
     this.getRevista(publicacion);
-    this.getPublicacionHasUsuario(publicacion);
     this.getEvento(publicacion.evento_idEvento ?? 0, publicacion);
     this.getTipoTesis(publicacion);
   }
@@ -479,7 +441,7 @@ export default class GlobalSearchComponent implements OnInit {
     });
   }
 
-  /* Fill Proyecto */
+  /* Fill project data */
 
   fillProyecto(proyecto: Proyecto, index: number): void {
     proyecto.fechaI = this.datePipe.transform(proyecto.fechaInicio ?? "", "MMMM, y", "es") ?? undefined;
@@ -604,17 +566,6 @@ export default class GlobalSearchComponent implements OnInit {
     this._usuarioService.getUser(obj.autorPublicacion ?? "").subscribe((res: any[]) => {
       if (res[0] != undefined) {
         obj.autor = res[0].nombre + " " + res[0].apellidoPaterno;
-      }
-    });
-  }
-
-  getAutor(idAutor: number, obj: any): void {
-    this._autorService.getAuthor(idAutor).subscribe((res: any[]) => {
-      if (obj != undefined) {
-        if (obj.autor.findIndex((x: any) => x.idAutor === res[0].idAutor) == -1) {
-          obj.autor.push(res[0]);
-        }
-        this.fillAuthName(obj);
       }
     });
   }
