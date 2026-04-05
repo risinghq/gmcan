@@ -22,11 +22,7 @@
         <div class="flex-news">
           <div class="member-img-round mr-8">
             @if (row.foto) {
-              <img
-                class="member-img"
-                src="{{ url + 'usuario/get-image-usuario/' + row.foto }}"
-                alt="../../assets/img/user.png"
-              />
+              <img class="member-img" src="{{ url + 'usuario/' + row.DNI + '/file }}" alt="../../assets/img/user.png" />
             }
             @if (!row.foto) {
               <img class="member-img" src="../../assets/img/user.png" alt="" />

@@ -68,6 +68,6 @@ export class MethodsService {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "metodo/upload-metodo-foto/" + id, formData, { headers });
+    return this.http.put(`${this.url}metodo/${id}/file`, formData, { headers });
   }
 }

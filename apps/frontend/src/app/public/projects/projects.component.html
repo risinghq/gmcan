@@ -75,10 +75,7 @@
                             <div class="project-members">
                               <div class="member-img-round">
                                 @if (usuario.foto) {
-                                  <img
-                                    class="member-img"
-                                    src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
-                                  />
+                                  <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
                                 }
                                 @if (!usuario.foto) {
                                   <img class="member-img" src="../../assets/img/user.png" alt="" />

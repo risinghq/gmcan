@@ -65,9 +65,9 @@ export default class LoginComponent implements OnInit {
     this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
       this.grupoinfo = res[0];
       this.session.setGrupoInfo(this.grupoinfo);
-      this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
+      this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
     });
-    this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
+    this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
   }
 
   login(): void {

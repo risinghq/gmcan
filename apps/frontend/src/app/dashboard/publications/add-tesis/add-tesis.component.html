@@ -102,7 +102,7 @@
                         @if (option.foto) {
                           <img
                             class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'usuario/get-image-usuario/' + option.foto }}"
+                            src="{{ url + 'usuario/' + option.DNI + '/file }}"
                           />
                         }
                         <span class="mdc-list-item__text">{{ option.nombre }}</span>
@@ -120,7 +120,7 @@
                         @if (option.foto) {
                           <img
                             class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'usuario/get-image-usuario/' + option.foto }}"
+                            src="{{ url + 'usuario/' + option.DNI + '/file }}"
                           />
                         }
                         <span class="mdc-list-item__text">{{ option.nombre }}</span>

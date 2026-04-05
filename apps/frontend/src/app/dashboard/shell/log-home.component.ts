@@ -114,10 +114,10 @@ export default class LogHomeComponent implements OnInit {
     this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
       this.grupoinfo = res[0];
       this._session.setGrupoInfo(this.grupoinfo);
-      this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + (this.grupoinfo.logoHeader ?? "");
+      this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
       this.getUser();
     });
-    this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + (this.grupoinfo.logoHeader ?? "");
+    this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
   }
 
   getUser(): void {

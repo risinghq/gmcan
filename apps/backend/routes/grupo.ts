@@ -4,10 +4,29 @@ import { z } from "zod";
 
 import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
-import { extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
+import { deleteUploadedFile, extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const SlotParam = z.object({ slot: z.enum(["facilidades", "header", "footer"]) });
+
+const SLOT_CONFIG = {
+  facilidades: {
+    column: "facilidadesRecursosFoto" as const,
+    directory: "grupo",
+    kind: "image" as const,
+  },
+  header: {
+    column: "logoHeader" as const,
+    directory: "grupo",
+    kind: "brandImage" as const,
+  },
+  footer: {
+    column: "logoFooter" as const,
+    directory: "grupo",
+    kind: "brandImage" as const,
+  },
+};
 
 router.get("/get-grupo", async (c) => {
   const rows = await db.selectFrom("grupo").selectAll().execute();
@@ -151,48 +170,42 @@ router.put(
   },
 );
 
-router.put("/upload-image-facilidades/:id", checkSession, zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
+router.put("/:id/files/:slot", checkSession, zValidator("param", IdParam.merge(SlotParam)), async (c) => {
+  const { id, slot } = c.req.valid("param");
+  const config = SLOT_CONFIG[slot];
+  const current = await db.selectFrom("grupo").select(config.column).where("idGrupo", "=", id).executeTakeFirst();
+  if (!current) return c.json({ error: "Not found" }, 404);
+
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
+
   const storedFileName = await saveUploadedFile(file, {
-    directory: "grupo",
-    allowedExtensions: ["jpg", "png", "jpeg"],
+    directory: config.directory,
+    kind: config.kind,
   });
   if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
-  await db.updateTable("grupo").set({ facilidadesRecursosFoto: storedFileName }).where("idGrupo", "=", id).execute();
+
+  await db
+    .updateTable("grupo")
+    .set({ [config.column]: storedFileName })
+    .where("idGrupo", "=", id)
+    .execute();
+  const previousFileName = current[config.column];
+  if (previousFileName && previousFileName !== storedFileName) {
+    await deleteUploadedFile({ directory: config.directory, fileName: previousFileName });
+  }
+
   return c.json({ status: 1 });
 });
 
-router.put("/upload-grupo-header/:id", checkSession, zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, { directory: "grupo", allowedExtensions: ["png", "svg"] });
-  if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
-  await db.updateTable("grupo").set({ logoHeader: storedFileName }).where("idGrupo", "=", id).execute();
-  return c.json({ status: 1 });
-});
-
-router.put("/upload-grupo-footer/:id", checkSession, zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, { directory: "grupo", allowedExtensions: ["png", "svg"] });
-  if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
-  await db.updateTable("grupo").set({ logoFooter: storedFileName }).where("idGrupo", "=", id).execute();
-  return c.json({ status: 1 });
-});
-
-router.get("/get-image-grupo/:imageFile", async (c) => {
-  return serveUploadedFile(c, "grupo", c.req.param("imageFile"));
-});
-
-router.get("/get-image-facilidades/:imageFile", async (c) => {
-  return serveUploadedFile(c, "grupo", c.req.param("imageFile"));
+router.get("/:id/files/:slot", zValidator("param", IdParam.merge(SlotParam)), async (c) => {
+  const { id, slot } = c.req.valid("param");
+  const config = SLOT_CONFIG[slot];
+  const row = await db.selectFrom("grupo").select(config.column).where("idGrupo", "=", id).executeTakeFirst();
+  const fileName = row?.[config.column];
+  if (!fileName) return c.json({ error: "File not found" }, 404);
+  return serveUploadedFile(c, { directory: config.directory, fileName });
 });
 
 export default router;

@@ -112,11 +112,11 @@ export class UsuarioService {
   uploadUsuarioFoto(fileData: File, id: string): Observable<any> {
     const formData = new FormData();
     formData.append("image", fileData, fileData.name);
-    return this.http.put(this.url + "usuario/upload-usuario-file/" + id, formData).pipe(catchError(this.handleError));
+    return this.http.put(`${this.url}usuario/${id}/file`, formData).pipe(catchError(this.handleError));
   }
 
-  deleteImage(idImage: string): Observable<any> {
-    return this.http.delete(this.url + "usuario/erase-image/" + idImage).pipe(catchError(this.handleError));
+  deleteImage(dni: string): Observable<any> {
+    return this.http.delete(`${this.url}usuario/${dni}/file`).pipe(catchError(this.handleError));
   }
 
   getUserLogged(): any {

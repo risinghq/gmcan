@@ -31,8 +31,8 @@ export class GrupoService {
       return this.http.get(this.url + "grupo/get-grupo-en", { headers: headers });
     }
   }
-  getGrupoImage(imageFile: string) {
-    return this.http.get(this.url + "grupo/get-image-grupo/" + imageFile, { responseType: "text" });
+  getGrupoImage(idGrupo: number, slot: "header" | "footer" | "facilidades") {
+    return this.http.get(`${this.url}grupo/${idGrupo}/files/${slot}`, { responseType: "text" });
   }
 
   getFacilidadesRecursos(): any {
@@ -55,7 +55,7 @@ export class GrupoService {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "grupo/upload-image-facilidades/" + id, formData, { headers });
+    return this.http.put(`${this.url}grupo/${id}/files/facilidades`, formData, { headers });
   }
 
   getTrabajosFuturos(): any {
@@ -78,14 +78,14 @@ export class GrupoService {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "grupo/upload-grupo-header/" + id, formData, { headers });
+    return this.http.put(`${this.url}grupo/${id}/files/header`, formData, { headers });
   }
 
   uploadFooterLogo(fileData: File, id: number): any {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "grupo/upload-grupo-footer/" + id, formData, { headers });
+    return this.http.put(`${this.url}grupo/${id}/files/footer`, formData, { headers });
   }
 
   updateSeccionInfo(grupo: unknown): any {

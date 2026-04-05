@@ -80,7 +80,7 @@ export class NoticiaService {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "noticia/upload-noticia-file/" + id, formData, { headers });
+    return this.http.put(`${this.url}noticia/${id}/file`, formData, { headers });
   }
 
   getNoticiaFull(idNoticia: number): any {

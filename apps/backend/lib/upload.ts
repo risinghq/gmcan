@@ -12,6 +12,14 @@ export const MIME_TYPES: Record<string, string> = {
   pdf: "application/pdf",
 };
 
+export const UPLOAD_FILE_KIND_EXTENSIONS = {
+  image: ["png", "jpg", "jpeg"],
+  brandImage: ["png", "svg"],
+  document: ["pdf"],
+} as const;
+
+export type UploadFileKind = keyof typeof UPLOAD_FILE_KIND_EXTENSIONS;
+
 const UPLOADS_ROOT = path.resolve(process.cwd(), "uploads");
 const SAFE_FILE_NAME = /^[A-Za-z0-9._-]+$/;
 const SAFE_DIRECTORY = /^[A-Za-z0-9/_-]+$/;
@@ -64,10 +72,11 @@ export async function serveFile(c: Context, filePath: string): Promise<Response>
 
 export async function saveUploadedFile(
   file: File,
-  options: { directory: string; allowedExtensions: string[] },
+  options: { directory: string; kind: UploadFileKind },
 ): Promise<string | null> {
   const ext = extensionOf(file.name);
-  if (!options.allowedExtensions.includes(ext)) return null;
+  const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind] as readonly string[];
+  if (!allowedExtensions.includes(ext)) return null;
 
   const fileName = `${Date.now()}-${randomUUID()}.${ext}`;
   const directoryPath = resolveUploadDirectory(options.directory);
@@ -79,27 +88,25 @@ export async function saveUploadedFile(
   return fileName;
 }
 
-export async function serveUploadedFile(c: Context, directory: string, fileName: string): Promise<Response> {
-  const filePath = resolveUploadFilePath(directory, fileName);
+export async function serveUploadedFile(
+  c: Context,
+  options: { directory: string; fileName: string; asAttachment?: boolean },
+): Promise<Response> {
+  const filePath = resolveUploadFilePath(options.directory, options.fileName);
   if (!filePath) return c.json({ error: "Invalid file path" }, 400);
-  return serveFile(c, filePath);
-}
+  if (!options.asAttachment) return serveFile(c, filePath);
 
-export async function downloadUploadedFile(c: Context, directory: string, fileName: string): Promise<Response> {
-  const filePath = resolveUploadFilePath(directory, fileName);
-  if (!filePath) return c.json({ error: "Invalid file path" }, 400);
   if (!fs.existsSync(filePath)) return c.json({ error: "File not found" }, 404);
-
   const data = await fs.promises.readFile(filePath);
-  const ext = extensionOf(fileName);
+  const ext = extensionOf(options.fileName);
   return c.body(data, 200, {
     "Content-Type": MIME_TYPES[ext] ?? "application/octet-stream",
-    "Content-Disposition": `attachment; filename="${fileName}"`,
+    "Content-Disposition": `attachment; filename="${options.fileName}"`,
   });
 }
 
-export async function deleteUploadedFile(directory: string, fileName: string): Promise<boolean> {
-  const filePath = resolveUploadFilePath(directory, fileName);
+export async function deleteUploadedFile(options: { directory: string; fileName: string }): Promise<boolean> {
+  const filePath = resolveUploadFilePath(options.directory, options.fileName);
   if (!filePath || !fs.existsSync(filePath)) return false;
   await fs.promises.unlink(filePath);
   return true;

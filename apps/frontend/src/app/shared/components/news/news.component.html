@@ -4,7 +4,7 @@
   </div>
   <div class="img-hover-zoom">
     @if (noticiaPrincipal.foto) {
-      <img class="card-img-div" src="{{ url + 'noticia/get-image-noticia/' + noticiaPrincipal.foto }}" />
+      <img class="card-img-div" src="{{ url + 'noticia/' + noticiaPrincipal.idNoticia + '/file }}" />
     }
   </div>
   <div class="card-text-div card-text-div-3">
@@ -40,7 +40,7 @@
         </div>
         <div class="img-hover-zoom-2 img-div-zoom">
           @if (noticia.foto) {
-            <img class="other-news-img" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" alt="nada" />
+            <img class="other-news-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" alt="nada" />
           }
         </div>
       </div>

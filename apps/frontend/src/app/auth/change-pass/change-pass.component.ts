@@ -66,7 +66,7 @@ export default class ChangePassComponent implements OnInit {
         if (res && res.length > 0) {
           this.grupoInfo = res[0];
           this.session.setGrupoInfo(this.grupoInfo);
-          this.grupoInfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoInfo.logoHeader;
+          this.grupoInfo.logoHeader = this.url + "grupo/" + this.grupoInfo.idGrupo + "/files/header";
         }
       },
       error: (error: any) => {

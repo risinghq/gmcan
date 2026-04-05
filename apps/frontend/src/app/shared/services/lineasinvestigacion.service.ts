@@ -97,6 +97,6 @@ export class LineasInvestigacionService {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "lineasinvestigacion/upload-lineainvestigacion-foto/" + id, formData, { headers });
+    return this.http.put(`${this.url}lineasinvestigacion/${id}/file`, formData, { headers });
   }
 }

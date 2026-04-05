@@ -5,7 +5,7 @@
         @if (lineasProyecto[0].foto) {
           <img
             class="line-img"
-            src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineasProyecto[0].foto }}"
+            src="{{ url + 'lineasinvestigacion/' + lineasProyecto[0].idLineasInvestigacion + '/file }}"
           />
         }
       </div>
@@ -45,7 +45,7 @@
                   <div class="project-members">
                     <div class="member-img-round">
                       @if (usuario.foto) {
-                        <img class="member-img" src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}" />
+                        <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
                       }
                       @if (!usuario.foto) {
                         <img class="member-img" src="../../assets/img/user.png" alt="" />
@@ -138,7 +138,7 @@
         @if (lineasProyecto[1].foto) {
           <img
             class="line-img"
-            src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineasProyecto[1].foto }}"
+            src="{{ url + 'lineasinvestigacion/' + lineasProyecto[1].idLineasInvestigacion + '/file }}"
           />
         }
       </div>
@@ -178,7 +178,7 @@
                   <div class="project-members">
                     <div class="member-img-round">
                       @if (usuario.foto) {
-                        <img class="member-img" src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}" />
+                        <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
                       }
                       @if (!usuario.foto) {
                         <img class="member-img" src="../../assets/img/user.png" alt="" />
@@ -271,7 +271,7 @@
         @if (lineasProyecto[2].foto) {
           <img
             class="line-img"
-            src="{{ url + 'lineasinvestigacion/get-image-lineainvestigacion/' + lineasProyecto[2].foto }}"
+            src="{{ url + 'lineasinvestigacion/' + lineasProyecto[2].idLineasInvestigacion + '/file }}"
           />
         }
       </div>
@@ -311,7 +311,7 @@
                   <div class="project-members">
                     <div class="member-img-round">
                       @if (usuario.foto) {
-                        <img class="member-img" src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}" />
+                        <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
                       }
                       @if (!usuario.foto) {
                         <img class="member-img" src="../../assets/img/user.png" alt="" />

@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
-import { extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
+import { deleteUploadedFile, extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -16,6 +16,10 @@ const Body = z.object({
   grupo_idGrupo: z.number().int(),
 });
 const UpdateBody = Body.extend({ idMetodo: z.number().int() });
+const METODO_FILE = {
+  directory: "metodos",
+  kind: "image",
+} as const;
 
 router.get("/get-metodo", async (c) => {
   const rows = await db.selectFrom("metodo").selectAll().execute();
@@ -46,22 +50,30 @@ router.put("/update-metodo", checkSession, zValidator("json", UpdateBody), async
   return c.json({ status: 1 });
 });
 
-router.put("/upload-metodo-foto/:id", checkSession, zValidator("param", IdParam), async (c) => {
+router.put("/:id/file", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
+  const current = await db.selectFrom("metodo").select("foto").where("idMetodo", "=", id).executeTakeFirst();
+  if (!current) return c.json({ error: "Not found" }, 404);
+
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, {
-    directory: "metodos",
-    allowedExtensions: ["png", "jpg", "jpeg"],
-  });
+  const storedFileName = await saveUploadedFile(file, METODO_FILE);
   if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
+
   await db.updateTable("metodo").set({ foto: storedFileName }).where("idMetodo", "=", id).execute();
+  if (current.foto && current.foto !== storedFileName) {
+    await deleteUploadedFile({ directory: METODO_FILE.directory, fileName: current.foto });
+  }
+
   return c.json({ status: 1 });
 });
 
-router.get("/get-image-metodo/:imageFile", async (c) => {
-  return serveUploadedFile(c, "metodos", c.req.param("imageFile"));
+router.get("/:id/file", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await db.selectFrom("metodo").select("foto").where("idMetodo", "=", id).executeTakeFirst();
+  if (!row?.foto) return c.json({ error: "File not found" }, 404);
+  return serveUploadedFile(c, { directory: METODO_FILE.directory, fileName: row.foto });
 });
 
 export default router;

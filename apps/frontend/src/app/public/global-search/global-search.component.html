@@ -147,7 +147,7 @@
                             @if (autor.foto) {
                               <img
                                 class="member-img"
-                                src="{{ url + 'usuario/get-image-usuario/' + autor.foto }}"
+                                src="{{ url + 'usuario/' + autor.DNI + '/file }}"
                                 alt="../../assets/img/user.png"
                               />
                             }
@@ -173,7 +173,7 @@
                     ) {
                       <a
                         class="publication-green"
-                        href="{{ this.url + 'publicacion/get-file-publicacion/' + publicacion.archivo }}"
+                        href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file' }}"
                         target="_blank"
                       >
                         {{ this.language.publicationsText[0].preview }}
@@ -186,7 +186,7 @@
                     ) {
                       <a
                         class="publication-green"
-                        href="{{ this.url + 'publicacion/download-publicacion/' + publicacion.archivo }}"
+                        href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file/download }}"
                       >
                         {{ this.language.publicationsText[0].download }}
                       </a>
@@ -295,7 +295,7 @@
                         <div class="project-members">
                           <div class="member-img-round">
                             @if (usuario.foto) {
-                              <img class="member-img" src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}" />
+                              <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
                             }
                             @if (!usuario.foto) {
                               <img class="member-img" src="../../assets/img/user.png" alt="" />
@@ -414,7 +414,7 @@
                     @if (miembro.foto) {
                       <img
                         class="member-img"
-                        src="{{ url + 'usuario/get-image-usuario/' + miembro.foto }}"
+                        src="{{ url + 'usuario/' + miembro.DNI + '/file }}"
                         alt="../../assets/img/user.png"
                       />
                     }
@@ -472,7 +472,7 @@
                       <img class="card-img-div" src="../../assets/img/grupal.jpg" />
                     }
                     @if (noticia.foto) {
-                      <img class="card-img-div" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
+                      <img class="card-img-div" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
                     }
                   </div>
                   <div class="card-text-div card-text-div-3">

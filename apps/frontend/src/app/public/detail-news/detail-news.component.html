@@ -21,7 +21,7 @@
         <div class="card-detail">
           <div class="news-title-div">
             @if (noticia.foto) {
-              <img class="detail-img" src="{{ url + 'noticia/get-image-noticia/' + noticia.foto }}" />
+              <img class="detail-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
             }
             <div class="news-title">
               {{ noticia.titulo }}
@@ -34,7 +34,7 @@
             <div class="autor-div">
               <div class="autor-img-div">
                 @if (usuario.foto) {
-                  <img class="autor-img" src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}" />
+                  <img class="autor-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
                 }
               </div>
               <div class="autor-text">

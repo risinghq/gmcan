@@ -63,7 +63,7 @@ export class AboutUsService {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
     let headers = new HttpHeaders({});
-    return this.http.put(this.url + "sobrenosotros/upload-sobrenosotros-foto/" + id, formData, {
+    return this.http.put(`${this.url}sobrenosotros/${id}/file`, formData, {
       headers,
     });
   }

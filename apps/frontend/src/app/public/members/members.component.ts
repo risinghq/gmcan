@@ -55,7 +55,7 @@ export default class MembersComponent implements OnInit {
         const prefijos = this.lookup.prefijos();
         for (const usuario of this.usuarios) {
           if (usuario.foto != null) {
-            usuario.foto = this.url + "usuario/get-image-usuario/" + usuario.foto;
+            usuario.foto = this.url + "usuario/" + usuario.DNI + "/file";
           } else {
             usuario.foto = "../../assets/img/user.png";
           }

@@ -14,6 +14,7 @@ const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const DniParam = z.object({ id: z.string().min(1) });
 const SearchBody = z.object({ nombre: z.string() });
+const USUARIO_FILE = { directory: "usuario", kind: "image" } as const;
 
 const CreateBody = z.object({
   DNI: z.string().min(1),
@@ -142,22 +143,30 @@ router.put("/update-usuario", checkSession, zValidator("json", UpdateBody), asyn
   return c.json({ status: 1 });
 });
 
-router.put("/upload-usuario-file/:id", checkSession, zValidator("param", DniParam), async (c) => {
+router.put("/:id/file", checkSession, zValidator("param", DniParam), async (c) => {
   const { id } = c.req.valid("param");
+  const current = await db.selectFrom("usuario").select("foto").where("DNI", "=", id).executeTakeFirst();
+  if (!current) return c.json({ error: "Not found" }, 404);
+
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, {
-    directory: "usuario",
-    allowedExtensions: ["png", "jpg", "jpeg"],
-  });
+  const storedFileName = await saveUploadedFile(file, USUARIO_FILE);
   if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
+
   await db.updateTable("usuario").set({ foto: storedFileName }).where("DNI", "=", id).execute();
+  if (current.foto && current.foto !== storedFileName) {
+    await deleteUploadedFile({ directory: USUARIO_FILE.directory, fileName: current.foto });
+  }
+
   return c.json({ status: 1 });
 });
 
-router.get("/get-image-usuario/:imageFile", async (c) => {
-  return serveUploadedFile(c, "usuario", c.req.param("imageFile"));
+router.get("/:id/file", zValidator("param", DniParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await db.selectFrom("usuario").select("foto").where("DNI", "=", id).executeTakeFirst();
+  if (!row?.foto) return c.json({ error: "File not found" }, 404);
+  return serveUploadedFile(c, { directory: USUARIO_FILE.directory, fileName: row.foto });
 });
 
 router.post(
@@ -248,9 +257,15 @@ router.get("/:id/profile", zValidator("param", DniParam), async (c) => {
   return c.json(result);
 });
 
-router.delete("/erase-image/:id", checkSession, async (c) => {
-  const deleted = await deleteUploadedFile("usuario", c.req.param("id"));
+router.delete("/:id/file", checkSession, zValidator("param", DniParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await db.selectFrom("usuario").select("foto").where("DNI", "=", id).executeTakeFirst();
+  if (!row?.foto) return c.json({ error: "File not found" }, 404);
+
+  const deleted = await deleteUploadedFile({ directory: USUARIO_FILE.directory, fileName: row.foto });
   if (!deleted) return c.json({ error: "File not found" }, 404);
+
+  await db.updateTable("usuario").set({ foto: null }).where("DNI", "=", id).execute();
   return c.json({ status: 1 });
 });
 

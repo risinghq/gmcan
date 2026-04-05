@@ -112,8 +112,7 @@ export class EmailExitoso {
     this.screenWidth = window.innerWidth;
     this.url = GLOBAL.url;
     this.grupoInfo = this._session.getGrupoInfo();
-    this.grupoLogo = this.grupoInfo.logoHeader;
-    this.grupoLogo = this.url + "grupo/get-image-grupo/" + this.grupoLogo;
+    this.grupoLogo = this.url + "grupo/" + this.grupoInfo.idGrupo + "/files/header";
   }
 
   onNoClick(): void {

@@ -32,31 +32,27 @@ export class PublicacionService {
   }
 
   getPublicacion(): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacion`);
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/`);
   }
 
   getPublicaciones(idTipoPublicacion: number): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicaciones/${idTipoPublicacion}`);
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/by-tipo/${idTipoPublicacion}`);
   }
 
   getPublication(idPublicacion: number): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacion/${idPublicacion}`);
-  }
-
-  getPublicacionesCiudad(idCiudad: number): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesciudad/${idCiudad}`);
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/${idPublicacion}`);
   }
 
   getPublicacionesEvento(idEvento: number): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesevento/${idEvento}`);
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/by-evento/${idEvento}`);
   }
 
   getPublicacionesUniversidad(idUniversidad: number): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesuniversidad/${idUniversidad}`);
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/by-universidad/${idUniversidad}`);
   }
 
   getPublicacionesRevista(idRevista: number): Observable<Publicacion[]> {
-    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesrevista/${idRevista}`);
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/by-revista/${idRevista}`);
   }
 
   getEditView(id: number): Observable<PublicacionEditView> {
@@ -78,14 +74,14 @@ export class PublicacionService {
   uploadFile(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}publicacion/upload-publicacion-file/${id}`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}publicacion/${id}/file`, formData);
   }
 
   uploadPublicacionFile(fileData: File, id: number): Observable<{ status: number }> {
     return this.uploadFile(id, fileData);
   }
 
-  downloadPublicacion(pdfFile: string): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}publicacion/download-publicacion/${pdfFile}`, { responseType: "blob" });
+  downloadPublicacion(idPublicacion: number): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}publicacion/${idPublicacion}/file/download`, { responseType: "blob" });
   }
 }

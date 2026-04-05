@@ -31,7 +31,7 @@
                   @if (usuario.foto) {
                     <img
                       class="member-img"
-                      src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                      src="{{ url + 'usuario/' + usuario.DNI + '/file }}"
                       alt="../../assets/img/user.png"
                     />
                   }
@@ -119,7 +119,7 @@
                 @if (usuario.foto) {
                   <img
                     class="member-img"
-                    src="{{ url + 'usuario/get-image-usuario/' + usuario.foto }}"
+                    src="{{ url + 'usuario/' + usuario.DNI + '/file }}"
                     alt="../../assets/img/user.png"
                   />
                 }

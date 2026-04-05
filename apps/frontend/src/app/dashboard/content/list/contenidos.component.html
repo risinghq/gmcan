@@ -19,7 +19,7 @@
               }
               @if (aboutUs.foto && !previewUrl) {
                 <div class="img-preview">
-                  <img class="img-set" src="{{ url + 'sobrenosotros/get-image-sobrenosotros/' + aboutUs.foto }}" />
+                  <img class="img-set" src="{{ url + 'sobrenosotros/' + aboutUs.idSobreNosotros + '/file }}" />
                 </div>
               }
               <div class="green-text ml-16 mt-auto">
@@ -194,10 +194,7 @@
               }
               @if (facilidadesRecursos.facilidadesRecursosFoto && !previewUrl2) {
                 <div class="img-preview">
-                  <img
-                    class="img-set"
-                    src="{{ url + 'grupo/get-image-facilidades/' + facilidadesRecursos.facilidadesRecursosFoto }}"
-                  />
+                  <img class="img-set" src="{{ url + 'grupo/' + facilidadesRecursos.idGrupo + '/files/facilidades }}" />
                 </div>
               }
               <div class="green-text ml-16 mt-auto">
@@ -339,7 +336,7 @@
               }
               @if (informacionExtra.logoHeader && !previewUrl3) {
                 <div class="logo-preview mb-16">
-                  <img class="img-logo" src="{{ url + 'grupo/get-image-grupo/' + informacionExtra.logoHeader }}" />
+                  <img class="img-logo" src="{{ url + 'grupo/' + informacionExtra.idGrupo + '/files/header }}" />
                 </div>
               }
               <div class="green-text text-left">
@@ -363,7 +360,7 @@
               }
               @if (informacionExtra.logoFooter && !previewUrl4) {
                 <div class="logo-preview-inverse mb-16">
-                  <img class="img-logo" src="{{ url + 'grupo/get-image-grupo/' + informacionExtra.logoFooter }}" />
+                  <img class="img-logo" src="{{ url + 'grupo/' + informacionExtra.idGrupo + '/files/footer }}" />
                 </div>
               }
               <div class="green-text text-left">

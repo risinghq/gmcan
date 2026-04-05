@@ -5,18 +5,18 @@ import { db } from "../../db/client.js";
 import { IdParam, SearchByTipoBody, SearchGlobalBody } from "./schema.js";
 
 export function registerPublicacionReadRoutes(router: Hono): void {
-  router.get("/get-publicacion", async (c) => {
+  router.get("/", async (c) => {
     const rows = await db.selectFrom("publicacion").selectAll().execute();
     return c.json(rows);
   });
 
-  router.get("/get-publicacion/:id", zValidator("param", IdParam), async (c) => {
+  router.get("/:id", zValidator("param", IdParam), async (c) => {
     const { id } = c.req.valid("param");
     const rows = await db.selectFrom("publicacion").selectAll().where("idPublicacion", "=", id).execute();
     return c.json(rows);
   });
 
-  router.get("/get-publicaciones/:id", zValidator("param", IdParam), async (c) => {
+  router.get("/by-tipo/:id", zValidator("param", IdParam), async (c) => {
     const { id } = c.req.valid("param");
     const rows = await db
       .selectFrom("publicacion")
@@ -26,31 +26,25 @@ export function registerPublicacionReadRoutes(router: Hono): void {
     return c.json(rows);
   });
 
-  router.get("/get-publicacionesciudad/:id", zValidator("param", IdParam), async (c) => {
+  router.get("/by-evento/:id", zValidator("param", IdParam), async (c) => {
     const { id } = c.req.valid("param");
     const rows = await db.selectFrom("publicacion").selectAll().where("evento_idEvento", "=", id).execute();
     return c.json(rows);
   });
 
-  router.get("/get-publicacionesevento/:id", zValidator("param", IdParam), async (c) => {
-    const { id } = c.req.valid("param");
-    const rows = await db.selectFrom("publicacion").selectAll().where("evento_idEvento", "=", id).execute();
-    return c.json(rows);
-  });
-
-  router.get("/get-publicacionesuniversidad/:id", zValidator("param", IdParam), async (c) => {
+  router.get("/by-universidad/:id", zValidator("param", IdParam), async (c) => {
     const { id } = c.req.valid("param");
     const rows = await db.selectFrom("publicacion").selectAll().where("universidad_idUniversidad", "=", id).execute();
     return c.json(rows);
   });
 
-  router.get("/get-publicacionesrevista/:id", zValidator("param", IdParam), async (c) => {
+  router.get("/by-revista/:id", zValidator("param", IdParam), async (c) => {
     const { id } = c.req.valid("param");
     const rows = await db.selectFrom("publicacion").selectAll().where("revista_idRevista", "=", id).execute();
     return c.json(rows);
   });
 
-  router.post("/search-publicaciones", zValidator("json", SearchByTipoBody), async (c) => {
+  router.post("/search/by-tipo", zValidator("json", SearchByTipoBody), async (c) => {
     const { titulo, tipoPublicacion_idTipoPublicacion } = c.req.valid("json");
     const rows = await db
       .selectFrom("publicacion")
@@ -61,7 +55,7 @@ export function registerPublicacionReadRoutes(router: Hono): void {
     return c.json(rows);
   });
 
-  router.post("/search-publicaciones-global", zValidator("json", SearchGlobalBody), async (c) => {
+  router.post("/search", zValidator("json", SearchGlobalBody), async (c) => {
     const { titulo } = c.req.valid("json");
     const term = `%${titulo}%`;
     const rows = await db

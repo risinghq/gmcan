@@ -225,7 +225,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       language: value,
       titulo: null,
       resumen: null,
-      foto: this.url + "noticia/get-image-noticia/" + this.noticia.foto,
+      foto: this.url + "noticia/" + this.noticia.idNoticia + "/file",
       nombreTipoNoticia: null,
       usuario: {
         nombre: null,

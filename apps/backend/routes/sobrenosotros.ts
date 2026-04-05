@@ -4,10 +4,11 @@ import { z } from "zod";
 
 import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
-import { extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
+import { deleteUploadedFile, extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const SOBRE_NOSOTROS_FILE = { directory: "sobrenosotros", kind: "image" } as const;
 
 router.get("/get-sobrenosotros", async (c) => {
   const rows = await db.selectFrom("sobrenosotros").selectAll().execute();
@@ -79,22 +80,35 @@ router.put(
   },
 );
 
-router.put("/upload-sobrenosotros-foto/:id", checkSession, zValidator("param", IdParam), async (c) => {
+router.put("/:id/file", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
+  const current = await db
+    .selectFrom("sobrenosotros")
+    .select("foto")
+    .where("idSobreNosotros", "=", id)
+    .executeTakeFirst();
+  if (!current) return c.json({ error: "Not found" }, 404);
+
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, {
-    directory: "sobrenosotros",
-    allowedExtensions: ["png", "jpg", "jpeg"],
-  });
+
+  const storedFileName = await saveUploadedFile(file, SOBRE_NOSOTROS_FILE);
   if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
+
   await db.updateTable("sobrenosotros").set({ foto: storedFileName }).where("idSobreNosotros", "=", id).execute();
+  if (current.foto && current.foto !== storedFileName) {
+    await deleteUploadedFile({ directory: SOBRE_NOSOTROS_FILE.directory, fileName: current.foto });
+  }
+
   return c.json({ status: 1 });
 });
 
-router.get("/get-image-sobrenosotros/:imageFile", async (c) => {
-  return serveUploadedFile(c, "sobrenosotros", c.req.param("imageFile"));
+router.get("/:id/file", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await db.selectFrom("sobrenosotros").select("foto").where("idSobreNosotros", "=", id).executeTakeFirst();
+  if (!row?.foto) return c.json({ error: "File not found" }, 404);
+  return serveUploadedFile(c, { directory: SOBRE_NOSOTROS_FILE.directory, fileName: row.foto });
 });
 
 export default router;

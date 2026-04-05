@@ -62,7 +62,7 @@ export default class DashboardComponent implements OnInit {
 
   getGrupoInfo(): void {
     this.grupoinfo = this._session.getGrupoInfo();
-    this.grupoinfo.logoHeader = this.url + "grupo/get-image-grupo/" + this.grupoinfo.logoHeader;
+    this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
   }
 
   getPermiso(): void {

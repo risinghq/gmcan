@@ -170,7 +170,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   previewMethod(value: number): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
     localStorage.setItem("langLocale", "0");
-    method.foto = this.url + "metodo/get-image-metodo/" + method.foto;
+    method.foto = this.url + "metodo/" + this.metodo.idMetodo + "/file";
     if (this.previewUrl) {
       method.foto = typeof this.previewUrl === "string" ? this.previewUrl : "";
     }
