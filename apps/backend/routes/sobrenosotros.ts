@@ -1,13 +1,10 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
-import { extractFirstFile, serveFile } from "../lib/upload.js";
+import { extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -87,16 +84,17 @@ router.put("/upload-sobrenosotros-foto/:id", checkSession, zValidator("param", I
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const ext = path.extname(file.name).slice(1).toLowerCase();
-  if (!["png", "jpg", "jpeg"].includes(ext)) return c.json({ error: "Extensión del archivo no válida" }, 400);
-  const buffer = Buffer.from(await file.arrayBuffer());
-  fs.writeFileSync(`./uploads/sobrenosotros/${file.name}`, buffer);
-  await db.updateTable("sobrenosotros").set({ foto: file.name }).where("idSobreNosotros", "=", id).execute();
+  const storedFileName = await saveUploadedFile(file, {
+    directory: "sobrenosotros",
+    allowedExtensions: ["png", "jpg", "jpeg"],
+  });
+  if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
+  await db.updateTable("sobrenosotros").set({ foto: storedFileName }).where("idSobreNosotros", "=", id).execute();
   return c.json({ status: 1 });
 });
 
 router.get("/get-image-sobrenosotros/:imageFile", async (c) => {
-  return serveFile(c, `./uploads/sobrenosotros/${c.req.param("imageFile")}`);
+  return serveUploadedFile(c, "sobrenosotros", c.req.param("imageFile"));
 });
 
 export default router;

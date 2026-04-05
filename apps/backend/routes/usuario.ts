@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -10,7 +7,7 @@ import { db } from "../db/client.js";
 import { USUARIO_PUBLIC, USUARIO_NAME, USUARIO_ACTIVE } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
 import { hashPassword, verifyPassword } from "../lib/password.js";
-import { extractFirstFile, serveFile } from "../lib/upload.js";
+import { deleteUploadedFile, extractFirstFile, saveUploadedFile, serveUploadedFile } from "../lib/upload.js";
 
 const router = new Hono();
 
@@ -150,15 +147,17 @@ router.put("/upload-usuario-file/:id", checkSession, zValidator("param", DniPara
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const ext = path.extname(file.name).slice(1).toLowerCase();
-  if (!["png", "jpg", "jpeg"].includes(ext)) return c.json({ error: "Extensión del archivo no válida" }, 400);
-  fs.writeFileSync(`./uploads/usuario/${file.name}`, Buffer.from(await file.arrayBuffer()));
-  await db.updateTable("usuario").set({ foto: file.name }).where("DNI", "=", id).execute();
+  const storedFileName = await saveUploadedFile(file, {
+    directory: "usuario",
+    allowedExtensions: ["png", "jpg", "jpeg"],
+  });
+  if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
+  await db.updateTable("usuario").set({ foto: storedFileName }).where("DNI", "=", id).execute();
   return c.json({ status: 1 });
 });
 
 router.get("/get-image-usuario/:imageFile", async (c) => {
-  return serveFile(c, `./uploads/usuario/${c.req.param("imageFile")}`);
+  return serveUploadedFile(c, "usuario", c.req.param("imageFile"));
 });
 
 router.post(
@@ -249,13 +248,10 @@ router.get("/:id/profile", zValidator("param", DniParam), async (c) => {
   return c.json(result);
 });
 
-router.delete("/erase-image/:id", checkSession, (c) => {
-  try {
-    fs.unlinkSync(`uploads/usuario/${c.req.param("id")}`);
-    return c.json({ status: 1 });
-  } catch {
-    return c.json({ error: "File not found" }, 404);
-  }
+router.delete("/erase-image/:id", checkSession, async (c) => {
+  const deleted = await deleteUploadedFile("usuario", c.req.param("id"));
+  if (!deleted) return c.json({ error: "File not found" }, 404);
+  return c.json({ status: 1 });
 });
 
 export default router;
