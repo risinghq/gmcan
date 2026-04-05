@@ -51,7 +51,10 @@ router.put("/upload-metodo-foto/:id", checkSession, zValidator("param", IdParam)
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, { directory: "metodos", allowedExtensions: ["png", "jpg", "jpeg"] });
+  const storedFileName = await saveUploadedFile(file, {
+    directory: "metodos",
+    allowedExtensions: ["png", "jpg", "jpeg"],
+  });
   if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
   await db.updateTable("metodo").set({ foto: storedFileName }).where("idMetodo", "=", id).execute();
   return c.json({ status: 1 });

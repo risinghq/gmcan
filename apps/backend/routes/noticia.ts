@@ -96,7 +96,10 @@ router.put("/upload-noticia-file/:id", checkSession, zValidator("param", IdParam
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const storedFileName = await saveUploadedFile(file, { directory: "noticia", allowedExtensions: ["png", "jpg", "jpeg"] });
+  const storedFileName = await saveUploadedFile(file, {
+    directory: "noticia",
+    allowedExtensions: ["png", "jpg", "jpeg"],
+  });
   if (!storedFileName) return c.json({ error: "Extensión del archivo no válida" }, 400);
   await db.updateTable("noticia").set({ foto: storedFileName }).where("idNoticia", "=", id).execute();
   return c.json({ status: 1 });
