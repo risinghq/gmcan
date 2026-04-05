@@ -1,0 +1,348 @@
+<mat-sidenav-container class="d-flex flex-column h-100">
+  <mat-sidenav #sidenav mode="over" position="end">
+    <div class="sidenav-header">
+      <div class="close-div">
+        <mat-icon class="close-icon" (click)="sidenav.close()"> close </mat-icon>
+      </div>
+      <div class="link2">
+        <a
+          class="link full-width"
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="sidenav.close()"
+        >
+          {{ language.home }}
+        </a>
+      </div>
+      <div class="link4">
+        <a class="link mb-16"> {{ language.aboutUs }} </a>
+        <a
+          class="link fs-13 mb-8 ml-16"
+          routerLink="./about-us/about"
+          routerLinkActive="active"
+          (click)="sidenav.close()"
+        >
+          {{ language.who }}
+        </a>
+        <a
+          class="link fs-13 mb-8 ml-16"
+          routerLink="./about-us/lines-investigation"
+          routerLinkActive="active"
+          (click)="sidenav.close()"
+        >
+          {{ language.linesInvestigation }}
+        </a>
+        <a
+          class="link fs-13 mb-8 ml-16"
+          routerLink="./about-us/methods"
+          routerLinkActive="active"
+          (click)="sidenav.close()"
+        >
+          {{ language.methods }}
+        </a>
+        <a
+          class="link fs-13 mb-8 ml-16"
+          routerLink="./about-us/facilities-resources"
+          routerLinkActive="active"
+          (click)="sidenav.close()"
+        >
+          {{ language.resources }}
+        </a>
+        <a class="link fs-13 ml-16" routerLink="./about-us/works" routerLinkActive="active" (click)="sidenav.close()">
+          {{ language.futureWorks }}
+        </a>
+      </div>
+      <div class="link2">
+        <a class="link" routerLink="./members" routerLinkActive="active" (click)="sidenav.close()">
+          {{ language.members }}
+        </a>
+      </div>
+      <div class="link2">
+        <a class="link" routerLink="./projects" routerLinkActive="active" (click)="sidenav.close()">
+          {{ language.projects }}
+        </a>
+      </div>
+      <div class="link2">
+        <a class="link" routerLink="./publications" routerLinkActive="active" (click)="sidenav.close()">
+          {{ language.publications }}
+        </a>
+      </div>
+      <div class="link2">
+        <a class="link" routerLink="./news" routerLinkActive="active" (click)="sidenav.close()">
+          {{ language.news }}
+        </a>
+      </div>
+      <div class="login-div" (click)="sidenav.close(); loginLink()">
+        <div class="login">{{ language.login }}</div>
+        <img class="login-icon" src="../assets/img/login.svg" />
+      </div>
+      <a class="link-box" routerLink="/join-us" routerLinkActive="active" (click)="sidenav.close()">
+        {{ language.join }}
+      </a>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="search-top full-width" [style.display]="screenWidth > 1050 ? 'none' : 'inline-flex'">
+      @if (!inputExpand) {
+      <div class="languages">
+        <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
+          <div class="fitter">EN</div>
+          <img class="flag" src="../../assets/img/usa.jpg" />
+        </div>
+        <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
+          <div class="fitter">ES</div>
+          <img class="flag" src="../../assets/img/spain.png" />
+        </div>
+      </div>
+      }
+      <form [formGroup]="searchGlobalForm2" [class.full-width]="inputExpand">
+        <input
+          class="search-top-input"
+          [class.search-top-input-compressed]="!inputExpand"
+          [class.search-top-input-decompressed]="inputExpand"
+          #nombre1
+          autocomplete="off"
+          name="nombre1"
+          formControlName="nombre1"
+          placeholder="{{ language.searchMobile }}"
+          (keyup.enter)="searchGlobal(nombre1.value)"
+        />
+      </form>
+      <div class="search-top-div center" (click)="expandInput()">
+        <mat-icon class="icon-search-top">search</mat-icon>
+      </div>
+    </div>
+    <mat-toolbar id="main-toolbar" class="main-toolbar">
+      <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
+        <img class="logo-nav" src="{{ grupoinfo.logoHeader }}" alt="logo" />
+      </div>
+      <div class="full-width ml-16" [style.display]="screenWidth < 1050 ? 'none' : 'block'">
+        <div class="top-bar-div">
+          <form class="input-search-toolbar full-width" [formGroup]="searchGlobalForm">
+            <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
+            <input
+              class="input-search-text"
+              placeholder="{{ language.search }}"
+              #nombre
+              autocomplete="off"
+              name="nombre"
+              formControlName="nombre"
+              (keyup.enter)="searchGlobal(nombre.value)"
+            />
+          </form>
+          <div class="languages mr-12">
+            <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
+              <div class="fitter">EN</div>
+              <img class="flag" src="../../assets/img/usa.jpg" />
+            </div>
+            <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
+              <div class="fitter">ES</div>
+              <img class="flag" src="../../assets/img/spain.png" />
+            </div>
+          </div>
+          <div class="login-div" (click)="sidenav.close(); loginLink()">
+            <div class="login link">{{ language.login }}</div>
+            <img class="login-icon" src="../../assets/img/login.svg" />
+          </div>
+        </div>
+        <div class="down-bar-div text-right">
+          <div class="center right">
+            <a class="link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              {{ language.home }}
+            </a>
+          </div>
+          <div class="center">
+            <div
+              class="flex-news mr-28 mt-2-5"
+              [matMenuTriggerFor]="menu"
+              #menuTrigger="matMenuTrigger"
+              (mouseover)="menuTrigger.openMenu()"
+            >
+              <a class="link-3"> {{ language.aboutUs }} </a>
+              <mat-icon class="middle">arrow_drop_down</mat-icon>
+            </div>
+            <mat-menu #menu="matMenu" [overlapTrigger]="false">
+              <span (mouseleave)="menuTrigger.closeMenu()">
+                <div mat-menu-item [disableRipple]="true">
+                  <a
+                    class="link5"
+                    routerLink="./about-us/about"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    {{ language.who }}
+                  </a>
+                </div>
+                <div mat-menu-item [disableRipple]="true">
+                  <a
+                    class="link5"
+                    routerLink="./about-us/lines-investigation"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    {{ language.linesInvestigation }}
+                  </a>
+                </div>
+                <div mat-menu-item [disableRipple]="true">
+                  <a
+                    class="link5"
+                    routerLink="./about-us/methods"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    {{ language.methods }}
+                  </a>
+                </div>
+                <div mat-menu-item [disableRipple]="true">
+                  <a
+                    class="link5"
+                    routerLink="./about-us/facilities-resources"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    {{ language.resources }}
+                  </a>
+                </div>
+                <div mat-menu-item [disableRipple]="true">
+                  <a
+                    class="link5"
+                    routerLink="./about-us/works"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    {{ language.futureWorks }}
+                  </a>
+                </div>
+              </span>
+            </mat-menu>
+          </div>
+          <div class="center">
+            <a class="link" routerLink="./members" routerLinkActive="active"> {{ language.members }} </a>
+          </div>
+          <div class="center">
+            <a class="link" routerLink="./projects" routerLinkActive="active"> {{ language.projects }} </a>
+          </div>
+          <div class="center">
+            <a class="link" routerLink="./publications" routerLinkActive="active"> {{ language.publications }} </a>
+          </div>
+          <div class="center">
+            <a class="link" routerLink="./news" routerLinkActive="active"> {{ language.news }} </a>
+          </div>
+          <div class="center link-box">
+            <a class="link link-box-text" routerLink="./join-us" routerLinkActive="active"> {{ language.join }} </a>
+          </div>
+        </div>
+      </div>
+      <div class="right menu-text" [style.display]="screenWidth > 1050 ? 'none' : 'block'">Menú</div>
+      <div [style.display]="screenWidth > 1024 ? 'none' : 'block'">
+        <mat-icon class="center-vertical carousel-icon" (click)="sidenav.open()" style="color: black"> menu </mat-icon>
+      </div>
+    </mat-toolbar>
+    <router-outlet />
+    <footer class="footer-div text-white">
+      <div class="footer-flex">
+        <div class="flex-news">
+          <div class="link-logo-div" (click)="scroll()" routerLink="/">
+            @if (!grupoinfo.logoFooter) {
+            <img class="img-logo-white" src="../assets/img/logoWhite.png" />
+            } @if (grupoinfo.logoFooter) {
+            <img class="img-logo-white" src="{{ grupoinfo.logoFooter }}" />
+            }
+          </div>
+          <div class="link-logo-div">
+            <img class="img-logo-white" src="../../assets/img/logoUNMSM.png" />
+          </div>
+        </div>
+        <div class="footer-down-bar">
+          <div class="center max-con flex-news">
+            <a
+              class="link3"
+              routerLink="/"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="scroll()"
+            >
+              {{ language.home }}
+            </a>
+          </div>
+          <div class="center max-con flex-news">
+            <a class="link3" routerLink="./about-us" routerLinkActive="active" (click)="scroll()">
+              {{ language.aboutUs }}
+            </a>
+          </div>
+          <div class="center max-con flex-news">
+            <a class="link3" routerLink="./members" routerLinkActive="active" (click)="scroll()">
+              {{ language.members }}
+            </a>
+          </div>
+          <div class="center max-con flex-news">
+            <a class="link3" routerLink="./projects" routerLinkActive="active" (click)="scroll()">
+              {{ language.projects }}
+            </a>
+          </div>
+          <div class="center max-con flex-news">
+            <a class="link3" routerLink="./publications" routerLinkActive="active" (click)="scroll()">
+              {{ language.publications }}
+            </a>
+          </div>
+          <div class="center max-con flex-news">
+            <a class="link3" routerLink="./news" routerLinkActive="active" (click)="scroll()"> {{ language.news }} </a>
+          </div>
+          <div class="center link-box2">
+            <a class="link3 link-box-text" routerLink="./join-us" routerLinkActive="active" (click)="scroll()">
+              {{ language.join }}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="contact-div">
+        <div class="row">
+          <div class="col-12 col-sm-6 col-no-padding">
+            <div class="footer-title">{{ language.contactUs }}</div>
+            <div class="footer-info">
+              <div class="footer-icon-div">
+                <img class="footer-icon" src="../assets/img/location.svg" />
+              </div>
+              <div class="footer-text">
+                <div class="footer-text-title">
+                  Facultad de Ciencias Físicas, Universidad Nacional Mayor de San Marcos
+                </div>
+                <div class="footer-direction">{{ grupoinfo.direccion }}</div>
+              </div>
+            </div>
+            <div class="footer-info footer-info-2 footerdiflex">
+              <div class="flex-news">
+                <div class="footer-icon-div">
+                  <img class="footer-icon" src="../assets/img/mail.svg" />
+                </div>
+                <div class="footer-text" style="display: flex">
+                  <div class="footer-direction footer-email">{{ grupoinfo.correo }}</div>
+                </div>
+              </div>
+              <div class="flex-news">
+                @if (grupoinfo.telefono && grupoinfo.telefono != "") {
+                <div class="footer-icon-div ml-footer">
+                  <img class="footer-icon" src="../assets/img/phone.svg" />
+                </div>
+                }
+                <div class="footer-text" style="display: flex">
+                  <div class="footer-direction footer-email">{{ grupoinfo.telefono }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 google-maps">
+            <iframe
+              class="google-html"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d975.4432492025269!2d-77.0818349707683!3d-12.059133899466177!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c94730ddd147%3A0x458926002761c75c!2sInstituto%20de%20Investigaci%C3%B3n%20Facultad%20de%20Ciencias%20F%C3%ADsicas%20-%20UNMSM!5e0!3m2!1ses-419!2spe!4v1579747938555!5m2!1ses-419!2spe"
+              frameborder="0"
+              style="border: 0"
+              allowfullscreen=""
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </mat-sidenav-content>
+</mat-sidenav-container>

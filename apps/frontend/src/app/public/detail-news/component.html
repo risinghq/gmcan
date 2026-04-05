@@ -1,0 +1,56 @@
+<div class="detail-div">
+  @if (!cargado) {
+  <div>
+    <mat-spinner />
+  </div>
+  } @if (cargado) {
+  <div class="row">
+    <div class="col-lg-8 col-sm-6 col-12">
+      <div class="detail-links">
+        <a class="detail-link-active" href="/">{{ language.home }}</a>
+        <mat-icon class="detail-icon"> arrow_right </mat-icon>
+        @if (previouslink != "home") {
+        <a class="detail-link-active" href="/{{ previouslink }}">{{ previouspage }}</a>
+        } @if (previouslink != "home") {
+        <mat-icon class="detail-icon"> arrow_right </mat-icon>
+        }
+        <a class="detail-link">{{ language.detailNews }}</a>
+      </div>
+      <div class="card-detail">
+        <div class="news-title-div">
+          @if (noticia.foto) {
+          <img class="detail-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+          }
+          <div class="news-title">{{ noticia.titulo }}</div>
+        </div>
+        <div class="detail-text-div">
+          <div class="news-abstract">{{ noticia.resumen }}</div>
+          <div class="autor-div">
+            <div class="autor-img-div">
+              @if (usuario.foto) {
+              <img class="autor-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
+              }
+            </div>
+            <div class="autor-text">
+              <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
+              <div class="autor-name">
+                {{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}
+              </div>
+              <div class="news-date">
+                {{ language.detailNewsText[0].written1 }} {{ dia }} {{ language.detailNewsText[0].written2 }} {{ mes }}
+                {{ language.detailNewsText[0].written3 }} {{ anio }}
+              </div>
+            </div>
+          </div>
+          <app-shared-share-buttons [url]="url + 'noticia/' + noticia.idNoticia" [title]="noticia.titulo" />
+
+          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.cuerpo ?? ''"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-sm-6 col-12">
+      <app-news />
+    </div>
+  </div>
+  }
+</div>

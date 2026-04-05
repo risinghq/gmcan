@@ -1,0 +1,95 @@
+<div class="member-div">
+  <div class="row">
+    <div class="col-lg-8 col-sm-6 col-12">
+      <div class="member-links">
+        <a class="member-link-active" href="/">{{ language.home }}</a>
+        <mat-icon class="member-icon"> arrow_right </mat-icon>
+        <a class="member-link">{{ language.members }}</a>
+      </div>
+      <div class="member-card">
+        <div class="member-title">{{ language.membersText[0].memberTitle }}</div>
+        <div class="member-sub">{{ language.membersText[0].memberText }}</div>
+        <mat-tab-group>
+          <mat-tab label="{{ language.membersText[0].memberActual }}">
+            @if (!allCharged) {
+            <div class="spinner-pad">
+              <mat-spinner class="auto mb-8" />
+              <div class="loading-text center">Cargando</div>
+            </div>
+            } @if (allCharged) {
+            <div class="members-container">
+              @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
+              <div class="member-type-container">
+                @if ((tipoMiembro.miembros?.length ?? 0) > 0) {
+                <div class="member-type-title">{{ tipoMiembro.nombre }}</div>
+                } @if ((tipoMiembro.miembros?.length ?? 0) > 0) {
+                <div class="row">
+                  @for (miembro of tipoMiembro.miembros; track miembro) {
+                  <div class="col-12 col-sm-6">
+                    <div class="flex-news member-mt">
+                      <div class="member-img-div">
+                        <img class="member-img" src="{{ miembro.foto }}" alt="foto" />
+                      </div>
+                      <div class="member-text">
+                        <div class="member-name full-width">
+                          {{ miembro.prefijo }} {{ miembro.nombre }} {{ miembro.apellidoPaterno }} {{
+                          miembro.apellidoMaterno }}
+                        </div>
+                        <div class="member-email">
+                          <mat-icon class="email-icon"> email </mat-icon>
+                          {{ miembro.correo }}
+                        </div>
+                        <div class="member-profile" (click)="profile(miembro)">
+                          {{ language.membersText[0].seeProfile }}
+                          <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  }
+                </div>
+                }
+              </div>
+              }
+            </div>
+            }
+          </mat-tab>
+          <mat-tab label="{{ language.membersText[0].memberOld }}">
+            <div class="row member-type-container">
+              @for (usuario of usuariosNoActivos; track usuario) {
+              <div class="col-12 col-sm-6">
+                <div class="flex-news member-mt">
+                  <div class="member-img-div">
+                    <img class="member-img" src="../../assets/img/user.png" />
+                  </div>
+                  <div class="member-text full-width">
+                    <div class="member-name">
+                      {{ usuario.prefijo }} {{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{
+                      usuario.apellidoMaterno }}
+                    </div>
+                    @if (usuario.estado === 3) {
+                    <div class="member-email cursive">In memoriam</div>
+                    } @if (usuario.estado != 3) {
+                    <div class="member-email">
+                      <mat-icon class="email-icon"> email </mat-icon>
+                      {{ usuario.correo }}
+                    </div>
+                    }
+                    <div class="member-profile" (click)="profile(usuario)">
+                      {{ language.membersText[0].seeProfile }}
+                      <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+    <div class="col-lg-4 col-sm-6 col-12">
+      <app-news />
+    </div>
+  </div>
+</div>

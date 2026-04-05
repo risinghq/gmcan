@@ -1,60 +1,60 @@
 import { Routes } from "@angular/router";
 
-import { detailNewsResolver } from "./detail-news/detail-news.resolver";
-import { globalSearchResolver } from "./global-search/global-search.resolver";
-import { homeResolver } from "./home/home.resolver";
-import { projectsResolver } from "./projects/projects.resolver";
-import { publicationResolver } from "./publication/publication.resolver";
+import { detailNewsResolver } from "./detail-news/resolver";
+import { globalSearchResolver } from "./global-search/resolver";
+import { homeResolver } from "./home/resolver";
+import { projectsResolver } from "./projects/resolver";
+import { publicationResolver } from "./publication/resolver";
 
 export default [
   {
     path: "",
-    loadComponent: () => import("./landing/landing.component"),
+    loadComponent: () => import("./landing/component"),
     children: [
       {
         path: "",
-        loadComponent: () => import("./home/home.component"),
+        loadComponent: () => import("./home/component"),
         resolve: { home: homeResolver },
       },
       {
         path: "publications",
-        loadComponent: () => import("./publication/publication.component"),
+        loadComponent: () => import("./publication/component"),
         resolve: { publications: publicationResolver },
       },
-      { path: "news", loadComponent: () => import("./main-news/main-news.component") },
-      { path: "members", loadComponent: () => import("./members/members.component") },
+      { path: "news", loadComponent: () => import("./main-news/component") },
+      { path: "members", loadComponent: () => import("./members/component") },
       {
         path: "projects",
-        loadComponent: () => import("./projects/projects.component"),
+        loadComponent: () => import("./projects/component"),
         resolve: { projects: projectsResolver },
       },
       {
         path: "about-us",
-        loadComponent: () => import("./about/about.component"),
+        loadComponent: () => import("./about/component"),
         children: [
-          { path: "", loadComponent: () => import("./about/about-us/about-us.component") },
-          { path: "about", loadComponent: () => import("./about/about-us/about-us.component") },
+          { path: "", loadComponent: () => import("./about/about-us/component") },
+          { path: "about", loadComponent: () => import("./about/about-us/component") },
           {
             path: "lines-investigation",
-            loadComponent: () => import("./about/lines-investigation/lines-investigation.component"),
+            loadComponent: () => import("./about/lines-investigation/component"),
           },
-          { path: "methods", loadComponent: () => import("./about/method/method.component") },
-          { path: "facilities-resources", loadComponent: () => import("./about/facilities/facilities.component") },
-          { path: "works", loadComponent: () => import("./about/works/works.component") },
+          { path: "methods", loadComponent: () => import("./about/method/component") },
+          { path: "facilities-resources", loadComponent: () => import("./about/facilities/component") },
+          { path: "works", loadComponent: () => import("./about/works/component") },
         ],
       },
       {
         path: "detail-news/:id",
-        loadComponent: () => import("./detail-news/detail-news.component"),
+        loadComponent: () => import("./detail-news/component"),
         resolve: { news: detailNewsResolver },
       },
-      { path: "detail-member/:id", loadComponent: () => import("./detail-member/detail-member.component") },
+      { path: "detail-member/:id", loadComponent: () => import("./detail-member/component") },
       {
         path: "search/:id",
-        loadComponent: () => import("./global-search/global-search.component"),
+        loadComponent: () => import("./global-search/component"),
         resolve: { search: globalSearchResolver },
       },
-      { path: "join-us", loadComponent: () => import("./join-us/join-us.component") },
+      { path: "join-us", loadComponent: () => import("./join-us/component") },
     ],
   },
 ] satisfies Routes;

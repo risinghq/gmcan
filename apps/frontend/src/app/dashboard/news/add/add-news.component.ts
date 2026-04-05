@@ -313,7 +313,7 @@ export class DialogPublish {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-preview.html",
-  styleUrl: "../../../public/detail-news/detail-news.component.scss",
+  styleUrl: "../../../public/detail-news/component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview {

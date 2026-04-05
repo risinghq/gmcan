@@ -1,0 +1,150 @@
+<div class="project-div">
+  <div class="row">
+    <div class="col-lg-8 col-sm-6 col-12">
+      <div class="project-links">
+        <a class="project-link-active" href="/">{{ language.home }}</a>
+        <mat-icon class="project-icon"> arrow_right </mat-icon>
+        <a class="project-link">{{ language.projects }}</a>
+      </div>
+      <div class="project-card-div">
+        <div class="project-header">{{ language.projectsText[0].projectsTitle }}</div>
+        <div class="project-subtext">{{ infoText }}</div>
+        <mat-tab-group (selectedTabChange)="changeTab($event)">
+          @for (tipoProyecto of tipoProyectos; track tipoProyecto; let j = $index) {
+          <mat-tab label="{{ tipoProyecto }}">
+            <form class="mt-16" [formGroup]="searchForm">
+              <div class="flex-news">
+                <div class="input-search-project">
+                  <mat-icon class="icon-search">search</mat-icon>
+                  <input
+                    (keyup.enter)="search(titulo.value, j)"
+                    #titulo
+                    class="input-search"
+                    placeholder="{{ searchText }}"
+                    name="titulo"
+                    formControlName="titulo"
+                    autocomplete="off"
+                  />
+                </div>
+                <div (click)="search(titulo.value, j)" class="btn-black">
+                  <div class="link">{{ language.searchMobile }}</div>
+                </div>
+              </div>
+            </form>
+            @if (!allCharged) {
+            <div class="spinner-pad">
+              <mat-spinner class="auto mb-8" />
+              <div class="loading-text center">Cargando</div>
+            </div>
+            } @if (allCharged && proyectos.length == 0) {
+            <div class="not-found">{{ language.projectsText[0].results }}</div>
+            } @if (allCharged && proyectos.length > 0) {
+            <div>
+              @for ( proyecto of proyectos | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize; track
+              proyecto; let i = $index ) {
+              <div class="project">
+                <div class="project-code">{{ proyecto.codigo }}</div>
+                <div class="flex-news project-mt">
+                  <div class="project-title">{{ proyecto.titulo }}</div>
+                </div>
+                <div class="project-rev">
+                  <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
+                  proyecto.lineasInvestigacion }}
+                </div>
+                <div class="mt-16">
+                  <div class="flex-news flex-flow">
+                    <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+                    @for (usuario of proyecto.usuario; track usuario) {
+                    <div class="project-members">
+                      <div class="member-img-round">
+                        @if (usuario.foto) {
+                        <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
+                        } @if (!usuario.foto) {
+                        <img class="member-img" src="../../assets/img/user.png" alt="" />
+                        }
+                      </div>
+                      <div class="member-name" (click)="profile(usuario)">{{ usuario.nombreCompleto }}</div>
+                    </div>
+                    }
+                  </div>
+                  <div class="flex-news">
+                    <a
+                      [class.abstract-active]="isExpanded('proj', i)"
+                      (click)="toggleExpanded('proj', i)"
+                      class="project-abstract"
+                      data-toggle="collapse"
+                      href="#collapseExample{{ i }}"
+                      role="button"
+                      aria-expanded="false"
+                      aria-controls="collapseExample"
+                    >
+                      {{ expandLabel( "proj", i, this.language.projectsText[0].seeMore,
+                      this.language.projectsText[0].seeLess ) }}
+                    </a>
+                    <mat-icon
+                      class="project-abs-icon"
+                      [class]="{
+                              'abs-active': isExpanded('proj', i),
+                              'abs-not-active': !isExpanded('proj', i),
+                            }"
+                    >
+                      keyboard_arrow_down
+                    </mat-icon>
+                  </div>
+                </div>
+                <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+                  <div class="abstract mb-8">
+                    <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+                    {{ proyecto.descripcion }}
+                  </div>
+                  <div class="abstract mb-8">
+                    <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+                    {{ proyecto.fuenteFinanciamiento }}
+                  </div>
+                  <div class="abstract mb-8">
+                    <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+                    {{ proyecto.moneda }}{{ proyecto.montoFinanciado }}
+                  </div>
+                  <div class="abstract mb-8">
+                    <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+                    {{ proyecto.fechaI }}
+                  </div>
+                  @if (proyecto.fechaF) {
+                  <div class="abstract">
+                    <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+                    {{ proyecto.fechaF }}
+                  </div>
+                  }
+                </div>
+              </div>
+              } @if (proyectos.length > 5) {
+              <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="proyectos.length">
+                <ng-template class="unique-left" ngbPaginationPrevious>
+                  <div (click)="scroll()" class="h-ih">
+                    <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+                  </div>
+                </ng-template>
+                <ng-template ngbPaginationNumber let-page>
+                  <div (click)="scroll()" class="h-ih">{{ page }}</div>
+                </ng-template>
+                <ng-template ngbPaginationNext>
+                  <div (click)="scroll()" class="h-ih">
+                    <mat-icon class="pag-arrow" style="padding-bottom: 20px !important">
+                      keyboard_arrow_right
+                    </mat-icon>
+                  </div>
+                </ng-template>
+              </ngb-pagination>
+              }
+            </div>
+            }
+          </mat-tab>
+          }
+        </mat-tab-group>
+      </div>
+    </div>
+    <div class="col-lg-4 col-sm-6 col-12">
+      <app-news />
+    </div>
+  </div>
+</div>

@@ -208,7 +208,7 @@ export class DialogErase12 {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
-  styleUrl: "../../../public/about/method/method.component.scss",
+  styleUrl: "../../../public/about/method/component.scss",
   imports: [MatDialogClose],
 })
 export class DialogPreview5 {

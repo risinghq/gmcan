@@ -1,0 +1,114 @@
+@if (progress < 100) {
+<mat-progress-bar mode="determinate" [value]="progress" />
+}
+<div class="main-news-div">
+  <div class="row">
+    <div class="col-lg-8 col-sm-6 col-12">
+      <div class="main-news-links">
+        <a class="main-news-link-active" href="/">{{ language.home }}</a>
+        <mat-icon class="main-news-icon"> arrow_right </mat-icon>
+        <a class="main-news-link">{{ language.news }}</a>
+      </div>
+      <div class="news-list-div">
+        @if (!allCharged) {
+        <div class="spinner-pad">
+          <mat-spinner class="auto mb-8" />
+          <div class="loading-text center">Cargando</div>
+        </div>
+        } @if (allCharged) {
+        <div class="columna">
+          <div class="main-news-title">{{ language.newsText[0].newsTitle }}</div>
+          <button
+            mat-button
+            class="right"
+            [matMenuTriggerFor]="menu"
+            [style.display]="screenWidth < 960 ? 'block' : 'none'"
+          >
+            {{ categoryNombre }}
+            <mat-icon> keyboard_arrow_down </mat-icon>
+          </button>
+          <mat-menu #menu="matMenu" xPosition="before">
+            <button mat-menu-item (click)="selectCategory(-1, language.newsText[0].allNews)">
+              {{ language.newsText[0].allNews }}
+            </button>
+            @for (tiponoticia of tiponoticias; track tiponoticia) {
+            <button mat-menu-item (click)="selectCategory(tiponoticia.idtipoNoticia ?? 0, tiponoticia.nombre ?? '')">
+              {{ tiponoticia.nombre }}
+            </button>
+            }
+          </mat-menu>
+        </div>
+        } @if (noticias.length > 0 && allCharged) {
+        <div>
+          @for ( noticia of noticias | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize; track noticia )
+          {
+          <div class="news flex-news">
+            <div
+              class="img-hover-zoom-2 img-div-zoom right pl-24"
+              [style.display]="screenWidth < 960 ? 'block' : 'none'"
+            >
+              @if (!noticia.foto) {
+              <img class="news-img" src="../../assets/img/grupal.jpg" />
+              } @if (noticia.foto) {
+              <img class="news-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+              }
+            </div>
+            <div class="news-text-div">
+              <div class="columna">
+                <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
+                <div class="news-date right">{{ noticia.fechaPublicacion }}</div>
+              </div>
+              <div class="news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.titulo }}</div>
+              <div class="news-abstract">{{ noticia.resumen }}</div>
+              <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
+            </div>
+            <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
+              @if (!noticia.foto) {
+              <img class="news-img" src="../../assets/img/grupal.jpg" />
+              } @if (noticia.foto) {
+              <img class="news-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+              }
+            </div>
+          </div>
+          } @if (noticias.length > 10) {
+          <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="noticias.length">
+            <ng-template class="unique-left" ngbPaginationPrevious>
+              <div (click)="scroll()" class="h-ih">
+                <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+              </div>
+            </ng-template>
+            <ng-template ngbPaginationNumber let-page>
+              <div (click)="scroll()" class="h-ih">{{ page }}</div>
+            </ng-template>
+            <ng-template ngbPaginationNext>
+              <div (click)="scroll()" class="h-ih">
+                <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
+              </div>
+            </ng-template>
+          </ngb-pagination>
+          }
+        </div>
+        }
+      </div>
+    </div>
+    <div class="col-lg-4 col-sm-6 col-12" [style.display]="screenWidth > 960 ? 'block' : 'none'">
+      <div class="category-title">{{ language.newsText[0].categoryTitle }}</div>
+      <div
+        class="category"
+        [ngClass]="categorySelected == -1 ? 'active' : 'category'"
+        (click)="selectCategory(-1, language.newsText[0].allNews)"
+      >
+        {{ language.newsText[0].allNews }}
+      </div>
+      @for (tiponoticia of tiponoticias; track tiponoticia) {
+      <div
+        class="category"
+        [ngClass]="categorySelected == tiponoticia.idtipoNoticia ? 'active' : 'category'"
+        (click)="selectCategory(tiponoticia.idtipoNoticia ?? 0, tiponoticia.nombre ?? '')"
+      >
+        {{ tiponoticia.nombre }}
+      </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div class="card-methods">
+  <div class="methods-text-div">
+    @for (method of methods; track method; let i = $index) {
+    <div>
+      <div class="methods-img-div">
+        @if (method.foto) {
+        <img class="methods-img" src="{{ url + 'metodo/' + method.idMetodo + '/file }}" />
+        }
+      </div>
+      <div class="methods-title">{{ method.nombre }}</div>
+      <div class="methods-sub-divi"></div>
+      <div class="methods-text" [innerHTML]="method.descripcion ?? ''"></div>
+    </div>
+    }
+  </div>
+</div>
