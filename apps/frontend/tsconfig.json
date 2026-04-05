@@ -1,9 +1,8 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/app/*"]
+      "@app/*": ["./src/app/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "strict": true,
