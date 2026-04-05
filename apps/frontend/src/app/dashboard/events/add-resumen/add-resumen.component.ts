@@ -198,13 +198,20 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
 
     const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
-    this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
+    const fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
 
-    this._publicacionService.addPublicacion(this.publicacion).subscribe((result: any) => {
-      if (result.status === 1) {
-        this._publicacionAutoresService
-          .saveForPublication(result.idPublicacion, this.buildSaveList())
-          .subscribe(() => {});
+    const data = {
+      titulo: this.publicacion.titulo ?? "",
+      resumen: this.publicacion.resumen,
+      resumenEN: this.publicacion.resumenEN,
+      DOI: this.publicacion.DOI,
+      fechaPublicacion,
+      tipoPublicacion_idTipoPublicacion: 3,
+      evento_idEvento: this.publicacion.evento_idEvento,
+    };
+
+    this._publicacionService.save(data, this.buildSaveList()).subscribe((result) => {
+      if (result.idPublicacion != null) {
         this.publicacionForm.markAsPristine();
         this.return();
         this.openSnackBar();

@@ -19,7 +19,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { AuthorOption, SaveAuthorEntry } from "@app/shared/models/author";
 import type { AuthorFormRow } from "@app/shared/models/author-form";
 import { DialogData } from "@app/shared/models/dialogdata";
@@ -112,17 +112,15 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   getResumen(): void {
-    this._route.params.forEach((params: Params) => {
-      const idArticulo = params["id"];
-      this._publicacionService.getPublication(idArticulo).subscribe((result: any[]) => {
-        if (result) {
-          this.publicacion = result[0];
-          const d = new Date(result[0].fechaPublicacion);
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.publicacion.fechaPublicacionDate = d;
-          this.getEventos(idArticulo);
-        }
-      });
+    const idArticulo = this._route.snapshot.params["id"];
+    this._publicacionService.getPublication(idArticulo).subscribe((result: any[]) => {
+      if (result) {
+        this.publicacion = result[0];
+        const d = new Date(result[0].fechaPublicacion);
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        this.publicacion.fechaPublicacionDate = d;
+        this.getEventos(idArticulo);
+      }
     });
   }
 
@@ -256,13 +254,21 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
     this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
 
-    this._publicacionService.updatePublicacion(this.publicacion).subscribe((updateResponse: any) => {
+    const data = {
+      titulo: this.publicacion.titulo ?? "",
+      resumen: this.publicacion.resumen,
+      resumenEN: this.publicacion.resumenEN,
+      DOI: this.publicacion.DOI,
+      fechaPublicacion: this.publicacion.fechaPublicacion ?? "",
+      tipoPublicacion_idTipoPublicacion: 3,
+      evento_idEvento: this.publicacion.evento_idEvento,
+    };
+
+    this._publicacionService.update(idPublicacion, data, this.buildSaveList()).subscribe((updateResponse) => {
       if (updateResponse.status === 1) {
-        this._publicacionAutoresService.saveForPublication(idPublicacion, this.buildSaveList()).subscribe(() => {
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Resumen actualizado exitosamente");
-        });
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Resumen actualizado exitosamente");
       }
     });
   }
@@ -292,14 +298,12 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
 
   erasePublicacion(): void {
     const idPublicacion = Number(this.publicacion.idPublicacion ?? 0);
-    this._publicacionAutoresService.saveForPublication(idPublicacion, []).subscribe(() => {
-      this._publicacionService.deletePublicacion(idPublicacion).subscribe((deleteResponse: any) => {
-        if (deleteResponse.status === 1) {
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Resumen eliminado exitosamente");
-        }
-      });
+    this._publicacionService.delete(idPublicacion).subscribe((deleteResponse) => {
+      if (deleteResponse.status === 1) {
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Resumen eliminado exitosamente");
+      }
     });
   }
 

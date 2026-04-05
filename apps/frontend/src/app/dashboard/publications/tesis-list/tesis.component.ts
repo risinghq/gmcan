@@ -21,11 +21,10 @@ import { Router } from "@angular/router";
 import { Publicacion } from "@app/shared/models/publicacion";
 import { Universidad } from "@app/shared/models/universidad";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 
 @Component({
   selector: "app-tesis",
@@ -52,12 +51,11 @@ import { UniversidadService } from "@app/shared/services/universidad.service";
 })
 export default class TesisComponent implements OnInit {
   _router = inject(Router);
-  _universidadService = inject(UniversidadService);
+  lookup = inject(LookupService);
   private _publicacionService = inject(PublicacionService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
   private _publicacionAutoresService = inject(PublicacionAutoresService);
-  private _tipoTesisService = inject(TipoTesisService);
   private _tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
@@ -83,7 +81,14 @@ export default class TesisComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedTab = this._tabState.thesisTab();
-    this.getUniversidad();
+    this.universidades = this.lookup.universidades().map((u) => ({
+      idUniversidad: u.idUniversidad,
+      nombre: u.nombre ?? "",
+      nombreEN: u.nombreEN ?? "",
+    }));
+    this.dataSource2 = new MatTableDataSource(this.universidades);
+    this.dataSource2.sort = this.sort2();
+    this.dataSource2.paginator = this.paginator2();
     this.getThesis();
   }
 
@@ -116,12 +121,8 @@ export default class TesisComponent implements OnInit {
   }
 
   getTipoThesis(publicacion: Publicacion): void {
-    this._tipoTesisService.getTipoTesis(publicacion.tipoTesis_idTipoTesis ?? 0).subscribe((res: unknown) => {
-      const data = res as { nombre?: string }[];
-      if (data) {
-        publicacion.tipoTesis = data[0]?.nombre ?? "";
-      }
-    });
+    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
+    if (found) publicacion.tipoTesis = found.nombre;
   }
 
   getThesisAuthors(publicacion: Publicacion): void {
@@ -131,23 +132,8 @@ export default class TesisComponent implements OnInit {
   }
 
   getSpeUniversidad(publicacion: Publicacion): void {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: unknown) => {
-      const data = res as { nombre?: string }[];
-      if (data) {
-        publicacion.universidad = data[0]?.nombre ?? "";
-      }
-    });
-  }
-
-  getUniversidad(): void {
-    this._universidadService.getUniversidades().subscribe((res: Universidad[]) => {
-      if (res) {
-        this.universidades = res;
-        this.dataSource2 = new MatTableDataSource(this.universidades);
-        this.dataSource2.sort = this.sort2();
-        this.dataSource2.paginator = this.paginator2();
-      }
-    });
+    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
+    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   displayedNotFound = false;

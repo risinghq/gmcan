@@ -20,19 +20,18 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createNoticiaFull } from "@app/shared/models/factories";
 import { Languages } from "@app/shared/models/languages";
 import type { NoticiaFull } from "@app/shared/models/noticiafull";
-import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
@@ -88,7 +87,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   private _noticiaService = inject(NoticiaService);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _tipoNoticiaService = inject(TipoNoticiaService);
+  lookup = inject(LookupService);
   private _usuarioService = inject(UsuarioService);
   private _session = inject(SessionService);
 
@@ -117,7 +116,9 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
   url: string;
   public newsForm: FormGroup;
-  categorias: TipoNoticia[] = [];
+  get categorias() {
+    return this.lookup.tiposNoticia();
+  }
   autores: Usuario[] = [];
   button_text = "";
   button_text2 = "";
@@ -127,36 +128,25 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getNews(): void {
-    this._route.params.forEach((params: Params) => {
-      const idNoticia = Number(params["id"] ?? 0);
-      this._noticiaService.getNoticiaFull(idNoticia).subscribe((result: NoticiaFull) => {
-        if (result) {
-          this.noticia = result;
-          this.newsForm.controls["cuerpo"].setValue(this.noticia.cuerpo);
-          const d = new Date(result.fechaPublicacion ?? new Date());
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.noticia.fechaPublicacion = d.toISOString();
-          this.noticia.fechaPublicacionDate = d;
-          this._session.setNoticiaPublicada((this.noticia.estado ?? 0) === 1);
-          this.getCategorias();
-          if (this.noticia.estado == 0) {
-            this.button_text = "Publicar noticia";
-            this.button_text2 = "Guardar sin publicar";
-          } else {
-            this.button_text = "Actualizar noticia";
-            this.button_text2 = "Dejar de publicar y guardar cambios";
-          }
-        }
-      });
-    });
-  }
-
-  getCategorias(): void {
-    this._tipoNoticiaService.getTipoNoticia().subscribe((result: TipoNoticia[]) => {
+    const idNoticia = Number(this._route.snapshot.params["id"] ?? 0);
+    this._noticiaService.getNoticiaFull(idNoticia).subscribe((result: NoticiaFull) => {
       if (result) {
-        this.categorias = result;
+        this.noticia = result;
+        this.newsForm.controls["cuerpo"].setValue(this.noticia.cuerpo);
+        const d = new Date(result.fechaPublicacion ?? new Date());
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        this.noticia.fechaPublicacion = d.toISOString();
+        this.noticia.fechaPublicacionDate = d;
+        this._session.setNoticiaPublicada((this.noticia.estado ?? 0) === 1);
+        this.getAuthors();
+        if (this.noticia.estado == 0) {
+          this.button_text = "Publicar noticia";
+          this.button_text2 = "Guardar sin publicar";
+        } else {
+          this.button_text = "Actualizar noticia";
+          this.button_text2 = "Dejar de publicar y guardar cambios";
+        }
       }
-      this.getAuthors();
     });
   }
 
@@ -229,9 +219,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   private previewDialog?: MatDialogRef<DialogPreview2>;
 
   previewNews(value: number): void {
-    const indexCat = this.categorias.findIndex(
-      (x: TipoNoticia) => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia,
-    );
+    const indexCat = this.categorias.findIndex((x) => x.idtipoNoticia == this.noticia.tipoNoticia_idtipoNoticia);
     const indexAut = this.autores.findIndex((x: Usuario) => x.DNI == this.noticia.autorPublicacion);
     let noticiaPreview: NewsPreviewData = {
       language: value,

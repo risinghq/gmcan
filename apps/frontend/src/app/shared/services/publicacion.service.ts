@@ -1,160 +1,91 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { SessionService } from "@app/shared/services/session.service";
+import { Observable } from "rxjs";
 
+import type { SaveAuthorEntry } from "../models/author";
+import type { Publicacion } from "../models/publicacion";
+import type { PublicacionEditView } from "../models/publicacion-edit-view";
 import { GLOBAL } from "./global";
+import { SessionService } from "./session.service";
 
-@Injectable({
-  providedIn: "root",
-})
+interface PublicacionFields {
+  titulo: string;
+  resumen?: string;
+  resumenEN?: string;
+  DOI?: string;
+  fechaPublicacion: string;
+  nroRevista?: number;
+  tipoPublicacion_idTipoPublicacion: number;
+  revista_idRevista?: number;
+  universidad_idUniversidad?: number;
+  tipoTesis_idTipoTesis?: number;
+  evento_idEvento?: number;
+}
+
+@Injectable({ providedIn: "root" })
 export class PublicacionService {
   http = inject(HttpClient);
   private _session = inject(SessionService);
-
-  public url: string;
 
   private get languagelocal(): string {
     return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
   }
 
-  constructor() {
-    this.url = GLOBAL.url;
+  getPublicacion(): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacion`);
   }
 
-  getPublicacion(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicacion", { headers: headers });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicacion-en", { headers: headers });
-    }
+  getPublicaciones(idTipoPublicacion: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicaciones/${idTipoPublicacion}`);
   }
 
-  getPublicaciones(idTipoPublicacion: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicaciones/" + idTipoPublicacion, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicaciones-en/" + idTipoPublicacion, {
-        headers: headers,
-      });
-    }
+  getPublication(idPublicacion: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacion/${idPublicacion}`);
   }
 
-  getPublication(idPublicacion: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicacion/" + idPublicacion, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicacion-en/" + idPublicacion, {
-        headers: headers,
-      });
-    }
+  getPublicacionesCiudad(idCiudad: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesciudad/${idCiudad}`);
   }
 
-  getPublicacionesCiudad(idCiudad: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicacionesciudad/" + idCiudad, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicacionesciudad-en/" + idCiudad, {
-        headers: headers,
-      });
-    }
+  getPublicacionesEvento(idEvento: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesevento/${idEvento}`);
   }
 
-  getPublicacionesEvento(idEvento: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicacionesevento/" + idEvento, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicacionesevento-en/" + idEvento, {
-        headers: headers,
-      });
-    }
+  getPublicacionesUniversidad(idUniversidad: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesuniversidad/${idUniversidad}`);
   }
 
-  getPublicacionesUniversidad(idUniversidad: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicacionesuniversidad/" + idUniversidad, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicacionesuniversidad-en/" + idUniversidad, {
-        headers: headers,
-      });
-    }
+  getPublicacionesRevista(idRevista: number): Observable<Publicacion[]> {
+    return this.http.get<Publicacion[]>(`${GLOBAL.url}publicacion/get-publicacionesrevista/${idRevista}`);
   }
 
-  getPublicacionesRevista(idRevista: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "publicacion/get-publicacionesrevista/" + idRevista, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "publicacion/get-publicacionesrevista-en/" + idRevista, {
-        headers: headers,
-      });
-    }
+  getEditView(id: number): Observable<PublicacionEditView> {
+    return this.http.get<PublicacionEditView>(`${GLOBAL.url}publicacion/${id}/edit-view`);
   }
 
-  addPublicacion(publicacion: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "publicacion/post-publicacion/", publicacion, {
-      headers: headers,
-    });
+  save(data: PublicacionFields, autores: SaveAuthorEntry[]): Observable<{ idPublicacion: number }> {
+    return this.http.post<{ idPublicacion: number }>(`${GLOBAL.url}publicacion`, { data, autores });
   }
 
-  updatePublicacion(publicacion: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "publicacion/update-publicacion/", publicacion, {
-      headers: headers,
-    });
+  update(id: number, data: PublicacionFields, autores: SaveAuthorEntry[]): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(`${GLOBAL.url}publicacion/${id}`, { data, autores });
   }
 
-  deletePublicacion(idPublicacion: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "publicacion/delete-publicacion/" + idPublicacion, {
-      headers: headers,
-    });
+  delete(id: number): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${GLOBAL.url}publicacion/${id}`);
   }
 
-  uploadPublicacionFile(fileData: File, id: number) {
+  uploadFile(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", fileData, fileData.name);
-    let headers = new HttpHeaders({});
-    return this.http.put(this.url + "publicacion/upload-publicacion-file/" + id, formData, {
-      headers: headers,
-    });
+    formData.append("file", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}publicacion/upload-publicacion-file/${id}`, formData);
+  }
+
+  uploadPublicacionFile(fileData: File, id: number): Observable<{ status: number }> {
+    return this.uploadFile(id, fileData);
+  }
+
+  downloadPublicacion(pdfFile: string): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}publicacion/download-publicacion/${pdfFile}`, { responseType: "blob" });
   }
 }

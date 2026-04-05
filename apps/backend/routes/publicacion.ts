@@ -5,13 +5,15 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { checkSession } from "../auth/session.js";
 import { db } from "../db/client.js";
+import { publicacionWithAuthors } from "../db/views.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
 
-const Body = z.object({
+const PublicacionFields = z.object({
   titulo: z.string().min(1),
   resumen: z.string().optional(),
   resumenEN: z.string().optional(),
@@ -25,7 +27,22 @@ const Body = z.object({
   evento_idEvento: z.number().int().optional(),
 });
 
-const UpdateBody = Body.extend({ idPublicacion: z.number().int() });
+const SaveEntry = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("registered"), DNI: z.string().min(1), isPrincipal: z.number().int() }),
+  z.object({ kind: z.literal("external"), nombre: z.string().min(1), isPrincipal: z.number().int() }),
+]);
+
+const CreateBody = z.object({
+  data: PublicacionFields,
+  autores: z.array(SaveEntry),
+});
+
+const UpdateBody = z.object({
+  data: PublicacionFields,
+  autores: z.array(SaveEntry),
+});
+
+// ── GET list/filter ───────────────────────────────────────────────────────────
 
 router.get("/get-publicacion", async (c) => {
   const rows = await db.selectFrom("publicacion").selectAll().execute();
@@ -111,25 +128,75 @@ router.post("/search-publicaciones-global", zValidator("json", z.object({ titulo
   return c.json(rows);
 });
 
-router.post("/post-publicacion", zValidator("json", Body), async (c) => {
-  const body = c.req.valid("json");
-  const result = await db.insertInto("publicacion").values(body).executeTakeFirst();
-  return c.json({ idPublicacion: Number(result.insertId) }, 201);
-});
+// ── Composite edit view ───────────────────────────────────────────────────────
 
-router.delete("/delete-publicacion/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id/edit-view", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  await db.deleteFrom("publicacion").where("idPublicacion", "=", id).execute();
+  const result = await publicacionWithAuthors(id);
+  if (!result.publicacion) return c.json({ error: "Not found" }, 404);
+  return c.json(result);
+});
+
+// ── CRUD (atomic) ─────────────────────────────────────────────────────────────
+
+router.post("/", checkSession, zValidator("json", CreateBody), async (c) => {
+  const { data, autores } = c.req.valid("json");
+  const idPublicacion = await db.transaction().execute(async (trx) => {
+    const result = await trx.insertInto("publicacion").values(data).executeTakeFirstOrThrow();
+    const id = Number(result.insertId);
+    if (autores.length > 0) {
+      await trx
+        .insertInto("publicacion_has_autor")
+        .values(
+          autores.map((a) => ({
+            publicacion_idPublicacion: id,
+            isPrincipal: a.isPrincipal,
+            nombre: a.kind === "external" ? a.nombre : null,
+            usuario_DNI: a.kind === "registered" ? a.DNI : null,
+          })),
+        )
+        .execute();
+    }
+    return id;
+  });
+  return c.json({ idPublicacion }, 201);
+});
+
+router.put("/:id", checkSession, zValidator("param", IdParam), zValidator("json", UpdateBody), async (c) => {
+  const { id } = c.req.valid("param");
+  const { data, autores } = c.req.valid("json");
+  await db.transaction().execute(async (trx) => {
+    await trx.updateTable("publicacion").set(data).where("idPublicacion", "=", id).execute();
+    await trx.deleteFrom("publicacion_has_autor").where("publicacion_idPublicacion", "=", id).execute();
+    if (autores.length > 0) {
+      await trx
+        .insertInto("publicacion_has_autor")
+        .values(
+          autores.map((a) => ({
+            publicacion_idPublicacion: id,
+            isPrincipal: a.isPrincipal,
+            nombre: a.kind === "external" ? a.nombre : null,
+            usuario_DNI: a.kind === "registered" ? a.DNI : null,
+          })),
+        )
+        .execute();
+    }
+  });
   return c.json({ status: 1 });
 });
 
-router.put("/update-publicacion", zValidator("json", UpdateBody), async (c) => {
-  const { idPublicacion, ...fields } = c.req.valid("json");
-  await db.updateTable("publicacion").set(fields).where("idPublicacion", "=", idPublicacion).execute();
+router.delete("/:id", checkSession, zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  await db.transaction().execute(async (trx) => {
+    await trx.deleteFrom("publicacion_has_autor").where("publicacion_idPublicacion", "=", id).execute();
+    await trx.deleteFrom("publicacion").where("idPublicacion", "=", id).execute();
+  });
   return c.json({ status: 1 });
 });
 
-router.put("/upload-publicacion-file/:id", zValidator("param", IdParam), async (c) => {
+// ── File upload / serving ─────────────────────────────────────────────────────
+
+router.put("/upload-publicacion-file/:id", checkSession, zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

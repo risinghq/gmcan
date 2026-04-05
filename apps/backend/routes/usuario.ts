@@ -8,6 +8,7 @@ import { z } from "zod";
 import { checkSession, createSession, destroySession } from "../auth/session.js";
 import { db } from "../db/client.js";
 import { USUARIO_PUBLIC, USUARIO_NAME, USUARIO_ACTIVE } from "../db/projections.js";
+import { publicProfile } from "../db/views.js";
 import { hashPassword, verifyPassword } from "../lib/password.js";
 import { extractFirstFile, serveFile } from "../lib/upload.js";
 
@@ -238,6 +239,14 @@ router.post("/verify-DNI", checkSession, zValidator("json", z.object({ DNI: z.st
   const { DNI } = c.req.valid("json");
   const rows = await db.selectFrom("usuario").select("DNI").where("DNI", "=", DNI).execute();
   return c.json(rows);
+});
+
+// GET /usuario/:dni/profile — composite public profile
+router.get("/:id/profile", zValidator("param", DniParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const result = await publicProfile(id);
+  if (!result.usuario) return c.json({ error: "Not found" }, 404);
+  return c.json(result);
 });
 
 router.delete("/erase-image/:id", checkSession, (c) => {

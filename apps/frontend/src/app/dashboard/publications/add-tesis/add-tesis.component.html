@@ -30,8 +30,8 @@
                 formControlName="tipoTesis_idTipoTesis"
                 name="tipoTesis_idTipoTesis"
               >
-                @for (tipoTesis of tipoTesis; track tipoTesis) {
-                  <mat-option [value]="tipoTesis.idTipoTesis">{{ tipoTesis.nombre }}</mat-option>
+                @for (t of lookup.tiposTesis(); track t) {
+                  <mat-option [value]="t.idTipoTesis">{{ t.nombre }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -63,8 +63,8 @@
                 formControlName="universidad_idUniversidad"
                 name="universidad_idUniversidad"
               >
-                @for (universidad of universidad; track universidad) {
-                  <mat-option [value]="universidad.idUniversidad">{{ universidad.nombre }}</mat-option>
+                @for (u of lookup.universidades(); track u) {
+                  <mat-option [value]="u.idUniversidad">{{ u.nombre }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>

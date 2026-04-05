@@ -12,7 +12,7 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Software } from "@app/shared/models/software";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -58,14 +58,12 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   }
 
   getSoftware(): void {
-    this._route.params.forEach((params: Params) => {
-      let idSoftware = params["id"];
-      this._softwareService.getSoftwareId(idSoftware).subscribe((result: Software[]) => {
-        if (result.length > 0) {
-          this.software = result[0];
-          localStorage.setItem("softwareEdit", JSON.stringify(this.software.nombre));
-        }
-      });
+    let idSoftware = this._route.snapshot.params["id"];
+    this._softwareService.getSoftwareId(idSoftware).subscribe((result: Software[]) => {
+      if (result.length > 0) {
+        this.software = result[0];
+        localStorage.setItem("softwareEdit", JSON.stringify(this.software.nombre));
+      }
     });
   }
 

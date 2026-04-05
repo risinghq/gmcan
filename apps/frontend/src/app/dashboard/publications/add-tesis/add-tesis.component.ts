@@ -15,22 +15,14 @@ import type { AuthorOption, SaveAuthorEntry } from "@app/shared/models/author";
 import type { AuthorFormRow } from "@app/shared/models/author-form";
 import { createPublicacion } from "@app/shared/models/factories";
 import type { Publicacion } from "@app/shared/models/publicacion";
-import { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 import { AutosizeModule } from "ngx-autosize";
 import { startWith, map } from "rxjs/operators";
-
-interface TipoTesisItem {
-  idTipoTesis?: number;
-  nombre?: string;
-  nombreEN?: string;
-}
 
 @Component({
   selector: "app-add-tesis",
@@ -62,23 +54,18 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   private _publicacionService = inject(PublicacionService);
   private _publicacionAutoresService = inject(PublicacionAutoresService);
+  lookup = inject(LookupService);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _universidadService = inject(UniversidadService);
-  private _tipotesisService = inject(TipoTesisService);
 
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Guardar tesis";
-  universidad: Universidad[] = [];
   url: string;
-  tipoTesis: TipoTesisItem[] = [];
   edit = false;
 
   options: AuthorOption[] = [];
-  // All authors (including principal at index 0) go through otrosAutores
   otrosAutores: AuthorFormRow[] = [];
-
   fileData: File | null = null;
 
   constructor() {
@@ -102,32 +89,10 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   ngOnInit(): void {
-    this.getUniversidades();
-  }
-
-  getUniversidades(): void {
-    this._universidadService.getUniversidades().subscribe((result: Universidad[]) => {
-      if (result) {
-        this.universidad = result;
-        this.loadAuthors();
-      }
-    });
-  }
-
-  loadAuthors(): void {
     this._publicacionAutoresService.search().subscribe((authors) => {
       this.options = authors;
       this.otrosAutores = [this.newCoAuthorRow()];
       this.setupCoAuthorFilters();
-      this.getTipoTesis();
-    });
-  }
-
-  getTipoTesis(): void {
-    this._tipotesisService.getTiposTesis().subscribe((result: TipoTesisItem[]) => {
-      if (result) {
-        this.tipoTesis = result;
-      }
     });
   }
 
@@ -195,14 +160,23 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
     const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
     this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
 
-    this._publicacionService.addPublicacion(this.publicacion).subscribe((result: any) => {
-      if (result.status === 1 && result.idPublicacion != null) {
+    const data = {
+      titulo: this.publicacion.titulo ?? "",
+      resumen: this.publicacion.resumen,
+      resumenEN: this.publicacion.resumenEN,
+      DOI: this.publicacion.DOI,
+      fechaPublicacion: this.publicacion.fechaPublicacion,
+      nroRevista: this.publicacion.nroRevista,
+      tipoPublicacion_idTipoPublicacion: this.publicacion.tipoPublicacion_idTipoPublicacion ?? 2,
+      universidad_idUniversidad: this.publicacion.universidad_idUniversidad,
+      tipoTesis_idTipoTesis: this.publicacion.tipoTesis_idTipoTesis,
+    };
+
+    this._publicacionService.save(data, this.buildSaveList()).subscribe((result) => {
+      if (result.idPublicacion != null) {
         if (this.fileData) {
-          this._publicacionService.uploadPublicacionFile(this.fileData, result.idPublicacion).subscribe(() => {});
+          this._publicacionService.uploadFile(result.idPublicacion, this.fileData).subscribe(() => {});
         }
-        this._publicacionAutoresService
-          .saveForPublication(result.idPublicacion, this.buildSaveList())
-          .subscribe(() => {});
         this.publicacionForm.markAsPristine();
         this.return();
         this.openSnackBar();

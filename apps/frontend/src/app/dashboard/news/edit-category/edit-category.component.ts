@@ -12,13 +12,14 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AdminTipoNoticiaService } from "@app/shared/services/admin-tiponoticia.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 
 interface StatusResponse {
   status?: number;
@@ -35,7 +36,8 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   dialog = inject(MatDialog);
-  _tipoNoticiaService = inject(TipoNoticiaService);
+  private _adminTipoNoticiaService = inject(AdminTipoNoticiaService);
+  private lookup = inject(LookupService);
   _noticiaService = inject(NoticiaService);
   private _snackBar = inject(MatSnackBar);
 
@@ -58,28 +60,20 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   getCategory(): void {
-    this._route.params.forEach((params: Params) => {
-      this.idCategory = Number(params["id"] ?? 0);
-      this._tipoNoticiaService.getTipoNews(this.idCategory).subscribe((result: unknown) => {
-        const categories = result as TipoNoticia[];
-        if (categories[0]) {
-          this.category = categories[0];
-          localStorage.setItem("categoryEdit", JSON.stringify(this.category.nombre ?? ""));
-        }
-        this.getRelatedNews();
-      });
-    });
+    this.idCategory = Number(this._route.snapshot.params["id"] ?? 0);
+    const found = this.lookup.tiposNoticia().find((t) => t.idtipoNoticia === this.idCategory);
+    if (found) {
+      this.category = found as TipoNoticia;
+      localStorage.setItem("categoryEdit", JSON.stringify(this.category.nombre ?? ""));
+    }
+    this.getRelatedNews();
   }
 
   notCanDo = false;
 
   getRelatedNews(): void {
     this._noticiaService.getNoticiaTipo(this.idCategory).subscribe((result: unknown[]) => {
-      if (result.length > 0) {
-        this.notCanDo = false;
-      } else {
-        this.notCanDo = true;
-      }
+      this.notCanDo = result.length === 0;
     });
   }
 
@@ -93,7 +87,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
 
   submitCategory(): void {
     if (this.categoryForm.valid) {
-      this._tipoNoticiaService.updateCategory(this.category).subscribe((result: StatusResponse) => {
+      this._adminTipoNoticiaService.updateCategory(this.category).subscribe((result: StatusResponse) => {
         if (result.status == 1) {
           this.categoryForm.markAsPristine();
           this.return();
@@ -137,7 +131,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   eraseCategory(): void {
     this._noticiaService.getNoticiaTipo(this.idCategory).subscribe((newsByCategory: unknown[]) => {
       if (newsByCategory.length == 0) {
-        this._tipoNoticiaService.deleteCategory(this.idCategory).subscribe((deleteResponse: StatusResponse) => {
+        this._adminTipoNoticiaService.deleteCategory(this.idCategory).subscribe((deleteResponse: StatusResponse) => {
           if (deleteResponse.status == 1) {
             this.categoryForm.markAsPristine();
             this.return();

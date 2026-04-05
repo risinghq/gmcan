@@ -1,5 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, DestroyRef, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import {
   AbstractControl,
   FormBuilder,
@@ -26,19 +27,18 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createProyecto } from "@app/shared/models/factories";
 import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
 import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
-import { Moneda } from "@app/shared/models/moneda";
 import type { Proyecto } from "@app/shared/models/proyecto";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
-import { MonedaService } from "@app/shared/services/moneda.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TabStateService } from "@app/shared/services/tab-state.service";
@@ -94,11 +94,12 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   private _usuarioService = inject(UsuarioService);
   private _lineaInvestigacionService = inject(LineasInvestigacionService);
   private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  private _monedaService = inject(MonedaService);
+  lookup = inject(LookupService);
   private _proyectoService = inject(ProyectoService);
   private _usuariohasproyecto = inject(UsuarioHasProyectoService);
   dialog = inject(MatDialog);
   private _tabState = inject(TabStateService);
+  private readonly destroyRef = inject(DestroyRef);
 
   edit = true;
   terminado = false;
@@ -109,7 +110,9 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   fuentesFinaciamiento: FuenteFinanciamiento[] = [];
   proyecto: Proyecto;
   proyectoForm: FormGroup;
-  monedas: Moneda[] = [];
+  get monedas() {
+    return this.lookup.monedas();
+  }
   url: string;
 
   constructor() {
@@ -128,7 +131,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
     });
     this.proyecto = createProyecto();
     this.url = GLOBAL.url;
-    this.proyectoForm.valueChanges.subscribe(() => {
+    this.proyectoForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       const fechaInicioControl = this.proyectoForm.get("fechaInicio");
       if (fechaInicioControl?.hasError("lessThan")) {
         this.field2HasError = true;
@@ -181,30 +184,28 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   getProyecto(): void {
-    this._route.params.forEach((params: Params) => {
-      const idProyecto = Number(params["id"] ?? 0);
-      this._proyectoService.getProject(idProyecto).subscribe((result: Proyecto[]) => {
-        if (result) {
-          this.proyecto = result[0];
-          let d = new Date(this.proyecto.fechaInicio ?? new Date());
+    const idProyecto = Number(this._route.snapshot.params["id"] ?? 0);
+    this._proyectoService.getProject(idProyecto).subscribe((result: Proyecto[]) => {
+      if (result) {
+        this.proyecto = result[0];
+        let d = new Date(this.proyecto.fechaInicio ?? new Date());
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        this.proyecto.fechaInicio = d;
+        localStorage.setItem("proyectoEdit", JSON.stringify(this.proyecto.titulo ?? ""));
+        if (this.proyecto.estado == 0) {
+          this.terminado = true;
+          this.proyectoForm.get("fechaFin")?.setValidators(this.greaterThan("fechaInicio"));
+          d = new Date(this.proyecto.fechaFin ?? new Date());
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.proyecto.fechaInicio = d;
-          localStorage.setItem("proyectoEdit", JSON.stringify(this.proyecto.titulo ?? ""));
-          if (this.proyecto.estado == 0) {
-            this.terminado = true;
-            this.proyectoForm.get("fechaFin")?.setValidators(this.greaterThan("fechaInicio"));
-            d = new Date(this.proyecto.fechaFin ?? new Date());
-            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-            this.proyecto.fechaFin = d;
-            this.proyectoForm.disable();
-            this.proyectoForm.controls["fechaFin"]?.enable();
-            this.disableSelect = true;
-            this.button_text2 = "Reactivar proyecto";
-          }
-          this.getLineaInvestigacion();
-          this.getUsuariosPublicacion(this.proyecto.idProyecto ?? 0);
+          this.proyecto.fechaFin = d;
+          this.proyectoForm.disable();
+          this.proyectoForm.controls["fechaFin"]?.enable();
+          this.disableSelect = true;
+          this.button_text2 = "Reactivar proyecto";
         }
-      });
+        this.getLineaInvestigacion();
+        this.getUsuariosPublicacion(this.proyecto.idProyecto ?? 0);
+      }
     });
   }
 
@@ -265,15 +266,6 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
     this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result: FuenteFinanciamiento[]) => {
       if (result) {
         this.fuentesFinaciamiento = result;
-        this.getMoneda();
-      }
-    });
-  }
-
-  getMoneda(): void {
-    this._monedaService.getMonedas().subscribe((result: Moneda[]) => {
-      if (result) {
-        this.monedas = result;
         this.getUsuarios();
       }
     });

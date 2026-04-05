@@ -6,8 +6,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AdminUniversidadService } from "@app/shared/services/admin-universidad.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 
 interface StatusResponse {
   status?: number;
@@ -25,7 +25,7 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _universidadService = inject(UniversidadService);
+  private _adminUniversidadService = inject(AdminUniversidadService);
 
   universidad: Universidad;
   public universidadForm: FormGroup;
@@ -47,7 +47,7 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   ngOnInit() {}
 
   submitUniversidad(): void {
-    this._universidadService.addUniversidad(this.universidad).subscribe((result: StatusResponse) => {
+    this._adminUniversidadService.addUniversidad(this.universidad).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.universidadForm.markAsPristine();
         this.return();

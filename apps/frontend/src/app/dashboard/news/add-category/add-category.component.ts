@@ -6,8 +6,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AdminTipoNoticiaService } from "@app/shared/services/admin-tiponoticia.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 
 @Component({
   selector: "app-add-category",
@@ -20,7 +20,7 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   dialog = inject(MatDialog);
-  _tipoNoticiaService = inject(TipoNoticiaService);
+  private _adminTipoNoticiaService = inject(AdminTipoNoticiaService);
   private _snackBar = inject(MatSnackBar);
 
   category: TipoNoticia;
@@ -51,7 +51,7 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
 
   submitCategory(): void {
     if (this.categoryForm.valid) {
-      this._tipoNoticiaService.addCategory(this.category).subscribe((result: { status?: number }) => {
+      this._adminTipoNoticiaService.addCategory(this.category).subscribe((result: { status?: number }) => {
         if (result.status == 1) {
           this.categoryForm.markAsPristine();
           this.return();

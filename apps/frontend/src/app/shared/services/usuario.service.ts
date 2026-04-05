@@ -3,6 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 
+import type { MemberProfile } from "../models/member-profile";
 import { GLOBAL } from "./global";
 import { SessionService } from "./session.service";
 
@@ -129,5 +130,9 @@ export class UsuarioService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem(this.USER_KEY);
+  }
+
+  getProfile(dni: string): Observable<MemberProfile> {
+    return this.http.get<MemberProfile>(`${this.url}usuario/${dni}/profile`).pipe(catchError(this.handleError));
   }
 }

@@ -24,19 +24,14 @@ import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinancia
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { MethodsService } from "@app/shared/services/methods.service";
-import { MonedaService } from "@app/shared/services/moneda.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { SearchService } from "@app/shared/services/search.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
-import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 
@@ -56,22 +51,17 @@ export default class HomeComponent implements OnInit {
   _publicacionAutoresService = inject(PublicacionAutoresService);
   _proyectohasusuarioService = inject(UsuarioHasProyectoService);
   _usuarioService = inject(UsuarioService);
-  _revistaService = inject(RevistaService);
-  _universidadService = inject(UniversidadService);
+  lookup = inject(LookupService);
   _lineasInvestigacionServices = inject(LineasInvestigacionService);
   _proyectoServices = inject(ProyectoService);
-  _tiponoticiaService = inject(TipoNoticiaService);
   _noticiaService = inject(NoticiaService);
   _eventoService = inject(EventoService);
-  _tipotesisService = inject(TipoTesisService);
   _publicacionesService = inject(PublicacionService);
-  _tipoPublicacionService = inject(TipoPublicacionService);
   fb = inject(FormBuilder);
   _methodsService = inject(MethodsService);
   aboutusService = inject(AboutUsService);
   location = inject(Location);
   _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  _monedaService = inject(MonedaService);
   private _session = inject(SessionService);
   meta = inject(Meta);
   private titleService = inject(Title);
@@ -157,13 +147,9 @@ export default class HomeComponent implements OnInit {
   /* Get Publicacion */
 
   getTipoPublicacion(): void {
-    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res: any) => {
-      if (res) {
-        this.tipoPublicaciones = res;
-        this.progress = this.progress + this.augment;
-        this.getPublicaciones();
-      }
-    });
+    this.tipoPublicaciones = [...this.lookup.tiposPublicacion()];
+    this.progress = this.progress + this.augment;
+    this.getPublicaciones();
   }
 
   resumenes = 0;
@@ -210,15 +196,8 @@ export default class HomeComponent implements OnInit {
   }
 
   getTipoTesis(publicacion: any): void {
-    this._tipotesisService.getTiposTesis().subscribe((res: any) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          if (publicacion.tipoTesis_idTipoTesis == res[index].idTipoTesis) {
-            publicacion.tipoTesis = res[index].nombre;
-          }
-        }
-      }
-    });
+    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
+    if (found) publicacion.tipoTesis = found.nombre;
   }
 
   /* Fill Publicacion */
@@ -296,11 +275,8 @@ export default class HomeComponent implements OnInit {
   }
 
   getMoneda(proyecto: any): void {
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda ?? 0).subscribe((res: any) => {
-      if (res.length > 0) {
-        proyecto.moneda = res[0].simbolo;
-      }
-    });
+    const found = this.lookup.monedas().find((m) => m.idMoneda === proyecto.moneda_idMoneda);
+    if (found) proyecto.moneda = found.simbolo;
   }
 
   /* Fill Proyecto */
@@ -356,11 +332,9 @@ export default class HomeComponent implements OnInit {
   }
 
   getTipoNoticias(): void {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res: any) => {
-      this.progress = this.progress + this.augment;
-      this.tiponoticias = res;
-      this.getNoticias();
-    });
+    this.progress = this.progress + this.augment;
+    this.tiponoticias = [...this.lookup.tiposNoticia()];
+    this.getNoticias();
   }
 
   /* Fill Noticia */
@@ -433,21 +407,13 @@ export default class HomeComponent implements OnInit {
   }
 
   getRevista(publicacion: any): void {
-    this._revistaService.getRevista(publicacion.revista_idRevista ?? 0).subscribe((res: any) => {
-      if (res) {
-        if (res[0] != undefined) {
-          publicacion.revista = res[0].nombre;
-        }
-      }
-    });
+    const found = this.lookup.revistas().find((r) => r.idRevista === publicacion.revista_idRevista);
+    if (found) publicacion.revista = found.nombre;
   }
 
   getUniversidad(publicacion: any): void {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: any) => {
-      if (res && res[0] != undefined) {
-        publicacion.universidad = res[0].nombre;
-      }
-    });
+    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
+    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   /* getUsuarios */

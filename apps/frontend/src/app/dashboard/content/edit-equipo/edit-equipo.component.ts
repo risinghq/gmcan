@@ -12,7 +12,7 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Equipo } from "@app/shared/models/equipo";
 import { createEquipo } from "@app/shared/models/factories";
@@ -59,14 +59,12 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   getEvento(): void {
-    this._route.params.forEach((params: Params) => {
-      let idEquipo = params["id"];
-      this._equipoService.getEquipo(idEquipo).subscribe((result: Equipo[]) => {
-        if (result.length > 0) {
-          this.equipo = result[0];
-          localStorage.setItem("equipoEdit", JSON.stringify(this.equipo.nombre));
-        }
-      });
+    let idEquipo = this._route.snapshot.params["id"];
+    this._equipoService.getEquipo(idEquipo).subscribe((result: Equipo[]) => {
+      if (result.length > 0) {
+        this.equipo = result[0];
+        localStorage.setItem("equipoEdit", JSON.stringify(this.equipo.nombre));
+      }
     });
   }
 

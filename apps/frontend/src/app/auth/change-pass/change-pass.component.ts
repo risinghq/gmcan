@@ -76,17 +76,15 @@ export default class ChangePassComponent implements OnInit {
   }
 
   private extractAndVerifyToken(): void {
-    this.route.queryParams.subscribe((params) => {
-      const token = params["token"] as string | undefined;
+    const token = this.route.snapshot.queryParams["token"] as string | undefined;
 
-      if (!token) {
-        this.error = "Token de recuperación no válido o no encontrado en la URL.";
-        return;
-      }
+    if (!token) {
+      this.error = "Token de recuperación no válido o no encontrado en la URL.";
+      return;
+    }
 
-      this.resetToken = token;
-      this.verifyToken(token);
-    });
+    this.resetToken = token;
+    this.verifyToken(token);
   }
 
   private verifyToken(token: string): void {

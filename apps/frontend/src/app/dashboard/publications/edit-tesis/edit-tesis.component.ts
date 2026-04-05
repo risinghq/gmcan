@@ -19,28 +19,20 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { AuthorOption, SaveAuthorEntry } from "@app/shared/models/author";
 import type { AuthorFormRow } from "@app/shared/models/author-form";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createPublicacion } from "@app/shared/models/factories";
 import type { Publicacion } from "@app/shared/models/publicacion";
-import { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 import { AutosizeModule } from "ngx-autosize";
 import { startWith, map } from "rxjs/operators";
-
-interface TipoTesisItem {
-  idTipoTesis?: number;
-  nombre?: string;
-  nombreEN?: string;
-}
 
 @Component({
   selector: "app-edit-tesis",
@@ -72,17 +64,14 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   private _publicacionService = inject(PublicacionService);
   private _publicacionAutoresService = inject(PublicacionAutoresService);
+  lookup = inject(LookupService);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _universidadService = inject(UniversidadService);
-  private _tipotesisService = inject(TipoTesisService);
 
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
-  universidad: Universidad[] = [];
   url: string;
-  tipoTesis: TipoTesisItem[] = [];
   edit = true;
 
   options: AuthorOption[] = [];
@@ -108,39 +97,16 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getArticulo();
-  }
+    const idTesis = Number(this._route.snapshot.params["id"] ?? 0);
+    this._publicacionService.getEditView(idTesis).subscribe((view) => {
+      this.publicacion = view.publicacion;
+      const d = new Date(view.publicacion.fechaPublicacion ?? "");
+      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+      this.publicacion.fechaPublicacionDate = d;
 
-  getArticulo(): void {
-    this._route.params.forEach((params: Params) => {
-      const idTesis = Number(params["id"] ?? 0);
-      this._publicacionService.getPublication(idTesis).subscribe((result: any[]) => {
-        if (result) {
-          this.publicacion = result[0];
-          const d = new Date(result[0].fechaPublicacion ?? "");
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.publicacion.fechaPublicacionDate = d;
-          this.getUniversidades(idTesis);
-        }
-      });
-    });
-  }
-
-  getUniversidades(idPublicacion: number): void {
-    this._universidadService.getUniversidades().subscribe((result: Universidad[]) => {
-      if (result) {
-        this.universidad = result;
-        this.loadAuthors(idPublicacion);
-      }
-    });
-  }
-
-  loadAuthors(idPublicacion: number): void {
-    this._publicacionAutoresService.search().subscribe((allAuthors) => {
-      this.options = allAuthors;
-
-      this._publicacionAutoresService.getForPublication(idPublicacion).subscribe((authors) => {
-        const sorted = authors.toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+      this._publicacionAutoresService.search().subscribe((allAuthors) => {
+        this.options = allAuthors;
+        const sorted = view.autores.toSorted((a, b) => a.isPrincipal - b.isPrincipal);
         this.otrosAutores = sorted.map((a, i) => {
           const row: AuthorFormRow = {
             id: i + 1,
@@ -159,15 +125,7 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
           this.otrosAutores = [this.newCoAuthorRow()];
           this.setupFilters();
         }
-
-        this.getTipoTesis();
       });
-    });
-  }
-
-  getTipoTesis(): void {
-    this._tipotesisService.getTiposTesis().subscribe((result: TipoTesisItem[]) => {
-      if (result) this.tipoTesis = result;
     });
   }
 
@@ -236,16 +194,26 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
     const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
     this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
 
-    this._publicacionService.updatePublicacion(this.publicacion).subscribe((updateResponse: any) => {
-      if (updateResponse.status === 1) {
+    const data = {
+      titulo: this.publicacion.titulo ?? "",
+      resumen: this.publicacion.resumen,
+      resumenEN: this.publicacion.resumenEN,
+      DOI: this.publicacion.DOI,
+      fechaPublicacion: this.publicacion.fechaPublicacion,
+      nroRevista: this.publicacion.nroRevista,
+      tipoPublicacion_idTipoPublicacion: this.publicacion.tipoPublicacion_idTipoPublicacion ?? 2,
+      universidad_idUniversidad: this.publicacion.universidad_idUniversidad,
+      tipoTesis_idTipoTesis: this.publicacion.tipoTesis_idTipoTesis,
+    };
+
+    this._publicacionService.update(idPublicacion, data, this.buildSaveList()).subscribe((response) => {
+      if (response.status === 1) {
         if (this.fileData) {
-          this._publicacionService.uploadPublicacionFile(this.fileData, idPublicacion).subscribe(() => {});
+          this._publicacionService.uploadFile(idPublicacion, this.fileData).subscribe(() => {});
         }
-        this._publicacionAutoresService.saveForPublication(idPublicacion, this.buildSaveList()).subscribe(() => {
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Tesis actualizada exitosamente");
-        });
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Tesis actualizada exitosamente");
       }
     });
   }
@@ -264,14 +232,12 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
 
   erasePublicacion(): void {
     const idPublicacion = this.publicacion.idPublicacion ?? 0;
-    this._publicacionAutoresService.saveForPublication(idPublicacion, []).subscribe(() => {
-      this._publicacionService.deletePublicacion(idPublicacion).subscribe((deleteResponse: any) => {
-        if (deleteResponse.status === 1) {
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Tesis eliminada exitosamente");
-        }
-      });
+    this._publicacionService.delete(idPublicacion).subscribe((response) => {
+      if (response.status === 1) {
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Tesis eliminada exitosamente");
+      }
     });
   }
 

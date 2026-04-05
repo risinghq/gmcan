@@ -12,13 +12,14 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AdminUniversidadService } from "@app/shared/services/admin-universidad.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 
 @Component({
   selector: "app-edit-universidad",
@@ -32,7 +33,8 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _universidadService = inject(UniversidadService);
+  private _adminUniversidadService = inject(AdminUniversidadService);
+  private lookup = inject(LookupService);
   private _publicacionService = inject(PublicacionService);
 
   universidad: Universidad;
@@ -59,17 +61,17 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   notCanDo = false;
 
   getUniversidad(): void {
-    this._route.params.forEach((params: Params) => {
-      const idUniversidad = Number(params["id"] ?? 0);
-      this._universidadService.getUniversidad(idUniversidad).subscribe((result: unknown) => {
-        const universidades = result as Universidad[];
-        if (universidades) {
-          this.universidad = universidades[0];
-          localStorage.setItem("universidadEdit", JSON.stringify(this.universidad.nombre ?? ""));
-          this.getPublicacionUniversidad(idUniversidad);
-        }
-      });
-    });
+    const idUniversidad = Number(this._route.snapshot.params["id"] ?? 0);
+    const found = this.lookup.universidades().find((u) => u.idUniversidad === idUniversidad);
+    if (found) {
+      this.universidad = {
+        idUniversidad: found.idUniversidad,
+        nombre: found.nombre ?? "",
+        nombreEN: found.nombreEN ?? "",
+      };
+      localStorage.setItem("universidadEdit", JSON.stringify(this.universidad.nombre ?? ""));
+      this.getPublicacionUniversidad(idUniversidad);
+    }
   }
 
   getPublicacionUniversidad(idUniversidad: number): void {
@@ -81,7 +83,7 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   }
 
   submitUniversidad(): void {
-    this._universidadService.updateUniversidad(this.universidad).subscribe((result: { status?: number }) => {
+    this._adminUniversidadService.updateUniversidad(this.universidad).subscribe((result: { status?: number }) => {
       if (result.status === 1) {
         this.universidadForm.markAsPristine();
         this.return();
@@ -126,7 +128,7 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
 
   eraseNews(): void {
     if (this.notCanDo) {
-      this._universidadService
+      this._adminUniversidadService
         .deleteUniversidad(this.universidad.idUniversidad ?? 0)
         .subscribe((result: { status?: number }) => {
           if (result.status === 1) {

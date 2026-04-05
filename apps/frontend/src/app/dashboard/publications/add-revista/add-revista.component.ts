@@ -6,7 +6,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { RevistaService } from "@app/shared/services/revista.service";
+import { AdminRevistaService } from "@app/shared/services/admin-revista.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 @Component({
@@ -21,7 +21,7 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _revistaService = inject(RevistaService);
+  private _adminRevistaService = inject(AdminRevistaService);
 
   revista: Revista;
   public revistaForm: FormGroup;
@@ -45,7 +45,7 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
 
   submitRevista(): void {
-    this._revistaService.addRevista(this.revista).subscribe((result: { status?: number }) => {
+    this._adminRevistaService.addRevista(this.revista).subscribe((result: { status?: number }) => {
       if (result.status == 1) {
         this.revistaForm.markAsPristine();
         this.return();

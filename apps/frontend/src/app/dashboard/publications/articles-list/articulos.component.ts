@@ -21,9 +21,9 @@ import { Router } from "@angular/router";
 import { Publicacion } from "@app/shared/models/publicacion";
 import { Revista } from "@app/shared/models/revista";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
 @Component({
@@ -51,7 +51,7 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
 })
 export default class ArticulosComponent implements OnInit {
   _router = inject(Router);
-  _revistasService = inject(RevistaService);
+  lookup = inject(LookupService);
   private _publicacionService = inject(PublicacionService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
@@ -80,7 +80,10 @@ export default class ArticulosComponent implements OnInit {
   selectedTab = 0;
   ngOnInit(): void {
     this.selectedTab = this._tabState.articleTab();
-    this.getRevistas();
+    this.revistas = [...this.lookup.revistas()];
+    this.dataSource2 = new MatTableDataSource(this.revistas);
+    this.dataSource2.sort = this.sort2();
+    this.dataSource2.paginator = this.paginator2();
     this.getArticles();
   }
 
@@ -113,17 +116,6 @@ export default class ArticulosComponent implements OnInit {
   getAuthors(publicacion: Publicacion): void {
     this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
       publicacion.autor = authors;
-    });
-  }
-
-  getRevistas(): void {
-    this._revistasService.getRevistas().subscribe((res: Revista[]) => {
-      if (res) {
-        this.revistas = res;
-        this.dataSource2 = new MatTableDataSource(this.revistas);
-        this.dataSource2.sort = this.sort2();
-        this.dataSource2.paginator = this.paginator2();
-      }
     });
   }
 

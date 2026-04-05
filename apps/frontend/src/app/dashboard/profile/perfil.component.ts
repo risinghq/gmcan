@@ -11,15 +11,10 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { createUsuarioFull } from "@app/shared/models/factories";
-import { Genero } from "@app/shared/models/genero";
-import { Prefijo } from "@app/shared/models/prefijo";
-import { TipoMiembro } from "@app/shared/models/tipomiembro";
 import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { CommonService } from "@app/shared/services/common.service";
-import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { PrefijoService } from "@app/shared/services/prefijo.service";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -48,9 +43,7 @@ import { AutosizeModule } from "ngx-autosize";
 export default class PerfilComponent implements OnInit {
   formBuilder = inject(FormBuilder);
   _usuarioService = inject(UsuarioService);
-  _tipoMiembroService = inject(TipoMiembroService);
-  _prefijoService = inject(PrefijoService);
-  _generoService = inject(GeneroService);
+  lookup = inject(LookupService);
   private _snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
   private _commonService = inject(CommonService);
@@ -61,9 +54,15 @@ export default class PerfilComponent implements OnInit {
   url: string;
   member: UsuarioFull;
   public memberForm: FormGroup;
-  tipoMiembros: TipoMiembro[] = [];
-  prefijos: Prefijo[] = [];
-  generos: Genero[] = [];
+  get tipoMiembros() {
+    return this.lookup.tiposMiembro();
+  }
+  get prefijos() {
+    return this.lookup.prefijos();
+  }
+  get generos() {
+    return this.lookup.generos();
+  }
   button_text = "Actualizar información";
 
   constructor() {
@@ -114,41 +113,12 @@ export default class PerfilComponent implements OnInit {
           this.member.nombre = string[0];
           this.memberForm.controls["segundoNombre"].setValue(string[1]);
         }
-        this.getCargo(this.member);
-        this.getNivelAcademico(this.member);
-      }
-    });
-  }
-
-  getCargo(miembro: UsuarioFull): void {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res: (TipoMiembro & { nombreSingular?: string })[]) => {
-      if (res) {
-        this.tipoMiembros = res;
-        const index = res.findIndex((x: TipoMiembro) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
-        if (index !== -1) {
-          miembro.tipoMiembro = res[index].nombreSingular ?? "";
-        }
-      }
-    });
-  }
-
-  getNivelAcademico(miembro: UsuarioFull): void {
-    this._prefijoService.getPrefijos().subscribe((res: Prefijo[]) => {
-      if (res) {
-        this.prefijos = res;
-        const index = res.findIndex((x: Prefijo) => x.idPrefijo === miembro.prefijo_idPrefijo);
-        if (index !== -1) {
-          miembro.prefijo = res[index].nombre ?? "";
-        }
-        this.getGenero();
-      }
-    });
-  }
-
-  getGenero(): void {
-    this._generoService.getGeneros().subscribe((result: Genero[]) => {
-      if (result) {
-        this.generos = result;
+        const tipoMiembro = this.lookup
+          .tiposMiembro()
+          .find((t) => t.idTipoMiembro === this.member.tipoMiembro_idTipoMiembro);
+        if (tipoMiembro) this.member.tipoMiembro = tipoMiembro.nombreSingular;
+        const prefijo = this.lookup.prefijos().find((p) => p.idPrefijo === this.member.prefijo_idPrefijo);
+        if (prefijo) this.member.prefijo = prefijo.nombre;
       }
     });
   }

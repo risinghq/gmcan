@@ -19,18 +19,17 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { AuthorOption, SaveAuthorEntry } from "@app/shared/models/author";
 import type { AuthorFormRow } from "@app/shared/models/author-form";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createPublicacion } from "@app/shared/models/factories";
 import type { Publicacion } from "@app/shared/models/publicacion";
-import { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
@@ -66,28 +65,22 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   private _publicacionService = inject(PublicacionService);
   private _publicacionAutoresService = inject(PublicacionAutoresService);
+  lookup = inject(LookupService);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _revistaService = inject(RevistaService);
 
   publicacion: Publicacion;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
-  revista: Revista[] = [];
   url: string;
   edit = true;
 
-  // Principal author
   selectedUser = "";
   principalAuthor: AuthorOption | null = null;
   myControl = new FormControl<string>("", { nonNullable: true });
   options: AuthorOption[] = [];
   filteredOptions!: Observable<AuthorOption[]>;
-
-  // Co-authors
   otrosAutores: AuthorFormRow[] = [];
-
-  // File upload
   fileData: File | null = null;
 
   constructor() {
@@ -111,43 +104,21 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getArticulo();
-  }
+    const idArticulo = Number(this._route.snapshot.params["id"] ?? 0);
+    this._publicacionService.getEditView(idArticulo).subscribe((view) => {
+      this.publicacion = view.publicacion;
+      const d = new Date(view.publicacion.fechaPublicacion ?? "");
+      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+      this.publicacion.fechaPublicacionDate = d;
 
-  getArticulo(): void {
-    this._route.params.forEach((params: Params) => {
-      const idArticulo = Number(params["id"] ?? 0);
-      this._publicacionService.getPublication(idArticulo).subscribe((result: any[]) => {
-        if (result) {
-          this.publicacion = result[0];
-          const d = new Date(result[0].fechaPublicacion ?? "");
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.publicacion.fechaPublicacionDate = d;
-          this.getRevista(idArticulo);
-        }
-      });
-    });
-  }
+      this._publicacionAutoresService.search().subscribe((allAuthors) => {
+        this.options = allAuthors;
+        this.filteredOptions = this.myControl.valueChanges.pipe(
+          startWith(""),
+          map((value) => this.filterAuthors(value)),
+        );
 
-  getRevista(idPublicacion: number): void {
-    this._revistaService.getRevistas().subscribe((result: Revista[]) => {
-      if (result) {
-        this.revista = result;
-        this.loadAuthors(idPublicacion);
-      }
-    });
-  }
-
-  loadAuthors(idPublicacion: number): void {
-    this._publicacionAutoresService.search().subscribe((allAuthors) => {
-      this.options = allAuthors;
-      this.filteredOptions = this.myControl.valueChanges.pipe(
-        startWith(""),
-        map((value) => this.filterAuthors(value)),
-      );
-
-      this._publicacionAutoresService.getForPublication(idPublicacion).subscribe((authors) => {
-        const principal = authors.find((a) => a.isPrincipal === 0);
+        const principal = view.autores.find((a) => a.isPrincipal === 0);
         if (principal) {
           this.selectedUser = principal.nombre;
           this.principalAuthor = {
@@ -159,7 +130,9 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
           this.myControl.setValue(principal.nombre);
         }
 
-        const coAuthors = authors.filter((a) => a.isPrincipal > 0).toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+        const coAuthors = view.autores
+          .filter((a) => a.isPrincipal > 0)
+          .toSorted((a, b) => a.isPrincipal - b.isPrincipal);
         this.otrosAutores = coAuthors.map((a, i) => {
           const row: AuthorFormRow = {
             id: i + 1,
@@ -259,16 +232,25 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
     const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
     this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
 
-    this._publicacionService.updatePublicacion(this.publicacion).subscribe((updateResponse: any) => {
-      if (updateResponse.status === 1) {
+    const data = {
+      titulo: this.publicacion.titulo ?? "",
+      resumen: this.publicacion.resumen,
+      resumenEN: this.publicacion.resumenEN,
+      DOI: this.publicacion.DOI,
+      fechaPublicacion: this.publicacion.fechaPublicacion,
+      nroRevista: this.publicacion.nroRevista,
+      tipoPublicacion_idTipoPublicacion: this.publicacion.tipoPublicacion_idTipoPublicacion ?? 1,
+      revista_idRevista: this.publicacion.revista_idRevista,
+    };
+
+    this._publicacionService.update(idPublicacion, data, this.buildSaveList()).subscribe((response) => {
+      if (response.status === 1) {
         if (this.fileData) {
-          this._publicacionService.uploadPublicacionFile(this.fileData, idPublicacion).subscribe(() => {});
+          this._publicacionService.uploadFile(idPublicacion, this.fileData).subscribe(() => {});
         }
-        this._publicacionAutoresService.saveForPublication(idPublicacion, this.buildSaveList()).subscribe(() => {
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Artículo actualizado exitosamente");
-        });
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Artículo actualizado exitosamente");
       }
     });
   }
@@ -298,14 +280,12 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
 
   erasePublicacion(): void {
     const idPublicacion = this.publicacion.idPublicacion ?? 0;
-    this._publicacionAutoresService.saveForPublication(idPublicacion, []).subscribe(() => {
-      this._publicacionService.deletePublicacion(idPublicacion).subscribe((deleteResponse: any) => {
-        if (deleteResponse.status === 1) {
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Artículo eliminado exitosamente");
-        }
-      });
+    this._publicacionService.delete(idPublicacion).subscribe((response) => {
+      if (response.status === 1) {
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Artículo eliminado exitosamente");
+      }
     });
   }
 

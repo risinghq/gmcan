@@ -1,7 +1,9 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
+import { Observable } from "rxjs";
 
+import type { Noticia } from "../models/noticia";
 import { GLOBAL } from "./global";
 
 @Injectable({
@@ -32,14 +34,12 @@ export class NoticiaService {
     }
   }
 
-  getNoticia(idNoticia: number) {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
+  getNoticia(idNoticia: number): Observable<Noticia[]> {
+    const headers = new HttpHeaders({ "Content-Type": "application/json" });
     if (this.languagelocal == "es") {
-      return this.http.get(this.url + "noticia/get-noticia/" + idNoticia, { headers: headers });
+      return this.http.get<Noticia[]>(this.url + "noticia/get-noticia/" + idNoticia, { headers });
     } else {
-      return this.http.get(this.url + "noticia/get-noticia-en/" + idNoticia, { headers: headers });
+      return this.http.get<Noticia[]>(this.url + "noticia/get-noticia-en/" + idNoticia, { headers });
     }
   }
 

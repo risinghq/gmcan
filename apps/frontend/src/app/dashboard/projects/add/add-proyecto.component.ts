@@ -12,14 +12,13 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { createProyecto } from "@app/shared/models/factories";
 import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
 import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
-import { Moneda } from "@app/shared/models/moneda";
 import type { Proyecto } from "@app/shared/models/proyecto";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
-import { MonedaService } from "@app/shared/services/moneda.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { UsuarioService } from "@app/shared/services/usuario.service";
@@ -75,7 +74,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   private _usuarioService = inject(UsuarioService);
   private _lineaInvestigacionService = inject(LineasInvestigacionService);
   private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  private _monedaService = inject(MonedaService);
+  lookup = inject(LookupService);
   private _proyectoService = inject(ProyectoService);
   private _usuariohasproyecto = inject(UsuarioHasProyectoService);
   dialog = inject(MatDialog);
@@ -88,7 +87,9 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   fuentesFinaciamiento: FuenteFinanciamiento[] = [];
   proyecto: Proyecto;
   proyectoForm: FormGroup;
-  monedas: Moneda[] = [];
+  get monedas() {
+    return this.lookup.monedas();
+  }
   url: string;
 
   disableSelect = false;
@@ -134,15 +135,6 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result: FuenteFinanciamiento[]) => {
       if (result) {
         this.fuentesFinaciamiento = result;
-        this.getMoneda();
-      }
-    });
-  }
-
-  getMoneda(): void {
-    this._monedaService.getMonedas().subscribe((result: Moneda[]) => {
-      if (result) {
-        this.monedas = result;
         this.getUsuarios();
       }
     });

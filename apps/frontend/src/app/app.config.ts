@@ -5,13 +5,15 @@ import localeEsAr from "@angular/common/locales/es-AR";
 import localePy from "@angular/common/locales/es-PY";
 import localePt from "@angular/common/locales/pt";
 import {
+  APP_INITIALIZER,
   ApplicationConfig,
   LOCALE_ID,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from "@angular/core";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
-import { provideRouter } from "@angular/router";
+import { provideRouter, withComponentInputBinding } from "@angular/router";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
@@ -27,12 +29,18 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
     provideCharts(withDefaultRegisterables()),
     DatePipe,
     TitleCasePipe,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (lookup: LookupService) => () => lookup.load(),
+      deps: [LookupService],
+      multi: true,
+    },
     {
       provide: LOCALE_ID,
       deps: [SessionService],

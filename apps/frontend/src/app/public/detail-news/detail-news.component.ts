@@ -4,16 +4,16 @@ import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Meta, Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { createNoticia } from "@app/shared/models/factories";
 import type { Noticia } from "@app/shared/models/noticia";
 import type { Usuario } from "@app/shared/models/usuario";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
@@ -26,7 +26,7 @@ export default class DetailNewsComponent implements OnInit {
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
   _noticiaService = inject(NoticiaService);
-  _tipoNoticiaService = inject(TipoNoticiaService);
+  lookup = inject(LookupService);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   _previousService = inject(PreviousPageService);
@@ -94,35 +94,32 @@ export default class DetailNewsComponent implements OnInit {
   }
 
   getNoticia(): void {
-    this._route.params.forEach((params: Params) => {
-      const idNoticia = Number(params["id"]);
-      this._noticiaService.getNoticia(idNoticia).subscribe((res: any) => {
-        this.noticia = res[0];
-        const d = new Date(this.noticia.fechaPublicacion ?? "");
-        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.noticia.fechaPublicacion = this.datePipe.transform(d, "MM/dd/y", "es") ?? undefined;
-        this.datere = new Date(String(this.noticia.fechaPublicacion));
-        this.dia = this.datePipe.transform(this.datere, "dd") ?? "";
-        this.mes = this.datePipe.transform(this.datere, "MMMM") ?? "";
-        this.anio = this.datePipe.transform(this.datere, "y") ?? "";
-        this.meta.updateTag({ name: "title", content: String(this.noticia.titulo) });
-        this.meta.updateTag({ property: "og:title", content: String(this.noticia.titulo) });
-        this.titleService.setTitle(String(this.noticia.titulo));
-        const newsBody = document.getElementById("newsBody");
-        if (newsBody) {
-          newsBody.innerHTML = this.noticia.cuerpo ?? "";
-        }
-        this.getTipoNoticia(this.noticia.tipoNoticia_idtipoNoticia ?? 0);
-        this.getUsuario(this.noticia.autorPublicacion ?? "");
-      });
-      this.cargado = true;
+    const idNoticia = Number(this._route.snapshot.params["id"]);
+    this._noticiaService.getNoticia(idNoticia).subscribe((res: any) => {
+      this.noticia = res[0];
+      const d = new Date(this.noticia.fechaPublicacion ?? "");
+      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+      this.noticia.fechaPublicacion = this.datePipe.transform(d, "MM/dd/y", "es") ?? undefined;
+      this.datere = new Date(String(this.noticia.fechaPublicacion));
+      this.dia = this.datePipe.transform(this.datere, "dd") ?? "";
+      this.mes = this.datePipe.transform(this.datere, "MMMM") ?? "";
+      this.anio = this.datePipe.transform(this.datere, "y") ?? "";
+      this.meta.updateTag({ name: "title", content: String(this.noticia.titulo) });
+      this.meta.updateTag({ property: "og:title", content: String(this.noticia.titulo) });
+      this.titleService.setTitle(String(this.noticia.titulo));
+      const newsBody = document.getElementById("newsBody");
+      if (newsBody) {
+        newsBody.innerHTML = this.noticia.cuerpo ?? "";
+      }
+      this.getTipoNoticia(this.noticia.tipoNoticia_idtipoNoticia ?? 0);
+      this.getUsuario(this.noticia.autorPublicacion ?? "");
     });
+    this.cargado = true;
   }
 
   getTipoNoticia(idTipoNoticia: number): void {
-    this._tipoNoticiaService.getTipoNews(idTipoNoticia).subscribe((res: any) => {
-      this.noticia.nombreTipoNoticia = res[0].nombre;
-    });
+    const found = this.lookup.tiposNoticia().find((t) => t.idtipoNoticia === idTipoNoticia);
+    if (found) this.noticia.nombreTipoNoticia = found.nombre;
   }
 
   getUsuario(idUsuario: string): void {

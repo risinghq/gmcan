@@ -47,8 +47,8 @@
                 formControlName="revista_idRevista"
                 name="revista_idRevista"
               >
-                @for (revista of revista; track revista) {
-                  <mat-option [value]="revista.idRevista">{{ revista.nombre }}</mat-option>
+                @for (r of lookup.revistas(); track r) {
+                  <mat-option [value]="r.idRevista">{{ r.nombre }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>

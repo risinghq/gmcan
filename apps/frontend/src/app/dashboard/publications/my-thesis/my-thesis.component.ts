@@ -19,11 +19,9 @@ import {
 import { Router } from "@angular/router";
 import { Publicacion } from "@app/shared/models/publicacion";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 
@@ -50,15 +48,13 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 })
 export default class MyThesisComponent implements OnInit {
   _router = inject(Router);
-  _revistasService = inject(RevistaService);
+  lookup = inject(LookupService);
   private _publicacionService = inject(PublicacionService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
   private _publicacionAutoresService = inject(PublicacionAutoresService);
   private _usuarioService = inject(UsuarioService);
   _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
-  private _universidadService = inject(UniversidadService);
-  private _tipoTesisService = inject(TipoTesisService);
 
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
   dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
@@ -120,21 +116,13 @@ export default class MyThesisComponent implements OnInit {
   }
 
   getTipoThesis(publicacion: Publicacion): void {
-    this._tipoTesisService.getTipoTesis(publicacion.tipoTesis_idTipoTesis ?? 0).subscribe((res: unknown) => {
-      const data = res as { nombre?: string }[];
-      if (data) {
-        publicacion.tipoTesis = data[0]?.nombre ?? "";
-      }
-    });
+    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
+    if (found) publicacion.tipoTesis = found.nombre;
   }
 
   getSpeUniversidad(publicacion: Publicacion): void {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: unknown) => {
-      const data = res as { nombre?: string }[];
-      if (data) {
-        publicacion.universidad = data[0]?.nombre ?? "";
-      }
-    });
+    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
+    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   getAuthors(publicacion: Publicacion): void {

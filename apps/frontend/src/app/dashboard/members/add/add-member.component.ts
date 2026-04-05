@@ -12,18 +12,13 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { createUsuarioFull } from "@app/shared/models/factories";
-import { Genero } from "@app/shared/models/genero";
-import { Prefijo } from "@app/shared/models/prefijo";
-import { TipoMiembro } from "@app/shared/models/tipomiembro";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { UsuarioPermiso } from "@app/shared/models/usuariopermiso";
-import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PermisoService } from "@app/shared/services/permiso.service";
-import { PrefijoService } from "@app/shared/services/prefijo.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { AutosizeModule } from "ngx-autosize";
@@ -58,9 +53,7 @@ interface PermisoItem {
 export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
   _usuarioService = inject(UsuarioService);
-  _generoService = inject(GeneroService);
-  _tipoMiembroService = inject(TipoMiembroService);
-  _prefijoService = inject(PrefijoService);
+  lookup = inject(LookupService);
   _permisosService = inject(PermisoService);
   _usuarioPermisoService = inject(UsuarioHasPermisoService);
   private _snackBar = inject(MatSnackBar);
@@ -69,9 +62,15 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   public memberForm: FormGroup;
   member: UsuarioFull;
-  generos: Genero[] = [];
-  tipoMiembros: TipoMiembro[] = [];
-  prefijos: Prefijo[] = [];
+  get generos() {
+    return this.lookup.generos();
+  }
+  get tipoMiembros() {
+    return this.lookup.tiposMiembro();
+  }
+  get prefijos() {
+    return this.lookup.prefijos();
+  }
   usuarioPermiso: UsuarioPermiso = {} as UsuarioPermiso;
   listaPermisos: Array<number> = [];
   hide = true;
@@ -106,45 +105,11 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getGenero();
+    this._permisosService.getPermisos().subscribe((_res: PermisoItem[]) => {});
   }
 
   isDirty(): boolean {
     return this.memberForm.dirty;
-  }
-
-  getGenero(): void {
-    this._generoService.getGeneros().subscribe((result: Genero[]) => {
-      if (result) {
-        this.generos = result;
-        this.getCargo();
-      }
-    });
-  }
-
-  getCargo(): void {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembro[]) => {
-      if (res) {
-        this.tipoMiembros = res;
-        this.getNivelAcademico();
-      }
-    });
-  }
-
-  getNivelAcademico(): void {
-    this._prefijoService.getPrefijos().subscribe((res: Prefijo[]) => {
-      if (res) {
-        this.prefijos = res;
-        this.getPermisos();
-      }
-    });
-  }
-
-  getPermisos(): void {
-    this._permisosService.getPermisos().subscribe((res: PermisoItem[]) => {
-      if (res) {
-      }
-    });
   }
 
   adHono = 0;
@@ -168,7 +133,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   addMember(): void {
     if (this.memberForm.valid) {
       if (this.member.fechaNacimientoDate) {
-        const momentDate = new Date(this.member.fechaNacimientoDate); // Replace event.value with your date value
+        const momentDate = new Date(this.member.fechaNacimientoDate);
         const formattedDate = new Date(momentDate).toLocaleDateString("sv");
         this.member.fechaNacimiento = formattedDate;
       } else {
@@ -199,10 +164,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
                   this.addPermisos(res.user);
                 }
                 if (this.fileData) {
-                  this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((_res: unknown) => {
-                    if (res) {
-                    }
-                  });
+                  this._usuarioService.uploadUsuarioFoto(this.fileData, res.user).subscribe((_res: unknown) => {});
                 }
                 this.openSnackBar("Miembro agregado exitosamente", undefined);
                 this.memberForm.markAsPristine();
@@ -252,7 +214,6 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   preview(): void {
-    // Show preview
     if (!this.fileData) {
       return;
     }

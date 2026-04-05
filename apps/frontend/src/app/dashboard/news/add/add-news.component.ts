@@ -25,13 +25,12 @@ import { DialogData } from "@app/shared/models/dialogdata";
 import { createNoticiaFull } from "@app/shared/models/factories";
 import { Languages } from "@app/shared/models/languages";
 import type { NoticiaFull } from "@app/shared/models/noticiafull";
-import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { Usuario } from "@app/shared/models/usuario";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
@@ -86,14 +85,16 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   _noticiaService = inject(NoticiaService);
   private _snackBar = inject(MatSnackBar);
-  private _tipoNoticiaService = inject(TipoNoticiaService);
+  lookup = inject(LookupService);
   private _usuarioService = inject(UsuarioService);
 
   public Editor = ClassicEditor;
   url: string;
   noticia: NoticiaFull;
   public newsForm: FormGroup;
-  categorias: TipoNoticia[] = [];
+  get categorias() {
+    return this.lookup.tiposNoticia();
+  }
   autores: Usuario[] = [];
   button_text = "Publicar noticia";
   button_text2 = "Guardar sin publicar";
@@ -114,20 +115,11 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getCategorias();
+    this.getAuthors();
   }
 
   isDirty(): boolean {
     return this.newsForm.dirty;
-  }
-
-  getCategorias(): void {
-    this._tipoNoticiaService.getTipoNoticia().subscribe((result: TipoNoticia[]) => {
-      if (result) {
-        this.categorias = result;
-      }
-      this.getAuthors();
-    });
   }
 
   getAuthors(): void {
@@ -184,9 +176,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   private previewDialog?: MatDialogRef<DialogPreview>;
 
   previewNews(value: number): void {
-    const indexCat = this.categorias.findIndex(
-      (x: TipoNoticia) => x.idtipoNoticia === this.noticia.tipoNoticia_idtipoNoticia,
-    );
+    const indexCat = this.categorias.findIndex((x) => x.idtipoNoticia === this.noticia.tipoNoticia_idtipoNoticia);
     const indexAut = this.autores.findIndex((x: Usuario) => x.DNI === this.noticia.autorPublicacion);
     const d = new Date(this.noticia.fechaPublicacionDate ?? new Date());
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());

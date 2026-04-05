@@ -12,9 +12,9 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { Noticia } from "@app/shared/models/noticia";
 import { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import {
   NgbPagination,
@@ -48,7 +48,7 @@ export default class MainNewsComponent implements OnInit {
   datePipe = inject(DatePipe);
   _noticiaService = inject(NoticiaService);
   _route = inject(ActivatedRoute);
-  _tiponoticiaService = inject(TipoNoticiaService);
+  lookup = inject(LookupService);
   location = inject(Location);
   _router = inject(Router);
   _usuarioService = inject(UsuarioService);
@@ -77,7 +77,8 @@ export default class MainNewsComponent implements OnInit {
     this.language = this._session.getLanguageData<any>() ?? {};
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.categoryNombre = this.language.newsText[0].categoryTitle;
-    this.getTipoNoticias();
+    this.tiponoticias = this.lookup.tiposNoticia().toSorted((a, b) => ((a.nombre ?? "") > (b.nombre ?? "") ? 1 : -1));
+    this.getNoticia();
   }
 
   progress = 0;
@@ -140,19 +141,10 @@ export default class MainNewsComponent implements OnInit {
     this.getNoticia();
     this.page = 1;
   }
-  getTipoNoticias(): void {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res: TipoNoticia[]) => {
-      res.sort((a: TipoNoticia, b: TipoNoticia) => ((a.nombre ?? "") > (b.nombre ?? "") ? 1 : -1));
-      this.tiponoticias = res;
-      this.getNoticia();
-    });
-  }
-
   detalleNoticia(noticia: Noticia): void {
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll();
-    this.getTipoNoticias();
   }
   scroll(): void {
     const el = document.getElementById("main-toolbar");

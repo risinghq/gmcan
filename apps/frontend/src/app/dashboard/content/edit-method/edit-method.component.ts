@@ -12,7 +12,7 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { Languages } from "@app/shared/models/languages";
 import type { Method } from "@app/shared/models/method";
@@ -71,14 +71,12 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   }
 
   getMethod(): void {
-    this._route.params.forEach((params: Params) => {
-      let idMethod = params["id"];
-      this._methodService.getMethod(idMethod).subscribe((result: Method[]) => {
-        if (result.length > 0) {
-          this.metodo = result[0];
-          localStorage.setItem("metodoEdit", JSON.stringify(this.metodo.nombre));
-        }
-      });
+    let idMethod = this._route.snapshot.params["id"];
+    this._methodService.getMethod(idMethod).subscribe((result: Method[]) => {
+      if (result.length > 0) {
+        this.metodo = result[0];
+        localStorage.setItem("metodoEdit", JSON.stringify(this.metodo.nombre));
+      }
     });
   }
 

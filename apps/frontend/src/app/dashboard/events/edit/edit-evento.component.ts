@@ -17,7 +17,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Evento } from "@app/shared/models/eventos";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -164,15 +164,13 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   }
 
   getEvento(): void {
-    this._route.params.forEach((params: Params) => {
-      let idEvento = params["id"];
-      this._eventoService.getEvento(idEvento).subscribe((result: Evento[]) => {
-        if (result) {
-          this.evento = result[0];
-          localStorage.setItem("eventoEdit", JSON.stringify(this.evento.nombre));
-          this.getPublicacionEvento(idEvento);
-        }
-      });
+    let idEvento = this._route.snapshot.params["id"];
+    this._eventoService.getEvento(idEvento).subscribe((result: Evento[]) => {
+      if (result) {
+        this.evento = result[0];
+        localStorage.setItem("eventoEdit", JSON.stringify(this.evento.nombre));
+        this.getPublicacionEvento(idEvento);
+      }
     });
   }
 

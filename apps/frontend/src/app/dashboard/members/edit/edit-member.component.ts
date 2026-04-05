@@ -19,19 +19,17 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Params, Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createUsuarioFull } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { UsuarioPermiso } from "@app/shared/models/usuariopermiso";
-import { GeneroService } from "@app/shared/services/genero.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
-import { PrefijoService } from "@app/shared/services/prefijo.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { AutosizeModule } from "ngx-autosize";
@@ -40,29 +38,6 @@ interface StatusResponse {
   status?: number;
   user?: number;
 }
-
-interface TipoMiembroOption {
-  idTipoMiembro?: number;
-  nombreSingular?: string;
-  nombre?: string;
-}
-
-interface PrefijoOption {
-  idPrefijo?: number;
-  nombre?: string;
-}
-
-interface GeneroOption {
-  idGenero?: number;
-  nombre?: string;
-}
-
-/*
-interface PermisoResponse {
-  permiso_idPermiso?: number;
-  usuario_DNI?: string;
-}
-*/
 
 @Component({
   selector: "app-edit-member",
@@ -92,9 +67,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   _usuarioService = inject(UsuarioService);
-  _tipoMiembroService = inject(TipoMiembroService);
-  _prefijoService = inject(PrefijoService);
-  _generoService = inject(GeneroService);
+  lookup = inject(LookupService);
   _usuarioPermisoService = inject(UsuarioHasPermisoService);
   private _snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
@@ -104,9 +77,15 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   url: string;
   public memberForm: FormGroup;
   member: UsuarioFull = createUsuarioFull();
-  tipoMiembros: TipoMiembroOption[] = [];
-  prefijos: PrefijoOption[] = [];
-  generos: GeneroOption[] = [];
+  get tipoMiembros() {
+    return this.lookup.tiposMiembro();
+  }
+  get prefijos() {
+    return this.lookup.prefijos();
+  }
+  get generos() {
+    return this.lookup.generos();
+  }
   listaPermisos: number[] = [];
   button_text = "Actualizar información";
   permisosExistentes: UsuarioPermiso[] = [];
@@ -151,67 +130,43 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   oldPassword = "";
 
   getUser(): void {
-    this._route.params.forEach((params: Params) => {
-      const DNI = String(params["id"] ?? "");
-      this._usuarioService.getFullUser(DNI).subscribe((result: UsuarioFull[]) => {
-        if (result.length > 0) {
-          this.memberForm.controls["DNI"].disable();
-          this.member = result[0];
-          this.oldEmail = this.member.correo ?? "";
-          this.oldPassword = this.member.password ?? "";
-          this.memberForm.controls["confirmPassword"].setValue(this.member.password);
-          const d = new Date(this.member.fechaNacimiento ?? new Date());
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.member.fechaNacimientoDate = d;
-          if (this.member.apellidoMaterno) {
-            this.member.nombreCompleto =
-              this.member.nombre + " " + this.member.apellidoPaterno + " " + this.member.apellidoMaterno;
-          } else {
-            this.member.nombreCompleto = this.member.nombre + " " + this.member.apellidoPaterno;
-          }
-          localStorage.setItem("miembroEdit", JSON.stringify(this.member.nombreCompleto));
-          if ((this.member.nombre ?? "").includes(" ")) {
-            const parts = (this.member.nombre ?? "").split(" ");
-            this.member.nombre = parts[0] ?? "";
-            this.memberForm.controls["segundoNombre"].setValue(parts[1] ?? "");
-          }
-          this.getCargo(this.member);
-          this.getNivelAcademico(this.member);
+    const DNI = String(this._route.snapshot.params["id"] ?? "");
+    this._usuarioService.getFullUser(DNI).subscribe((result: UsuarioFull[]) => {
+      if (result.length > 0) {
+        this.memberForm.controls["DNI"].disable();
+        this.member = result[0];
+        this.oldEmail = this.member.correo ?? "";
+        this.oldPassword = this.member.password ?? "";
+        this.memberForm.controls["confirmPassword"].setValue(this.member.password);
+        const d = new Date(this.member.fechaNacimiento ?? new Date());
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        this.member.fechaNacimientoDate = d;
+        if (this.member.apellidoMaterno) {
+          this.member.nombreCompleto =
+            this.member.nombre + " " + this.member.apellidoPaterno + " " + this.member.apellidoMaterno;
+        } else {
+          this.member.nombreCompleto = this.member.nombre + " " + this.member.apellidoPaterno;
         }
-      });
-    });
-  }
-
-  getCargo(miembro: UsuarioFull): void {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembroOption[]) => {
-      if (res) {
-        this.tipoMiembros = res;
-        const index = res.findIndex((x: TipoMiembroOption) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
-        if (index != -1) {
-          miembro.tipoMiembro = res[index].nombre ?? res[index].nombreSingular ?? "";
+        localStorage.setItem("miembroEdit", JSON.stringify(this.member.nombreCompleto));
+        if ((this.member.nombre ?? "").includes(" ")) {
+          const parts = (this.member.nombre ?? "").split(" ");
+          this.member.nombre = parts[0] ?? "";
+          this.memberForm.controls["segundoNombre"].setValue(parts[1] ?? "");
         }
-      }
-    });
-  }
 
-  getNivelAcademico(miembro: UsuarioFull): void {
-    this._prefijoService.getPrefijos().subscribe((res: PrefijoOption[]) => {
-      if (res) {
-        this.prefijos = res;
-        const index = res.findIndex((x: PrefijoOption) => x.idPrefijo === miembro.prefijo_idPrefijo);
-        if (index != -1) {
-          miembro.prefijo = res[index].nombre ?? "";
+        // Resolve display values from lookup signals
+        const tipoMiembro = this.lookup
+          .tiposMiembro()
+          .find((t) => t.idTipoMiembro === this.member.tipoMiembro_idTipoMiembro);
+        if (tipoMiembro) {
+          this.member.tipoMiembro = tipoMiembro.nombre ?? tipoMiembro.nombreSingular;
         }
-        this.getGenero(miembro);
-      }
-    });
-  }
+        const prefijo = this.lookup.prefijos().find((p) => p.idPrefijo === this.member.prefijo_idPrefijo);
+        if (prefijo) {
+          this.member.prefijo = prefijo.nombre;
+        }
 
-  getGenero(miembro: UsuarioFull): void {
-    this._generoService.getGeneros().subscribe((result: GeneroOption[]) => {
-      if (result) {
-        this.generos = result;
-        this.getPermisos(miembro);
+        this.getPermisos(this.member);
       }
     });
   }
@@ -341,30 +296,20 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
                       password: this.member.password ?? "",
                       correo: this.member.correo ?? "",
                     })
-                    .subscribe((passwordResult: unknown) => {
-                      if (passwordResult) {
-                      }
-                    });
+                    .subscribe((_passwordResult: unknown) => {});
                 }
                 if (this.fileData) {
                   if (this.member.foto == null) {
                     this._usuarioService
                       .uploadUsuarioFoto(this.fileData, String(res.user ?? ""))
-                      .subscribe((uploadResult: unknown) => {
-                        if (uploadResult) {
-                        }
-                      });
+                      .subscribe((_uploadResult: unknown) => {});
                   } else {
-                    this._usuarioService.deleteImage(String(this.member.foto)).subscribe((deleteResult: unknown) => {
-                      if (deleteResult) {
-                      }
-                    });
+                    this._usuarioService
+                      .deleteImage(String(this.member.foto))
+                      .subscribe((_deleteResult: unknown) => {});
                     this._usuarioService
                       .uploadUsuarioFoto(this.fileData, String(res.user ?? ""))
-                      .subscribe((uploadResult: unknown) => {
-                        if (uploadResult) {
-                        }
-                      });
+                      .subscribe((_uploadResult: unknown) => {});
                   }
                 }
                 this.openSnackBar("Miembro actualizado exitosamente");
@@ -398,18 +343,13 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     if (permisoEx) {
       this._usuarioPermisoService
         .deletePermisoUsuario({ usuario_DNI: permisoEx.usuario_DNI ?? "" })
-        .subscribe((deleteResult: unknown) => {
-          if (deleteResult) {
-          }
+        .subscribe((_deleteResult: unknown) => {
           for (let index = 0; index < this.listaPermisos.length; index++) {
             let permiso = {
               usuario_DNI: this.member.DNI ?? "",
               permiso_idPermiso: this.listaPermisos[index],
             };
-            this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((addResult: unknown) => {
-              if (addResult) {
-              }
-            });
+            this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((_addResult: unknown) => {});
           }
         });
     } else {
@@ -418,10 +358,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
           usuario_DNI: this.member.DNI ?? "",
           permiso_idPermiso: this.listaPermisos[index],
         };
-        this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((addResult: unknown) => {
-          if (addResult) {
-          }
-        });
+        this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((_addResult: unknown) => {});
       }
     }
   }
@@ -436,7 +373,6 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   preview(): void {
-    // Show preview
     if (!this.fileData) {
       return;
     }
@@ -497,10 +433,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     for (let index = 0; index < this.permisosExistentes.length; index++) {
       this._usuarioPermisoService
         .deletePermisoUsuario({ usuario_DNI: this.permisosExistentes[index].usuario_DNI ?? "" })
-        .subscribe((deleteResult: unknown) => {
-          if (deleteResult) {
-          }
-        });
+        .subscribe((_deleteResult: unknown) => {});
       if (index == this.permisosExistentes.length - 1) {
         end = true;
       }
@@ -515,10 +448,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
 
   eraseUser(): void {
     if (this.member.foto)
-      this._usuarioService.deleteImage(String(this.member.foto)).subscribe((deleteImageResult: unknown) => {
-        if (deleteImageResult) {
-        }
-      });
+      this._usuarioService.deleteImage(String(this.member.foto)).subscribe((_deleteImageResult: unknown) => {});
     this._usuarioService.deleteUsuario({ DNI: String(this.member.DNI ?? "") }).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.memberForm.markAsPristine();

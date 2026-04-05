@@ -9,7 +9,7 @@ import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion"
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
-import { MonedaService } from "@app/shared/services/moneda.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
@@ -38,7 +38,7 @@ export default class LinesInvestigationComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  _monedaService = inject(MonedaService);
+  lookup = inject(LookupService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
 
@@ -140,11 +140,8 @@ export default class LinesInvestigationComponent implements OnInit {
   }
 
   getMoneda(proyecto: any): void {
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda ?? 0).subscribe((res: any) => {
-      if (res.length > 0) {
-        proyecto.moneda = res[0].simbolo;
-      }
-    });
+    const found = this.lookup.monedas().find((m: { idMoneda: number }) => m.idMoneda === proyecto.moneda_idMoneda);
+    if (found) proyecto.moneda = (found as { simbolo: string }).simbolo;
   }
 
   getUsuarioHasProyecto(proyecto: any): void {

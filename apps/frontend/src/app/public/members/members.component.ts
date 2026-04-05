@@ -9,9 +9,8 @@ import NewsComponent from "@app/shared/components/news/news.component";
 import { TipoMiembro } from "@app/shared/models/tipomiembro";
 import { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { GLOBAL } from "@app/shared/services/global";
-import { PrefijoService } from "@app/shared/services/prefijo.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
@@ -24,8 +23,7 @@ export default class MembersComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   _usuarioService = inject(UsuarioService);
-  _prefijoService = inject(PrefijoService);
-  _tipoMiembroService = inject(TipoMiembroService);
+  lookup = inject(LookupService);
   private _session = inject(SessionService);
   location = inject(Location);
   private titleService = inject(Title);
@@ -46,67 +44,33 @@ export default class MembersComponent implements OnInit {
     this.language = this._session.getLanguageData<any>() ?? {};
     this.titleService.setTitle("GMCAN | " + this.language.members);
     this.cargado = true;
-    this.getTipoMiembros();
+    this.tipoMiembros = this.lookup.tiposMiembro().map((t) => Object.assign({}, t, { miembros: [] as UsuarioFull[] }));
+    this.getUsuarios();
   }
 
-  getUsuarios(tipoMiembro: TipoMiembro): void {
+  getUsuarios(): void {
     this._usuarioService.getUsuarios().subscribe((res: UsuarioFull[]) => {
       if (res) {
         this.usuarios = res;
-        for (let index = 0; index < this.usuarios.length; index++) {
-          if (this.usuarios[index].foto != null) {
-            this.usuarios[index].foto = this.url + "usuario/get-image-usuario/" + this.usuarios[index].foto;
+        const prefijos = this.lookup.prefijos();
+        for (const usuario of this.usuarios) {
+          if (usuario.foto != null) {
+            usuario.foto = this.url + "usuario/get-image-usuario/" + usuario.foto;
           } else {
-            this.usuarios[index].foto = "../../assets/img/user.png";
+            usuario.foto = "../../assets/img/user.png";
           }
+          const prefijo = prefijos.find(
+            (p) => p.idPrefijo === usuario.prefijo_idPrefijo && p.nombre !== "Ninguno" && p.nombre !== "Bachiller",
+          );
+          if (prefijo) usuario.prefijo = prefijo.nombre;
         }
-        this.getPrefijos(tipoMiembro);
-      }
-    });
-  }
-
-  getTipoMiembros(): void {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembro[]) => {
-      if (res) {
-        this.tipoMiembros = res;
-        for (let index = 0; index < this.tipoMiembros.length; index++) {
-          this.tipoMiembros[index].miembros = [];
-          this.getUsuarios(this.tipoMiembros[index]);
-        }
-      }
-    });
-  }
-
-  getPrefijos(tipoMiembro: TipoMiembro): void {
-    this._prefijoService.getPrefijos().subscribe((res: any[]) => {
-      if (res) {
         this.allCharged = true;
-        for (let index = 0; index < this.usuarios.length; index++) {
-          for (let j = 0; j < res.length; j++) {
-            if (
-              this.usuarios[index].prefijo_idPrefijo == res[j].idPrefijo &&
-              res[j].nombre != "Ninguno" &&
-              res[j].nombre != "Bachiller"
-            ) {
-              this.usuarios[index].prefijo = res[j].nombre;
-            }
-          }
+        for (const tipoMiembro of this.tipoMiembros) {
+          tipoMiembro.miembros = this.usuarios.filter(
+            (u) => u.tipoMiembro_idTipoMiembro === tipoMiembro.idTipoMiembro && u.estado === 1,
+          );
         }
-        for (let j = 0; j < this.usuarios.length; j++) {
-          if (
-            tipoMiembro.idTipoMiembro == this.usuarios[j].tipoMiembro_idTipoMiembro &&
-            this.usuarios[j].estado === 1
-          ) {
-            tipoMiembro.miembros ??= [];
-            tipoMiembro.miembros.push(this.usuarios[j]);
-          } else if (
-            this.usuarios[j].estado != 1 &&
-            // Si el usuario tiene estado 2, es inactivo si es 3 es in memoriam
-            this.usuariosNoActivos.findIndex((x: UsuarioFull) => x.DNI === this.usuarios[j].DNI) == -1
-          ) {
-            this.usuariosNoActivos.push(this.usuarios[j]);
-          }
-        }
+        this.usuariosNoActivos = this.usuarios.filter((u) => u.estado !== 1);
       }
     });
   }

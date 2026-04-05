@@ -5,25 +5,19 @@ import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import type { PublicationAuthor } from "@app/shared/models/author";
 import { createUsuarioFull } from "@app/shared/models/factories";
+import type { MemberProfile } from "@app/shared/models/member-profile";
 import type { Publicacion } from "@app/shared/models/publicacion";
 import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import type { UsuarioFull } from "@app/shared/models/usuarioFull";
-import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { PrefijoService } from "@app/shared/services/prefijo.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
-import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import {
   NgbPagination,
@@ -54,15 +48,8 @@ export default class DetailMemberComponent implements OnInit {
   datePipe = inject(DatePipe);
   _usuarioService = inject(UsuarioService);
   _publicacionAutoresService = inject(PublicacionAutoresService);
-  _publicacionService = inject(PublicacionService);
-  _revistaService = inject(RevistaService);
-  _universidadService = inject(UniversidadService);
+  lookup = inject(LookupService);
   _previousService = inject(PreviousPageService);
-  _prefijoService = inject(PrefijoService);
-  _tipoMiembroService = inject(TipoMiembroService);
-  _tipoPublicacionService = inject(TipoPublicacionService);
-  _tipotesisService = inject(TipoTesisService);
-  _eventoService = inject(EventoService);
   private _session = inject(SessionService);
   location = inject(Location);
   private titleService = inject(Title);
@@ -153,72 +140,35 @@ export default class DetailMemberComponent implements OnInit {
 
   searchUsuario(): void {
     this.publicaciones = [];
-    this._route.params.forEach((params: Params) => {
-      const DNI = params["id"];
-      this._usuarioService.getUser(DNI).subscribe((res: any) => {
-        if (res) {
-          this.usuario = res[0];
-          if (this.usuario.estado === 1) {
-            this.usuario.active = this.language.detailMemberText[0].activeMember;
-          } else {
-            this.usuario.active = this.language.detailMemberText[0].oldMember;
-          }
-          this.titleService.setTitle("GMCAN | " + this.usuario.nombre + " " + this.usuario.apellidoPaterno);
-          this.loadPublications(this.usuario.DNI ?? "");
-          this.getPrefijos();
-          this.getTipoMiembros();
+    const DNI = this._route.snapshot.params["id"];
+    this._usuarioService.getProfile(DNI).subscribe((res: MemberProfile) => {
+      if (res?.usuario) {
+        this.usuario = res.usuario;
+        if (this.usuario.estado === 1) {
+          this.usuario.active = this.language.detailMemberText[0].activeMember;
+        } else {
+          this.usuario.active = this.language.detailMemberText[0].oldMember;
         }
-      });
-    });
-  }
-
-  loadPublications(DNI: string): void {
-    this._publicacionAutoresService.getByUser(DNI).subscribe((res) => {
-      if (res.length > 0) {
-        for (const item of res) {
-          this.getPublicacion(item.publicacion_idPublicacion);
+        this.titleService.setTitle("GMCAN | " + this.usuario.nombre + " " + this.usuario.apellidoPaterno);
+        this.publicaciones = [...(res.publicaciones ?? [])];
+        for (const publicacion of this.publicaciones) {
+          this.fillPublicacion(publicacion);
         }
+        this.cargado = true;
+        this.getPrefijos();
+        this.getTipoMiembros();
       }
     });
   }
 
   getTipoPublicacion() {
-    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res: any) => {
-      this.tipoPublicaciones = [];
-      if (res) {
-        this.tipoPublicaciones = res;
-        this.searchUsuario();
-      }
-      this.cargado = true;
-    });
+    this.tipoPublicaciones = this.lookup.tiposPublicacion().map((t) => Object.assign({}, t) as TipoPublicacion);
+    this.searchUsuario();
   }
 
-  getPublicacion(idPublicacion: number) {
-    this._publicacionService.getPublication(idPublicacion).subscribe((res: any) => {
-      if (res.length > 0) {
-        for (const pub of res) {
-          if (this.publicaciones.findIndex((x) => x.idPublicacion === pub.idPublicacion) === -1) {
-            this.publicaciones.push(pub);
-          }
-        }
-        for (const publicacion of this.publicaciones) {
-          this.fillPublicacion(publicacion);
-        }
-        this.cargado = true;
-      }
-    });
-  }
-
-  getTipoTesis(publicacion: any) {
-    this._tipotesisService.getTiposTesis().subscribe((res: any) => {
-      if (res.length > 0) {
-        for (const tipo of res) {
-          if (publicacion.tipoTesis_idTipoTesis == tipo.idTipoTesis) {
-            publicacion.tipoTesis = tipo.nombre;
-          }
-        }
-      }
-    });
+  getTipoTesis(publicacion: Publicacion) {
+    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
+    if (found) publicacion.tipoTesis = found.nombre;
   }
 
   fillPublicacion(publicacion: Publicacion) {
@@ -238,34 +188,27 @@ export default class DetailMemberComponent implements OnInit {
     this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
       publicacion.autor = authors;
     });
-    this.getEvento(publicacion.evento_idEvento ?? 0, publicacion);
+    this.getEvento(publicacion);
     this.getTipoTesis(publicacion);
   }
 
-  getEvento(idEvento: number, publicacion: any) {
-    this._eventoService.getEvento(idEvento).subscribe((res: any) => {
-      if (res.length > 0) {
-        publicacion.evento = res[0].nombre;
-        publicacion.ciudad = res[0].ciudad;
-        publicacion.pais = res[0].pais;
-      }
-    });
+  getEvento(publicacion: Publicacion) {
+    const found = this.lookup.eventos().find((e) => e.idEvento === publicacion.evento_idEvento);
+    if (found) {
+      publicacion.evento = found.nombre;
+      publicacion.ciudad = found.ciudad ?? "";
+      publicacion.pais = found.pais ?? "";
+    }
   }
 
-  getRevista(publicacion: any) {
-    this._revistaService.getRevista(publicacion.revista_idRevista ?? 0).subscribe((res: any) => {
-      if (res && res[0] != undefined) {
-        publicacion.revista = res[0].nombre;
-      }
-    });
+  getRevista(publicacion: Publicacion) {
+    const found = this.lookup.revistas().find((r) => r.idRevista === publicacion.revista_idRevista);
+    if (found) publicacion.revista = found.nombre;
   }
 
-  getUniversidad(publicacion: any) {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: any) => {
-      if (res && res[0] != undefined) {
-        publicacion.universidad = res[0].nombre;
-      }
-    });
+  getUniversidad(publicacion: Publicacion) {
+    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
+    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   return(): void {
@@ -273,31 +216,25 @@ export default class DetailMemberComponent implements OnInit {
   }
 
   getPrefijos() {
-    this._prefijoService.getPrefijos().subscribe((res: any) => {
-      if (res) {
-        for (const prefijo of res) {
-          if (
-            this.usuario.prefijo_idPrefijo == prefijo.idPrefijo &&
-            prefijo.nombre != "Ninguno" &&
-            prefijo.nombre != "Bachiller"
-          ) {
-            this.usuario.prefijo = prefijo.nombre;
-          }
-        }
+    const prefijos = this.lookup.prefijos();
+    for (const prefijo of prefijos) {
+      if (
+        this.usuario.prefijo_idPrefijo == prefijo.idPrefijo &&
+        prefijo.nombre != "Ninguno" &&
+        prefijo.nombre != "Bachiller"
+      ) {
+        this.usuario.prefijo = prefijo.nombre;
       }
-    });
+    }
   }
 
   getTipoMiembros() {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res: any) => {
-      if (res) {
-        for (const tipo of res) {
-          if (this.usuario.tipoMiembro_idTipoMiembro === tipo.idTipoMiembro) {
-            this.usuario.tipoMiembro = tipo.nombreSingular;
-          }
-        }
+    const tipos = this.lookup.tiposMiembro();
+    for (const tipo of tipos) {
+      if (this.usuario.tipoMiembro_idTipoMiembro === tipo.idTipoMiembro) {
+        this.usuario.tipoMiembro = tipo.nombreSingular;
       }
-    });
+    }
   }
 
   profile(autor: PublicationAuthor): void {

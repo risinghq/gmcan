@@ -15,15 +15,12 @@ import { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { SearchService } from "@app/shared/services/search.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
-import { TipoTesisService } from "@app/shared/services/tipotesis.service";
-import { UniversidadService } from "@app/shared/services/universidad.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import {
   NgbPagination,
@@ -56,15 +53,12 @@ export default class PublicationComponent implements OnInit {
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
   _previousService = inject(PreviousPageService);
-  _tipoPublicacionService = inject(TipoPublicacionService);
+  lookup = inject(LookupService);
   _publicacionService = inject(PublicacionService);
-  _revistaService = inject(RevistaService);
   _publicacionAutoresService = inject(PublicacionAutoresService);
   _usuarioService = inject(UsuarioService);
-  _universidadService = inject(UniversidadService);
   _searchService = inject(SearchService);
   _eventoService = inject(EventoService);
-  _tipotesisService = inject(TipoTesisService);
   location = inject(Location);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
@@ -147,13 +141,11 @@ export default class PublicationComponent implements OnInit {
   }
 
   getTipoPublicacion(): void {
-    this._tipoPublicacionService.getTipoPublicaciones().subscribe((res: TipoPublicacion[]) => {
-      if (res) {
-        this.tipoPublicaciones = res;
-        this.getPublicaciones(this.tipoPublicaciones[0].idTipoPublicacion ?? 0);
-        this.cargado = true;
-      }
-    });
+    this.tipoPublicaciones = this.lookup.tiposPublicacion().map((t) => Object.assign({}, t) as TipoPublicacion);
+    if (this.tipoPublicaciones.length > 0) {
+      this.getPublicaciones(this.tipoPublicaciones[0].idTipoPublicacion ?? 0);
+      this.cargado = true;
+    }
   }
 
   getPublicaciones(idTipoPublicacion: number): void {
@@ -178,11 +170,8 @@ export default class PublicationComponent implements OnInit {
   }
 
   getRevista(publicacion: Publicacion): void {
-    this._revistaService.getRevista(publicacion.revista_idRevista ?? 0).subscribe((res: any[]) => {
-      if (res && res[0] != undefined) {
-        publicacion.revista = res[0].nombre;
-      }
-    });
+    const found = this.lookup.revistas().find((r) => r.idRevista === publicacion.revista_idRevista);
+    if (found) publicacion.revista = found.nombre;
   }
 
   getEvento(idEvento: number, publicacion: Publicacion): void {
@@ -196,15 +185,12 @@ export default class PublicationComponent implements OnInit {
   }
 
   getUniversidad(publicacion: Publicacion): void {
-    this._universidadService.getUniversidad(publicacion.universidad_idUniversidad ?? 0).subscribe((res: any) => {
-      if (res && res[0] != undefined) {
-        publicacion.universidad = res[0].nombre;
-      }
-    });
+    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
+    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   getPublicacion(idPublicacion: number): void {
-    this._publicacionService.getPublication(idPublicacion).subscribe((res: Publicacion[]) => {
+    this._publicacionService.getPublication(idPublicacion).subscribe((res) => {
       if (res.length > 0) {
         for (const pub of res) {
           if (this.publicacionSearch.findIndex((x: Publicacion) => x.idPublicacion === pub.idPublicacion) == -1) {
@@ -225,15 +211,8 @@ export default class PublicationComponent implements OnInit {
   }
 
   getTipoTesis(publicacion: Publicacion): void {
-    this._tipotesisService.getTiposTesis().subscribe((res: any[]) => {
-      if (res.length > 0) {
-        for (const tipo of res) {
-          if (publicacion.tipoTesis_idTipoTesis == tipo.idTipoTesis) {
-            publicacion.tipoTesis = tipo.nombre;
-          }
-        }
-      }
-    });
+    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
+    if (found) publicacion.tipoTesis = found.nombre;
   }
 
   fillPublicacion(publicacion: Publicacion): void {
@@ -273,10 +252,11 @@ export default class PublicationComponent implements OnInit {
 
   searchPublicaciones(titulo: string, id: number): void {
     this.tipoPublicacion = id;
-    this._searchService.searchPublicaciones(titulo, id).subscribe((res: Publicacion[]) => {
-      this.publicacionSearch = [];
-      if (res.length > 0) {
-        this.publicacionSearch = res;
+    this.publicacionSearch = [];
+    this._searchService.search(titulo, ["publications"]).subscribe((results) => {
+      const filtered = results.publications.filter((p) => p.tipoPublicacion_idTipoPublicacion === id);
+      for (const pub of filtered) {
+        this.getPublicacion(pub.idPublicacion);
       }
       this.searchByAuthors(titulo);
       if (id === 3) {
@@ -298,40 +278,28 @@ export default class PublicationComponent implements OnInit {
   }
 
   searchEventos(nombre: string, tipoPublicacion: number): void {
-    this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res: Publicacion[]) => {
-      if (res.length > 0) {
-        const publicacionesFound = res;
-        this._searchService.searchEventos(nombre).subscribe((searchEvents: any[]) => {
-          if (searchEvents.length > 0) {
-            for (const ev of searchEvents) {
-              const valor = publicacionesFound.findIndex((x: Publicacion) => x.evento_idEvento === ev.idEvento);
-              if (valor != -1) {
-                this.getPublicacion(publicacionesFound[valor].idPublicacion ?? 0);
-              }
-            }
-          }
-        });
-      }
-    });
+    const matchingEvents = this.lookup.eventos().filter((e) => e.nombre.toLowerCase().includes(nombre.toLowerCase()));
+    if (matchingEvents.length > 0) {
+      this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res: Publicacion[]) => {
+        for (const ev of matchingEvents) {
+          const found = res.find((x) => x.evento_idEvento === ev.idEvento);
+          if (found) this.getPublicacion(found.idPublicacion ?? 0);
+        }
+      });
+    }
   }
 
   searchTipoTesis(nombre: string, tipoPublicacion: number): void {
-    this._searchService.searchTipoTesis(nombre).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        const tipoTesis = res;
-        this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((resPublicaciones: Publicacion[]) => {
-          if (resPublicaciones.length > 0) {
-            for (const pub of resPublicaciones) {
-              for (const tipo of tipoTesis) {
-                if (tipo.idTipoTesis === pub.tipoTesis_idTipoTesis) {
-                  this.getPublicacion(pub.idPublicacion ?? 0);
-                }
-              }
-            }
+    const matchingTypes = this.lookup.tiposTesis().filter((t) => t.nombre.toLowerCase().includes(nombre.toLowerCase()));
+    if (matchingTypes.length > 0) {
+      this._publicacionService.getPublicaciones(tipoPublicacion).subscribe((res: Publicacion[]) => {
+        for (const pub of res) {
+          if (matchingTypes.some((t) => t.idTipoTesis === pub.tipoTesis_idTipoTesis)) {
+            this.getPublicacion(pub.idPublicacion ?? 0);
           }
-        });
-      }
-    });
+        }
+      });
+    }
   }
 
   /* Fin de busqueda */

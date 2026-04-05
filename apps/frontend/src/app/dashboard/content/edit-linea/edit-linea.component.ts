@@ -12,7 +12,7 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createLineasInvestigacion } from "@app/shared/models/factories";
 import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
@@ -64,31 +64,29 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   getLinea(): void {
-    this._route.params.forEach((params: Params) => {
-      let idLineaInvestigacion = params["id"];
-      this._lineaInvestigacionService
-        .getLineaInvestigacion(idLineaInvestigacion)
-        .subscribe((lineas: LineasInvestigacion[]) => {
-          if (lineas.length > 0) {
-            this.lineaInvestigacion = lineas[0];
-            localStorage.setItem("lineaInvestigacionEdit", JSON.stringify(this.lineaInvestigacion.nombre));
-            this._proyectoService.getProyectosLinea(idLineaInvestigacion, 1).subscribe((proyectosActivos: any) => {
-              if (proyectosActivos == 0) {
-                this.notCanDo = true;
-              } else {
-                this.notCanDo = false;
-              }
-            });
-            this._proyectoService.getProyectosLinea(idLineaInvestigacion, 0).subscribe((proyectosInactivos: any) => {
-              if (proyectosInactivos == 0) {
-                this.notCanDo = true;
-              } else {
-                this.notCanDo = false;
-              }
-            });
-          }
-        });
-    });
+    let idLineaInvestigacion = this._route.snapshot.params["id"];
+    this._lineaInvestigacionService
+      .getLineaInvestigacion(idLineaInvestigacion)
+      .subscribe((lineas: LineasInvestigacion[]) => {
+        if (lineas.length > 0) {
+          this.lineaInvestigacion = lineas[0];
+          localStorage.setItem("lineaInvestigacionEdit", JSON.stringify(this.lineaInvestigacion.nombre));
+          this._proyectoService.getProyectosLinea(idLineaInvestigacion, 1).subscribe((proyectosActivos: any) => {
+            if (proyectosActivos == 0) {
+              this.notCanDo = true;
+            } else {
+              this.notCanDo = false;
+            }
+          });
+          this._proyectoService.getProyectosLinea(idLineaInvestigacion, 0).subscribe((proyectosInactivos: any) => {
+            if (proyectosInactivos == 0) {
+              this.notCanDo = true;
+            } else {
+              this.notCanDo = false;
+            }
+          });
+        }
+      });
   }
 
   submitLinea(): void {

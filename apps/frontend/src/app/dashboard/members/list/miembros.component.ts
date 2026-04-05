@@ -18,19 +18,8 @@ import {
 import { Router } from "@angular/router";
 import { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { GLOBAL } from "@app/shared/services/global";
-import { PrefijoService } from "@app/shared/services/prefijo.service";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
-
-interface TipoMiembroOption {
-  idTipoMiembro?: number;
-  nombreSingular?: string;
-}
-
-interface PrefijoOption {
-  idPrefijo?: number;
-  nombre?: string;
-}
 
 @Component({
   selector: "app-miembros",
@@ -55,8 +44,7 @@ interface PrefijoOption {
 })
 export default class MiembrosComponent implements OnInit {
   _usuarioService = inject(UsuarioService);
-  _tipoMiembroService = inject(TipoMiembroService);
-  _prefijoService = inject(PrefijoService);
+  lookup = inject(LookupService);
   _router = inject(Router);
 
   displayedColumns: string[] = ["nombre", "apellidoPaterno", "apellidoMaterno", "grado", "cargo", "correo"];
@@ -112,25 +100,13 @@ export default class MiembrosComponent implements OnInit {
   }
 
   getCargo(miembro: UsuarioFull): void {
-    this._tipoMiembroService.getTipoMiembros().subscribe((res: TipoMiembroOption[]) => {
-      if (res) {
-        const index = res.findIndex((x: TipoMiembroOption) => x.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
-        if (index != -1) {
-          miembro.tipoMiembro = res[index].nombreSingular ?? "";
-        }
-      }
-    });
+    const found = this.lookup.tiposMiembro().find((t) => t.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
+    if (found) miembro.tipoMiembro = found.nombreSingular;
   }
 
   getGrado(miembro: UsuarioFull): void {
-    this._prefijoService.getPrefijos().subscribe((res: PrefijoOption[]) => {
-      if (res) {
-        const index = res.findIndex((x: PrefijoOption) => x.idPrefijo === miembro.prefijo_idPrefijo);
-        if (index != -1) {
-          miembro.prefijo = res[index].nombre ?? "";
-        }
-      }
-    });
+    const found = this.lookup.prefijos().find((p) => p.idPrefijo === miembro.prefijo_idPrefijo);
+    if (found) miembro.prefijo = found.nombre;
   }
 
   displayedNotFound = false;

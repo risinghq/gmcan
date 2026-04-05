@@ -12,6 +12,7 @@ import FuenteFinanciamientoRoutes from "./routes/fuentefinanciamiento.js";
 import GeneroRoutes from "./routes/genero.js";
 import GrupoRoutes from "./routes/grupo.js";
 import LineasInvestigacionRoutes from "./routes/lineasinvestigacion.js";
+import LookupRoutes from "./routes/lookup.js";
 import MetodosRoutes from "./routes/metodos.js";
 import MonedaRoutes from "./routes/moneda.js";
 import NoticiaRoutes from "./routes/noticia.js";
@@ -21,6 +22,7 @@ import ProyectoRoutes from "./routes/proyecto.js";
 import PublicacionRoutes from "./routes/publicacion.js";
 import PublicacionAutoresRoutes from "./routes/publicacionautores.js";
 import RevistaRoutes from "./routes/revista.js";
+import SearchRoutes from "./routes/search.js";
 import SobreNosotrosRoutes from "./routes/sobrenosotros.js";
 import SoftwareRoutes from "./routes/software.js";
 import TipoMiembroRoutes from "./routes/tipomiembro.js";
@@ -51,6 +53,8 @@ app.use(
   }),
 );
 
+app.route("/lookup", LookupRoutes);
+app.route("/search", SearchRoutes);
 app.route("/grupo", GrupoRoutes);
 app.route("/noticia", NoticiaRoutes);
 app.route("/tipo-noticia", TipoNoticiaRoutes);

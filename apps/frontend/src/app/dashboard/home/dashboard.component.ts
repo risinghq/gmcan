@@ -1,3 +1,4 @@
+import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, inject } from "@angular/core";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { Grupo } from "@app/shared/models/grupo";
@@ -5,8 +6,6 @@ import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { PermisoService } from "@app/shared/services/permiso.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoMiembroService } from "@app/shared/services/tipomiembro.service";
-import { TipoPublicacionService } from "@app/shared/services/tipopublicacion.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { BaseChartDirective } from "ng2-charts";
@@ -33,8 +32,7 @@ export default class DashboardComponent implements OnInit {
   _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  _tipoMiembroService = inject(TipoMiembroService);
-  _tipoPublicacionService = inject(TipoPublicacionService);
+  private http = inject(HttpClient);
   private _session = inject(SessionService);
 
   token: string | null = null;
@@ -111,7 +109,7 @@ export default class DashboardComponent implements OnInit {
   total2 = 0;
 
   getCountTypeMember(): void {
-    this._tipoMiembroService.getCountType().subscribe((res: CountTypeItem[]) => {
+    this.http.get<CountTypeItem[]>(`${GLOBAL.url}tipo-miembro/get-count-type`).subscribe((res) => {
       if (res.length > 0) {
         const filler: string[] = [];
         const filler2: string[] = [];
@@ -128,7 +126,7 @@ export default class DashboardComponent implements OnInit {
   }
 
   getCountTypePublication(): void {
-    this._tipoPublicacionService.getCountType().subscribe((res: CountTypeItem[]) => {
+    this.http.get<CountTypeItem[]>(`${GLOBAL.url}tipo-publicacion/get-count-type`).subscribe((res) => {
       if (res.length > 0) {
         const filler3: string[] = [];
         const filler4: string[] = [];

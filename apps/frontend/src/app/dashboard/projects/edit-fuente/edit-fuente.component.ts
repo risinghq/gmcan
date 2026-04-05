@@ -12,7 +12,7 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -60,17 +60,13 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   }
 
   getFuente(): void {
-    this._route.params.forEach((params: Params) => {
-      const idFuente = Number(params["id"] ?? 0);
-      this._fuenteFinanciamientoService
-        .getFuenteFinanciamiento(idFuente)
-        .subscribe((result: FuenteFinanciamiento[]) => {
-          if (result.length > 0) {
-            this.fuente = result[0];
-            localStorage.setItem("fuenteEdit", JSON.stringify(this.fuente.nombre ?? ""));
-            this.getFuenteProyecto(this.fuente);
-          }
-        });
+    const idFuente = Number(this._route.snapshot.params["id"] ?? 0);
+    this._fuenteFinanciamientoService.getFuenteFinanciamiento(idFuente).subscribe((result: FuenteFinanciamiento[]) => {
+      if (result.length > 0) {
+        this.fuente = result[0];
+        localStorage.setItem("fuenteEdit", JSON.stringify(this.fuente.nombre ?? ""));
+        this.getFuenteProyecto(this.fuente);
+      }
     });
   }
 

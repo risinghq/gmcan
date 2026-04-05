@@ -1,5 +1,6 @@
 import { TitleCasePipe, DatePipe, SlicePipe } from "@angular/common";
 import { Location } from "@angular/common";
+import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
@@ -13,9 +14,8 @@ import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinancia
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
-import { MonedaService } from "@app/shared/services/moneda.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
-import { SearchService } from "@app/shared/services/search.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
@@ -56,9 +56,9 @@ export default class ProjectsComponent implements OnInit {
   location = inject(Location);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  _searchService = inject(SearchService);
+  private http = inject(HttpClient);
   _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  _monedaService = inject(MonedaService);
+  lookup = inject(LookupService);
   _grupoService = inject(GrupoService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
@@ -214,11 +214,8 @@ export default class ProjectsComponent implements OnInit {
   }
 
   getMoneda(proyecto: Proyecto): void {
-    this._monedaService.getMoneda(proyecto.moneda_idMoneda ?? 0).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        proyecto.moneda = res[0].simbolo;
-      }
-    });
+    const found = this.lookup.monedas().find((m) => m.idMoneda === proyecto.moneda_idMoneda);
+    if (found) proyecto.moneda = found.simbolo;
   }
 
   getUsuarioHasProyecto(proyecto: Proyecto): void {
@@ -327,7 +324,7 @@ export default class ProjectsComponent implements OnInit {
   }
 
   searchProyectos(nombre: string, estado: number): void {
-    this._searchService.searchProyectos(nombre, estado).subscribe((res: Proyecto[]) => {
+    this.http.post<Proyecto[]>(`${GLOBAL.url}proyecto/search-proyecto`, { nombre, estado }).subscribe((res) => {
       if (res.length > 0) {
         this.proyectos = res;
         for (let index = 0; index < this.proyectos.length; index++) {
@@ -343,22 +340,26 @@ export default class ProjectsComponent implements OnInit {
   }
 
   searchLineasInvestigacion(nombre: string, estado: number): void {
-    this._searchService.searchLineasInvestigacion(nombre).subscribe((res: any[]) => {
-      if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getProyectoLinea(res[index].idLineasInvestigacion, estado);
+    this.http
+      .post<{ idLineasInvestigacion: number }[]>(`${GLOBAL.url}lineasinvestigacion/search-lineasinvestigacion`, {
+        nombre,
+      })
+      .subscribe((res) => {
+        if (res.length > 0) {
+          for (const linea of res) {
+            this.getProyectoLinea(linea.idLineasInvestigacion, estado);
+          }
         }
-      }
-      this.searchResponsables(nombre, estado);
-    });
+        this.searchResponsables(nombre, estado);
+      });
   }
 
   searchResponsables(nombre: string, estado: number): void {
-    this._searchService.searchUsuarios(nombre).subscribe((res: any[]) => {
+    this.http.post<{ DNI: string }[]>(`${GLOBAL.url}usuario/search-usuarios`, { nombre }).subscribe((res) => {
       this.allCharged = true;
       if (res.length > 0) {
-        for (let index = 0; index < res.length; index++) {
-          this.getUsuarioHasProyectoId(res[0].DNI, estado);
+        for (const user of res) {
+          this.getUsuarioHasProyectoId(user.DNI, estado);
         }
       }
     });

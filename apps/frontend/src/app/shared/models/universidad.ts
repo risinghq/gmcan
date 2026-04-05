@@ -1,7 +1,7 @@
 export interface Universidad {
   idUniversidad?: number;
-  nombre?: string;
-  nombreEN?: string;
+  nombre?: string | null;
+  nombreEN?: string | null;
   fechaActualizacion?: Date;
   fechaCreacion?: Date;
 }

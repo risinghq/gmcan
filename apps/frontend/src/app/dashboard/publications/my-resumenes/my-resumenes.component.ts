@@ -22,7 +22,6 @@ import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
@@ -50,7 +49,6 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 })
 export default class MyResumenesComponent implements OnInit {
   _router = inject(Router);
-  _revistasService = inject(RevistaService);
   private _publicacionService = inject(PublicacionService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);

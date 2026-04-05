@@ -2,14 +2,14 @@ import { Location, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { createNoticia } from "@app/shared/models/factories";
 import type { Noticia } from "@app/shared/models/noticia";
 import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { TipoNoticiaService } from "@app/shared/services/tiponoticia.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
@@ -23,7 +23,7 @@ export default class NewsComponent implements OnInit {
   datePipe = inject(DatePipe);
   _noticiaService = inject(NoticiaService);
   _route = inject(ActivatedRoute);
-  _tiponoticiaService = inject(TipoNoticiaService);
+  lookup = inject(LookupService);
   location = inject(Location);
   _router = inject(Router);
   _usuarioService = inject(UsuarioService);
@@ -57,11 +57,10 @@ export default class NewsComponent implements OnInit {
     } else {
       this.numberShown = 5;
     }
-    this.getTipoNoticias();
-    this._route.params.forEach((params: Params) => {
-      this.idNoticiaE = params["id"];
-    });
+    this.tiponoticias = [...this.lookup.tiposNoticia()];
+    this.idNoticiaE = this._route.snapshot.params["id"];
     console.log(this.idNoticiaE);
+    this.getNoticia();
   }
   ngDoCheck(): void {
     this.title = this.language.news;
@@ -105,13 +104,6 @@ export default class NewsComponent implements OnInit {
       }
     });
   }
-  getTipoNoticias(): void {
-    this._tiponoticiaService.getTipoNoticia().subscribe((res: TipoNoticia[]) => {
-      this.tiponoticias = res;
-      this.getNoticia();
-    });
-  }
-
   getUsuario(idUser: string, i: number): void {
     this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
       if (res[0] != undefined) {
@@ -135,7 +127,6 @@ export default class NewsComponent implements OnInit {
     sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
-    this.getTipoNoticias();
   }
   scroll(el: HTMLElement | null): void {
     if (el) {

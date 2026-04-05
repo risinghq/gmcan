@@ -12,12 +12,13 @@ import {
 } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AdminRevistaService } from "@app/shared/services/admin-revista.service";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { RevistaService } from "@app/shared/services/revista.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 interface StatusResponse {
@@ -36,7 +37,8 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _revistaService = inject(RevistaService);
+  private _adminRevistaService = inject(AdminRevistaService);
+  private lookup = inject(LookupService);
   private _publicacionService = inject(PublicacionService);
 
   revista: Revista;
@@ -60,16 +62,13 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   getRevista(): void {
-    this._route.params.forEach((params: Params) => {
-      const idRevista = Number(params["id"] ?? 0);
-      this._revistaService.getRevista(idRevista).subscribe((result: Revista[]) => {
-        if (result) {
-          this.revista = result[0];
-          localStorage.setItem("revistaEdit", JSON.stringify(this.revista.nombre ?? ""));
-          this.getPublicacionRevista(idRevista);
-        }
-      });
-    });
+    const idRevista = Number(this._route.snapshot.params["id"] ?? 0);
+    const found = this.lookup.revistas().find((r) => r.idRevista === idRevista);
+    if (found) {
+      this.revista = found;
+      localStorage.setItem("revistaEdit", JSON.stringify(this.revista.nombre ?? ""));
+      this.getPublicacionRevista(idRevista);
+    }
   }
 
   notCanDo = false;
@@ -83,7 +82,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   submitRevista(): void {
-    this._revistaService.updateRevista(this.revista).subscribe((result: StatusResponse) => {
+    this._adminRevistaService.updateRevista(this.revista).subscribe((result: StatusResponse) => {
       if (result.status == 1) {
         this.revistaForm.markAsPristine();
         this.return();
@@ -128,7 +127,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
 
   eraseNews(): void {
     if (this.notCanDo) {
-      this._revistaService.deleteRevista(this.revista.idRevista ?? 0).subscribe((result: StatusResponse) => {
+      this._adminRevistaService.deleteRevista(this.revista.idRevista ?? 0).subscribe((result: StatusResponse) => {
         if (result.status == 1) {
           this.revistaForm.markAsPristine();
           this.return();
