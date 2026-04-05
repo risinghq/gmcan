@@ -20,13 +20,13 @@
   "type": "module",
   "main": "server.ts",
   "scripts": {
-    "start": "node --env-file=.env --import=tsx server.ts",
+    "dev": "bun run --env-file=../../.env --hot server.ts",
+    "start": "bun --env-file=../../.env server.ts",
     "lint": "oxlint",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.12",
     "@hono/zod-validator": "^0.7.6",
     "@libsql/client": "^0.17.2",
     "bcrypt": "^6.0.0",

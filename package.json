@@ -3,14 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
-    "dev": "pnpm --parallel --filter \"./apps/*\" run start",
-    "dev:frontend": "pnpm --filter frontend run start",
-    "dev:backend": "pnpm --filter backend run start",
-    "build": "pnpm --filter \"./apps/*\" run build",
-    "build:frontend": "pnpm --filter frontend run build",
-    "build:backend": "pnpm --filter backend run build",
-    "test": "pnpm --filter \"./apps/*\" run test",
+    "dev": "bun --filter './apps/*' start",
+    "dev:frontend": "bun --filter frontend start",
+    "dev:backend": "bun --filter backend start",
+    "build": "bun --filter './apps/*' build",
+    "build:frontend": "bun --filter frontend build",
+    "build:backend": "bun --filter backend build",
+    "test": "bun --filter './apps/*' test",
     "lint": "oxlint .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check ."
@@ -21,12 +24,10 @@
   },
   "engines": {
     "node": ">=20.19.0",
-    "pnpm": ">=9.0.0"
+    "bun": ">=1.0.0"
   },
-  "packageManager": "pnpm@9.15.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "bcrypt"
-    ]
-  }
+  "packageManager": "bun@1.3.11",
+  "trustedDependencies": [
+    "bcrypt"
+  ]
 }
