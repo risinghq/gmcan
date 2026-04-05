@@ -5,10 +5,11 @@ import localeEsAr from "@angular/common/locales/es-AR";
 import localePy from "@angular/common/locales/es-PY";
 import localePt from "@angular/common/locales/pt";
 import {
-  APP_INITIALIZER,
   ApplicationConfig,
   LOCALE_ID,
+  inject,
   provideBrowserGlobalErrorListeners,
+  provideAppInitializer,
   provideZonelessChangeDetection,
 } from "@angular/core";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
@@ -35,12 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     DatePipe,
     TitleCasePipe,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (lookup: LookupService) => () => lookup.load(),
-      deps: [LookupService],
-      multi: true,
-    },
+    provideAppInitializer(() => inject(LookupService).load()),
     {
       provide: LOCALE_ID,
       deps: [SessionService],
