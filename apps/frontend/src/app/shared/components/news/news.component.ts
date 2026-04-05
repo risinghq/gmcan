@@ -1,4 +1,4 @@
-import { Location, SlicePipe } from "@angular/common";
+import { SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
@@ -8,6 +8,7 @@ import type { Noticia } from "@app/shared/models/noticia";
 import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UsuarioService } from "@app/shared/services/usuario.service";
@@ -23,9 +24,9 @@ export default class NewsComponent implements OnInit {
   datePipe = inject(DatePipe);
   _noticiaService = inject(NoticiaService);
   _route = inject(ActivatedRoute);
-  lookup = inject(LookupService);
-  location = inject(Location);
   _router = inject(Router);
+  lookup = inject(LookupService);
+  private _navigationHistory = inject(NavigationHistoryService);
   _usuarioService = inject(UsuarioService);
   private _session = inject(SessionService);
 
@@ -51,7 +52,7 @@ export default class NewsComponent implements OnInit {
   public idNoticiaE = 0;
   language: any = {};
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     if (window.innerWidth >= 1300) {
       this.numberShown = 10;
     } else {
@@ -64,7 +65,7 @@ export default class NewsComponent implements OnInit {
   }
   ngDoCheck(): void {
     this.title = this.language.news;
-    if (this.location.path().slice(1, 12) === "detail-news") {
+    if (this._router.url.includes("/detail-news")) {
       this.title = this.language.moreNews;
     }
   }
@@ -124,7 +125,6 @@ export default class NewsComponent implements OnInit {
   }
 
   detalleNoticia(noticia: Noticia): void {
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll(document.getElementById("main-toolbar"));
   }

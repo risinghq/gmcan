@@ -100,10 +100,11 @@
           </div>
         </div>
       }
-      <form id="formExpand" [formGroup]="searchGlobalForm2">
+      <form [formGroup]="searchGlobalForm2" [class.full-width]="inputExpand">
         <input
-          id="inputExpand"
-          class="search-top-input search-top-input-compressed"
+          class="search-top-input"
+          [class.search-top-input-compressed]="!inputExpand"
+          [class.search-top-input-decompressed]="inputExpand"
           #nombre1
           autocomplete="off"
           name="nombre1"

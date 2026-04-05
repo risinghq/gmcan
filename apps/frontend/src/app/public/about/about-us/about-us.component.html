@@ -10,7 +10,7 @@
       {{ language.aboutText[0].aboutUs }}
     </div>
     <div class="about-sub-divi"></div>
-    <div id="whoAre" class="about-text"></div>
+    <div class="about-text" [innerHTML]="aboutus.quienesSomos ?? ''"></div>
     <div class="about-title about-top">
       {{ language.aboutText[0].ourObjectives }}
     </div>
@@ -18,7 +18,7 @@
       {{ language.aboutText[0].ourObjectivesQuestion }}
     </div>
     <div class="about-sub-divi"></div>
-    <div id="objectives" class="about-text"></div>
+    <div class="about-text" [innerHTML]="aboutus.objetivos ?? ''"></div>
     <div class="about-title about-top">
       {{ language.aboutText[0].ourServices }}
     </div>
@@ -26,6 +26,6 @@
       {{ language.aboutText[0].ourServicesQuestion }}
     </div>
     <div class="about-sub-divi"></div>
-    <div id="services" class="about-text"></div>
+    <div class="about-text" [innerHTML]="aboutus.servicios ?? ''"></div>
   </div>
 </div>

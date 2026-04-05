@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from "@angular/core";
-import { Title } from "@angular/platform-browser";
 import { Languages } from "@app/shared/models/languages";
 import { Method } from "@app/shared/models/method";
 import { GLOBAL } from "@app/shared/services/global";
 import { MethodsService } from "@app/shared/services/methods.service";
+import { SeoService } from "@app/shared/services/seo.service";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
   selector: "app-method",
@@ -13,7 +14,8 @@ import { MethodsService } from "@app/shared/services/methods.service";
 })
 export default class MethodComponent implements OnInit {
   _methodService = inject(MethodsService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
+  private session = inject(SessionService);
 
   language: (typeof Languages)[number] = Languages[0];
   url: string;
@@ -25,20 +27,9 @@ export default class MethodComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.language = JSON.parse(localStorage.getItem("language") ?? JSON.stringify(Languages[0]));
-    this.titleService.setTitle("GMCAN | " + this.language.methods);
+    this.language = this.session.language();
+    this.seo.setPageTitle("GMCAN | " + this.language.methods);
     this.getMethods();
-  }
-
-  ngAfterViewChecked(): void {
-    if (this.methods) {
-      for (let index = 0; index < this.methods.length; index++) {
-        const descripcion = document.getElementById("descripcion" + index);
-        if (descripcion) {
-          descripcion.innerHTML = this.methods[index].descripcion ?? "";
-        }
-      }
-    }
   }
 
   getMethods(): void {

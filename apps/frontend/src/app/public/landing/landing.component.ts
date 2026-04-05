@@ -1,5 +1,4 @@
-import { Location } from "@angular/common";
-import { Component, OnInit, Renderer2, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
@@ -37,11 +36,9 @@ import { SessionService } from "@app/shared/services/session.service";
 export default class LandingComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  private ren = inject(Renderer2);
   _grupoService = inject(GrupoService);
   private session = inject(SessionService);
   fb = inject(FormBuilder);
-  location = inject(Location);
   private titleService = inject(Title);
 
   screenWidth: number;
@@ -60,12 +57,8 @@ export default class LandingComponent implements OnInit {
     this.searchGlobalForm2 = this.fb.group({
       nombre1: [""],
     });
-    this.language = Languages[this.lanSelected];
-    const storedLanId = this.session.getLanguageId();
-    if (storedLanId) {
-      this.language = Languages[storedLanId];
-      this.lanSelected = storedLanId;
-    }
+    this.lanSelected = this.session.languageId();
+    this.language = this.session.language();
     this.url = GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
@@ -80,15 +73,14 @@ export default class LandingComponent implements OnInit {
   ngOnInit(): void {
     this.titleService.setTitle("GMCAN | UNMSM");
     this.getGrupoInfo();
-    this.session.setLanguageData(this.language);
   }
 
   lanSelected = 0;
 
   lanSelect(number: number): void {
     this.lanSelected = number;
-    this.session.setLanguageData(Languages[this.lanSelected]);
-    this.session.setLanguageId(number);
+    this.language = Languages[this.lanSelected] ?? Languages[0];
+    this.session.setLanguage(this.language, number);
     window.location.reload();
   }
 
@@ -103,23 +95,15 @@ export default class LandingComponent implements OnInit {
   inputExpand = false;
   expandInput(): void {
     this.inputExpand = !this.inputExpand;
-    if (this.inputExpand) {
-      document.getElementById("inputExpand")?.setAttribute("class", "search-top-input search-top-input-decompressed");
-      document.getElementById("formExpand")?.setAttribute("class", "full-width");
-    } else {
-      document.getElementById("inputExpand")?.setAttribute("class", "search-top-input search-top-input-compressed");
-      document.getElementById("formExpand")?.setAttribute("class", "");
-    }
   }
 
   /* globalSearch */
 
   searchGlobal(value: string): void {
-    window.location.href = "/home/search/" + value;
+    this._router.navigate(["/home/search/" + value]);
   }
 
   loginLink(): void {
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/login"]);
   }
 

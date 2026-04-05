@@ -59,30 +59,36 @@
               </div>
               <div class="flex-news">
                 <a
-                  id="abstract{{ i }}"
-                  [class.abstract-active]="selectedItem === i"
-                  (click)="listClick($event, i)"
+                  [class.abstract-active]="isExpanded('line0', i)"
+                  (click)="toggleExpanded('line0', i)"
                   class="project-abstract"
                   data-toggle="collapse"
-                  href="#collapseExample{{ i }}"
+                  href="#collapseExample0{{ i }}"
                   role="button"
                   aria-expanded="false"
                   aria-controls="collapseExample"
                 >
-                  {{ language.linesInvestigationText[0].seeMore }}
+                  {{
+                    expandLabel(
+                      "line0",
+                      i,
+                      language.linesInvestigationText[0].seeMore,
+                      language.linesInvestigationText[0].seeLess
+                    )
+                  }}
                 </a>
                 <mat-icon
                   class="project-abs-icon"
                   [class]="{
-                    'abs-active': selectedItem === i,
-                    'abs-not-active': selectedItem == -1,
+                    'abs-active': isExpanded('line0', i),
+                    'abs-not-active': !isExpanded('line0', i),
                   }"
                 >
                   keyboard_arrow_down
                 </mat-icon>
               </div>
             </div>
-            <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+            <div class="collapse collapsed-resumen mt-16" id="collapseExample0{{ i }}">
               <div class="abstract mb-8">
                 <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
                 {{ proyecto.descripcion }}
@@ -192,30 +198,36 @@
               </div>
               <div class="flex-news">
                 <a
-                  id="abstract{{ i }}"
-                  [class.abstract-active]="selectedItem === i"
-                  (click)="listClick($event, i)"
+                  [class.abstract-active]="isExpanded('line1', i)"
+                  (click)="toggleExpanded('line1', i)"
                   class="project-abstract"
                   data-toggle="collapse"
-                  href="#collapseExample{{ i }}"
+                  href="#collapseExample1{{ i }}"
                   role="button"
                   aria-expanded="false"
                   aria-controls="collapseExample"
                 >
-                  {{ this.language.projectsText[0].seeMore }}
+                  {{
+                    expandLabel(
+                      "line1",
+                      i,
+                      this.language.projectsText[0].seeMore,
+                      this.language.projectsText[0].seeLess
+                    )
+                  }}
                 </a>
                 <mat-icon
                   class="project-abs-icon"
                   [class]="{
-                    'abs-active': selectedItem === i,
-                    'abs-not-active': selectedItem == -1,
+                    'abs-active': isExpanded('line1', i),
+                    'abs-not-active': !isExpanded('line1', i),
                   }"
                 >
                   keyboard_arrow_down
                 </mat-icon>
               </div>
             </div>
-            <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+            <div class="collapse collapsed-resumen mt-16" id="collapseExample1{{ i }}">
               <div class="abstract mb-8">
                 <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
                 {{ proyecto.descripcion }}
@@ -325,30 +337,36 @@
               </div>
               <div class="flex-news">
                 <a
-                  id="abstract{{ i }}"
-                  [class.abstract-active]="selectedItem === i"
-                  (click)="listClick($event, i)"
+                  [class.abstract-active]="isExpanded('line2', i)"
+                  (click)="toggleExpanded('line2', i)"
                   class="project-abstract"
                   data-toggle="collapse"
-                  href="#collapseExample{{ i }}"
+                  href="#collapseExample2{{ i }}"
                   role="button"
                   aria-expanded="false"
                   aria-controls="collapseExample"
                 >
-                  {{ this.language.projectsText[0].seeMore }}
+                  {{
+                    expandLabel(
+                      "line2",
+                      i,
+                      this.language.projectsText[0].seeMore,
+                      this.language.projectsText[0].seeLess
+                    )
+                  }}
                 </a>
                 <mat-icon
                   class="project-abs-icon"
                   [class]="{
-                    'abs-active': selectedItem === i,
-                    'abs-not-active': selectedItem == -1,
+                    'abs-active': isExpanded('line2', i),
+                    'abs-not-active': !isExpanded('line2', i),
                   }"
                 >
                   keyboard_arrow_down
                 </mat-icon>
               </div>
             </div>
-            <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+            <div class="collapse collapsed-resumen mt-16" id="collapseExample2{{ i }}">
               <div class="abstract mb-8">
                 <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
                 {{ proyecto.descripcion }}

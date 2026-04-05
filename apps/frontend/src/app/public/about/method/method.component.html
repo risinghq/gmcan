@@ -11,7 +11,7 @@
           {{ method.nombre }}
         </div>
         <div class="methods-sub-divi"></div>
-        <div id="descripcion{{ i }}" class="methods-text"></div>
+        <div class="methods-text" [innerHTML]="method.descripcion ?? ''"></div>
       </div>
     }
   </div>

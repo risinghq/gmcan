@@ -7,6 +7,6 @@
       {{ language.worksText[0].subtitle }}
     </div>
     <div class="works-sub-divi"></div>
-    <div id="works"></div>
+    <div [innerHTML]="info.trabajosFuturos ?? ''"></div>
   </div>
 </div>

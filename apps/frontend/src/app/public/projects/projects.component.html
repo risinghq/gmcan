@@ -89,9 +89,8 @@
                         </div>
                         <div class="flex-news">
                           <a
-                            id="abstract{{ i }}"
-                            [class.abstract-active]="selectedItem === i"
-                            (click)="listClick($event, i)"
+                            [class.abstract-active]="isExpanded('proj', i)"
+                            (click)="toggleExpanded('proj', i)"
                             class="project-abstract"
                             data-toggle="collapse"
                             href="#collapseExample{{ i }}"
@@ -99,13 +98,20 @@
                             aria-expanded="false"
                             aria-controls="collapseExample"
                           >
-                            {{ this.language.projectsText[0].seeMore }}
+                            {{
+                              expandLabel(
+                                "proj",
+                                i,
+                                this.language.projectsText[0].seeMore,
+                                this.language.projectsText[0].seeLess
+                              )
+                            }}
                           </a>
                           <mat-icon
                             class="project-abs-icon"
                             [class]="{
-                              'abs-active': selectedItem === i,
-                              'abs-not-active': selectedItem == -1,
+                              'abs-active': isExpanded('proj', i),
+                              'abs-not-active': !isExpanded('proj', i),
                             }"
                           >
                             keyboard_arrow_down

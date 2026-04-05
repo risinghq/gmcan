@@ -1,9 +1,10 @@
-import { registerLocaleData } from "@angular/common";
+import { isPlatformBrowser, registerLocaleData } from "@angular/common";
 import localeEnglish from "@angular/common/locales/en";
 import localeSpanish from "@angular/common/locales/es";
-import { Injectable, signal } from "@angular/core";
+import { Injectable, PLATFORM_ID, inject, signal } from "@angular/core";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
+import { Languages } from "@app/shared/models/languages";
 
 /**
  * SessionService owns all browser storage access.
@@ -12,94 +13,70 @@ import type { Grupo } from "@app/shared/models/grupo";
  */
 @Injectable({ providedIn: "root" })
 export class SessionService {
-  private _locale = "es-Ar";
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly browser = isPlatformBrowser(this.platformId);
+
+  private readonly _appLocale = signal("es-Ar");
+  private readonly _languageId = signal(0);
+  private readonly _language = signal<(typeof Languages)[number]>(Languages[0]);
+  private readonly _grupoInfo = signal<Grupo>(createGrupo());
+  private readonly _noticiaPublicada = signal(false);
+  private readonly _sessionEnding = signal(false);
+
+  readonly language = this._language.asReadonly();
+  readonly languageId = this._languageId.asReadonly();
+  readonly localeSignal = this._appLocale.asReadonly();
+  readonly grupoInfo = this._grupoInfo.asReadonly();
+  readonly noticiaPublicada = this._noticiaPublicada.asReadonly();
+  readonly sessionEnding = this._sessionEnding.asReadonly();
+
+  get languageCode(): string {
+    return this._language().locale;
+  }
 
   set locale(value: string) {
-    this._locale = value;
+    this.setAppLocale(value);
   }
   get locale(): string {
-    return localStorage.getItem("locale") || "es-Ar";
+    return this._appLocale();
+  }
+
+  init(): void {
+    const storedLocale = this.browser ? localStorage.getItem("locale") : null;
+    const locale = this.resolveAppLocale(storedLocale ?? this.detectBrowserLocale());
+    this.setAppLocale(locale, false);
   }
 
   registerCulture(culture: string): void {
-    if (!culture) {
-      return;
-    }
-    this.locale = culture;
-
-    // Register locale data since only the en-US locale data comes with Angular
-    switch (culture) {
-      case "es-Ar": {
-        localStorage.setItem("locale", "es-Ar");
-        registerLocaleData(localeSpanish);
-        break;
-      }
-      case "en-US": {
-        localStorage.setItem("locale", "en-US");
-        registerLocaleData(localeEnglish);
-        break;
-      }
-    }
+    this.setAppLocale(culture, true);
   }
 
-  // Language ID
-  setLanguageId(id: number): void {
-    localStorage.setItem("lanId", JSON.stringify(id));
-  }
-
-  getLanguageId(): number {
-    const stored = localStorage.getItem("lanId");
-    if (!stored) return 0;
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return 0;
-    }
-  }
-
-  // Language object (cached to avoid unnecessary API calls on every page)
-  setLanguageData<T>(data: T): void {
-    localStorage.setItem("language", JSON.stringify(data));
-  }
-
-  /**
-   * Get language object. Returns the parsed language data or null.
-   * Caller should check for null before using.
-   */
-  getLanguageData<T>(): T | null {
-    const stored = localStorage.getItem("language");
-    if (!stored) return null;
-    try {
-      return JSON.parse(stored) as T;
-    } catch {
-      return null;
-    }
+  setLanguage(language: (typeof Languages)[number], id = 0): void {
+    const appLocale = this.resolveAppLocale(language.locale);
+    this.setAppLocale(appLocale, true, language, id);
   }
 
   // Research group info (cached to avoid unnecessary API calls on every page)
   setGrupoInfo(grupo: Grupo): void {
-    localStorage.setItem("grupoInfo", JSON.stringify(grupo));
+    this._grupoInfo.set(grupo);
+    if (this.browser) {
+      localStorage.setItem("grupoInfo", JSON.stringify(grupo));
+    }
   }
 
   /** Get cached grupo info. Returns the parsed object or empty default. */
   getGrupoInfo(): Grupo {
-    const stored = localStorage.getItem("grupoInfo");
-    if (!stored) return createGrupo();
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return createGrupo();
-    }
+    return this._grupoInfo();
   }
 
   clearGrupoInfo(): void {
-    localStorage.removeItem("grupoInfo");
+    this._grupoInfo.set(createGrupo());
+    if (this.browser) {
+      localStorage.removeItem("grupoInfo");
+    }
   }
 
   // Session ending flag (used by the deactivate guard to allow programmatic logouts to navigate through)
-  private readonly _sessionEnding = signal(false);
-  readonly sessionEnding = this._sessionEnding.asReadonly();
-
   /** Call before programmatic logout so the deactivate guard allows navigation. */
   beginSessionEnd(): void {
     this._sessionEnding.set(true);
@@ -112,37 +89,83 @@ export class SessionService {
 
   // Back navigation: previous page
   setPreviousPage(path: string): void {
-    sessionStorage.setItem("previous-page", path);
+    if (this.browser) {
+      sessionStorage.setItem("previous-page", path);
+    }
   }
 
   getPreviousPage(): string | null {
-    return sessionStorage.getItem("previous-page");
+    return this.browser ? sessionStorage.getItem("previous-page") : null;
   }
 
   // Back navigation: summary pages
   setResumenBack(path: string): void {
-    localStorage.setItem("resumen-back", path);
+    if (this.browser) {
+      localStorage.setItem("resumen-back", path);
+    }
   }
 
   getResumenBack(): string | null {
-    return localStorage.getItem("resumen-back");
+    return this.browser ? localStorage.getItem("resumen-back") : null;
   }
 
   // Published news flag (used to trigger news refresh on home page after publishing a news item)
-  private readonly _noticiaPublicada = signal(false);
-  readonly noticiaPublicada = this._noticiaPublicada.asReadonly();
-
   setNoticiaPublicada(published: boolean): void {
     this._noticiaPublicada.set(published);
   }
 
   // Session clearing methods
   clearSession(): void {
-    sessionStorage.clear();
+    if (this.browser) {
+      sessionStorage.clear();
+    }
   }
 
   clearAll(): void {
-    localStorage.clear();
-    sessionStorage.clear();
+    if (this.browser) {
+      localStorage.clear();
+      sessionStorage.clear();
+    }
+  }
+
+  private setAppLocale(
+    locale: string,
+    persist = true,
+    languageOverride?: (typeof Languages)[number],
+    languageId?: number,
+  ): void {
+    const appLocale = this.resolveAppLocale(locale);
+    const language = languageOverride ?? this.resolveLanguage(appLocale);
+    const resolvedLanguageId = languageId ?? Languages.findIndex((item) => item.locale === language.locale);
+
+    this._appLocale.set(appLocale);
+    this._language.set(language);
+    this._languageId.set(resolvedLanguageId >= 0 ? resolvedLanguageId : 0);
+
+    if (persist && this.browser) {
+      localStorage.setItem("locale", appLocale);
+    }
+
+    if (appLocale === "en-US") {
+      registerLocaleData(localeEnglish);
+    } else {
+      registerLocaleData(localeSpanish);
+    }
+  }
+
+  private resolveLanguage(appLocale: string): (typeof Languages)[number] {
+    return appLocale.startsWith("en") ? Languages[1] : Languages[0];
+  }
+
+  private resolveAppLocale(locale: string): string {
+    return locale.startsWith("en") ? "en-US" : "es-Ar";
+  }
+
+  private detectBrowserLocale(): string {
+    if (!this.browser) {
+      return "es-Ar";
+    }
+
+    return navigator.language || "es-Ar";
   }
 }

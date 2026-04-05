@@ -10,6 +10,7 @@ import type { EmailBody } from "@app/shared/models/emailBody";
 import { createEmailBody } from "@app/shared/models/factories";
 import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -24,6 +25,7 @@ export default class JoinUsComponent implements OnInit {
   _emailService = inject(EmailService);
   dialog = inject(MatDialog);
   _router = inject(Router);
+  private _navigationHistory = inject(NavigationHistoryService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
 
@@ -43,9 +45,9 @@ export default class JoinUsComponent implements OnInit {
 
   public previouslink: string | null = null;
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.titleService.setTitle("GMCAN | " + this.language.join);
-    this.previouslink = sessionStorage.getItem("previous-page");
+    this.previouslink = this._navigationHistory.previousUrl();
   }
 
   return(): void {
@@ -108,7 +110,7 @@ export class EmailExitoso {
   screenWidth: number;
   language: any = {};
   constructor() {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.screenWidth = window.innerWidth;
     this.url = GLOBAL.url;
     this.grupoInfo = this._session.getGrupoInfo();

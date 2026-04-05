@@ -1,144 +1,68 @@
-import { DatePipe } from "@angular/common";
-import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Meta, Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { createNoticia } from "@app/shared/models/factories";
+import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
 import type { Noticia } from "@app/shared/models/noticia";
 import type { Usuario } from "@app/shared/models/usuario";
 import { GLOBAL } from "@app/shared/services/global";
-import { LookupService } from "@app/shared/services/lookup.service";
-import { NoticiaService } from "@app/shared/services/noticia.service";
+import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
+
+import type { DetailNewsViewModel } from "./detail-news-data.types";
 
 @Component({
   selector: "app-detail-news",
   templateUrl: "./detail-news.component.html",
   styleUrl: "./detail-news.component.scss",
-  imports: [MatProgressSpinner, MatIcon, NewsComponent],
+  imports: [MatProgressSpinner, MatIcon, NewsComponent, SharedShareButtonsComponent],
 })
 export default class DetailNewsComponent implements OnInit {
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  _noticiaService = inject(NoticiaService);
-  lookup = inject(LookupService);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  _previousService = inject(PreviousPageService);
-  _usuarioService = inject(UsuarioService);
-  private _session = inject(SessionService);
-  meta = inject(Meta);
-  private titleService = inject(Title);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _navigationHistory = inject(NavigationHistoryService);
+  private readonly _previousService = inject(PreviousPageService);
+  private readonly _session = inject(SessionService);
+  private readonly _meta = inject(Meta);
+  private readonly _titleService = inject(Title);
 
-  public noticia: Noticia;
-  public previouspage = "";
-  public previouslink: string | null = null;
-  public usuario: Usuario;
-  url: string;
-  constructor() {
-    this.noticia = createNoticia();
-    this.usuario = {
-      DNI: "",
-      nombre: "",
-      nombreCompleto: "",
-      apellidoPaterno: "",
-      apellidoMaterno: "",
-      foto: "",
-      isPrincipal: 0,
-    };
-    this.url = GLOBAL.url;
-  }
-
-  language: any = {};
-  ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
-    this.cargado = false;
-    this.getNoticia();
-    this.previouslink = sessionStorage.getItem("previous-page");
-    this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
-  }
-
+  noticia: Noticia = {} as Noticia;
+  usuario: Usuario = {
+    DNI: "",
+    nombre: "",
+    nombreCompleto: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
+    foto: "",
+    isPrincipal: 0,
+  };
+  previouspage = "";
+  previouslink: string | null = null;
+  cargado = false;
   dia = "";
   mes = "";
   anio = "";
-  datere = new Date();
-  cargado = false;
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
+  url = GLOBAL.url;
+  language: any = {};
 
-  mouseEnter(int: number): void {
-    switch (int) {
-      case 1:
-        this.fbicon = "../../assets/img/Facebook2.svg";
-        break;
-      case 2:
-        this.twitter = "../../assets/img/twitter2.svg";
-        break;
-    }
-  }
+  ngOnInit(): void {
+    this.language = this._session.language();
+    const newsData = this._route.snapshot.data["news"] as DetailNewsViewModel;
 
-  mouseLeave(int: number): void {
-    switch (int) {
-      case 1:
-        this.fbicon = "../../assets/img/Facebook.svg";
-        break;
-      case 2:
-        this.twitter = "../../assets/img/twitter.svg";
-        break;
-    }
-  }
+    this.noticia = newsData.noticia;
+    this.usuario = newsData.usuario ?? this.usuario;
+    this.dia = newsData.dia;
+    this.mes = newsData.mes;
+    this.anio = newsData.anio;
 
-  getNoticia(): void {
-    const idNoticia = Number(this._route.snapshot.params["id"]);
-    this._noticiaService.getNoticia(idNoticia).subscribe((res: any) => {
-      this.noticia = res[0];
-      const d = new Date(this.noticia.fechaPublicacion ?? "");
-      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      this.noticia.fechaPublicacion = this.datePipe.transform(d, "MM/dd/y", "es") ?? undefined;
-      this.datere = new Date(String(this.noticia.fechaPublicacion));
-      this.dia = this.datePipe.transform(this.datere, "dd") ?? "";
-      this.mes = this.datePipe.transform(this.datere, "MMMM") ?? "";
-      this.anio = this.datePipe.transform(this.datere, "y") ?? "";
-      this.meta.updateTag({ name: "title", content: String(this.noticia.titulo) });
-      this.meta.updateTag({ property: "og:title", content: String(this.noticia.titulo) });
-      this.titleService.setTitle(String(this.noticia.titulo));
-      const newsBody = document.getElementById("newsBody");
-      if (newsBody) {
-        newsBody.innerHTML = this.noticia.cuerpo ?? "";
-      }
-      this.getTipoNoticia(this.noticia.tipoNoticia_idtipoNoticia ?? 0);
-      this.getUsuario(this.noticia.autorPublicacion ?? "");
-    });
+    this._meta.updateTag({ name: "title", content: String(this.noticia.titulo) });
+    this._meta.updateTag({ property: "og:title", content: String(this.noticia.titulo) });
+    this._titleService.setTitle(String(this.noticia.titulo));
+
+    this.previouslink = this._navigationHistory.previousUrl();
+    this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
     this.cargado = true;
-  }
-
-  getTipoNoticia(idTipoNoticia: number): void {
-    const found = this.lookup.tiposNoticia().find((t) => t.idtipoNoticia === idTipoNoticia);
-    if (found) this.noticia.nombreTipoNoticia = found.nombre;
-  }
-
-  getUsuario(idUsuario: string): void {
-    this._usuarioService.getUser(idUsuario).subscribe((res: Usuario[]) => {
-      this.usuario = res[0];
-    });
-  }
-
-  fb(e: Event): boolean {
-    const url = location.href;
-    e.preventDefault();
-    const facebookWindow = window.open(
-      "https://www.facebook.com/sharer/sharer.php?u=" + url,
-      "facebook-share-dialog",
-      "height=350,width=600",
-    );
-    if (facebookWindow?.focus) {
-      facebookWindow.focus();
-    }
-    return false;
   }
 }

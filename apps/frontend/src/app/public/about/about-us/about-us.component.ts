@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from "@angular/core";
-import { Title } from "@angular/platform-browser";
 import type { SobreNosotros } from "@app/shared/models/aboutus";
 import { Languages } from "@app/shared/models/languages";
 import { AboutUsService } from "@app/shared/services/aboutus.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { SeoService } from "@app/shared/services/seo.service";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
   selector: "app-about-us",
@@ -13,7 +14,8 @@ import { GLOBAL } from "@app/shared/services/global";
 })
 export default class AboutUsComponent implements OnInit {
   aboutusService = inject(AboutUsService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
+  private session = inject(SessionService);
 
   url: string;
   language: (typeof Languages)[number] = Languages[0];
@@ -36,26 +38,14 @@ export default class AboutUsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.language = JSON.parse(localStorage.getItem("language") ?? JSON.stringify(Languages[0]));
+    this.language = this.session.language();
     this.getAboutUs();
-    this.titleService.setTitle("GMCAN | " + this.language.who);
+    this.seo.setPageTitle("GMCAN | " + this.language.who);
   }
 
   getAboutUs(): void {
     this.aboutusService.getAboutUsInfo().subscribe((res: SobreNosotros[]) => {
       this.aboutus = res[0];
-      const services = document.getElementById("services");
-      const whoAre = document.getElementById("whoAre");
-      const objectives = document.getElementById("objectives");
-      if (services) {
-        services.innerHTML = this.aboutus.servicios ?? "";
-      }
-      if (whoAre) {
-        whoAre.innerHTML = this.aboutus.quienesSomos ?? "";
-      }
-      if (objectives) {
-        objectives.innerHTML = this.aboutus.objetivos ?? "";
-      }
     });
   }
 }

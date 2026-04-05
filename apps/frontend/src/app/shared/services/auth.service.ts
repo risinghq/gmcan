@@ -38,8 +38,8 @@ export class AuthService {
   }
 
   clearLocalStorage(): void {
-    const language = localStorage.getItem("language");
+    const locale = localStorage.getItem("locale");
     localStorage.clear();
-    if (language) localStorage.setItem("language", language);
+    if (locale) localStorage.setItem("locale", locale);
   }
 }

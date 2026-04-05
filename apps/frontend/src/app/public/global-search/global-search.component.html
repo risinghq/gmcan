@@ -192,9 +192,8 @@
                       </a>
                     }
                     <a
-                      id="abstract{{ i }}"
-                      [class.abstract-active]="selectedItem === i"
-                      (click)="listClick($event, i)"
+                      [class.abstract-active]="isExpanded('search-pub', i)"
+                      (click)="toggleExpanded('search-pub', i)"
                       class="publication-abstract"
                       data-toggle="collapse"
                       href="#publication{{ i }}"
@@ -202,13 +201,20 @@
                       aria-expanded="false"
                       aria-controls="publication"
                     >
-                      {{ this.language.publicationsText[0].seeMore }}
+                      {{
+                        expandLabel(
+                          "search-pub",
+                          i,
+                          this.language.publicationsText[0].seeMore,
+                          this.language.publicationsText[0].seeLess
+                        )
+                      }}
                     </a>
                     <mat-icon
                       class="publication-abs-icon"
                       [class]="{
-                        'abs-active': selectedItem === i,
-                        'abs-not-active': selectedItem == -1,
+                        'abs-active': isExpanded('search-pub', i),
+                        'abs-not-active': !isExpanded('search-pub', i),
                       }"
                     >
                       keyboard_arrow_down
@@ -309,9 +315,8 @@
                     </div>
                     <div class="flex-news">
                       <a
-                        id="abstract{{ i }}"
-                        [class.abstract-active]="selectedItem === i"
-                        (click)="listClick($event, i)"
+                        [class.abstract-active]="isExpanded('search-proj', i)"
+                        (click)="toggleExpanded('search-proj', i)"
                         class="project-abstract"
                         data-toggle="collapse"
                         href="#project{{ i }}"
@@ -319,13 +324,20 @@
                         aria-expanded="false"
                         aria-controls="project"
                       >
-                        {{ this.language.projectsText[0].seeMore }}
+                        {{
+                          expandLabel(
+                            "search-proj",
+                            i,
+                            this.language.projectsText[0].seeMore,
+                            this.language.projectsText[0].seeLess
+                          )
+                        }}
                       </a>
                       <mat-icon
                         class="project-abs-icon"
                         [class]="{
-                          'abs-active': selectedItem === i,
-                          'abs-not-active': selectedItem == -1,
+                          'abs-active': isExpanded('search-proj', i),
+                          'abs-not-active': !isExpanded('search-proj', i),
                         }"
                       >
                         keyboard_arrow_down

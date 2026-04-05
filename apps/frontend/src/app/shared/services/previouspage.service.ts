@@ -8,7 +8,7 @@ export class PreviousPageService {
   private _session = inject(SessionService);
 
   getPreviousPage(param: string): string {
-    const locale = this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+    const locale = this._session.languageCode ?? "es";
     if (locale == "es") {
       if (param && param.includes("search")) {
         return "Resultados de Búsqueda";

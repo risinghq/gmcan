@@ -1,4 +1,4 @@
-import { Location, NgClass, SlicePipe } from "@angular/common";
+import { NgClass, SlicePipe } from "@angular/common";
 import { DatePipe } from "@angular/common";
 import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
@@ -49,7 +49,6 @@ export default class MainNewsComponent implements OnInit {
   _noticiaService = inject(NoticiaService);
   _route = inject(ActivatedRoute);
   lookup = inject(LookupService);
-  location = inject(Location);
   _router = inject(Router);
   _usuarioService = inject(UsuarioService);
   private _session = inject(SessionService);
@@ -74,7 +73,7 @@ export default class MainNewsComponent implements OnInit {
   public pageSize = 10;
   language: any = {};
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.categoryNombre = this.language.newsText[0].categoryTitle;
     this.tiponoticias = this.lookup.tiposNoticia().toSorted((a, b) => ((a.nombre ?? "") > (b.nombre ?? "") ? 1 : -1));
@@ -142,7 +141,6 @@ export default class MainNewsComponent implements OnInit {
     this.page = 1;
   }
   detalleNoticia(noticia: Noticia): void {
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
     this.scroll();
   }

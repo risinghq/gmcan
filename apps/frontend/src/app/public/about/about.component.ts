@@ -3,57 +3,33 @@ import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute, RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
-import { Languages } from "@app/shared/models/languages";
 import { GrupoService } from "@app/shared/services/grupo.service";
+
+import { AboutFacade } from "./about.facade";
 
 @Component({
   selector: "app-about",
   templateUrl: "./about.component.html",
   styleUrl: "./about.component.scss",
   imports: [MatIcon, RouterOutlet, RouterLink, RouterLinkActive],
+  providers: [AboutFacade],
 })
 export default class AboutComponent implements OnInit {
   _grupoService = inject(GrupoService);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
+  readonly facade = inject(AboutFacade);
 
   public info: Grupo;
   constructor() {
     this.info = createGrupo();
   }
 
-  selectedCategory = "";
-
-  language: (typeof Languages)[number] = Languages[0];
-
   ngOnInit(): void {
-    this.language = JSON.parse(localStorage.getItem("language") ?? JSON.stringify(Languages[0]));
-    this.verifyRoutes(this._router.url);
-  }
-
-  verifyRoutes(route: string): void {
-    switch (route) {
-      case "/home/about-us/about":
-        this.selectedCategory = this.language.who;
-        break;
-      case "/home/about-us/lines-investigation":
-        this.selectedCategory = this.language.linesInvestigation;
-        break;
-      case "/home/about-us/methods":
-        this.selectedCategory = this.language.methods;
-        break;
-      case "/home/about-us/facilities-resources":
-        this.selectedCategory = this.language.resources;
-        break;
-      case "/home/about-us/works":
-        this.selectedCategory = this.language.futureWorks;
-        break;
-      default:
-        break;
-    }
+    this.facade.init(this._router.url);
   }
 
   selected(element: string): void {
-    this.selectedCategory = element;
+    this.facade.setSelectedCategory(element);
   }
 }

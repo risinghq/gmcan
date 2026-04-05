@@ -2,10 +2,10 @@
   "name": "gmcan-monorepo",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "workspaces": [
     "apps/*"
   ],
+  "type": "module",
   "scripts": {
     "dev": "bun --filter './apps/*' start",
     "dev:frontend": "bun --filter frontend start",
@@ -23,8 +23,8 @@
     "oxlint": "^1.58.0"
   },
   "engines": {
-    "node": ">=20.19.0",
-    "bun": ">=1.0.0"
+    "bun": ">=1.0.0",
+    "node": ">=20.19.0"
   },
   "packageManager": "bun@1.3.11",
   "trustedDependencies": [

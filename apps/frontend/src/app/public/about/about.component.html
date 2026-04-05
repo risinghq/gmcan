@@ -2,11 +2,11 @@
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="about-links">
-        <a class="about-link-active" href="/">{{ language.home }}</a>
+        <a class="about-link-active" href="/">{{ facade.language().home }}</a>
         <mat-icon class="about-icon"> arrow_right </mat-icon>
-        <a class="about-link-active">{{ language.aboutUs }}</a>
+        <a class="about-link-active">{{ facade.language().aboutUs }}</a>
         <mat-icon class="about-icon"> arrow_right </mat-icon>
-        <a class="about-link short-text">{{ selectedCategory }}</a>
+        <a class="about-link short-text">{{ facade.selectedCategory() }}</a>
       </div>
       <router-outlet />
     </div>
@@ -15,47 +15,47 @@
         <div
           class="about-category"
           routerLink="./about"
-          (click)="selected(language.who)"
+          (click)="selected(facade.language().who)"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          {{ language.who }}
+          {{ facade.language().who }}
         </div>
         <div
           class="about-category"
           routerLink="./lines-investigation"
-          (click)="selected(language.linesInvestigation)"
+          (click)="selected(facade.language().linesInvestigation)"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          {{ language.linesInvestigation }}
+          {{ facade.language().linesInvestigation }}
         </div>
         <div
           class="about-category"
           routerLink="./methods"
-          (click)="selected(language.methods)"
+          (click)="selected(facade.language().methods)"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          {{ language.methods }}
+          {{ facade.language().methods }}
         </div>
         <div
           class="about-category"
           routerLink="./facilities-resources"
-          (click)="selected(language.resources)"
+          (click)="selected(facade.language().resources)"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          {{ language.resources }}
+          {{ facade.language().resources }}
         </div>
         <div
           class="about-category"
           routerLink="./works"
-          (click)="selected(language.futureWorks)"
+          (click)="selected(facade.language().futureWorks)"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          {{ language.futureWorks }}
+          {{ facade.language().futureWorks }}
         </div>
       </div>
     </div>

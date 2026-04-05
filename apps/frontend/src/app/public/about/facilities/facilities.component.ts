@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
-import { Title } from "@angular/platform-browser";
 import { Equipo } from "@app/shared/models/equipo";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
@@ -8,6 +7,8 @@ import { Software } from "@app/shared/models/software";
 import { EquipoService } from "@app/shared/services/equipo.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
+import { SeoService } from "@app/shared/services/seo.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { SoftwareService } from "@app/shared/services/software.service";
 
 @Component({
@@ -20,7 +21,8 @@ export default class FacilitiesComponent implements OnInit {
   _equipoService = inject(EquipoService);
   _softwareService = inject(SoftwareService);
   _grupoService = inject(GrupoService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
+  private session = inject(SessionService);
 
   equipos: Equipo[] = [];
   software: Software[] = [];
@@ -40,10 +42,8 @@ export default class FacilitiesComponent implements OnInit {
   language: any = { locale: "es", resources: "Facilidades y recursos" };
 
   ngOnInit(): void {
-    this.language = JSON.parse(
-      localStorage.getItem("language") ?? '{"locale":"es","resources":"Facilidades y recursos"}',
-    );
-    this.titleService.setTitle("GMCAN | " + this.language.resources);
+    this.language = this.session.language();
+    this.seo.setPageTitle("GMCAN | " + this.language.resources);
     this.getEquipos();
     this.getSoftware();
     this.getGrupo();

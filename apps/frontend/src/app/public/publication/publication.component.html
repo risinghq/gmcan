@@ -178,9 +178,8 @@
                             </a>
                           }
                           <a
-                            id="abstract{{ i }}"
-                            [class.abstract-active]="selectedItem === i"
-                            (click)="listClick($event, i)"
+                            [class.abstract-active]="isExpanded('pub', i)"
+                            (click)="toggleExpanded('pub', i)"
                             class="publication-abstract"
                             data-toggle="collapse"
                             href="#collapseExample{{ i }}"
@@ -188,13 +187,20 @@
                             aria-expanded="false"
                             aria-controls="collapseExample"
                           >
-                            {{ this.language.publicationsText[0].seeMore }}
+                            {{
+                              expandLabel(
+                                "pub",
+                                i,
+                                this.language.publicationsText[0].seeMore,
+                                this.language.publicationsText[0].seeLess
+                              )
+                            }}
                           </a>
                           <mat-icon
                             class="publication-abs-icon"
                             [class]="{
-                              'abs-active': selectedItem === i,
-                              'abs-not-active': selectedItem == -1,
+                              'abs-active': isExpanded('pub', i),
+                              'abs-not-active': !isExpanded('pub', i),
                             }"
                           >
                             keyboard_arrow_down

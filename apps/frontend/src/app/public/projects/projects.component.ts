@@ -1,5 +1,4 @@
 import { TitleCasePipe, DatePipe, SlicePipe } from "@angular/common";
-import { Location } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -12,7 +11,6 @@ import NewsComponent from "@app/shared/components/news/news.component";
 import { Proyecto } from "@app/shared/models/proyecto";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProyectoService } from "@app/shared/services/proyecto.service";
@@ -25,6 +23,8 @@ import {
   NgbPaginationNumber,
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
+
+import type { ProjectsViewModel } from "./projects-data.types";
 
 @Component({
   selector: "app-projects",
@@ -46,56 +46,64 @@ import {
   ],
 })
 export default class ProjectsComponent implements OnInit {
-  fb = inject(FormBuilder);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  private _proyectoServices = inject(ProyectoService);
-  private _lineasInvestigacionServices = inject(LineasInvestigacionService);
-  private _usuarioHasProyectoService = inject(UsuarioHasProyectoService);
-  private _usuarioService = inject(UsuarioService);
-  location = inject(Location);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private http = inject(HttpClient);
-  _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  lookup = inject(LookupService);
-  _grupoService = inject(GrupoService);
-  private _session = inject(SessionService);
-  private titleService = inject(Title);
+  private readonly _fb = inject(FormBuilder);
+  private readonly _titlecasePipe = inject(TitleCasePipe);
+  private readonly _datePipe = inject(DatePipe);
+  private readonly _proyectoServices = inject(ProyectoService);
+  private readonly _lineasInvestigacionServices = inject(LineasInvestigacionService);
+  private readonly _usuarioHasProyectoService = inject(UsuarioHasProyectoService);
+  private readonly _usuarioService = inject(UsuarioService);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+  private readonly _http = inject(HttpClient);
+  private readonly _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  private readonly _lookup = inject(LookupService);
+  private readonly _session = inject(SessionService);
+  private readonly _titleService = inject(Title);
 
-  public proyectos: Proyecto[] = [];
-  public tipoProyectos: string[] = [];
+  proyectos: Proyecto[] = [];
+  tipoProyectos: string[] = [];
   allCharged: boolean | null = false;
-  public searchForm: FormGroup;
-  public url: string = GLOBAL.url;
+  searchForm: FormGroup;
+  url = GLOBAL.url;
   infoText = "";
+  language: any = {};
+  page = 1;
+  pageSize = 5;
+  screenWidth = 0;
+  searchText = "";
+  expandedKey: string | null = null;
 
   constructor() {
-    this.searchForm = this.fb.group({
+    this.searchForm = this._fb.group({
       titulo: [""],
     });
   }
-  language: any = {};
-  public page = 1;
-  public pageSize = 5;
-  screenWidth = 0;
-  searchText = "";
+
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
     this.screenWidth = window.innerWidth;
     this.setSearchText();
   }
+
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
-    this.titleService.setTitle("GMCAN | " + this.language.projects);
+    this.language = this._session.language();
+    this._titleService.setTitle("GMCAN | " + this.language.projects);
     this.screenWidth = window.innerWidth;
     this.url = GLOBAL.url;
-    this.proyectos = [];
     this.page = 1;
     this.pageSize = 5;
     this.setSearchText();
-    this.getProyectos(1);
-    this.getGrupo();
+
+    const projectsData = this._route.snapshot.data["projects"] as ProjectsViewModel;
+    this.proyectos = projectsData.proyectos;
+    this.infoText = projectsData.infoText;
+
+    this.tipoProyectos.push(this.language.projectsText[0].projectsType1);
+    this.tipoProyectos.push(this.language.projectsText[0].projectsType2);
+    this._hydrateProjects();
+
+    this.allCharged = true;
   }
 
   ngDoCheck(): void {
@@ -105,14 +113,6 @@ export default class ProjectsComponent implements OnInit {
     }
   }
 
-  getGrupo(): void {
-    this._grupoService.getGrupoInfo().subscribe((res: any[]) => {
-      if (res.length > 0) {
-        this.infoText = res[0].seccionProyectos;
-      }
-    });
-  }
-
   setSearchText(): void {
     this.searchText = this.language.projectsText[0].placeholderMobile;
     if (this.screenWidth > 960) {
@@ -120,7 +120,6 @@ export default class ProjectsComponent implements OnInit {
     }
   }
 
-  /* Request Publicaciones at Tab Change */
   changeTab($event: { index: number }): void {
     let estado = 0;
     if ($event.index == 0) {
@@ -140,19 +139,32 @@ export default class ProjectsComponent implements OnInit {
 
   getProyectos(estado: number): void {
     this._proyectoServices.getProyectos(estado).subscribe((res: Proyecto[]) => {
-      if (res.length > 0) {
-        res.sort((a: Proyecto, b: Proyecto) =>
-          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
-        );
-        this.proyectos = res;
-        this.tipoProyectos.push(this.language.projectsText[0].projectsType1);
-        this.tipoProyectos.push(this.language.projectsText[0].projectsType2);
-        for (let index = 0; index < this.proyectos.length; index++) {
-          this.fillProyecto(this.proyectos[index], index);
-        }
-      }
+      this.proyectos = this._sortProjects(res ?? []);
+      this._hydrateProjects();
       this.allCharged = true;
     });
+  }
+
+  private _sortProjects(projects: Proyecto[]): Proyecto[] {
+    return projects.toSorted((a: Proyecto, b: Proyecto) =>
+      (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
+    );
+  }
+
+  private _hydrateProjects(): void {
+    for (let index = 0; index < this.proyectos.length; index++) {
+      if (this.proyectos[index] != undefined) {
+        this.fillProyecto(this.proyectos[index], index);
+      }
+    }
+  }
+
+  private _appendUniqueProjects(projects: Proyecto[]): void {
+    for (const project of projects) {
+      if (this.proyectos.findIndex((current: Proyecto) => current.idProyecto === project.idProyecto) === -1) {
+        this.proyectos.push(project);
+      }
+    }
   }
 
   getLineasInvestigacion(idLinea: number, index: number): void {
@@ -164,38 +176,31 @@ export default class ProjectsComponent implements OnInit {
       }
     });
   }
-  selectedItem = -1;
-  oldValue = -1;
 
-  listClick(_event: Event, newValue: number): void {
-    this.oldValue = this.selectedItem;
-    this.selectedItem = newValue;
-    const current = document.getElementById("abstract" + newValue);
-    if (current) {
-      current.innerText = this.language.projectsText[0].seeLess;
-    }
-    if (this.selectedItem == this.oldValue) {
-      this.selectedItem = -1;
-      const previous = document.getElementById("abstract" + this.oldValue);
-      if (previous) {
-        previous.innerText = this.language.projectsText[0].seeMore;
-      }
-    }
+  toggleExpanded(section: string, index: number): void {
+    const key = `${section}:${index}`;
+    this.expandedKey = this.expandedKey === key ? null : key;
   }
 
-  /* Fill proyecto data */
+  isExpanded(section: string, index: number): boolean {
+    return this.expandedKey === `${section}:${index}`;
+  }
+
+  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
+    return this.isExpanded(section, index) ? seeLess : seeMore;
+  }
 
   fillProyecto(proyecto: Proyecto, index: number): void {
     let d = new Date(proyecto.fechaInicio ?? new Date());
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es") ?? undefined;
-    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
+    proyecto.fechaI = this._datePipe.transform(d, "MMMM, y", "es") ?? undefined;
+    proyecto.fechaI = this._titlecasePipe.transform(proyecto.fechaI ?? "");
     proyecto.usuario = [];
     if (proyecto.fechaFin) {
       d = new Date(proyecto.fechaFin);
       d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es") ?? undefined;
-      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF ?? "");
+      proyecto.fechaF = this._datePipe.transform(proyecto.fechaFin, "MMMM, y", "es") ?? undefined;
+      proyecto.fechaF = this._titlecasePipe.transform(proyecto.fechaF ?? "");
     }
     this.getLineasInvestigacion(proyecto.lineasInvestigacion_idLineasInvestigacion ?? 0, index);
     this.getUsuarioHasProyecto(proyecto);
@@ -214,7 +219,7 @@ export default class ProjectsComponent implements OnInit {
   }
 
   getMoneda(proyecto: Proyecto): void {
-    const found = this.lookup.monedas().find((m) => m.idMoneda === proyecto.moneda_idMoneda);
+    const found = this._lookup.monedas().find((m) => m.idMoneda === proyecto.moneda_idMoneda);
     if (found) proyecto.moneda = found.simbolo;
   }
 
@@ -258,54 +263,24 @@ export default class ProjectsComponent implements OnInit {
     if (!user.DNI) {
       return;
     }
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
-
-  /* Search Methods */
 
   getProyectoLinea(idLineaInvestigacion: number, estado: number): void {
     this._proyectoServices.getProyectosLinea(idLineaInvestigacion, estado).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
-        if (this.proyectos) {
-          for (let index = 0; index < res.length; index++) {
-            if (this.proyectos.findIndex((x: Proyecto) => x.idProyecto === res[index].idProyecto) == -1) {
-              this.proyectos.push(res[index]);
-            }
-          }
-        } else {
-          this.proyectos = res;
-        }
+        this._appendUniqueProjects(res);
       }
-      for (let index = 0; index < this.proyectos.length; index++) {
-        if (this.proyectos[index] != undefined) {
-          this.fillProyecto(this.proyectos[index], index);
-        }
-      }
+      this._hydrateProjects();
     });
   }
 
   getProyectoId(idProyecto: number, estado: number): void {
     this._proyectoServices.getProyectosId(idProyecto, estado).subscribe((res: Proyecto[]) => {
       if (res.length > 0) {
-        res.sort((a: Proyecto, b: Proyecto) =>
-          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
-        );
-        if (this.proyectos) {
-          for (let index = 0; index < res.length; index++) {
-            if (this.proyectos.findIndex((x: Proyecto) => x.idProyecto === res[index].idProyecto) == -1) {
-              this.proyectos.push(res[index]);
-            }
-          }
-        } else {
-          this.proyectos = res;
-        }
+        this._appendUniqueProjects(this._sortProjects(res));
       }
-      for (let index = 0; index < this.proyectos.length; index++) {
-        if (this.proyectos[index] != undefined) {
-          this.fillProyecto(this.proyectos[index], index);
-        }
-      }
+      this._hydrateProjects();
     });
   }
 
@@ -324,27 +299,23 @@ export default class ProjectsComponent implements OnInit {
   }
 
   searchProyectos(nombre: string, estado: number): void {
-    this.http.post<Proyecto[]>(`${GLOBAL.url}proyecto/search-proyecto`, { nombre, estado }).subscribe((res) => {
-      if (res.length > 0) {
-        this.proyectos = res;
-        for (let index = 0; index < this.proyectos.length; index++) {
-          if (this.proyectos[index] != undefined && this.proyectos[index].estado == estado) {
-            this.fillProyecto(this.proyectos[index], index);
-          } else {
-            this.proyectos.splice(index, 1);
-          }
+    this._http
+      .post<Proyecto[]>(`${GLOBAL.url}proyecto/search-proyecto`, { nombre, estado })
+      .subscribe((res: Proyecto[]) => {
+        if (res.length > 0) {
+          this.proyectos = this._sortProjects(res.filter((project) => project.estado == estado));
+          this._hydrateProjects();
         }
-      }
-      this.searchLineasInvestigacion(nombre, estado);
-    });
+        this.searchLineasInvestigacion(nombre, estado);
+      });
   }
 
   searchLineasInvestigacion(nombre: string, estado: number): void {
-    this.http
+    this._http
       .post<{ idLineasInvestigacion: number }[]>(`${GLOBAL.url}lineasinvestigacion/search-lineasinvestigacion`, {
         nombre,
       })
-      .subscribe((res) => {
+      .subscribe((res: { idLineasInvestigacion: number }[]) => {
         if (res.length > 0) {
           for (const linea of res) {
             this.getProyectoLinea(linea.idLineasInvestigacion, estado);
@@ -355,14 +326,16 @@ export default class ProjectsComponent implements OnInit {
   }
 
   searchResponsables(nombre: string, estado: number): void {
-    this.http.post<{ DNI: string }[]>(`${GLOBAL.url}usuario/search-usuarios`, { nombre }).subscribe((res) => {
-      this.allCharged = true;
-      if (res.length > 0) {
-        for (const user of res) {
-          this.getUsuarioHasProyectoId(user.DNI, estado);
+    this._http
+      .post<{ DNI: string }[]>(`${GLOBAL.url}usuario/search-usuarios`, { nombre })
+      .subscribe((res: { DNI: string }[]) => {
+        this.allCharged = true;
+        if (res.length > 0) {
+          for (const user of res) {
+            this.getUsuarioHasProyectoId(user.DNI, estado);
+          }
         }
-      }
-    });
+      });
   }
 
   getUsuarioHasProyectoId(DNI: string, estado: number): void {

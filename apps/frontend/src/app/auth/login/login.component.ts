@@ -51,10 +51,8 @@ export default class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.session.setLanguageId(0);
-    this.language = Languages[0];
-    this.session.setLanguageData(this.language);
-    this.language = this.session.getLanguageData<(typeof Languages)[number]>() ?? Languages[0];
+    this.session.setLanguage(Languages[0], 0);
+    this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.login);
     this.getGrupoInfo();
     this.previouslink = this.session.getPreviousPage();
@@ -78,7 +76,7 @@ export default class LoginComponent implements OnInit {
       };
       this.authService.login(user).subscribe((res: any) => {
         if (res.state == 1) {
-          window.location.href = "/dashboard";
+          this._router.navigate(["/dashboard"]);
         } else {
           this.error = "Correo electrónico o contraseña incorrectos";
         }

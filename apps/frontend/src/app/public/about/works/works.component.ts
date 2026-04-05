@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from "@angular/core";
-import { Title } from "@angular/platform-browser";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 import { Languages } from "@app/shared/models/languages";
 import { GrupoService } from "@app/shared/services/grupo.service";
+import { SeoService } from "@app/shared/services/seo.service";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
   selector: "app-works",
@@ -12,7 +13,8 @@ import { GrupoService } from "@app/shared/services/grupo.service";
 })
 export default class WorksComponent implements OnInit {
   _grupoService = inject(GrupoService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
+  private session = inject(SessionService);
 
   public info: Grupo;
   language: (typeof Languages)[number] = Languages[0];
@@ -21,18 +23,14 @@ export default class WorksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.language = JSON.parse(localStorage.getItem("language") ?? JSON.stringify(Languages[0]));
-    this.titleService.setTitle("GMCAN | " + this.language.futureWorks);
+    this.language = this.session.language();
+    this.seo.setPageTitle("GMCAN | " + this.language.futureWorks);
     this.getGrupoInfo();
   }
 
   getGrupoInfo(): void {
     this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
       this.info = res[0];
-      const works = document.getElementById("works");
-      if (works) {
-        works.innerHTML = this.info.trabajosFuturos ?? "";
-      }
     });
   }
 }

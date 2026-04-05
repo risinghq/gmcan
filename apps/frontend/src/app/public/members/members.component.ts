@@ -1,4 +1,3 @@
-import { Location } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -25,7 +24,6 @@ export default class MembersComponent implements OnInit {
   _usuarioService = inject(UsuarioService);
   lookup = inject(LookupService);
   private _session = inject(SessionService);
-  location = inject(Location);
   private titleService = inject(Title);
 
   public cargado = false;
@@ -41,7 +39,7 @@ export default class MembersComponent implements OnInit {
   allCharged = false;
 
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.titleService.setTitle("GMCAN | " + this.language.members);
     this.cargado = true;
     this.tipoMiembros = this.lookup.tiposMiembro().map((t) => Object.assign({}, t, { miembros: [] as UsuarioFull[] }));
@@ -76,7 +74,6 @@ export default class MembersComponent implements OnInit {
   }
 
   profile(user: UsuarioFull): void {
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
 }

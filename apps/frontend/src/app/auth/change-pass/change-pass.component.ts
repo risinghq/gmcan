@@ -57,7 +57,7 @@ export default class ChangePassComponent implements OnInit {
   }
 
   private initializeLanguage(): void {
-    this.language = this.session.getLanguageData<any>() ?? {};
+    this.language = this.session.language();
   }
 
   private getGrupoInfo(): void {

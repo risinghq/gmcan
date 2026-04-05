@@ -16,7 +16,7 @@ export default class NotFoundComponent implements OnInit {
 
   language: any = {};
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.setTexts();
   }
 

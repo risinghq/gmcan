@@ -50,7 +50,7 @@
         <mat-card class="line-card center">
           <div class="line-img-div">
             @if (linea.foto) {
-              <img class="line-img" src="{{ url + 'lineasinvestigacion/' + linea.idLineasInvestigacion + '/file }}" />
+              <img class="line-img" src="{{ url + 'lineasinvestigacion/' + linea.idLineasInvestigacion + '/file' }}" />
             }
             @if (!linea.foto) {
               <img class="line-img" src="../../assets/img/prop_estruc.jpg" />
@@ -156,7 +156,7 @@
   </div>
   <div class="services-card">
     <img class="services-icon" src="../../assets/img/bulb.svg" />
-    <div class="mt-services about-text" id="services"></div>
+    <div class="mt-services about-text" [innerHTML]="aboutUs"></div>
     <div
       class="btn-black align-center"
       [style.display]="screenWidth < 960 ? 'none' : 'block'"
@@ -214,7 +214,7 @@
               {{ metodo.nombre }}
             </div>
           </div>
-          <div id="method{{ i }}" class="linea-text method-text"></div>
+          <div class="linea-text method-text" [innerHTML]="metodo.descripcion"></div>
           <a class="linea-text-green method-green" href="/home/about-us/methods">
             {{ language.seeMore }}
           </a>
@@ -427,9 +427,8 @@
                 </a>
               }
               <a
-                id="abstract{{ i }}"
-                [class.abstract-active]="selectedItem === i"
-                (click)="listClick($event, i)"
+                [class.abstract-active]="isExpanded('home-pub', i)"
+                (click)="toggleExpanded('home-pub', i)"
                 class="publication-abstract"
                 data-toggle="collapse"
                 href="#publication{{ i }}"
@@ -437,11 +436,18 @@
                 aria-expanded="false"
                 aria-controls="publication"
               >
-                {{ this.language.publicationsText[0].seeMore }}
+                {{
+                  expandLabel(
+                    "home-pub",
+                    i,
+                    this.language.publicationsText[0].seeMore,
+                    this.language.publicationsText[0].seeLess
+                  )
+                }}
               </a>
               <mat-icon
                 class="publication-abs-icon"
-                [class]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
+                [class]="{ 'abs-active': isExpanded('home-pub', i), 'abs-not-active': !isExpanded('home-pub', i) }"
               >
                 keyboard_arrow_down
               </mat-icon>
@@ -540,9 +546,8 @@
             </div>
             <div class="flex-news" [style.display]="screenWidth > 960 ? 'none' : 'block'">
               <a
-                id="abstract{{ i }}"
-                [class.abstract-active]="selectedItem === i"
-                (click)="listClick($event, i)"
+                [class.abstract-active]="isExpanded('home-proj', i)"
+                (click)="toggleExpanded('home-proj', i)"
                 class="project-abstract"
                 data-toggle="collapse"
                 href="#project{{ i }}"
@@ -550,11 +555,21 @@
                 aria-expanded="false"
                 aria-controls="project"
               >
-                {{ this.language.projectsText[0].seeMore }}
+                {{
+                  expandLabel(
+                    "home-proj",
+                    i,
+                    this.language.projectsText[0].seeMore,
+                    this.language.projectsText[0].seeLess
+                  )
+                }}
               </a>
               <mat-icon
                 class="project-abs-icon"
-                [class]="{ 'abs-active': selectedItem === i, 'abs-not-active': selectedItem == -1 }"
+                [class]="{
+                  'abs-active': isExpanded('home-proj', i),
+                  'abs-not-active': !isExpanded('home-proj', i),
+                }"
               >
                 keyboard_arrow_down
               </mat-icon>

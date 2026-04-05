@@ -50,7 +50,9 @@
                 </div>
               </div>
             </div>
-            <div id="newsBody" class="detail-text" style="white-space: pre-wrap"></div>
+            <app-shared-share-buttons [url]="url + 'noticia/' + noticia.idNoticia" [title]="noticia.titulo" />
+
+            <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.cuerpo ?? ''"></div>
           </div>
         </div>
       </div>

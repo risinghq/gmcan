@@ -15,6 +15,7 @@ import {
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
 import { provideRouter, withComponentInputBinding } from "@angular/router";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
@@ -36,6 +37,10 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     DatePipe,
     TitleCasePipe,
+    provideAppInitializer(() => inject(SessionService).init()),
+    provideAppInitializer(() => {
+      inject(NavigationHistoryService);
+    }),
     provideAppInitializer(() => inject(LookupService).load()),
     {
       provide: LOCALE_ID,

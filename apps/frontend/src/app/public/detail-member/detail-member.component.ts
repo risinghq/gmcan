@@ -15,6 +15,7 @@ import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import type { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -49,6 +50,7 @@ export default class DetailMemberComponent implements OnInit {
   _usuarioService = inject(UsuarioService);
   _publicacionAutoresService = inject(PublicacionAutoresService);
   lookup = inject(LookupService);
+  private _navigationHistory = inject(NavigationHistoryService);
   _previousService = inject(PreviousPageService);
   private _session = inject(SessionService);
   location = inject(Location);
@@ -71,70 +73,29 @@ export default class DetailMemberComponent implements OnInit {
   language: any = {};
 
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.getTipoPublicacion();
-    this.previouslink = sessionStorage.getItem("previous-page");
+    this.previouslink = this._navigationHistory.previousUrl();
     this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
   }
-  selectedItem = -1;
-  oldValue = -1;
-  listClick(_event: Event, newValue: number) {
-    this.oldValue = this.selectedItem;
-    this.selectedItem = newValue;
-    const current = document.getElementById("abstract" + newValue);
-    if (current) {
-      current.innerText = this.language.detailMemberText[0].seeLess;
-    }
-    if (this.selectedItem == this.oldValue) {
-      this.selectedItem = -1;
-      const previous = document.getElementById("abstract" + this.oldValue);
-      if (previous) {
-        previous.innerText = this.language.detailMemberText[0].seeMore;
-      }
-    }
+  expandedKey: string | null = null;
+  toggleExpanded(section: string, index: number): void {
+    const key = `${section}:${index}`;
+    this.expandedKey = this.expandedKey === key ? null : key;
+  }
+
+  isExpanded(section: string, index: number): boolean {
+    return this.expandedKey === `${section}:${index}`;
+  }
+
+  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
+    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 
   scroll(): void {
     const el = document.getElementById("main-toolbar");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
-  /* Share Hover */
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
-  mouseEnter(int: number, index: number) {
-    switch (int) {
-      case 1:
-        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
-        break;
-      case 2:
-        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
-        break;
-      case 3:
-        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
-        break;
-      case 4:
-        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
-        break;
-    }
-  }
-
-  mouseLeave(int: number, index: number) {
-    switch (int) {
-      case 1:
-        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
-        break;
-      case 2:
-        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
-        break;
-      case 3:
-        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
-        break;
-      case 4:
-        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
-        break;
     }
   }
 
@@ -241,7 +202,6 @@ export default class DetailMemberComponent implements OnInit {
     if (!autor?.DNI) {
       return;
     }
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + autor.DNI]);
     this.getTipoPublicacion();
   }

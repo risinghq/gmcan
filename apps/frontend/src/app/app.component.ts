@@ -1,4 +1,4 @@
-import { Component, Renderer2, HostListener, inject } from "@angular/core";
+import { Component, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { createGrupo } from "@app/shared/models/factories";
@@ -17,7 +17,6 @@ import { SessionService } from "@app/shared/services/session.service";
 export default class AppComponent {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  private ren = inject(Renderer2);
   _grupoService = inject(GrupoService);
   private session = inject(SessionService);
   fb = inject(FormBuilder);
@@ -30,14 +29,14 @@ export default class AppComponent {
   isMatMenuOpen = false;
   prevButtonTrigger = false;
   language: (typeof Languages)[number];
-  lanSelected = 0;
+  lanSelected: number;
   public searchGlobalForm: FormGroup;
   constructor() {
     this.searchGlobalForm = this.fb.group({
       nombre: [""],
     });
-    this.lanSelected = this.session.getLanguageId();
-    this.language = Languages[this.lanSelected] ?? Languages[0];
+    this.lanSelected = this.session.languageId();
+    this.language = this.session.language();
     this.url = GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = window.innerWidth;
@@ -50,35 +49,13 @@ export default class AppComponent {
   }
 
   ngOnInit(): void {
-    console.log(this.session.locale);
     this.getGrupoInfo();
-    this.session.setLanguageData(this.language);
-    this.verifyLocale(this.language);
-  }
-
-  verifyLocale(language: { locale?: string }): void {
-    if (language.locale == "en") {
-      this.english();
-    } else {
-      this.spanish();
-    }
-  }
-
-  english(): void {
-    console.log("hola");
-    this.session.registerCulture("en-US");
-  }
-
-  spanish(): void {
-    this.session.registerCulture("es-Ar");
   }
 
   lanSelect(index: number): void {
     this.lanSelected = index;
     this.language = Languages[this.lanSelected] ?? Languages[0];
-    this.verifyLocale(this.language);
-    this.session.setLanguageData(this.language);
-    this.session.setLanguageId(index);
+    this.session.setLanguage(this.language, index);
     window.location.reload();
   }
 
@@ -89,20 +66,6 @@ export default class AppComponent {
       this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
     });
   }
-  inputExpand = false;
-  expandInput(): void {
-    this.inputExpand = !this.inputExpand;
-    const inputElement = document.getElementById("inputExpand");
-    if (!inputElement) return;
-    if (this.inputExpand) {
-      inputElement.setAttribute("class", "search-top-input search-top-input-decompressed");
-    } else {
-      inputElement.setAttribute("class", "search-top-input search-top-input-compressed");
-    }
-  }
-
-  /* globalSearch */
-
   searchGlobal(value: string): void {
     this._router.navigate(["/search/" + value]);
   }

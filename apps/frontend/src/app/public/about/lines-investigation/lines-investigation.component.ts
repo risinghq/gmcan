@@ -1,5 +1,4 @@
 import { TitleCasePipe, DatePipe, SlicePipe } from "@angular/common";
-import { Location } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
@@ -34,7 +33,6 @@ export default class LinesInvestigationComponent implements OnInit {
   private _usuarioService = inject(UsuarioService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  location = inject(Location);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
@@ -60,28 +58,24 @@ export default class LinesInvestigationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
+    this.language = this._session.language();
     this.titleService.setTitle("GMCAN | " + this.language.linesInvestigation);
     this.getLineasInvestigacion();
   }
 
-  selectedItem = -1;
-  oldValue = -1;
+  expandedKey: string | null = null;
 
-  listClick(_event: Event, newValue: number): void {
-    this.oldValue = this.selectedItem;
-    this.selectedItem = newValue;
-    const current = document.getElementById("abstract" + newValue);
-    if (current) {
-      current.innerText = this.language.linesInvestigationText[0].seeLess;
-    }
-    if (this.selectedItem == this.oldValue) {
-      this.selectedItem = -1;
-      const previous = document.getElementById("abstract" + this.oldValue);
-      if (previous) {
-        previous.innerText = this.language.linesInvestigationText[0].seeMore;
-      }
-    }
+  toggleExpanded(section: string, index: number): void {
+    const key = `${section}:${index}`;
+    this.expandedKey = this.expandedKey === key ? null : key;
+  }
+
+  isExpanded(section: string, index: number): boolean {
+    return this.expandedKey === `${section}:${index}`;
+  }
+
+  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
+    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 
   getLineasInvestigacion(): void {
@@ -179,7 +173,6 @@ export default class LinesInvestigationComponent implements OnInit {
     if (!user?.DNI) {
       return;
     }
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
     this._router.navigate(["/home/detail-member/" + user.DNI]);
   }
 }

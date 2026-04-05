@@ -1,29 +1,28 @@
-import { TitleCasePipe, DatePipe, SlicePipe } from "@angular/common";
-import { Location } from "@angular/common";
-import { Component, OnInit, DestroyRef, inject } from "@angular/core";
+import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
+import { Component, DestroyRef, OnInit, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router, Params } from "@angular/router";
+import { ActivatedRoute, Params, Router } from "@angular/router";
 import { Noticia } from "@app/shared/models/noticia";
 import { Proyecto } from "@app/shared/models/proyecto";
 import { Publicacion } from "@app/shared/models/publicacion";
-import type { SearchResults } from "@app/shared/models/search-results";
 import { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { TipoPublicacion } from "@app/shared/models/tipopublicacion";
-import { Usuario } from "@app/shared/models/usuario";
 import { UsuarioFull } from "@app/shared/models/usuarioFull";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { SearchService } from "@app/shared/services/search.service";
+import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,
-  NgbPaginationPrevious,
-  NgbPaginationNumber,
   NgbPaginationNext,
+  NgbPaginationNumber,
+  NgbPaginationPrevious,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
+
+import type { GlobalSearchViewModel } from "./global-search-data.types";
 
 @Component({
   selector: "app-global-search",
@@ -41,94 +40,16 @@ import {
   ],
 })
 export default class GlobalSearchComponent implements OnInit {
-  private mapProject(hit: SearchResults["projects"][number]): Proyecto {
-    const users: Usuario[] = (hit.usuario ?? []).map((user) => ({
-      DNI: user.DNI,
-      nombreCompleto: user.nombreCompleto,
-      foto: user.foto ?? undefined,
-    }));
-
-    return {
-      idProyecto: hit.idProyecto,
-      titulo: hit.titulo,
-      tituloEN: hit.tituloEN ?? undefined,
-      codigo: hit.codigo,
-      montoFinanciado: hit.montoFinanciado,
-      descripcion: hit.descripcion,
-      descripcionEN: hit.descripcionEN ?? undefined,
-      estado: hit.estado ?? undefined,
-      fechaInicio: new Date(hit.fechaInicio),
-      fechaFin: hit.fechaFin ? new Date(hit.fechaFin) : undefined,
-      lineasInvestigacion_idLineasInvestigacion: hit.lineasInvestigacion_idLineasInvestigacion,
-      fuenteFinanciamiento_idFuenteFinanciamiento: hit.fuenteFinanciamiento_idFuenteFinanciamiento,
-      moneda_idMoneda: hit.moneda_idMoneda,
-      lineasInvestigacion: hit.lineasInvestigacion,
-      fuenteFinanciamiento: hit.fuenteFinanciamiento,
-      usuario: users,
-    };
-  }
-
-  private mapMember(hit: SearchResults["members"][number]): UsuarioFull {
-    return {
-      DNI: hit.DNI,
-      correo: hit.correo,
-      nombre: hit.nombre,
-      apellidoPaterno: hit.apellidoPaterno,
-      apellidoMaterno: hit.apellidoMaterno ?? undefined,
-      fechaNacimiento: hit.fechaNacimiento,
-      resumenPro: hit.resumenPro ?? undefined,
-      resumenProEN: hit.resumenProEN ?? undefined,
-      foto: hit.foto ?? undefined,
-      estado: hit.estado,
-      tipoUsuario_idTipoUsuario: hit.tipoUsuario_idTipoUsuario,
-      tipoMiembro_idTipoMiembro: hit.tipoMiembro_idTipoMiembro,
-      prefijo_idPrefijo: hit.prefijo_idPrefijo ?? undefined,
-    };
-  }
-
-  private mapNews(hit: SearchResults["news"][number]): Noticia {
-    return {
-      idNoticia: hit.idNoticia,
-      titulo: hit.titulo ?? undefined,
-      fechaPublicacion: hit.fechaPublicacion ?? undefined,
-      foto: hit.foto ?? undefined,
-      autorPublicacion: hit.autorPublicacion ?? undefined,
-      tipoNoticia_idtipoNoticia: hit.tipoNoticia_idtipoNoticia ?? undefined,
-      estado: hit.estado ?? undefined,
-      autor: hit.autor,
-    };
-  }
-
-  private mapPublication(hit: SearchResults["publications"][number]): Publicacion {
-    return {
-      idPublicacion: hit.idPublicacion,
-      titulo: hit.titulo,
-      archivo: hit.archivo ?? undefined,
-      resumen: hit.resumen ?? undefined,
-      resumenEN: hit.resumenEN ?? undefined,
-      DOI: hit.DOI ?? undefined,
-      fechaPublicacion: hit.fechaPublicacion,
-      tipoPublicacion_idTipoPublicacion: hit.tipoPublicacion_idTipoPublicacion,
-      nroRevista: hit.nroRevista ?? undefined,
-      revista_idRevista: hit.revista_idRevista ?? undefined,
-      universidad_idUniversidad: hit.universidad_idUniversidad ?? undefined,
-      evento_idEvento: hit.evento_idEvento ?? undefined,
-      tipoTesis_idTipoTesis: hit.tipoTesis_idTipoTesis ?? undefined,
-      autor: hit.autor,
-    };
-  }
-
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  _searchService = inject(SearchService);
-  lookup = inject(LookupService);
-  fb = inject(FormBuilder);
-  private _session = inject(SessionService);
-  location = inject(Location);
-  private titleService = inject(Title);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly _titlecasePipe = inject(TitleCasePipe);
+  private readonly _datePipe = inject(DatePipe);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _router = inject(Router);
+  private readonly _lookup = inject(LookupService);
+  private readonly _fb = inject(FormBuilder);
+  private readonly _session = inject(SessionService);
+  private readonly _titleService = inject(Title);
+  private readonly _navigationHistory = inject(NavigationHistoryService);
+  private readonly _destroyRef = inject(DestroyRef);
 
   proyectos: Proyecto[] = [];
   publicaciones: Publicacion[] = [];
@@ -137,263 +58,142 @@ export default class GlobalSearchComponent implements OnInit {
   tipoPublicaciones: TipoPublicacion[] = [];
   tiponoticias: TipoNoticia[] = [];
   language: any = {};
-  public searchGlobalForm: FormGroup;
+  searchGlobalForm: FormGroup;
   page1 = 1;
-  pageSize = 5;
   page2 = 1;
-  public url: string;
-
-  constructor() {
-    this.searchGlobalForm = this.fb.group({
-      nombre: [""],
-    });
-    this.url = GLOBAL.url;
-  }
-
-  public previouslink: string | null = null;
-
-  ngOnInit(): void {
-    this.language = this._session.getLanguageData<any>() ?? {};
-    this.findGlobal();
-    this.previouslink = sessionStorage.getItem("previous-page");
-  }
-
-  /* globalSearch */
-
-  searchGlobal(value: string): void {
-    this._router.navigate(["/home/search/" + value]);
-    this.ngOnInit();
-  }
-  findGlobal(): void {
-    this.publicaciones = [];
-    this.proyectos = [];
-    this.noticias = [];
-    this.miembros = [];
-    this.tipoPublicaciones = [];
-    this.getTipoPublicacion();
-    this.getTipoNoticias();
-  }
-
-  getTipoPublicacion(): void {
-    this.tipoPublicaciones = [...this.lookup.tiposPublicacion()];
-    this._route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: Params) => {
-      const nombre = params["id"];
-      this.titleService.setTitle("GMCAN | " + nombre);
-      this.searchGlobalForm.controls["nombre"].setValue(nombre);
-      this.searchAll(nombre);
-    });
-  }
-
-  searchAll(nombre: string): void {
-    this._searchService.search(nombre, ["projects", "members", "news", "publications"]).subscribe((results) => {
-      this.proyectos = results.projects
-        .toSorted((a, b) =>
-          (a.fechaInicio ?? "") < (b.fechaInicio ?? "") ? 1 : (b.fechaInicio ?? "") < (a.fechaInicio ?? "") ? -1 : 0,
-        )
-        .map((project) => this.mapProject(project));
-      for (const proyecto of this.proyectos) {
-        this.fillProyecto(proyecto);
-      }
-
-      this.miembros = results.members.map((member) => {
-        const mapped = this.mapMember(member);
-        const prefijo = this.lookup.prefijos().find((p) => p.idPrefijo === member.prefijo_idPrefijo);
-        const enriched = Object.assign({}, mapped);
-        enriched.prefijo = prefijo?.nombre;
-        return enriched;
-      });
-
-      this.noticias = [];
-      for (const item of results.news) {
-        if (item.estado !== 1) continue;
-        const noticia = this.mapNews(item);
-        if (this.noticias.findIndex((x) => x.idNoticia === noticia.idNoticia) === -1) {
-          this.fillNoticia(noticia);
-          this.noticias.push(noticia);
-        }
-      }
-
-      this.publicaciones = [];
-      for (const pub of results.publications) {
-        const publication = this.mapPublication(pub);
-        if (this.publicaciones.findIndex((x) => x.idPublicacion === publication.idPublicacion) === -1) {
-          this.fillPublicacion(publication);
-          this.publicaciones.push(publication);
-        }
-      }
-    });
-  }
-
-  getEvento(idEvento: number, publicacion: Publicacion): void {
-    const found = this.lookup.eventos().find((e) => e.idEvento === idEvento);
-    if (found) {
-      publicacion.evento = found.nombre;
-      publicacion.ciudad = found.ciudad ?? "";
-      publicacion.pais = found.pais ?? "";
-    }
-  }
-
-  getTipoTesis(publicacion: Publicacion): void {
-    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
-    if (found) publicacion.tipoTesis = found.nombre;
-  }
-
-  /* Fill publication data */
-
-  fillPublicacion(publicacion: Publicacion): void {
-    publicacion.autor = publicacion.autor ?? [];
-    const d = new Date(publicacion.fechaPublicacion ?? "");
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    publicacion.fecha = this.datePipe.transform(d, "MMMM y", "es") ?? undefined;
-    publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha ?? "");
-    const tipoIdx = this.tipoPublicaciones.findIndex(
-      (x) => x.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion,
-    );
-    if (tipoIdx !== -1) {
-      publicacion.tipoPublicacion = this.tipoPublicaciones[tipoIdx].nombre;
-    }
-    this.getUniversidad(publicacion);
-    this.getRevista(publicacion);
-    this.getEvento(publicacion.evento_idEvento ?? 0, publicacion);
-    this.getTipoTesis(publicacion);
-  }
-
-  /* Fill project data */
-
-  fillProyecto(proyecto: Proyecto): void {
-    proyecto.fechaI = this.datePipe.transform(proyecto.fechaInicio ?? "", "MMMM, y", "es") ?? undefined;
-    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
-    proyecto.usuario = proyecto.usuario ?? [];
-    if (proyecto.fechaFin) {
-      proyecto.fechaF = this.datePipe.transform(proyecto.fechaFin, "MMMM, y", "es") ?? undefined;
-      proyecto.fechaF = this.titlecasePipe.transform(proyecto.fechaF ?? "");
-    }
-  }
-
-  /* get Noticias */
-
-  getTipoNoticias(): void {
-    this.tiponoticias = [...this.lookup.tiposNoticia()];
-  }
-
-  /* Fill Noticia */
-
-  fillNoticia(obj: Noticia): void {
-    for (let j = 0; j < this.tiponoticias.length; j++) {
-      if (obj.tipoNoticia_idtipoNoticia === this.tiponoticias[j].idtipoNoticia) {
-        obj.nombreTipoNoticia = this.tiponoticias[j].nombre;
-      }
-    }
-    const d = new Date(obj.fechaPublicacion ?? "");
-    if (String(d) != "Invalid Date") {
-      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      obj.fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? undefined;
-      obj.fechaPublicacion = this.titlecasePipe.transform(obj.fechaPublicacion ?? "");
-    }
-  }
-
-  getRevista(publicacion: Publicacion): void {
-    const found = this.lookup.revistas().find((r) => r.idRevista === publicacion.revista_idRevista);
-    if (found) publicacion.revista = found.nombre;
-  }
-
-  getUniversidad(publicacion: Publicacion): void {
-    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
-    if (found) publicacion.universidad = found.nombre ?? "";
-  }
-
-  /* Hovers Publicaciones */
-
-  /* Share Hover */
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
-  mouseEnter(int: number, index: number): void {
-    switch (int) {
-      case 1:
-        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
-        break;
-      case 2:
-        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
-        break;
-      case 3:
-        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook2.svg");
-        break;
-      case 4:
-        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter2.svg");
-        break;
-    }
-  }
-
-  mouseLeave(int: number, index: number): void {
-    switch (int) {
-      case 1:
-        document.getElementById("fb" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
-        break;
-      case 2:
-        document.getElementById("t" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
-        break;
-      case 3:
-        document.getElementById("fbl" + index)?.setAttribute("src", "../../assets/img/Facebook.svg");
-        break;
-      case 4:
-        document.getElementById("tl" + index)?.setAttribute("src", "../../assets/img/twitter.svg");
-        break;
-    }
-  }
-
-  selectedItem = -1;
-  oldValue = -1;
-
-  listClick(_event: Event, newValue: number): void {
-    this.oldValue = this.selectedItem;
-    this.selectedItem = newValue;
-    const current = document.getElementById("abstract" + newValue);
-    if (current) {
-      current.innerText = this.language.publicationsText[0].seeLess;
-    }
-    if (this.selectedItem == this.oldValue) {
-      this.selectedItem = -1;
-      const previous = document.getElementById("abstract" + this.oldValue);
-      if (previous) {
-        previous.innerText = this.language.publicationsText[0].seeMore;
-      }
-    }
-  }
-
-  scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
-  profile(user: { DNI?: string }): void {
-    if (!user.DNI) {
-      return;
-    }
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(["/home/detail-member/" + user.DNI]);
-  }
-
-  detalleNoticia(noticia: { idNoticia?: number }): void {
-    if (!noticia.idNoticia) {
-      return;
-    }
-    sessionStorage.setItem("previous-page", this.location.path().slice(1));
-    this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
-  }
-
-  return() {
-    if (this.previouslink) {
-      this._router.navigate([this.previouslink]);
-    } else {
-      this._router.navigate(["/home"]);
-    }
-  }
+  pageSize = 5;
+  url = GLOBAL.url;
+  previouslink: string | null = null;
+  searchId = "";
+  expandedKey: string | null = null;
   publicationExpanded = true;
   projectExpanded = true;
   memberExpanded = true;
   newsExpanded = true;
+
+  constructor() {
+    this.searchGlobalForm = this._fb.group({
+      nombre: [""],
+    });
+  }
+
+  ngOnInit(): void {
+    this.language = this._session.language();
+
+    const searchData = this._route.snapshot.data["search"] as GlobalSearchViewModel;
+    this.proyectos = searchData.projects;
+    this.publicaciones = searchData.publications;
+    this.miembros = searchData.members;
+    this.noticias = searchData.news;
+
+    this.tipoPublicaciones = [...this._lookup.tiposPublicacion()];
+    this.tiponoticias = [...this._lookup.tiposNoticia()];
+
+    this._route.params.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params: Params) => {
+      const nombre = params["id"];
+      this.searchId = nombre;
+      this._titleService.setTitle("GMCAN | " + nombre);
+      this.searchGlobalForm.controls["nombre"].setValue(nombre);
+    });
+
+    for (const proyecto of this.proyectos) this.fillProyecto(proyecto);
+    for (const publicacion of this.publicaciones) this.fillPublicacion(publicacion);
+    for (const noticia of this.noticias) this.fillNoticia(noticia);
+
+    this.previouslink = this._navigationHistory.previousUrl();
+  }
+
+  searchGlobal(value: string): void {
+    this._router.navigate(["/home/search/" + value]);
+  }
+
+  fillProyecto(proyecto: Proyecto): void {
+    // Search payload already includes the research line label.
+    if (proyecto.lineasInvestigacion == null) {
+      proyecto.lineasInvestigacion = "";
+    }
+
+    const moneda = this._lookup.monedas().find((item) => item.idMoneda === proyecto.moneda_idMoneda);
+    if (moneda) proyecto.moneda = moneda.simbolo;
+
+    const fechaInicio = new Date(proyecto.fechaInicio ?? new Date());
+    fechaInicio.setMinutes(fechaInicio.getMinutes() + fechaInicio.getTimezoneOffset());
+    proyecto.fechaI = this._datePipe.transform(fechaInicio, "MMMM, y", "es") ?? undefined;
+    proyecto.fechaI = this._titlecasePipe.transform(proyecto.fechaI ?? "");
+
+    if (proyecto.fechaFin) {
+      const fechaFin = new Date(proyecto.fechaFin);
+      fechaFin.setMinutes(fechaFin.getMinutes() + fechaFin.getTimezoneOffset());
+      proyecto.fechaF = this._datePipe.transform(fechaFin, "MMMM, y", "es") ?? undefined;
+      proyecto.fechaF = this._titlecasePipe.transform(proyecto.fechaF ?? "");
+    }
+  }
+
+  fillPublicacion(publicacion: Publicacion): void {
+    publicacion.tipoPublicacion = this.tipoPublicaciones.find(
+      (item) => item.idTipoPublicacion === publicacion.tipoPublicacion_idTipoPublicacion,
+    )?.nombre;
+    publicacion.revista = this._lookup
+      .revistas()
+      .find((item) => item.idRevista === publicacion.revista_idRevista)?.nombre;
+    publicacion.universidad =
+      this._lookup.universidades().find((item) => item.idUniversidad === publicacion.universidad_idUniversidad)
+        ?.nombre ?? undefined;
+    publicacion.tipoTesis = this._lookup
+      .tiposTesis()
+      .find((item) => item.idTipoTesis === publicacion.tipoTesis_idTipoTesis)?.nombre;
+
+    const fechaPublicacion = new Date(publicacion.fechaPublicacion ?? "");
+    fechaPublicacion.setMinutes(fechaPublicacion.getMinutes() + fechaPublicacion.getTimezoneOffset());
+    publicacion.fecha = this._datePipe.transform(fechaPublicacion, "MMMM y", "es") ?? undefined;
+    publicacion.fecha = this._titlecasePipe.transform(publicacion.fecha ?? "");
+  }
+
+  fillNoticia(noticia: Noticia): void {
+    noticia.nombreTipoNoticia = this.tiponoticias.find(
+      (item) => item.idtipoNoticia === noticia.tipoNoticia_idtipoNoticia,
+    )?.nombre;
+
+    const fechaPublicacion = new Date(noticia.fechaPublicacion ?? "");
+    fechaPublicacion.setMinutes(fechaPublicacion.getMinutes() + fechaPublicacion.getTimezoneOffset());
+    noticia.fechaPublicacion = this._datePipe.transform(fechaPublicacion, "MM/dd/y", "es") ?? undefined;
+  }
+
+  toggleExpanded(section: string, index: number): void {
+    const key = `${section}:${index}`;
+    this.expandedKey = this.expandedKey === key ? null : key;
+  }
+
+  isExpanded(section: string, index: number): boolean {
+    return this.expandedKey === `${section}:${index}`;
+  }
+
+  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
+    return this.isExpanded(section, index) ? seeLess : seeMore;
+  }
+
+  scroll(): void {
+    const element = document.getElementById("main-toolbar");
+    if (element) element.scrollIntoView({ behavior: "smooth" });
+  }
+
+  profile(user: { DNI?: string }): void {
+    if (!user.DNI) return;
+    this._router.navigate(["/home/detail-member/" + user.DNI]);
+  }
+
+  detalleNoticia(noticia: { idNoticia?: number }): void {
+    if (!noticia.idNoticia) return;
+    this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
+  }
+
+  return(): void {
+    if (this.previouslink) {
+      this._router.navigate([this.previouslink]);
+      return;
+    }
+    this._router.navigate(["/home"]);
+  }
 
   toggleRotation(caso: number): void {
     switch (caso) {

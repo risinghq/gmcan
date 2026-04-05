@@ -28,7 +28,7 @@ export class PublicacionService {
   private _session = inject(SessionService);
 
   private get languagelocal(): string {
-    return this._session.getLanguageData<{ locale?: string }>()?.locale ?? "es";
+    return this._session.languageCode ?? "es";
   }
 
   getPublicacion(): Observable<Publicacion[]> {
