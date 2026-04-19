@@ -4,6 +4,7 @@ import { Equipo } from "@app/shared/models/equipo";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 import { Software } from "@app/shared/models/software";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { EquipoService } from "@app/shared/services/equipo.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
@@ -21,6 +22,7 @@ export default class FacilitiesComponent implements OnInit {
   _equipoService = inject(EquipoService);
   _softwareService = inject(SoftwareService);
   _grupoService = inject(GrupoService);
+  private browser = inject(BrowserService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
@@ -71,9 +73,6 @@ export default class FacilitiesComponent implements OnInit {
   }
 
   scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 }

@@ -11,6 +11,7 @@ import { Publicacion } from "@app/shared/models/publicacion";
 import { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import { UsuarioFull } from "@app/shared/models/usuarioFull";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
@@ -47,6 +48,7 @@ export default class GlobalSearchComponent implements OnInit {
   private readonly _lookup = inject(LookupService);
   private readonly _fb = inject(FormBuilder);
   private readonly _session = inject(SessionService);
+  private readonly _browser = inject(BrowserService);
   private readonly _titleService = inject(Title);
   private readonly _navigationHistory = inject(NavigationHistoryService);
   private readonly _destroyRef = inject(DestroyRef);
@@ -173,8 +175,7 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   scroll(): void {
-    const element = document.getElementById("main-toolbar");
-    if (element) element.scrollIntoView({ behavior: "smooth" });
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 
   profile(user: { DNI?: string }): void {

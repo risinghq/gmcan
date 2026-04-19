@@ -11,6 +11,7 @@ import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import { Noticia } from "@app/shared/models/noticia";
 import { TipoNoticia } from "@app/shared/models/tiponoticia";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NoticiaService } from "@app/shared/services/noticia.service";
@@ -51,6 +52,7 @@ export default class MainNewsComponent implements OnInit {
   lookup = inject(LookupService);
   _router = inject(Router);
   _usuarioService = inject(UsuarioService);
+  private _browser = inject(BrowserService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
 
@@ -59,13 +61,13 @@ export default class MainNewsComponent implements OnInit {
   public screenWidth: number;
   url: string;
   constructor() {
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this._browser.innerWidth();
     this.url = GLOBAL.url;
   }
   numberShown = 5;
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this._browser.innerWidth();
   }
   public categorySelected = -1;
   public categoryNombre = "";
@@ -145,10 +147,7 @@ export default class MainNewsComponent implements OnInit {
     this.scroll();
   }
   scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 
   getUsuario(idUser: string, i: number): void {

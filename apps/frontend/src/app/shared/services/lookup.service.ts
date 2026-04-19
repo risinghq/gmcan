@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, computed, inject, signal } from "@angular/core";
-import { Observable, map, tap } from "rxjs";
+import { Injectable, inject, signal } from "@angular/core";
+import { firstValueFrom, Observable, tap } from "rxjs";
 
 import type { LookupData } from "../models/lookup";
 import { GLOBAL } from "./global";
@@ -9,24 +9,81 @@ import { GLOBAL } from "./global";
 export class LookupService {
   private http = inject(HttpClient);
   private _data = signal<LookupData | null>(null);
+  private _loaded = false;
 
-  readonly generos = computed(() => this._data()?.generos ?? []);
-  readonly prefijos = computed(() => this._data()?.prefijos ?? []);
-  readonly tiposMiembro = computed(() => this._data()?.tiposMiembro ?? []);
-  readonly tiposPublicacion = computed(() => this._data()?.tiposPublicacion ?? []);
-  readonly tiposTesis = computed(() => this._data()?.tiposTesis ?? []);
-  readonly monedas = computed(() => this._data()?.monedas ?? []);
-  readonly tiposNoticia = computed(() => this._data()?.tiposNoticia ?? []);
-  readonly tiposUsuario = computed(() => this._data()?.tiposUsuario ?? []);
-  readonly fuentesFinanciamiento = computed(() => this._data()?.fuentesFinanciamiento ?? []);
-  readonly universidades = computed(() => this._data()?.universidades ?? []);
-  readonly revistas = computed(() => this._data()?.revistas ?? []);
-  readonly eventos = computed(() => this._data()?.eventos ?? []);
+  private _ensureLoaded(): void {
+    if (!this._loaded) {
+      this._loaded = true;
+      firstValueFrom(this.load());
+    }
+  }
 
-  load(): Observable<void> {
+  generos() {
+    this._ensureLoaded();
+    return this._data()?.generos ?? [];
+  }
+
+  prefijos() {
+    this._ensureLoaded();
+    return this._data()?.prefijos ?? [];
+  }
+
+  tiposMiembro() {
+    this._ensureLoaded();
+    return this._data()?.tiposMiembro ?? [];
+  }
+
+  tiposPublicacion() {
+    this._ensureLoaded();
+    return this._data()?.tiposPublicacion ?? [];
+  }
+
+  tiposTesis() {
+    this._ensureLoaded();
+    return this._data()?.tiposTesis ?? [];
+  }
+
+  monedas() {
+    this._ensureLoaded();
+    return this._data()?.monedas ?? [];
+  }
+
+  tiposNoticia() {
+    this._ensureLoaded();
+    return this._data()?.tiposNoticia ?? [];
+  }
+
+  tiposUsuario() {
+    this._ensureLoaded();
+    return this._data()?.tiposUsuario ?? [];
+  }
+
+  fuentesFinanciamiento() {
+    this._ensureLoaded();
+    return this._data()?.fuentesFinanciamiento ?? [];
+  }
+
+  universidades() {
+    this._ensureLoaded();
+    return this._data()?.universidades ?? [];
+  }
+
+  revistas() {
+    this._ensureLoaded();
+    return this._data()?.revistas ?? [];
+  }
+
+  eventos() {
+    this._ensureLoaded();
+    return this._data()?.eventos ?? [];
+  }
+
+  load(): Observable<LookupData> {
     return this.http.get<LookupData>(`${GLOBAL.url}lookup`).pipe(
       tap((data) => this._data.set(data)),
-      map(() => undefined),
+      tap(() => {
+        this._loaded = true;
+      }),
     );
   }
 }

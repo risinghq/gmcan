@@ -9,6 +9,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } fr
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 import { Languages } from "@app/shared/models/languages";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -37,6 +38,7 @@ export default class LandingComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   _grupoService = inject(GrupoService);
+  private browser = inject(BrowserService);
   private session = inject(SessionService);
   fb = inject(FormBuilder);
   private titleService = inject(Title);
@@ -61,13 +63,13 @@ export default class LandingComponent implements OnInit {
     this.language = this.session.language();
     this.url = GLOBAL.url;
     // set screenWidth on page load
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this.browser.innerWidth();
     this.grupoinfo = createGrupo();
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this.browser.innerWidth();
   }
 
   ngOnInit(): void {
@@ -81,7 +83,7 @@ export default class LandingComponent implements OnInit {
     this.lanSelected = number;
     this.language = Languages[this.lanSelected] ?? Languages[0];
     this.session.setLanguage(this.language, number);
-    window.location.reload();
+    this.browser.reload();
   }
 
   getGrupoInfo(): void {
@@ -108,9 +110,6 @@ export default class LandingComponent implements OnInit {
   }
 
   scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 }

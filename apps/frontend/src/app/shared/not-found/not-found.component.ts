@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from "@angular/core";
 import { Router } from "@angular/router";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
@@ -9,6 +10,7 @@ import { SessionService } from "@app/shared/services/session.service";
 })
 export default class NotFoundComponent implements OnInit {
   _router = inject(Router);
+  private _browser = inject(BrowserService);
   private _session = inject(SessionService);
 
   button_text = "";
@@ -21,7 +23,7 @@ export default class NotFoundComponent implements OnInit {
   }
 
   setTexts(): void {
-    if (window.location.href.includes("dashboard")) {
+    if (this._browser.locationHref().includes("dashboard")) {
       this.button_text = "Volver al dashboard";
       this.dashboard = true;
     } else {

@@ -11,6 +11,7 @@ import NewsComponent from "@app/shared/components/news/news.component";
 import type { PublicationAuthor } from "@app/shared/models/author";
 import { Publicacion } from "@app/shared/models/publicacion";
 import { TipoPublicacion } from "@app/shared/models/tipopublicacion";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { EventoService } from "@app/shared/services/evento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -62,6 +63,7 @@ export default class PublicationComponent implements OnInit {
   private readonly _route = inject(ActivatedRoute);
   private readonly _router = inject(Router);
   private readonly _session = inject(SessionService);
+  private readonly _browser = inject(BrowserService);
   private readonly _titleService = inject(Title);
 
   previouslink: string | null = null;
@@ -119,10 +121,7 @@ export default class PublicationComponent implements OnInit {
   }
 
   scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 
   getPublicaciones(idTipoPublicacion: number): void {

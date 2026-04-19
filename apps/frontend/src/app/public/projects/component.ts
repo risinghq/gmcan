@@ -9,6 +9,7 @@ import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Proyecto } from "@app/shared/models/proyecto";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
@@ -58,6 +59,7 @@ export default class ProjectsComponent implements OnInit {
   private readonly _http = inject(HttpClient);
   private readonly _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
   private readonly _lookup = inject(LookupService);
+  private readonly _browser = inject(BrowserService);
   private readonly _session = inject(SessionService);
   private readonly _titleService = inject(Title);
 
@@ -82,14 +84,14 @@ export default class ProjectsComponent implements OnInit {
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this._browser.innerWidth();
     this.setSearchText();
   }
 
   ngOnInit(): void {
     this.language = this._session.language();
     this._titleService.setTitle("GMCAN | " + this.language.projects);
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this._browser.innerWidth();
     this.url = GLOBAL.url;
     this.page = 1;
     this.pageSize = 5;
@@ -131,10 +133,7 @@ export default class ProjectsComponent implements OnInit {
   }
 
   scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 
   getProyectos(estado: number): void {

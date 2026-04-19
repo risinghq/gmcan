@@ -9,6 +9,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import type { Grupo } from "@app/shared/models/grupo";
 import type { Method } from "@app/shared/models/method";
 import type { Usuario } from "@app/shared/models/usuario";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -24,12 +25,13 @@ export default class HomeComponent implements OnInit {
   private _router = inject(Router);
   private _route = inject(ActivatedRoute);
   private _session = inject(SessionService);
+  private _browser = inject(BrowserService);
   private _titleService = inject(Title);
   private _meta = inject(Meta);
 
   language: any = {};
   url = GLOBAL.appUrl;
-  screenWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+  screenWidth = this._browser.innerWidth();
   expandedKey: string | null = null;
 
   progress = 100;
@@ -48,7 +50,7 @@ export default class HomeComponent implements OnInit {
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this._browser.innerWidth();
   }
 
   ngOnInit(): void {
@@ -117,13 +119,11 @@ export default class HomeComponent implements OnInit {
       return;
     }
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
-    this.scroll(document.getElementById("main-toolbar"));
+    this.scroll();
   }
 
-  scroll(el: HTMLElement | null): void {
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+  scroll(): void {
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 
   /* Share Hover */
@@ -131,7 +131,7 @@ export default class HomeComponent implements OnInit {
     const title = String(this.publicaciones[i]?.titulo ?? "");
     this._meta.updateTag({ name: "description", content: title });
 
-    window.open(
+    this._browser.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.url)}`,
       "facebook-share-dialog",
       "width=626,height=436",

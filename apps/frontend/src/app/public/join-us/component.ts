@@ -8,6 +8,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import type { EmailBody } from "@app/shared/models/emailBody";
 import { createEmailBody } from "@app/shared/models/factories";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
@@ -25,6 +26,7 @@ export default class JoinUsComponent implements OnInit {
   _emailService = inject(EmailService);
   dialog = inject(MatDialog);
   _router = inject(Router);
+  private _browser = inject(BrowserService);
   private _navigationHistory = inject(NavigationHistoryService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
@@ -79,7 +81,7 @@ export default class JoinUsComponent implements OnInit {
 
   openDialog(): void {
     let width = "913px";
-    if (window.innerWidth < 960) {
+    if (this._browser.innerWidth() < 960) {
       width = "312px";
     }
     const dialogRef = this.dialog.open(EmailExitoso, {
@@ -102,6 +104,7 @@ export class EmailExitoso {
   dialogRef = inject<MatDialogRef<EmailExitoso>>(MatDialogRef);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
+  private _browser = inject(BrowserService);
   private _session = inject(SessionService);
 
   public url: string;
@@ -111,7 +114,7 @@ export class EmailExitoso {
   language: any = {};
   constructor() {
     this.language = this._session.language();
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this._browser.innerWidth();
     this.url = GLOBAL.url;
     this.grupoInfo = this._session.getGrupoInfo();
     this.grupoLogo = this.url + "grupo/" + this.grupoInfo.idGrupo + "/files/header";

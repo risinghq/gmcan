@@ -1,4 +1,6 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
+
+import { BrowserService } from "./browser.service";
 
 export type SharePlatform = "facebook" | "twitter";
 
@@ -6,6 +8,8 @@ export type SharePlatform = "facebook" | "twitter";
   providedIn: "root",
 })
 export class ShareService {
+  private readonly browser = inject(BrowserService);
+
   /**
    * Open a share dialog for the given platform with the provided content.
    *
@@ -15,7 +19,7 @@ export class ShareService {
    */
   openShare(platform: SharePlatform, url: string, title?: string): void {
     const shareUrl = this._generateShareUrl(platform, url, title);
-    window.open(shareUrl, `${platform}-share-dialog`, "width=626,height=436");
+    this.browser.open(shareUrl, `${platform}-share-dialog`, "width=626,height=436");
   }
 
   /**

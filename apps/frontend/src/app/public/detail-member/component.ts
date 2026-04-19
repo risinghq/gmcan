@@ -13,6 +13,7 @@ import type { MemberProfile } from "@app/shared/models/member-profile";
 import type { Publicacion } from "@app/shared/models/publicacion";
 import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
 import type { UsuarioFull } from "@app/shared/models/usuarioFull";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
@@ -53,6 +54,7 @@ export default class DetailMemberComponent implements OnInit {
   private _navigationHistory = inject(NavigationHistoryService);
   _previousService = inject(PreviousPageService);
   private _session = inject(SessionService);
+  private _browser = inject(BrowserService);
   location = inject(Location);
   private titleService = inject(Title);
 
@@ -93,10 +95,7 @@ export default class DetailMemberComponent implements OnInit {
   }
 
   scroll(): void {
-    const el = document.getElementById("main-toolbar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 
   searchUsuario(): void {

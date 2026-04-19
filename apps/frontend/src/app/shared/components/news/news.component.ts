@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { createNoticia } from "@app/shared/models/factories";
 import type { Noticia } from "@app/shared/models/noticia";
 import type { TipoNoticia } from "@app/shared/models/tiponoticia";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
@@ -26,6 +27,7 @@ export default class NewsComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   lookup = inject(LookupService);
+  private _browser = inject(BrowserService);
   private _navigationHistory = inject(NavigationHistoryService);
   _usuarioService = inject(UsuarioService);
   private _session = inject(SessionService);
@@ -42,7 +44,7 @@ export default class NewsComponent implements OnInit {
   numberShown = 5;
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    if (window.innerWidth >= 1300) {
+    if (this._browser.innerWidth() >= 1300) {
       this.numberShown = 10;
     } else {
       this.numberShown = 5;
@@ -53,14 +55,13 @@ export default class NewsComponent implements OnInit {
   language: any = {};
   ngOnInit(): void {
     this.language = this._session.language();
-    if (window.innerWidth >= 1300) {
+    if (this._browser.innerWidth() >= 1300) {
       this.numberShown = 10;
     } else {
       this.numberShown = 5;
     }
     this.tiponoticias = [...this.lookup.tiposNoticia()];
     this.idNoticiaE = this._route.snapshot.params["id"];
-    console.log(this.idNoticiaE);
     this.getNoticia();
   }
   ngDoCheck(): void {
@@ -126,11 +127,9 @@ export default class NewsComponent implements OnInit {
 
   detalleNoticia(noticia: Noticia): void {
     this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
-    this.scroll(document.getElementById("main-toolbar"));
+    this.scroll();
   }
-  scroll(el: HTMLElement | null): void {
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+  scroll(): void {
+    this._browser.scrollIntoViewById("main-toolbar");
   }
 }

@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 import { createGrupo } from "@app/shared/models/factories";
 import type { Grupo } from "@app/shared/models/grupo";
 import { Languages } from "@app/shared/models/languages";
+import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GrupoService } from "@app/shared/services/grupo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -19,6 +20,7 @@ export default class AppComponent {
   _router = inject(Router);
   _grupoService = inject(GrupoService);
   private session = inject(SessionService);
+  private browser = inject(BrowserService);
   fb = inject(FormBuilder);
   private router = inject(Router);
 
@@ -39,13 +41,13 @@ export default class AppComponent {
     this.language = this.session.language();
     this.url = GLOBAL.url;
     // set screenWidth on page load
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this.browser.innerWidth();
     this.grupoinfo = createGrupo();
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: UIEvent): void {
-    this.screenWidth = window.innerWidth;
+    this.screenWidth = this.browser.innerWidth();
   }
 
   ngOnInit(): void {
@@ -56,7 +58,7 @@ export default class AppComponent {
     this.lanSelected = index;
     this.language = Languages[this.lanSelected] ?? Languages[0];
     this.session.setLanguage(this.language, index);
-    window.location.reload();
+    this.browser.reload();
   }
 
   getGrupoInfo(): void {
