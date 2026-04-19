@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -13,8 +13,8 @@ export class AboutUsService {
 
   public url: string;
 
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
+  private get lang(): string {
+    return this._session.languageCode === "en" ? "en" : "es";
   }
 
   constructor() {
@@ -22,49 +22,24 @@ export class AboutUsService {
   }
 
   getAboutUsInfo(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "sobrenosotros/get-sobrenosotros", { headers: headers });
-    } else {
-      return this.http.get(this.url + "sobrenosotros/get-sobrenosotros-en", { headers: headers });
-    }
+    return this.http.get(`${this.url}sobrenosotros?lang=${this.lang}`);
   }
 
   updateDescripcion(sobrenosotros: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "sobrenosotros/update-descripciongrupo/", sobrenosotros, {
-      headers: headers,
-    });
+    return this.http.put(`${this.url}sobrenosotros/descripcion`, sobrenosotros);
   }
 
   updateObjetivos(sobrenosotros: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "sobrenosotros/update-objetivosgrupo/", sobrenosotros, {
-      headers: headers,
-    });
+    return this.http.put(`${this.url}sobrenosotros/objetivos`, sobrenosotros);
   }
 
   updateServicios(sobrenosotros: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "sobrenosotros/update-serviciosgrupo/", sobrenosotros, {
-      headers: headers,
-    });
+    return this.http.put(`${this.url}sobrenosotros/servicios`, sobrenosotros);
   }
 
   uploadGrupoFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({});
-    return this.http.put(`${this.url}sobrenosotros/${id}/file`, formData, {
-      headers,
-    });
+    return this.http.put(`${this.url}sobrenosotros/${id}/file`, formData);
   }
 }

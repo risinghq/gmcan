@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -13,114 +13,54 @@ export class ProyectoService {
 
   public url: string;
 
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
+  private get lang(): string {
+    return this._session.languageCode === "en" ? "en" : "es";
   }
 
   constructor() {
     this.url = GLOBAL.url;
   }
 
-  getProyecto(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "proyecto/get-proyecto", { headers: headers });
-    } else {
-      return this.http.get(this.url + "proyecto/get-proyecto-en", { headers: headers });
-    }
+  getProyectos(): any {
+    return this.http.get(`${this.url}proyecto?lang=${this.lang}`);
   }
 
-  getProyectos(estado: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "proyecto/get-proyectos/" + estado, { headers: headers });
-    } else {
-      return this.http.get(this.url + "proyecto/get-proyectos-en/" + estado, { headers: headers });
-    }
+  getProyectosByEstado(estado: number): any {
+    return this.http.get(`${this.url}proyecto?estado=${estado}&lang=${this.lang}`);
   }
 
-  getProyectosLinea(idLinea: number, estado: number): any {
-    let body = { lineasInvestigacion_idLineasInvestigacion: idLinea, estado: estado };
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
+  getProyectosByLinea(idLinea: number, estado: number): any {
+    return this.http.post(`${this.url}proyecto/search`, {
+      lineasInvestigacion_idLineasInvestigacion: idLinea,
+      estado,
     });
-    if (this.languagelocal == "es") {
-      return this.http.post(this.url + "proyecto/get-proyectolinea", body, { headers });
-    } else {
-      return this.http.post(this.url + "proyecto/get-proyectolinea-en", body, { headers });
-    }
   }
 
-  getProyectosId(idProyecto: number, estado: number): any {
-    let body = { idProyecto: idProyecto, estado: estado };
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.post(this.url + "proyecto/get-proyectoid", body, { headers });
-    } else {
-      return this.http.post(this.url + "proyecto/get-proyectoid-en", body, { headers });
-    }
-  }
-
-  getProject(idProyecto: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "proyecto/get-proyecto/" + idProyecto, { headers: headers });
-    } else {
-      return this.http.get(this.url + "proyecto/get-proyecto-en/" + idProyecto, {
-        headers: headers,
-      });
-    }
+  getProyectoById(id: number): any {
+    return this.http.get(`${this.url}proyecto/${id}?lang=${this.lang}`);
   }
 
   getProyectoFuente(idFuente: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "proyecto/get-proyectofuente/" + idFuente, { headers });
+    return this.http.get(`${this.url}proyecto?fuenteId=${idFuente}`);
   }
 
   addProyecto(proyecto: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "proyecto/post-proyecto/", proyecto, { headers: headers });
+    return this.http.post(`${this.url}proyecto`, proyecto);
   }
 
   updateProyecto(proyecto: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "proyecto/update-proyecto/", proyecto, { headers: headers });
+    return this.http.put(`${this.url}proyecto`, proyecto);
   }
 
-  deleteProyecto(idProyecto: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "proyecto/delete-proyecto/" + idProyecto, {
-      headers: headers,
-    });
+  deleteProyecto(id: number): any {
+    return this.http.delete(`${this.url}proyecto/${id}`);
   }
 
   endProyecto(proyecto: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "proyecto/end-proyecto/", proyecto, { headers: headers });
+    return this.http.put(`${this.url}proyecto/${proyecto}/end`, {});
   }
 
   restartProyecto(proyecto: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "proyecto/restart-proyecto/", proyecto, { headers: headers });
+    return this.http.put(`${this.url}proyecto/${proyecto}/restart`, {});
   }
 }

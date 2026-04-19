@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -13,8 +13,8 @@ export class SoftwareService {
 
   public url: string;
 
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
+  private get lang(): string {
+    return this._session.languageCode === "en" ? "en" : "es";
   }
 
   constructor() {
@@ -22,43 +22,22 @@ export class SoftwareService {
   }
 
   getSoftware(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "software/get-software", { headers: headers });
-    } else {
-      return this.http.get(this.url + "software/get-software-en", { headers: headers });
-    }
+    return this.http.get(`${this.url}software?lang=${this.lang}`);
   }
 
-  getSoftwareId(idSoftware: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "software/get-software/" + idSoftware, { headers: headers });
+  getSoftwareId(id: number): any {
+    return this.http.get(`${this.url}software/${id}?lang=${this.lang}`);
   }
 
   addSoftware(software: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "software/post-software/", software, { headers: headers });
+    return this.http.post(`${this.url}software`, software);
   }
 
   updateSoftware(software: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "software/update-software/", software, { headers: headers });
+    return this.http.put(`${this.url}software`, software);
   }
 
-  deleteSoftware(idSoftware: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "software/delete-software/" + idSoftware, {
-      headers: headers,
-    });
+  deleteSoftware(id: number): any {
+    return this.http.delete(`${this.url}software/${id}`);
   }
 }

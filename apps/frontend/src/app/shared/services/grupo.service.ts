@@ -22,24 +22,16 @@ export class GrupoService {
   }
 
   getGrupoInfo(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "grupo/get-grupo", { headers: headers });
-    } else {
-      return this.http.get(this.url + "grupo/get-grupo-en", { headers: headers });
-    }
+    const lang = this.languagelocal === "en" ? "en" : "es";
+    return this.http.get(`${this.url}grupo?lang=${lang}`);
   }
   getGrupoImage(idGrupo: number, slot: "header" | "footer" | "facilidades") {
     return this.http.get(`${this.url}grupo/${idGrupo}/files/${slot}`, { responseType: "text" });
   }
 
   getFacilidadesRecursos(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "grupo/get-grupo-facilidades", { headers: headers });
+    const lang = this.languagelocal === "en" ? "en" : "es";
+    return this.http.get(`${this.url}grupo/facilidades?lang=${lang}`);
   }
 
   updateRecursos(facilidades: unknown): any {
@@ -59,10 +51,8 @@ export class GrupoService {
   }
 
   getTrabajosFuturos(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "grupo/get-grupo-trabajosfuturos", { headers: headers });
+    const lang = this.languagelocal === "en" ? "en" : "es";
+    return this.http.get(`${this.url}grupo/trabajos-futuros?lang=${lang}`);
   }
 
   updateTrabajosFuturos(trabajos: unknown): any {

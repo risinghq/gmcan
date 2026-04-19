@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -13,8 +13,8 @@ export class LineasInvestigacionService {
 
   public url: string;
 
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
+  private get lang(): string {
+    return this._session.languageCode === "en" ? "en" : "es";
   }
 
   constructor() {
@@ -22,81 +22,32 @@ export class LineasInvestigacionService {
   }
 
   getLineasInvestigacion(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "lineasinvestigacion/get-lineasinvestigacion", {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "lineasinvestigacion/get-lineasinvestigacion-en", {
-        headers: headers,
-      });
-    }
+    return this.http.get(`${this.url}lineasinvestigacion?lang=${this.lang}`);
   }
 
-  getLineasInvestigaciones(idLinea: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "lineasinvestigacion/get-lineasinvestigacions/" + idLinea, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "lineasinvestigacion/get-lineasinvestigacions-en/" + idLinea, {
-        headers: headers,
-      });
-    }
+  getLineasInvestigacionByLinea(idLinea: number): any {
+    return this.http.get(`${this.url}lineasinvestigacion?parentId=${idLinea}&lang=${this.lang}`);
   }
 
-  getLineaInvestigacion(idLineasInvestigacion: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "lineasinvestigacion/get-lineasinvestigacion/" + idLineasInvestigacion, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "lineasinvestigacion/get-lineasinvestigacion-en/" + idLineasInvestigacion, {
-        headers: headers,
-      });
-    }
+  getLineaInvestigacion(id: number): any {
+    return this.http.get(`${this.url}lineasinvestigacion/${id}?lang=${this.lang}`);
   }
 
   addLinea(linea: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "lineasinvestigacion/post-lineasinvestigacion/", linea, {
-      headers: headers,
-    });
+    return this.http.post(`${this.url}lineasinvestigacion`, linea);
   }
 
   updateLinea(linea: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "lineasinvestigacion/update-lineasinvestigacion/", linea, {
-      headers: headers,
-    });
+    return this.http.put(`${this.url}lineasinvestigacion`, linea);
   }
 
-  deleteLinea(idLinea: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "lineasinvestigacion/delete-lineasinvestigacion/" + idLinea, {
-      headers: headers,
-    });
+  deleteLinea(id: number): any {
+    return this.http.delete(`${this.url}lineasinvestigacion/${id}`);
   }
 
   uploadLineaFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({});
-    return this.http.put(`${this.url}lineasinvestigacion/${id}/file`, formData, { headers });
+    return this.http.put(`${this.url}lineasinvestigacion/${id}/file`, formData);
   }
 }

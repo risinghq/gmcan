@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 import { Observable } from "rxjs";
@@ -15,8 +15,8 @@ export class NoticiaService {
 
   public url: string;
 
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
+  private get lang(): string {
+    return this._session.languageCode === "en" ? "en" : "es";
   }
 
   constructor() {
@@ -24,83 +24,40 @@ export class NoticiaService {
   }
 
   getNoticias(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "noticia/get-noticia", { headers: headers });
-    } else {
-      return this.http.get(this.url + "noticia/get-noticia-en", { headers: headers });
-    }
+    return this.http.get(`${this.url}noticia?lang=${this.lang}`);
   }
 
-  getNoticia(idNoticia: number): Observable<Noticia[]> {
-    const headers = new HttpHeaders({ "Content-Type": "application/json" });
-    if (this.languagelocal == "es") {
-      return this.http.get<Noticia[]>(this.url + "noticia/get-noticia/" + idNoticia, { headers });
-    } else {
-      return this.http.get<Noticia[]>(this.url + "noticia/get-noticia-en/" + idNoticia, { headers });
-    }
+  getNoticia(id: number): Observable<Noticia[]> {
+    return this.http.get<Noticia[]>(`${this.url}noticia/${id}?lang=${this.lang}`);
   }
 
-  getNoticiaTipo(idTipo: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "noticia/get-noticiatipo/" + idTipo, { headers: headers });
-    } else {
-      return this.http.get(this.url + "noticia/get-noticiatipo-en/" + idTipo, { headers: headers });
-    }
+  getNoticiaByTipo(idTipo: number): any {
+    return this.http.get(`${this.url}noticia?tipoId=${idTipo}&lang=${this.lang}`);
   }
 
-  getNoticiaUsuario(idUsuario: string): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "noticia/get-noticiausuario/" + idUsuario, {
-        headers: headers,
-      });
-    } else {
-      return this.http.get(this.url + "noticia/get-noticiausuario-en/" + idUsuario, {
-        headers: headers,
-      });
-    }
+  getNoticiaByUsuario(dni: string): any {
+    return this.http.get(`${this.url}noticia?usuarioDni=${dni}&lang=${this.lang}`);
   }
 
   addNews(noticia: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "noticia/post-noticia", noticia, { headers });
+    return this.http.post(`${this.url}noticia`, noticia);
+  }
+
+  updateNoticia(noticia: unknown): any {
+    return this.http.put(`${this.url}noticia`, noticia);
+  }
+
+  deleteNoticia(id: number): any {
+    return this.http.delete(`${this.url}noticia/${id}`);
   }
 
   uploadNoticiaFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({});
-    return this.http.put(`${this.url}noticia/${id}/file`, formData, { headers });
+    return this.http.put(`${this.url}noticia/${id}/file`, formData);
   }
 
-  getNoticiaFull(idNoticia: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "noticia/get-noticiafull/" + idNoticia, { headers: headers });
-  }
-
-  updateNoticia(noticia: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "noticia/update-noticia", noticia, { headers });
-  }
-
-  deleteNoticia(idNoticia: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "noticia/delete-noticia/" + idNoticia, { headers });
+  getNoticiaFull(id: number): any {
+    return this.http.get(`${this.url}noticia/${id}/full`);
   }
 }

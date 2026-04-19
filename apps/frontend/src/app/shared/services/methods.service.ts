@@ -1,6 +1,5 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { SessionService } from "@app/shared/services/session.service";
 
 import { GLOBAL } from "./global";
 
@@ -9,65 +8,36 @@ import { GLOBAL } from "./global";
 })
 export class MethodsService {
   http = inject(HttpClient);
-  private _session = inject(SessionService);
 
   public url: string;
-
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
-  }
 
   constructor() {
     this.url = GLOBAL.url;
   }
 
   getMethods(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "metodo/get-metodo", { headers: headers });
-    } else {
-      return this.http.get(this.url + "metodo/get-metodo-en", { headers: headers });
-    }
+    return this.http.get(`${this.url}metodo`);
   }
 
-  getMethod(idNoticia: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "metodo/get-metodo/" + idNoticia, { headers: headers });
-    } else {
-      return this.http.get(this.url + "metodo/get-metodo-en/" + idNoticia, { headers: headers });
-    }
+  getMethod(id: number): any {
+    return this.http.get(`${this.url}metodo/${id}`);
   }
 
   addMetodo(metodo: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "metodo/post-metodo/", metodo, { headers: headers });
+    return this.http.post(`${this.url}metodo`, metodo);
   }
 
   updateMetodo(metodo: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "metodo/update-metodo/", metodo, { headers: headers });
+    return this.http.put(`${this.url}metodo`, metodo);
   }
 
-  deleteMetodo(idMetodo: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "metodo/delete-metodo/" + idMetodo, { headers: headers });
+  deleteMetodo(id: number): any {
+    return this.http.delete(`${this.url}metodo/${id}`);
   }
 
   uploadMetodoFoto(fileData: File, id: number) {
     const formData = new FormData();
     formData.append("foto", fileData, fileData.name);
-    let headers = new HttpHeaders({});
-    return this.http.put(`${this.url}metodo/${id}/file`, formData, { headers });
+    return this.http.put(`${this.url}metodo/${id}/file`, formData);
   }
 }

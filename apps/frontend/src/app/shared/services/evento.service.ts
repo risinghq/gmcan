@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -12,82 +12,40 @@ export class EventoService {
   private _session = inject(SessionService);
 
   public url: string;
-  private get languagelocal(): string {
-    return this._session.languageCode ?? "es";
+
+  private get lang(): string {
+    return this._session.languageCode === "en" ? "en" : "es";
   }
 
   constructor() {
     this.url = GLOBAL.url;
   }
 
-  getEventoesAll(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "evento/get-evento", { headers: headers });
-    } else {
-      return this.http.get(this.url + "evento/get-evento-en", { headers: headers });
-    }
+  getEventos(): any {
+    return this.http.get(`${this.url}evento?lang=${this.lang}`);
   }
 
-  getEvento(idEvento: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    if (this.languagelocal == "es") {
-      return this.http.get(this.url + "evento/get-evento/" + idEvento, { headers: headers });
-    } else {
-      return this.http.get(this.url + "evento/get-evento-en/" + idEvento, { headers: headers });
-    }
+  getEvento(id: number): any {
+    return this.http.get(`${this.url}evento/${id}?lang=${this.lang}`);
   }
 
   addEvento(evento: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.post(this.url + "evento/post-evento/", evento, { headers: headers });
+    return this.http.post(`${this.url}evento`, evento);
   }
 
   updateEvento(evento: unknown): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.put(this.url + "evento/update-evento/", evento, { headers: headers });
+    return this.http.put(`${this.url}evento`, evento);
   }
 
-  deleteEvento(idEvento: number): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.delete(this.url + "evento/delete-evento/" + idEvento, { headers: headers });
+  deleteEvento(id: number): any {
+    return this.http.delete(`${this.url}evento/${id}`);
   }
 
   getCiudades(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "evento/get-ciudad/", { headers: headers });
-  }
-
-  getCiudadesEN(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "evento/get-ciudad-en/", { headers: headers });
+    return this.http.get(`${this.url}evento/ciudades?lang=${this.lang}`);
   }
 
   getPais(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "evento/get-pais/", { headers: headers });
-  }
-
-  getPaisEN(): any {
-    let headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
-    return this.http.get(this.url + "evento/get-pais-en/", { headers: headers });
+    return this.http.get(`${this.url}evento/paises?lang=${this.lang}`);
   }
 }
