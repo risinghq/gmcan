@@ -39,7 +39,7 @@ import UsuarioHasProyectoRoutes from "./routes/usuariohasproyecto.js";
 
 await bootstrap();
 
-const app = new Hono();
+const app = new Hono({ strict: false });
 
 app.onError(onError);
 
