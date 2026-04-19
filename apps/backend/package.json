@@ -27,6 +27,7 @@
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.14",
     "@hono/zod-validator": "^0.7.6",
     "@libsql/client": "^0.17.2",
     "bcrypt": "^6.0.0",
