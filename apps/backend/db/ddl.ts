@@ -159,8 +159,8 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .addColumn("createdAt", "text")
+    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema

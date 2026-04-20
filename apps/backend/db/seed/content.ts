@@ -1,3 +1,4 @@
+import { NewsType, PublicationType, Currency, FundingSource, ResearchLine, Event } from "../../lib/enums.js";
 import { db } from "../client.js";
 
 const today = new Date().toISOString().split("T")[0];
@@ -23,7 +24,7 @@ export async function seedNews() {
         photo: null,
         priority: null,
         authorId: null,
-        newsTypeId: 1,
+        newsTypeId: NewsType.GENERAL,
       },
       {
         id: 51,
@@ -100,7 +101,7 @@ export async function seedNews() {
         photo: "ndKNxjxt9rHPMFfKdWDqYbgn.jpg",
         priority: null,
         authorId: null,
-        newsTypeId: 85,
+        newsTypeId: NewsType.GENERAL,
       },
     ])
     .onConflict((oc) => oc.doNothing())
@@ -175,9 +176,9 @@ export async function seedProject() {
       endDate: null,
       createdAt: null,
       updatedAt: null,
-      researchLineId: 2,
-      currencyId: 1,
-      fundingSourceId: 1,
+      researchLineId: ResearchLine.HEXAGONAL,
+      currencyId: Currency.SOL,
+      fundingSourceId: FundingSource.VRIP,
     })
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -212,10 +213,10 @@ export async function seedPublications() {
         publishedAt: "2019-11-18",
         updatedAt: null,
         createdAt: null,
-        typeId: 3,
+        typeId: PublicationType.THESIS,
         journalId: null,
         universityId: null,
-        eventId: 1,
+        eventId: Event.SIMPOSIO_FISICA,
         thesisTypeId: null,
       },
       {
@@ -231,7 +232,7 @@ export async function seedPublications() {
         publishedAt: "2020-06-18",
         updatedAt: null,
         createdAt: null,
-        typeId: 1,
+        typeId: PublicationType.JOURNAL,
         journalId: 1,
         universityId: null,
         eventId: null,
@@ -250,7 +251,7 @@ export async function seedPublications() {
         publishedAt: "2020-08-01",
         updatedAt: null,
         createdAt: null,
-        typeId: 1,
+        typeId: PublicationType.JOURNAL,
         journalId: null,
         universityId: null,
         eventId: null,
