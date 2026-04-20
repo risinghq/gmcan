@@ -31,7 +31,7 @@
     "@hono/zod-validator": "^0.7.6",
     "@libsql/client": "^0.17.2",
     "bcrypt": "^6.0.0",
-    "hono": "^4.12.9",
+    "hono": "^4.12.14",
     "kysely": "^0.28.15",
     "kysely-libsql": "^0.7.1",
     "resend": "^6.10.0",
