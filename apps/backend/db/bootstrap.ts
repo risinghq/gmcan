@@ -8,18 +8,18 @@ interface PragmaColumn {
   name: string;
 }
 
+async function sweepExpiredSessions() {
+  await db.deleteFrom("session").where("expiresAt", "<", new Date().toISOString()).execute();
+}
+
 export async function bootstrap() {
   if (process.env.NODE_ENV === "production") return;
 
-  // Enable FK enforcement for the session (no-op for HTTP/sqld targets)
   await sql`PRAGMA foreign_keys = ON`.execute(db);
 
-  // Create all tables that don't yet exist
   await createTables(db);
 
-  // Detect schema drift by comparing expected columns against PRAGMA table_info
   const issues: string[] = [];
-
   const entries = Object.entries(EXPECTED_COLUMNS);
   const results = await Promise.all(
     entries.map(([table]) => sql<PragmaColumn>`PRAGMA table_info(${sql.raw(table)})`.execute(db)),
@@ -27,10 +27,8 @@ export async function bootstrap() {
 
   for (const [[table, expectedCols], result] of entries.map((e, i) => [e, results[i]] as const)) {
     const actualCols = result.rows.map((r) => r.name);
-
     const missing = expectedCols.filter((col) => !actualCols.includes(col));
     const extra = actualCols.filter((col) => !expectedCols.includes(col));
-
     if (missing.length) issues.push(`  Table '${table}': missing columns [${missing.join(", ")}]`);
     if (extra.length) issues.push(`  Table '${table}': unexpected columns [${extra.join(", ")}]`);
   }
@@ -43,8 +41,10 @@ export async function bootstrap() {
     process.exit(1);
   }
 
-  // Seed reference data and dev user on first run
   await seed();
+
+  await sweepExpiredSessions();
+  setInterval(sweepExpiredSessions, 6 * 60 * 60 * 1000);
 
   console.log("[DB] Ready");
 }

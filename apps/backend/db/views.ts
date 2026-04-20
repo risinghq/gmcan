@@ -1,83 +1,82 @@
 import { sql } from "kysely";
 
 import { db } from "./client.js";
-import { USUARIO_PUBLIC } from "./projections.js";
+import { MEMBER_PUBLIC } from "./projections.js";
 
 export interface AuthorEntry {
   kind: "registered" | "external";
-  DNI?: string;
-  nombre: string;
-  foto?: string | null;
+  memberId?: number;
+  name: string;
+  photo?: string | null;
   isPrincipal: number;
 }
 
-export async function publicacionWithAuthors(id: number): Promise<{
-  publicacion: Record<string, unknown>;
-  autores: AuthorEntry[];
+export async function publicationWithAuthors(id: number): Promise<{
+  publication: Record<string, unknown>;
+  authors: AuthorEntry[];
 }> {
-  const [publicacion, rows] = await Promise.all([
-    db.selectFrom("publicacion").selectAll().where("idPublicacion", "=", id).executeTakeFirst(),
+  const [publication, rows] = await Promise.all([
+    db.selectFrom("publication").selectAll().where("id", "=", id).executeTakeFirst(),
     db
-      .selectFrom("publicacion_has_autor")
-      .leftJoin("usuario", "usuario.DNI", "publicacion_has_autor.usuario_DNI")
+      .selectFrom("publication_author")
+      .leftJoin("member", "member.id", "publication_author.memberId")
       .select([
-        "publicacion_has_autor.isPrincipal",
-        "publicacion_has_autor.nombre",
-        "publicacion_has_autor.usuario_DNI",
-        sql<string>`usuario.nombre`.as("userNombre"),
-        sql<string>`usuario.apellidoPaterno`.as("userApellidoPaterno"),
-        sql<string | null>`usuario.apellidoMaterno`.as("userApellidoMaterno"),
-        sql<string | null>`usuario.foto`.as("userFoto"),
+        "publication_author.isPrincipal",
+        "publication_author.externalName",
+        "publication_author.memberId",
+        sql<string>`member.firstName`.as("memberFirstName"),
+        sql<string>`member.lastName`.as("memberLastName"),
+        sql<string | null>`member.maternalName`.as("memberMaternalName"),
+        sql<string | null>`member.photo`.as("memberPhoto"),
       ])
-      .where("publicacion_has_autor.publicacion_idPublicacion", "=", id)
-      .orderBy("publicacion_has_autor.isPrincipal", "asc")
+      .where("publication_author.publicationId", "=", id)
+      .orderBy("publication_author.isPrincipal", "asc")
       .execute(),
   ]);
 
-  const autores: AuthorEntry[] = rows.map((row) => {
-    if (row.usuario_DNI) {
+  const authors: AuthorEntry[] = rows.map((row) => {
+    if (row.memberId) {
       return {
         kind: "registered" as const,
-        DNI: row.usuario_DNI,
-        nombre:
-          `${row.userNombre ?? ""} ${row.userApellidoPaterno ?? ""}${row.userApellidoMaterno ? " " + row.userApellidoMaterno : ""}`.trim(),
-        foto: row.userFoto ?? null,
+        memberId: row.memberId,
+        name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+        photo: row.memberPhoto ?? null,
         isPrincipal: row.isPrincipal,
       };
     }
     return {
       kind: "external" as const,
-      nombre: row.nombre ?? "",
+      name: row.externalName ?? "",
       isPrincipal: row.isPrincipal,
     };
   });
 
-  return { publicacion: publicacion as Record<string, unknown>, autores };
+  return { publication: publication as Record<string, unknown>, authors };
 }
 
-export async function memberProjects(dni: string) {
+export async function memberProjects(memberId: number) {
   return db
-    .selectFrom("proyecto")
-    .innerJoin("usuario_has_proyecto", "usuario_has_proyecto.proyecto_idProyecto", "proyecto.idProyecto")
-    .selectAll("proyecto")
-    .where("usuario_has_proyecto.usuario_DNI", "=", dni)
+    .selectFrom("project")
+    .innerJoin("member_project", "member_project.projectId", "project.id")
+    .selectAll("project")
+    .where("member_project.memberId", "=", memberId)
     .execute();
 }
 
-export async function memberPublications(dni: string) {
+export async function memberPublications(memberId: number) {
   return db
-    .selectFrom("publicacion")
-    .innerJoin("publicacion_has_autor", "publicacion_has_autor.publicacion_idPublicacion", "publicacion.idPublicacion")
-    .selectAll("publicacion")
-    .where("publicacion_has_autor.usuario_DNI", "=", dni)
+    .selectFrom("publication")
+    .innerJoin("publication_author", "publication_author.publicationId", "publication.id")
+    .selectAll("publication")
+    .where("publication_author.memberId", "=", memberId)
     .execute();
 }
 
-export async function publicProfile(dni: string) {
-  const [usuario, proyectos, publicaciones] = await Promise.all([
-    db.selectFrom("usuario").select(USUARIO_PUBLIC).where("DNI", "=", dni).executeTakeFirst(),
-    memberProjects(dni),
-    memberPublications(dni),
+export async function publicProfile(memberId: number) {
+  const [member, projects, publications] = await Promise.all([
+    db.selectFrom("member").select(MEMBER_PUBLIC).where("id", "=", memberId).executeTakeFirst(),
+    memberProjects(memberId),
+    memberPublications(memberId),
   ]);
-  return { usuario, proyectos, publicaciones };
+  return { member, projects, publications };
 }

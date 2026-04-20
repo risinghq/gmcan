@@ -1,336 +1,312 @@
 import type { Generated } from "kysely";
 
-// All dates stored as ISO strings (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
 type DateString = string;
 
-export interface EquipoTable {
-  idEquipo: Generated<number>;
-  nombre: string;
-  cpu: string | null;
-  gpu: string | null;
-  ram: string | null;
-  hd: string | null;
-  grupo_idGrupo: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
+export interface GenderTable {
+  id: Generated<number>;
+  name: string;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
 }
 
-export interface EventoTable {
-  idEvento: Generated<number>;
-  nombre: string;
-  ciudad: string | null;
-  pais: string | null;
-  ciudadEN: string | null;
-  paisEN: string | null;
+export interface PrefixTable {
+  id: Generated<number>;
+  name: string;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
 }
 
-export interface FuenteFinanciamientoTable {
-  idFuenteFinanciamiento: Generated<number>;
-  nombre: string;
+export interface RoleTable {
+  id: Generated<number>;
+  name: string;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
 
-export interface GeneroTable {
-  idGenero: Generated<number>;
-  nombre: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
+export interface MemberTypeTable {
+  id: Generated<number>;
+  name: string;
+  nameEN: string;
+  nameSingular: string;
+  nameSingularEN: string;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
 }
 
-export interface GrupoTable {
-  idGrupo: Generated<number>;
-  quienesSomosResumenEN: string;
-  quienesSomosResumen: string;
-  direccion: string | null;
-  correo: string | null;
-  telefono: string | null;
-  nombreGrupo: string | null;
-  nombreGrupo2: string | null;
-  facilidadesRecursosFoto: string | null;
-  facilidadesRecursos: string | null;
-  facilidadesRecursosEN: string | null;
-  trabajosFuturos: string | null;
-  trabajosFuturosEN: string | null;
+export interface PublicationTypeTable {
+  id: Generated<number>;
+  name: string;
+  nameEN: string;
+  createdAt: DateString;
+  updatedAt: DateString;
+}
+
+export interface ThesisTypeTable {
+  id: Generated<number>;
+  name: string;
+  nameEN: string;
+  createdAt: DateString;
+  updatedAt: DateString;
+}
+
+export interface NewsTypeTable {
+  id: Generated<number>;
+  name: string;
+  nameEN: string;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface JournalTable {
+  id: Generated<number>;
+  name: string;
+}
+
+export interface UniversityTable {
+  id: Generated<number>;
+  name: string | null;
+  nameEN: string | null;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface EventTable {
+  id: Generated<number>;
+  name: string;
+  city: string | null;
+  country: string | null;
+  cityEN: string | null;
+  countryEN: string | null;
+}
+
+export interface FundingSourceTable {
+  id: Generated<number>;
+  name: string;
+}
+
+export interface CurrencyTable {
+  id: Generated<number>;
+  symbol: string;
+}
+
+export interface ResearchGroupTable {
+  id: Generated<number>;
+  summaryES: string;
+  summaryEN: string;
+  address: string | null;
+  email: string | null;
+  phone: string | null;
+  name: string | null;
+  fullName: string | null;
+  facilitiesPhoto: string | null;
+  facilitiesES: string | null;
+  facilitiesEN: string | null;
+  futureWorkES: string | null;
+  futureWorkEN: string | null;
   logoFooter: string | null;
   logoHeader: string | null;
-  seccionPublicaciones: string | null;
-  seccionPublicacionesEN: string | null;
-  seccionProyectos: string | null;
-  seccionProyectosEN: string | null;
-  fechaCreacion: DateString;
-  fechaActualizacion: DateString;
+  publicationsSectionES: string | null;
+  publicationsSectionEN: string | null;
+  projectsSectionES: string | null;
+  projectsSectionEN: string | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
 
-export interface LineasInvestigacionTable {
-  idLineasInvestigacion: Generated<number>;
-  nombre: string;
-  nombreEN: string;
-  descripcion: string | null;
-  descripcionEN: string | null;
-  foto: string | null;
-  grupo_idGrupo: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface MetodoTable {
-  idMetodo: Generated<number>;
-  nombreEN: string;
-  nombre: string;
-  descripcion: string;
-  descripcionEN: string | null;
-  foto: string | null;
-  grupo_idGrupo: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface MonedaTable {
-  idMoneda: Generated<number>;
-  simbolo: string;
-}
-
-export interface NoticiaTable {
-  idNoticia: Generated<number>;
-  titulo: string | null;
-  tituloEN: string | null;
-  resumen: string | null;
-  resumenEN: string | null;
-  cuerpo: string | null;
-  cuerpoEN: string | null;
-  estado: number | null;
-  fechaPublicacion: DateString | null;
-  fechaActualizacion: DateString | null;
-  fechaCreacion: DateString | null;
-  foto: string | null;
-  prioridad: number | null;
-  autorPublicacion: string | null;
-  tipoNoticia_idtipoNoticia: number | null;
-}
-
-export interface PermisoTable {
-  idPermiso: Generated<number>;
-  nombre: string;
-  fechaCreacion: DateString;
-  fechaActualizacion: DateString;
-}
-
-export interface PrefijoTable {
-  idPrefijo: Generated<number>;
-  nombre: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface ProyectoTable {
-  idProyecto: Generated<number>;
-  titulo: string;
-  tituloEN: string | null;
-  codigo: string;
-  montoFinanciado: string;
-  descripcion: string;
-  descripcionEN: string | null;
-  estado: number | null;
-  fechaInicio: DateString;
-  fechaFin: DateString | null;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-  lineasInvestigacion_idLineasInvestigacion: number;
-  moneda_idMoneda: number;
-  fuenteFinanciamiento_idFuenteFinanciamiento: number;
-}
-
-export interface PublicacionTable {
-  idPublicacion: Generated<number>;
-  titulo: string;
-  archivo: string | null;
-  resumen: string | null;
-  resumenEN: string | null;
-  nroRevista: number | null;
-  DOI: string | null;
-  fechaPublicacion: DateString;
-  fechaActualizacion: DateString | null;
-  fechaCreacion: DateString | null;
-  tipoPublicacion_idTipoPublicacion: number;
-  revista_idRevista: number | null;
-  universidad_idUniversidad: number | null;
-  evento_idEvento: number | null;
-  tipoTesis_idTipoTesis: number | null;
-}
-
-export interface PublicacionHasAutorTable {
-  idPublicacionHasAutor: Generated<number>;
-  publicacion_idPublicacion: number;
-  isPrincipal: number;
-  nombre: string | null; // external authors only
-  usuario_DNI: string | null; // registered users only
-}
-
-export interface RevistaTable {
-  idRevista: Generated<number>;
-  nombre: string;
-}
-
-export interface SobreNosotrosTable {
-  idSobreNosotros: Generated<number>;
-  quienesSomos: string;
-  quienesSomosEN: string;
-  objetivos: string | null;
-  objetivosEN: string | null;
-  servicios: string | null;
-  serviciosEN: string | null;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-  foto: string | null;
-  grupo_idGrupo: number;
-}
-
-export interface SoftwareTable {
-  idSoftware: Generated<number>;
-  nombre: string | null;
-  descripcion: string | null;
-  descripcionEN: string | null;
-  moreInfo: string | null;
-  grupo_idGrupo: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface TipoMiembroTable {
-  idTipoMiembro: Generated<number>;
-  nombre: string;
-  nombreEN: string;
-  nombreSingular: string;
-  nombreSingularEN: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface TipoNoticiaTable {
-  idtipoNoticia: Generated<number>;
-  nombre: string;
-  nombreEN: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface TipoPermisoTable {
-  idTipoPermiso: Generated<number>;
-  nombre: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface TipoPublicacionTable {
-  idTipoPublicacion: Generated<number>;
-  nombre: string;
-  nombreEN: string;
-  fechaActualizacion: DateString;
-  fechaCreacion: DateString;
-}
-
-export interface TipoTesisTable {
-  idTipoTesis: Generated<number>;
-  nombre: string;
-  nombreEN: string;
-  fechaCreacion: DateString;
-  fechaActualizacion: DateString;
-}
-
-export interface TipoUsuarioTable {
-  idTipoUsuario: Generated<number>;
-  nombre: string;
-  fechaCreacion: DateString;
-  fechaActualizacion: DateString;
-}
-
-export interface UniversidadTable {
-  idUniversidad: Generated<number>;
-  nombreEN: string | null;
-  nombre: string | null;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface UsuarioTable {
-  DNI: string;
-  correo: string;
+export interface MemberTable {
+  id: Generated<number>;
+  dni: string;
+  email: string;
   password: string;
-  nombre: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string | null;
-  fechaNacimiento: DateString | null;
-  resumenPro: string | null;
-  resumenProEN: string | null;
-  foto: string | null;
-  estado: number;
-  restablecer: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-  tipoUsuario_idTipoUsuario: number;
-  tipoMiembro_idTipoMiembro: number;
-  prefijo_idPrefijo: number | null;
-  genero_idGenero: number | null;
-  reset_token: string | null;
-  reset_expires: DateString | null;
-}
-
-export interface UsuarioHasGrupoTable {
-  usuario_DNI: string;
-  grupo_idGrupo: number;
-  fechaCreacion: DateString;
-  fechaActualizacion: DateString;
-}
-
-export interface UsuarioHasProyectoTable {
-  proyecto_idProyecto: number;
-  usuario_DNI: string;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
-}
-
-export interface UsuarioHasPermisoTable {
-  usuario_DNI: string;
-  permiso_idPermiso: number;
-  fechaCreacion: DateString | null;
-  fechaActualizacion: DateString | null;
+  firstName: string;
+  lastName: string;
+  maternalName: string | null;
+  birthDate: DateString | null;
+  bio: string | null;
+  bioEN: string | null;
+  photo: string | null;
+  status: number;
+  resetPassword: number;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+  roleId: number;
+  memberTypeId: number;
+  prefixId: number | null;
+  genderId: number | null;
+  resetToken: string | null;
+  resetExpires: DateString | null;
 }
 
 export interface SessionTable {
   id: string;
-  userDNI: string;
-  userCorreo: string;
+  memberId: number;
+  email: string;
   expiresAt: DateString;
   lastActive: DateString;
 }
 
+export interface ResearchLineTable {
+  id: Generated<number>;
+  name: string;
+  nameEN: string;
+  description: string | null;
+  descriptionEN: string | null;
+  photo: string | null;
+  groupId: number;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface MethodTable {
+  id: Generated<number>;
+  name: string;
+  nameEN: string;
+  description: string;
+  descriptionEN: string | null;
+  photo: string | null;
+  groupId: number;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface EquipmentTable {
+  id: Generated<number>;
+  name: string;
+  cpu: string | null;
+  gpu: string | null;
+  ram: string | null;
+  storage: string | null;
+  groupId: number;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface SoftwareTable {
+  id: Generated<number>;
+  name: string | null;
+  description: string | null;
+  descriptionEN: string | null;
+  moreInfo: string | null;
+  groupId: number;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface AboutTable {
+  id: Generated<number>;
+  descriptionES: string;
+  descriptionEN: string;
+  objectivesES: string | null;
+  objectivesEN: string | null;
+  servicesES: string | null;
+  servicesEN: string | null;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+  photo: string | null;
+  groupId: number;
+}
+
+export interface NewsTable {
+  id: Generated<number>;
+  title: string | null;
+  titleEN: string | null;
+  summary: string | null;
+  summaryEN: string | null;
+  body: string | null;
+  bodyEN: string | null;
+  status: number | null;
+  publishedAt: DateString | null;
+  updatedAt: DateString | null;
+  createdAt: DateString | null;
+  photo: string | null;
+  priority: number | null;
+  authorId: number | null;
+  newsTypeId: number | null;
+}
+
+export interface PublicationTable {
+  id: Generated<number>;
+  title: string;
+  file: string | null;
+  abstractES: string | null;
+  abstractEN: string | null;
+  journalIssue: number | null;
+  doi: string | null;
+  publishedAt: DateString;
+  updatedAt: DateString | null;
+  createdAt: DateString | null;
+  typeId: number;
+  journalId: number | null;
+  universityId: number | null;
+  eventId: number | null;
+  thesisTypeId: number | null;
+}
+
+export interface PublicationAuthorTable {
+  id: Generated<number>;
+  publicationId: number;
+  isPrincipal: number;
+  externalName: string | null;
+  memberId: number | null;
+}
+
+export interface ProjectTable {
+  id: Generated<number>;
+  title: string;
+  titleEN: string | null;
+  code: string;
+  fundedAmount: string;
+  description: string;
+  descriptionEN: string | null;
+  status: number | null;
+  startDate: DateString;
+  endDate: DateString | null;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+  researchLineId: number;
+  currencyId: number;
+  fundingSourceId: number;
+}
+
+export interface MemberProjectTable {
+  projectId: number;
+  memberId: number;
+  createdAt: DateString | null;
+  updatedAt: DateString | null;
+}
+
+export interface MemberGroupTable {
+  memberId: number;
+  groupId: number;
+  createdAt: DateString;
+  updatedAt: DateString;
+}
+
 export interface Database {
-  equipo: EquipoTable;
-  evento: EventoTable;
-  fuentefinanciamiento: FuenteFinanciamientoTable;
-  genero: GeneroTable;
-  grupo: GrupoTable;
-  lineasinvestigacion: LineasInvestigacionTable;
-  metodo: MetodoTable;
-  moneda: MonedaTable;
-  noticia: NoticiaTable;
-  permiso: PermisoTable;
-  prefijo: PrefijoTable;
-  proyecto: ProyectoTable;
-  publicacion: PublicacionTable;
-  publicacion_has_autor: PublicacionHasAutorTable;
-  revista: RevistaTable;
-  sobrenosotros: SobreNosotrosTable;
-  software: SoftwareTable;
-  tipomiembro: TipoMiembroTable;
-  tiponoticia: TipoNoticiaTable;
-  tipopermiso: TipoPermisoTable;
-  tipopublicacion: TipoPublicacionTable;
-  tipotesis: TipoTesisTable;
-  tipousuario: TipoUsuarioTable;
-  universidad: UniversidadTable;
-  usuario: UsuarioTable;
-  usuario_has_grupo: UsuarioHasGrupoTable;
-  usuario_has_proyecto: UsuarioHasProyectoTable;
-  usuariohaspermiso: UsuarioHasPermisoTable;
+  gender: GenderTable;
+  prefix: PrefixTable;
+  role: RoleTable;
+  member_type: MemberTypeTable;
+  publication_type: PublicationTypeTable;
+  thesis_type: ThesisTypeTable;
+  news_type: NewsTypeTable;
+  journal: JournalTable;
+  university: UniversityTable;
+  event: EventTable;
+  funding_source: FundingSourceTable;
+  currency: CurrencyTable;
+  research_group: ResearchGroupTable;
+  member: MemberTable;
   session: SessionTable;
+  research_line: ResearchLineTable;
+  method: MethodTable;
+  equipment: EquipmentTable;
+  software: SoftwareTable;
+  about: AboutTable;
+  news: NewsTable;
+  publication: PublicationTable;
+  publication_author: PublicationAuthorTable;
+  project: ProjectTable;
+  member_project: MemberProjectTable;
+  member_group: MemberGroupTable;
 }

@@ -4,205 +4,184 @@ import { db } from "./client.js";
 const today = new Date().toISOString().split("T")[0];
 
 export async function seed() {
-  // Insert reference data using onConflict().doNothing() so re-runs are safe.
-
   await db
-    .insertInto("genero")
+    .insertInto("gender")
     .values([
-      { idGenero: 1, nombre: "Masculino", fechaCreacion: today, fechaActualizacion: today },
-      { idGenero: 2, nombre: "Femenino", fechaCreacion: today, fechaActualizacion: today },
+      { id: 1, name: "Male", createdAt: today, updatedAt: today },
+      { id: 2, name: "Female", createdAt: today, updatedAt: today },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("prefijo")
+    .insertInto("prefix")
     .values([
-      { idPrefijo: 1, nombre: "Dr.", fechaCreacion: today, fechaActualizacion: today },
-      { idPrefijo: 2, nombre: "Dra.", fechaCreacion: today, fechaActualizacion: today },
-      { idPrefijo: 3, nombre: "Mg.", fechaCreacion: today, fechaActualizacion: today },
-      { idPrefijo: 4, nombre: "Lic.", fechaCreacion: today, fechaActualizacion: today },
-      { idPrefijo: 5, nombre: "Bach.", fechaCreacion: today, fechaActualizacion: today },
-      { idPrefijo: 6, nombre: "Ing.", fechaCreacion: today, fechaActualizacion: today },
-      { idPrefijo: 7, nombre: "-", fechaCreacion: today, fechaActualizacion: today },
+      { id: 1, name: "Dr.", createdAt: today, updatedAt: today },
+      { id: 2, name: "Dra.", createdAt: today, updatedAt: today },
+      { id: 3, name: "Mg.", createdAt: today, updatedAt: today },
+      { id: 4, name: "Lic.", createdAt: today, updatedAt: today },
+      { id: 5, name: "Bach.", createdAt: today, updatedAt: today },
+      { id: 6, name: "Ing.", createdAt: today, updatedAt: today },
+      { id: 7, name: "-", createdAt: today, updatedAt: today },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("tipousuario")
+    .insertInto("role")
     .values([
-      { idTipoUsuario: 1, nombre: "Administrador", fechaCreacion: today, fechaActualizacion: today },
-      { idTipoUsuario: 2, nombre: "Investigador", fechaCreacion: today, fechaActualizacion: today },
-      { idTipoUsuario: 3, nombre: "Visitante", fechaCreacion: today, fechaActualizacion: today },
+      { id: 1, name: "Administrator", createdAt: today, updatedAt: today },
+      { id: 2, name: "Researcher", createdAt: today, updatedAt: today },
+      { id: 3, name: "Visitor", createdAt: today, updatedAt: today },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("tipomiembro")
+    .insertInto("member_type")
     .values([
       {
-        idTipoMiembro: 1,
-        nombre: "Investigadores",
-        nombreEN: "Researchers",
-        nombreSingular: "Investigador",
-        nombreSingularEN: "Researcher",
-        fechaCreacion: today,
-        fechaActualizacion: today,
+        id: 1,
+        name: "Investigadores",
+        nameEN: "Researchers",
+        nameSingular: "Investigador",
+        nameSingularEN: "Researcher",
+        createdAt: today,
+        updatedAt: today,
       },
       {
-        idTipoMiembro: 2,
-        nombre: "Estudiantes de Doctorado",
-        nombreEN: "PhD Students",
-        nombreSingular: "Estudiante de Doctorado",
-        nombreSingularEN: "PhD Student",
-        fechaCreacion: today,
-        fechaActualizacion: today,
+        id: 2,
+        name: "Estudiantes de Doctorado",
+        nameEN: "PhD Students",
+        nameSingular: "Estudiante de Doctorado",
+        nameSingularEN: "PhD Student",
+        createdAt: today,
+        updatedAt: today,
       },
       {
-        idTipoMiembro: 3,
-        nombre: "Estudiantes de Maestría",
-        nombreEN: "Master Students",
-        nombreSingular: "Estudiante de Maestría",
-        nombreSingularEN: "Master Student",
-        fechaCreacion: today,
-        fechaActualizacion: today,
+        id: 3,
+        name: "Estudiantes de Maestría",
+        nameEN: "Master Students",
+        nameSingular: "Estudiante de Maestría",
+        nameSingularEN: "Master Student",
+        createdAt: today,
+        updatedAt: today,
       },
       {
-        idTipoMiembro: 4,
-        nombre: "Estudiantes de Pregrado",
-        nombreEN: "Undergraduate Students",
-        nombreSingular: "Estudiante de Pregrado",
-        nombreSingularEN: "Undergraduate Student",
-        fechaCreacion: today,
-        fechaActualizacion: today,
+        id: 4,
+        name: "Estudiantes de Pregrado",
+        nameEN: "Undergraduate Students",
+        nameSingular: "Estudiante de Pregrado",
+        nameSingularEN: "Undergraduate Student",
+        createdAt: today,
+        updatedAt: today,
       },
       {
-        idTipoMiembro: 5,
-        nombre: "Colaboradores",
-        nombreEN: "Collaborators",
-        nombreSingular: "Colaborador",
-        nombreSingularEN: "Collaborator",
-        fechaCreacion: today,
-        fechaActualizacion: today,
+        id: 5,
+        name: "Colaboradores",
+        nameEN: "Collaborators",
+        nameSingular: "Colaborador",
+        nameSingularEN: "Collaborator",
+        createdAt: today,
+        updatedAt: today,
       },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("tipopublicacion")
+    .insertInto("publication_type")
     .values([
-      {
-        idTipoPublicacion: 1,
-        nombre: "Artículo de Revista",
-        nombreEN: "Journal Article",
-        fechaCreacion: today,
-        fechaActualizacion: today,
-      },
-      {
-        idTipoPublicacion: 2,
-        nombre: "Ponencia en Conferencia",
-        nombreEN: "Conference Paper",
-        fechaCreacion: today,
-        fechaActualizacion: today,
-      },
-      { idTipoPublicacion: 3, nombre: "Tesis", nombreEN: "Thesis", fechaCreacion: today, fechaActualizacion: today },
+      { id: 1, name: "Journal Article", nameEN: "Journal Article", createdAt: today, updatedAt: today },
+      { id: 2, name: "Conference Paper", nameEN: "Conference Paper", createdAt: today, updatedAt: today },
+      { id: 3, name: "Thesis", nameEN: "Thesis", createdAt: today, updatedAt: today },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("tipotesis")
+    .insertInto("thesis_type")
     .values([
-      { idTipoTesis: 1, nombre: "Doctorado", nombreEN: "PhD", fechaCreacion: today, fechaActualizacion: today },
-      { idTipoTesis: 2, nombre: "Maestría", nombreEN: "Master's", fechaCreacion: today, fechaActualizacion: today },
+      { id: 1, name: "PhD", nameEN: "PhD", createdAt: today, updatedAt: today },
+      { id: 2, name: "Master's", nameEN: "Master's", createdAt: today, updatedAt: today },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("tiponoticia")
+    .insertInto("news_type")
     .values([
-      { idtipoNoticia: 1, nombre: "General", nombreEN: "General", fechaCreacion: today, fechaActualizacion: today },
-      {
-        idtipoNoticia: 2,
-        nombre: "Investigación",
-        nombreEN: "Research",
-        fechaCreacion: today,
-        fechaActualizacion: today,
-      },
-      { idtipoNoticia: 3, nombre: "Evento", nombreEN: "Event", fechaCreacion: today, fechaActualizacion: today },
+      { id: 1, name: "General", nameEN: "General", createdAt: today, updatedAt: today },
+      { id: 2, name: "Research", nameEN: "Research", createdAt: today, updatedAt: today },
+      { id: 3, name: "Event", nameEN: "Event", createdAt: today, updatedAt: today },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("moneda")
+    .insertInto("currency")
     .values([
-      { idMoneda: 1, simbolo: "S/" },
-      { idMoneda: 2, simbolo: "$" },
+      { id: 1, symbol: "S/" },
+      { id: 2, symbol: "$" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
   await db
-    .insertInto("grupo")
+    .insertInto("research_group")
     .values([
       {
-        idGrupo: 1,
-        quienesSomosResumen: "Grupo de investigación de la UNMSM.",
-        quienesSomosResumenEN: "Research group of UNMSM.",
-        nombreGrupo: "GMCAN",
-        nombreGrupo2: "Grupo de Minería de Conocimiento y Análisis de Negocios",
-        fechaCreacion: today,
-        fechaActualizacion: today,
-        direccion: null,
-        correo: null,
-        telefono: null,
-        facilidadesRecursosFoto: null,
-        facilidadesRecursos: null,
-        facilidadesRecursosEN: null,
-        trabajosFuturos: null,
-        trabajosFuturosEN: null,
+        id: 1,
+        summaryES: "Grupo de investigación de la UNMSM.",
+        summaryEN: "Research group of UNMSM.",
+        name: "GMCAN",
+        fullName: "Grupo de Minería de Conocimiento y Análisis de Negocios",
+        createdAt: today,
+        updatedAt: today,
+        address: null,
+        email: null,
+        phone: null,
+        facilitiesPhoto: null,
+        facilitiesES: null,
+        facilitiesEN: null,
+        futureWorkES: null,
+        futureWorkEN: null,
         logoFooter: null,
         logoHeader: null,
-        seccionPublicaciones: null,
-        seccionPublicacionesEN: null,
-        seccionProyectos: null,
-        seccionProyectosEN: null,
+        publicationsSectionES: null,
+        publicationsSectionEN: null,
+        projectsSectionES: null,
+        projectsSectionEN: null,
       },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
-  // Seed admin user only if no users exist yet
-  const existing = await db.selectFrom("usuario").select("DNI").executeTakeFirst();
+  const existing = await db.selectFrom("member").select("id").executeTakeFirst();
   if (!existing) {
     await db
-      .insertInto("usuario")
+      .insertInto("member")
       .values({
-        DNI: "00000001",
-        correo: "admin@gmcan.dev",
+        dni: "00000001",
+        email: "admin@gmcan.dev",
         password: hashPassword("admin1234"),
-        nombre: "Admin",
-        apellidoPaterno: "Dev",
-        apellidoMaterno: null,
-        estado: 1,
-        restablecer: 0,
-        tipoUsuario_idTipoUsuario: 1,
-        tipoMiembro_idTipoMiembro: 1,
-        prefijo_idPrefijo: null,
-        genero_idGenero: null,
-        fechaCreacion: today,
-        fechaActualizacion: today,
-        fechaNacimiento: null,
-        resumenPro: null,
-        resumenProEN: null,
-        foto: null,
-        reset_token: null,
-        reset_expires: null,
+        firstName: "Admin",
+        lastName: "Dev",
+        maternalName: null,
+        status: 1,
+        resetPassword: 0,
+        roleId: 1,
+        memberTypeId: 1,
+        prefixId: null,
+        genderId: null,
+        createdAt: today,
+        updatedAt: today,
+        birthDate: null,
+        bio: null,
+        bioEN: null,
+        photo: null,
+        resetToken: null,
+        resetExpires: null,
       })
       .execute();
   }
