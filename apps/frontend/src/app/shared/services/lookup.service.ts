@@ -11,7 +11,7 @@ import { GLOBAL } from "./global";
 export class LookupService {
   private http = inject(HttpClient);
 
-  private readonly lookup$ = this.http.get<LookupData>(`${GLOBAL.url}lookup`).pipe(
+  private readonly lookup$ = this.http.get<LookupData>(`${GLOBAL.url}api/lookup`).pipe(
     share(),
     catchError(() => of(this.getEmptyLookup())),
   );
@@ -20,18 +20,14 @@ export class LookupService {
 
   private getEmptyLookup(): LookupData {
     return {
-      generos: [],
-      prefijos: [],
-      tiposMiembro: [],
-      tiposPublicacion: [],
-      tiposTesis: [],
-      monedas: [],
-      tiposNoticia: [],
-      tiposUsuario: [],
-      fuentesFinanciamiento: [],
-      universidades: [],
-      revistas: [],
-      eventos: [],
+      memberTypes: [],
+      publicationTypes: [],
+      thesisTypes: [],
+      newsTypes: [],
+      fundingSources: [],
+      universities: [],
+      journals: [],
+      events: [],
     };
   }
 
@@ -47,39 +43,35 @@ export class LookupService {
     return MONEDAS;
   }
 
-  tiposUsuario() {
-    return [];
+  memberTypes() {
+    return this.data().memberTypes;
   }
 
-  tiposMiembro() {
-    return this.data().tiposMiembro;
+  publicationTypes() {
+    return this.data().publicationTypes;
   }
 
-  tiposPublicacion() {
-    return this.data().tiposPublicacion;
+  thesisTypes() {
+    return this.data().thesisTypes;
   }
 
-  tiposTesis() {
-    return this.data().tiposTesis;
+  newsTypes() {
+    return this.data().newsTypes;
   }
 
-  tiposNoticia() {
-    return this.data().tiposNoticia;
+  fundingSources() {
+    return this.data().fundingSources;
   }
 
-  fuentesFinanciamiento() {
-    return this.data().fuentesFinanciamiento;
+  universities() {
+    return this.data().universities;
   }
 
-  universidades() {
-    return this.data().universidades;
+  journals() {
+    return this.data().journals;
   }
 
-  revistas() {
-    return this.data().revistas;
-  }
-
-  eventos() {
-    return this.data().eventos;
+  events() {
+    return this.data().events;
   }
 }

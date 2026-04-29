@@ -17,13 +17,17 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { Publicacion } from "@app/shared/models/publicacion";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+
+interface PublicationRow extends PublicationWithAuthors {
+  fecha?: string;
+  thesisTypeName?: string;
+  universityName?: string;
+}
 
 @Component({
   selector: "app-my-thesis",
@@ -49,16 +53,14 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 export default class MyThesisComponent implements OnInit {
   _router = inject(Router);
   lookup = inject(LookupService);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _publicacionAutoresService = inject(PublicacionAutoresService);
-  private _usuarioService = inject(UsuarioService);
-  _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
+  private _auth = inject(AuthService);
 
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
-  dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
-  tesis: Publicacion[] = [];
+  dataSource: MatTableDataSource<PublicationRow> = new MatTableDataSource<PublicationRow>([]);
+  tesis: PublicationRow[] = [];
   url: string;
 
   constructor() {
@@ -68,66 +70,34 @@ export default class MyThesisComponent implements OnInit {
   readonly paginator = viewChild.required(MatPaginator);
   readonly matSort = viewChild.required(MatSort);
 
-  selectedTab: string | null = null;
   ngOnInit(): void {
-    this.getUserArticles();
+    this.getUserThesis();
   }
 
-  getUserArticles(): void {
-    const user = this._usuarioService.getUserLogged();
-    this.getPermisoHasUsuario(user.DNI ?? "");
-    this._publicacionAutoresService.getByUser(user.DNI ?? "").subscribe((res) => {
+  getUserThesis(): void {
+    const user = this._auth.getUser();
+    if (!user) return;
+    this._publicationService.listPublications({ type: 2 }).subscribe((res) => {
       if (res) {
-        this.tesis = [];
-        for (const item of res) {
-          this.getThesis(item.publicacion_idPublicacion);
-        }
-      }
-    });
-  }
-
-  getThesis(idPublicacion: number): void {
-    this._publicacionService.getPublication(idPublicacion).subscribe((res: Publicacion[]) => {
-      if (res[0]) {
-        if (res[0].tipoPublicacion_idTipoPublicacion === 2) {
-          this.tesis.push(res[0]);
-          const last = this.tesis[this.tesis.length - 1];
-          const d = new Date(last.fechaPublicacion ?? "");
+        const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
+        const sorted = mine.toSorted((a, b) =>
+          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
+        );
+        this.tesis = sorted.map((pub) => {
+          const row: PublicationRow = Object.assign({} as PublicationRow, pub);
+          const d = new Date(pub.publishedAt);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          last.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          last.fecha = this.titlecasePipe.transform(last.fecha ?? "");
-          last.autor = [];
-          this.getAuthors(last);
-          this.getTipoThesis(last);
-          this.getSpeUniversidad(last);
-          this.tesis.sort((a: Publicacion, b: Publicacion) =>
-            (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-              ? 1
-              : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-                ? -1
-                : 0,
-          );
-        }
+          row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
+          const thesisType = this.lookup.thesisTypes().find((t) => t.id === pub.thesisTypeId);
+          row.thesisTypeName = thesisType?.name ?? "";
+          const university = this.lookup.universities().find((u) => u.id === pub.universityId);
+          row.universityName = university?.name ?? "";
+          return row;
+        });
         this.dataSource = new MatTableDataSource(this.tesis);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
       }
-    });
-  }
-
-  getTipoThesis(publicacion: Publicacion): void {
-    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
-    if (found) publicacion.tipoTesis = found.nombre;
-  }
-
-  getSpeUniversidad(publicacion: Publicacion): void {
-    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
-    if (found) publicacion.universidad = found.nombre ?? "";
-  }
-
-  getAuthors(publicacion: Publicacion): void {
-    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
-      publicacion.autor = authors;
     });
   }
 
@@ -139,25 +109,7 @@ export default class MyThesisComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
-  }
-
-  publicacionPermiso = false;
-
-  getPermisoHasUsuario(DNI: string): void {
-    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: { permiso_idPermiso?: number }[]) => {
-      if (res.length > 0) {
-        for (const permiso of res) {
-          if (permiso.permiso_idPermiso === 3) {
-            this.publicacionPermiso = true;
-          }
-        }
-      }
-    });
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   addThesis(): void {
@@ -166,13 +118,7 @@ export default class MyThesisComponent implements OnInit {
   }
 
   editThesis(id: number): void {
-    this._publicacionAutoresService.getForPublication(id).subscribe((authors) => {
-      const user = this._usuarioService.getUserLogged();
-      const isPrincipal = authors.some((a) => a.kind === "registered" && a.DNI === user.DNI && a.isPrincipal === 0);
-      if (isPrincipal || this.publicacionPermiso) {
-        localStorage.setItem("thesis-back", "my-thesis");
-        this._router.navigate(["dashboard/edit-thesis/" + id]);
-      }
-    });
+    localStorage.setItem("thesis-back", "my-thesis");
+    this._router.navigate(["dashboard/edit-thesis/" + id]);
   }
 }

@@ -1,12 +1,12 @@
 import { Component, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
@@ -18,14 +18,14 @@ import { SessionService } from "@app/shared/services/session.service";
 export default class AppComponent {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  _grupoService = inject(GrupoService);
+  _grupoService = inject(GroupService);
   private session = inject(SessionService);
   private browser = inject(BrowserService);
   fb = inject(FormBuilder);
   private router = inject(Router);
 
   screenWidth: number;
-  public grupoinfo: Grupo;
+  public grupoinfo: Group;
   public url: string;
   enteredButton = false;
   isMatMenuOpen = false;
@@ -42,7 +42,7 @@ export default class AppComponent {
     this.url = GLOBAL.url;
     // set screenWidth on page load
     this.screenWidth = this.browser.innerWidth();
-    this.grupoinfo = createGrupo();
+    this.grupoinfo = createGroup();
   }
 
   @HostListener("window:resize", ["$event"])
@@ -51,7 +51,7 @@ export default class AppComponent {
   }
 
   ngOnInit(): void {
-    this.getGrupoInfo();
+    this.getGroupInfo();
   }
 
   lanSelect(index: number): void {
@@ -61,11 +61,11 @@ export default class AppComponent {
     this.browser.reload();
   }
 
-  getGrupoInfo(): void {
-    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
-      this.grupoinfo = res[0];
-      this.session.setGrupoInfo(this.grupoinfo);
-      this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
+  getGroupInfo(): void {
+    this._grupoService.getGroup().subscribe((res: Group) => {
+      this.grupoinfo = res;
+      this.session.setGroupInfo(res);
+      this.grupoinfo.logoHeader = this.url + "api/group/files/header";
     });
   }
   searchGlobal(value: string): void {

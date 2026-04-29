@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from "@angular/core";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
-import { GrupoService } from "@app/shared/services/grupo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -12,25 +12,25 @@ import { SessionService } from "@app/shared/services/session.service";
   styleUrl: "./component.scss",
 })
 export default class WorksComponent implements OnInit {
-  _grupoService = inject(GrupoService);
+  _grupoService = inject(GroupService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
-  public info: Grupo;
+  public info: Group;
   language: (typeof Languages)[number] = Languages[0];
   constructor() {
-    this.info = createGrupo();
+    this.info = createGroup();
   }
 
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.futureWorks);
-    this.getGrupoInfo();
+    this.getGroupInfo();
   }
 
-  getGrupoInfo(): void {
-    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
-      this.info = res[0];
+  getGroupInfo(): void {
+    this._grupoService.getGroup().subscribe((res: Group) => {
+      this.info = res;
     });
   }
 }

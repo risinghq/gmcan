@@ -1,6 +1,3 @@
-@if (progress < 100) {
-<mat-progress-bar mode="determinate" [value]="progress" />
-}
 <div class="main-news-div">
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
@@ -32,8 +29,8 @@
               {{ language.newsText[0].allNews }}
             </button>
             @for (tiponoticia of tiponoticias; track tiponoticia) {
-            <button mat-menu-item (click)="selectCategory(tiponoticia.idtipoNoticia ?? 0, tiponoticia.nombre ?? '')">
-              {{ tiponoticia.nombre }}
+            <button mat-menu-item (click)="selectCategory(tiponoticia.id, tiponoticia.name)">
+              {{ tiponoticia.name }}
             </button>
             }
           </mat-menu>
@@ -47,26 +44,26 @@
               class="img-hover-zoom-2 img-div-zoom right pl-24"
               [style.display]="screenWidth < 960 ? 'block' : 'none'"
             >
-              @if (!noticia.foto) {
+              @if (!noticia.photo) {
               <img class="news-img" src="../../assets/img/grupal.jpg" />
-              } @if (noticia.foto) {
-              <img class="news-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+              } @if (noticia.photo) {
+              <img class="news-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
               }
             </div>
             <div class="news-text-div">
               <div class="columna">
                 <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
-                <div class="news-date right">{{ noticia.fechaPublicacion }}</div>
+                <div class="news-date right">{{ noticia.fechaFormateada }}</div>
               </div>
-              <div class="news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.titulo }}</div>
-              <div class="news-abstract">{{ noticia.resumen }}</div>
+              <div class="news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.title }}</div>
+              <div class="news-abstract">{{ noticia.summary }}</div>
               <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
             </div>
             <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-              @if (!noticia.foto) {
+              @if (!noticia.photo) {
               <img class="news-img" src="../../assets/img/grupal.jpg" />
-              } @if (noticia.foto) {
-              <img class="news-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+              } @if (noticia.photo) {
+              <img class="news-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
               }
             </div>
           </div>
@@ -103,10 +100,10 @@
       @for (tiponoticia of tiponoticias; track tiponoticia) {
       <div
         class="category"
-        [ngClass]="categorySelected == tiponoticia.idtipoNoticia ? 'active' : 'category'"
-        (click)="selectCategory(tiponoticia.idtipoNoticia ?? 0, tiponoticia.nombre ?? '')"
+        [ngClass]="categorySelected == tiponoticia.id ? 'active' : 'category'"
+        (click)="selectCategory(tiponoticia.id, tiponoticia.name)"
       >
-        {{ tiponoticia.nombre }}
+        {{ tiponoticia.name }}
       </div>
       }
     </div>

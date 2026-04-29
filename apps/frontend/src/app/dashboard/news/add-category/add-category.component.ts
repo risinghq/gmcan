@@ -4,9 +4,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { TipoNoticia } from "@app/shared/models/tiponoticia";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { AdminTipoNoticiaService } from "@app/shared/services/admin-tiponoticia.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 @Component({
@@ -20,19 +19,19 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   dialog = inject(MatDialog);
-  private _adminTipoNoticiaService = inject(AdminTipoNoticiaService);
+  private _refService = inject(RefService);
   private _snackBar = inject(MatSnackBar);
 
-  category: TipoNoticia;
+  category = { id: 0, name: "", nameEN: "" };
   public categoryForm: FormGroup;
   button_text = "Agregar categoría";
   notCanDo = false;
+
   constructor() {
     this.categoryForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.category = { idtipoNoticia: 0, nombre: "", nombreEN: "" };
   }
 
   @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
@@ -51,18 +50,20 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
 
   submitCategory(): void {
     if (this.categoryForm.valid) {
-      this._adminTipoNoticiaService.addCategory(this.category).subscribe((result: { status?: number }) => {
-        if (result.status == 1) {
-          this.categoryForm.markAsPristine();
-          this.return();
-          this.openSnackBar();
-        }
-      });
+      this._refService
+        .createNewsType({ name: this.category.name, nameEN: this.category.nameEN })
+        .subscribe((result) => {
+          if (result.id) {
+            this.categoryForm.markAsPristine();
+            this.return();
+            this.openSnackBar("Categoría agregada exitosamente");
+          }
+        });
     }
   }
 
-  openSnackBar(): void {
-    this._snackBar.open("Categoría agregada exitosamente", undefined, {
+  openSnackBar(msg: string): void {
+    this._snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

@@ -59,17 +59,17 @@
             track publicacion; let i = $index ) {
             <div class="publication">
               <div class="flex-news">
-                @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
+                @if (publicacion.typeId != 2) {
                 <div
                   class="publication-type"
                   [class]="{
-                          'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
-                          'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
+                          'publication-type-1': publicacion.typeId == 1,
+                          'publication-type-3': publicacion.typeId == 3,
                         }"
                 >
                   {{ publicacion.tipoPublicacion }}
                 </div>
-                } @if (publicacion.tipoPublicacion_idTipoPublicacion == 2) {
+                } @if (publicacion.typeId == 2) {
                 <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
                 }
                 <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
@@ -77,14 +77,14 @@
                 </div>
               </div>
               <div class="flex-news publication-mt">
-                <div class="publication-title">{{ publicacion.titulo }}</div>
+                <div class="publication-title">{{ publicacion.title }}</div>
               </div>
               <div class="flex-news publication-mt">
                 <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
                 <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
                 @if (publicacion.revista != null && publicacion.revista != "") {
                 <div class="publication-rev">
-                  {{ publicacion.revista }} Vol. {{ publicacion.nroRevista }} {{ publicacion.universidad }}
+                  {{ publicacion.revista }} Vol. {{ publicacion.journalIssue }} {{ publicacion.universidad }}
                 </div>
                 } @if (publicacion.universidad != null && publicacion.universidad != "") {
                 <div class="publication-rev">{{ publicacion.universidad }}</div>
@@ -96,49 +96,47 @@
                 <div class="publication-rev">{{ publicacion.ciudad }}, {{ publicacion.pais }}</div>
                 }
               </div>
-              @if (publicacion.DOI != null) {
+              @if (publicacion.doi != null) {
               <div class="publication-rev line-1">
                 DOI:
-                <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank"
-                  >{{ publicacion.DOI }}</a
+                <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
+                  >{{ publicacion.doi }}</a
                 >
               </div>
               }
               <div class="flex-news publication-mt" style="flex-flow: wrap">
-                @for (autor of publicacion.autor; track autor; let last = $last) { @if (autor.kind === "registered") {
+                @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered") {
                 <div class="publication-members">
                   <div class="member-img-round">
-                    @if (autor.foto) {
+                    @if (autor.photo) {
                     <img
                       class="member-img"
-                      src="{{ url + 'usuario/' + autor.DNI + '/file }}"
+                      src="{{ url + 'api/members/' + autor.memberId + '/photo' }}"
                       alt="../../assets/img/user.png"
                     />
-                    } @if (!autor.foto) {
+                    } @if (!autor.photo) {
                     <img class="member-img" src="../../assets/img/user.png" alt="" />
                     }
                   </div>
-                  <div class="member-name" (click)="profile(autor)">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
+                  <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
                 </div>
                 } @if (autor.kind === "external") {
-                <div class="publication-authors">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
+                <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>
                 } }
               </div>
               <div class="flex-news mt-16">
-                @if ( publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo
-                != "" ) {
+                @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
                 <a
                   class="publication-green"
-                  href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file' }}"
+                  href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
                   target="_blank"
                 >
                   {{ this.language.publicationsText[0].preview }}
                 </a>
-                } @if ( publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo
-                != "" ) {
+                } @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
                 <a
                   class="publication-green"
-                  href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file/download }}"
+                  href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}"
                 >
                   {{ this.language.publicationsText[0].download }}
                 </a>
@@ -168,7 +166,7 @@
               </div>
               <div class="collapse collapsed-resumen" id="publication{{ i }}">
                 <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
-                <div class="abstract">{{ publicacion.resumen }}</div>
+                <div class="abstract">{{ publicacion.abstractES }}</div>
               </div>
             </div>
             } @if (publicaciones.length > 5) {
@@ -214,27 +212,27 @@
             } @for ( proyecto of proyectos | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize + pageSize; track
             proyecto; let i = $index ) {
             <div class="project">
-              <div class="project-code">{{ proyecto.codigo }}</div>
+              <div class="project-code">{{ proyecto.code }}</div>
               <div class="flex-news project-mt">
-                <div class="project-title">{{ proyecto.titulo }}</div>
+                <div class="project-title">{{ proyecto.title }}</div>
               </div>
               <div class="project-rev">
                 <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
-                proyecto.lineasInvestigacion }}
+                proyecto.researchLine }}
               </div>
               <div class="project-pt">
                 <div class="flex-news flex-flow">
                   <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
-                  @for (usuario of proyecto.usuario; track usuario) {
+                  @for (member of proyecto.members; track member) {
                   <div class="project-members">
                     <div class="member-img-round">
-                      @if (usuario.foto) {
-                      <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
-                      } @if (!usuario.foto) {
+                      @if (member.photo) {
+                      <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
+                      } @if (!member.photo) {
                       <img class="member-img" src="../../assets/img/user.png" alt="" />
                       }
                     </div>
-                    <div class="member-name" (click)="profile(usuario)">{{ usuario.nombreCompleto }}</div>
+                    <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
                   </div>
                   }
                 </div>
@@ -266,15 +264,15 @@
               <div class="collapse collapsed-resumen project-mt" id="project{{ i }}">
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
-                  {{ proyecto.descripcion }}
+                  {{ proyecto.description }}
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
-                  {{ proyecto.fuenteFinanciamiento }}
+                  {{ proyecto.fundingSource }}
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
-                  {{ proyecto.montoFinanciado }}
+                  {{ proyecto.moneda }}{{ proyecto.fundedAmount }}
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
@@ -333,23 +331,23 @@
             } @for (miembro of miembros; track miembro; let i = $index) {
             <div class="flex-news" [class.mb-24]="i + 1 != miembros.length">
               <div class="miembro-img-div">
-                @if (miembro.foto) {
+                @if (miembro.photo) {
                 <img
                   class="member-img"
-                  src="{{ url + 'usuario/' + miembro.DNI + '/file }}"
+                  src="{{ url + 'api/members/' + miembro.id + '/photo' }}"
                   alt="../../assets/img/user.png"
                 />
-                } @if (!miembro.foto) {
+                } @if (!miembro.photo) {
                 <img class="member-img" src="../../assets/img/user.png" alt="" />
                 }
               </div>
               <div class="miembro-text">
                 <div class="miembro-name full-width">
-                  {{ miembro.prefijo }} {{ miembro.nombre }} {{ miembro.apellidoPaterno }} {{ miembro.apellidoMaterno }}
+                  {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                 </div>
                 <div class="miembro-email">
                   <mat-icon class="email-icon"> email </mat-icon>
-                  {{ miembro.correo }}
+                  {{ miembro.email }}
                 </div>
                 <div class="miembro-profile" (click)="profile(miembro)">
                   {{ language.membersText[0].seeProfile }}
@@ -384,19 +382,19 @@
             } @for (noticia of noticias; track noticia) {
             <div class="news-div-list">
               <div class="img-hover-zoom">
-                @if (!noticia.foto) {
+                @if (!noticia.photo) {
                 <img class="card-img-div" src="../../assets/img/grupal.jpg" />
-                } @if (noticia.foto) {
-                <img class="card-img-div" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+                } @if (noticia.photo) {
+                <img class="card-img-div" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
                 }
               </div>
               <div class="card-text-div card-text-div-3">
                 <div class="flex-news flex-news-3">
                   <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
-                  <div class="other-news-date">{{ noticia.fechaPublicacion }}</div>
+                  <div class="other-news-date">{{ noticia.fechaFormateada }}</div>
                 </div>
-                <div class="other-news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.titulo }}</div>
-                <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
+                <div class="other-news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.title }}</div>
+                <div class="news-author">{{ language.newsText[0].by }} {{ noticia.authorName }}</div>
               </div>
             </div>
             }

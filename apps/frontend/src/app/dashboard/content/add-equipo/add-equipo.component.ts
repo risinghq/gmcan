@@ -4,10 +4,10 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { Equipo } from "@app/shared/models/equipo";
-import { createEquipo } from "@app/shared/models/factories";
+import type { Equipment } from "@app/shared/models/equipment";
+import { createEquipment } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { EquipoService } from "@app/shared/services/equipo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 @Component({
@@ -22,9 +22,9 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _equipoService = inject(EquipoService);
+  private _groupService = inject(GroupService);
 
-  equipo: Equipo;
+  equipo: Equipment;
   equipoForm: FormGroup;
   button_text = "Guardar equipo";
 
@@ -32,7 +32,7 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
 
   constructor() {
-    this.equipo = createEquipo();
+    this.equipo = createEquipment();
     this.equipoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       cpu: [""],
@@ -50,13 +50,22 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
 
   submitEquipo(): void {
     if (this.equipoForm.valid) {
-      this._equipoService.addEquipo(this.equipo).subscribe((res: any) => {
-        if (res.status == 1) {
-          this.equipoForm.markAsPristine();
-          this.return();
-          this.openSnackBar();
-        }
-      });
+      this._groupService
+        .createEquipment({
+          name: this.equipo.name,
+          cpu: this.equipo.cpu ?? undefined,
+          gpu: this.equipo.gpu ?? undefined,
+          ram: this.equipo.ram ?? undefined,
+          storage: this.equipo.storage ?? undefined,
+          groupId: this.equipo.groupId,
+        })
+        .subscribe((res) => {
+          if (res.id) {
+            this.equipoForm.markAsPristine();
+            this.return();
+            this.openSnackBar();
+          }
+        });
     }
   }
 

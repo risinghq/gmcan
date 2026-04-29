@@ -51,13 +51,15 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
       descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.metodo = {
-      idMetodo: 0,
-      nombre: "",
-      nombreEN: "",
-      descripcion: "",
-      descripcionEN: "",
-      foto: "",
-      grupo_idGrupo: 1,
+      id: 0,
+      name: "",
+      nameEN: "",
+      description: "",
+      descriptionEN: null,
+      photo: null,
+      groupId: 1,
+      createdAt: null,
+      updatedAt: null,
     };
     this.url = GLOBAL.url;
   }
@@ -71,27 +73,34 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   }
 
   getMethod(): void {
-    let idMethod = this._route.snapshot.params["id"];
-    this._methodService.getMethod(idMethod).subscribe((result: Method[]) => {
-      if (result.length > 0) {
-        this.metodo = result[0];
-        localStorage.setItem("metodoEdit", JSON.stringify(this.metodo.nombre));
+    const idMethod = Number(this._route.snapshot.params["id"]);
+    this._methodService.get(idMethod).subscribe((result: Method) => {
+      if (result) {
+        this.metodo = result;
+        localStorage.setItem("metodoEdit", JSON.stringify(result.name));
       }
     });
   }
 
   submitMethod(): void {
     if (this.methodForm.valid) {
-      this._methodService.updateMetodo(this.metodo).subscribe((result: any) => {
-        if (result.status == 1) {
-          if (this.fileData) {
-            this._methodService.uploadMetodoFoto(this.fileData, this.metodo.idMetodo ?? 0).subscribe((_res: any) => {});
+      this._methodService
+        .update(this.metodo.id, {
+          name: this.metodo.name,
+          nameEN: this.metodo.nameEN,
+          description: this.metodo.description,
+          descriptionEN: this.metodo.descriptionEN ?? undefined,
+        })
+        .subscribe((result) => {
+          if (result.status === 1) {
+            if (this.fileData) {
+              this._methodService.uploadPhoto(this.metodo.id, this.fileData).subscribe(() => {});
+            }
+            this.methodForm.markAsPristine();
+            this.return();
+            this.openSnackBar("Metódo actualizado exitosamente");
           }
-          this.methodForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Metódo actualizado exitosamente");
-        }
-      });
+        });
     }
   }
 
@@ -110,8 +119,8 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   edit = true;
 
   eraseMethod(): void {
-    this._methodService.deleteMetodo(this.metodo.idMetodo ?? 0).subscribe((res: any) => {
-      if (res.status == 1) {
+    this._methodService.delete(this.metodo.id).subscribe((res) => {
+      if (res.status === 1) {
         this.methodForm.markAsPristine();
         this.return();
         this.openSnackBar("Metódo eliminado exitosamente");
@@ -121,8 +130,6 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   fileData: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
   fileProgress(fileInput: Event): void {
     const target = fileInput.target as HTMLInputElement | null;
     this.fileData = target?.files?.[0] ?? null;
@@ -132,7 +139,6 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   preview(): void {
     if (!this.fileData) return;
-    // Show preview
     const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
@@ -152,8 +158,8 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
       width: "530px",
       id: "idleTimer",
       data: {
-        title: "Eliminar línea de investigación",
-        text: "¿Estás seguro que deseas eliminar esta línea?",
+        title: "Eliminar método",
+        text: "¿Estás seguro que deseas eliminar este método?",
         cancel: "Sí, eliminar",
         yes: "No, cancelar",
       },
@@ -170,13 +176,13 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   previewMethod(value: number): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
     localStorage.setItem("langLocale", "0");
-    method.foto = this.url + "metodo/" + this.metodo.idMetodo + "/file";
+    method.photo = this.url + "admin/methods/" + this.metodo.id + "/photo";
     if (this.previewUrl) {
-      method.foto = typeof this.previewUrl === "string" ? this.previewUrl : "";
+      method.photo = typeof this.previewUrl === "string" ? this.previewUrl : null;
     }
     if (value == 1) {
-      method.nombre = method.nombreEN;
-      method.descripcion = method.descripcionEN;
+      method.name = method.nameEN;
+      method.description = method.descriptionEN ?? method.description;
       localStorage.setItem("langLocale", "1");
     }
     this.previewDialog = this.dialog.open(DialogPreview5, {
@@ -229,7 +235,7 @@ export class DialogPreview5 {
     }
     const descripcion = document.getElementById("descripcion");
     if (descripcion) {
-      descripcion.innerHTML = this.method.descripcion ?? "";
+      descripcion.innerHTML = this.method.description ?? "";
     }
   }
 }

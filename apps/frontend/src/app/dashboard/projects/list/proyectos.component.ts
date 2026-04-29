@@ -18,14 +18,16 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
-import { Proyecto } from "@app/shared/models/proyecto";
-import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
-import { GLOBAL } from "@app/shared/services/global";
-import { ProyectoService } from "@app/shared/services/proyecto.service";
+import type { Project } from "@app/shared/models/project";
+import { LookupService } from "@app/shared/services/lookup.service";
+import { ProjectService } from "@app/shared/services/project.service";
+import type { FundingSourceItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
+
+interface ProjectRow extends Project {
+  fechaI?: string;
+  members?: { memberId: number; name: string }[];
+}
 
 @Component({
   selector: "app-proyectos",
@@ -54,24 +56,17 @@ export default class ProyectosComponent implements OnInit {
   _router = inject(Router);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  _proyectoService = inject(ProyectoService);
-  _proyectohasusuarioService = inject(UsuarioHasProyectoService);
-  _usuarioService = inject(UsuarioService);
+  _projectService = inject(ProjectService);
+  _lookup = inject(LookupService);
   private _tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
   displayedColumns2: string[] = ["nombre"];
-  dataSource: MatTableDataSource<Proyecto> = new MatTableDataSource<Proyecto>([]);
-  dataSource2: MatTableDataSource<FuenteFinanciamiento> = new MatTableDataSource<FuenteFinanciamiento>([]);
-  fuenteFinanciamientos: FuenteFinanciamiento[] = [];
-  proyectos: Proyecto[] = [];
-  url: string;
+  dataSource: MatTableDataSource<ProjectRow> = new MatTableDataSource<ProjectRow>([]);
+  dataSource2: MatTableDataSource<FundingSourceItem> = new MatTableDataSource<FundingSourceItem>([]);
+  fundingSources: FundingSourceItem[] = [];
+  proyectos: ProjectRow[] = [];
   selectedTab = 0;
-
-  constructor() {
-    this.url = GLOBAL.url;
-  }
 
   readonly paginator = viewChild.required(MatPaginator);
   readonly matSort = viewChild.required(MatSort);
@@ -85,82 +80,47 @@ export default class ProyectosComponent implements OnInit {
     this.selectedTab = this._tabState.projectTab();
     if (window.location.href.includes("ejecucion")) {
       this.ejecucion = true;
-      this.getFuenteFinanciamiento();
+      this.loadFundingSources();
       this.getProyectos(1);
     } else {
       this.getProyectos(0);
     }
   }
 
-  getFuenteFinanciamiento(): void {
-    this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((res: FuenteFinanciamiento[]) => {
-      if (res) {
-        res.sort((a: FuenteFinanciamiento, b: FuenteFinanciamiento) =>
-          (a.nombre ?? "") < (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
-        );
-        this.fuenteFinanciamientos = res;
-        this.dataSource2 = new MatTableDataSource(this.fuenteFinanciamientos);
-        this.dataSource2.sort = this.matSort();
-        this.dataSource2.paginator = this.paginator();
-      }
-    });
+  loadFundingSources(): void {
+    const sources = this._lookup.fundingSources();
+    this.fundingSources = sources;
+    this.dataSource2 = new MatTableDataSource(this.fundingSources);
+    this.dataSource2.sort = this.sort2();
+    this.dataSource2.paginator = this.paginator2();
   }
 
-  getProyectos(value: number): void {
-    this._proyectoService.getProyectos(value).subscribe((res: Proyecto[]) => {
+  getProyectos(status: number): void {
+    this._projectService.listAdminProjects().subscribe((res: Project[]) => {
       if (res) {
-        res.sort((a: Proyecto, b: Proyecto) =>
-          (a.fechaInicio?.toString() ?? "") < (b.fechaInicio?.toString() ?? "")
-            ? 1
-            : (b.fechaInicio?.toString() ?? "") < (a.fechaInicio?.toString() ?? "")
-              ? -1
-              : 0,
+        const filtered = (
+          status === 1 ? res.filter((p) => p.status === 1) : res.filter((p) => p.status !== 1)
+        ).toSorted((a, b) =>
+          (a.startDate ?? "") < (b.startDate ?? "") ? 1 : (b.startDate ?? "") < (a.startDate ?? "") ? -1 : 0,
         );
-        this.proyectos = res;
+        this.proyectos = filtered.map((p) => {
+          const d = new Date(p.startDate ?? "");
+          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+          return Object.assign({} as ProjectRow, p, {
+            fechaI: this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? ""),
+          });
+        });
         this.dataSource = new MatTableDataSource(this.proyectos);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
-        for (let index = 0; index < this.proyectos.length; index++) {
-          this.fillProyecto(this.proyectos[index]);
+
+        for (const proyecto of this.proyectos) {
+          this._projectService.getProjectMembers(proyecto.id).subscribe((members) => {
+            proyecto.members = members as { memberId: number; name: string }[];
+          });
         }
       }
     });
-  }
-
-  fillProyecto(proyecto: Proyecto): void {
-    const d = new Date(proyecto.fechaInicio ?? new Date());
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    proyecto.fechaI = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-    proyecto.fechaI = this.titlecasePipe.transform(proyecto.fechaI ?? "");
-    proyecto.usuario = [];
-    this.getProyectoUsuarios(proyecto);
-  }
-
-  getProyectoUsuarios(proyecto: Proyecto): void {
-    this._proyectohasusuarioService
-      .getUsuarioHasProyectos(proyecto.idProyecto ?? 0)
-      .subscribe((res: { usuario_DNI?: string }[]) => {
-        if (res.length > 0) {
-          for (let index = 0; index < res.length; index++) {
-            this.getUsuario(proyecto, res[index].usuario_DNI ?? "");
-          }
-        }
-      });
-  }
-
-  getUsuario(proyecto: Proyecto, DNI: string): void {
-    this._usuarioService
-      .getUser(DNI)
-      .subscribe((res: { nombre?: string; apellidoPaterno?: string; apellidoMaterno?: string }[]) => {
-        if (res) {
-          const usuario = {
-            ...res[0],
-            nombreCompleto:
-              (res[0].nombre ?? "") + " " + (res[0].apellidoPaterno ?? "") + " " + (res[0].apellidoMaterno ?? ""),
-          };
-          proyecto.usuario?.push(usuario);
-        }
-      });
   }
 
   displayedNotFound = false;
@@ -171,11 +131,7 @@ export default class ProyectosComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   displayedNotFound2 = false;
@@ -186,26 +142,7 @@ export default class ProyectosComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
-  }
-
-  displayedNotFound3 = false;
-
-  applyFilter3(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource2.paginator) {
-      this.dataSource2.paginator.firstPage();
-    }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
+    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
   }
 
   changedTab(event: number): void {

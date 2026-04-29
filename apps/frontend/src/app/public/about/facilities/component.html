@@ -1,26 +1,26 @@
 <div class="card-facilities">
-  @if (!grupo.facilidadesRecursosFoto) {
+  @if (!grupo.facilitiesPhoto) {
   <img class="facilities-img" src="../../assets/img/grupal.jpg" />
-  } @if (grupo.facilidadesRecursosFoto) {
-  <img class="facilities-img" src="{{ url + 'grupo/' + grupo.idGrupo + '/files/facilidades }}" />
+  } @if (grupo.facilitiesPhoto) {
+  <img class="facilities-img" src="{{ url + 'api/group/files/facilities' }}" />
   }
   <div class="facilities-text-div">
     <div class="facilities-title">{{ language.facilitiesText[0].title }}</div>
     <div class="facilities-subtitle">{{ language.facilitiesText[0].subtitle }}</div>
     <div class="facilities-sub-divi"></div>
-    <div class="facilities-text">{{ grupo.facilidadesRecursos }}</div>
+    <div class="facilities-text">{{ grupo.facilitiesES }}</div>
     @if (equipos.length > 0 && equipos.length != undefined) {
     <div class="equipment">{{ language.facilitiesText[0].equipment }}</div>
     } @if (equipos.length > 0) {
     <div>
       @for (equipo of equipos; track equipo; let i = $index) {
       <div class="publication" [class.no-border]="i + 1 == equipos.length">
-        <div class="equipment-name mb-equipment">{{ equipo.nombre }}</div>
+        <div class="equipment-name mb-equipment">{{ equipo.name }}</div>
         <mat-chip-set>
           <mat-chip class="equipo-chip">CPU: <a class="equipo-chip-slick">{{ equipo.cpu }}</a></mat-chip>
           <mat-chip class="equipo-chip">RAM: <a class="equipo-chip-slick">{{ equipo.ram }}</a></mat-chip>
           <mat-chip class="equipo-chip">GPU: <a class="equipo-chip-slick">{{ equipo.gpu }}</a></mat-chip>
-          <mat-chip class="equipo-chip">HD: <a class="equipo-chip-slick">{{ equipo.hd }}</a></mat-chip>
+          <mat-chip class="equipo-chip">HD: <a class="equipo-chip-slick">{{ equipo.storage }}</a></mat-chip>
         </mat-chip-set>
       </div>
       }
@@ -31,8 +31,8 @@
     <div>
       @for (soft of software; track soft; let i = $index) {
       <div class="publication" [class.no-border]="i + 1 == software.length">
-        <div class="equipment-name mb-8">{{ soft.nombre }}</div>
-        <div class="soft-description mb-8">{{ soft.descripcion }}</div>
+        <div class="equipment-name mb-8">{{ soft.name }}</div>
+        <div class="soft-description mb-8">{{ soft.description }}</div>
         @if (soft.moreInfo) {
         <div class="soft-more">
           {{ language.facilitiesText[0].moreInfo }}:

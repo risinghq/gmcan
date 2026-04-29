@@ -29,12 +29,12 @@ export default class MethodComponent implements OnInit {
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.methods);
-    this.getMethods();
+    this.loadMethods();
   }
 
-  getMethods(): void {
-    this._methodService.getMethods().subscribe((res: unknown) => {
-      this.methods = res as Method[];
+  loadMethods(): void {
+    this._methodService.list().subscribe((res: Method[]) => {
+      this.methods = res;
     });
   }
 }

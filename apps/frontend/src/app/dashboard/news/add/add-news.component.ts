@@ -1,9 +1,7 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { TitleCasePipe } from "@angular/common";
-import { DatePipe } from "@angular/common";
+import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { FormControl } from "@angular/forms";
+import { FormBuilder, FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
 import {
@@ -22,39 +20,29 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { createNoticiaFull } from "@app/shared/models/factories";
+import { createNews } from "@app/shared/models/factories";
 import { Languages } from "@app/shared/models/languages";
-import type { NoticiaFull } from "@app/shared/models/noticiafull";
+import type { Member } from "@app/shared/models/member";
+import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { Usuario } from "@app/shared/models/usuario";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { NoticiaService } from "@app/shared/services/noticia.service";
+import { MemberService } from "@app/shared/services/member.service";
+import { NewsService, type NewsBody } from "@app/shared/services/news.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
 import { AutosizeModule } from "ngx-autosize";
 
-interface AddNewsResponse {
-  status?: number;
-  rows?: number;
-}
-
 interface NewsPreviewData {
   language: number;
-  titulo?: string;
-  resumen?: string;
-  foto: string | ArrayBuffer | null;
-  nombreTipoNoticia?: string;
-  usuario: {
-    nombre?: string;
-    apellidoPaterno?: string;
-    apellidoMaterno?: string;
-    foto?: string;
-  };
-  cuerpo?: string;
-  fechaPublicacion?: string;
+  title: string | null;
+  summary: string | null;
+  photo: string | ArrayBuffer | null;
+  newsTypeName: string | null;
+  author: { firstName: string; lastName: string; maternalName: string | null; photo: string | null } | null;
+  body: string | null;
+  publishedAt: string | null;
 }
 
 @Component({
@@ -83,21 +71,23 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   dialog = inject(MatDialog);
-  _noticiaService = inject(NoticiaService);
+  private _newsService = inject(NewsService);
   private _snackBar = inject(MatSnackBar);
   lookup = inject(LookupService);
-  private _usuarioService = inject(UsuarioService);
+  private _memberService = inject(MemberService);
 
   public Editor = ClassicEditor;
   url: string;
-  noticia: NoticiaFull;
+  noticia: News;
+  publishedAtObj?: Date;
   public newsForm: FormGroup;
   get categorias() {
-    return this.lookup.tiposNoticia();
+    return this.lookup.newsTypes();
   }
-  autores: Usuario[] = [];
+  autores: Member[] = [];
   button_text = "Publicar noticia";
   button_text2 = "Guardar sin publicar";
+
   constructor() {
     this.newsForm = this.formBuilder.group({
       titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -110,7 +100,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
       autorPublicacion: [null, Validators.required],
       tipoNoticia_idtipoNoticia: ["", Validators.required],
     });
-    this.noticia = createNoticiaFull();
+    this.noticia = createNews();
     this.url = GLOBAL.url;
   }
 
@@ -123,7 +113,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getAuthors(): void {
-    this._usuarioService.getUsuario().subscribe((result: Usuario[]) => {
+    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
         this.autores = result;
       }
@@ -137,38 +127,36 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
     this._router.navigate(["dashboard/noticias"]);
   }
 
-  submitCategory(value: number): void {
-    this.noticia.estado = value;
-  }
-
-  submitNews(value: number): void {
-    if (value === 1 && this.newsForm.valid && this.fileData) {
-      this.publishDialog(value);
-    } else if (value === 0) {
-      this.publish(value);
+  submitNews(status: number): void {
+    if (status === 1 && this.newsForm.valid && this.fileData) {
+      this.publishDialog(status);
+    } else if (status === 0) {
+      this.publish(status);
     }
   }
 
-  publish(value: number): void {
-    this.noticia.estado = value;
-    if (this.noticia.fechaPublicacionDate) {
-      const momentDate = new Date(this.noticia.fechaPublicacionDate); // Replace event.value with your date value
-      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
-      this.noticia.fechaPublicacion = formattedDate;
-    } else {
-      this.noticia.fechaPublicacion = undefined;
-    }
-    if (!this.noticia.autorPublicacion) {
-      this.noticia.autorPublicacion = undefined;
-    }
-    this._noticiaService.addNews(this.noticia).subscribe((result: AddNewsResponse) => {
-      if (result.status === 1) {
-        if (this.fileData && result.rows != null) {
-          this._noticiaService.uploadNoticiaFoto(this.fileData, result.rows).subscribe(() => {});
+  publish(status: number): void {
+    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : undefined;
+    const body: NewsBody = {
+      title: this.noticia.title ?? undefined,
+      titleEN: this.noticia.titleEN ?? undefined,
+      summary: this.noticia.summary ?? undefined,
+      summaryEN: this.noticia.summaryEN ?? undefined,
+      body: this.noticia.body ?? undefined,
+      bodyEN: this.noticia.bodyEN ?? undefined,
+      status,
+      publishedAt,
+      authorId: this.noticia.authorId ?? undefined,
+      newsTypeId: this.noticia.newsTypeId ?? undefined,
+    };
+    this._newsService.createNews(body).subscribe((result) => {
+      if (result.id) {
+        if (this.fileData) {
+          this._newsService.uploadPhoto(result.id, this.fileData).subscribe(() => {});
         }
         this.newsForm.markAsPristine();
         this.return();
-        this.openSnackBar();
+        this.openSnackBar("Noticia agregada exitosamente");
       }
     });
   }
@@ -176,61 +164,27 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   private previewDialog?: MatDialogRef<DialogPreview>;
 
   previewNews(value: number): void {
-    const indexCat = this.categorias.findIndex((x) => x.idtipoNoticia === this.noticia.tipoNoticia_idtipoNoticia);
-    const indexAut = this.autores.findIndex((x: Usuario) => x.DNI === this.noticia.autorPublicacion);
-    const d = new Date(this.noticia.fechaPublicacionDate ?? new Date());
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    const momentDate = d; // Replace event.value with your date value
-    const formattedDate = new Date(momentDate).toLocaleDateString("sv");
-    this.noticia.fechaPublicacion = formattedDate;
-    const noticiaPreview: NewsPreviewData = {
+    const cat = this.categorias.find((x) => x.id === this.noticia.newsTypeId);
+    const aut = this.autores.find((x) => x.id === this.noticia.authorId) ?? null;
+    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : null;
+    const data: NewsPreviewData = {
       language: value,
-      titulo: "",
-      resumen: "",
-      foto: this.previewUrl,
-      nombreTipoNoticia: "",
-      usuario: {
-        nombre: "",
-        apellidoPaterno: "",
-        apellidoMaterno: "",
-        foto: "",
-      },
-      cuerpo: "",
-      fechaPublicacion: this.noticia.fechaPublicacion,
+      title: value === 0 ? (this.noticia.title ?? null) : (this.noticia.titleEN ?? null),
+      summary: value === 0 ? (this.noticia.summary ?? null) : (this.noticia.summaryEN ?? null),
+      photo: this.previewUrl,
+      newsTypeName: cat?.name ?? null,
+      author: aut
+        ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, photo: aut.photo }
+        : null,
+      body: value === 0 ? (this.noticia.body ?? null) : (this.noticia.bodyEN ?? null),
+      publishedAt,
     };
-    if (indexCat !== -1) {
-      noticiaPreview.nombreTipoNoticia = this.categorias[indexCat].nombre;
-    }
-    if (indexAut !== -1) {
-      noticiaPreview.usuario.nombre = this.autores[indexAut].nombre;
-      noticiaPreview.usuario.apellidoPaterno = this.autores[indexAut].apellidoPaterno;
-      noticiaPreview.usuario.apellidoMaterno = this.autores[indexAut].apellidoMaterno;
-      noticiaPreview.usuario.foto = this.autores[indexAut].foto;
-    }
-    switch (value) {
-      case 0:
-        noticiaPreview.titulo = this.noticia.titulo;
-        noticiaPreview.resumen = this.noticia.resumen;
-        noticiaPreview.cuerpo = this.noticia.cuerpo;
-        break;
-      case 1:
-        noticiaPreview.titulo = this.noticia.tituloEN;
-        noticiaPreview.resumen = this.noticia.resumenEN;
-        noticiaPreview.cuerpo = this.noticia.cuerpoEN;
-        break;
-      default:
-        break;
-    }
     this.previewDialog = this.dialog.open(DialogPreview, {
       width: "871px",
       id: "previewNews",
-      data: noticiaPreview,
+      data,
     });
-
-    this.previewDialog.afterClosed().subscribe((result: unknown) => {
-      if (!result) {
-      }
-    });
+    this.previewDialog.afterClosed().subscribe(() => {});
   }
 
   private dialogRef?: MatDialogRef<DialogPublish>;
@@ -246,7 +200,6 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
         yes: "Sí, publicar",
       },
     });
-
     this.dialogRef.afterClosed().subscribe((result: unknown) => {
       if (!result) {
         this.publish(value);
@@ -254,8 +207,8 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  openSnackBar(): void {
-    this._snackBar.open("Noticia agregada exitosamente", undefined, {
+  openSnackBar(msg: string): void {
+    this._snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -266,8 +219,6 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
 
   fileData: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
   fileProgress(fileInput: Event): void {
     const input = fileInput.target as HTMLInputElement;
     this.fileData = input.files?.[0] ?? null;
@@ -279,13 +230,8 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
       this.previewUrl = null;
       return;
     }
-
-    // Show preview
     const mimeType = this.fileData.type;
-    if (mimeType.match(/image\/*/) == null) {
-      return;
-    }
-
+    if (mimeType.match(/image\/*/) == null) return;
     const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
     reader.addEventListener("load", () => {
@@ -328,6 +274,7 @@ export class DialogPreview {
   mes = "";
   anio = "";
   datere: Date = new Date();
+
   constructor() {
     this.url = GLOBAL.url;
   }
@@ -336,9 +283,9 @@ export class DialogPreview {
     this.language = Languages[this.noticia.language];
     const newsBody = document.getElementById("newsBody");
     if (newsBody) {
-      newsBody.innerHTML = this.noticia.cuerpo ?? "";
+      newsBody.innerHTML = this.noticia.body ?? "";
     }
-    this.datere = new Date(String(this.noticia.fechaPublicacion));
+    this.datere = new Date(String(this.noticia.publishedAt));
     this.dia = this.datePipe.transform(this.datere, "dd") ?? "";
     this.mes = this.datePipe.transform(this.datere, "MMMM") ?? "";
     this.anio = this.datePipe.transform(this.datere, "y") ?? "";

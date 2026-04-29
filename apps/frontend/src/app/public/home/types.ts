@@ -1,33 +1,52 @@
-import type { Grupo } from "@app/shared/models/grupo";
+import type { Group } from "@app/shared/models/group";
+import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
-import type { Noticia } from "@app/shared/models/noticia";
-import type { Proyecto } from "@app/shared/models/proyecto";
-import type { Publicacion } from "@app/shared/models/publicacion";
-import type { Usuario } from "@app/shared/models/usuario";
+import type { News } from "@app/shared/models/news";
+import type { Project } from "@app/shared/models/project";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { ResearchLine } from "@app/shared/models/research-line";
 
-export type HomePublicacion = Publicacion & {
+export type HomePublicacion = PublicationWithAuthors & {
   fecha: string;
+  tipoPublicacion?: string;
+  tipoTesis?: string;
+  revista?: string;
+  universidad?: string;
+  evento?: string;
+  ciudad?: string | null;
+  pais?: string | null;
 };
 
-export type HomeProyecto = Proyecto & {
+export type HomeProjectMember = {
+  memberId: number;
+  name: string;
+  photo: string | null;
+};
+
+export type HomeProyecto = Project & {
   fechaI: string;
-  usuario: Usuario[];
+  fechaF?: string;
+  lineasInvestigacion?: string;
+  fuenteFinanciamiento?: string;
+  moneda?: string;
+  members: HomeProjectMember[];
 };
 
-export type HomeNoticia = Noticia & {
+export type HomeNoticia = News & {
   nombreTipoNoticia: string;
   autor: string;
+  fechaPublicacion: string;
 };
 
 export type HomeViewModel = {
-  info: Grupo;
+  info: Group;
   publicaciones: HomePublicacion[];
   proyectos: HomeProyecto[];
   noticias: HomeNoticia[];
   noticiaPrincipal: HomeNoticia | null;
-  lineasInvestigacion: Array<{ idLineasInvestigacion?: number; nombre?: string; descripcion?: string; foto?: string }>;
+  lineasInvestigacion: ResearchLine[];
   metodos: Method[];
-  usuarios: Usuario[];
+  miembros: Member[];
   aboutUs: string;
   articulos: number;
   tesis: number;

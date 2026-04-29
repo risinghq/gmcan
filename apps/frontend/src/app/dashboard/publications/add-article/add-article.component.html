@@ -12,7 +12,7 @@
         <div class="full-width">
           <div class="text-category">Título <span class="red-text">*</span></div>
           <input
-            [(ngModel)]="publicacion.titulo"
+            [(ngModel)]="publicacion.title"
             formControlName="título"
             name="título"
             class="input-category"
@@ -28,10 +28,10 @@
                 <mat-label>Seleccionar fecha</mat-label>
                 <input
                   matInput
-                  [(ngModel)]="publicacion.fechaPublicacionDate"
+                  [(ngModel)]="publishedAtObj"
                   [matDatepicker]="dp"
-                  formControlName="fechaPublicacionDate"
-                  name="fechaPublicacionDate"
+                  formControlName="publishedAt"
+                  name="publishedAt"
                 />
                 <mat-datepicker-toggle matSuffix [for]="dp" />
                 <mat-datepicker #dp />
@@ -42,13 +42,9 @@
             <div class="text-category">Revista <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar revista</mat-label>
-              <mat-select
-                [(ngModel)]="publicacion.revista_idRevista"
-                formControlName="revista_idRevista"
-                name="revista_idRevista"
-              >
-                @for (r of lookup.revistas(); track r) {
-                  <mat-option [value]="r.idRevista">{{ r.nombre }}</mat-option>
+              <mat-select [(ngModel)]="publicacion.journalId" formControlName="journalId" name="journalId">
+                @for (r of lookup.journals(); track r) {
+                  <mat-option [value]="r.id">{{ r.name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -56,9 +52,9 @@
           <div class="mr-32 full-width">
             <div class="text-category">Volumen <span class="red-text">*</span></div>
             <input
-              [(ngModel)]="publicacion.nroRevista"
-              formControlName="nroRevista"
-              name="nroRevista"
+              [(ngModel)]="publicacion.journalIssue"
+              formControlName="journalIssue"
+              name="journalIssue"
               class="input-category"
               placeholder="Vol"
               required
@@ -67,9 +63,9 @@
           <div class="full-width">
             <div class="text-category">DOI <span class="red-text">*</span></div>
             <input
-              [(ngModel)]="publicacion.DOI"
-              formControlName="DOI"
-              name="DOI"
+              [(ngModel)]="publicacion.doi"
+              formControlName="doi"
+              name="doi"
               class="input-category"
               placeholder="Insertar DOI"
               required
@@ -101,17 +97,17 @@
                 #auto="matAutocomplete"
               >
                 @for (option of filteredOptions | async; track option) {
-                  <mat-option class="mdc-list-item" [value]="option.nombre">
-                    @if (option.kind === "registered" && !option.foto) {
+                  <mat-option class="mdc-list-item" [value]="option.name">
+                    @if (!option.photo) {
                       <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
                     }
-                    @if (option.foto) {
+                    @if (option.photo) {
                       <img
                         class="mdc-list-item__graphic mr-12 img-user"
-                        src="{{ url + 'usuario/' + option.DNI + '/file }}"
+                        src="{{ url + 'api/members/' + option.id + '/photo' }}"
                       />
                     }
-                    <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                    <span class="mdc-list-item__text">{{ option.name }}</span>
                   </mat-option>
                 }
               </mat-autocomplete>
@@ -120,16 +116,16 @@
               <mat-select (selectionChange)="selectUser($event.value, 1)">
                 @for (option of options; track option) {
                   <mat-option class="mdc-list-item" [value]="option">
-                    @if (option.kind === "registered" && !option.foto) {
+                    @if (!option.photo) {
                       <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
                     }
-                    @if (option.foto) {
+                    @if (option.photo) {
                       <img
                         class="mdc-list-item__graphic mr-12 img-user"
-                        src="{{ url + 'usuario/' + option.DNI + '/file }}"
+                        src="{{ url + 'api/members/' + option.id + '/photo' }}"
                       />
                     }
-                    <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                    <span class="mdc-list-item__text">{{ option.name }}</span>
                   </mat-option>
                 }
               </mat-select>
@@ -152,7 +148,7 @@
                     matInput
                     [formControl]="otroAutor.myControl"
                     [matAutocomplete]="auto"
-                    [(ngModel)]="otroAutor.nombre"
+                    [(ngModel)]="otroAutor.name"
                   />
                   <mat-label>Seleccionar autor</mat-label>
                   <mat-autocomplete
@@ -161,17 +157,17 @@
                     #auto="matAutocomplete"
                   >
                     @for (option of otroAutor.filteredOptions | async; track option) {
-                      <mat-option class="mdc-list-item" [value]="option.nombre">
-                        @if (option.kind === "registered" && !option.foto) {
+                      <mat-option class="mdc-list-item" [value]="option.name">
+                        @if (!option.photo) {
                           <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
                         }
-                        @if (option.foto) {
+                        @if (option.photo) {
                           <img
                             class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'usuario/' + option.DNI + '/file }}"
+                            src="{{ url + 'api/members/' + option.id + '/photo' }}"
                           />
                         }
-                        <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                        <span class="mdc-list-item__text">{{ option.name }}</span>
                       </mat-option>
                     }
                   </mat-autocomplete>
@@ -180,21 +176,21 @@
                   <mat-select (selectionChange)="selectUserAutor($event.value, 1, i)">
                     @for (option of options; track option) {
                       <mat-option class="mdc-list-item" [value]="option">
-                        @if (option.kind === "registered" && !option.foto) {
+                        @if (!option.photo) {
                           <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
                         }
-                        @if (option.foto) {
+                        @if (option.photo) {
                           <img
                             class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'usuario/' + option.DNI + '/file }}"
+                            src="{{ url + 'api/members/' + option.id + '/photo' }}"
                           />
                         }
-                        <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                        <span class="mdc-list-item__text">{{ option.name }}</span>
                       </mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
-                @if (otroAutor.nombre) {
+                @if (otroAutor.name) {
                   <mat-icon class="erase-icon" (click)="removeAnotherAuthor(i)">clear</mat-icon>
                 }
               </section>
@@ -205,10 +201,10 @@
         <div class="full-width mt-16 mb-16">
           <div class="text-category">Resumen en español <span class="red-text">*</span></div>
           <textarea
-            [(ngModel)]="publicacion.resumen"
+            [(ngModel)]="publicacion.abstractES"
             placeholder="Insertar resumen"
-            formControlName="resumen"
-            name="resumen"
+            formControlName="abstractES"
+            name="abstractES"
             autosize
             class="input-category"
           ></textarea>
@@ -216,10 +212,10 @@
         <div class="full-width mb-16">
           <div class="text-category">Resumen en inglés <span class="red-text">*</span></div>
           <textarea
-            [(ngModel)]="publicacion.resumenEN"
+            [(ngModel)]="publicacion.abstractEN"
             placeholder="Insertar resumen"
-            formControlName="resumenEN"
-            name="resumenEN"
+            formControlName="abstractEN"
+            name="abstractEN"
             autosize
             class="input-category"
           ></textarea>
@@ -229,21 +225,21 @@
           <div class="flex-news">
             <div class="gray-box flex-news mr-16">
               <img class="upload-icon mr-16" src="../../assets/img/upload.svg" />
-              @if (!fileData && !publicacion.archivo) {
+              @if (!fileData && !publicacion.file) {
                 <span class="gray-pdf plex-sans">PDF</span>
               }
               @if (fileData) {
                 <span class="gray-pdf plex-sans">{{ fileData.name }}</span>
               }
-              @if (!fileData && publicacion.archivo) {
-                <span class="gray-pdf plex-sans">{{ publicacion.archivo }}</span>
+              @if (!fileData && publicacion.file) {
+                <span class="gray-pdf plex-sans">{{ publicacion.file }}</span>
               }
             </div>
             <div class="green-text">
-              @if (!fileData && !publicacion.archivo) {
+              @if (!fileData && !publicacion.file) {
                 <span class="plex-sans">Seleccionar PDF</span>
               }
-              @if (fileData || publicacion.archivo) {
+              @if (fileData || publicacion.file) {
                 <span class="plex-sans">Cambiar</span>
               }
               <input

@@ -8,41 +8,39 @@
       />
       <mat-icon class="icon-search-toolbar">search</mat-icon>
     </div>
-    @if (publicacionPermiso) {
-      <div class="center btn-black" (click)="addArticle()">
-        <a class="link"> Agregar artículo </a>
-      </div>
-    }
+    <div class="center btn-black" (click)="addArticle()">
+      <a class="link"> Agregar artículo </a>
+    </div>
   </div>
   <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
-    <!-- ID Column -->
     <ng-container matColumnDef="titulo">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
-      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.idPublicacion)">
-        {{ row.titulo }}
+      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.id)">
+        {{ row.title }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="primerAutor">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Primer autor</th>
-      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.idPublicacion)">
-        @if (row.autor && row.autor.length != 0) {
+      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.id)">
+        @if (row.authors && row.authors.length != 0) {
+          @let principal = row.authors[0];
           <div class="flex-news">
-            @if (row.autor[0].kind === "registered") {
+            @if (principal.memberId) {
               <div class="member-img-round mr-8">
-                @if (row.autor[0].foto) {
+                @if (principal.photo) {
                   <img
                     class="member-img"
-                    src="{{ url + 'usuario/' + row.autor[0].DNI + '/file }}"
+                    src="{{ url + 'api/members/' + principal.memberId + '/photo' }}"
                     alt="../../assets/img/user.png"
                   />
                 }
-                @if (!row.autor[0].foto) {
+                @if (!principal.photo) {
                   <img class="member-img" src="../../assets/img/user.png" alt="" />
                 }
               </div>
             }
-            {{ row.autor[0].nombre }}
+            {{ principal.name }}
           </div>
         }
       </td>
@@ -50,15 +48,15 @@
 
     <ng-container matColumnDef="publicacion">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Publicación</th>
-      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.idPublicacion)">
+      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.id)">
         {{ row.fecha }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="DOI">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>DOI</th>
-      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.idPublicacion)">
-        <a class="link-DOI" href="https://doi.org/{{ row.DOI }}">{{ row.DOI }} </a>
+      <td mat-cell *matCellDef="let row" (click)="editArticulo(row.id)">
+        <a class="link-DOI" href="https://doi.org/{{ row.doi }}">{{ row.doi }} </a>
       </td>
     </ng-container>
 

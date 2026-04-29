@@ -1,20 +1,10 @@
 export interface LookupData {
-  generos: { idGenero: number; nombre: string }[];
-  prefijos: { idPrefijo: number; nombre: string }[];
-  tiposMiembro: {
-    idTipoMiembro: number;
-    nombre: string;
-    nombreEN: string;
-    nombreSingular: string;
-    nombreSingularEN: string;
-  }[];
-  tiposPublicacion: { idTipoPublicacion: number; nombre: string; nombreEN: string }[];
-  tiposTesis: { idTipoTesis: number; nombre: string; nombreEN: string }[];
-  monedas: { idMoneda: number; simbolo: string }[];
-  tiposNoticia: { idtipoNoticia: number; nombre: string; nombreEN: string }[];
-  tiposUsuario: { idTipoUsuario: number; nombre: string }[];
-  fuentesFinanciamiento: { idFuenteFinanciamiento: number; nombre: string }[];
-  universidades: { idUniversidad: number; nombre: string | null; nombreEN: string | null }[];
-  revistas: { idRevista: number; nombre: string }[];
-  eventos: { idEvento: number; nombre: string; ciudad: string | null; pais: string | null }[];
+  memberTypes: { id: number; name: string; nameEN: string; nameSingular: string; nameSingularEN: string }[];
+  publicationTypes: { id: number; name: string; nameEN: string }[];
+  thesisTypes: { id: number; name: string; nameEN: string }[];
+  newsTypes: { id: number; name: string; nameEN: string }[];
+  fundingSources: { id: number; name: string }[];
+  universities: { id: number; name: string | null; nameEN: string | null }[];
+  journals: { id: number; name: string }[];
+  events: { id: number; name: string; city: string | null; country: string | null }[];
 }

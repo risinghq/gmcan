@@ -16,10 +16,15 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { UsuarioFull } from "@app/shared/models/usuarioFull";
+import type { Member } from "@app/shared/models/member";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
+import { MemberService } from "@app/shared/services/member.service";
+
+interface MemberRow extends Member {
+  memberTypeName?: string;
+  prefixName?: string;
+}
 
 @Component({
   selector: "app-miembros",
@@ -43,13 +48,13 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   ],
 })
 export default class MiembrosComponent implements OnInit {
-  _usuarioService = inject(UsuarioService);
+  private _memberService = inject(MemberService);
   lookup = inject(LookupService);
   _router = inject(Router);
 
-  displayedColumns: string[] = ["nombre", "apellidoPaterno", "apellidoMaterno", "grado", "cargo", "correo"];
-  miembros: UsuarioFull[] = [];
-  dataSource = new MatTableDataSource<UsuarioFull>([]);
+  displayedColumns: string[] = ["firstName", "lastName", "maternalName", "memberTypeName", "prefixName", "email"];
+  miembros: MemberRow[] = [];
+  dataSource = new MatTableDataSource<MemberRow>([]);
   url: string;
   constructor() {
     this.url = GLOBAL.url;
@@ -65,48 +70,32 @@ export default class MiembrosComponent implements OnInit {
   obtainingValue(): void {
     if (window.location.href.includes("activos")) {
       localStorage.setItem("active-member", "1");
-      this.getMiembrosActivos(1);
+      this.getMembers(1);
       this.canAdd = true;
     } else {
       localStorage.setItem("active-member", "0");
-      this.getMiembrosActivos(0);
-      this.getMiembrosActivos(3);
-      this.canAdd = false;
+      this.getMembers(0);
+      this.getMembers(3);
     }
   }
 
-  getMiembrosActivos(value: number): void {
-    this._usuarioService.getUsersActive(String(value)).subscribe((res: UsuarioFull[]) => {
+  getMembers(status: number): void {
+    this._memberService.listAdminMembers({ status }).subscribe((res: Member[]) => {
       if (res.length > 0) {
-        res.sort((a: UsuarioFull, b: UsuarioFull) =>
-          (a.apellidoPaterno ?? "") < (b.apellidoPaterno ?? "")
-            ? 1
-            : (b.apellidoPaterno ?? "") < (a.apellidoPaterno ?? "")
-              ? -1
-              : 0,
-        );
-        for (let index = 0; index < res.length; index++) {
-          this.miembros.push(res[index]);
+        const sorted = res.toSorted((a, b) => a.lastName.localeCompare(b.lastName));
+        for (const m of sorted) {
+          const row: MemberRow = { ...m };
+          const memberType = this.lookup.memberTypes().find((t) => t.id === m.memberTypeId);
+          if (memberType) row.memberTypeName = memberType.nameSingular;
+          const prefijo = this.lookup.prefijos().find((p) => p.idPrefijo === m.prefixId);
+          if (prefijo) row.prefixName = prefijo.nombre;
+          this.miembros.push(row);
         }
         this.dataSource = new MatTableDataSource(this.miembros);
         this.dataSource.paginator = this.paginator();
         this.dataSource.sort = this.matSort();
-        for (let index = 0; index < this.miembros.length; index++) {
-          this.getCargo(this.miembros[index]);
-          this.getGrado(this.miembros[index]);
-        }
       }
     });
-  }
-
-  getCargo(miembro: UsuarioFull): void {
-    const found = this.lookup.tiposMiembro().find((t) => t.idTipoMiembro === miembro.tipoMiembro_idTipoMiembro);
-    if (found) miembro.tipoMiembro = found.nombreSingular;
-  }
-
-  getGrado(miembro: UsuarioFull): void {
-    const found = this.lookup.prefijos().find((p) => p.idPrefijo === miembro.prefijo_idPrefijo);
-    if (found) miembro.prefijo = found.nombre;
   }
 
   displayedNotFound = false;
@@ -116,23 +105,14 @@ export default class MiembrosComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   addMember(): void {
     this._router.navigate(["dashboard/add-member"]);
   }
 
-  editMember(id: string): void {
-    const user = this._usuarioService.getUserLogged();
-    if (user.DNI == id) {
-      this._router.navigate(["dashboard/perfil"]);
-    } else {
-      this._router.navigate(["dashboard/edit-member/" + id]);
-    }
+  editMember(id: number): void {
+    this._router.navigate(["dashboard/edit-member/" + id]);
   }
 }

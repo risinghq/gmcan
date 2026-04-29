@@ -2,8 +2,8 @@ import { isPlatformBrowser, registerLocaleData } from "@angular/common";
 import localeEnglish from "@angular/common/locales/en";
 import localeSpanish from "@angular/common/locales/es";
 import { Injectable, PLATFORM_ID, inject, signal } from "@angular/core";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
 
 /**
@@ -19,14 +19,14 @@ export class SessionService {
   private readonly _appLocale = signal("es-Ar");
   private readonly _languageId = signal(0);
   private readonly _language = signal<(typeof Languages)[number]>(Languages[0]);
-  private readonly _grupoInfo = signal<Grupo>(createGrupo());
+  private readonly _groupInfo = signal<Group>(createGroup());
   private readonly _noticiaPublicada = signal(false);
   private readonly _sessionEnding = signal(false);
 
   readonly language = this._language.asReadonly();
   readonly languageId = this._languageId.asReadonly();
   readonly localeSignal = this._appLocale.asReadonly();
-  readonly grupoInfo = this._grupoInfo.asReadonly();
+  readonly groupInfo = this._groupInfo.asReadonly();
   readonly noticiaPublicada = this._noticiaPublicada.asReadonly();
   readonly sessionEnding = this._sessionEnding.asReadonly();
 
@@ -57,22 +57,21 @@ export class SessionService {
   }
 
   // Research group info (cached to avoid unnecessary API calls on every page)
-  setGrupoInfo(grupo: Grupo): void {
-    this._grupoInfo.set(grupo);
+  setGroupInfo(group: Group): void {
+    this._groupInfo.set(group);
     if (this.browser) {
-      localStorage.setItem("grupoInfo", JSON.stringify(grupo));
+      localStorage.setItem("groupInfo", JSON.stringify(group));
     }
   }
 
-  /** Get cached grupo info. Returns the parsed object or empty default. */
-  getGrupoInfo(): Grupo {
-    return this._grupoInfo();
+  getGroupInfo(): Group {
+    return this._groupInfo();
   }
 
-  clearGrupoInfo(): void {
-    this._grupoInfo.set(createGrupo());
+  clearGroupInfo(): void {
+    this._groupInfo.set(createGroup());
     if (this.browser) {
-      localStorage.removeItem("grupoInfo");
+      localStorage.removeItem("groupInfo");
     }
   }
 

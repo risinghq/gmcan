@@ -14,12 +14,11 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { createLineasInvestigacion } from "@app/shared/models/factories";
-import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import { createResearchLine } from "@app/shared/models/factories";
+import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
-import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
-import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -35,14 +34,14 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _lineaInvestigacionService = inject(LineasInvestigacionService);
-  private _proyectoService = inject(ProyectoService);
+  private _researchLinesService = inject(ResearchLinesService);
 
   button_text = "Actualizar información";
-  lineaInvestigacion: LineasInvestigacion;
+  lineaInvestigacion: ResearchLine;
   public lineaForm: FormGroup;
   url: string;
   edit = true;
+  notCanDo = true;
 
   constructor() {
     this.lineaForm = this.formBuilder.group({
@@ -51,7 +50,7 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.lineaInvestigacion = createLineasInvestigacion();
+    this.lineaInvestigacion = createResearchLine();
     this.url = GLOBAL.url;
   }
 
@@ -64,44 +63,35 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   getLinea(): void {
-    let idLineaInvestigacion = this._route.snapshot.params["id"];
-    this._lineaInvestigacionService
-      .getLineaInvestigacion(idLineaInvestigacion)
-      .subscribe((lineas: LineasInvestigacion[]) => {
-        if (lineas.length > 0) {
-          this.lineaInvestigacion = lineas[0];
-          localStorage.setItem("lineaInvestigacionEdit", JSON.stringify(this.lineaInvestigacion.nombre));
-          this._proyectoService.getProyectosLinea(idLineaInvestigacion, 1).subscribe((proyectosActivos: any) => {
-            if (proyectosActivos == 0) {
-              this.notCanDo = true;
-            } else {
-              this.notCanDo = false;
-            }
-          });
-          this._proyectoService.getProyectosLinea(idLineaInvestigacion, 0).subscribe((proyectosInactivos: any) => {
-            if (proyectosInactivos == 0) {
-              this.notCanDo = true;
-            } else {
-              this.notCanDo = false;
-            }
-          });
-        }
-      });
+    const idLinea = Number(this._route.snapshot.params["id"]);
+    this._researchLinesService.get(idLinea).subscribe((linea: ResearchLine) => {
+      if (linea) {
+        this.lineaInvestigacion = linea;
+        localStorage.setItem("lineaInvestigacionEdit", JSON.stringify(linea.name));
+      }
+    });
   }
 
   submitLinea(): void {
-    this._lineaInvestigacionService.updateLinea(this.lineaInvestigacion).subscribe((result: any) => {
-      if (result.status == 1) {
-        if (this.fileData) {
-          this._lineaInvestigacionService
-            .uploadLineaFoto(this.fileData, this.lineaInvestigacion.idLineasInvestigacion ?? 0)
-            .subscribe((_res: any) => {});
-        }
-        this.lineaForm.markAsPristine();
-        this.return();
-        this.openSnackBar("Linea de investigación actualizada exitosamente");
-      }
-    });
+    if (this.lineaForm.valid) {
+      this._researchLinesService
+        .update(this.lineaInvestigacion.id, {
+          name: this.lineaInvestigacion.name,
+          nameEN: this.lineaInvestigacion.nameEN,
+          description: this.lineaInvestigacion.description ?? undefined,
+          descriptionEN: this.lineaInvestigacion.descriptionEN ?? undefined,
+        })
+        .subscribe((result) => {
+          if (result.status === 1) {
+            if (this.fileData) {
+              this._researchLinesService.uploadPhoto(this.lineaInvestigacion.id, this.fileData).subscribe(() => {});
+            }
+            this.lineaForm.markAsPristine();
+            this.return();
+            this.openSnackBar("Linea de investigación actualizada exitosamente");
+          }
+        });
+    }
   }
 
   return(): void {
@@ -118,8 +108,6 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
 
   fileData: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
   fileProgress(fileInput: Event): void {
     const target = fileInput.target as HTMLInputElement | null;
     this.fileData = target?.files?.[0] ?? null;
@@ -129,7 +117,6 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
 
   preview(): void {
     if (!this.fileData) return;
-    // Show preview
     const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
@@ -142,44 +129,36 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  notCanDo = false;
-
   eraseLinea(): void {
-    if (this.notCanDo) {
-      this._lineaInvestigacionService
-        .deleteLinea(this.lineaInvestigacion.idLineasInvestigacion ?? 0)
-        .subscribe((result: any) => {
-          if (result.status == 1) {
-            this.lineaForm.markAsPristine();
-            this.return();
-            this.openSnackBar("Evento eliminado exitosamente");
-          } else {
-            this.openSnackBar("Hubo un problema al eliminar");
-          }
-        });
-    }
+    this._researchLinesService.delete(this.lineaInvestigacion.id).subscribe((result) => {
+      if (result.status === 1) {
+        this.lineaForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Línea de investigación eliminada exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
+      }
+    });
   }
 
   private dialogRef2?: MatDialogRef<DialogErase11>;
 
   openEraser(): void {
-    if (this.notCanDo) {
-      this.dialogRef2 = this.dialog.open(DialogErase11, {
-        width: "530px",
-        id: "idleTimer",
-        data: {
-          title: "Eliminar línea de investigación",
-          text: "¿Estás seguro que deseas eliminar esta línea?",
-          cancel: "Sí, eliminar",
-          yes: "No, cancelar",
-        },
-      });
-      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
-        if (result) {
-          this.eraseLinea();
-        }
-      });
-    }
+    this.dialogRef2 = this.dialog.open(DialogErase11, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "Eliminar línea de investigación",
+        text: "¿Estás seguro que deseas eliminar esta línea?",
+        cancel: "Sí, eliminar",
+        yes: "No, cancelar",
+      },
+    });
+    this.dialogRef2.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.eraseLinea();
+      }
+    });
   }
 }
 

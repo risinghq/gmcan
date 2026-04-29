@@ -14,11 +14,11 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { Universidad } from "@app/shared/models/universidad";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { AdminUniversidadService } from "@app/shared/services/admin-universidad.service";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+import type { UniversityItem } from "@app/shared/services/ref.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 @Component({
@@ -33,17 +33,17 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _adminUniversidadService = inject(AdminUniversidadService);
+  private _refService = inject(RefService);
   private lookup = inject(LookupService);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
 
-  universidad: Universidad;
+  universidad: UniversityItem = { id: 0, name: null, nameEN: null };
   public universidadForm: FormGroup;
-  button_text = "Guardar universidad";
+  button_text = "Actualizar universidad";
   edit = true;
+  notCanDo = false;
 
   constructor() {
-    this.universidad = { idUniversidad: 0, nombre: "", nombreEN: "" };
     this.universidadForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -58,38 +58,36 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     this.getUniversidad();
   }
 
-  notCanDo = false;
-
   getUniversidad(): void {
-    const idUniversidad = Number(this._route.snapshot.params["id"] ?? 0);
-    const found = this.lookup.universidades().find((u) => u.idUniversidad === idUniversidad);
+    const id = Number(this._route.snapshot.params["id"] ?? 0);
+    const found = this.lookup.universities().find((u) => u.id === id);
     if (found) {
-      this.universidad = {
-        idUniversidad: found.idUniversidad,
-        nombre: found.nombre ?? "",
-        nombreEN: found.nombreEN ?? "",
-      };
-      localStorage.setItem("universidadEdit", JSON.stringify(this.universidad.nombre ?? ""));
-      this.getPublicacionUniversidad(idUniversidad);
+      this.universidad = { id: found.id, name: found.name, nameEN: found.nameEN };
+      localStorage.setItem("universidadEdit", JSON.stringify(found.name ?? ""));
+      this.checkCanDelete(id);
     }
   }
 
-  getPublicacionUniversidad(idUniversidad: number): void {
-    this._publicacionService.getPublicacionesUniversidad(idUniversidad).subscribe((result: unknown[]) => {
-      if (result.length === 0) {
-        this.notCanDo = true;
-      }
+  checkCanDelete(id: number): void {
+    this._publicationService.listAdminPublications().subscribe((pubs) => {
+      this.notCanDo = pubs.filter((p) => p.universityId === id).length === 0;
     });
   }
 
   submitUniversidad(): void {
-    this._adminUniversidadService.updateUniversidad(this.universidad).subscribe((result: { status?: number }) => {
-      if (result.status === 1) {
-        this.universidadForm.markAsPristine();
-        this.return();
-        this.openSnackBar("Universidad actualizada exitosamente");
-      }
-    });
+    if (!this.universidadForm.valid) return;
+    this._refService
+      .updateUniversity(this.universidad.id, {
+        name: this.universidad.name ?? "",
+        nameEN: this.universidad.nameEN ?? undefined,
+      })
+      .subscribe((result) => {
+        if (result.status === 1) {
+          this.universidadForm.markAsPristine();
+          this.return();
+          this.openSnackBar("Universidad actualizada exitosamente");
+        }
+      });
   }
 
   return(): void {
@@ -120,26 +118,22 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
       });
       this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
-          this.eraseNews();
+          this.eraseUniversidad();
         }
       });
     }
   }
 
-  eraseNews(): void {
-    if (this.notCanDo) {
-      this._adminUniversidadService
-        .deleteUniversidad(this.universidad.idUniversidad ?? 0)
-        .subscribe((result: { status?: number }) => {
-          if (result.status === 1) {
-            this.universidadForm.markAsPristine();
-            this.return();
-            this.openSnackBar("Universidad eliminada exitosamente");
-          } else {
-            this.openSnackBar("Hubo un problema al eliminar");
-          }
-        });
-    }
+  eraseUniversidad(): void {
+    this._refService.deleteUniversity(this.universidad.id).subscribe((result) => {
+      if (result.status === 1) {
+        this.universidadForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Universidad eliminada exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
+      }
+    });
   }
 }
 

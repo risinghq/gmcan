@@ -18,13 +18,16 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { Publicacion } from "@app/shared/models/publicacion";
-import { Revista } from "@app/shared/models/revista";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+import type { JournalItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+
+interface PublicationRow extends PublicationWithAuthors {
+  fecha?: string;
+}
 
 @Component({
   selector: "app-articulos",
@@ -52,19 +55,17 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
 export default class ArticulosComponent implements OnInit {
   _router = inject(Router);
   lookup = inject(LookupService);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _publicacionAutoresService = inject(PublicacionAutoresService);
   private _tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
   displayedColumns2: string[] = ["nombre"];
-  dataSource = new MatTableDataSource<Publicacion>([]);
-  dataSource2 = new MatTableDataSource<Revista>([]);
+  dataSource = new MatTableDataSource<PublicationRow>([]);
+  dataSource2 = new MatTableDataSource<JournalItem>([]);
 
-  revistas: Revista[] = [];
-  articulos: Publicacion[] = [];
+  articulos: PublicationRow[] = [];
   url: string;
 
   constructor() {
@@ -80,42 +81,30 @@ export default class ArticulosComponent implements OnInit {
   selectedTab = 0;
   ngOnInit(): void {
     this.selectedTab = this._tabState.articleTab();
-    this.revistas = [...this.lookup.revistas()];
-    this.dataSource2 = new MatTableDataSource(this.revistas);
+    const journals = this.lookup.journals();
+    this.dataSource2 = new MatTableDataSource(journals);
     this.dataSource2.sort = this.sort2();
     this.dataSource2.paginator = this.paginator2();
     this.getArticles();
   }
 
   getArticles(): void {
-    this._publicacionService.getPublicaciones(1).subscribe((res: Publicacion[]) => {
+    this._publicationService.listPublications({ type: 1 }).subscribe((res) => {
       if (res) {
-        res.sort((a: Publicacion, b: Publicacion) =>
-          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-            ? 1
-            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-              ? -1
-              : 0,
+        const sorted = res.toSorted((a, b) =>
+          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
         );
-        this.articulos = res;
-        for (const articulo of this.articulos) {
-          const d = new Date(articulo.fechaPublicacion ?? new Date());
+        this.articulos = sorted.map((pub) => {
+          const row: PublicationRow = Object.assign({} as PublicationRow, pub);
+          const d = new Date(pub.publishedAt);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          articulo.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          articulo.fecha = this.titlecasePipe.transform(articulo.fecha) ?? "";
-          articulo.autor = [];
-          this.getAuthors(articulo);
-        }
+          row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
+          return row;
+        });
         this.dataSource = new MatTableDataSource(this.articulos);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
       }
-    });
-  }
-
-  getAuthors(publicacion: Publicacion): void {
-    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
-      publicacion.autor = authors;
     });
   }
 
@@ -127,11 +116,7 @@ export default class ArticulosComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   displayedNotFound2 = false;
@@ -142,11 +127,7 @@ export default class ArticulosComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
+    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
   }
 
   changedTab(event: number): void {

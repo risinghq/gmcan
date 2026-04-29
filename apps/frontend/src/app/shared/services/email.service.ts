@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
@@ -19,41 +19,26 @@ export interface EmailResponse {
 }
 
 export interface PasswordResetRequest {
-  correo: string;
+  email: string;
 }
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable({ providedIn: "root" })
 export class EmailService {
   private http = inject(HttpClient);
 
-  private readonly url: string;
-  private readonly headers = new HttpHeaders({
-    "Content-Type": "application/json",
-  });
-
-  constructor() {
-    this.url = GLOBAL.url;
-  }
-
   sendMembershipApplication(application: MembershipApplication): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(`${this.url}email/send-email`, application, {
-      headers: this.headers,
-    });
+    return this.http.post<EmailResponse>(`${GLOBAL.url}api/email`, application);
   }
 
   sendPasswordReset(request: PasswordResetRequest): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(`${this.url}email/send-password-reset`, request, {
-      headers: this.headers,
-    });
+    return this.http.post<EmailResponse>(`${GLOBAL.url}admin/auth/password-reset`, request);
   }
 
-  verifyResetToken(token: string): Observable<any> {
-    return this.http.post(`${this.url}email/verify-reset-token`, { token }, { headers: this.headers });
+  verifyResetToken(token: string): Observable<{ valid: boolean }> {
+    return this.http.post<{ valid: boolean }>(`${GLOBAL.url}admin/auth/verify-reset-token`, { token });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.url}email/reset-password`, { token, newPassword }, { headers: this.headers });
+  resetPassword(token: string, newPassword: string): Observable<{ status: number }> {
+    return this.http.post<{ status: number }>(`${GLOBAL.url}admin/auth/reset-password`, { token, newPassword });
   }
 }

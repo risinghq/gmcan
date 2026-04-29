@@ -15,22 +15,22 @@
         <div class="card-publication-title">{{ language.publicationsText[0].publicationsTitle }}</div>
         <div class="card-publication-text">{{ infoText }}</div>
         <mat-tab-group (selectedTabChange)="changeTab($event)">
-          @for (tipoPublicacion of tipoPublicaciones; track tipoPublicacion) {
-          <mat-tab label="{{ tipoPublicacion.nombreTab }}">
+          @for (tab of tabLabels; track tab; let j = $index) {
+          <mat-tab label="{{ tab.label }}">
             <form class="flex-news" [formGroup]="searchForm">
               <div class="input-search-publication">
                 <mat-icon class="icon-search">search</mat-icon>
                 <input
-                  (keyup.enter)="search(titulo.value, tipoPublicacion.idTipoPublicacion)"
+                  (keyup.enter)="search(titulo.value)"
                   #titulo
                   class="input-search"
-                  placeholder="{{ tipoPublicacion.search }}"
+                  placeholder="{{ tab.search }}"
                   name="titulo"
                   formControlName="titulo"
                   autocomplete="off"
                 />
               </div>
-              <div (click)="search(titulo.value, tipoPublicacion.idTipoPublicacion)" class="btn-black">
+              <div (click)="search(titulo.value)" class="btn-black">
                 <div class="link">{{ language.searchMobile }}</div>
               </div>
             </form>
@@ -47,17 +47,17 @@
               track publicacion; let i = $index ) {
               <div class="publication">
                 <div class="flex-news">
-                  @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
+                  @if (publicacion.typeId != 2) {
                   <div
                     class="publication-type"
                     [class]="{
-                                'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
-                                'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
+                                'publication-type-1': publicacion.typeId == 1,
+                                'publication-type-3': publicacion.typeId == 3,
                               }"
                   >
-                    {{ tipoPublicacion.nombre }}
+                    {{ publicacion.tipoPublicacion }}
                   </div>
-                  } @if (publicacion.tipoPublicacion_idTipoPublicacion == 2) {
+                  } @if (publicacion.typeId == 2) {
                   <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
                   }
                   <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
@@ -65,14 +65,14 @@
                   </div>
                 </div>
                 <div class="flex-news publication-mt">
-                  <div class="publication-title">{{ publicacion.titulo }}</div>
+                  <div class="publication-title">{{ publicacion.title }}</div>
                 </div>
                 <div class="flex-news publication-mt">
                   <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
                   <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
                   @if (publicacion.revista != null && publicacion.revista != "") {
                   <div class="publication-rev">
-                    {{ publicacion.revista }} Vol. {{ publicacion.nroRevista }} {{ publicacion.universidad }}
+                    {{ publicacion.revista }} Vol. {{ publicacion.journalIssue }} {{ publicacion.universidad }}
                   </div>
                   } @if (publicacion.universidad != null && publicacion.universidad != "") {
                   <div class="publication-rev">{{ publicacion.universidad }}</div>
@@ -84,49 +84,48 @@
                   <div class="publication-rev">{{ publicacion.ciudad }}, {{ publicacion.pais }}</div>
                   }
                 </div>
-                @if (publicacion.DOI != null) {
+                @if (publicacion.doi != null) {
                 <div class="publication-rev line-1">
                   DOI:
-                  <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank"
-                    >{{ publicacion.DOI }}</a
+                  <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
+                    >{{ publicacion.doi }}</a
                   >
                 </div>
                 }
                 <div class="flex-news publication-mt" style="flex-flow: wrap">
-                  @for (autor of publicacion.autor; track autor; let last = $last) { @if (autor.kind === "registered") {
+                  @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered")
+                  {
                   <div class="publication-members">
                     <div class="member-img-round">
-                      @if (autor.foto) {
+                      @if (autor.photo) {
                       <img
                         class="member-img"
-                        src="{{ url + 'usuario/' + autor.DNI + '/file }}"
+                        src="{{ url + 'api/members/' + autor.memberId + '/photo' }}"
                         alt="../../assets/img/user.png"
                       />
-                      } @if (!autor.foto) {
+                      } @if (!autor.photo) {
                       <img class="member-img" src="../../assets/img/user.png" alt="" />
                       }
                     </div>
-                    <div class="member-name" (click)="profile(autor)">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
+                    <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
                   </div>
                   } @if (autor.kind === "external") {
-                  <div class="publication-authors">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
+                  <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>
                   } }
                 </div>
                 <div class="flex-news mt-16">
-                  @if ( publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo
-                  != "" ) {
+                  @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
                   <a
                     class="publication-green"
-                    href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file' }}"
+                    href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
                     target="_blank"
                   >
                     {{ this.language.publicationsText[0].preview }}
                   </a>
-                  } @if ( publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo &&
-                  publicacion.archivo != "" ) {
+                  } @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
                   <a
                     class="publication-green"
-                    href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file/download }}"
+                    href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}"
                   >
                     {{ this.language.publicationsText[0].download }}
                   </a>
@@ -156,7 +155,7 @@
                 </div>
                 <div class="collapse collapsed-resumen" id="collapseExample{{ i }}">
                   <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
-                  <div class="abstract">{{ publicacion.resumen }}</div>
+                  <div class="abstract">{{ publicacion.abstractES }}</div>
                 </div>
               </div>
               } @if (publicaciones.length > 5) {

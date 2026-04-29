@@ -3,7 +3,7 @@
   <div>
     <mat-spinner />
   </div>
-  } @if (cargado) {
+  } @if (cargado && usuario) {
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="member-detail-links">
@@ -15,7 +15,7 @@
         }
         <mat-icon class="member-detail-icon"> arrow_right </mat-icon>
         <a class="member-detail-link">
-          {{ usuario.prefijo }} {{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}
+          {{ usuario.prefix }} {{ usuario.firstName }} {{ usuario.lastName }} {{ usuario.maternalName }}
         </a>
       </div>
       <div class="member-detail-card">
@@ -25,29 +25,29 @@
         </div>
         <div class="flex-detail member-title-div">
           <div class="member-detail-img-div">
-            @if (usuario.foto != null) {
-            <img class="member-detail-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" alt="" />
-            } @if (usuario.foto == null) {
+            @if (usuario.photo != null) {
+            <img class="member-detail-img" src="{{ url + 'api/members/' + usuario.id + '/photo' }}" alt="" />
+            } @if (usuario.photo == null) {
             <img class="member-detail-img" src="../../assets/img/user.png" alt="" />
             }
           </div>
           <div class="member-detail-name-div">
             <div class="member-detail-active">{{ usuario.active }}</div>
             <div class="member-detail-title">
-              {{ usuario.prefijo }} {{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}
+              {{ usuario.prefix }} {{ usuario.firstName }} {{ usuario.lastName }} {{ usuario.maternalName }}
             </div>
             <div class="member-detail-type">{{ usuario.tipoMiembro }}</div>
-            @if (usuario.estado === 3) {
+            @if (usuario.status === 3) {
             <div class="member-email flex-detail cursive">In memoriam</div>
-            } @if (usuario.estado != 3) {
+            } @if (usuario.status !== 3) {
             <div class="member-email flex-detail">
               <mat-icon class="email-icon"> email </mat-icon>
-              <div>{{ usuario.correo }}</div>
+              <div>{{ usuario.email }}</div>
             </div>
             }
           </div>
         </div>
-        <div class="detail-member-resum">{{ usuario.resumenPro }}</div>
+        <div class="detail-member-resum">{{ usuario.bio }}</div>
         @if (publicaciones.length > 0) {
         <div class="member-publications">{{ language.detailMemberText[0].publications }}</div>
         } @if (publicaciones.length > 0) {
@@ -56,17 +56,17 @@
           publicacion; let i = $index ) {
           <div class="publication">
             <div class="flex-news">
-              @if (publicacion.tipoPublicacion_idTipoPublicacion != 2) {
+              @if (publicacion.typeId !== 2) {
               <div
                 class="publication-type"
                 [class]="{
-                          'publication-type-1': publicacion.tipoPublicacion_idTipoPublicacion == 1,
-                          'publication-type-3': publicacion.tipoPublicacion_idTipoPublicacion == 3,
+                          'publication-type-1': publicacion.typeId === 1,
+                          'publication-type-3': publicacion.typeId === 3,
                         }"
               >
                 {{ publicacion.tipoPublicacion }}
               </div>
-              } @if (publicacion.tipoPublicacion_idTipoPublicacion == 2) {
+              } @if (publicacion.typeId === 2) {
               <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
               }
               <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
@@ -74,14 +74,14 @@
               </div>
             </div>
             <div class="flex-news publication-mt">
-              <div class="publication-title">{{ publicacion.titulo }}</div>
+              <div class="publication-title">{{ publicacion.title }}</div>
             </div>
             <div class="flex-news publication-mt">
               <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
               <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
               @if (publicacion.revista != null && publicacion.revista != "") {
               <div class="publication-rev">
-                {{ publicacion.revista }} Vol. {{ publicacion.nroRevista }} {{ publicacion.universidad }}
+                {{ publicacion.revista }} Vol. {{ publicacion.journalIssue }} {{ publicacion.universidad }}
               </div>
               } @if (publicacion.universidad != null && publicacion.universidad != "") {
               <div class="publication-rev">{{ publicacion.universidad }}</div>
@@ -93,49 +93,27 @@
               <div class="publication-rev">{{ publicacion.ciudad }}, {{ publicacion.pais }}</div>
               }
             </div>
-            @if (publicacion.DOI != null) {
+            @if (publicacion.doi != null) {
             <div class="publication-rev" style="line-height: 12px">
               DOI:
-              <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.DOI }}" target="_blank"
-                >{{ publicacion.DOI }}</a
+              <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
+                >{{ publicacion.doi }}</a
               >
             </div>
             }
-            <div class="flex-news publication-mt" style="flex-flow: wrap">
-              @for (autor of publicacion.autor; track autor; let last = $last) { @if (autor.kind === "registered") {
-              <div class="publication-members">
-                <div class="member-img-round">
-                  @if (autor.foto) {
-                  <img
-                    class="member-img"
-                    src="{{ url + 'usuario/' + autor.DNI + '/file }}"
-                    alt="../../assets/img/user.png"
-                  />
-                  } @if (!autor.foto) {
-                  <img class="member-img" src="../../assets/img/user.png" alt="" />
-                  }
-                </div>
-                <div class="member-name" (click)="profile(autor)">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
-              </div>
-              } @if (autor.kind === "external") {
-              <div class="publication-authors">{{ autor.nombre }}{{ !last ? "," : "" }}</div>
-              } }
-            </div>
             <div class="flex-news mt-16">
-              @if ( publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo !=
-              "" ) {
+              @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
               <a
                 class="publication-green"
-                href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file' }}"
+                href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
                 target="_blank"
               >
                 {{ this.language.publicationsText[0].preview }}
               </a>
-              } @if ( publicacion.tipoPublicacion_idTipoPublicacion != 3 && publicacion.archivo && publicacion.archivo
-              != "" ) {
+              } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
               <a
                 class="publication-green"
-                href="{{ this.url + 'publicacion/' + publicacion.idPublicacion + '/file/download }}"
+                href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}"
               >
                 {{ this.language.publicationsText[0].download }}
               </a>
@@ -165,7 +143,7 @@
             </div>
             <div class="collapse collapsed-resumen" id="collapseExample{{ i }}">
               <div class="abstract-title">{{ language.detailMemberText[0].abstract }}:</div>
-              <div class="abstract">{{ publicacion.resumen }}</div>
+              <div class="abstract">{{ publicacion.abstractES }}</div>
             </div>
           </div>
           } @if (publicaciones.length > 5) {

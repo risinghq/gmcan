@@ -1,9 +1,11 @@
 export interface Method {
-  idMetodo?: number;
-  nombre?: string;
-  nombreEN?: string;
-  descripcion?: string;
-  descripcionEN?: string;
-  foto?: string;
-  grupo_idGrupo?: number;
+  id: number;
+  name: string;
+  nameEN: string;
+  description: string;
+  descriptionEN: string | null;
+  photo: string | null;
+  groupId: number;
+  createdAt: string | null;
+  updatedAt: string | null;
 }

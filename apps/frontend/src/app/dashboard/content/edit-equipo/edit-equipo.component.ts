@@ -14,10 +14,10 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { Equipo } from "@app/shared/models/equipo";
-import { createEquipo } from "@app/shared/models/factories";
+import type { Equipment } from "@app/shared/models/equipment";
+import { createEquipment } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { EquipoService } from "@app/shared/services/equipo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 @Component({
@@ -32,15 +32,15 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _equipoService = inject(EquipoService);
+  private _groupService = inject(GroupService);
 
   edit = true;
-  equipo: Equipo;
+  equipo: Equipment;
   equipoForm: FormGroup;
   button_text = "Actualizar información";
 
   constructor() {
-    this.equipo = createEquipo();
+    this.equipo = createEquipment();
     this.equipoForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       cpu: [""],
@@ -51,32 +51,41 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit() {
-    this.getEvento();
+    this.getEquipo();
   }
 
   isDirty(): boolean {
     return this.equipoForm.dirty;
   }
 
-  getEvento(): void {
-    let idEquipo = this._route.snapshot.params["id"];
-    this._equipoService.getEquipo(idEquipo).subscribe((result: Equipo[]) => {
-      if (result.length > 0) {
-        this.equipo = result[0];
-        localStorage.setItem("equipoEdit", JSON.stringify(this.equipo.nombre));
+  getEquipo(): void {
+    const idEquipo = Number(this._route.snapshot.params["id"]);
+    this._groupService.getEquipment(idEquipo).subscribe((result: unknown) => {
+      const eq = result as Equipment;
+      if (eq) {
+        this.equipo = eq;
+        localStorage.setItem("equipoEdit", JSON.stringify(eq.name));
       }
     });
   }
 
   submitEquipo(): void {
     if (this.equipoForm.valid) {
-      this._equipoService.updateEquipo(this.equipo).subscribe((res: any) => {
-        if (res.status == 1) {
-          this.equipoForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Equipo actualizado exitosamente");
-        }
-      });
+      this._groupService
+        .updateEquipment(this.equipo.id, {
+          name: this.equipo.name,
+          cpu: this.equipo.cpu ?? undefined,
+          gpu: this.equipo.gpu ?? undefined,
+          ram: this.equipo.ram ?? undefined,
+          storage: this.equipo.storage ?? undefined,
+        })
+        .subscribe((res) => {
+          if (res.status === 1) {
+            this.equipoForm.markAsPristine();
+            this.return();
+            this.openSnackBar("Equipo actualizado exitosamente");
+          }
+        });
     }
   }
 
@@ -113,8 +122,8 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   eraseEquipo(): void {
-    this._equipoService.deleteEquipo(this.equipo.idEquipo ?? 0).subscribe((result: any) => {
-      if (result.status == 1) {
+    this._groupService.deleteEquipment(this.equipo.id).subscribe((result) => {
+      if (result.status === 1) {
         this.equipoForm.markAsPristine();
         this.return();
         this.openSnackBar("Equipo eliminado exitosamente");

@@ -14,9 +14,10 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
+import { createSoftware } from "@app/shared/models/factories";
 import type { Software } from "@app/shared/models/software";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { SoftwareService } from "@app/shared/services/software.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -32,7 +33,7 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _softwareService = inject(SoftwareService);
+  private _groupService = inject(GroupService);
 
   edit = true;
   software: Software;
@@ -40,7 +41,7 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   button_text = "Actualizar información";
 
   constructor() {
-    this.software = { idSoftware: 0, nombre: "", descripcion: "", descripcionEN: "", moreInfo: "", grupo_idGrupo: 1 };
+    this.software = createSoftware();
     this.softwareForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -58,23 +59,33 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   }
 
   getSoftware(): void {
-    let idSoftware = this._route.snapshot.params["id"];
-    this._softwareService.getSoftwareId(idSoftware).subscribe((result: Software[]) => {
-      if (result.length > 0) {
-        this.software = result[0];
-        localStorage.setItem("softwareEdit", JSON.stringify(this.software.nombre));
+    const idSoftware = Number(this._route.snapshot.params["id"]);
+    this._groupService.getSoftwareItem(idSoftware).subscribe((result: unknown) => {
+      const sw = result as Software;
+      if (sw) {
+        this.software = sw;
+        localStorage.setItem("softwareEdit", JSON.stringify(sw.name));
       }
     });
   }
 
   submitSoftware(): void {
-    this._softwareService.updateSoftware(this.software).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.softwareForm.markAsPristine();
-        this.return();
-        this.openSnackBar("Software actualizado exitosamente");
-      }
-    });
+    if (this.softwareForm.valid) {
+      this._groupService
+        .updateSoftware(this.software.id, {
+          name: this.software.name ?? undefined,
+          description: this.software.description ?? undefined,
+          descriptionEN: this.software.descriptionEN ?? undefined,
+          moreInfo: this.software.moreInfo ?? undefined,
+        })
+        .subscribe((res) => {
+          if (res.status === 1) {
+            this.softwareForm.markAsPristine();
+            this.return();
+            this.openSnackBar("Software actualizado exitosamente");
+          }
+        });
+    }
   }
 
   return(): void {
@@ -110,8 +121,8 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   }
 
   eraseSoftware(): void {
-    this._softwareService.deleteSoftware(this.software.idSoftware ?? 0).subscribe((result: any) => {
-      if (result.status == 1) {
+    this._groupService.deleteSoftware(this.software.id).subscribe((result) => {
+      if (result.status === 1) {
         this.softwareForm.markAsPristine();
         this.return();
         this.openSnackBar("Software eliminado exitosamente");

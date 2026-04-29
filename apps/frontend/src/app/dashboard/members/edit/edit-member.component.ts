@@ -2,7 +2,6 @@ import { CdkScrollable } from "@angular/cdk/scrolling";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
-import { MatCheckbox } from "@angular/material/checkbox";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
 import {
@@ -21,23 +20,14 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router, ActivatedRoute } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { createUsuarioFull } from "@app/shared/models/factories";
+import { createMemberFull } from "@app/shared/models/factories";
+import type { MemberFull } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import type { UsuarioFull } from "@app/shared/models/usuarioFull";
-import { UsuarioPermiso } from "@app/shared/models/usuariopermiso";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { NoticiaService } from "@app/shared/services/noticia.service";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 import { AutosizeModule } from "ngx-autosize";
-
-interface StatusResponse {
-  status?: number;
-  user?: number;
-}
 
 @Component({
   selector: "app-edit-member",
@@ -59,26 +49,27 @@ interface StatusResponse {
     MatOption,
     MatIconButton,
     AutosizeModule,
-    MatCheckbox,
   ],
 })
 export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  _usuarioService = inject(UsuarioService);
+  private _memberService = inject(MemberService);
   lookup = inject(LookupService);
-  _usuarioPermisoService = inject(UsuarioHasPermisoService);
   private _snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
-  _publicacionAutoresService = inject(PublicacionAutoresService);
-  _noticiaService = inject(NoticiaService);
 
   url: string;
   public memberForm: FormGroup;
-  member: UsuarioFull = createUsuarioFull();
+  member: MemberFull;
+  segundoNombre = "";
+  birthDateObj?: Date;
+  password = "";
+  private oldPassword = "";
+  private oldEmail = "";
   get tipoMiembros() {
-    return this.lookup.tiposMiembro();
+    return this.lookup.memberTypes();
   }
   get prefijos() {
     return this.lookup.prefijos();
@@ -86,10 +77,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   get generos() {
     return this.lookup.generos();
   }
-  listaPermisos: number[] = [];
   button_text = "Actualizar información";
-  permisosExistentes: UsuarioPermiso[] = [];
-  edit = false;
+  edit = true;
 
   constructor() {
     this.memberForm = this.formBuilder.group({
@@ -105,10 +94,10 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       DNI: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       password: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       confirmPassword: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumenPro: [""],
-      resumenProEN: [""],
+      bio: [""],
+      bioEN: [""],
     });
-    this.member = createUsuarioFull();
+    this.member = createMemberFull();
     this.url = GLOBAL.url;
   }
 
@@ -127,126 +116,39 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     return this.memberForm.dirty;
   }
 
-  oldPassword = "";
-
   getUser(): void {
-    const DNI = String(this._route.snapshot.params["id"] ?? "");
-    this._usuarioService.getFullUser(DNI).subscribe((result: UsuarioFull[]) => {
-      if (result.length > 0) {
-        this.memberForm.controls["DNI"].disable();
-        this.member = result[0];
-        this.oldEmail = this.member.correo ?? "";
-        this.oldPassword = this.member.password ?? "";
-        this.memberForm.controls["confirmPassword"].setValue(this.member.password);
-        const d = new Date(this.member.fechaNacimiento ?? new Date());
-        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.member.fechaNacimientoDate = d;
-        if (this.member.apellidoMaterno) {
-          this.member.nombreCompleto =
-            this.member.nombre + " " + this.member.apellidoPaterno + " " + this.member.apellidoMaterno;
-        } else {
-          this.member.nombreCompleto = this.member.nombre + " " + this.member.apellidoPaterno;
-        }
-        localStorage.setItem("miembroEdit", JSON.stringify(this.member.nombreCompleto));
-        if ((this.member.nombre ?? "").includes(" ")) {
-          const parts = (this.member.nombre ?? "").split(" ");
-          this.member.nombre = parts[0] ?? "";
-          this.memberForm.controls["segundoNombre"].setValue(parts[1] ?? "");
-        }
-
-        // Resolve display values from lookup signals
-        const tipoMiembro = this.lookup
-          .tiposMiembro()
-          .find((t) => t.idTipoMiembro === this.member.tipoMiembro_idTipoMiembro);
-        if (tipoMiembro) {
-          this.member.tipoMiembro = tipoMiembro.nombre ?? tipoMiembro.nombreSingular;
-        }
-        const prefijo = this.lookup.prefijos().find((p) => p.idPrefijo === this.member.prefijo_idPrefijo);
-        if (prefijo) {
-          this.member.prefijo = prefijo.nombre;
-        }
-
-        this.getPermisos(this.member);
-      }
-    });
-  }
-
-  getPermisos(miembro: UsuarioFull): void {
-    this._usuarioPermisoService.getUsuarioHasPermiso(miembro.DNI ?? "").subscribe((result: UsuarioPermiso[]) => {
+    const id = Number(this._route.snapshot.params["id"] ?? 0);
+    this._memberService.getMemberFull(id).subscribe((result: MemberFull) => {
       if (result) {
-        this.permisosExistentes = result;
-        this.validarPermisos(this.permisosExistentes);
-        this.getPublicaciones(miembro);
+        this.memberForm.controls["DNI"].disable();
+        this.member = result;
+        this.oldEmail = result.email ?? "";
+
+        if (result.birthDate) {
+          const d = new Date(result.birthDate);
+          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+          this.birthDateObj = d;
+        }
+
+        const fullName =
+          `${result.firstName} ${result.lastName}${result.maternalName ? " " + result.maternalName : ""}`.trim();
+        localStorage.setItem("miembroEdit", JSON.stringify(fullName));
+
+        if (result.firstName.includes(" ")) {
+          const parts = result.firstName.split(" ");
+          this.member.firstName = parts[0] ?? "";
+          this.segundoNombre = parts.slice(1).join(" ");
+        }
+
+        this.memberForm.controls["confirmPassword"].setValue("");
       }
     });
-  }
-
-  getPublicaciones(miembro: UsuarioFull): void {
-    this._publicacionAutoresService.getByUser(miembro.DNI ?? "").subscribe((result) => {
-      if (result.length == 0) {
-        this.edit = true;
-      }
-      if (this.edit) {
-        this.getNoticias(miembro);
-      }
-    });
-  }
-
-  getNoticias(miembro: UsuarioFull): void {
-    this._noticiaService.getNoticiaUsuario(miembro.DNI ?? "").subscribe((result: unknown[]) => {
-      if (result.length == 0) {
-        this.edit = true;
-      } else {
-        this.edit = false;
-      }
-    });
-  }
-
-  permisoNoticia = false;
-  permisoPublicacion = false;
-  permisoProyecto = false;
-  permisoContenido = false;
-
-  validarPermisos(permisos: UsuarioPermiso[]): void {
-    for (let index = 0; index < permisos.length; index++) {
-      switch (Number(permisos[index].permiso_idPermiso ?? 0)) {
-        case 1:
-          this.permisoNoticia = true;
-          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
-          break;
-        case 3:
-          this.permisoPublicacion = true;
-          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
-          break;
-        case 2:
-          this.permisoProyecto = true;
-          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
-          break;
-        case 5:
-          this.permisoContenido = true;
-          this.listaPermisos.push(Number(permisos[index].permiso_idPermiso ?? 0));
-          break;
-        default:
-          break;
-      }
-    }
-  }
-
-  selectPermiso(id: number, event: boolean): void {
-    if (event) {
-      this.listaPermisos.push(id);
-    } else {
-      const index = this.listaPermisos.findIndex((x: number) => x === id);
-      if (index != -1) {
-        this.listaPermisos.splice(index, 1);
-      }
-    }
   }
 
   adHono = 0;
 
   setCoord(value: number): void {
-    this.member.tipoUsuario_idTipoUsuario = value;
+    this.member.roleId = value;
   }
 
   adHonorem(value: number): void {
@@ -260,130 +162,90 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
 
   errPass = false;
   errEmail = false;
-  oldEmail = "";
 
   addMember(): void {
     if (this.memberForm.valid) {
-      if (this.member.fechaNacimientoDate) {
-        const momentDate = new Date(this.member.fechaNacimientoDate);
-        const formattedDate = new Date(momentDate).toLocaleDateString("sv");
-        this.member.fechaNacimiento = formattedDate;
-      } else {
-        this.member.fechaNacimiento = undefined;
-      }
-      this._usuarioService.verifyUser(this.member).subscribe((result: UsuarioFull[]) => {
-        if (result.length == 0 || this.oldEmail == this.member.correo) {
-          if (this.member.password === this.memberForm.controls["confirmPassword"].value) {
-            if (
-              this.memberForm.controls["segundoNombre"].value != "" &&
-              this.memberForm.controls["segundoNombre"].value
-            ) {
-              this.member.nombre =
-                `${this.member.nombre ?? ""} ${this.memberForm.controls["segundoNombre"].value}`.trim();
-            }
-            if (this.adHono == 3) {
-              this.member.estado = this.adHono;
-            } else if (this.oldMem == 0) {
-              this.member.estado = this.oldMem;
-            } else if (!this.member.estado) {
-              this.member.estado = 1;
-            }
-            this._usuarioService.updateUser(this.member).subscribe((res: StatusResponse) => {
-              if (res.status == 1) {
-                if (this.member.password != this.oldPassword) {
-                  this._usuarioService
-                    .changePassword({
-                      password: this.member.password ?? "",
-                      correo: this.member.correo ?? "",
-                    })
-                    .subscribe((_passwordResult: unknown) => {});
-                }
-                if (this.fileData) {
-                  if (this.member.foto == null) {
-                    this._usuarioService
-                      .uploadUsuarioFoto(this.fileData, String(res.user ?? ""))
-                      .subscribe((_uploadResult: unknown) => {});
-                  } else {
-                    this._usuarioService
-                      .deleteImage(String(this.member.foto))
-                      .subscribe((_deleteResult: unknown) => {});
-                    this._usuarioService
-                      .uploadUsuarioFoto(this.fileData, String(res.user ?? ""))
-                      .subscribe((_uploadResult: unknown) => {});
-                  }
-                }
-                this.openSnackBar("Miembro actualizado exitosamente");
-                this.memberForm.markAsPristine();
-                this.return();
-              }
-              this.setPermisos();
-            });
-          } else {
-            this.openSnackBar("Las contraseñas no coinciden", "err-snackbar");
-            this.errPass = true;
-            this.errEmail = false;
-          }
-        } else {
-          this.openSnackBar("Este usuario ya se encuentra registrado", "err-snackbar");
-          this.errEmail = true;
-        }
-      });
-    }
-  }
+      const firstName = this.segundoNombre
+        ? `${this.member.firstName} ${this.segundoNombre}`.trim()
+        : this.member.firstName;
+      const birthDate = this.birthDateObj ? new Date(this.birthDateObj).toLocaleDateString("sv") : undefined;
 
-  setPermisos(): void {
-    let permisoEx: UsuarioPermiso | undefined;
-    if (this.permisosExistentes.length > 0) {
-      permisoEx = this.permisosExistentes[0];
-    }
-    if (this.member.tipoUsuario_idTipoUsuario == 2) {
-      this.listaPermisos.push(4);
-      this.listaPermisos.push(6);
-    }
-    if (permisoEx) {
-      this._usuarioPermisoService
-        .deletePermisoUsuario({ usuario_DNI: permisoEx.usuario_DNI ?? "" })
-        .subscribe((_deleteResult: unknown) => {
-          for (let index = 0; index < this.listaPermisos.length; index++) {
-            let permiso = {
-              usuario_DNI: this.member.DNI ?? "",
-              permiso_idPermiso: this.listaPermisos[index],
-            };
-            this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((_addResult: unknown) => {});
+      let status: number;
+      if (this.adHono === 3) {
+        status = 3;
+      } else if (this.oldMem === 0) {
+        status = 0;
+      } else if (!this.member.status) {
+        status = 1;
+      } else {
+        status = this.member.status;
+      }
+
+      const doUpdate = () => {
+        const confirmPass = this.memberForm.controls["confirmPassword"].value;
+        if (this.password && this.password !== confirmPass) {
+          this.openSnackBar("Las contraseñas no coinciden", "err-snackbar");
+          this.errPass = true;
+          return;
+        }
+        this._memberService
+          .updateMember(this.member.id, {
+            email: this.member.email,
+            firstName,
+            lastName: this.member.lastName,
+            maternalName: this.member.maternalName ?? undefined,
+            birthDate,
+            bio: this.member.bio ?? undefined,
+            bioEN: this.member.bioEN ?? undefined,
+            status,
+            roleId: this.member.roleId,
+            memberTypeId: this.member.memberTypeId,
+            prefixId: this.member.prefixId ?? undefined,
+            genderId: this.member.genderId ?? undefined,
+          })
+          .subscribe((res) => {
+            if (res.status === 1) {
+              if (this.fileData) {
+                this._memberService.uploadPhoto(this.member.id, this.fileData).subscribe(() => {});
+              }
+              this.openSnackBar("Miembro actualizado exitosamente");
+              this.memberForm.markAsPristine();
+              this.return();
+            }
+          });
+      };
+
+      if (this.oldEmail !== this.member.email) {
+        this._memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
+          const list = result as unknown[];
+          if (list.length === 0) {
+            doUpdate();
+          } else {
+            this.openSnackBar("Este usuario ya se encuentra registrado", "err-snackbar");
+            this.errEmail = true;
           }
         });
-    } else {
-      for (let index = 0; index < this.listaPermisos.length; index++) {
-        let permiso = {
-          usuario_DNI: this.member.DNI ?? "",
-          permiso_idPermiso: this.listaPermisos[index],
-        };
-        this._usuarioPermisoService.addPermisoUsuario(permiso).subscribe((_addResult: unknown) => {});
+      } else {
+        doUpdate();
       }
     }
   }
 
   fileData: File | null = null;
-  previewUrl: any = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
-  fileProgress(fileInput: any): void {
-    this.fileData = <File>fileInput.target.files[0];
+  previewUrl: unknown = null;
+  fileProgress(fileInput: Event): void {
+    const input = fileInput.target as HTMLInputElement;
+    this.fileData = input.files?.[0] ?? null;
     this.preview();
   }
 
   preview(): void {
-    if (!this.fileData) {
-      return;
-    }
+    if (!this.fileData) return;
     const mimeType = this.fileData.type;
-    if (mimeType.match(/image\/*/) == null) {
-      return;
-    }
-
+    if (mimeType.match(/image\/*/) == null) return;
     const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
-    reader.addEventListener("load", (_event: ProgressEvent<FileReader>) => {
+    reader.addEventListener("load", () => {
       this.previewUrl = reader.result;
     });
   }
@@ -398,7 +260,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   return() {
-    if (localStorage.getItem("active-member") == "1") {
+    if (localStorage.getItem("active-member") === "1") {
       this._router.navigate(["dashboard/miembros-activos"]);
     } else {
       this._router.navigate(["dashboard/miembros-antiguos"]);
@@ -408,49 +270,26 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   private dialogRef2?: MatDialogRef<DialogCancel5>;
 
   openEraser(): void {
-    if (this.edit) {
-      this.dialogRef2 = this.dialog.open(DialogCancel5, {
-        width: "530px",
-        id: "idleTimer",
-        data: {
-          title: "Eliminar miembro",
-          text: "¿Estás seguro que deseas eliminar a este miembro del grupo?",
-          cancel: "Sí, eliminar",
-          yes: "No, cancelar",
-        },
-      });
-
-      this.dialogRef2.afterClosed().subscribe((result: boolean) => {
-        if (result) {
-          this.erasePermisos();
-        }
-      });
-    }
-  }
-
-  erasePermisos(): void {
-    let end = false;
-    for (let index = 0; index < this.permisosExistentes.length; index++) {
-      this._usuarioPermisoService
-        .deletePermisoUsuario({ usuario_DNI: this.permisosExistentes[index].usuario_DNI ?? "" })
-        .subscribe((_deleteResult: unknown) => {});
-      if (index == this.permisosExistentes.length - 1) {
-        end = true;
+    this.dialogRef2 = this.dialog.open(DialogCancel5, {
+      width: "530px",
+      id: "idleTimer",
+      data: {
+        title: "Eliminar miembro",
+        text: "¿Estás seguro que deseas eliminar a este miembro del grupo?",
+        cancel: "Sí, eliminar",
+        yes: "No, cancelar",
+      },
+    });
+    this.dialogRef2.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.eraseMember();
       }
-    }
-    if (this.permisosExistentes.length == 0) {
-      end = true;
-    }
-    if (end) {
-      this.eraseUser();
-    }
+    });
   }
 
-  eraseUser(): void {
-    if (this.member.foto)
-      this._usuarioService.deleteImage(String(this.member.foto)).subscribe((_deleteImageResult: unknown) => {});
-    this._usuarioService.deleteUsuario({ DNI: String(this.member.DNI ?? "") }).subscribe((result: StatusResponse) => {
-      if (result.status == 1) {
+  eraseMember(): void {
+    this._memberService.deleteMember(this.member.id).subscribe((result) => {
+      if (result.status === 1) {
         this.memberForm.markAsPristine();
         this.return();
         this.openSnackBar("Usuario eliminado exitosamente");

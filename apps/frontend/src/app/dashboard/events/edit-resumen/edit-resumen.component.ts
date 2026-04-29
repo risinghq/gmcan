@@ -20,22 +20,33 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { AuthorOption, SaveAuthorEntry } from "@app/shared/models/author";
-import type { AuthorFormRow } from "@app/shared/models/author-form";
+import type { AuthorEntry, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Evento } from "@app/shared/models/eventos";
-import { createPublicacion } from "@app/shared/models/factories";
-import type { Publicacion } from "@app/shared/models/publicacion";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { EventoService } from "@app/shared/services/evento.service";
-import { GLOBAL } from "@app/shared/services/global";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
+import type { EventItem } from "@app/shared/services/event.service";
+import { EventService } from "@app/shared/services/event.service";
+import { MemberService } from "@app/shared/services/member.service";
+import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
+
+interface AuthorSearchResult {
+  id: number;
+  name: string;
+  photo: string | null;
+}
+
+interface AuthorFormRow {
+  id: number;
+  name: string;
+  memberId: number | null;
+  myControl: FormControl<string>;
+  filteredOptions?: Observable<AuthorSearchResult[]>;
+}
 
 @Component({
   selector: "app-edit-resumen",
@@ -65,28 +76,25 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  private _publicacionService = inject(PublicacionService);
-  private _publicacionAutoresService = inject(PublicacionAutoresService);
+  private _publicationService = inject(PublicationService);
+  private _memberService = inject(MemberService);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _eventoService = inject(EventoService);
+  private _eventService = inject(EventService);
   private _session = inject(SessionService);
 
-  publicacion: Publicacion;
+  publicacion: PublicationWithAuthors & { publishedAtDate?: Date };
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
-  evento: Array<Evento> = [];
-  url: string;
+  eventos: EventItem[] = [];
   edit = true;
 
-  // Principal author
   selectedUser: string | null = null;
-  principalAuthor: AuthorOption | null = null;
+  principalMemberId: number | null = null;
   myControl = new FormControl<string>("");
-  options: AuthorOption[] = [];
-  filteredOptions!: Observable<AuthorOption[]>;
+  options: AuthorSearchResult[] = [];
+  filteredOptions!: Observable<AuthorSearchResult[]>;
 
-  // Co-authors
   otrosAutores: AuthorFormRow[] = [];
 
   constructor() {
@@ -99,8 +107,24 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
       resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
-    this.publicacion = createPublicacion();
-    this.url = GLOBAL.url;
+    this.publicacion = {
+      id: 0,
+      title: "",
+      file: null,
+      abstractES: null,
+      abstractEN: null,
+      journalIssue: null,
+      doi: null,
+      publishedAt: "",
+      typeId: 3,
+      journalId: null,
+      universityId: null,
+      eventId: null,
+      thesisTypeId: null,
+      updatedAt: null,
+      createdAt: null,
+      authors: [],
+    };
   }
 
   isDirty(): boolean {
@@ -112,81 +136,76 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   getResumen(): void {
-    const idArticulo = this._route.snapshot.params["id"];
-    this._publicacionService.getPublication(idArticulo).subscribe((result: any[]) => {
+    const idArticulo = Number(this._route.snapshot.params["id"]);
+    this._publicationService.getPublication(idArticulo).subscribe((result: PublicationWithAuthors) => {
       if (result) {
-        this.publicacion = result[0];
-        const d = new Date(result[0].fechaPublicacion);
+        this.publicacion = result;
+        const d = new Date(result.publishedAt);
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.publicacion.fechaPublicacionDate = d;
-        this.getEventos(idArticulo);
+        this.publicacion.publishedAtDate = d;
+        this.getEventos(result.authors);
       }
     });
   }
 
-  getEventos(idPublicacion: number): void {
-    this._eventoService.getEventoesAll().subscribe((result: Evento[]) => {
+  getEventos(authors: AuthorEntry[]): void {
+    this._eventService.listAdmin().subscribe((result: EventItem[]) => {
       if (result) {
-        this.evento = result;
-        this.loadAuthors(idPublicacion);
+        this.eventos = result;
+        this.loadAuthors(authors);
       }
     });
   }
 
-  loadAuthors(idPublicacion: number): void {
-    this._publicacionAutoresService.search().subscribe((allAuthors) => {
-      this.options = allAuthors;
+  loadAuthors(existingAuthors: AuthorEntry[]): void {
+    this._memberService.searchAuthors("").subscribe((allAuthors) => {
+      this.options = allAuthors as AuthorSearchResult[];
       this.filteredOptions = this.myControl.valueChanges.pipe(
         startWith(""),
         map((value) => this.filterAuthors(value ?? "")),
       );
 
-      this._publicacionAutoresService.getForPublication(idPublicacion).subscribe((authors) => {
-        const principal = authors.find((a) => a.isPrincipal === 0);
-        if (principal) {
-          this.selectedUser = principal.nombre;
-          this.principalAuthor = {
-            kind: principal.kind,
-            nombre: principal.nombre,
-            DNI: principal.DNI,
-            foto: principal.foto,
-          };
-          this.myControl.setValue(principal.nombre);
-        }
+      const principal = existingAuthors.find((a) => a.isPrincipal === 0);
+      if (principal) {
+        this.selectedUser = principal.name;
+        this.principalMemberId = principal.memberId ?? null;
+        this.myControl.setValue(principal.name);
+      }
 
-        const coAuthors = authors.filter((a) => a.isPrincipal > 0).toSorted((a, b) => a.isPrincipal - b.isPrincipal);
-        this.otrosAutores = coAuthors.map((a, i) => {
-          const row: AuthorFormRow = {
-            id: i + 1,
-            nombre: a.nombre,
-            option: { kind: a.kind, nombre: a.nombre, DNI: a.DNI, foto: a.foto },
-            myControl: new FormControl<string>(a.nombre, { nonNullable: true }),
-          };
-          row.filteredOptions = row.myControl.valueChanges.pipe(
-            startWith(""),
-            map((v) => this.filterAuthors(v ?? "")),
-          );
-          return row;
-        });
-
-        if (this.otrosAutores.length === 0) {
-          this.otrosAutores = [this.newCoAuthorRow()];
-          this.setupCoAuthorFilters();
-        }
+      const coAuthors = existingAuthors
+        .filter((a) => a.isPrincipal > 0)
+        .toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+      this.otrosAutores = coAuthors.map((a, i) => {
+        const row: AuthorFormRow = {
+          id: i + 1,
+          name: a.name,
+          memberId: a.memberId ?? null,
+          myControl: new FormControl<string>(a.name, { nonNullable: true }),
+        };
+        row.filteredOptions = row.myControl.valueChanges.pipe(
+          startWith(""),
+          map((v) => this.filterAuthors(v ?? "")),
+        );
+        return row;
       });
+
+      if (this.otrosAutores.length === 0) {
+        this.otrosAutores = [this.newCoAuthorRow()];
+        this.setupCoAuthorFilters();
+      }
     });
   }
 
-  private filterAuthors(value: string): AuthorOption[] {
+  private filterAuthors(value: string): AuthorSearchResult[] {
     const lower = value.toLowerCase();
-    return this.options.filter((o) => o.nombre.toLowerCase().includes(lower));
+    return this.options.filter((o) => o.name.toLowerCase().includes(lower));
   }
 
   private newCoAuthorRow(): AuthorFormRow {
     return {
       id: this.otrosAutores.length + 1,
-      nombre: "",
-      option: null,
+      name: "",
+      memberId: null,
       myControl: new FormControl<string>("", { nonNullable: true }),
     };
   }
@@ -200,29 +219,31 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
-  selectUser(evento: AuthorOption | { value: string }, value: number): void {
+  selectUser(author: AuthorSearchResult | { value: string }, value: number): void {
     if (value === 1) {
-      const author = evento as AuthorOption;
-      this.myControl.setValue(author.nombre);
-      this.selectedUser = author.nombre;
-      this.principalAuthor = author;
+      const a = author as AuthorSearchResult;
+      this.myControl.setValue(a.name);
+      this.selectedUser = a.name;
+      this.principalMemberId = a.id;
     } else {
-      const nombre = (evento as { value: string }).value;
-      this.principalAuthor = this.options.find((o) => o.nombre === nombre) ?? null;
+      const name = (author as { value: string }).value;
+      const found = this.options.find((o) => o.name === name) ?? null;
+      this.selectedUser = name;
+      this.principalMemberId = found?.id ?? null;
     }
   }
 
-  selectUserAutor(evento: AuthorOption | { value: string }, value: number, i: number): void {
+  selectUserAutor(author: AuthorSearchResult | { value: string }, value: number, i: number): void {
     if (value === 1) {
-      const author = evento as AuthorOption;
-      this.otrosAutores[i].option = author;
-      this.otrosAutores[i].nombre = author.nombre;
-      this.otrosAutores[i].myControl.setValue(author.nombre);
+      const a = author as AuthorSearchResult;
+      this.otrosAutores[i].memberId = a.id;
+      this.otrosAutores[i].name = a.name;
+      this.otrosAutores[i].myControl.setValue(a.name);
     } else {
-      const nombre = (evento as { value: string }).value;
-      const author = this.options.find((o) => o.nombre === nombre) ?? null;
-      this.otrosAutores[i].option = author;
-      this.otrosAutores[i].nombre = author?.nombre ?? nombre;
+      const name = (author as { value: string }).value;
+      const found = this.options.find((o) => o.name === name) ?? null;
+      this.otrosAutores[i].memberId = found?.id ?? null;
+      this.otrosAutores[i].name = name;
     }
   }
 
@@ -250,22 +271,21 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
 
-    const idPublicacion = Number(this.publicacion.idPublicacion ?? 0);
-    const momentDate = new Date(this.publicacion.fechaPublicacionDate ?? new Date());
-    this.publicacion.fechaPublicacion = new Date(momentDate).toLocaleDateString("sv");
+    const momentDate = new Date(this.publicacion.publishedAtDate ?? new Date());
+    const publishedAt = new Date(momentDate).toLocaleDateString("sv");
 
-    const data = {
-      titulo: this.publicacion.titulo ?? "",
-      resumen: this.publicacion.resumen,
-      resumenEN: this.publicacion.resumenEN,
-      DOI: this.publicacion.DOI,
-      fechaPublicacion: this.publicacion.fechaPublicacion ?? "",
-      tipoPublicacion_idTipoPublicacion: 3,
-      evento_idEvento: this.publicacion.evento_idEvento,
+    const data: PublicationFields = {
+      title: this.publicacion.title,
+      abstractES: this.publicacion.abstractES ?? undefined,
+      abstractEN: this.publicacion.abstractEN ?? undefined,
+      doi: this.publicacion.doi ?? undefined,
+      publishedAt,
+      typeId: 3,
+      eventId: this.publicacion.eventId ?? undefined,
     };
 
-    this._publicacionService.update(idPublicacion, data, this.buildSaveList()).subscribe((updateResponse) => {
-      if (updateResponse.status === 1) {
+    this._publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((result) => {
+      if (result.status === 1) {
         this.publicacionForm.markAsPristine();
         this.return();
         this.openSnackBar("Resumen actualizado exitosamente");
@@ -276,20 +296,18 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   private buildSaveList(): SaveAuthorEntry[] {
     const entries: SaveAuthorEntry[] = [];
 
-    const resolvedPrincipal = this.principalAuthor?.nombre === this.selectedUser ? this.principalAuthor : null;
-    if (resolvedPrincipal?.kind === "registered" && resolvedPrincipal.DNI) {
-      entries.push({ kind: "registered", DNI: resolvedPrincipal.DNI, isPrincipal: 0 });
-    } else {
-      entries.push({ kind: "external", nombre: this.selectedUser!, isPrincipal: 0 });
+    if (this.principalMemberId) {
+      entries.push({ kind: "registered", memberId: this.principalMemberId, isPrincipal: 0 });
+    } else if (this.selectedUser) {
+      entries.push({ kind: "external", externalName: this.selectedUser, isPrincipal: 0 });
     }
 
     this.otrosAutores.forEach((row, i) => {
-      if (!row.nombre) return;
-      const opt = row.option?.nombre === row.nombre ? row.option : null;
-      if (opt?.kind === "registered" && opt.DNI) {
-        entries.push({ kind: "registered", DNI: opt.DNI, isPrincipal: i + 1 });
+      if (!row.name) return;
+      if (row.memberId) {
+        entries.push({ kind: "registered", memberId: row.memberId, isPrincipal: i + 1 });
       } else {
-        entries.push({ kind: "external", nombre: row.nombre, isPrincipal: i + 1 });
+        entries.push({ kind: "external", externalName: row.name, isPrincipal: i + 1 });
       }
     });
 
@@ -297,9 +315,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   erasePublicacion(): void {
-    const idPublicacion = Number(this.publicacion.idPublicacion ?? 0);
-    this._publicacionService.delete(idPublicacion).subscribe((deleteResponse) => {
-      if (deleteResponse.status === 1) {
+    this._publicationService.deletePublication(this.publicacion.id).subscribe((result) => {
+      if (result.status === 1) {
         this.publicacionForm.markAsPristine();
         this.return();
         this.openSnackBar("Resumen eliminado exitosamente");

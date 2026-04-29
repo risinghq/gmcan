@@ -1,10 +1,11 @@
-import type { Noticia } from "@app/shared/models/noticia";
-import type { Usuario } from "@app/shared/models/usuario";
+import type { News } from "@app/shared/models/news";
 
 export type DetailNewsViewModel = {
-  noticia: Noticia;
-  usuario: Usuario | null;
+  noticia: News;
   tipoNoticia: string;
+  autorName: string;
+  autorPhoto: string | null;
+  autorId: number | null;
   dia: string;
   mes: string;
   anio: string;

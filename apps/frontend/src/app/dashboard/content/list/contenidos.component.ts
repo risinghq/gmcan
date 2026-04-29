@@ -21,22 +21,17 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { SobreNosotros } from "@app/shared/models/aboutus";
-import type { Equipo } from "@app/shared/models/equipo";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import type { About } from "@app/shared/models/about";
+import type { Equipment } from "@app/shared/models/equipment";
+import { createGroup, type Group } from "@app/shared/models/factories";
 import { Languages } from "@app/shared/models/languages";
-import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
 import type { Method } from "@app/shared/models/method";
+import type { ResearchLine } from "@app/shared/models/research-line";
 import type { Software } from "@app/shared/models/software";
-import { AboutUsService } from "@app/shared/services/aboutus.service";
-import { CommonService } from "@app/shared/services/common.service";
-import { EquipoService } from "@app/shared/services/equipo.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
-import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { MethodsService } from "@app/shared/services/methods.service";
-import { SoftwareService } from "@app/shared/services/software.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
@@ -70,25 +65,21 @@ import { AutosizeModule } from "ngx-autosize";
   ],
 })
 export default class ContenidosComponent implements OnInit {
-  private _aboutService = inject(AboutUsService);
   formBuilder = inject(FormBuilder);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _commonService = inject(CommonService);
-  private _lineasInvestigaciónService = inject(LineasInvestigacionService);
+  private _researchLinesService = inject(ResearchLinesService);
   private _metodosService = inject(MethodsService);
-  private _grupoService = inject(GrupoService);
-  private _equipoService = inject(EquipoService);
-  private _softwareService = inject(SoftwareService);
+  private _groupService = inject(GroupService);
   private _tabState = inject(TabStateService);
 
   public Editor = ClassicEditor;
   displayedColumns: string[] = ["nombre"];
   displayedColumns2: string[] = ["nombre"];
   url: string;
-  aboutUs: SobreNosotros;
+  aboutUs: About;
   public descripcionForm: FormGroup;
   public objetivosForm: FormGroup;
   public serviciosForm: FormGroup;
@@ -98,71 +89,64 @@ export default class ContenidosComponent implements OnInit {
   presentacionForm: FormGroup;
   publicacionesForm: FormGroup;
   proyectosForm: FormGroup;
-  lineasInvestigaciones: Array<LineasInvestigacion> = [];
-  dataSource: MatTableDataSource<LineasInvestigacion> = new MatTableDataSource<LineasInvestigacion>([]);
+  dataSource: MatTableDataSource<ResearchLine> = new MatTableDataSource<ResearchLine>([]);
   dataSource2: MatTableDataSource<Method> = new MatTableDataSource<Method>([]);
-  dataSource3: MatTableDataSource<Equipo> = new MatTableDataSource<Equipo>([]);
+  dataSource3: MatTableDataSource<Equipment> = new MatTableDataSource<Equipment>([]);
   dataSource4: MatTableDataSource<Software> = new MatTableDataSource<Software>([]);
-  facilidadesRecursos: Grupo;
-  trabajosFuturos: Grupo;
-  informacionExtra: Grupo;
+  group: Group;
 
   constructor() {
     this.aboutUs = {
-      idSobreNosotros: 0,
-      quienesSomos: "",
-      quienesSomosEN: "",
-      foto: "",
-      objetivos: "",
-      objetivosEN: "",
-      servicios: "",
-      serviciosEN: "",
-      grupo_idGrupo: 0,
+      id: 0,
+      descriptionES: "",
+      descriptionEN: "",
+      objectivesES: null,
+      objectivesEN: null,
+      servicesES: null,
+      servicesEN: null,
+      photo: null,
+      groupId: 0,
+      createdAt: null,
+      updatedAt: null,
     };
-    this.facilidadesRecursos = createGrupo();
-    this.trabajosFuturos = createGrupo();
-    this.informacionExtra = createGrupo();
+    this.group = createGroup();
     this.descripcionForm = this.formBuilder.group({
-      quienesSomos: ["", Validators.required],
-      quienesSomosEN: ["", Validators.required],
-      foto: ["", Validators.required],
+      descriptionES: ["", Validators.required],
+      descriptionEN: ["", Validators.required],
+      photo: ["", Validators.required],
     });
     this.objetivosForm = this.formBuilder.group({
-      objetivos: ["", Validators.required],
-      objetivosEN: ["", Validators.required],
+      objectivesES: ["", Validators.required],
+      objectivesEN: ["", Validators.required],
     });
     this.serviciosForm = this.formBuilder.group({
-      servicios: ["", Validators.required],
-      serviciosEN: ["", Validators.required],
+      servicesES: ["", Validators.required],
+      servicesEN: ["", Validators.required],
     });
     this.facilidadesRecursosForm = this.formBuilder.group({
-      facilidadesRecursos: ["", Validators.required],
-      facilidadesRecursosEN: ["", Validators.required],
-      facilidadesRecursosFoto: ["", Validators.required],
+      facilitiesES: ["", Validators.required],
+      facilitiesEN: ["", Validators.required],
+      facilitiesPhoto: ["", Validators.required],
     });
     this.trabajosFuturosForm = this.formBuilder.group({
-      trabajosFuturos: ["", Validators.required],
-      trabajosFuturosEN: ["", Validators.required],
-    });
-    this.trabajosFuturosForm = this.formBuilder.group({
-      trabajosFuturos: ["", Validators.required],
-      trabajosFuturosEN: ["", Validators.required],
+      futureWorkES: ["", Validators.required],
+      futureWorkEN: ["", Validators.required],
     });
     this.footerForm = this.formBuilder.group({
-      correo: ["", Validators.required],
-      telefono: ["", Validators.required],
+      email: ["", Validators.required],
+      phone: ["", Validators.required],
     });
     this.presentacionForm = this.formBuilder.group({
-      quienesSomosResumen: ["", Validators.required],
-      quienesSomosResumenEN: ["", Validators.required],
+      summaryES: ["", Validators.required],
+      summaryEN: ["", Validators.required],
     });
     this.publicacionesForm = this.formBuilder.group({
-      seccionPublicaciones: ["", Validators.required],
-      seccionPublicacionesEN: ["", Validators.required],
+      publicationsSectionES: ["", Validators.required],
+      publicationsSectionEN: ["", Validators.required],
     });
     this.proyectosForm = this.formBuilder.group({
-      seccionProyectos: ["", Validators.required],
-      seccionProyectosEN: ["", Validators.required],
+      projectsSectionES: ["", Validators.required],
+      projectsSectionEN: ["", Validators.required],
     });
     this.url = GLOBAL.url;
   }
@@ -187,14 +171,16 @@ export default class ContenidosComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedTab = this._tabState.contenidosTab();
-    this.getContenidos();
+    this._groupService.listGroups().subscribe((res) => {
+      if (res.length > 0) {
+        this.group = res[0];
+        this.getContenidos();
+        this.getEquipos();
+        this.getSoftware();
+      }
+    });
     this.getLineasInvestigación();
     this.getMetodos();
-    this.getFacilidadesyRecursos();
-    this.getEquipos();
-    this.getSoftware();
-    this.getTrabajosFuturos();
-    this.getInformaciónExtra();
   }
 
   changedTab(event: number): void {
@@ -202,13 +188,10 @@ export default class ContenidosComponent implements OnInit {
   }
 
   getLineasInvestigación(): void {
-    this._lineasInvestigaciónService.getLineasInvestigacion().subscribe((res: LineasInvestigacion[]) => {
+    this._researchLinesService.listAdmin().subscribe((res: ResearchLine[]) => {
       if (res.length > 0) {
-        res.sort((a: LineasInvestigacion, b: LineasInvestigacion) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
-        );
-        this.lineasInvestigaciones = res;
-        this.dataSource = new MatTableDataSource(this.lineasInvestigaciones);
+        res.sort((a, b) => (a.name > b.name ? 1 : b.name < a.name ? -1 : 0));
+        this.dataSource = new MatTableDataSource(res);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
       }
@@ -248,11 +231,9 @@ export default class ContenidosComponent implements OnInit {
   }
 
   getMetodos(): void {
-    this._metodosService.getMethods().subscribe((res: Method[]) => {
+    this._metodosService.listAdmin().subscribe((res: Method[]) => {
       if (res.length > 0) {
-        res.sort((a: Method, b: Method) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
-        );
+        res.sort((a, b) => (a.name > b.name ? 1 : b.name < a.name ? -1 : 0));
         this.dataSource2 = new MatTableDataSource(res);
         this.dataSource2.sort = this.sort2();
         this.dataSource2.paginator = this.paginator2();
@@ -266,11 +247,7 @@ export default class ContenidosComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   applyFilter2(event: Event) {
@@ -279,11 +256,7 @@ export default class ContenidosComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
+    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
   }
 
   applyFilter3(event: Event) {
@@ -292,11 +265,7 @@ export default class ContenidosComponent implements OnInit {
     if (this.dataSource3.paginator) {
       this.dataSource3.paginator.firstPage();
     }
-    if (this.dataSource3.filteredData.length == 0) {
-      this.displayedNotFound3 = true;
-    } else {
-      this.displayedNotFound3 = false;
-    }
+    this.displayedNotFound3 = this.dataSource3.filteredData.length === 0;
   }
 
   applyFilter4(event: Event) {
@@ -305,128 +274,11 @@ export default class ContenidosComponent implements OnInit {
     if (this.dataSource4.paginator) {
       this.dataSource4.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound4 = true;
-    } else {
-      this.displayedNotFound4 = false;
-    }
-  }
-
-  getFacilidadesyRecursos(): void {
-    this._grupoService.getFacilidadesRecursos().subscribe((res: Grupo[]) => {
-      if (res.length > 0) {
-        this.facilidadesRecursos = res[0];
-      }
-    });
-  }
-
-  submitFacilidadesyRecursos(): void {
-    this._grupoService.updateRecursos(this.facilidadesRecursos).subscribe((res: any) => {
-      if (res.status == 1) {
-        if (this.fileData2) {
-          this._grupoService
-            .uploadFacilidadesFoto(this.fileData2, this.facilidadesRecursos.idGrupo ?? 0)
-            .subscribe((_res: any) => {});
-        }
-        this.openSnackBar("Información actualizado exitosamente");
-      }
-    });
-  }
-
-  getTrabajosFuturos(): void {
-    this._grupoService.getTrabajosFuturos().subscribe((res: Grupo[]) => {
-      if (res.length > 0) {
-        this.trabajosFuturos = res[0];
-      }
-    });
-  }
-
-  submitTrabajosFuturos(): void {
-    this._grupoService.updateTrabajosFuturos(this.trabajosFuturos).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.openSnackBar("Información actualizado exitosamente");
-      }
-    });
-  }
-
-  getInformaciónExtra(): void {
-    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
-      if (res.length > 0) {
-        this.informacionExtra = res[0];
-      }
-    });
-  }
-
-  submitSeccionInfo(): void {
-    this._grupoService.updateSeccionInfo(this.informacionExtra).subscribe((res: any) => {
-      if (res.status == 1) {
-        if (this.fileData3) {
-          this._grupoService
-            .uploadHeaderLogo(this.fileData3, this.informacionExtra.idGrupo ?? 0)
-            .subscribe((_res: any) => {});
-        }
-        if (this.fileData4) {
-          this._grupoService
-            .uploadFooterLogo(this.fileData4, this.informacionExtra.idGrupo ?? 0)
-            .subscribe((_res: any) => {});
-        }
-        this.openSnackBar("Información actualizado exitosamente");
-      }
-    });
-  }
-
-  submitSeccionPresentacion(): void {
-    this._grupoService.updateSeccionPresentacion(this.informacionExtra).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.openSnackBar("Información actualizado exitosamente");
-      }
-    });
-  }
-
-  submitSeccionPublicaciones(): void {
-    this._grupoService.updateSeccionPublicaciones(this.informacionExtra).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.openSnackBar("Información actualizado exitosamente");
-      }
-    });
-  }
-
-  submitSeccionProyectos(): void {
-    this._grupoService.updateSeccionProyectos(this.informacionExtra).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.openSnackBar("Información actualizado exitosamente");
-      }
-    });
-  }
-
-  getEquipos(): void {
-    this._equipoService.getEquipos().subscribe((res: Equipo[]) => {
-      if (res.length > 0) {
-        res.sort((a: Equipo, b: Equipo) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
-        );
-        this.dataSource3 = new MatTableDataSource(res);
-        this.dataSource3.sort = this.sort3();
-        this.dataSource3.paginator = this.paginator3();
-      }
-    });
-  }
-
-  getSoftware(): void {
-    this._softwareService.getSoftware().subscribe((res: Software[]) => {
-      if (res.length > 0) {
-        res.sort((a: Software, b: Software) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") < (a.nombre ?? "") ? -1 : 0,
-        );
-        this.dataSource4 = new MatTableDataSource(res);
-        this.dataSource4.sort = this.sort4();
-        this.dataSource4.paginator = this.paginator4();
-      }
-    });
+    this.displayedNotFound4 = this.dataSource4.filteredData.length === 0;
   }
 
   getContenidos(): void {
-    this._aboutService.getAboutUsInfo().subscribe((res: SobreNosotros[]) => {
+    this._groupService.listAbout(this.group.id).subscribe((res: About[]) => {
       if (res.length > 0) {
         this.aboutUs = res[0];
       }
@@ -434,30 +286,154 @@ export default class ContenidosComponent implements OnInit {
   }
 
   submitQuienesSomos(): void {
-    this._aboutService.updateDescripcion(this.aboutUs).subscribe((res: any) => {
-      if (res.status == 1) {
-        if (this.fileData) {
-          this._aboutService
-            .uploadGrupoFoto(this.fileData, this.aboutUs.idSobreNosotros ?? 0)
-            .subscribe((_res: any) => {});
+    this._groupService
+      .updateAboutDescription(this.aboutUs.id, {
+        descriptionES: this.aboutUs.descriptionES,
+        descriptionEN: this.aboutUs.descriptionEN,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          if (this.fileData) {
+            this._groupService.uploadAboutPhoto(this.aboutUs.id, this.fileData).subscribe(() => {});
+          }
+          this.openSnackBar("Contenido actualizado exitosamente");
         }
-        this.openSnackBar("Contenido actualizado exitosamente");
-      }
-    });
+      });
   }
 
   submitObjetivos(): void {
-    this._aboutService.updateObjetivos(this.aboutUs).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.openSnackBar("Contenido actualizado exitosamente");
+    this._groupService
+      .updateAboutObjectives(this.aboutUs.id, {
+        objectivesES: this.aboutUs.objectivesES ?? undefined,
+        objectivesEN: this.aboutUs.objectivesEN ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          this.openSnackBar("Contenido actualizado exitosamente");
+        }
+      });
+  }
+
+  submitServicios(): void {
+    this._groupService
+      .updateAboutServices(this.aboutUs.id, {
+        servicesES: this.aboutUs.servicesES ?? undefined,
+        servicesEN: this.aboutUs.servicesEN ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          this.openSnackBar("Contenido actualizado exitosamente");
+        }
+      });
+  }
+
+  submitFacilidadesyRecursos(): void {
+    this._groupService
+      .updateFacilities(this.group.id, {
+        facilitiesES: this.group.facilitiesES ?? undefined,
+        facilitiesEN: this.group.facilitiesEN ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          if (this.fileData2) {
+            this._groupService.uploadFile(this.group.id, "facilities", this.fileData2).subscribe(() => {});
+          }
+          this.openSnackBar("Información actualizada exitosamente");
+        }
+      });
+  }
+
+  submitTrabajosFuturos(): void {
+    this._groupService
+      .updateFutureWork(this.group.id, {
+        futureWorkES: this.group.futureWorkES ?? undefined,
+        futureWorkEN: this.group.futureWorkEN ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          this.openSnackBar("Información actualizada exitosamente");
+        }
+      });
+  }
+
+  submitSeccionInfo(): void {
+    this._groupService
+      .updateInfo(this.group.id, {
+        email: this.group.email ?? undefined,
+        phone: this.group.phone ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          if (this.fileData3) {
+            this._groupService.uploadFile(this.group.id, "header", this.fileData3).subscribe(() => {});
+          }
+          if (this.fileData4) {
+            this._groupService.uploadFile(this.group.id, "footer", this.fileData4).subscribe(() => {});
+          }
+          this.openSnackBar("Información actualizada exitosamente");
+        }
+      });
+  }
+
+  submitSeccionPresentacion(): void {
+    this._groupService
+      .updateSummary(this.group.id, {
+        summaryES: this.group.summaryES,
+        summaryEN: this.group.summaryEN,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          this.openSnackBar("Información actualizada exitosamente");
+        }
+      });
+  }
+
+  submitSeccionPublicaciones(): void {
+    this._groupService
+      .updatePublicationsSection(this.group.id, {
+        publicationsSectionES: this.group.publicationsSectionES ?? undefined,
+        publicationsSectionEN: this.group.publicationsSectionEN ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          this.openSnackBar("Información actualizada exitosamente");
+        }
+      });
+  }
+
+  submitSeccionProyectos(): void {
+    this._groupService
+      .updateProjectsSection(this.group.id, {
+        projectsSectionES: this.group.projectsSectionES ?? undefined,
+        projectsSectionEN: this.group.projectsSectionEN ?? undefined,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) {
+          this.openSnackBar("Información actualizada exitosamente");
+        }
+      });
+  }
+
+  getEquipos(): void {
+    this._groupService.listEquipment(this.group.id).subscribe((res) => {
+      const items = res as Equipment[];
+      if (items.length > 0) {
+        items.sort((a, b) => (a.name > b.name ? 1 : b.name < a.name ? -1 : 0));
+        this.dataSource3 = new MatTableDataSource(items);
+        this.dataSource3.sort = this.sort3();
+        this.dataSource3.paginator = this.paginator3();
       }
     });
   }
 
-  submitServicios(): void {
-    this._aboutService.updateServicios(this.aboutUs).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.openSnackBar("Contenido actualizado exitosamente");
+  getSoftware(): void {
+    this._groupService.listSoftware(this.group.id).subscribe((res) => {
+      const items = res as Software[];
+      if (items.length > 0) {
+        items.sort((a, b) => ((a.name ?? "") > (b.name ?? "") ? 1 : (b.name ?? "") < (a.name ?? "") ? -1 : 0));
+        this.dataSource4 = new MatTableDataSource(items);
+        this.dataSource4.sort = this.sort4();
+        this.dataSource4.paginator = this.paginator4();
       }
     });
   }
@@ -478,6 +454,7 @@ export default class ContenidosComponent implements OnInit {
   previewUrl3: string | ArrayBuffer | null = null;
   fileData4: File | null = null;
   previewUrl4: string | ArrayBuffer | null = null;
+
   fileProgress(fileInput: Event, id: number): void {
     const target = fileInput.target as HTMLInputElement | null;
     const file = target?.files?.[0] ?? null;
@@ -499,102 +476,67 @@ export default class ContenidosComponent implements OnInit {
         this.fileData4 = file;
         this.preview(id);
         break;
-      default:
-        break;
     }
   }
 
   preview(id: number): void {
     switch (id) {
       case 1:
-        if (!this.fileData) return;
-        const mimeType = this.fileData.type;
-        if (mimeType.match(/image\/*/) == null) {
-          return;
-        }
-        const reader = new FileReader();
-        reader.readAsDataURL(this.fileData);
-        reader.addEventListener("load", (_event) => {
-          this.previewUrl = reader.result;
-        });
+        if (this.fileData) this.readImageFile(this.fileData, (url) => (this.previewUrl = url));
         break;
       case 2:
-        if (!this.fileData2) return;
-        const mimeType2 = this.fileData2.type;
-        if (mimeType2.match(/image\/*/) == null) {
-          return;
-        }
-        const reader2 = new FileReader();
-        reader2.readAsDataURL(this.fileData2);
-        reader2.addEventListener("load", (_event) => {
-          this.previewUrl2 = reader2.result;
-        });
+        if (this.fileData2) this.readImageFile(this.fileData2, (url) => (this.previewUrl2 = url));
         break;
       case 3:
-        if (!this.fileData3) return;
-        const mimeType3 = this.fileData3.type;
-        if (mimeType3.match(/image\/*/) == null) {
-          return;
-        }
-        const reader3 = new FileReader();
-        reader3.readAsDataURL(this.fileData3);
-        reader3.addEventListener("load", (_event) => {
-          this.previewUrl3 = reader3.result;
-        });
+        if (this.fileData3) this.readImageFile(this.fileData3, (url) => (this.previewUrl3 = url));
         break;
       case 4:
-        if (!this.fileData4) return;
-        const mimeType4 = this.fileData4.type;
-        if (mimeType4.match(/image\/*/) == null) {
-          return;
-        }
-        const reader4 = new FileReader();
-        reader4.readAsDataURL(this.fileData4);
-        reader4.addEventListener("load", (_event) => {
-          this.previewUrl4 = reader4.result;
-        });
-        break;
-      default:
+        if (this.fileData4) this.readImageFile(this.fileData4, (url) => (this.previewUrl4 = url));
         break;
     }
+  }
+
+  private readImageFile(file: File, onLoad: (url: string | ArrayBuffer | null) => void): void {
+    if (!file.type.match(/image\/*/)) return;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.addEventListener("load", () => onLoad(reader.result));
   }
 
   private previewDialog?: MatDialogRef<DialogPreview3>;
 
   previewAboutUs(value: number): void {
-    const aboutus: SobreNosotros = JSON.parse(JSON.stringify(this.aboutUs));
+    const about: About = JSON.parse(JSON.stringify(this.aboutUs));
     localStorage.setItem("langLocale", "0");
-    if (value == 1) {
-      aboutus.objetivos = aboutus.objetivosEN;
-      aboutus.servicios = aboutus.serviciosEN;
-      aboutus.quienesSomos = aboutus.quienesSomosEN;
+    if (value === 1) {
+      about.objectivesES = about.objectivesEN;
+      about.servicesES = about.servicesEN;
+      about.descriptionES = about.descriptionEN;
       localStorage.setItem("langLocale", "1");
     }
     this.previewDialog = this.dialog.open(DialogPreview3, {
       width: "871px",
       id: "previewAboutUs",
-      data: aboutus,
+      data: about,
     });
-
     this.previewDialog.afterClosed().subscribe(() => {});
   }
 
   private previewDialog2?: MatDialogRef<DialogPreview6>;
 
   previewTrabajosFuturos(value: number): void {
-    const aboutus: Grupo = JSON.parse(JSON.stringify(this.trabajosFuturos));
+    const group: Group = JSON.parse(JSON.stringify(this.group));
     localStorage.setItem("langLocale", "0");
-    if (value == 1) {
-      aboutus.trabajosFuturos = aboutus.trabajosFuturosEN;
+    if (value === 1) {
+      group.futureWorkES = group.futureWorkEN;
       localStorage.setItem("langLocale", "1");
     }
-    this.previewDialog = this.dialog.open(DialogPreview6, {
+    this.previewDialog2 = this.dialog.open(DialogPreview6, {
       width: "871px",
       id: "previewTrabajosFuturos",
-      data: aboutus,
+      data: group,
     });
-
-    this.previewDialog.afterClosed().subscribe(() => {});
+    this.previewDialog2.afterClosed().subscribe(() => {});
   }
 }
 
@@ -606,7 +548,7 @@ export default class ContenidosComponent implements OnInit {
 })
 export class DialogPreview3 {
   dialogRef = inject<MatDialogRef<DialogPreview3>>(MatDialogRef);
-  aboutus = inject<SobreNosotros>(MAT_DIALOG_DATA);
+  aboutus = inject<About>(MAT_DIALOG_DATA);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
 
@@ -617,7 +559,7 @@ export class DialogPreview3 {
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem("langLocale") == "0") {
+    if (localStorage.getItem("langLocale") === "0") {
       this.language = Languages[0];
     } else {
       this.language = Languages[1];
@@ -625,9 +567,9 @@ export class DialogPreview3 {
     const services = document.getElementById("services");
     const whoAre = document.getElementById("whoAre");
     const objectives = document.getElementById("objectives");
-    if (services) services.innerHTML = this.aboutus.servicios ?? "";
-    if (whoAre) whoAre.innerHTML = this.aboutus.quienesSomos ?? "";
-    if (objectives) objectives.innerHTML = this.aboutus.objetivos ?? "";
+    if (services) services.innerHTML = this.aboutus.servicesES ?? "";
+    if (whoAre) whoAre.innerHTML = this.aboutus.descriptionES ?? "";
+    if (objectives) objectives.innerHTML = this.aboutus.objectivesES ?? "";
   }
 }
 
@@ -639,7 +581,7 @@ export class DialogPreview3 {
 })
 export class DialogPreview6 {
   dialogRef = inject<MatDialogRef<DialogPreview6>>(MatDialogRef);
-  aboutus = inject<Grupo>(MAT_DIALOG_DATA);
+  aboutus = inject<Group>(MAT_DIALOG_DATA);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
 
@@ -650,14 +592,14 @@ export class DialogPreview6 {
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem("langLocale") == "0") {
+    if (localStorage.getItem("langLocale") === "0") {
       this.language = Languages[0];
     } else {
       this.language = Languages[1];
     }
     const works = document.getElementById("works");
     if (works) {
-      works.innerHTML = this.aboutus.trabajosFuturos ?? "";
+      works.innerHTML = this.aboutus.futureWorkES ?? "";
     }
   }
 }

@@ -17,12 +17,14 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { Publicacion } from "@app/shared/models/publicacion";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+
+interface PublicationRow extends PublicationWithAuthors {
+  fecha?: string;
+}
 
 @Component({
   selector: "app-my-article",
@@ -47,17 +49,15 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 })
 export default class MyArticleComponent implements OnInit {
   _router = inject(Router);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _publicacionAutoresService = inject(PublicacionAutoresService);
-  private _usuarioService = inject(UsuarioService);
-  _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
+  private _auth = inject(AuthService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
-  dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
+  dataSource: MatTableDataSource<PublicationRow> = new MatTableDataSource<PublicationRow>([]);
 
-  articulos: Publicacion[] = [];
+  articulos: PublicationRow[] = [];
   url: string;
 
   constructor() {
@@ -72,49 +72,25 @@ export default class MyArticleComponent implements OnInit {
   }
 
   getUserArticles(): void {
-    const user = this._usuarioService.getUserLogged();
-    this.getPermisoHasUsuario(user?.DNI ?? "");
-    this._publicacionAutoresService.getByUser(user?.DNI ?? "").subscribe((res) => {
+    const user = this._auth.getUser();
+    if (!user) return;
+    this._publicationService.listPublications({ type: 1 }).subscribe((res) => {
       if (res) {
-        this.articulos = [];
-        for (const item of res) {
-          this.getArticle(item.publicacion_idPublicacion);
-        }
-      }
-    });
-  }
-
-  getArticle(idPublicacion: number): void {
-    this._publicacionService.getPublication(idPublicacion).subscribe((res: Publicacion[]) => {
-      if (res[0]) {
-        if (res[0].tipoPublicacion_idTipoPublicacion === 1) {
-          this.articulos.push(res[0]);
-          this.articulos.sort((a: Publicacion, b: Publicacion) =>
-            (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-              ? 1
-              : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-                ? -1
-                : 0,
-          );
-          for (const articulo of this.articulos) {
-            const d = new Date(articulo.fechaPublicacion ?? "");
-            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-            articulo.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-            articulo.fecha = this.titlecasePipe.transform(articulo.fecha ?? "");
-            articulo.autor = [];
-            this.getAuthors(articulo);
-          }
-        }
+        const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
+        const sorted = mine.toSorted((a, b) =>
+          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
+        );
+        this.articulos = sorted.map((pub) => {
+          const row: PublicationRow = Object.assign({} as PublicationRow, pub);
+          const d = new Date(pub.publishedAt);
+          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+          row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
+          return row;
+        });
         this.dataSource = new MatTableDataSource(this.articulos);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
       }
-    });
-  }
-
-  getAuthors(publicacion: Publicacion): void {
-    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
-      publicacion.autor = authors;
     });
   }
 
@@ -126,25 +102,7 @@ export default class MyArticleComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
-  }
-
-  publicacionPermiso = false;
-
-  getPermisoHasUsuario(DNI: string): void {
-    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: { permiso_idPermiso?: number }[]) => {
-      if (res.length > 0) {
-        for (const permiso of res) {
-          if (permiso.permiso_idPermiso === 3) {
-            this.publicacionPermiso = true;
-          }
-        }
-      }
-    });
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   addArticle(): void {
@@ -153,13 +111,7 @@ export default class MyArticleComponent implements OnInit {
   }
 
   editArticulo(id: number): void {
-    this._publicacionAutoresService.getForPublication(id).subscribe((authors) => {
-      const user = this._usuarioService.getUserLogged();
-      const isPrincipal = authors.some((a) => a.kind === "registered" && a.DNI === user?.DNI && a.isPrincipal === 0);
-      if (isPrincipal || this.publicacionPermiso) {
-        localStorage.setItem("article-back", "my-articles");
-        this._router.navigate(["dashboard/edit-article/" + id]);
-      }
-    });
+    localStorage.setItem("article-back", "my-articles");
+    this._router.navigate(["dashboard/edit-article/" + id]);
   }
 }

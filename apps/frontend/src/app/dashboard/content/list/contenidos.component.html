@@ -12,14 +12,14 @@
                   <img class="img-set" src="{{ previewUrl }}" />
                 </div>
               }
-              @if (!previewUrl && !aboutUs.foto) {
+              @if (!previewUrl && !aboutUs.photo) {
                 <div class="grupal-img">
                   <img class="img-set" src="../../assets/img/grupal.jpg" />
                 </div>
               }
-              @if (aboutUs.foto && !previewUrl) {
+              @if (aboutUs.photo && !previewUrl) {
                 <div class="img-preview">
-                  <img class="img-set" src="{{ url + 'sobrenosotros/' + aboutUs.idSobreNosotros + '/file }}" />
+                  <img class="img-set" src="{{ url + 'api/group/about/' + aboutUs.id + '/photo' }}" />
                 </div>
               }
               <div class="green-text ml-16 mt-auto">
@@ -42,9 +42,9 @@
             </div>
             <ckeditor
               [editor]="Editor"
-              [(ngModel)]="aboutUs.quienesSomos"
-              formControlName="quienesSomos"
-              name="quienesSomos"
+              [(ngModel)]="aboutUs.descriptionES"
+              formControlName="descriptionES"
+              name="descriptionES"
             />
           </div>
           <div class="full-width mb-24">
@@ -54,9 +54,9 @@
             </div>
             <ckeditor
               [editor]="Editor"
-              [(ngModel)]="aboutUs.quienesSomosEN"
-              formControlName="quienesSomosEN"
-              name="quienesSomosEN"
+              [(ngModel)]="aboutUs.descriptionEN"
+              formControlName="descriptionEN"
+              name="descriptionEN"
             />
           </div>
           <div class="right black-btn mb-12">
@@ -70,7 +70,12 @@
               <div class="text-category">Objetivos en español <span class="red-text">*</span></div>
               <div class="green-text right plex-sans" (click)="previewAboutUs(0)">Vista Previa</div>
             </div>
-            <ckeditor [editor]="Editor" [(ngModel)]="aboutUs.objetivos" formControlName="objetivos" name="objetivos" />
+            <ckeditor
+              [editor]="Editor"
+              [(ngModel)]="aboutUs.objectivesES"
+              formControlName="objectivesES"
+              name="objectivesES"
+            />
           </div>
           <div class="full-width mb-24">
             <div class="flex-news">
@@ -79,9 +84,9 @@
             </div>
             <ckeditor
               [editor]="Editor"
-              [(ngModel)]="aboutUs.objetivosEN"
-              formControlName="objetivosEN"
-              name="objetivosEN"
+              [(ngModel)]="aboutUs.objectivesEN"
+              formControlName="objectivesEN"
+              name="objectivesEN"
             />
           </div>
           <div class="right black-btn mb-12">
@@ -95,7 +100,12 @@
               <div class="text-category">Servicios en español <span class="red-text">*</span></div>
               <div class="green-text right plex-sans" (click)="previewAboutUs(0)">Vista Previa</div>
             </div>
-            <ckeditor [editor]="Editor" [(ngModel)]="aboutUs.servicios" formControlName="servicios" name="servicios" />
+            <ckeditor
+              [editor]="Editor"
+              [(ngModel)]="aboutUs.servicesES"
+              formControlName="servicesES"
+              name="servicesES"
+            />
           </div>
           <div class="full-width mb-24">
             <div class="flex-news">
@@ -104,9 +114,9 @@
             </div>
             <ckeditor
               [editor]="Editor"
-              [(ngModel)]="aboutUs.serviciosEN"
-              formControlName="serviciosEN"
-              name="serviciosEN"
+              [(ngModel)]="aboutUs.servicesEN"
+              formControlName="servicesEN"
+              name="servicesEN"
             />
           </div>
           <div class="right black-btn mb-12">
@@ -131,8 +141,8 @@
         <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let row" (click)="editLinea(row.idLineasInvestigacion)">
-              {{ row.nombre }}
+            <td mat-cell *matCellDef="let row" (click)="editLinea(row.id)">
+              {{ row.name }}
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -160,8 +170,8 @@
         <table mat-table [dataSource]="dataSource2" [hidden]="displayedNotFound2" matSort>
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let row" (click)="editMethod(row.idMetodo)">
-              {{ row.nombre }}
+            <td mat-cell *matCellDef="let row" (click)="editMethod(row.id)">
+              {{ row.name }}
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
@@ -187,14 +197,14 @@
                   <img class="img-set" src="{{ previewUrl2 }}" />
                 </div>
               }
-              @if (!previewUrl2 && !facilidadesRecursos.facilidadesRecursosFoto) {
+              @if (!previewUrl2 && !group.facilitiesPhoto) {
                 <div class="grupal-img">
                   <img class="img-set" src="../../assets/img/grupal.jpg" />
                 </div>
               }
-              @if (facilidadesRecursos.facilidadesRecursosFoto && !previewUrl2) {
+              @if (group.facilitiesPhoto && !previewUrl2) {
                 <div class="img-preview">
-                  <img class="img-set" src="{{ url + 'grupo/' + facilidadesRecursos.idGrupo + '/files/facilidades }}" />
+                  <img class="img-set" src="{{ url + 'api/group/files/facilities' }}" />
                 </div>
               }
               <div class="green-text ml-16 mt-auto">
@@ -215,9 +225,9 @@
               <div class="text-category">Descripción en español <span class="red-text">*</span></div>
             </div>
             <textarea
-              [(ngModel)]="facilidadesRecursos.facilidadesRecursos"
-              formControlName="facilidadesRecursos"
-              name="facilidadesRecursos"
+              [(ngModel)]="group.facilitiesES"
+              formControlName="facilitiesES"
+              name="facilitiesES"
               autosize
               class="input-category"
             ></textarea>
@@ -227,9 +237,9 @@
               <div class="text-category">Descripción en inglés <span class="red-text">*</span></div>
             </div>
             <textarea
-              [(ngModel)]="facilidadesRecursos.facilidadesRecursosEN"
-              formControlName="facilidadesRecursosEN"
-              name="facilidadesRecursosEN"
+              [(ngModel)]="group.facilitiesEN"
+              formControlName="facilitiesEN"
+              name="facilitiesEN"
               autosize
               class="input-category"
             ></textarea>
@@ -251,8 +261,8 @@
         <table mat-table [dataSource]="dataSource3" [hidden]="displayedNotFound3" matSort>
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let row" (click)="editEquipo(row.idEquipo)">
-              {{ row.nombre }}
+            <td mat-cell *matCellDef="let row" (click)="editEquipo(row.id)">
+              {{ row.name }}
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -275,8 +285,8 @@
         <table mat-table [dataSource]="dataSource4" [hidden]="displayedNotFound4" matSort>
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-            <td mat-cell *matCellDef="let row" (click)="editSoftware(row.idSoftware)">
-              {{ row.nombre }}
+            <td mat-cell *matCellDef="let row" (click)="editSoftware(row.id)">
+              {{ row.name }}
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -299,9 +309,9 @@
           </div>
           <ckeditor
             [editor]="Editor"
-            [(ngModel)]="trabajosFuturos.trabajosFuturos"
-            formControlName="trabajosFuturos"
-            name="trabajosFuturos"
+            [(ngModel)]="group.futureWorkES"
+            formControlName="futureWorkES"
+            name="futureWorkES"
           />
         </div>
         <div class="full-width mb-24">
@@ -311,9 +321,9 @@
           </div>
           <ckeditor
             [editor]="Editor"
-            [(ngModel)]="trabajosFuturos.trabajosFuturosEN"
-            formControlName="trabajosFuturosEN"
-            name="trabajosFuturosEN"
+            [(ngModel)]="group.futureWorkEN"
+            formControlName="futureWorkEN"
+            name="futureWorkEN"
           />
         </div>
         <div class="right black-btn mb-12">
@@ -334,9 +344,9 @@
                   <img class="img-logo" src="{{ previewUrl3 }}" />
                 </div>
               }
-              @if (informacionExtra.logoHeader && !previewUrl3) {
+              @if (group.logoHeader && !previewUrl3) {
                 <div class="logo-preview mb-16">
-                  <img class="img-logo" src="{{ url + 'grupo/' + informacionExtra.idGrupo + '/files/header }}" />
+                  <img class="img-logo" src="{{ url + 'api/group/files/header' }}" />
                 </div>
               }
               <div class="green-text text-left">
@@ -358,9 +368,9 @@
                   <img class="img-logo" src="{{ previewUrl4 }}" />
                 </div>
               }
-              @if (informacionExtra.logoFooter && !previewUrl4) {
+              @if (group.logoFooter && !previewUrl4) {
                 <div class="logo-preview-inverse mb-16">
-                  <img class="img-logo" src="{{ url + 'grupo/' + informacionExtra.idGrupo + '/files/footer }}" />
+                  <img class="img-logo" src="{{ url + 'api/group/files/footer' }}" />
                 </div>
               }
               <div class="green-text text-left">
@@ -379,23 +389,11 @@
           <div class="flex-news">
             <div class="full-width mb-24 mr-32">
               <div class="text-category">Correo del grupo</div>
-              <input
-                [(ngModel)]="informacionExtra.correo"
-                formControlName="correo"
-                name="correo"
-                class="input-category"
-                required
-              />
+              <input [(ngModel)]="group.email" formControlName="email" name="email" class="input-category" required />
             </div>
             <div class="full-width mb-24">
               <div class="text-category">Teléfono del grupo</div>
-              <input
-                [(ngModel)]="informacionExtra.telefono"
-                formControlName="telefono"
-                name="telefono"
-                class="input-category"
-                required
-              />
+              <input [(ngModel)]="group.phone" formControlName="phone" name="phone" class="input-category" required />
             </div>
           </div>
           <div class="right black-btn mb-12">
@@ -407,18 +405,18 @@
           <div class="full-width mb-24">
             <div class="text-category">Descripción en español</div>
             <textarea
-              [(ngModel)]="informacionExtra.quienesSomosResumen"
-              formControlName="quienesSomosResumen"
-              name="quienesSomosResumen"
+              [(ngModel)]="group.summaryES"
+              formControlName="summaryES"
+              name="summaryES"
               class="input-category"
             ></textarea>
           </div>
           <div class="full-width mb-24">
             <div class="text-category">Descripción en inglés</div>
             <textarea
-              [(ngModel)]="informacionExtra.quienesSomosResumenEN"
-              formControlName="quienesSomosResumenEN"
-              name="quienesSomosResumenEN"
+              [(ngModel)]="group.summaryEN"
+              formControlName="summaryEN"
+              name="summaryEN"
               class="input-category"
             ></textarea>
           </div>
@@ -431,18 +429,18 @@
           <div class="full-width mb-24">
             <div class="text-category">Descripción en español</div>
             <textarea
-              [(ngModel)]="informacionExtra.seccionPublicaciones"
-              formControlName="seccionPublicaciones"
-              name="seccionPublicaciones"
+              [(ngModel)]="group.publicationsSectionES"
+              formControlName="publicationsSectionES"
+              name="publicationsSectionES"
               class="input-category"
             ></textarea>
           </div>
           <div class="full-width mb-24">
             <div class="text-category">Descripción en inglés</div>
             <textarea
-              [(ngModel)]="informacionExtra.seccionPublicacionesEN"
-              formControlName="seccionPublicacionesEN"
-              name="seccionPublicacionesEN"
+              [(ngModel)]="group.publicationsSectionEN"
+              formControlName="publicationsSectionEN"
+              name="publicationsSectionEN"
               class="input-category"
             ></textarea>
           </div>
@@ -455,18 +453,18 @@
           <div class="full-width mb-24">
             <div class="text-category">Descripción en español</div>
             <textarea
-              [(ngModel)]="informacionExtra.seccionProyectos"
-              formControlName="seccionProyectos"
-              name="seccionProyectos"
+              [(ngModel)]="group.projectsSectionES"
+              formControlName="projectsSectionES"
+              name="projectsSectionES"
               class="input-category"
             ></textarea>
           </div>
           <div class="full-width mb-24">
             <div class="text-category">Descripción en inglés</div>
             <textarea
-              [(ngModel)]="informacionExtra.seccionProyectosEN"
-              formControlName="seccionProyectosEN"
-              name="seccionProyectosEN"
+              [(ngModel)]="group.projectsSectionEN"
+              formControlName="projectsSectionEN"
+              name="projectsSectionEN"
               class="input-category"
             ></textarea>
           </div>

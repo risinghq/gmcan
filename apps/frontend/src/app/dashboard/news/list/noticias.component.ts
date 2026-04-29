@@ -18,22 +18,20 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
-import { Noticia } from "@app/shared/models/noticia";
-import { TipoNoticia } from "@app/shared/models/tiponoticia";
-import { Usuario } from "@app/shared/models/usuario";
+import type { News } from "@app/shared/models/news";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { NoticiaService } from "@app/shared/services/noticia.service";
+import { NewsService } from "@app/shared/services/news.service";
+import type { RefItem } from "@app/shared/services/ref.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 
-interface NoticiaResponse extends Noticia {
-  fechaPublicacion?: string;
-  nombreTipoNoticia?: string;
-  status?: string;
-  autor?: string;
-  foto?: string;
+interface NewsRow extends News {
+  publishedAtDisplay?: string;
+  newsTypeName?: string;
+  statusText?: string;
 }
+
 @Component({
   selector: "app-noticias",
   templateUrl: "./noticias.component.html",
@@ -58,8 +56,8 @@ interface NoticiaResponse extends Noticia {
   ],
 })
 export default class NoticiasComponent implements OnInit {
-  _noticiaService = inject(NoticiaService);
-  _usuarioService = inject(UsuarioService);
+  private _newsService = inject(NewsService);
+  private _refService = inject(RefService);
   lookup = inject(LookupService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
@@ -67,24 +65,20 @@ export default class NoticiasComponent implements OnInit {
   _router = inject(Router);
   private _tabState = inject(TabStateService);
 
-  displayedColumns: string[] = ["titulo", "fechaPublicacion", "nombreTipoNoticia", "autor", "status"];
-  displayedColumns2: string[] = ["nombre"];
-  dataSource = new MatTableDataSource<NoticiaResponse>([]);
-  dataSource2 = new MatTableDataSource<TipoNoticia>([]);
+  displayedColumns: string[] = ["title", "publishedAtDisplay", "newsTypeName", "statusText"];
+  displayedColumns2: string[] = ["name"];
+  dataSource = new MatTableDataSource<NewsRow>([]);
+  dataSource2 = new MatTableDataSource<RefItem>([]);
   selectedTab = 0;
 
   url: string;
-  public noticias: NoticiaResponse[] = [];
-  public tiponoticias: TipoNoticia[] = [];
+  public noticias: NewsRow[] = [];
+  public newsTypes: RefItem[] = [];
 
   ngOnInit(): void {
     this.selectedTab = this._tabState.newsTab();
-    this.tiponoticias = [...this.lookup.tiposNoticia()];
-    this.tiponoticias.sort((a, b) => ((a.nombre ?? "") > (b.nombre ?? "") ? 1 : -1));
-    this.dataSource2 = new MatTableDataSource(this.tiponoticias);
-    this.dataSource2.sort = this.sort2();
-    this.dataSource2.paginator = this.paginator2();
-    this.getNoticia();
+    this.loadNewsTypes();
+    this.getNews();
   }
 
   readonly paginator = viewChild.required(MatPaginator);
@@ -97,54 +91,36 @@ export default class NoticiasComponent implements OnInit {
     this.url = GLOBAL.url;
   }
 
-  /**
-   * Set the paginator and sort after the view init since this component will
-   * be able to query its view for the initialized paginator and sort.
-   */
-
-  getNoticia(): void {
-    this._noticiaService.getNoticias().subscribe((res: NoticiaResponse[]) => {
-      if (res != null) {
-        res.sort((a: NoticiaResponse, b: NoticiaResponse) =>
-          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-            ? 1
-            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-              ? -1
-              : 0,
-        );
-        this.noticias = res;
-        this.dataSource = new MatTableDataSource(this.noticias);
-        this.dataSource.paginator = this.paginator();
-        this.dataSource.sort = this.matSort();
-        for (let index = 0; index < this.noticias.length; index++) {
-          for (let j = 0; j < this.tiponoticias.length; j++) {
-            if (this.noticias[index].tipoNoticia_idtipoNoticia === this.tiponoticias[j].idtipoNoticia) {
-              this.noticias[index].nombreTipoNoticia = this.tiponoticias[j].nombre ?? "";
-            }
-            if (this.noticias[index].estado === 1) {
-              this.noticias[index].status = "Activo";
-            } else {
-              this.noticias[index].status = "Inactivo";
-            }
-          }
-          const d = new Date(this.noticias[index].fechaPublicacion ?? new Date());
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.noticias[index].fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? "";
-          this.noticias[index].fechaPublicacion =
-            this.titlecasePipe.transform(this.noticias[index].fechaPublicacion) ?? "";
-          this.getUsuario(this.noticias[index].autorPublicacion ?? "", index);
-        }
-      }
+  loadNewsTypes(): void {
+    this._refService.listNewsTypes().subscribe((types) => {
+      this.newsTypes = types;
+      this.dataSource2 = new MatTableDataSource(this.newsTypes);
+      this.dataSource2.sort = this.sort2();
+      this.dataSource2.paginator = this.paginator2();
     });
   }
 
-  getUsuario(idUser: string, i: number): void {
-    this._usuarioService.getUser(idUser).subscribe((res: Usuario[]) => {
-      if (res[0] != undefined) {
-        if (this.noticias[i] != undefined) {
-          this.noticias[i].autor = `${res[0].nombre ?? ""} ${res[0].apellidoPaterno ?? ""}`.trim();
-          this.noticias[i].foto = res[0].foto ?? "";
-        }
+  getNews(): void {
+    this._newsService.listAdminNews().subscribe((res: News[]) => {
+      if (res != null) {
+        const sorted = res.toSorted((a, b) =>
+          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
+        );
+        this.noticias = sorted.map((n) => {
+          const row: NewsRow = Object.assign({} as NewsRow, n);
+          const cat = this.newsTypes.find((t) => t.id === n.newsTypeId);
+          row.newsTypeName = cat?.name ?? "";
+          row.statusText = n.status === 1 ? "Activo" : "Inactivo";
+          if (n.publishedAt) {
+            const d = new Date(n.publishedAt);
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+            row.publishedAtDisplay = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM dd, y", "es") ?? "");
+          }
+          return row;
+        });
+        this.dataSource = new MatTableDataSource(this.noticias);
+        this.dataSource.paginator = this.paginator();
+        this.dataSource.sort = this.matSort();
       }
     });
   }
@@ -158,11 +134,7 @@ export default class NoticiasComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   applyFilter2(event: Event) {
@@ -171,11 +143,7 @@ export default class NoticiasComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
+    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
   }
 
   addCategory(): void {

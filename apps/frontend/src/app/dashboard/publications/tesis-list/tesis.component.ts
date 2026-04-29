@@ -18,13 +18,18 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { Publicacion } from "@app/shared/models/publicacion";
-import { Universidad } from "@app/shared/models/universidad";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+import type { UniversityItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+
+interface PublicationRow extends PublicationWithAuthors {
+  fecha?: string;
+  thesisTypeName?: string;
+  universityName?: string;
+}
 
 @Component({
   selector: "app-tesis",
@@ -52,20 +57,17 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
 export default class TesisComponent implements OnInit {
   _router = inject(Router);
   lookup = inject(LookupService);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _publicacionAutoresService = inject(PublicacionAutoresService);
   private _tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
   displayedColumns2: string[] = ["nombre"];
-  dataSource: MatTableDataSource<Publicacion> = new MatTableDataSource<Publicacion>([]);
-  dataSource2: MatTableDataSource<Universidad> = new MatTableDataSource<Universidad>([]);
-  tesis: Publicacion[] = [];
+  dataSource: MatTableDataSource<PublicationRow> = new MatTableDataSource<PublicationRow>([]);
+  dataSource2: MatTableDataSource<UniversityItem> = new MatTableDataSource<UniversityItem>([]);
+  tesis: PublicationRow[] = [];
   url: string;
-
-  universidades: Universidad[] = [];
 
   constructor() {
     this.url = GLOBAL.url;
@@ -81,59 +83,35 @@ export default class TesisComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedTab = this._tabState.thesisTab();
-    this.universidades = this.lookup.universidades().map((u) => ({
-      idUniversidad: u.idUniversidad,
-      nombre: u.nombre ?? "",
-      nombreEN: u.nombreEN ?? "",
-    }));
-    this.dataSource2 = new MatTableDataSource(this.universidades);
+    const universities = this.lookup.universities();
+    this.dataSource2 = new MatTableDataSource(universities);
     this.dataSource2.sort = this.sort2();
     this.dataSource2.paginator = this.paginator2();
     this.getThesis();
   }
 
   getThesis(): void {
-    this._publicacionService.getPublicaciones(2).subscribe((res: Publicacion[]) => {
+    this._publicationService.listPublications({ type: 2 }).subscribe((res) => {
       if (res) {
-        res.sort((a: Publicacion, b: Publicacion) =>
-          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-            ? 1
-            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-              ? -1
-              : 0,
+        const sorted = res.toSorted((a, b) =>
+          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
         );
-        this.tesis = res;
-        for (let index = 0; index < this.tesis.length; index++) {
-          const d = new Date(this.tesis[index].fechaPublicacion ?? "");
+        this.tesis = sorted.map((pub) => {
+          const row: PublicationRow = Object.assign({} as PublicationRow, pub);
+          const d = new Date(pub.publishedAt);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.tesis[index].fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          this.tesis[index].fecha = this.titlecasePipe.transform(this.tesis[index].fecha ?? "");
-          this.tesis[index].autor = [];
-          this.getThesisAuthors(this.tesis[index]);
-          this.getTipoThesis(this.tesis[index]);
-          this.getSpeUniversidad(this.tesis[index]);
-        }
+          row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
+          const thesisType = this.lookup.thesisTypes().find((t) => t.id === pub.thesisTypeId);
+          row.thesisTypeName = thesisType?.name ?? "";
+          const university = this.lookup.universities().find((u) => u.id === pub.universityId);
+          row.universityName = university?.name ?? "";
+          return row;
+        });
         this.dataSource = new MatTableDataSource(this.tesis);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
       }
     });
-  }
-
-  getTipoThesis(publicacion: Publicacion): void {
-    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
-    if (found) publicacion.tipoTesis = found.nombre;
-  }
-
-  getThesisAuthors(publicacion: Publicacion): void {
-    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
-      publicacion.autor = authors;
-    });
-  }
-
-  getSpeUniversidad(publicacion: Publicacion): void {
-    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
-    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   displayedNotFound = false;
@@ -144,11 +122,7 @@ export default class TesisComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   displayedNotFound2 = false;
@@ -159,11 +133,7 @@ export default class TesisComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
+    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
   }
 
   changedTab(event: number): void {
@@ -184,7 +154,7 @@ export default class TesisComponent implements OnInit {
     this._router.navigate(["dashboard/add-universidad"]);
   }
 
-  editUniversidad(idUniversidad: number): void {
-    this._router.navigate(["dashboard/edit-universidad/" + idUniversidad]);
+  editUniversidad(id: number): void {
+    this._router.navigate(["dashboard/edit-universidad/" + id]);
   }
 }

@@ -5,12 +5,14 @@ import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { TipoMiembro } from "@app/shared/models/tipomiembro";
-import { UsuarioFull } from "@app/shared/models/usuarioFull";
+import type { Member } from "@app/shared/models/member";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
+
+type MemberDisplay = Member & { photoUrl: string; prefix: string };
+type MemberTypeGroup = { id: number; name: string; members: MemberDisplay[] };
 
 @Component({
   selector: "app-members",
@@ -21,59 +23,54 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
 export default class MembersComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  _usuarioService = inject(UsuarioService);
+  _memberService = inject(MemberService);
   lookup = inject(LookupService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
 
   public cargado = false;
-  public usuarios: UsuarioFull[] = [];
-  public usuariosNoActivos: UsuarioFull[] = [];
-  public tipoMiembros: TipoMiembro[] = [];
+  public tipoMiembros: MemberTypeGroup[] = [];
+  public membrosNoActivos: MemberDisplay[] = [];
   public url: string;
   language: any = {};
+  allCharged = false;
+
   constructor() {
     this.url = GLOBAL.url;
   }
-
-  allCharged = false;
 
   ngOnInit(): void {
     this.language = this._session.language();
     this.titleService.setTitle("GMCAN | " + this.language.members);
     this.cargado = true;
-    this.tipoMiembros = this.lookup.tiposMiembro().map((t) => Object.assign({}, t, { miembros: [] as UsuarioFull[] }));
-    this.getUsuarios();
+    this.tipoMiembros = this.lookup.memberTypes().map((t) => ({ id: t.id, name: t.name, members: [] }));
+    this.getMembers();
   }
 
-  getUsuarios(): void {
-    this._usuarioService.getUsuarios().subscribe((res: UsuarioFull[]) => {
+  getMembers(): void {
+    this._memberService.listMembers().subscribe((res: Member[]) => {
       if (res) {
-        this.usuarios = res;
         const prefijos = this.lookup.prefijos();
-        for (const usuario of this.usuarios) {
-          if (usuario.foto != null) {
-            usuario.foto = this.url + "usuario/" + usuario.DNI + "/file";
-          } else {
-            usuario.foto = "../../assets/img/user.png";
-          }
-          const prefijo = prefijos.find(
-            (p) => p.idPrefijo === usuario.prefijo_idPrefijo && p.nombre !== "Ninguno" && p.nombre !== "Bachiller",
-          );
-          if (prefijo) usuario.prefijo = prefijo.nombre;
-        }
-        this.allCharged = true;
+        const prefijosMap = new Map(prefijos.map((p) => [p.idPrefijo, p]));
+
+        const processed = res.map((m): MemberDisplay => {
+          const photoUrl = m.photo ? this.url + "api/members/" + m.id + "/photo" : "../../assets/img/user.png";
+          const prefijo = m.prefixId ? prefijosMap.get(m.prefixId) : undefined;
+          const prefix =
+            prefijo && prefijo.nombre !== "Ninguno" && prefijo.nombre !== "Bachiller" ? prefijo.nombre : "";
+          return { ...m, photoUrl, prefix };
+        });
+
         for (const tipoMiembro of this.tipoMiembros) {
-          tipoMiembro.miembros = this.usuarios.filter(
-            (u) => u.tipoMiembro_idTipoMiembro === tipoMiembro.idTipoMiembro && u.estado === 1,
-          );
+          tipoMiembro.members = processed.filter((m) => m.memberTypeId === tipoMiembro.id && m.status === 1);
         }
-        this.usuariosNoActivos = this.usuarios.filter((u) => u.estado !== 1);
+        this.membrosNoActivos = processed.filter((m) => m.status !== 1);
+        this.allCharged = true;
       }
     });
   }
 
-  profile(user: UsuarioFull): void {
-    this._router.navigate(["/home/detail-member/" + user.DNI]);
+  profile(member: MemberDisplay): void {
+    this._router.navigate(["/home/detail-member/" + member.id]);
   }
 }

@@ -44,13 +44,15 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
       descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.metodo = {
-      idMetodo: 0,
-      nombre: "",
-      nombreEN: "",
-      descripcion: "",
-      descripcionEN: "",
-      foto: "",
-      grupo_idGrupo: 1,
+      id: 0,
+      name: "",
+      nameEN: "",
+      description: "",
+      descriptionEN: null,
+      photo: null,
+      groupId: 1,
+      createdAt: null,
+      updatedAt: null,
     };
     this.url = GLOBAL.url;
   }
@@ -63,16 +65,24 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 
   submitMethod(): void {
     if (this.methodForm.valid) {
-      this._methodService.addMetodo(this.metodo).subscribe((result: any) => {
-        if (result.status == 1) {
-          if (this.fileData) {
-            this._methodService.uploadMetodoFoto(this.fileData, result.idMetodo).subscribe((_res: any) => {});
+      this._methodService
+        .create({
+          name: this.metodo.name,
+          nameEN: this.metodo.nameEN,
+          description: this.metodo.description,
+          descriptionEN: this.metodo.descriptionEN ?? undefined,
+          groupId: this.metodo.groupId,
+        })
+        .subscribe((result) => {
+          if (result.id) {
+            if (this.fileData) {
+              this._methodService.uploadPhoto(result.id, this.fileData).subscribe(() => {});
+            }
+            this.methodForm.markAsPristine();
+            this.return();
+            this.openSnackBar();
           }
-          this.methodForm.markAsPristine();
-          this.return();
-          this.openSnackBar();
-        }
-      });
+        });
     }
   }
 
@@ -90,8 +100,6 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 
   fileData: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
   fileProgress(fileInput: Event): void {
     const target = fileInput.target as HTMLInputElement | null;
     this.fileData = target?.files?.[0] ?? null;
@@ -101,7 +109,6 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 
   preview(): void {
     if (!this.fileData) return;
-    // Show preview
     const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;
@@ -119,10 +126,10 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   previewMethod(value: number): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
     localStorage.setItem("langLocale", "0");
-    method.foto = typeof this.previewUrl === "string" ? this.previewUrl : "";
+    method.photo = typeof this.previewUrl === "string" ? this.previewUrl : null;
     if (value == 1) {
-      method.nombre = method.nombreEN;
-      method.descripcion = method.descripcionEN;
+      method.name = method.nameEN;
+      method.description = method.descriptionEN ?? method.description;
       localStorage.setItem("langLocale", "1");
     }
     this.previewDialog = this.dialog.open(DialogPreview4, {
@@ -159,7 +166,7 @@ export class DialogPreview4 {
     }
     const descripcion = document.getElementById("descripcion");
     if (descripcion) {
-      descripcion.innerHTML = this.method.descripcion ?? "";
+      descripcion.innerHTML = this.method.description ?? "";
     }
   }
 }

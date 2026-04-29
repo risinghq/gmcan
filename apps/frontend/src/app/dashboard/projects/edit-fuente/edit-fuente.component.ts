@@ -14,15 +14,11 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
-import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { ProjectService } from "@app/shared/services/project.service";
+import type { FundingSourceItem } from "@app/shared/services/ref.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-
-interface StatusResponse {
-  status?: number;
-}
 
 @Component({
   selector: "app-edit-fuente",
@@ -36,16 +32,15 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  private _proyectoService = inject(ProyectoService);
+  private _refService = inject(RefService);
+  private _projectService = inject(ProjectService);
 
-  fuente: FuenteFinanciamiento;
+  fuente: FundingSourceItem = { id: 0, name: "" };
   public fuenteForm: FormGroup;
   button_text = "Actualizar información";
   edit = true;
 
   constructor() {
-    this.fuente = { idFuenteFinanciamiento: 0, nombre: "" };
     this.fuenteForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
@@ -61,29 +56,28 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
 
   getFuente(): void {
     const idFuente = Number(this._route.snapshot.params["id"] ?? 0);
-    this._fuenteFinanciamientoService.getFuenteFinanciamiento(idFuente).subscribe((result: FuenteFinanciamiento[]) => {
-      if (result.length > 0) {
-        this.fuente = result[0];
-        localStorage.setItem("fuenteEdit", JSON.stringify(this.fuente.nombre ?? ""));
-        this.getFuenteProyecto(this.fuente);
+    this._refService.getFundingSource(idFuente).subscribe((result) => {
+      if (result) {
+        this.fuente = result;
+        localStorage.setItem("fuenteEdit", JSON.stringify(result.name ?? ""));
+        this.checkCanDelete(result.id);
       }
     });
   }
 
   notCanDo = false;
 
-  getFuenteProyecto(fuente: FuenteFinanciamiento): void {
-    this._proyectoService.getProyectoFuente(fuente.idFuenteFinanciamiento ?? 0).subscribe((result: unknown[]) => {
-      if (result.length == 0) {
-        this.notCanDo = true;
-      }
+  checkCanDelete(fundingSourceId: number): void {
+    this._projectService.listAdminProjects().subscribe((projects) => {
+      const inUse = projects.some((p) => p.fundingSourceId === fundingSourceId);
+      this.notCanDo = !inUse;
     });
   }
 
   submitFuente(): void {
     if (this.fuenteForm.valid) {
-      this._fuenteFinanciamientoService.updateFuenteFinanciamiento(this.fuente).subscribe((result: StatusResponse) => {
-        if (result.status == 1) {
+      this._refService.updateFundingSource(this.fuente.id, { name: this.fuente.name }).subscribe((result) => {
+        if (result.status === 1) {
           this.fuenteForm.markAsPristine();
           this.return();
           this.openSnackBar("Fuente de financiamiento actualizada exitosamente");
@@ -120,25 +114,23 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
       });
       this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
-          this.eraseNews();
+          this.eraseFuente();
         }
       });
     }
   }
 
-  eraseNews(): void {
+  eraseFuente(): void {
     if (this.notCanDo) {
-      this._fuenteFinanciamientoService
-        .deleteFuenteFinanciamiento(this.fuente.idFuenteFinanciamiento ?? 0)
-        .subscribe((result: StatusResponse) => {
-          if (result.status == 1) {
-            this.fuenteForm.markAsPristine();
-            this.return();
-            this.openSnackBar("Fuente de financiamiento eliminada exitosamente");
-          } else {
-            this.openSnackBar("Hubo un problema al eliminar");
-          }
-        });
+      this._refService.deleteFundingSource(this.fuente.id).subscribe((result) => {
+        if (result.status === 1) {
+          this.fuenteForm.markAsPristine();
+          this.return();
+          this.openSnackBar("Fuente de financiamiento eliminada exitosamente");
+        } else {
+          this.openSnackBar("Hubo un problema al eliminar");
+        }
+      });
     }
   }
 }

@@ -4,11 +4,11 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { createLineasInvestigacion } from "@app/shared/models/factories";
-import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import { createResearchLine } from "@app/shared/models/factories";
+import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
-import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -24,10 +24,10 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _lineaInvestigacionService = inject(LineasInvestigacionService);
+  private _researchLinesService = inject(ResearchLinesService);
 
   button_text = "Guardar línea";
-  lineaInvestigacion: LineasInvestigacion;
+  lineaInvestigacion: ResearchLine;
   public lineaForm: FormGroup;
   url: string;
 
@@ -42,7 +42,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.lineaInvestigacion = createLineasInvestigacion();
+    this.lineaInvestigacion = createResearchLine();
     this.url = GLOBAL.url;
   }
 
@@ -53,18 +53,26 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   submitLinea(): void {
-    this._lineaInvestigacionService.addLinea(this.lineaInvestigacion).subscribe((result: any) => {
-      if (result.status == 1) {
-        if (this.fileData) {
-          this._lineaInvestigacionService
-            .uploadLineaFoto(this.fileData, result.idLineasInvestigacion)
-            .subscribe((_res: any) => {});
-        }
-        this.lineaForm.markAsPristine();
-        this.return();
-        this.openSnackBar();
-      }
-    });
+    if (this.lineaForm.valid) {
+      this._researchLinesService
+        .create({
+          name: this.lineaInvestigacion.name,
+          nameEN: this.lineaInvestigacion.nameEN,
+          description: this.lineaInvestigacion.description ?? undefined,
+          descriptionEN: this.lineaInvestigacion.descriptionEN ?? undefined,
+          groupId: this.lineaInvestigacion.groupId,
+        })
+        .subscribe((result) => {
+          if (result.id) {
+            if (this.fileData) {
+              this._researchLinesService.uploadPhoto(result.id, this.fileData).subscribe(() => {});
+            }
+            this.lineaForm.markAsPristine();
+            this.return();
+            this.openSnackBar();
+          }
+        });
+    }
   }
 
   return(): void {
@@ -81,8 +89,6 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
 
   fileData: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
-  fileUploadProgress: string | null = null;
-  uploadedFilePath: string | null = null;
   fileProgress(fileInput: Event): void {
     const target = fileInput.target as HTMLInputElement | null;
     this.fileData = target?.files?.[0] ?? null;
@@ -92,7 +98,6 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
 
   preview(): void {
     if (!this.fileData) return;
-    // Show preview
     const mimeType = this.fileData.type;
     if (mimeType.match(/image\/*/) == null) {
       return;

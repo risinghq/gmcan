@@ -1,8 +1,19 @@
-import type { Publicacion } from "@app/shared/models/publicacion";
-import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
+
+export type PublicationDisplay = PublicationWithAuthors & {
+  fecha: string;
+  tipoPublicacion?: string;
+  tipoTesis?: string;
+  revista?: string;
+  universidad?: string;
+  evento?: string;
+  ciudad?: string | null;
+  pais?: string | null;
+};
 
 export type PublicationViewModel = {
-  publicaciones: Publicacion[];
-  tipoPublicaciones: TipoPublicacion[];
+  articulos: PublicationDisplay[];
+  tesis: PublicationDisplay[];
+  resumenes: PublicationDisplay[];
   infoText: string;
 };

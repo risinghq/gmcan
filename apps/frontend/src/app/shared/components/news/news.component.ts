@@ -1,18 +1,18 @@
 import { SlicePipe } from "@angular/common";
-import { DatePipe } from "@angular/common";
-import { TitleCasePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
-import { createNoticia } from "@app/shared/models/factories";
-import type { Noticia } from "@app/shared/models/noticia";
-import type { TipoNoticia } from "@app/shared/models/tiponoticia";
+import type { Member } from "@app/shared/models/member";
+import type { News } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
-import { NoticiaService } from "@app/shared/services/noticia.service";
+import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
+import { forkJoin } from "rxjs";
+
+type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
 
 @Component({
   selector: "app-news",
@@ -21,114 +21,94 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [SlicePipe],
 })
 export default class NewsComponent implements OnInit {
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  _noticiaService = inject(NoticiaService);
+  _newsService = inject(NewsService);
+  _memberService = inject(MemberService);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   lookup = inject(LookupService);
   private _browser = inject(BrowserService);
   private _navigationHistory = inject(NavigationHistoryService);
-  _usuarioService = inject(UsuarioService);
   private _session = inject(SessionService);
 
-  public noticias: Noticia[] = [];
-  public noticiaPrincipal: Noticia;
-  public tiponoticias: TipoNoticia[] = [];
+  public noticias: NewsDisplay[] = [];
+  public noticiaPrincipal: NewsDisplay | null = null;
   url: string;
 
   constructor() {
-    this.noticiaPrincipal = createNoticia();
     this.url = GLOBAL.url;
   }
+
   numberShown = 5;
+
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    if (this._browser.innerWidth() >= 1300) {
-      this.numberShown = 10;
-    } else {
-      this.numberShown = 5;
-    }
+    this.numberShown = this._browser.innerWidth() >= 1300 ? 10 : 5;
   }
+
   public title = "";
   public idNoticiaE = 0;
   language: any = {};
+
   ngOnInit(): void {
     this.language = this._session.language();
-    if (this._browser.innerWidth() >= 1300) {
-      this.numberShown = 10;
-    } else {
-      this.numberShown = 5;
-    }
-    this.tiponoticias = [...this.lookup.tiposNoticia()];
-    this.idNoticiaE = this._route.snapshot.params["id"];
-    this.getNoticia();
+    this.numberShown = this._browser.innerWidth() >= 1300 ? 10 : 5;
+    this.idNoticiaE = Number(this._route.snapshot.params["id"]) || 0;
+    this.loadNoticias();
   }
+
   ngDoCheck(): void {
     this.title = this.language.news;
     if (this._router.url.includes("/detail-news")) {
       this.title = this.language.moreNews;
     }
   }
-  getNoticia(): void {
-    this._noticiaService.getNoticias().subscribe((res: Noticia[]) => {
-      if (res != null) {
-        res.sort((a: Noticia, b: Noticia) =>
-          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-            ? 1
-            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-              ? -1
-              : 0,
-        );
-        this.noticias = res;
-        for (let index = 0; index < this.noticias.length; index++) {
-          if (this.noticias[index].idNoticia == this.idNoticiaE || this.noticias[index].estado == 0) {
-            this.noticias.splice(index, 1);
-            index--;
-            continue;
+
+  loadNoticias(): void {
+    forkJoin({
+      news: this._newsService.listNews(),
+      members: this._memberService.listMembers(),
+    }).subscribe(({ news, members }) => {
+      const membersMap = new Map((members as Member[]).map((m) => [m.id, m]));
+      const newsTypesMap = new Map(this.lookup.newsTypes().map((t) => [t.id, t]));
+
+      const enriched = (news as News[])
+        .filter((n) => n.status !== 0 && n.id !== this.idNoticiaE)
+        .toSorted((a, b) => {
+          const left = new Date(a.publishedAt ?? "").getTime();
+          const right = new Date(b.publishedAt ?? "").getTime();
+          return right - left;
+        })
+        .map((n): NewsDisplay => {
+          const d = new Date(n.publishedAt ?? "");
+          if (String(d) !== "Invalid Date") {
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           }
-          for (let j = 0; j < this.tiponoticias.length; j++) {
-            if (this.noticias[index].tipoNoticia_idtipoNoticia === this.tiponoticias[j].idtipoNoticia) {
-              this.noticias[index].nombreTipoNoticia = this.tiponoticias[j].nombre;
-            }
-          }
-          const d = new Date(this.noticias[index].fechaPublicacion ?? "");
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.noticias[index].fechaPublicacion = this.datePipe.transform(d, "MMMM dd, y", "es") ?? undefined;
-          this.noticias[index].fechaPublicacion = this.titlecasePipe.transform(
-            this.noticias[index].fechaPublicacion ?? "",
-          );
-          this.getUsuario(this.noticias[index].autorPublicacion ?? "", index);
-        }
-        this.noticiaPrincipal = this.noticias[0];
-        this.noticias.splice(0, 1);
-        this.getUser(this.noticiaPrincipal.autorPublicacion ?? "");
-      }
-    });
-  }
-  getUsuario(idUser: string, i: number): void {
-    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
-      if (res[0] != undefined) {
-        if (this.noticias[i] != undefined) {
-          this.noticias[i].autor = res[0].nombre + " " + res[0].apellidoPaterno;
-        }
-      }
-    });
-  }
-  getUser(idUser: string): void {
-    this._usuarioService.getUser(idUser).subscribe((res: any[]) => {
-      if (res[0] != undefined) {
-        if (this.noticiaPrincipal != undefined) {
-          this.noticiaPrincipal.autor = res[0].nombre + " " + res[0].apellidoPaterno;
-        }
-      }
+          const fechaFormateada =
+            String(d) === "Invalid Date"
+              ? ""
+              : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
+
+          const newsType = n.newsTypeId ? newsTypesMap.get(n.newsTypeId) : undefined;
+          const member = n.authorId ? membersMap.get(n.authorId) : undefined;
+          const autor = member ? `${member.firstName} ${member.lastName}`.trim() : "";
+
+          return Object.assign({} as NewsDisplay, n, {
+            nombreTipoNoticia: newsType?.name ?? "",
+            fechaFormateada,
+            autor,
+          });
+        });
+
+      this.noticiaPrincipal = enriched[0] ?? null;
+      this.noticias = enriched.slice(1);
     });
   }
 
-  detalleNoticia(noticia: Noticia): void {
-    this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
+  detalleNoticia(noticia: NewsDisplay): void {
+    this._router.navigate(["/home/detail-news/" + noticia.id]);
     this.scroll();
   }
+
   scroll(): void {
     this._browser.scrollIntoViewById("main-toolbar");
   }

@@ -7,17 +7,14 @@ import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { DialogIdle } from "@app/shared/modals/dialog-idle.component";
-import { createGrupo, createUsuarioFull } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
-import type { UsuarioFull } from "@app/shared/models/usuarioFull";
+import { createGroup, type Group } from "@app/shared/models/factories";
+import type { Member } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
 import { CommonService } from "@app/shared/services/common.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
-import { PermisoService } from "@app/shared/services/permiso.service";
+import { GroupService } from "@app/shared/services/group.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso.service";
 
 @Component({
   selector: "app-log-home",
@@ -38,41 +35,28 @@ import { UsuarioHasPermisoService } from "@app/shared/services/usuariohaspermiso
 })
 export default class LogHomeComponent implements OnInit {
   _authService = inject(AuthService);
-  _usuarioService = inject(UsuarioService);
-  _permisoService = inject(PermisoService);
-  _usuarioHasPermisoService = inject(UsuarioHasPermisoService);
+  _memberService = inject(MemberService);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   dialog = inject(MatDialog);
   private router = inject(Router);
   private _commonService = inject(CommonService);
-  private _grupoService = inject(GrupoService);
+  private _groupService = inject(GroupService);
   private _session = inject(SessionService);
   private titleService = inject(Title);
 
-  token: string | null = null;
-  user: UsuarioFull;
+  user: Member | null = null;
   screenWidth: number;
   public url: string;
-  public grupoinfo: Grupo;
-  permisos = {
-    noticiaPermiso: false,
-    miembroPermiso: false,
-    proyectoPermiso: false,
-    publicacionPermiso: false,
-    contenidoPermiso: false,
-    analiticaPermiso: false,
-  };
+  public grupoinfo: Group;
 
   title = "Dashboard";
-  permisoUsuario: { permiso_idPermiso?: number }[] = [];
 
   constructor() {
     this.screenWidth = window.innerWidth;
     this.enterAny = this.screenWidth < 960;
     this.url = GLOBAL.url;
-    this.user = createUsuarioFull();
-    this.grupoinfo = createGrupo();
+    this.grupoinfo = createGroup();
   }
 
   @HostListener("window:resize", ["$event"])
@@ -80,8 +64,6 @@ export default class LogHomeComponent implements OnInit {
     this.screenWidth = window.innerWidth;
     this.enterAny = this.screenWidth < 960;
   }
-
-  language: { locale?: string } | null = null;
 
   ngOnInit(): void {
     this.titleService.setTitle("GMCAN | Administrador");
@@ -110,72 +92,36 @@ export default class LogHomeComponent implements OnInit {
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this._session.getGrupoInfo();
-    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
-      this.grupoinfo = res[0];
-      this._session.setGrupoInfo(this.grupoinfo);
-      this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
+    this.grupoinfo = this._session.groupInfo();
+    this._groupService.getGroup().subscribe((group: Group) => {
+      this.grupoinfo = group;
+      this._session.setGroupInfo(group);
+      (this.grupoinfo as any).logoHeader = this.url + "api/group/" + group.id + "/files/header";
       this.getUser();
     });
-    this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
+    if (this.grupoinfo.id) {
+      (this.grupoinfo as any).logoHeader = this.url + "api/group/" + this.grupoinfo.id + "/files/header";
+    }
   }
 
   getUser(): void {
-    const user = this._usuarioService.getUserLogged();
+    const user = this._authService.getUser();
     if (user == null) {
       this.logout();
     } else {
-      this._usuarioService.getFullUser(user.DNI).subscribe((result: UsuarioFull[]) => {
-        if (result.length > 0) {
-          this.user = result[0];
-          if (this.user.apellidoMaterno) {
-            this.user.nombreCompleto =
-              (this.user.nombre ?? "") + " " + (this.user.apellidoPaterno ?? "") + " " + this.user.apellidoMaterno;
-          } else {
-            this.user.nombreCompleto = (this.user.nombre ?? "") + " " + (this.user.apellidoPaterno ?? "");
-          }
-          if ((this.user.nombre ?? "").includes(" ")) {
-            const parts = (this.user.nombre ?? "").split(" ");
-            this.user.nombre = parts[0];
-          }
-        }
-        if (this.user.DNI) {
-          this.getPermisoHasUsuario(this.user.DNI);
+      this.user = user;
+      this._memberService.getMemberFull(user.id).subscribe((result) => {
+        if (result) {
+          this.user = result;
         }
       });
     }
   }
 
-  getPermisoHasUsuario(DNI: string): void {
-    this._usuarioHasPermisoService.getUsuarioHasPermiso(DNI).subscribe((res: { permiso_idPermiso?: number }[]) => {
-      if (res.length > 0) {
-        this.permisoUsuario = res;
-        for (let index = 0; index < this.permisoUsuario.length; index++) {
-          switch (this.permisoUsuario[index].permiso_idPermiso) {
-            case 1:
-              this.permisos.noticiaPermiso = true;
-              break;
-            case 2:
-              this.permisos.proyectoPermiso = true;
-              break;
-            case 3:
-              this.permisos.publicacionPermiso = true;
-              break;
-            case 4:
-              this.permisos.miembroPermiso = true;
-              break;
-            case 5:
-              this.permisos.contenidoPermiso = true;
-              break;
-            case 6:
-              this.permisos.analiticaPermiso = true;
-              break;
-            default:
-              break;
-          }
-        }
-      }
-    });
+  get userDisplayName(): string {
+    if (!this.user) return "";
+    const parts = [this.user.firstName, this.user.lastName, this.user.maternalName].filter(Boolean);
+    return parts.join(" ");
   }
 
   logout(): void {

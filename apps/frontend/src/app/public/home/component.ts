@@ -6,9 +6,10 @@ import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { Meta, Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
+import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
-import type { Usuario } from "@app/shared/models/usuario";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { SessionService } from "@app/shared/services/session.service";
@@ -35,8 +36,8 @@ export default class HomeComponent implements OnInit {
   expandedKey: string | null = null;
 
   progress = 100;
-  info: Grupo = {};
-  usuarios: Usuario[] = [];
+  info: Group = createGroup();
+  miembros: Member[] = [];
   articulos = 0;
   tesis = 0;
   resumenes = 0;
@@ -65,28 +66,12 @@ export default class HomeComponent implements OnInit {
     this.noticiaPrincipal = home.noticiaPrincipal ?? ({} as HomeNoticia);
     this.lineasInvestigacion = home.lineasInvestigacion;
     this.metodos = home.metodos;
-    this.usuarios = home.usuarios;
+    this.miembros = home.miembros;
     this.aboutUs = home.aboutUs;
     this.articulos = home.articulos;
     this.tesis = home.tesis;
     this.resumenes = home.resumenes;
   }
-
-  /* Get Grupo */
-
-  /* Get Publicacion */
-
-  /* get Proyectos */
-
-  /* get Noticias */
-
-  /* get Lineas Investigacion */
-
-  /* get Metodos */
-
-  /*  Get Normal */
-
-  /* getUsuarios */
 
   publicationLink(_value: unknown): void {}
 
@@ -107,18 +92,18 @@ export default class HomeComponent implements OnInit {
     return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 
-  profile(user: { DNI?: string }): void {
-    if (!user.DNI) {
+  profile(user: { id?: number }): void {
+    if (!user.id) {
       return;
     }
-    this._router.navigate(["/home/detail-member/" + user.DNI]);
+    this._router.navigate(["/home/detail-member/" + user.id]);
   }
 
-  detalleNoticia(noticia: { idNoticia?: number }): void {
-    if (!noticia.idNoticia) {
+  detalleNoticia(noticia: { id?: number }): void {
+    if (!noticia.id) {
       return;
     }
-    this._router.navigate(["/home/detail-news/" + noticia.idNoticia]);
+    this._router.navigate(["/home/detail-news/" + noticia.id]);
     this.scroll();
   }
 
@@ -126,9 +111,8 @@ export default class HomeComponent implements OnInit {
     this._browser.scrollIntoViewById("main-toolbar");
   }
 
-  /* Share Hover */
   fbsharing(i: number): boolean {
-    const title = String(this.publicaciones[i]?.titulo ?? "");
+    const title = String(this.publicaciones[i]?.title ?? "");
     this._meta.updateTag({ name: "description", content: title });
 
     this._browser.open(

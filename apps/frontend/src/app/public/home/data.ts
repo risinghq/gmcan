@@ -1,248 +1,204 @@
 import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
-import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
+import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
-import type { Noticia } from "@app/shared/models/noticia";
-import type { Proyecto } from "@app/shared/models/proyecto";
-import type { Publicacion } from "@app/shared/models/publicacion";
-import type { TipoNoticia } from "@app/shared/models/tiponoticia";
-import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
-import type { Usuario } from "@app/shared/models/usuario";
-import { AboutUsService } from "@app/shared/services/aboutus.service";
-import { EventoService } from "@app/shared/services/evento.service";
-import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
-import { GrupoService } from "@app/shared/services/grupo.service";
-import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
+import type { News } from "@app/shared/models/news";
+import type { ProjectWithMembers } from "@app/shared/models/project";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { ResearchLine } from "@app/shared/models/research-line";
+import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { MethodsService } from "@app/shared/services/methods.service";
-import { NoticiaService } from "@app/shared/services/noticia.service";
-import { ProyectoService } from "@app/shared/services/proyecto.service";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
+import { NewsService } from "@app/shared/services/news.service";
+import { ProjectService } from "@app/shared/services/project.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { firstValueFrom } from "rxjs";
 
 import type { HomeNoticia, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
 @Injectable({ providedIn: "root" })
 export class HomeDataService {
-  private readonly _grupoService = inject(GrupoService);
-  private readonly _publicacionService = inject(PublicacionService);
-  private readonly _proyectoService = inject(ProyectoService);
-  private readonly _noticiaService = inject(NoticiaService);
-  private readonly _lineasService = inject(LineasInvestigacionService);
+  private readonly _groupService = inject(GroupService);
+  private readonly _publicationService = inject(PublicationService);
+  private readonly _projectService = inject(ProjectService);
+  private readonly _newsService = inject(NewsService);
+  private readonly _researchLinesService = inject(ResearchLinesService);
   private readonly _methodsService = inject(MethodsService);
-  private readonly _usuarioService = inject(UsuarioService);
+  private readonly _memberService = inject(MemberService);
   private readonly _lookup = inject(LookupService);
-  private readonly _aboutUsService = inject(AboutUsService);
-  private readonly _publicacionAutoresService = inject(PublicacionAutoresService);
-  private readonly _proyectoHasUsuarioService = inject(UsuarioHasProyectoService);
-  private readonly _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
-  private readonly _eventoService = inject(EventoService);
   private readonly _datePipe = inject(DatePipe);
   private readonly _titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<HomeViewModel> {
-    const [grupoRaw, tipoPublicaciones, tipoNoticias, lineasInvestigacionRaw, metodosRaw, usuariosRaw] =
-      await Promise.all([
-        firstValueFrom(this._grupoService.getGrupoInfo()),
-        Promise.resolve(this._lookup.tiposPublicacion()),
-        Promise.resolve(this._lookup.tiposNoticia()),
-        firstValueFrom(this._lineasService.getLineasInvestigacion()),
-        firstValueFrom(this._methodsService.getMethods()),
-        firstValueFrom(this._usuarioService.getUsuarios()),
-      ]);
-
-    const [publicacionesRaw, proyectosRaw, noticiasRaw, aboutUsRaw] = await Promise.all([
-      firstValueFrom(this._publicacionService.getPublicacion()),
-      firstValueFrom(this._proyectoService.getProyecto()),
-      firstValueFrom(this._noticiaService.getNoticias()),
-      firstValueFrom(this._aboutUsService.getAboutUsInfo()),
+    const [group, publicacionesRaw, proyectosRaw, noticiasRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
+      firstValueFrom(this._groupService.getGroup()),
+      firstValueFrom(this._publicationService.listPublications()),
+      firstValueFrom(this._projectService.listProjects()),
+      firstValueFrom(this._newsService.listNews(1)),
+      firstValueFrom(this._researchLinesService.list()),
+      firstValueFrom(this._methodsService.list()),
+      firstValueFrom(this._memberService.listMembers()),
     ]);
 
-    const grupo = Array.isArray(grupoRaw) ? grupoRaw : [];
-    const lineasInvestigacion = Array.isArray(lineasInvestigacionRaw)
-      ? (lineasInvestigacionRaw as LineasInvestigacion[])
-      : [];
+    const lineasInvestigacion = Array.isArray(lineasRaw) ? (lineasRaw as ResearchLine[]) : [];
     const metodos = Array.isArray(metodosRaw) ? (metodosRaw as Method[]) : [];
-    const usuarios = Array.isArray(usuariosRaw) ? (usuariosRaw as Usuario[]) : [];
-    const publicacionesSafe = Array.isArray(publicacionesRaw) ? (publicacionesRaw as Publicacion[]) : [];
-    const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as Proyecto[]) : [];
-    const noticiasSafe = Array.isArray(noticiasRaw) ? (noticiasRaw as Noticia[]) : [];
-    const aboutUs = Array.isArray(aboutUsRaw) ? (aboutUsRaw as Array<{ servicios?: string }>) : [];
+    const miembros = Array.isArray(miembrosRaw) ? (miembrosRaw as Member[]) : [];
+    const publicacionesSafe = Array.isArray(publicacionesRaw) ? (publicacionesRaw as PublicationWithAuthors[]) : [];
+    const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
+    const noticiasSafe = Array.isArray(noticiasRaw) ? (noticiasRaw as News[]) : [];
 
-    const publicaciones = await this._enrichPublicaciones(publicacionesSafe, tipoPublicaciones ?? []);
-    const proyectos = await this._enrichProyectos(
-      proyectosSafe.filter((proyecto) => !proyecto.fechaFin),
+    const aboutUs = group?.id ? await this._loadAboutUs(group.id) : "";
+
+    const publicaciones = this._enrichPublicaciones(publicacionesSafe);
+    const proyectos = this._enrichProyectos(
+      proyectosSafe.filter((p) => !p.endDate),
       lineasInvestigacion,
     );
-    const noticias = await this._enrichNoticias(
-      noticiasSafe.filter((noticia) => noticia.estado === 1),
-      tipoNoticias ?? [],
-    );
+    const noticias = this._enrichNoticias(noticiasSafe, miembros);
 
     const orderedPublicaciones = publicaciones.toSorted((a, b) => {
-      const left = new Date(a.fechaPublicacion ?? "").getTime();
-      const right = new Date(b.fechaPublicacion ?? "").getTime();
+      const left = new Date(a.publishedAt ?? "").getTime();
+      const right = new Date(b.publishedAt ?? "").getTime();
       return right - left;
     });
 
     const orderedProyectos = proyectos.toSorted((a, b) => {
-      const left = new Date(a.fechaInicio ?? "").getTime();
-      const right = new Date(b.fechaInicio ?? "").getTime();
+      const left = new Date(a.startDate ?? "").getTime();
+      const right = new Date(b.startDate ?? "").getTime();
       return right - left;
     });
 
     const orderedNoticias = noticias.toSorted((a, b) => {
-      const left = new Date(a.fechaPublicacion ?? "").getTime();
-      const right = new Date(b.fechaPublicacion ?? "").getTime();
+      const left = new Date(a.publishedAt ?? "").getTime();
+      const right = new Date(b.publishedAt ?? "").getTime();
       return right - left;
     });
 
     return {
-      info: grupo?.[0] ?? {},
+      info: group,
       publicaciones: orderedPublicaciones,
       proyectos: orderedProyectos,
       noticias: orderedNoticias,
       noticiaPrincipal: orderedNoticias[0] ?? null,
       lineasInvestigacion,
       metodos,
-      usuarios,
-      aboutUs: aboutUs?.[0]?.servicios ?? "",
-      articulos: orderedPublicaciones.filter((p) => p.tipoPublicacion_idTipoPublicacion === 1).length,
-      tesis: orderedPublicaciones.filter((p) => p.tipoPublicacion_idTipoPublicacion === 2).length,
-      resumenes: orderedPublicaciones.filter((p) => p.tipoPublicacion_idTipoPublicacion === 3).length,
+      miembros,
+      aboutUs,
+      articulos: orderedPublicaciones.filter((p) => p.typeId === 1).length,
+      tesis: orderedPublicaciones.filter((p) => p.typeId === 2).length,
+      resumenes: orderedPublicaciones.filter((p) => p.typeId === 3).length,
     };
   }
 
-  private async _enrichPublicaciones(
-    publicaciones: Publicacion[],
-    tiposPublicacion: TipoPublicacion[],
-  ): Promise<HomePublicacion[]> {
-    const tiposMap = new Map(tiposPublicacion.map((tipo) => [tipo.idTipoPublicacion, tipo]));
-    const revistasMap = new Map(this._lookup.revistas().map((revista) => [revista.idRevista, revista]));
-    const universidadesMap = new Map(
-      this._lookup.universidades().map((universidad) => [universidad.idUniversidad, universidad]),
-    );
-    const tiposTesisMap = new Map(this._lookup.tiposTesis().map((tipo) => [tipo.idTipoTesis, tipo]));
-
-    return Promise.all(
-      publicaciones.map(async (publicacion) => {
-        const fechaPublicacion = new Date(publicacion.fechaPublicacion ?? "");
-        if (String(fechaPublicacion) !== "Invalid Date") {
-          fechaPublicacion.setMinutes(fechaPublicacion.getMinutes() + fechaPublicacion.getTimezoneOffset());
-        }
-
-        const [autores, evento] = await Promise.all([
-          firstValueFrom(this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0)),
-          publicacion.evento_idEvento
-            ? firstValueFrom(this._eventoService.getEvento(publicacion.evento_idEvento))
-            : Promise.resolve(null),
-        ]);
-
-        const eventoValue = Array.isArray(evento)
-          ? (evento as Array<{ nombre?: string; ciudad?: string; pais?: string }>)
-          : [];
-
-        return {
-          ...publicacion,
-          fechaPublicacion: String(fechaPublicacion) === "Invalid Date" ? "" : fechaPublicacion.toISOString(),
-          fecha: this._titlecasePipe.transform(this._datePipe.transform(fechaPublicacion, "MMMM y", "es") ?? ""),
-          tipoPublicacion: tiposMap.get(publicacion.tipoPublicacion_idTipoPublicacion ?? 0)?.nombre,
-          revista: revistasMap.get(publicacion.revista_idRevista ?? 0)?.nombre,
-          universidad: universidadesMap.get(publicacion.universidad_idUniversidad ?? 0)?.nombre ?? undefined,
-          tipoTesis: tiposTesisMap.get(publicacion.tipoTesis_idTipoTesis ?? 0)?.nombre,
-          autor: (Array.isArray(autores) ? autores : []) as HomePublicacion["autor"],
-          evento: eventoValue[0]?.nombre,
-          ciudad: eventoValue[0]?.ciudad,
-          pais: eventoValue[0]?.pais,
-        };
-      }),
-    );
+  private async _loadAboutUs(groupId: number): Promise<string> {
+    try {
+      const aboutList = await firstValueFrom(this._groupService.listAbout(groupId));
+      return Array.isArray(aboutList) ? (aboutList[0]?.servicesES ?? "") : "";
+    } catch {
+      return "";
+    }
   }
 
-  private async _enrichProyectos(
-    proyectos: Proyecto[],
-    lineasInvestigacion: LineasInvestigacion[],
-  ): Promise<HomeProyecto[]> {
-    const lineasMap = new Map(lineasInvestigacion.map((linea) => [linea.idLineasInvestigacion, linea]));
-    const monedasMap = new Map(this._lookup.monedas().map((moneda) => [moneda.idMoneda, moneda]));
+  private _enrichPublicaciones(publicaciones: PublicationWithAuthors[]): HomePublicacion[] {
+    const publicationTypes = this._lookup.publicationTypes();
+    const thesisTypes = this._lookup.thesisTypes();
+    const journals = this._lookup.journals();
+    const universities = this._lookup.universities();
+    const events = this._lookup.events();
 
-    return Promise.all(
-      proyectos.map(async (proyecto) => {
-        const fechaInicio = new Date(proyecto.fechaInicio ?? "");
-        if (String(fechaInicio) !== "Invalid Date") {
-          fechaInicio.setMinutes(fechaInicio.getMinutes() + fechaInicio.getTimezoneOffset());
-        }
+    const tiposMap = new Map(publicationTypes.map((t) => [t.id, t]));
+    const tiposTesisMap = new Map(thesisTypes.map((t) => [t.id, t]));
+    const revistasMap = new Map(journals.map((j) => [j.id, j]));
+    const universidadesMap = new Map(universities.map((u) => [u.id, u]));
+    const eventosMap = new Map(events.map((e) => [e.id, e]));
 
-        const usuariosProyectoRaw = await firstValueFrom(
-          this._proyectoHasUsuarioService.getUsuarioHasProyectos(proyecto.idProyecto ?? 0),
-        );
-        const usuariosProyecto = Array.isArray(usuariosProyectoRaw)
-          ? (usuariosProyectoRaw as Array<{ usuario_DNI?: string }>)
-          : [];
+    return publicaciones.map((pub) => {
+      const publishedAt = new Date(pub.publishedAt ?? "");
+      if (String(publishedAt) !== "Invalid Date") {
+        publishedAt.setMinutes(publishedAt.getMinutes() + publishedAt.getTimezoneOffset());
+      }
+      const evento = pub.eventId ? eventosMap.get(pub.eventId) : undefined;
 
-        const usuario =
-          (usuariosProyecto?.length ?? 0) > 0
-            ? await Promise.all(
-                usuariosProyecto.map(async (usuarioProyecto) => {
-                  const users = await firstValueFrom(this._usuarioService.getUser(usuarioProyecto.usuario_DNI ?? ""));
-                  const user = users?.[0];
-                  if (!user) {
-                    return null;
-                  }
-
-                  const hydratedUser = Object.assign({}, user) as Usuario;
-                  hydratedUser.nombre = `${(user.nombre ?? "").split(" ")[0]}.`;
-                  hydratedUser.nombreCompleto =
-                    `${(user.nombre ?? "").split(" ")[0]} ${user.apellidoPaterno ?? ""}`.trim();
-                  return hydratedUser;
-                }),
-              )
-            : [];
-
-        const fuenteFinanciamiento = proyecto.fuenteFinanciamiento_idFuenteFinanciamiento
-          ? await firstValueFrom(
-              this._fuenteFinanciamientoService.getFuenteFinanciamiento(
-                proyecto.fuenteFinanciamiento_idFuenteFinanciamiento,
-              ),
-            )
-          : null;
-
-        return {
-          ...proyecto,
-          fechaI: this._titlecasePipe.transform(this._datePipe.transform(fechaInicio, "MMMM, y", "es") ?? ""),
-          lineasInvestigacion: lineasMap.get(proyecto.lineasInvestigacion_idLineasInvestigacion ?? 0)?.nombre,
-          usuario: usuario.filter((item: Usuario | null): item is Usuario => Boolean(item)),
-          fuenteFinanciamiento: Array.isArray(fuenteFinanciamiento)
-            ? (fuenteFinanciamiento as Array<{ nombre?: string }>)[0]?.nombre
-            : undefined,
-          moneda: monedasMap.get(proyecto.moneda_idMoneda ?? 0)?.simbolo,
-        };
-      }),
-    );
+      return {
+        ...pub,
+        fecha:
+          String(publishedAt) === "Invalid Date"
+            ? ""
+            : (this._titlecasePipe.transform(this._datePipe.transform(publishedAt, "MMMM y", "es") ?? "") ?? ""),
+        tipoPublicacion: tiposMap.get(pub.typeId)?.name,
+        tipoTesis: pub.thesisTypeId ? tiposTesisMap.get(pub.thesisTypeId)?.name : undefined,
+        revista: pub.journalId ? revistasMap.get(pub.journalId)?.name : undefined,
+        universidad: pub.universityId ? (universidadesMap.get(pub.universityId)?.name ?? undefined) : undefined,
+        evento: evento?.name,
+        ciudad: evento?.city ?? null,
+        pais: evento?.country ?? null,
+      };
+    });
   }
 
-  private async _enrichNoticias(noticias: Noticia[], tiposNoticia: TipoNoticia[]): Promise<HomeNoticia[]> {
-    const tiposMap = new Map(tiposNoticia.map((tipo) => [tipo.idtipoNoticia, tipo]));
+  private _enrichProyectos(proyectos: ProjectWithMembers[], lineas: ResearchLine[]): HomeProyecto[] {
+    const fundingSources = this._lookup.fundingSources();
+    const monedas = this._lookup.monedas();
 
-    return Promise.all(
-      noticias.map(async (noticia) => {
-        const fechaPublicacion = new Date(noticia.fechaPublicacion ?? "");
-        if (String(fechaPublicacion) !== "Invalid Date") {
-          fechaPublicacion.setMinutes(fechaPublicacion.getMinutes() + fechaPublicacion.getTimezoneOffset());
+    const lineasMap = new Map(lineas.map((l) => [l.id, l]));
+    const fuentesMap = new Map(fundingSources.map((f) => [f.id, f]));
+    const monedasMap = new Map(monedas.map((m) => [m.idMoneda, m]));
+
+    return proyectos.map((proyecto) => {
+      const startDate = new Date(proyecto.startDate ?? "");
+      if (String(startDate) !== "Invalid Date") {
+        startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
+      }
+
+      let fechaF: string | undefined;
+      if (proyecto.endDate) {
+        const endDate = new Date(proyecto.endDate);
+        if (String(endDate) !== "Invalid Date") {
+          endDate.setMinutes(endDate.getMinutes() + endDate.getTimezoneOffset());
+          fechaF = this._titlecasePipe.transform(this._datePipe.transform(endDate, "MMMM, y", "es") ?? "") ?? undefined;
         }
+      }
 
-        const autores = await firstValueFrom(this._usuarioService.getUser(noticia.autorPublicacion ?? ""));
+      return {
+        ...proyecto,
+        fechaI:
+          String(startDate) === "Invalid Date"
+            ? ""
+            : (this._titlecasePipe.transform(this._datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? ""),
+        fechaF,
+        lineasInvestigacion: lineasMap.get(proyecto.researchLineId)?.name,
+        fuenteFinanciamiento: fuentesMap.get(proyecto.fundingSourceId)?.name,
+        moneda: monedasMap.get(proyecto.currencyId)?.simbolo,
+        members: proyecto.members ?? [],
+      };
+    });
+  }
 
-        return {
-          ...noticia,
-          fechaPublicacion: this._datePipe.transform(fechaPublicacion, "MMMM dd, y", "es") ?? "",
-          nombreTipoNoticia: tiposMap.get(noticia.tipoNoticia_idtipoNoticia)?.nombre ?? "",
-          autor: autores?.[0] ? `${autores[0].nombre ?? ""} ${autores[0].apellidoPaterno ?? ""}`.trim() : "",
-        };
-      }),
-    );
+  private _enrichNoticias(noticias: News[], miembros: Member[]): HomeNoticia[] {
+    const newsTypes = this._lookup.newsTypes();
+    const tiposMap = new Map(newsTypes.map((t) => [t.id, t]));
+    const miembrosMap = new Map(miembros.map((m) => [m.id, m]));
+
+    return noticias.map((noticia) => {
+      const publishedAt = new Date(noticia.publishedAt ?? "");
+      if (String(publishedAt) !== "Invalid Date") {
+        publishedAt.setMinutes(publishedAt.getMinutes() + publishedAt.getTimezoneOffset());
+      }
+
+      const autor = noticia.authorId ? miembrosMap.get(noticia.authorId) : undefined;
+      const autorName = autor ? `${autor.firstName} ${autor.lastName}`.trim() : "";
+
+      return {
+        ...noticia,
+        fechaPublicacion:
+          String(publishedAt) === "Invalid Date"
+            ? ""
+            : (this._datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? ""),
+        nombreTipoNoticia: noticia.newsTypeId ? (tiposMap.get(noticia.newsTypeId)?.name ?? "") : "",
+        autor: autorName,
+      };
+    });
   }
 }

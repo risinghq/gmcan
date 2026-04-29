@@ -116,8 +116,8 @@ export class EmailExitoso {
     this.language = this._session.language();
     this.screenWidth = this._browser.innerWidth();
     this.url = GLOBAL.url;
-    this.grupoInfo = this._session.getGrupoInfo();
-    this.grupoLogo = this.url + "grupo/" + this.grupoInfo.idGrupo + "/files/header";
+    this.grupoInfo = this._session.getGroupInfo();
+    this.grupoLogo = this.url + "api/group/files/header";
   }
 
   onNoClick(): void {

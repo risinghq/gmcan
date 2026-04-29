@@ -1,198 +1,134 @@
-import { EmailBody } from "./emailBody";
-import { Equipo } from "./equipo";
-import { Grupo } from "./grupo";
-import { LineasInvestigacion } from "./lineaInvestigacion";
-import { Noticia } from "./noticia";
-import { NoticiaFull } from "./noticiafull";
-import { Proyecto } from "./proyecto";
-import { Publicacion } from "./publicacion";
-import { UsuarioFull } from "./usuarioFull";
+import type { EmailBody } from "./emailBody";
+import type { Equipment } from "./equipment";
+import { createGroup, type Group } from "./group";
+import type { MemberFull } from "./member";
+import type { News } from "./news";
+import type { Project } from "./project";
+import type { Publication } from "./publication";
+import type { ResearchLine } from "./research-line";
+import type { Software } from "./software";
 
-export function createGrupo(): Grupo {
+export { createGroup };
+export type { Group };
+
+export function createMemberFull(): MemberFull {
   return {
-    idGrupo: 0,
-    quienesSomosResumen: "",
-    quienesSomosResumenEN: "",
-    quienesSomos: "",
-    quienesSomosEN: "",
-    direccion: "",
-    correo: "",
-    nombreGrupo: "",
-    nombreGrupo2: "",
-    objetivos: "",
-    lineasInvestigacion: "",
-    telefono: "",
-    servicios: "",
-    facilidadesRecursosFoto: "",
-    facilidadesRecursos: "",
-    facilidadesRecursosEN: "",
-    trabajosFuturos: "",
-    trabajosFuturosEN: "",
-    seccionPublicaciones: "",
-    seccionPublicacionesEN: "",
-    seccionProyectos: "",
-    seccionProyectosEN: "",
-    foto: "",
-    logoFooter: "",
-    logoHeader: "",
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
+    id: 0,
+    dni: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    maternalName: null,
+    birthDate: null,
+    bio: null,
+    bioEN: null,
+    photo: null,
+    status: 1,
+    roleId: 2,
+    memberTypeId: 0,
+    prefixId: null,
+    genderId: null,
   };
 }
 
-export function createProyecto(): Proyecto {
+export function createNews(): News {
   return {
-    idProyecto: 0,
-    titulo: "",
-    tituloEN: "",
-    codigo: "",
-    fuenteFinanciamiento: "",
-    montoFinanciado: "",
-    descripcion: "",
-    descripcionEN: "",
-    estado: 0,
-    fechaInicio: undefined,
-    fechaFin: undefined,
-    fechaI: "",
-    fechaF: "",
-    lineasInvestigacion_idLineasInvestigacion: 0,
-    lineasInvestigacion: "",
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
-    fuenteFinanciamiento_idFuenteFinanciamiento: 0,
-    moneda_idMoneda: 0,
-    moneda: "",
-    usuario: [],
+    id: 0,
+    title: "",
+    titleEN: "",
+    summary: "",
+    summaryEN: "",
+    body: "",
+    bodyEN: "",
+    status: 0,
+    publishedAt: "",
+    photo: null,
+    priority: 0,
+    authorId: null,
+    newsTypeId: 0,
+    updatedAt: null,
+    createdAt: null,
   };
 }
 
-export function createEquipo(): Equipo {
+export function createPublication(): Publication {
   return {
-    idEquipo: 0,
-    nombre: "",
+    id: 0,
+    title: "",
+    file: null,
+    abstractES: "",
+    abstractEN: "",
+    journalIssue: null,
+    doi: "",
+    publishedAt: "",
+    typeId: 0,
+    journalId: null,
+    universityId: null,
+    eventId: null,
+    thesisTypeId: null,
+    updatedAt: null,
+    createdAt: null,
+  };
+}
+
+export function createProject(): Project {
+  return {
+    id: 0,
+    title: "",
+    titleEN: "",
+    code: "",
+    fundedAmount: "",
+    description: "",
+    descriptionEN: "",
+    status: 1,
+    startDate: "",
+    endDate: null,
+    researchLineId: 0,
+    currencyId: 0,
+    fundingSourceId: 0,
+    createdAt: null,
+    updatedAt: null,
+  };
+}
+
+export function createResearchLine(): ResearchLine {
+  return {
+    id: 0,
+    name: "",
+    nameEN: "",
+    description: "",
+    descriptionEN: "",
+    photo: null,
+    groupId: 1,
+    createdAt: null,
+    updatedAt: null,
+  };
+}
+
+export function createEquipment(): Equipment {
+  return {
+    id: 0,
+    name: "",
     cpu: "",
     gpu: "",
     ram: "",
-    hd: "",
-    grupo_idGrupo: 1,
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
+    storage: "",
+    groupId: 1,
+    createdAt: null,
+    updatedAt: null,
   };
 }
 
-export function createPublicacion(): Publicacion {
+export function createSoftware(): Software {
   return {
-    idPublicacion: 0,
-    titulo: "",
-    archivo: "",
-
-    resumen: "",
-    resumenEN: "",
-    DOI: "",
-    fecha: "",
-    fechaPublicacionDate: undefined,
-    fechaPublicacion: "",
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
-    tipoPublicacion_idTipoPublicacion: 0,
-    tipoPublicacion: "",
-    revista: "",
-    nroRevista: 0,
-    revista_idRevista: 0,
-    universidad_idUniversidad: 0,
-    universidad: "",
-    autor: [],
-    ciudad_idCiudad: 0,
-    ciudad: "",
-    pais: "",
-    evento_idEvento: 0,
-    evento: "",
-    tipoTesis_idTipoTesis: 0,
-    tipoTesis: "",
-  };
-}
-
-export function createNoticia(): Noticia {
-  return {
-    idNoticia: 0,
-    titulo: "",
-    resumen: "",
-    cuerpo: "",
-    fechaPublicacion: "",
-    estado: 0,
-    status: "",
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
-    foto: "",
-    autorPublicacion: "",
-    tipoNoticia_idtipoNoticia: 0,
-    nombreTipoNoticia: "",
-    autor: "",
-  };
-}
-
-export function createNoticiaFull(): NoticiaFull {
-  return {
-    idNoticia: 0,
-    titulo: "",
-    tituloEN: "",
-    resumen: "",
-    resumenEN: "",
-    cuerpo: "",
-    cuerpoEN: "",
-    fechaPublicacionDate: undefined,
-    fechaPublicacion: "",
-    estado: 0,
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
-    fotoFile: undefined,
-    foto: "",
-    autorPublicacion: "",
-    tipoNoticia_idtipoNoticia: 0,
-  };
-}
-
-export function createUsuarioFull(): UsuarioFull {
-  return {
-    DNI: "",
-    correo: "",
-    nombre: "",
-    password: "",
-    segundoNombre: "",
-    nombreCompleto: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    foto: "",
-    estado: 0,
-    active: "",
-    resumenPro: "",
-    resumenProEN: "",
-    fechaActualizacion: undefined,
-    fechaCreacion: undefined,
-    fechaNacimiento: undefined,
-    fechaNacimientoDate: undefined,
-    tipoMiembro_idTipoMiembro: 0,
-    genero_idGenero: 0,
-    tipoMiembro: "",
-    tipoUsuario_idTipoUsuario: 0,
-    prefijo: "",
-    prefijo_idPrefijo: 0,
-  };
-}
-
-export function createLineasInvestigacion(): LineasInvestigacion {
-  return {
-    idLineasInvestigacion: 0,
-    nombre: "",
-    nombreEN: "",
-    foto: "",
-    descripcion: "",
-    descripcionEN: "",
-    grupo_idGrupo: 0,
-    fechaCreacion: undefined,
-    fechaActualizacion: undefined,
-    proyectos: [],
-    page: 0,
+    id: 0,
+    name: "",
+    description: "",
+    descriptionEN: "",
+    moreInfo: "",
+    groupId: 1,
+    createdAt: null,
+    updatedAt: null,
   };
 }
 

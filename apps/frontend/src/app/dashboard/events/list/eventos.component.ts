@@ -18,12 +18,11 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { Evento } from "@app/shared/models/eventos";
-import type { Publicacion } from "@app/shared/models/publicacion";
-import { EventoService } from "@app/shared/services/evento.service";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { EventItem } from "@app/shared/services/event.service";
+import { EventService } from "@app/shared/services/event.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
+import { PublicationService } from "@app/shared/services/publication.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
@@ -51,23 +50,22 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
   ],
 })
 export default class EventosComponent implements OnInit {
-  _eventosService = inject(EventoService);
+  _eventService = inject(EventService);
   _router = inject(Router);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _publicacionAutoresService = inject(PublicacionAutoresService);
   private _session = inject(SessionService);
   private _tabState = inject(TabStateService);
 
-  eventos: Evento[] = [];
-  resumenes: Publicacion[] = [];
+  eventos: EventItem[] = [];
+  resumenes: PublicationWithAuthors[] = [];
   url: string;
 
   displayedColumns: string[] = ["titulo", "primerAutor", "presentacion", "evento"];
   displayedColumns2: string[] = ["nombre", "pais", "ciudad"];
-  dataSource = new MatTableDataSource<Publicacion>([]);
-  dataSource2 = new MatTableDataSource<Evento>([]);
+  dataSource = new MatTableDataSource<PublicationWithAuthors>([]);
+  dataSource2 = new MatTableDataSource<EventItem>([]);
 
   readonly paginator = viewChild.required(MatPaginator);
   readonly matSort = viewChild.required(MatSort);
@@ -87,25 +85,19 @@ export default class EventosComponent implements OnInit {
   }
 
   getResumenes(): void {
-    this._publicacionService.getPublicaciones(3).subscribe((res: Publicacion[]) => {
+    this._publicationService.listPublications({ type: 3 }).subscribe((res: PublicationWithAuthors[]) => {
       if (res) {
-        res.sort((a: Publicacion, b: Publicacion) =>
-          (a.fechaPublicacion ?? "") < (b.fechaPublicacion ?? "")
-            ? 1
-            : (b.fechaPublicacion ?? "") < (a.fechaPublicacion ?? "")
-              ? -1
-              : 0,
+        res.sort((a, b) =>
+          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
         );
-        this.resumenes = res;
-        for (const resumen of this.resumenes) {
-          const d = new Date(resumen.fechaPublicacion ?? "");
+        this.resumenes = res.map((pub) => {
+          const d = new Date(pub.publishedAt ?? "");
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          resumen.fecha = this.datePipe.transform(d, "MMMM, y", "es") ?? "";
-          resumen.fecha = this.titlecasePipe.transform(resumen.fecha) ?? "";
-          resumen.autor = [];
-          this.getAuthors(resumen);
-          this.getSpeEvento(resumen);
-        }
+          return {
+            ...pub,
+            fecha: this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? ""),
+          };
+        });
         this.dataSource = new MatTableDataSource(this.resumenes);
         this.dataSource.sort = this.matSort();
         this.dataSource.paginator = this.paginator();
@@ -113,22 +105,8 @@ export default class EventosComponent implements OnInit {
     });
   }
 
-  getSpeEvento(publicacion: Publicacion): void {
-    this._eventosService.getEvento(publicacion.evento_idEvento ?? 0).subscribe((res: Evento[]) => {
-      if (res[0]) {
-        publicacion.evento = res[0].nombre;
-      }
-    });
-  }
-
-  getAuthors(publicacion: Publicacion): void {
-    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
-      publicacion.autor = authors;
-    });
-  }
-
   getEventos(): void {
-    this._eventosService.getEventoesAll().subscribe((res: Evento[]) => {
+    this._eventService.listAdmin().subscribe((res: EventItem[]) => {
       if (res) {
         this.eventos = res;
         this.dataSource2 = new MatTableDataSource(this.eventos);
@@ -146,11 +124,7 @@ export default class EventosComponent implements OnInit {
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
-    if (this.dataSource.filteredData.length == 0) {
-      this.displayedNotFound = true;
-    } else {
-      this.displayedNotFound = false;
-    }
+    this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
   displayedNotFound2 = false;
@@ -161,11 +135,7 @@ export default class EventosComponent implements OnInit {
     if (this.dataSource2.paginator) {
       this.dataSource2.paginator.firstPage();
     }
-    if (this.dataSource2.filteredData.length == 0) {
-      this.displayedNotFound2 = true;
-    } else {
-      this.displayedNotFound2 = false;
-    }
+    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
   }
 
   changedTab(event: number): void {
@@ -186,7 +156,7 @@ export default class EventosComponent implements OnInit {
     this._router.navigate(["dashboard/add-evento"]);
   }
 
-  editEvento(idEvento: number): void {
-    this._router.navigate(["dashboard/edit-evento/" + idEvento]);
+  editEvento(id: number): void {
+    this._router.navigate(["dashboard/edit-evento/" + id]);
   }
 }

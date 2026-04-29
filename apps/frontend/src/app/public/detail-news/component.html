@@ -18,33 +18,31 @@
       </div>
       <div class="card-detail">
         <div class="news-title-div">
-          @if (noticia.foto) {
-          <img class="detail-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+          @if (noticia.photo) {
+          <img class="detail-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
           }
-          <div class="news-title">{{ noticia.titulo }}</div>
+          <div class="news-title">{{ noticia.title }}</div>
         </div>
         <div class="detail-text-div">
-          <div class="news-abstract">{{ noticia.resumen }}</div>
+          <div class="news-abstract">{{ noticia.summary }}</div>
           <div class="autor-div">
             <div class="autor-img-div">
-              @if (usuario.foto) {
-              <img class="autor-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
+              @if (autorPhoto && autorId) {
+              <img class="autor-img" src="{{ url + 'api/members/' + autorId + '/photo' }}" />
               }
             </div>
             <div class="autor-text">
-              <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
-              <div class="autor-name">
-                {{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}
-              </div>
+              <div class="news-type">{{ tipoNoticia }}</div>
+              <div class="autor-name">{{ autorName }}</div>
               <div class="news-date">
                 {{ language.detailNewsText[0].written1 }} {{ dia }} {{ language.detailNewsText[0].written2 }} {{ mes }}
                 {{ language.detailNewsText[0].written3 }} {{ anio }}
               </div>
             </div>
           </div>
-          <app-shared-share-buttons [url]="url + 'noticia/' + noticia.idNoticia" [title]="noticia.titulo" />
+          <app-shared-share-buttons [url]="url + 'api/news/' + noticia.id" [title]="noticia.title" />
 
-          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.cuerpo ?? ''"></div>
+          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.body ?? ''"></div>
         </div>
       </div>
     </div>

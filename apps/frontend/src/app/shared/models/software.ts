@@ -1,10 +1,10 @@
 export interface Software {
-  idSoftware?: number;
-  nombre?: string;
-  descripcion?: string;
-  descripcionEN?: string;
-  moreInfo?: string;
-  grupo_idGrupo?: number;
-  fechaCreacion?: Date;
-  fechaActualizacion?: Date;
+  id: number;
+  name: string | null;
+  description: string | null;
+  descriptionEN: string | null;
+  moreInfo: string | null;
+  groupId: number;
+  createdAt: string | null;
+  updatedAt: string | null;
 }

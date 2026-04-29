@@ -4,9 +4,9 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { AdminRevistaService } from "@app/shared/services/admin-revista.service";
+import type { JournalItem } from "@app/shared/services/ref.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
 @Component({
@@ -21,14 +21,15 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _adminRevistaService = inject(AdminRevistaService);
+  private _refService = inject(RefService);
 
-  revista: Revista;
+  revista: JournalItem = { id: 0, name: "" };
   public revistaForm: FormGroup;
   button_text = "Guardar revista";
+  notCanDo = false;
+  edit = false;
 
   constructor() {
-    this.revista = { idRevista: 0, nombre: "" };
     this.revistaForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
@@ -40,16 +41,15 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
     return this.revistaForm.dirty;
   }
 
-  notCanDo = false;
-  edit = false;
   openEraser() {}
 
   submitRevista(): void {
-    this._adminRevistaService.addRevista(this.revista).subscribe((result: { status?: number }) => {
-      if (result.status == 1) {
+    if (!this.revistaForm.valid) return;
+    this._refService.createJournal({ name: this.revista.name }).subscribe((result) => {
+      if (result.id) {
         this.revistaForm.markAsPristine();
         this.return();
-        this.openSnackBar();
+        this.openSnackBar("Revista agregada exitosamente");
       }
     });
   }
@@ -58,8 +58,8 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
     this._router.navigate(["dashboard/articulos"]);
   }
 
-  openSnackBar(): void {
-    this._snackBar.open("Revista agregada exitosamente", undefined, {
+  openSnackBar(msg = "Revista agregada exitosamente"): void {
+    this._snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

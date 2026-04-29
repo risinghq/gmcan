@@ -1,16 +1,8 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, OnInit, DestroyRef, inject } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
-} from "@angular/forms";
+import { AsyncPipe } from "@angular/common";
+import { Component, OnInit, inject } from "@angular/core";
+import { FormBuilder, FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
 import {
@@ -29,40 +21,33 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { createProyecto } from "@app/shared/models/factories";
-import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
-import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
-import type { Proyecto } from "@app/shared/models/proyecto";
+import { createProject } from "@app/shared/models/factories";
+import type { Member } from "@app/shared/models/member";
+import type { Project } from "@app/shared/models/project";
+import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { Usuario } from "@app/shared/models/usuario";
-import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { MemberService } from "@app/shared/services/member.service";
+import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 import { AutosizeModule } from "ngx-autosize";
+import { Observable } from "rxjs";
+import { startWith, map } from "rxjs/operators";
 
-interface UserOption {
-  DNI?: string | null;
-  nombre?: string;
-  apellidoPaterno?: string;
-  apellidoMaterno?: string;
-  foto?: string;
-}
-
-interface AutorProyectoItem {
+interface MemberOption {
   id: number;
-  DNI: string | null;
-  nombre: string;
-  isAutor?: boolean;
+  name: string;
 }
 
-interface StatusResponse {
-  status?: number;
+interface ProjectMemberRow {
+  id: number;
+  memberId: number | null;
+  name: string;
+  myControl: FormControl<string>;
+  filteredOptions?: Observable<MemberOption[]>;
 }
 
 @Component({
@@ -84,6 +69,9 @@ interface StatusResponse {
     MatDatepickerToggle,
     MatSuffix,
     MatDatepicker,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    AsyncPipe,
   ],
 })
 export default class EditProyectoComponent implements OnInit, HasUnsavedChanges {
@@ -91,187 +79,179 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   private _snackBar = inject(MatSnackBar);
-  private _usuarioService = inject(UsuarioService);
-  private _lineaInvestigacionService = inject(LineasInvestigacionService);
-  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  private _memberService = inject(MemberService);
+  private _researchLinesService = inject(ResearchLinesService);
   lookup = inject(LookupService);
-  private _proyectoService = inject(ProyectoService);
-  private _usuariohasproyecto = inject(UsuarioHasProyectoService);
+  private _projectService = inject(ProjectService);
   dialog = inject(MatDialog);
   private _tabState = inject(TabStateService);
-  private readonly destroyRef = inject(DestroyRef);
 
   edit = true;
   terminado = false;
   button_text = "Actualizar información";
   button_text2 = "Concluir proyecto";
-  usuarios: Usuario[] = [];
-  lineasInvestigacion: LineasInvestigacion[] = [];
-  fuentesFinaciamiento: FuenteFinanciamiento[] = [];
-  proyecto: Proyecto;
+  memberOptions: MemberOption[] = [];
+  researchLines: ResearchLine[] = [];
+  proyecto: Project & { startDateObj?: Date; endDateObj?: Date };
   proyectoForm: FormGroup;
   get monedas() {
     return this.lookup.monedas();
   }
+  get fundingSources() {
+    return this.lookup.fundingSources();
+  }
   url: string;
+
+  disableSelect = false;
+
+  miembrosProyecto: ProjectMemberRow[] = [];
+  private originalMemberIds: number[] = [];
 
   constructor() {
     this.proyectoForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      títuloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      títuloEN: [""],
       codigo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaInicio: ["", [Validators.required]],
-      lineasInvestigacion_idLineasInvestigacion: ["", [Validators.required]],
-      fuenteFinanciamiento_idFuenteFinanciamiento: ["", [Validators.required]],
-      moneda_idMoneda: ["", [Validators.required]],
+      fechaInicio: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      researchLineId: ["", [Validators.required]],
+      fundingSourceId: ["", [Validators.required]],
+      currencyId: ["", [Validators.required]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: [""],
       montoFinanciado: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaFin: [""],
     });
-    this.proyecto = createProyecto();
+    this.proyecto = { ...createProject() };
     this.url = GLOBAL.url;
-    this.proyectoForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      const fechaInicioControl = this.proyectoForm.get("fechaInicio");
-      if (fechaInicioControl?.hasError("lessThan")) {
-        this.field2HasError = true;
-      } else {
-        this.field2HasError = false;
-      }
-    });
-  }
-  field2HasError = false;
-
-  greaterThan(field: string): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const group = control.parent;
-      if (!group) {
-        return null;
-      }
-      const fieldToCompare = group.get(field);
-      if (!fieldToCompare?.value || !control.value) {
-        return null;
-      }
-      const d = new Date(fieldToCompare.value);
-      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      const e = new Date(control.value);
-      e.setMinutes(e.getMinutes() + e.getTimezoneOffset());
-      let isLessThan = false;
-      if (e) {
-        isLessThan = d > e;
-      }
-      return isLessThan ? { lessThan: { value: control.value } } : null;
-    };
   }
 
   ngOnInit(): void {
-    this.getProyecto();
+    this.loadProject();
   }
 
   isDirty(): boolean {
     return this.proyectoForm.dirty;
   }
 
-  disableSelect = false;
-
-  ngAfterViewChecked(): void {
-    if (this.proyecto.estado == 0) {
-      const element = document.getElementsByClassName("text-autocomplete-normal");
-      for (let index = 0; index < element.length; index++) {
-        element[index].className = "text-autocomplete";
-      }
-    }
-  }
-
-  getProyecto(): void {
-    const idProyecto = Number(this._route.snapshot.params["id"] ?? 0);
-    this._proyectoService.getProject(idProyecto).subscribe((result: Proyecto[]) => {
+  loadProject(): void {
+    const id = Number(this._route.snapshot.params["id"]);
+    this._projectService.getProject(id).subscribe((result: Project) => {
       if (result) {
-        this.proyecto = result[0];
-        let d = new Date(this.proyecto.fechaInicio ?? new Date());
+        const d = new Date(result.startDate ?? new Date());
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.proyecto.fechaInicio = d;
-        localStorage.setItem("proyectoEdit", JSON.stringify(this.proyecto.titulo ?? ""));
-        if (this.proyecto.estado == 0) {
+        this.proyecto = {
+          ...result,
+          startDateObj: d,
+          endDateObj: result.endDate
+            ? (() => {
+                const e = new Date(result.endDate!);
+                e.setMinutes(e.getMinutes() + e.getTimezoneOffset());
+                return e;
+              })()
+            : undefined,
+        };
+        localStorage.setItem("proyectoEdit", JSON.stringify(result.title ?? ""));
+        if (result.status === 0) {
           this.terminado = true;
-          this.proyectoForm.get("fechaFin")?.setValidators(this.greaterThan("fechaInicio"));
-          d = new Date(this.proyecto.fechaFin ?? new Date());
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.proyecto.fechaFin = d;
-          this.proyectoForm.disable();
-          this.proyectoForm.controls["fechaFin"]?.enable();
           this.disableSelect = true;
           this.button_text2 = "Reactivar proyecto";
+          this.proyectoForm.disable();
+          this.proyectoForm.controls["fechaFin"]?.enable();
         }
-        this.getLineaInvestigacion();
-        this.getUsuariosPublicacion(this.proyecto.idProyecto ?? 0);
+        this.loadResearchLines();
+        this.loadProjectMembers(id);
       }
     });
   }
 
-  getUsuariosPublicacion(idProyecto: number): void {
-    this._usuariohasproyecto.getUsuarioHasProyectos(idProyecto).subscribe((result: { usuario_DNI?: string }[]) => {
+  loadResearchLines(): void {
+    this._researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
       if (result) {
-        for (let index = 0; index < result.length; index++) {
-          this.getUsuario(result[index].usuario_DNI ?? "");
-        }
+        this.researchLines = result;
+        this.loadMembers();
       }
     });
   }
 
-  getUsuario(DNI: string): void {
-    this._usuarioService.getUser(DNI).subscribe((result: Usuario[]) => {
+  loadMembers(): void {
+    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
-        const user: UserOption = {
-          ...result[0],
-          nombre:
-            `${result[0].nombre ?? ""} ${result[0].apellidoPaterno ?? ""} ${result[0].apellidoMaterno ?? ""}`.trim(),
-        };
-        this.autoresSeleccionados.push(user);
-        this.setearOtrosAutores();
+        result.sort((a, b) => a.firstName.localeCompare(b.firstName));
+        this.memberOptions = result.map((m) => ({
+          id: m.id,
+          name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
+        }));
       }
     });
   }
 
-  setearOtrosAutores(): void {
-    this.otrosAutores = [];
-    for (let index = 0; index < this.autoresSeleccionados.length; index++) {
-      this.otrosAutores.push({
-        id: this.otrosAutores.length + 1,
-        DNI: this.autoresSeleccionados[index].DNI ?? null,
-        nombre: this.autoresSeleccionados[index].nombre ?? "",
-      });
+  loadProjectMembers(projectId: number): void {
+    this._projectService.getProjectMembers(projectId).subscribe((members) => {
+      const rows = members as { memberId: number; name: string }[];
+      this.originalMemberIds = rows.map((r) => r.memberId);
+      if (rows.length > 0) {
+        this.miembrosProyecto = rows.map((r, i) => {
+          const row: ProjectMemberRow = {
+            id: i + 1,
+            memberId: r.memberId,
+            name: r.name,
+            myControl: new FormControl<string>(r.name, { nonNullable: true }),
+          };
+          row.filteredOptions = row.myControl.valueChanges.pipe(
+            startWith(r.name),
+            map((v) => this.filterMembers(v ?? "")),
+          );
+          return row;
+        });
+      } else {
+        this.miembrosProyecto = [this.newMemberRow()];
+      }
+    });
+  }
+
+  private newMemberRow(): ProjectMemberRow {
+    const row: ProjectMemberRow = {
+      id: this.miembrosProyecto.length + 1,
+      memberId: null,
+      name: "",
+      myControl: new FormControl<string>("", { nonNullable: true }),
+    };
+    row.filteredOptions = row.myControl.valueChanges.pipe(
+      startWith(""),
+      map((v) => this.filterMembers(v ?? "")),
+    );
+    return row;
+  }
+
+  private filterMembers(value: string): MemberOption[] {
+    const lower = value.toLowerCase();
+    return this.memberOptions.filter((m) => m.name.toLowerCase().includes(lower));
+  }
+
+  addAnotherMember(): void {
+    this.miembrosProyecto.push(this.newMemberRow());
+  }
+
+  removeAnotherMember(i: number): void {
+    if (i === 0 && this.miembrosProyecto.length === 1) {
+      this.miembrosProyecto[0] = this.newMemberRow();
+    } else {
+      this.miembrosProyecto.splice(i, 1);
     }
-    if (this.autoresSeleccionados.length == 0) {
-      this.otrosAutores.push({
-        id: 1,
-        DNI: null,
-        nombre: "",
-      });
+  }
+
+  selectMember(option: MemberOption | { value?: string }, i: number): void {
+    if ("id" in option) {
+      this.miembrosProyecto[i].memberId = option.id;
+      this.miembrosProyecto[i].name = option.name;
+      this.miembrosProyecto[i].myControl.setValue(option.name);
+    } else {
+      const name = (option as { value?: string }).value ?? "";
+      const found = this.memberOptions.find((m) => m.name === name) ?? null;
+      this.miembrosProyecto[i].memberId = found?.id ?? null;
+      this.miembrosProyecto[i].name = name;
     }
   }
-
-  autoresSeleccionados: UserOption[] = [];
-
-  getLineaInvestigacion(): void {
-    this._lineaInvestigacionService.getLineasInvestigacion().subscribe((result: LineasInvestigacion[]) => {
-      if (result) {
-        this.lineasInvestigacion = result;
-        this.getFuenteFinanciamiento();
-      }
-    });
-  }
-
-  getFuenteFinanciamiento(): void {
-    this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result: FuenteFinanciamiento[]) => {
-      if (result) {
-        this.fuentesFinaciamiento = result;
-        this.getUsuarios();
-      }
-    });
-  }
-
-  options: UserOption[] = [];
 
   return(): void {
     this._tabState.projectTab.set(0);
@@ -286,151 +266,81 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
     });
   }
 
-  getUsuarios(): void {
-    this._usuarioService.getUsuarios().subscribe((result: Usuario[]) => {
-      if (result) {
-        result.sort((a: Usuario, b: Usuario) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
-        );
-        this.usuarios = result;
-        for (let index = 0; index < this.usuarios.length; index++) {
-          this.usuarios[index].nombre =
-            (this.usuarios[index].nombre ?? "") +
-            " " +
-            (this.usuarios[index].apellidoPaterno ?? "") +
-            " " +
-            (this.usuarios[index].apellidoMaterno ?? "");
-          this.options.push(this.usuarios[index]);
-        }
-      }
-    });
-  }
-
-  otrosAutores: AutorProyectoItem[] = [];
-
-  addAnotherAuthor(): void {
-    this.otrosAutores.push({
-      id: this.otrosAutores.length + 1,
-      DNI: null,
-      nombre: "",
-    });
-  }
-
-  removeAnotherAuthor(i: number) {
-    if (i > 0) {
-      this.otrosAutores.splice(i, 1);
-    } else if (i == 0 && this.otrosAutores.length == 1) {
-      this.otrosAutores.splice(i, 1);
-      this.addAnotherAuthor();
-    } else {
-      this.otrosAutores.splice(i, 1);
-    }
-  }
-
-  selectUserAutor(evento: UserOption | { value?: string }, value: number, i: number): void {
-    if (value == 1) {
-      this.otrosAutores[i].DNI = (evento as UserOption).DNI ?? null;
-      this.otrosAutores[i].nombre = (evento as UserOption).nombre ?? "";
-    } else {
-      const index = this.options.findIndex(
-        (option: UserOption) => option.nombre === (evento as { value?: string }).value,
-      );
-      if (index === -1) {
-        return;
-      }
-      if (this.options[index].DNI) {
-        this.otrosAutores[i].DNI = this.options[index].DNI ?? null;
-      } else {
-        this.otrosAutores[i].DNI = this.options[index].DNI ?? null;
-        this.otrosAutores[i].isAutor = false;
-      }
-      this.otrosAutores[i].nombre = this.options[index].nombre ?? "";
-    }
-  }
-
   submitProyecto(): void {
-    this.revisarValues();
-    if (this.proyectoForm.valid && this.otrosAutores.length > 0 && this.otrosAutores[0].nombre != "") {
-      const momentDate = new Date(this.proyecto.fechaInicio ?? new Date());
-      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
-      this.proyecto.fechaI = formattedDate;
-      if (this.proyecto.fechaFin) {
-        const momentDate1 = new Date(this.proyecto.fechaFin);
-        const formattedDate1 = new Date(momentDate1).toLocaleDateString("sv");
-        this.proyecto.fechaF = formattedDate1;
-      }
-      this._proyectoService.updateProyecto(this.proyecto).subscribe((updateResponse: StatusResponse) => {
-        if (updateResponse.status == 1) {
-          this._usuariohasproyecto
-            .deleteUsuarioProyecto(this.proyecto.idProyecto ?? 0)
-            .subscribe((deleteUserProjectResponse: StatusResponse) => {
-              if (deleteUserProjectResponse.status == 1) {
-                for (let index = 0; index < this.otrosAutores.length; index++) {
-                  this.setAutores(this.otrosAutores[index], this.proyecto.idProyecto ?? 0);
-                }
-              }
-            });
-          this.proyectoForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Proyecto actualizado exitosamente");
+    if (!this.proyectoForm.valid) return;
+
+    const startDate = new Date(this.proyecto.startDateObj ?? new Date()).toLocaleDateString("sv");
+    const endDate = this.proyecto.endDateObj ? new Date(this.proyecto.endDateObj).toLocaleDateString("sv") : undefined;
+
+    const body: ProjectBody = {
+      title: this.proyecto.title,
+      titleEN: this.proyecto.titleEN ?? undefined,
+      code: this.proyecto.code,
+      fundedAmount: this.proyecto.fundedAmount,
+      description: this.proyecto.description,
+      descriptionEN: this.proyecto.descriptionEN ?? undefined,
+      startDate,
+      endDate,
+      researchLineId: this.proyecto.researchLineId,
+      currencyId: this.proyecto.currencyId,
+      fundingSourceId: this.proyecto.fundingSourceId,
+    };
+
+    this._projectService.updateProject(this.proyecto.id, body).subscribe((res) => {
+      if (res.status === 1) {
+        const newMemberIds = this.miembrosProyecto.filter((r) => r.memberId != null).map((r) => r.memberId as number);
+        const toRemove = this.originalMemberIds.filter((id) => !newMemberIds.includes(id));
+        const toAdd = newMemberIds.filter((id) => !this.originalMemberIds.includes(id));
+        for (const memberId of toRemove) {
+          this._projectService.removeProjectMember(this.proyecto.id, memberId).subscribe(() => {});
         }
-      });
-    }
+        for (const memberId of toAdd) {
+          this._projectService.addProjectMember(this.proyecto.id, memberId).subscribe(() => {});
+        }
+        this.proyectoForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Proyecto actualizado exitosamente");
+      }
+    });
   }
 
   projectEnd(): void {
-    if (this.proyecto.estado == 1) {
-      this.proyecto.estado = 0;
-      this._proyectoService.endProyecto(this.proyecto).subscribe((result: StatusResponse) => {
-        if (result.status == 1) {
-          this.proyectoForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Proyecto concluido exitosamente");
-        }
-      });
-    } else {
-      this.proyecto.estado = 1;
-      this._proyectoService.restartProyecto(this.proyecto).subscribe((result: StatusResponse) => {
-        if (result.status == 1) {
-          this.proyectoForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Proyecto reactivado exitosamente");
-        }
-      });
-    }
-  }
-
-  setAutores(autor: AutorProyectoItem, idProyecto: number): void {
-    const usuarioPublicacion = { usuario_DNI: autor.DNI ?? "", proyecto_idProyecto: idProyecto };
-    this._usuariohasproyecto.addUsuarioProyecto(usuarioPublicacion).subscribe((_res: unknown) => {});
-  }
-
-  revisarValues(): void {
-    for (let index = 0; index < this.otrosAutores.length; index++) {
-      const found = this.options.findIndex((option: UserOption) => option.nombre === this.otrosAutores[index].nombre);
-      if (found == -1) {
-        this.otrosAutores[index].DNI = null;
-        this.otrosAutores[index].isAutor = true;
+    const newStatus = this.proyecto.status === 1 ? 0 : 1;
+    const startDate = new Date(this.proyecto.startDateObj ?? new Date()).toLocaleDateString("sv");
+    const endDate = this.proyecto.endDateObj ? new Date(this.proyecto.endDateObj).toLocaleDateString("sv") : undefined;
+    const body: ProjectBody = {
+      title: this.proyecto.title,
+      titleEN: this.proyecto.titleEN ?? undefined,
+      code: this.proyecto.code,
+      fundedAmount: this.proyecto.fundedAmount,
+      description: this.proyecto.description,
+      descriptionEN: this.proyecto.descriptionEN ?? undefined,
+      startDate,
+      endDate,
+      researchLineId: this.proyecto.researchLineId,
+      currencyId: this.proyecto.currencyId,
+      fundingSourceId: this.proyecto.fundingSourceId,
+      status: newStatus,
+    };
+    this._projectService.updateProject(this.proyecto.id, body).subscribe((result) => {
+      if (result.status === 1) {
+        this.proyectoForm.markAsPristine();
+        this.return();
+        this.openSnackBar(newStatus === 0 ? "Proyecto concluido exitosamente" : "Proyecto reactivado exitosamente");
       }
-    }
+    });
   }
 
-  erasePublicacion(): void {
-    this._usuariohasproyecto
-      .deleteUsuarioProyecto(this.proyecto.idProyecto ?? 0)
-      .subscribe((deleteUserProjectResponse: StatusResponse) => {
-        if (deleteUserProjectResponse.status == 1) {
-          this._proyectoService
-            .deleteProyecto(this.proyecto.idProyecto ?? 0)
-            .subscribe((deleteProjectResponse: StatusResponse) => {
-              if (deleteProjectResponse.status == 1) {
-                this.proyectoForm.markAsPristine();
-                this.return();
-                this.openSnackBar("Proyecto eliminado exitosamente");
-              }
-            });
-        }
-      });
+  eraseProject(): void {
+    this._projectService.deleteProject(this.proyecto.id).subscribe((result) => {
+      if (result.status === 1) {
+        this.proyectoForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Proyecto eliminado exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
+      }
+    });
   }
 
   private dialogRef2?: MatDialogRef<DialogErase10>;
@@ -441,14 +351,14 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
       id: "idleTimer",
       data: {
         title: "Eliminar proyecto",
-        text: "¿Estás seguro que deseas eliminar esta proyecto?",
+        text: "¿Estás seguro que deseas eliminar este proyecto?",
         cancel: "Sí, eliminar",
         yes: "No, cancelar",
       },
     });
     this.dialogRef2.afterClosed().subscribe((result: boolean) => {
       if (result) {
-        this.erasePublicacion();
+        this.eraseProject();
       }
     });
   }

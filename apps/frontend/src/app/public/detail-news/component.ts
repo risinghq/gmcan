@@ -5,8 +5,7 @@ import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
-import type { Noticia } from "@app/shared/models/noticia";
-import type { Usuario } from "@app/shared/models/usuario";
+import type { News } from "@app/shared/models/news";
 import { GLOBAL } from "@app/shared/services/global";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
@@ -28,16 +27,11 @@ export default class DetailNewsComponent implements OnInit {
   private readonly _meta = inject(Meta);
   private readonly _titleService = inject(Title);
 
-  noticia: Noticia = {} as Noticia;
-  usuario: Usuario = {
-    DNI: "",
-    nombre: "",
-    nombreCompleto: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    foto: "",
-    isPrincipal: 0,
-  };
+  noticia: News = {} as News;
+  tipoNoticia = "";
+  autorName = "";
+  autorPhoto: string | null = null;
+  autorId: number | null = null;
   previouspage = "";
   previouslink: string | null = null;
   cargado = false;
@@ -52,14 +46,17 @@ export default class DetailNewsComponent implements OnInit {
     const newsData = this._route.snapshot.data["news"] as DetailNewsViewModel;
 
     this.noticia = newsData.noticia;
-    this.usuario = newsData.usuario ?? this.usuario;
+    this.tipoNoticia = newsData.tipoNoticia;
+    this.autorName = newsData.autorName;
+    this.autorPhoto = newsData.autorPhoto;
+    this.autorId = newsData.autorId;
     this.dia = newsData.dia;
     this.mes = newsData.mes;
     this.anio = newsData.anio;
 
-    this._meta.updateTag({ name: "title", content: String(this.noticia.titulo) });
-    this._meta.updateTag({ property: "og:title", content: String(this.noticia.titulo) });
-    this._titleService.setTitle(String(this.noticia.titulo));
+    this._meta.updateTag({ name: "title", content: String(this.noticia.title) });
+    this._meta.updateTag({ property: "og:title", content: String(this.noticia.title) });
+    this._titleService.setTitle(String(this.noticia.title));
 
     this.previouslink = this._navigationHistory.previousUrl();
     this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");

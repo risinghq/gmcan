@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable, tap } from "rxjs";
 
+import type { Member } from "../models/member";
 import { GLOBAL } from "./global";
 
 @Injectable({ providedIn: "root" })
@@ -10,8 +11,8 @@ export class AuthService {
 
   private readonly USER_KEY = "user";
 
-  login(user: { correo: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${GLOBAL.url}usuario/login`, user).pipe(
+  login(credentials: { email: string; password: string }): Observable<{ user: Member }> {
+    return this.http.post<{ user: Member }>(`${GLOBAL.url}admin/auth/login`, credentials).pipe(
       tap((res) => {
         if (res?.user) {
           localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
@@ -21,14 +22,14 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${GLOBAL.url}usuario/logout`, {}).pipe(tap(() => this.clearLocalStorage()));
+    return this.http.post<void>(`${GLOBAL.url}admin/auth/logout`, {}).pipe(tap(() => this.clearLocalStorage()));
   }
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem(this.USER_KEY);
   }
 
-  getUser(): any {
+  getUser(): Member | null {
     try {
       const u = localStorage.getItem(this.USER_KEY);
       return u ? JSON.parse(u) : null;

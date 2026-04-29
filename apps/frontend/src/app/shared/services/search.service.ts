@@ -14,6 +14,6 @@ export class SearchService {
     if (types && types.length > 0) {
       params["types"] = types.join(",");
     }
-    return this.http.get<SearchResults>(`${GLOBAL.url}search`, { params });
+    return this.http.get<SearchResults>(`${GLOBAL.url}api/search`, { params });
   }
 }

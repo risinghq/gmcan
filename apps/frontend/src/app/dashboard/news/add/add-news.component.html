@@ -18,14 +18,14 @@
               <img class="img-set" src="{{ previewUrl }}" />
             </div>
           }
-          @if (!previewUrl && !noticia.foto) {
+          @if (!previewUrl && !noticia.photo) {
             <div class="news-img">
               <img src="../../assets/img/upload.svg" />
             </div>
           }
-          @if (noticia.foto && !previewUrl) {
+          @if (noticia.photo && !previewUrl) {
             <div class="img-preview">
-              <img class="img-set" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" />
+              <img class="img-set" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
             </div>
           }
           <div class="green-text mt-16">
@@ -41,12 +41,12 @@
         <div class="full-width">
           <div class="full-width">
             <div class="text-category">
-              Título en español <span>({{ noticia.titulo?.length ?? 0 }}/100) </span>
+              Título en español <span>({{ noticia.title?.length ?? 0 }}/100) </span>
               <span class="red-text">*</span>
             </div>
             <input
               class="input-category"
-              [(ngModel)]="noticia.titulo"
+              [(ngModel)]="noticia.title"
               formControlName="titulo"
               name="titulo"
               maxlength="100"
@@ -55,12 +55,12 @@
           </div>
           <div class="full-width">
             <div class="text-category">
-              Título en inglés <span>({{ noticia.tituloEN?.length ?? 0 }}/100) </span>
+              Título en inglés <span>({{ noticia.titleEN?.length ?? 0 }}/100) </span>
               <span class="red-text">*</span>
             </div>
             <input
               class="input-category"
-              [(ngModel)]="noticia.tituloEN"
+              [(ngModel)]="noticia.titleEN"
               formControlName="tituloEN"
               name="tituloEN"
               maxlength="100"
@@ -73,7 +73,7 @@
               <mat-form-field class="input-category">
                 <input
                   matInput
-                  [(ngModel)]="noticia.fechaPublicacionDate"
+                  [(ngModel)]="publishedAtObj"
                   [matDatepicker]="dp"
                   formControlName="fechaPublicacion"
                   name="fechaPublicacion"
@@ -87,12 +87,12 @@
               <div class="text-category">Categoría <span class="red-text">*</span></div>
               <mat-form-field class="input-category">
                 <mat-select
-                  [(ngModel)]="noticia.tipoNoticia_idtipoNoticia"
+                  [(ngModel)]="noticia.newsTypeId"
                   formControlName="tipoNoticia_idtipoNoticia"
                   name="tipoNoticia_idtipoNoticia"
                 >
                   @for (categoria of categorias; track categoria) {
-                    <mat-option [value]="categoria.idtipoNoticia">{{ categoria.nombre }}</mat-option>
+                    <mat-option [value]="categoria.id">{{ categoria.name }}</mat-option>
                   }
                 </mat-select>
               </mat-form-field>
@@ -101,21 +101,21 @@
           <div class="full-width">
             <div class="text-category">Autor <span class="red-text">*</span></div>
             <mat-form-field class="input-category">
-              <mat-select
-                [(ngModel)]="noticia.autorPublicacion"
-                formControlName="autorPublicacion"
-                name="autorPublicacion"
-              >
+              <mat-select [(ngModel)]="noticia.authorId" formControlName="autorPublicacion" name="autorPublicacion">
                 @for (autor of autores; track autor) {
-                  <mat-option [value]="autor.DNI" class="mdc-list-item">
-                    @if (!autor.foto) {
+                  <mat-option [value]="autor.id" class="mdc-list-item">
+                    @if (!autor.photo) {
                       <img class="mdc-list-item__graphic img-user" src="../../assets/img/user.png" />
                     }
-                    @if (autor.foto) {
-                      <img class="mdc-list-item__graphic img-user" src="{{ url + 'usuario/' + autor.DNI + '/file }}" />
+                    @if (autor.photo) {
+                      <img
+                        class="mdc-list-item__graphic img-user"
+                        src="{{ url + 'api/members/' + autor.id + '/photo' }}"
+                      />
                     }
                     <span class="mdc-list-item__text"
-                      >{{ autor.nombre }} {{ autor.apellidoPaterno }} {{ autor.apellidoMaterno }}</span
+                      >{{ autor.firstName }} {{ autor.lastName
+                      }}{{ autor.maternalName ? " " + autor.maternalName : "" }}</span
                     >
                   </mat-option>
                 }
@@ -126,11 +126,11 @@
       </div>
       <div class="full-width mb-32">
         <div class="text-category">
-          Resumen en español <span>({{ noticia.resumen?.length ?? 0 }}/500) </span>
+          Resumen en español <span>({{ noticia.summary?.length ?? 0 }}/500) </span>
           <span class="red-text">*</span>
         </div>
         <textarea
-          [(ngModel)]="noticia.resumen"
+          [(ngModel)]="noticia.summary"
           formControlName="resumen"
           name="resumen"
           autosize
@@ -141,11 +141,11 @@
       </div>
       <div class="full-width mb-32">
         <div class="text-category">
-          Resumen en inglés <span>({{ noticia.resumenEN?.length ?? 0 }}/500) </span>
+          Resumen en inglés <span>({{ noticia.summaryEN?.length ?? 0 }}/500) </span>
           <span class="red-text">*</span>
         </div>
         <textarea
-          [(ngModel)]="noticia.resumenEN"
+          [(ngModel)]="noticia.summaryEN"
           formControlName="resumenEN"
           name="resumenEN"
           autosize
@@ -159,14 +159,14 @@
           <div class="text-category">Contenido en español <span class="red-text">*</span></div>
           <div class="green-text right plex-sans" (click)="previewNews(0)">Vista Previa</div>
         </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpo" formControlName="cuerpo" name="cuerpo" />
+        <ckeditor [editor]="Editor" [(ngModel)]="noticia.body" formControlName="cuerpo" name="cuerpo" />
       </div>
       <div class="full-width mb-32">
         <div class="flex-news">
           <div class="text-category">Contenido en inglés <span class="red-text">*</span></div>
           <div class="green-text right plex-sans" (click)="previewNews(1)">Vista Previa</div>
         </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="noticia.cuerpoEN" formControlName="cuerpoEN" name="cuerpoEN" />
+        <ckeditor [editor]="Editor" [(ngModel)]="noticia.bodyEN" formControlName="cuerpoEN" name="cuerpoEN" />
       </div>
       <div class="flex-news">
         @if (edit) {
@@ -181,8 +181,8 @@
         </div>
         <div
           [class]="{
-            'black-btn': newsForm.valid && (noticia.foto || fileData != null || previewUrl),
-            'btn-grey': !(newsForm.valid && (noticia.foto || fileData != null || previewUrl)),
+            'black-btn': newsForm.valid && (noticia.photo || fileData != null || previewUrl),
+            'btn-grey': !(newsForm.valid && (noticia.photo || fileData != null || previewUrl)),
           }"
         >
           <div class="link link-set" (click)="submitNews(1)">

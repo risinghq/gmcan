@@ -2,12 +2,12 @@ import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute } from "@angular/router";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
+import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
   selector: "app-change-pass",
@@ -19,12 +19,12 @@ export default class ChangePassComponent implements OnInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private usuarioService = inject(UsuarioService);
-  private grupoService = inject(GrupoService);
+  private _emailService = inject(EmailService);
+  private _groupService = inject(GroupService);
   private session = inject(SessionService);
 
   public passwordForm: FormGroup;
-  public grupoInfo: Grupo;
+  public grupoInfo: Group;
   public url: string;
   public loading = false;
   public success = false;
@@ -32,12 +32,11 @@ export default class ChangePassComponent implements OnInit {
   public language: any;
 
   private resetToken: string | null = null;
-  public userInfo: any = null;
   public tokenValid = false;
 
   constructor() {
     this.url = GLOBAL.url;
-    this.grupoInfo = createGrupo();
+    this.grupoInfo = createGroup();
 
     this.passwordForm = this.fb.group(
       {
@@ -52,7 +51,7 @@ export default class ChangePassComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeLanguage();
-    this.getGrupoInfo();
+    this.loadGroupInfo();
     this.extractAndVerifyToken();
   }
 
@@ -60,19 +59,15 @@ export default class ChangePassComponent implements OnInit {
     this.language = this.session.language();
   }
 
-  private getGrupoInfo(): void {
-    this.grupoService.getGrupoInfo().subscribe({
-      next: (res: Grupo[]) => {
-        if (res && res.length > 0) {
-          this.grupoInfo = res[0];
-          this.session.setGrupoInfo(this.grupoInfo);
-          this.grupoInfo.logoHeader = this.url + "grupo/" + this.grupoInfo.idGrupo + "/files/header";
-        }
-      },
-      error: (error: any) => {
-        console.error("Error getting grupo info:", error);
+  private loadGroupInfo(): void {
+    this._groupService.getGroup().subscribe({
+      next: (group: Group) => {
+        this.grupoInfo = group;
+        this.grupoInfo.logoHeader = this.url + "api/group/files/header";
+        this.session.setGroupInfo(this.grupoInfo);
       },
     });
+    this.grupoInfo.logoHeader = this.url + "api/group/files/header";
   }
 
   private extractAndVerifyToken(): void {
@@ -91,18 +86,14 @@ export default class ChangePassComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.usuarioService.verifyResetToken({ token }).subscribe({
-      next: (response: any) => {
-        if (response.success) {
-          this.tokenValid = true;
-          this.userInfo = response.user;
-        } else {
-          this.error = response.message || "Token inválido o expirado.";
-          this.tokenValid = false;
+    this._emailService.verifyResetToken(token).subscribe({
+      next: (response) => {
+        this.tokenValid = response.valid;
+        if (!response.valid) {
+          this.error = "Token inválido o expirado. Por favor, solicita un nuevo enlace.";
         }
       },
-      error: (error: any) => {
-        console.error("Token verification error:", error);
+      error: () => {
         this.error = "Token inválido o expirado. Por favor, solicita un nuevo enlace.";
         this.tokenValid = false;
       },
@@ -139,27 +130,19 @@ export default class ChangePassComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const resetData = {
-      token: this.resetToken,
-      password: this.passwordForm.value.password,
-    };
-
-    this.usuarioService.resetPassword(resetData).subscribe({
-      next: (response: any) => {
-        if (response.success) {
+    this._emailService.resetPassword(this.resetToken, this.passwordForm.value.password as string).subscribe({
+      next: (response) => {
+        if (response.status === 1) {
           this.success = true;
           this.passwordForm.reset();
-
-          // Redirect to login after showing success message
           setTimeout(() => {
             this.router.navigate(["/login"]);
           }, 3000);
         } else {
-          this.error = response.message || "Error al cambiar la contraseña";
+          this.error = "Error al cambiar la contraseña";
         }
       },
-      error: (error: any) => {
-        console.error("Password reset error:", error);
+      error: () => {
         this.error = "Error al cambiar la contraseña. Por favor intenta nuevamente.";
       },
       complete: () => {

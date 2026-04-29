@@ -4,9 +4,10 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { createSoftware } from "@app/shared/models/factories";
 import type { Software } from "@app/shared/models/software";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { SoftwareService } from "@app/shared/services/software.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -22,7 +23,7 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _softwareService = inject(SoftwareService);
+  private _groupService = inject(GroupService);
 
   software: Software;
   softwareForm: FormGroup;
@@ -32,7 +33,7 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   edit = false;
 
   constructor() {
-    this.software = { idSoftware: 0, nombre: "", descripcion: "", descripcionEN: "", moreInfo: "", grupo_idGrupo: 1 };
+    this.software = createSoftware();
     this.softwareForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -48,13 +49,23 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   }
 
   submitSoftware(): void {
-    this._softwareService.addSoftware(this.software).subscribe((res: any) => {
-      if (res.status == 1) {
-        this.softwareForm.markAsPristine();
-        this.return();
-        this.openSnackBar();
-      }
-    });
+    if (this.softwareForm.valid) {
+      this._groupService
+        .createSoftware({
+          name: this.software.name ?? undefined,
+          description: this.software.description ?? undefined,
+          descriptionEN: this.software.descriptionEN ?? undefined,
+          moreInfo: this.software.moreInfo ?? undefined,
+          groupId: this.software.groupId,
+        })
+        .subscribe((res) => {
+          if (res.id) {
+            this.softwareForm.markAsPristine();
+            this.return();
+            this.openSnackBar();
+          }
+        });
+    }
   }
 
   return(): void {

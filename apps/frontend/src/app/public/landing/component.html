@@ -308,7 +308,7 @@
                 <div class="footer-text-title">
                   Facultad de Ciencias Físicas, Universidad Nacional Mayor de San Marcos
                 </div>
-                <div class="footer-direction">{{ grupoinfo.direccion }}</div>
+                <div class="footer-direction">{{ grupoinfo.address }}</div>
               </div>
             </div>
             <div class="footer-info footer-info-2 footerdiflex">
@@ -317,17 +317,17 @@
                   <img class="footer-icon" src="../assets/img/mail.svg" />
                 </div>
                 <div class="footer-text" style="display: flex">
-                  <div class="footer-direction footer-email">{{ grupoinfo.correo }}</div>
+                  <div class="footer-direction footer-email">{{ grupoinfo.email }}</div>
                 </div>
               </div>
               <div class="flex-news">
-                @if (grupoinfo.telefono && grupoinfo.telefono != "") {
+                @if (grupoinfo.phone && grupoinfo.phone != "") {
                 <div class="footer-icon-div ml-footer">
                   <img class="footer-icon" src="../assets/img/phone.svg" />
                 </div>
                 }
                 <div class="footer-text" style="display: flex">
-                  <div class="footer-direction footer-email">{{ grupoinfo.telefono }}</div>
+                  <div class="footer-direction footer-email">{{ grupoinfo.phone }}</div>
                 </div>
               </div>
             </div>

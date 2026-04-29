@@ -1,43 +1,58 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import { Observable } from "rxjs";
 
+import type { Method } from "../models/method";
 import { GLOBAL } from "./global";
 
-@Injectable({
-  providedIn: "root",
-})
+export interface MethodBody {
+  name: string;
+  nameEN: string;
+  description: string;
+  descriptionEN?: string;
+  groupId: number;
+}
+
+export interface MethodUpdateBody {
+  name: string;
+  nameEN: string;
+  description: string;
+  descriptionEN?: string;
+}
+
+@Injectable({ providedIn: "root" })
 export class MethodsService {
-  http = inject(HttpClient);
+  private http = inject(HttpClient);
 
-  public url: string;
-
-  constructor() {
-    this.url = GLOBAL.url;
+  // Public
+  list(): Observable<Method[]> {
+    return this.http.get<Method[]>(`${GLOBAL.url}api/methods`);
   }
 
-  getMethods(): any {
-    return this.http.get(`${this.url}metodo`);
+  // Admin
+  listAdmin(): Observable<Method[]> {
+    return this.http.get<Method[]>(`${GLOBAL.url}admin/methods`);
   }
 
-  getMethod(id: number): any {
-    return this.http.get(`${this.url}metodo/${id}`);
+  get(id: number): Observable<Method> {
+    return this.http.get<Method>(`${GLOBAL.url}admin/methods/${id}`);
   }
 
-  addMetodo(metodo: unknown): any {
-    return this.http.post(`${this.url}metodo`, metodo);
+  create(body: MethodBody): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/methods`, body);
   }
 
-  updateMetodo(metodo: unknown): any {
-    return this.http.put(`${this.url}metodo`, metodo);
+  update(id: number, body: MethodUpdateBody): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/methods/${id}`, body);
   }
 
-  deleteMetodo(id: number): any {
-    return this.http.delete(`${this.url}metodo/${id}`);
+  delete(id: number): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/methods/${id}`);
   }
 
-  uploadMetodoFoto(fileData: File, id: number) {
+  uploadPhoto(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("foto", fileData, fileData.name);
-    return this.http.put(`${this.url}metodo/${id}/file`, formData);
+    formData.append("file", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/methods/${id}/photo`, formData);
   }
 }

@@ -1,5 +1,7 @@
+import { AsyncPipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder, FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
 import { MatDialog } from "@angular/material/dialog";
@@ -9,40 +11,33 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import { createProyecto } from "@app/shared/models/factories";
-import { FuenteFinanciamiento } from "@app/shared/models/fuentefinanciamiento";
-import type { LineasInvestigacion } from "@app/shared/models/lineaInvestigacion";
-import type { Proyecto } from "@app/shared/models/proyecto";
+import { createProject } from "@app/shared/models/factories";
+import type { Member } from "@app/shared/models/member";
+import type { Project } from "@app/shared/models/project";
+import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { Usuario } from "@app/shared/models/usuario";
-import { FuenteFinanciamientoService } from "@app/shared/services/fuentefinanciamiento.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { LineasInvestigacionService } from "@app/shared/services/lineasinvestigacion.service";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { ProyectoService } from "@app/shared/services/proyecto.service";
+import { MemberService } from "@app/shared/services/member.service";
+import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { UsuarioService } from "@app/shared/services/usuario.service";
-import { UsuarioHasProyectoService } from "@app/shared/services/usuariohasproyecto";
 import { AutosizeModule } from "ngx-autosize";
+import { forkJoin, Observable, of } from "rxjs";
+import { switchMap } from "rxjs/operators";
+import { startWith, map } from "rxjs/operators";
 
-interface UserOption {
-  DNI?: string | null;
-  nombre?: string;
-  apellidoPaterno?: string;
-  apellidoMaterno?: string;
-  foto?: string;
-}
-
-interface AutorProyectoItem {
+interface MemberOption {
   id: number;
-  DNI: string | null;
-  nombre: string;
-  isAutor: boolean;
+  name: string;
 }
 
-interface AddProyectoResponse {
-  status?: number;
-  idProyecto?: number;
+interface ProjectMemberRow {
+  id: number;
+  memberId: number | null;
+  name: string;
+  myControl: FormControl<string>;
+  filteredOptions?: Observable<MemberOption[]>;
 }
 
 @Component({
@@ -64,6 +59,9 @@ interface AddProyectoResponse {
     MatDatepickerToggle,
     MatSuffix,
     MatDatepicker,
+    MatAutocompleteTrigger,
+    MatAutocomplete,
+    AsyncPipe,
   ],
 })
 export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
@@ -71,24 +69,24 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
   private _snackBar = inject(MatSnackBar);
-  private _usuarioService = inject(UsuarioService);
-  private _lineaInvestigacionService = inject(LineasInvestigacionService);
-  private _fuenteFinanciamientoService = inject(FuenteFinanciamientoService);
+  private _memberService = inject(MemberService);
+  private _researchLinesService = inject(ResearchLinesService);
   lookup = inject(LookupService);
-  private _proyectoService = inject(ProyectoService);
-  private _usuariohasproyecto = inject(UsuarioHasProyectoService);
+  private _projectService = inject(ProjectService);
   dialog = inject(MatDialog);
 
   terminado = false;
   edit = false;
   button_text = "Guardar proyecto";
-  usuarios: Usuario[] = [];
-  lineasInvestigacion: LineasInvestigacion[] = [];
-  fuentesFinaciamiento: FuenteFinanciamiento[] = [];
-  proyecto: Proyecto;
+  memberOptions: MemberOption[] = [];
+  researchLines: ResearchLine[] = [];
+  proyecto: Project & { startDateObj?: Date; endDateObj?: Date };
   proyectoForm: FormGroup;
   get monedas() {
     return this.lookup.monedas();
+  }
+  get fundingSources() {
+    return this.lookup.fundingSources();
   }
   url: string;
 
@@ -96,51 +94,79 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
   projectEnd() {}
 
+  miembrosProyecto: ProjectMemberRow[] = [];
+
   constructor() {
     this.proyectoForm = this.formBuilder.group({
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      títuloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      títuloEN: [""],
       codigo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaInicio: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      lineasInvestigacion_idLineasInvestigacion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fuenteFinanciamiento_idFuenteFinanciamiento: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      moneda_idMoneda: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      researchLineId: ["", [Validators.required]],
+      fundingSourceId: ["", [Validators.required]],
+      currencyId: ["", [Validators.required]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      descripcionEN: [""],
       montoFinanciado: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       fechaFin: [""],
     });
-    this.proyecto = createProyecto();
+    this.proyecto = { ...createProject() };
     this.url = GLOBAL.url;
   }
 
   ngOnInit(): void {
-    this.getLineaInvestigacion();
+    this.loadResearchLines();
   }
 
   isDirty(): boolean {
     return this.proyectoForm.dirty;
   }
 
-  getLineaInvestigacion(): void {
-    this._lineaInvestigacionService.getLineasInvestigacion().subscribe((result: LineasInvestigacion[]) => {
+  loadResearchLines(): void {
+    this._researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
       if (result) {
-        this.lineasInvestigacion = result;
-        this.getFuenteFinanciamiento();
+        this.researchLines = result;
+        this.loadMembers();
       }
     });
   }
 
-  getFuenteFinanciamiento(): void {
-    this._fuenteFinanciamientoService.getFuenteFinanciamientos().subscribe((result: FuenteFinanciamiento[]) => {
+  loadMembers(): void {
+    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
-        this.fuentesFinaciamiento = result;
-        this.getUsuarios();
+        const sortedMembers = result.toSorted((a, b) => a.firstName.localeCompare(b.firstName));
+        this.memberOptions = sortedMembers.map((m) => ({
+          id: m.id,
+          name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
+        }));
+        this.miembrosProyecto = [this.newMemberRow()];
+        this.setupMemberFilters();
       }
     });
   }
 
-  options: UserOption[] = [];
+  private newMemberRow(): ProjectMemberRow {
+    return {
+      id: this.miembrosProyecto.length + 1,
+      memberId: null,
+      name: "",
+      myControl: new FormControl<string>("", { nonNullable: true }),
+    };
+  }
+
+  private setupMemberFilters(): void {
+    for (const row of this.miembrosProyecto) {
+      row.filteredOptions = row.myControl.valueChanges.pipe(
+        startWith(""),
+        map((v) => this.filterMembers(v ?? "")),
+      );
+    }
+  }
+
+  private filterMembers(value: string): MemberOption[] {
+    const lower = value.toLowerCase();
+    return this.memberOptions.filter((m) => m.name.toLowerCase().includes(lower));
+  }
 
   return(): void {
     this._router.navigate(["dashboard/proyectos-ejecucion"]);
@@ -154,114 +180,94 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getUsuarios(): void {
-    this._usuarioService.getUsuarios().subscribe((result: Usuario[]) => {
-      if (result) {
-        result.sort((a: Usuario, b: Usuario) =>
-          (a.nombre ?? "") > (b.nombre ?? "") ? 1 : (b.nombre ?? "") > (a.nombre ?? "") ? -1 : 0,
-        );
-        this.usuarios = result;
-        for (let index = 0; index < this.usuarios.length; index++) {
-          this.usuarios[index].nombre =
-            (this.usuarios[index].nombre ?? "") +
-            " " +
-            (this.usuarios[index].apellidoPaterno ?? "") +
-            " " +
-            (this.usuarios[index].apellidoMaterno ?? "");
-          this.options.push(this.usuarios[index]);
-        }
-      }
-    });
+  addAnotherMember(): void {
+    const row = this.newMemberRow();
+    row.filteredOptions = row.myControl.valueChanges.pipe(
+      startWith(""),
+      map((v) => this.filterMembers(v ?? "")),
+    );
+    this.miembrosProyecto.push(row);
   }
 
-  otrosAutores: AutorProyectoItem[] = [
-    {
-      id: 1,
-      DNI: null,
-      nombre: "",
-      isAutor: true,
-    },
-  ];
-
-  addAnotherAuthor(): void {
-    this.otrosAutores.push({
-      id: this.otrosAutores.length + 1,
-      DNI: null,
-      nombre: "",
-      isAutor: true,
-    });
-  }
-
-  removeAnotherAuthor(i: number) {
-    if (i > 0) {
-      this.otrosAutores.splice(i, 1);
-    } else if (i == 0 && this.otrosAutores.length == 1) {
-      this.otrosAutores.splice(i, 1);
-      this.addAnotherAuthor();
+  removeAnotherMember(i: number): void {
+    if (i === 0 && this.miembrosProyecto.length === 1) {
+      this.miembrosProyecto[0] = this.newMemberRow();
+      this.miembrosProyecto[0].filteredOptions = this.miembrosProyecto[0].myControl.valueChanges.pipe(
+        startWith(""),
+        map((v) => this.filterMembers(v ?? "")),
+      );
     } else {
-      this.otrosAutores.splice(i, 1);
+      this.miembrosProyecto.splice(i, 1);
     }
   }
 
-  selectUserAutor(evento: UserOption | { value?: string }, value: number, i: number): void {
-    if (value == 1) {
-      const selected = evento as UserOption;
-      if (selected.DNI) {
-        this.otrosAutores[i].DNI = selected.DNI;
-      } else {
-        this.otrosAutores[i].DNI = selected.DNI ?? null;
-        this.otrosAutores[i].isAutor = false;
-      }
-      this.otrosAutores[i].nombre = selected.nombre ?? "";
+  selectMember(option: MemberOption | { value?: string }, i: number): void {
+    if ("id" in option) {
+      this.miembrosProyecto[i].memberId = option.id;
+      this.miembrosProyecto[i].name = option.name;
+      this.miembrosProyecto[i].myControl.setValue(option.name);
     } else {
-      const typedEvent = evento as { value?: string };
-      const index = this.options.findIndex((option: UserOption) => option.nombre === typedEvent.value);
-      if (index === -1) {
-        return;
-      }
-      if (this.options[index].DNI) {
-        this.otrosAutores[i].DNI = this.options[index].DNI ?? null;
-      } else {
-        this.otrosAutores[i].DNI = this.options[index].DNI ?? null;
-        this.otrosAutores[i].isAutor = false;
-      }
-      this.otrosAutores[i].nombre = this.options[index].nombre ?? "";
+      const name = (option as { value?: string }).value ?? "";
+      const found = this.memberOptions.find((m) => m.name === name) ?? null;
+      this.miembrosProyecto[i].memberId = found?.id ?? null;
+      this.miembrosProyecto[i].name = name;
     }
   }
 
   submitProyecto(): void {
-    this.revisarValues();
-    if (this.proyectoForm.valid && this.otrosAutores.length > 0 && this.otrosAutores[0].nombre != "") {
-      const momentDate = new Date(this.proyecto.fechaInicio ?? new Date());
-      const formattedDate = new Date(momentDate).toLocaleDateString("sv");
-      this.proyecto.fechaI = formattedDate;
-      this.proyecto.fechaF = undefined;
-      this._proyectoService.addProyecto(this.proyecto).subscribe((result: AddProyectoResponse) => {
-        if (result.status == 1) {
-          for (let index = 0; index < this.otrosAutores.length; index++) {
-            this.setAutores(this.otrosAutores[index], result.idProyecto ?? 0);
-          }
+    if (!this.proyectoForm.valid) return;
+
+    const startDate = new Date(this.proyecto.startDateObj ?? new Date()).toLocaleDateString("sv");
+    const endDate = this.proyecto.endDateObj ? new Date(this.proyecto.endDateObj).toLocaleDateString("sv") : undefined;
+
+    const body: ProjectBody = {
+      title: this.proyecto.title,
+      titleEN: this.proyecto.titleEN ?? undefined,
+      code: this.proyecto.code,
+      fundedAmount: this.proyecto.fundedAmount,
+      description: this.proyecto.description,
+      descriptionEN: this.proyecto.descriptionEN ?? undefined,
+      startDate,
+      endDate,
+      researchLineId: this.proyecto.researchLineId,
+      currencyId: this.proyecto.currencyId,
+      fundingSourceId: this.proyecto.fundingSourceId,
+    };
+
+    this._projectService
+      .createProject(body)
+      .pipe(
+        switchMap((result) => {
+          if (!result.id) return of(result);
+          const projectId = result.id;
+          const memberIds = [
+            ...new Set(this.miembrosProyecto.map((row) => row.memberId).filter((id): id is number => id != null)),
+          ];
+          if (memberIds.length === 0) return of(result);
+          return forkJoin(memberIds.map((memberId) => this._projectService.addProjectMember(projectId, memberId))).pipe(
+            map(() => result),
+          );
+        }),
+      )
+      .subscribe({
+        next: (result) => {
+          if (!result.id) return;
           this.proyectoForm.markAsPristine();
           this.return();
           this.openSnackBar();
-        }
+        },
+        error: () => {
+          this.openSnackBarError("No se pudo completar el registro de miembros del proyecto");
+        },
       });
-    }
   }
 
-  setAutores(autor: AutorProyectoItem, idProyecto: number): void {
-    const usuarioPublicacion = { usuario_DNI: autor.DNI ?? "", proyecto_idProyecto: idProyecto };
-    this._usuariohasproyecto.addUsuarioProyecto(usuarioPublicacion).subscribe((_res: unknown) => {});
-  }
-
-  revisarValues(): void {
-    for (let index = 0; index < this.otrosAutores.length; index++) {
-      const found = this.options.findIndex((option: UserOption) => option.nombre === this.otrosAutores[index].nombre);
-      if (found == -1) {
-        this.otrosAutores[index].DNI = null;
-        this.otrosAutores[index].isAutor = true;
-      }
-    }
+  openSnackBarError(value: string): void {
+    this._snackBar.open(value, undefined, {
+      duration: 3000,
+      horizontalPosition: "right",
+      verticalPosition: "top",
+    });
   }
 
   button_text2 = "";

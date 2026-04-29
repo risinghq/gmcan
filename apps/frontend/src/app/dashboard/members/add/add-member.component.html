@@ -15,7 +15,7 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Primer nombre <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.nombre"
+                  [(ngModel)]="member.firstName"
                   formControlName="nombre"
                   name="nombre"
                   class="input-category"
@@ -26,7 +26,7 @@
               <div class="full-width">
                 <div class="text-category">Segundo nombre</div>
                 <input
-                  [(ngModel)]="member.segundoNombre"
+                  [(ngModel)]="segundoNombre"
                   formControlName="segundoNombre"
                   name="segundoNombre"
                   placeholder="Insertar segundo nombre"
@@ -38,7 +38,7 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Apellido paterno <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.apellidoPaterno"
+                  [(ngModel)]="member.lastName"
                   formControlName="apellidoPaterno"
                   name="apellidoPaterno"
                   class="input-category"
@@ -49,7 +49,7 @@
               <div class="full-width">
                 <div class="text-category">Apellido materno</div>
                 <input
-                  [(ngModel)]="member.apellidoMaterno"
+                  [(ngModel)]="member.maternalName"
                   formControlName="apellidoMaterno"
                   name="apellidoMaterno"
                   placeholder="Insertar apellido materno"
@@ -64,7 +64,7 @@
                   <mat-label />
                   <input
                     matInput
-                    [(ngModel)]="member.fechaNacimientoDate"
+                    [(ngModel)]="birthDateObj"
                     [matDatepicker]="dp"
                     formControlName="fechaNacimiento"
                     name="fechaNacimiento"
@@ -77,7 +77,7 @@
               <div class="full-width">
                 <div class="text-category">Correo electrónico <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.correo"
+                  [(ngModel)]="member.email"
                   type="email"
                   formControlName="correo"
                   name="correo"
@@ -92,11 +92,7 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Género</div>
                 <mat-form-field class="input-category">
-                  <mat-select
-                    [(ngModel)]="member.genero_idGenero"
-                    formControlName="genero_idGenero"
-                    name="genero_idGenero"
-                  >
+                  <mat-select [(ngModel)]="member.genderId" formControlName="genero_idGenero" name="genero_idGenero">
                     @for (genero of generos; track genero) {
                       <mat-option [value]="genero.idGenero">{{ genero.nombre }}</mat-option>
                     }
@@ -107,7 +103,7 @@
                 <div class="text-category">Máximo nivel académico alcanzado</div>
                 <mat-form-field class="input-category">
                   <mat-select
-                    [(ngModel)]="member.prefijo_idPrefijo"
+                    [(ngModel)]="member.prefixId"
                     formControlName="prefijo_idPrefijo"
                     name="prefijo_idPrefijo"
                   >
@@ -123,12 +119,12 @@
                 <div class="text-category">Cargo <span class="red-text">*</span></div>
                 <mat-form-field class="input-category">
                   <mat-select
-                    [(ngModel)]="member.tipoMiembro_idTipoMiembro"
+                    [(ngModel)]="member.memberTypeId"
                     formControlName="tipoMiembro_idTipoMiembro"
                     name="tipoMiembro_idTipoMiembro"
                   >
                     @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
-                      <mat-option [value]="tipoMiembro.idTipoMiembro">{{ tipoMiembro.nombre }}</mat-option>
+                      <mat-option [value]="tipoMiembro.id">{{ tipoMiembro.nameSingular }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -136,7 +132,7 @@
               <div class="full-width">
                 <div class="text-category">N° DNI / Pasaporte <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.DNI"
+                  [(ngModel)]="member.dni"
                   formControlName="DNI"
                   name="DNI"
                   [disabled]="edit"
@@ -154,7 +150,7 @@
                   <input
                     matInput
                     [type]="hide ? 'password' : 'text'"
-                    [(ngModel)]="member.password"
+                    [(ngModel)]="password"
                     formControlName="password"
                     name="password"
                   />
@@ -194,7 +190,7 @@
           </div>
           <div class="ml-24">
             <div class="text-category center">Imagen de perfil</div>
-            @if (!previewUrl && !member.foto) {
+            @if (!previewUrl && !member.photo) {
               <div class="img-div">
                 <img class="img-src" src="../../assets/img/upload.svg" />
               </div>
@@ -204,9 +200,9 @@
                 <img class="img-set" src="{{ previewUrl }}" />
               </div>
             }
-            @if (member.foto && !previewUrl) {
+            @if (member.photo && !previewUrl) {
               <div class="img-preview">
-                <img class="img-set" src="{{ url + 'usuario/' + member.DNI + '/file }}" />
+                <img class="img-set" src="{{ url + 'api/members/' + member.id + '/photo' }}" />
               </div>
             }
             <div class="green-text mt-16">
@@ -222,12 +218,12 @@
         </div>
         <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional en español <span>({{ member.resumenPro?.length ?? 0 }}/500)</span>
+            Resumen profesional en español <span>({{ member.bio?.length ?? 0 }}/500)</span>
           </div>
           <textarea
-            [(ngModel)]="member.resumenPro"
-            formControlName="resumenPro"
-            name="resumenPro"
+            [(ngModel)]="member.bio"
+            formControlName="bio"
+            name="bio"
             autosize
             class="input-category"
             maxlength="500"
@@ -235,12 +231,12 @@
         </div>
         <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional en inglés <span>({{ member.resumenProEN?.length ?? 0 }}/500)</span>
+            Resumen profesional en inglés <span>({{ member.bioEN?.length ?? 0 }}/500)</span>
           </div>
           <textarea
-            [(ngModel)]="member.resumenProEN"
-            formControlName="resumenProEN"
-            name="resumenProEN"
+            [(ngModel)]="member.bioEN"
+            formControlName="bioEN"
+            name="bioEN"
             autosize
             class="input-category"
             maxlength="500"
@@ -252,21 +248,9 @@
             analíticas
           </div>
           <div class="boxed">
-            <input
-              type="radio"
-              id="coordYes"
-              name="coord"
-              [checked]="member.tipoUsuario_idTipoUsuario == 3"
-              (click)="setCoord(3)"
-            />
+            <input type="radio" id="coordYes" name="coord" [checked]="member.roleId == 2" (click)="setCoord(2)" />
             <label class="mr-16" for="coordYes">No</label>
-            <input
-              type="radio"
-              id="coordNo"
-              name="coord"
-              [checked]="member.tipoUsuario_idTipoUsuario == 2"
-              (click)="setCoord(2)"
-            />
+            <input type="radio" id="coordNo" name="coord" [checked]="member.roleId == 1" (click)="setCoord(1)" />
             <label for="coordNo">Sí</label>
           </div>
         </div>
@@ -277,7 +261,7 @@
               type="radio"
               id="fallecidoYes"
               name="fallecido"
-              [checked]="member.estado == 0 || member.estado == 1"
+              [checked]="member.status == 0 || member.status == 1"
               (click)="adHonorem(1)"
             />
             <label class="mr-16" for="fallecidoYes">No</label>
@@ -285,7 +269,7 @@
               type="radio"
               id="fallecidoNo"
               name="fallecido"
-              [checked]="member.estado == 3"
+              [checked]="member.status == 3"
               (click)="adHonorem(3)"
             />
             <label for="fallecidoNo">Sí</label>
@@ -298,41 +282,12 @@
               type="radio"
               id="exMemberYes"
               name="ex"
-              [checked]="member.estado == 3 || member.estado == 1"
+              [checked]="member.status == 3 || member.status == 1"
               (click)="oldMember(1)"
             />
             <label class="mr-16" for="exMemberYes">No</label>
-            <input type="radio" id="exMemberNo" name="ex" [checked]="member.estado == 0" (click)="oldMember(0)" />
+            <input type="radio" id="exMemberNo" name="ex" [checked]="member.status == 0" (click)="oldMember(0)" />
             <label for="exMemberNo">Sí</label>
-          </div>
-        </div>
-        <div class="full-width mb-16">
-          <div class="text-category">Permisos</div>
-          <div>
-            <mat-checkbox
-              class="full-width block"
-              [checked]="permisoNoticia"
-              (change)="selectPermiso(1, $event.checked)"
-              >Gestionar noticias (visualizar, crear, editar o eliminar noticias)</mat-checkbox
-            >
-            <mat-checkbox
-              class="full-width block"
-              [checked]="permisoPublicacion"
-              (change)="selectPermiso(3, $event.checked)"
-              >Gestionar publicaciones (visualizar, crear, editar o eliminar miembros del grupo)</mat-checkbox
-            >
-            <mat-checkbox
-              class="full-width block"
-              [checked]="permisoProyecto"
-              (change)="selectPermiso(2, $event.checked)"
-              >Gestionar proyectos (visualizar, crear, editar o eliminar proyectos del grupo)</mat-checkbox
-            >
-            <mat-checkbox
-              class="full-width block"
-              [checked]="permisoContenido"
-              (change)="selectPermiso(5, $event.checked)"
-              >Gestionar contenidos (modificar contenidos de la plataforma)</mat-checkbox
-            >
           </div>
         </div>
       </form>

@@ -20,24 +20,23 @@
             <div class="members-container">
               @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
               <div class="member-type-container">
-                @if ((tipoMiembro.miembros?.length ?? 0) > 0) {
-                <div class="member-type-title">{{ tipoMiembro.nombre }}</div>
-                } @if ((tipoMiembro.miembros?.length ?? 0) > 0) {
+                @if ((tipoMiembro.members?.length ?? 0) > 0) {
+                <div class="member-type-title">{{ tipoMiembro.name }}</div>
+                } @if ((tipoMiembro.members?.length ?? 0) > 0) {
                 <div class="row">
-                  @for (miembro of tipoMiembro.miembros; track miembro) {
+                  @for (miembro of tipoMiembro.members; track miembro) {
                   <div class="col-12 col-sm-6">
                     <div class="flex-news member-mt">
                       <div class="member-img-div">
-                        <img class="member-img" src="{{ miembro.foto }}" alt="foto" />
+                        <img class="member-img" src="{{ miembro.photoUrl }}" alt="foto" />
                       </div>
                       <div class="member-text">
                         <div class="member-name full-width">
-                          {{ miembro.prefijo }} {{ miembro.nombre }} {{ miembro.apellidoPaterno }} {{
-                          miembro.apellidoMaterno }}
+                          {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                         </div>
                         <div class="member-email">
                           <mat-icon class="email-icon"> email </mat-icon>
-                          {{ miembro.correo }}
+                          {{ miembro.email }}
                         </div>
                         <div class="member-profile" (click)="profile(miembro)">
                           {{ language.membersText[0].seeProfile }}
@@ -56,7 +55,7 @@
           </mat-tab>
           <mat-tab label="{{ language.membersText[0].memberOld }}">
             <div class="row member-type-container">
-              @for (usuario of usuariosNoActivos; track usuario) {
+              @for (miembro of membrosNoActivos; track miembro) {
               <div class="col-12 col-sm-6">
                 <div class="flex-news member-mt">
                   <div class="member-img-div">
@@ -64,18 +63,17 @@
                   </div>
                   <div class="member-text full-width">
                     <div class="member-name">
-                      {{ usuario.prefijo }} {{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{
-                      usuario.apellidoMaterno }}
+                      {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                     </div>
-                    @if (usuario.estado === 3) {
+                    @if (miembro.status === 3) {
                     <div class="member-email cursive">In memoriam</div>
-                    } @if (usuario.estado != 3) {
+                    } @if (miembro.status !== 3) {
                     <div class="member-email">
                       <mat-icon class="email-icon"> email </mat-icon>
-                      {{ usuario.correo }}
+                      {{ miembro.email }}
                     </div>
                     }
-                    <div class="member-profile" (click)="profile(usuario)">
+                    <div class="member-profile" (click)="profile(miembro)">
                       {{ language.membersText[0].seeProfile }}
                       <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
                     </div>

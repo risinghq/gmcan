@@ -14,16 +14,12 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { Revista } from "@app/shared/models/revista";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { AdminRevistaService } from "@app/shared/services/admin-revista.service";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { PublicacionService } from "@app/shared/services/publicacion.service";
+import { PublicationService } from "@app/shared/services/publication.service";
+import type { JournalItem } from "@app/shared/services/ref.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-
-interface StatusResponse {
-  status?: number;
-}
 
 @Component({
   selector: "app-edit-revista",
@@ -37,17 +33,17 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   _router = inject(Router);
   dialog = inject(MatDialog);
   private _snackBar = inject(MatSnackBar);
-  private _adminRevistaService = inject(AdminRevistaService);
+  private _refService = inject(RefService);
   private lookup = inject(LookupService);
-  private _publicacionService = inject(PublicacionService);
+  private _publicationService = inject(PublicationService);
 
-  revista: Revista;
+  revista: JournalItem = { id: 0, name: "" };
   public revistaForm: FormGroup;
   button_text = "Actualizar revista";
   edit = true;
+  notCanDo = false;
 
   constructor() {
-    this.revista = { idRevista: 0, nombre: "" };
     this.revistaForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
@@ -62,28 +58,25 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   getRevista(): void {
-    const idRevista = Number(this._route.snapshot.params["id"] ?? 0);
-    const found = this.lookup.revistas().find((r) => r.idRevista === idRevista);
+    const id = Number(this._route.snapshot.params["id"] ?? 0);
+    const found = this.lookup.journals().find((r) => r.id === id);
     if (found) {
-      this.revista = found;
-      localStorage.setItem("revistaEdit", JSON.stringify(this.revista.nombre ?? ""));
-      this.getPublicacionRevista(idRevista);
+      this.revista = { id: found.id, name: found.name };
+      localStorage.setItem("revistaEdit", JSON.stringify(found.name));
+      this.checkCanDelete(id);
     }
   }
 
-  notCanDo = false;
-
-  getPublicacionRevista(idRevista: number): void {
-    this._publicacionService.getPublicacionesRevista(idRevista).subscribe((result: unknown[]) => {
-      if (result.length == 0) {
-        this.notCanDo = true;
-      }
+  checkCanDelete(id: number): void {
+    this._publicationService.listAdminPublications().subscribe((pubs) => {
+      this.notCanDo = pubs.filter((p) => p.journalId === id).length === 0;
     });
   }
 
   submitRevista(): void {
-    this._adminRevistaService.updateRevista(this.revista).subscribe((result: StatusResponse) => {
-      if (result.status == 1) {
+    if (!this.revistaForm.valid) return;
+    this._refService.updateJournal(this.revista.id, { name: this.revista.name }).subscribe((result) => {
+      if (result.status === 1) {
         this.revistaForm.markAsPristine();
         this.return();
         this.openSnackBar("Revista actualizada exitosamente");
@@ -103,15 +96,15 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
         width: "530px",
         id: "idleTimer",
         data: {
-          title: "Eliminar noticia",
-          text: "¿Estás seguro que deseas eliminar esta noticia?",
+          title: "Eliminar revista",
+          text: "¿Estás seguro que deseas eliminar esta revista?",
           cancel: "Sí, eliminar",
           yes: "No, cancelar",
         },
       });
       this.dialogRef2.afterClosed().subscribe((result: boolean) => {
         if (result) {
-          this.eraseNews();
+          this.eraseRevista();
         }
       });
     }
@@ -125,18 +118,16 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  eraseNews(): void {
-    if (this.notCanDo) {
-      this._adminRevistaService.deleteRevista(this.revista.idRevista ?? 0).subscribe((result: StatusResponse) => {
-        if (result.status == 1) {
-          this.revistaForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Revista eliminada exitosamente");
-        } else {
-          this.openSnackBar("Hubo un problema al eliminar");
-        }
-      });
-    }
+  eraseRevista(): void {
+    this._refService.deleteJournal(this.revista.id).subscribe((result) => {
+      if (result.status === 1) {
+        this.revistaForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Revista eliminada exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
+      }
+    });
   }
 }
 

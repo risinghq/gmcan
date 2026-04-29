@@ -3,15 +3,14 @@ import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } 
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
 import { AuthService } from "@app/shared/services/auth.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 
 @Component({
   selector: "app-login",
@@ -20,8 +19,7 @@ import { UsuarioService } from "@app/shared/services/usuario.service";
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class LoginComponent implements OnInit {
-  _usuarioService = inject(UsuarioService);
-  _grupoService = inject(GrupoService);
+  private _groupService = inject(GroupService);
   fb = inject(FormBuilder);
   _route = inject(ActivatedRoute);
   _router = inject(Router);
@@ -30,7 +28,7 @@ export default class LoginComponent implements OnInit {
   private session = inject(SessionService);
   private titleService = inject(Title);
 
-  public grupoinfo: Grupo;
+  public grupoinfo: Group;
   public url: string;
   public loginForm: FormGroup;
   public emailForm: FormGroup;
@@ -38,15 +36,16 @@ export default class LoginComponent implements OnInit {
   error: string | null = null;
   exito: string | null = null;
   language: (typeof Languages)[number] = Languages[0];
+
   constructor() {
     this.loginForm = this.fb.group({
-      correo: ["", [Validators.required, Validators.email]],
+      email: ["", [Validators.required, Validators.email]],
       password: ["", Validators.required],
     });
     this.emailForm = this.fb.group({
-      correo: ["", [Validators.required, Validators.email]],
+      email: ["", [Validators.required, Validators.email]],
     });
-    this.grupoinfo = createGrupo();
+    this.grupoinfo = createGroup();
     this.url = GLOBAL.url;
   }
 
@@ -59,30 +58,32 @@ export default class LoginComponent implements OnInit {
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this.session.getGrupoInfo();
-    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
-      this.grupoinfo = res[0];
-      this.session.setGrupoInfo(this.grupoinfo);
-      this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
+    this.grupoinfo = this.session.getGroupInfo();
+    this.grupoinfo.logoHeader = this.url + "api/group/files/header";
+    this._groupService.getGroup().subscribe((group: Group) => {
+      this.grupoinfo = group;
+      this.grupoinfo.logoHeader = this.url + "api/group/files/header";
+      this.session.setGroupInfo(this.grupoinfo);
     });
-    this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
   }
 
   login(): void {
     if (!this.loginForm.invalid) {
-      let user = {
-        correo: this.loginForm.controls["correo"].value,
-        password: this.loginForm.controls["password"].value,
+      const credentials = {
+        email: this.loginForm.controls["email"].value as string,
+        password: this.loginForm.controls["password"].value as string,
       };
-      this.authService.login(user).subscribe((res: any) => {
-        if (res.state == 1) {
+      this.authService.login(credentials).subscribe({
+        next: () => {
           this._router.navigate(["/dashboard"]);
-        } else {
+        },
+        error: () => {
           this.error = "Correo electrónico o contraseña incorrectos";
-        }
+        },
       });
     }
   }
+
   recoverValue = false;
 
   change(): void {
@@ -97,22 +98,23 @@ export default class LoginComponent implements OnInit {
     if (this.emailForm.invalid) {
       return;
     }
-    let user = {
-      correo: this.emailForm.controls["correo"].value,
+    const request = {
+      email: this.emailForm.controls["email"].value as string,
     };
-    this._emailService.sendPasswordReset(user).subscribe(
-      (res: any) => {
-        if (res && res.success) {
+    this._emailService.sendPasswordReset(request).subscribe({
+      next: (res) => {
+        if (res?.success) {
           this.exito = res.message;
         } else {
-          this.error = (res && res.message) || "Ocurrió un error al procesar la solicitud.";
+          this.error = res?.message || "Ocurrió un error al procesar la solicitud.";
         }
       },
-      (_err: any) => {
+      error: () => {
         this.error = "Hubo un problema de conexión. Intente más tarde.";
       },
-    );
+    });
   }
+
   return(): void {
     this._router.navigate(["/home"]);
   }

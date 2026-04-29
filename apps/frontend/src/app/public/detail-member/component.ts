@@ -1,5 +1,4 @@
-import { DatePipe, SlicePipe } from "@angular/common";
-import { TitleCasePipe } from "@angular/common";
+import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
 import { Location } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
@@ -7,26 +6,34 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
-import type { PublicationAuthor } from "@app/shared/models/author";
-import { createUsuarioFull } from "@app/shared/models/factories";
-import type { MemberProfile } from "@app/shared/models/member-profile";
-import type { Publicacion } from "@app/shared/models/publicacion";
-import type { TipoPublicacion } from "@app/shared/models/tipopublicacion";
-import type { UsuarioFull } from "@app/shared/models/usuarioFull";
+import type { Member } from "@app/shared/models/member";
+import type { Publication } from "@app/shared/models/publication";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
-import { PublicacionAutoresService } from "@app/shared/services/publicacion-autores.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { UsuarioService } from "@app/shared/services/usuario.service";
 import {
   NgbPagination,
   NgbPaginationPrevious,
   NgbPaginationNumber,
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
+
+type MemberDisplay = Member & { active: string; prefix: string; tipoMiembro: string };
+
+type PublicationDisplay = Publication & {
+  fecha: string;
+  tipoPublicacion?: string;
+  tipoTesis?: string;
+  revista?: string;
+  universidad?: string;
+  evento?: string;
+  ciudad?: string;
+  pais?: string;
+};
 
 @Component({
   selector: "app-detail-member",
@@ -46,10 +53,9 @@ import {
 export default class DetailMemberComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  _usuarioService = inject(UsuarioService);
-  _publicacionAutoresService = inject(PublicacionAutoresService);
+  private titlecasePipe = inject(TitleCasePipe);
+  private datePipe = inject(DatePipe);
+  _memberService = inject(MemberService);
   lookup = inject(LookupService);
   private _navigationHistory = inject(NavigationHistoryService);
   _previousService = inject(PreviousPageService);
@@ -58,29 +64,30 @@ export default class DetailMemberComponent implements OnInit {
   location = inject(Location);
   private titleService = inject(Title);
 
-  public usuario: UsuarioFull;
-  public publicaciones: Array<Publicacion> = [];
-  public tipoPublicaciones: Array<TipoPublicacion> = [];
+  public usuario: MemberDisplay | null = null;
+  public publicaciones: PublicationDisplay[] = [];
   public cargado = false;
   public previouspage = "";
   public previouslink: string | null = null;
   public url: string;
   page = 1;
   pageSize = 5;
-  constructor() {
-    this.url = GLOBAL.url;
-    this.usuario = createUsuarioFull();
-  }
 
   language: any = {};
 
+  constructor() {
+    this.url = GLOBAL.url;
+  }
+
   ngOnInit(): void {
     this.language = this._session.language();
-    this.getTipoPublicacion();
     this.previouslink = this._navigationHistory.previousUrl();
     this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
+    this.loadProfile();
   }
+
   expandedKey: string | null = null;
+
   toggleExpanded(section: string, index: number): void {
     const key = `${section}:${index}`;
     this.expandedKey = this.expandedKey === key ? null : key;
@@ -98,110 +105,75 @@ export default class DetailMemberComponent implements OnInit {
     this._browser.scrollIntoViewById("main-toolbar");
   }
 
-  searchUsuario(): void {
-    this.publicaciones = [];
-    const DNI = this._route.snapshot.params["id"];
-    this._usuarioService.getProfile(DNI).subscribe((res: MemberProfile) => {
-      if (res?.usuario) {
-        this.usuario = res.usuario;
-        if (this.usuario.estado === 1) {
-          this.usuario.active = this.language.detailMemberText[0].activeMember;
-        } else {
-          this.usuario.active = this.language.detailMemberText[0].oldMember;
+  private loadProfile(): void {
+    const id = Number(this._route.snapshot.params["id"]);
+    if (!id) return;
+
+    const prefijos = this.lookup.prefijos();
+    const prefijosMap = new Map(prefijos.map((p) => [p.idPrefijo, p]));
+    const memberTypes = this.lookup.memberTypes();
+    const memberTypesMap = new Map(memberTypes.map((t) => [t.id, t]));
+    const pubTypes = this.lookup.publicationTypes();
+    const pubTypesMap = new Map(pubTypes.map((t) => [t.id, t]));
+    const thesisTypes = this.lookup.thesisTypes();
+    const thesisTypesMap = new Map(thesisTypes.map((t) => [t.id, t]));
+    const journals = this.lookup.journals();
+    const journalsMap = new Map(journals.map((j) => [j.id, j]));
+    const universities = this.lookup.universities();
+    const universitiesMap = new Map(universities.map((u) => [u.id, u]));
+    const events = this.lookup.events();
+    const eventsMap = new Map(events.map((e) => [e.id, e]));
+
+    this._memberService.getMemberProfile(id).subscribe((res) => {
+      if (!res?.member) return;
+
+      const m = res.member;
+      const prefijo = m.prefixId ? prefijosMap.get(m.prefixId) : undefined;
+      const prefix = prefijo && prefijo.nombre !== "Ninguno" && prefijo.nombre !== "Bachiller" ? prefijo.nombre : "";
+      const memberType = memberTypesMap.get(m.memberTypeId);
+      const active =
+        m.status === 1
+          ? (this.language.detailMemberText?.[0]?.activeMember ?? "")
+          : (this.language.detailMemberText?.[0]?.oldMember ?? "");
+
+      this.usuario = { ...m, active, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
+      this.titleService.setTitle("GMCAN | " + m.firstName + " " + m.lastName);
+
+      this.publicaciones = (res.publications ?? []).map((pub): PublicationDisplay => {
+        const d = new Date(pub.publishedAt ?? "");
+        if (String(d) !== "Invalid Date") {
+          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
         }
-        this.titleService.setTitle("GMCAN | " + this.usuario.nombre + " " + this.usuario.apellidoPaterno);
-        this.publicaciones = [...(res.publicaciones ?? [])];
-        for (const publicacion of this.publicaciones) {
-          this.fillPublicacion(publicacion);
-        }
-        this.cargado = true;
-        this.getPrefijos();
-        this.getTipoMiembros();
-      }
+        const fecha =
+          String(d) === "Invalid Date"
+            ? ""
+            : (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "");
+
+        const evento = pub.eventId ? eventsMap.get(pub.eventId) : undefined;
+
+        return Object.assign({} as PublicationDisplay, pub, {
+          fecha,
+          tipoPublicacion: pubTypesMap.get(pub.typeId)?.name,
+          tipoTesis: pub.thesisTypeId ? thesisTypesMap.get(pub.thesisTypeId)?.name : undefined,
+          revista: pub.journalId ? journalsMap.get(pub.journalId)?.name : undefined,
+          universidad: pub.universityId ? (universitiesMap.get(pub.universityId)?.name ?? undefined) : undefined,
+          evento: evento?.name,
+          ciudad: evento?.city ?? undefined,
+          pais: evento?.country ?? undefined,
+        });
+      });
+
+      this.cargado = true;
     });
-  }
-
-  getTipoPublicacion() {
-    this.tipoPublicaciones = this.lookup.tiposPublicacion().map((t) => Object.assign({}, t) as TipoPublicacion);
-    this.searchUsuario();
-  }
-
-  getTipoTesis(publicacion: Publicacion) {
-    const found = this.lookup.tiposTesis().find((t) => t.idTipoTesis === publicacion.tipoTesis_idTipoTesis);
-    if (found) publicacion.tipoTesis = found.nombre;
-  }
-
-  fillPublicacion(publicacion: Publicacion) {
-    publicacion.autor = [];
-    const d = new Date(publicacion.fechaPublicacion ?? "");
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    publicacion.fechaPublicacion = d.toISOString();
-    publicacion.fecha = this.datePipe.transform(publicacion.fechaPublicacion, "MMMM y") ?? "";
-    publicacion.fecha = this.titlecasePipe.transform(publicacion.fecha ?? "");
-    for (const tipo of this.tipoPublicaciones) {
-      if (publicacion.tipoPublicacion_idTipoPublicacion === tipo.idTipoPublicacion) {
-        publicacion.tipoPublicacion = tipo.nombre;
-      }
-    }
-    this.getUniversidad(publicacion);
-    this.getRevista(publicacion);
-    this._publicacionAutoresService.getForPublication(publicacion.idPublicacion ?? 0).subscribe((authors) => {
-      publicacion.autor = authors;
-    });
-    this.getEvento(publicacion);
-    this.getTipoTesis(publicacion);
-  }
-
-  getEvento(publicacion: Publicacion) {
-    const found = this.lookup.eventos().find((e) => e.idEvento === publicacion.evento_idEvento);
-    if (found) {
-      publicacion.evento = found.nombre;
-      publicacion.ciudad = found.ciudad ?? "";
-      publicacion.pais = found.pais ?? "";
-    }
-  }
-
-  getRevista(publicacion: Publicacion) {
-    const found = this.lookup.revistas().find((r) => r.idRevista === publicacion.revista_idRevista);
-    if (found) publicacion.revista = found.nombre;
-  }
-
-  getUniversidad(publicacion: Publicacion) {
-    const found = this.lookup.universidades().find((u) => u.idUniversidad === publicacion.universidad_idUniversidad);
-    if (found) publicacion.universidad = found.nombre ?? "";
   }
 
   return(): void {
     this._router.navigate([this.previouslink ?? "/home"]);
   }
 
-  getPrefijos() {
-    const prefijos = this.lookup.prefijos();
-    for (const prefijo of prefijos) {
-      if (
-        this.usuario.prefijo_idPrefijo == prefijo.idPrefijo &&
-        prefijo.nombre != "Ninguno" &&
-        prefijo.nombre != "Bachiller"
-      ) {
-        this.usuario.prefijo = prefijo.nombre;
-      }
-    }
-  }
-
-  getTipoMiembros() {
-    const tipos = this.lookup.tiposMiembro();
-    for (const tipo of tipos) {
-      if (this.usuario.tipoMiembro_idTipoMiembro === tipo.idTipoMiembro) {
-        this.usuario.tipoMiembro = tipo.nombreSingular;
-      }
-    }
-  }
-
-  profile(autor: PublicationAuthor): void {
-    if (!autor?.DNI) {
-      return;
-    }
-    this._router.navigate(["/home/detail-member/" + autor.DNI]);
-    this.getTipoPublicacion();
+  profile(memberId: number | undefined): void {
+    if (!memberId) return;
+    this._router.navigate(["/home/detail-member/" + memberId]);
+    this.loadProfile();
   }
 }

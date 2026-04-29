@@ -1,20 +1,22 @@
+@if (aboutus) {
 <div class="card-about">
-  @if (!aboutus.foto) {
+  @if (!aboutus.photo) {
   <img class="about-img" src="../../assets/img/grupal.jpg" />
-  } @if (aboutus.foto) {
-  <img class="about-img" src="{{ url + 'sobrenosotros/' + aboutus.idSobreNosotros + '/file }}" />
+  } @if (aboutus.photo) {
+  <img class="about-img" src="{{ url + 'api/group/about/' + aboutus.id + '/photo' }}" />
   }
   <div class="about-text-div">
     <div class="about-title">{{ language.aboutText[0].aboutUs }}</div>
     <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus.quienesSomos ?? ''"></div>
+    <div class="about-text" [innerHTML]="aboutus.descriptionES ?? ''"></div>
     <div class="about-title about-top">{{ language.aboutText[0].ourObjectives }}</div>
     <div class="about-subtitle">{{ language.aboutText[0].ourObjectivesQuestion }}</div>
     <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus.objetivos ?? ''"></div>
+    <div class="about-text" [innerHTML]="aboutus.objectivesES ?? ''"></div>
     <div class="about-title about-top">{{ language.aboutText[0].ourServices }}</div>
     <div class="about-subtitle">{{ language.aboutText[0].ourServicesQuestion }}</div>
     <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus.servicios ?? ''"></div>
+    <div class="about-text" [innerHTML]="aboutus.servicesES ?? ''"></div>
   </div>
 </div>
+}

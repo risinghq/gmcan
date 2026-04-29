@@ -2,24 +2,21 @@
   <div class="lines-text-div">
     <div class="line-mb">
       <div class="line-img-div">
-        @if (lineasProyecto[0].foto) {
-        <img
-          class="line-img"
-          src="{{ url + 'lineasinvestigacion/' + lineasProyecto[0].idLineasInvestigacion + '/file }}"
-        />
+        @if (lineasProyecto[0].photo) {
+        <img class="line-img" src="{{ url + 'api/research-lines/' + lineasProyecto[0].id + '/photo' }}" />
         }
       </div>
-      <div class="lines-title">{{ lineasProyecto[0].nombre }}</div>
+      <div class="lines-title">{{ lineasProyecto[0].name }}</div>
       <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto[0].descripcion }}</div>
+      <div class="lines-subtitle">{{ lineasProyecto[0].description }}</div>
       <div class="lines-projects">{{ language.linesInvestigationText[0].projects }}</div>
       <div>
         @for ( proyecto of lineasProyecto[0].proyectos | slice: (page0 - 1) * pageSize : (page0 - 1) * pageSize +
         pageSize; track proyecto; let i = $index ) {
         <div class="project">
-          <div class="project-code">{{ proyecto.codigo }}</div>
+          <div class="project-code">{{ proyecto.code }}</div>
           <div class="flex-news project-mt">
-            <div class="project-title">{{ proyecto.titulo }}</div>
+            <div class="project-title">{{ proyecto.title }}</div>
           </div>
           <div class="project-rev">
             <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
@@ -28,16 +25,16 @@
           <div class="mt-16">
             <div class="flex-news flex-flow">
               <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
-              @for (usuario of proyecto.usuario; track usuario) {
+              @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
-                  @if (usuario.foto) {
-                  <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
-                  } @if (!usuario.foto) {
+                  @if (member.photo) {
+                  <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
+                  } @if (!member.photo) {
                   <img class="member-img" src="../../assets/img/user.png" alt="" />
                   }
                 </div>
-                <div class="member-name" (click)="profile(usuario)">{{ usuario.nombreCompleto }}</div>
+                <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
               </div>
               }
             </div>
@@ -69,7 +66,7 @@
           <div class="collapse collapsed-resumen mt-16" id="collapseExample0{{ i }}">
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
-              {{ proyecto.descripcion }}
+              {{ proyecto.description }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
@@ -77,7 +74,7 @@
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
-              {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
+              {{ proyecto.moneda }} {{ proyecto.fundedAmount }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
@@ -116,24 +113,21 @@
     </div>
     <div class="line-mb">
       <div class="line-img-div">
-        @if (lineasProyecto[1].foto) {
-        <img
-          class="line-img"
-          src="{{ url + 'lineasinvestigacion/' + lineasProyecto[1].idLineasInvestigacion + '/file }}"
-        />
+        @if (lineasProyecto[1].photo) {
+        <img class="line-img" src="{{ url + 'api/research-lines/' + lineasProyecto[1].id + '/photo' }}" />
         }
       </div>
-      <div class="lines-title">{{ lineasProyecto[1].nombre }}</div>
+      <div class="lines-title">{{ lineasProyecto[1].name }}</div>
       <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto[1].descripcion }}</div>
+      <div class="lines-subtitle">{{ lineasProyecto[1].description }}</div>
       <div class="lines-projects">{{ language.linesInvestigationText[0].projects }}</div>
       <div>
         @for ( proyecto of lineasProyecto[1].proyectos | slice: (page1 - 1) * pageSize : (page1 - 1) * pageSize +
         pageSize; track proyecto; let i = $index ) {
         <div class="project">
-          <div class="project-code">{{ proyecto.codigo }}</div>
+          <div class="project-code">{{ proyecto.code }}</div>
           <div class="flex-news project-mt">
-            <div class="project-title">{{ proyecto.titulo }}</div>
+            <div class="project-title">{{ proyecto.title }}</div>
           </div>
           <div class="project-rev">
             <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
@@ -142,16 +136,16 @@
           <div class="mt-16">
             <div class="flex-news flex-flow">
               <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
-              @for (usuario of proyecto.usuario; track usuario) {
+              @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
-                  @if (usuario.foto) {
-                  <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
-                  } @if (!usuario.foto) {
+                  @if (member.photo) {
+                  <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
+                  } @if (!member.photo) {
                   <img class="member-img" src="../../assets/img/user.png" alt="" />
                   }
                 </div>
-                <div class="member-name" (click)="profile(usuario)">{{ usuario.nombreCompleto }}</div>
+                <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
               </div>
               }
             </div>
@@ -183,7 +177,7 @@
           <div class="collapse collapsed-resumen mt-16" id="collapseExample1{{ i }}">
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
-              {{ proyecto.descripcion }}
+              {{ proyecto.description }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
@@ -191,7 +185,7 @@
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
-              {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
+              {{ proyecto.moneda }} {{ proyecto.fundedAmount }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
@@ -230,24 +224,21 @@
     </div>
     <div>
       <div class="line-img-div">
-        @if (lineasProyecto[2].foto) {
-        <img
-          class="line-img"
-          src="{{ url + 'lineasinvestigacion/' + lineasProyecto[2].idLineasInvestigacion + '/file }}"
-        />
+        @if (lineasProyecto[2].photo) {
+        <img class="line-img" src="{{ url + 'api/research-lines/' + lineasProyecto[2].id + '/photo' }}" />
         }
       </div>
-      <div class="lines-title">{{ lineasProyecto[2].nombre }}</div>
+      <div class="lines-title">{{ lineasProyecto[2].name }}</div>
       <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto[2].descripcion }}</div>
+      <div class="lines-subtitle">{{ lineasProyecto[2].description }}</div>
       <div class="lines-projects">{{ language.linesInvestigationText[0].projects }}</div>
       <div>
         @for ( proyecto of lineasProyecto[2].proyectos | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize +
         pageSize; track proyecto; let i = $index ) {
         <div class="project">
-          <div class="project-code">{{ proyecto.codigo }}</div>
+          <div class="project-code">{{ proyecto.code }}</div>
           <div class="flex-news project-mt">
-            <div class="project-title">{{ proyecto.titulo }}</div>
+            <div class="project-title">{{ proyecto.title }}</div>
           </div>
           <div class="project-rev">
             <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
@@ -256,16 +247,16 @@
           <div class="mt-16">
             <div class="flex-news flex-flow">
               <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
-              @for (usuario of proyecto.usuario; track usuario) {
+              @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
-                  @if (usuario.foto) {
-                  <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" />
-                  } @if (!usuario.foto) {
+                  @if (member.photo) {
+                  <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
+                  } @if (!member.photo) {
                   <img class="member-img" src="../../assets/img/user.png" alt="" />
                   }
                 </div>
-                <div class="member-name" (click)="profile(usuario)">{{ usuario.nombreCompleto }}</div>
+                <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
               </div>
               }
             </div>
@@ -297,7 +288,7 @@
           <div class="collapse collapsed-resumen mt-16" id="collapseExample2{{ i }}">
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
-              {{ proyecto.descripcion }}
+              {{ proyecto.description }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
@@ -305,7 +296,7 @@
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
-              {{ proyecto.moneda }} {{ proyecto.montoFinanciado }}
+              {{ proyecto.moneda }} {{ proyecto.fundedAmount }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
@@ -344,5 +335,3 @@
     </div>
   </div>
 </div>
-
-<!--Agregar mas ngbpagination conforme se agregue mas lineas-->

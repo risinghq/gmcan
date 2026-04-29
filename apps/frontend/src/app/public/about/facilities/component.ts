@@ -1,16 +1,15 @@
 import { Component, OnInit, inject } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
-import { Equipo } from "@app/shared/models/equipo";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
-import { Software } from "@app/shared/models/software";
+import type { Equipment } from "@app/shared/models/equipment";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
+import type { Software } from "@app/shared/models/software";
 import { BrowserService } from "@app/shared/services/browser.service";
-import { EquipoService } from "@app/shared/services/equipo.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { SoftwareService } from "@app/shared/services/software.service";
+import { forkJoin, map, switchMap } from "rxjs";
 
 @Component({
   selector: "app-facilities",
@@ -19,26 +18,23 @@ import { SoftwareService } from "@app/shared/services/software.service";
   imports: [MatChipSet, MatChip],
 })
 export default class FacilitiesComponent implements OnInit {
-  _equipoService = inject(EquipoService);
-  _softwareService = inject(SoftwareService);
-  _grupoService = inject(GrupoService);
+  private _groupService = inject(GroupService);
   private browser = inject(BrowserService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
-  equipos: Equipo[] = [];
+  equipos: Equipment[] = [];
   software: Software[] = [];
   url: string;
-  grupo: Grupo;
+  grupo: Group;
 
   public page1 = 1;
   public pageSize = 5;
-
   public page2 = 1;
 
   constructor() {
     this.url = GLOBAL.url;
-    this.grupo = createGrupo();
+    this.grupo = createGroup();
   }
 
   language: any = { locale: "es", resources: "Facilidades y recursos" };
@@ -46,30 +42,34 @@ export default class FacilitiesComponent implements OnInit {
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.resources);
-    this.getEquipos();
-    this.getSoftware();
-    this.getGrupo();
+    this.loadData();
   }
 
-  getGrupo(): void {
-    this._grupoService.getFacilidadesRecursos().subscribe((res: Grupo[]) => {
-      this.grupo = res[0];
-      if (this.language.locale === "en") {
-        this.grupo.facilidadesRecursos = this.grupo.facilidadesRecursosEN;
-      }
-    });
-  }
-
-  getEquipos(): void {
-    this._equipoService.getEquipos().subscribe((res: Equipo[]) => {
-      this.equipos = res;
-    });
-  }
-
-  getSoftware(): void {
-    this._softwareService.getSoftware().subscribe((res: Software[]) => {
-      this.software = res;
-    });
+  loadData(): void {
+    this._groupService
+      .getGroup()
+      .pipe(
+        switchMap((group) =>
+          forkJoin({
+            equipment: this._groupService.listEquipment(group.id),
+            software: this._groupService.listSoftware(group.id),
+          }).pipe(
+            map(({ equipment, software }) => ({
+              group,
+              equipment: equipment as Equipment[],
+              software: software as Software[],
+            })),
+          ),
+        ),
+      )
+      .subscribe(({ group, equipment, software }) => {
+        this.grupo = group;
+        if (this.language.locale === "en" && group.facilitiesEN) {
+          this.grupo = { ...group, facilitiesES: group.facilitiesEN };
+        }
+        this.equipos = equipment;
+        this.software = software;
+      });
   }
 
   scroll(): void {

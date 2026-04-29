@@ -6,12 +6,12 @@ import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/mat
 import { MatToolbar } from "@angular/material/toolbar";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
-import { createGrupo } from "@app/shared/models/factories";
-import type { Grupo } from "@app/shared/models/grupo";
+import { createGroup } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GrupoService } from "@app/shared/services/grupo.service";
+import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
@@ -37,14 +37,14 @@ import { SessionService } from "@app/shared/services/session.service";
 export default class LandingComponent implements OnInit {
   _route = inject(ActivatedRoute);
   _router = inject(Router);
-  _grupoService = inject(GrupoService);
+  _groupService = inject(GroupService);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
   fb = inject(FormBuilder);
   private titleService = inject(Title);
 
   screenWidth: number;
-  public grupoinfo: Grupo;
+  public grupoinfo: Group;
   public url: string;
   enteredButton = false;
   isMatMenuOpen = false;
@@ -52,6 +52,7 @@ export default class LandingComponent implements OnInit {
   language: any;
   public searchGlobalForm: FormGroup;
   public searchGlobalForm2: FormGroup;
+
   constructor() {
     this.searchGlobalForm = this.fb.group({
       nombre: [""],
@@ -62,9 +63,8 @@ export default class LandingComponent implements OnInit {
     this.lanSelected = this.session.languageId();
     this.language = this.session.language();
     this.url = GLOBAL.url;
-    // set screenWidth on page load
     this.screenWidth = this.browser.innerWidth();
-    this.grupoinfo = createGrupo();
+    this.grupoinfo = createGroup();
   }
 
   @HostListener("window:resize", ["$event"])
@@ -74,7 +74,7 @@ export default class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleService.setTitle("GMCAN | UNMSM");
-    this.getGrupoInfo();
+    this.getGroupInfo();
   }
 
   lanSelected = 0;
@@ -86,20 +86,20 @@ export default class LandingComponent implements OnInit {
     this.browser.reload();
   }
 
-  getGrupoInfo(): void {
-    this._grupoService.getGrupoInfo().subscribe((res: Grupo[]) => {
-      this.grupoinfo = res[0];
-      this.session.setGrupoInfo(this.grupoinfo);
-      this.grupoinfo.logoHeader = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/header";
-      this.grupoinfo.logoFooter = this.url + "grupo/" + this.grupoinfo.idGrupo + "/files/footer";
+  getGroupInfo(): void {
+    this._groupService.getGroup().subscribe((group: Group) => {
+      this.grupoinfo = group;
+      this.grupoinfo.logoHeader = this.url + "api/group/files/header";
+      this.grupoinfo.logoFooter = this.url + "api/group/files/footer";
+      this.session.setGroupInfo(this.grupoinfo);
     });
   }
+
   inputExpand = false;
+
   expandInput(): void {
     this.inputExpand = !this.inputExpand;
   }
-
-  /* globalSearch */
 
   searchGlobal(value: string): void {
     this._router.navigate(["/home/search/" + value]);

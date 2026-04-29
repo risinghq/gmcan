@@ -1,16 +1,17 @@
-/**
- * A person who can be credited on a publication.
- * Registered users have an account (DNI + foto); external authors are name-only.
- */
-export type AuthorOption = {
-  kind: "registered" | "external";
-  nombre: string;
-  DNI?: string; // present when kind === "registered"
-  foto?: string | null; // present when kind === "registered" and user has a photo
-};
+export interface AuthorSearchResult {
+  id: number;
+  name: string;
+  photo: string | null;
+}
 
-export type PublicationAuthor = AuthorOption & { isPrincipal: number };
+export interface AuthorEntry {
+  kind: "registered" | "external";
+  memberId?: number;
+  name: string;
+  photo?: string | null;
+  isPrincipal: number;
+}
 
 export type SaveAuthorEntry =
-  | { kind: "registered"; DNI: string; isPrincipal: number }
-  | { kind: "external"; nombre: string; isPrincipal: number };
+  | { kind: "registered"; memberId: number; isPrincipal: number }
+  | { kind: "external"; externalName: string; isPrincipal: number };

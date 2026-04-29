@@ -2,25 +2,27 @@
   <div class="news-title">
     {{ title }}
   </div>
-  <div class="img-hover-zoom">
-    @if (noticiaPrincipal.foto) {
-      <img class="card-img-div" src="{{ url + 'noticia/' + noticiaPrincipal.idNoticia + '/file }}" />
-    }
-  </div>
-  <div class="card-text-div card-text-div-3">
-    <div class="flex-news flex-news-3">
-      <div class="news-type">
-        {{ noticiaPrincipal.nombreTipoNoticia }}
-      </div>
-      <div class="other-news-date">
-        {{ noticiaPrincipal.fechaPublicacion }}
-      </div>
+  @if (noticiaPrincipal) {
+    <div class="img-hover-zoom">
+      @if (noticiaPrincipal.photo) {
+        <img class="card-img-div" src="{{ url + 'api/news/' + noticiaPrincipal.id + '/photo' }}" />
+      }
     </div>
-    <div class="other-news-text-2" (click)="detalleNoticia(noticiaPrincipal)">
-      {{ noticiaPrincipal.titulo }}
+    <div class="card-text-div card-text-div-3">
+      <div class="flex-news flex-news-3">
+        <div class="news-type">
+          {{ noticiaPrincipal.nombreTipoNoticia }}
+        </div>
+        <div class="other-news-date">
+          {{ noticiaPrincipal.fechaFormateada }}
+        </div>
+      </div>
+      <div class="other-news-text-2" (click)="detalleNoticia(noticiaPrincipal)">
+        {{ noticiaPrincipal.title }}
+      </div>
+      <div class="news-author">{{ language.newsText[0].by }} {{ noticiaPrincipal.autor }}</div>
     </div>
-    <div class="news-author">{{ language.newsText[0].by }} {{ noticiaPrincipal.autor }}</div>
-  </div>
+  }
   <div class="other-news-div">
     @for (noticia of noticias | slice: 0 : numberShown; track noticia; let i = $index) {
       <div class="other-news flex-news">
@@ -30,17 +32,17 @@
               {{ noticia.nombreTipoNoticia }}
             </div>
             <div class="other-news-date">
-              {{ noticia.fechaPublicacion }}
+              {{ noticia.fechaFormateada }}
             </div>
           </div>
           <div class="other-news-text-2" (click)="detalleNoticia(noticia)">
-            {{ noticia.titulo }}
+            {{ noticia.title }}
           </div>
           <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
         </div>
         <div class="img-hover-zoom-2 img-div-zoom">
-          @if (noticia.foto) {
-            <img class="other-news-img" src="{{ url + 'noticia/' + noticia.idNoticia + '/file }}" alt="nada" />
+          @if (noticia.photo) {
+            <img class="other-news-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" alt="nada" />
           }
         </div>
       </div>
