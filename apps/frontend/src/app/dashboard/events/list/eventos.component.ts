@@ -25,6 +25,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import { requireLocalDate } from "@app/shared/utils/date";
 
 @Component({
   selector: "app-eventos",
@@ -50,13 +51,13 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
   ],
 })
 export default class EventosComponent implements OnInit {
-  _eventService = inject(EventService);
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
+  eventService = inject(EventService);
+  router = inject(Router);
+  private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _session = inject(SessionService);
-  private _tabState = inject(TabStateService);
+  private session = inject(SessionService);
+  private tabState = inject(TabStateService);
 
   eventos: EventItem[] = [];
   resumenes: PublicationWithAuthors[] = [];
@@ -79,24 +80,22 @@ export default class EventosComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedTab = this._tabState.resumenTab();
+    this.selectedTab = this.tabState.resumenTab();
     this.getEventos();
     this.getResumenes();
   }
 
   getResumenes(): void {
-    this._publicationService.listPublications({ type: 3 }).subscribe((res: PublicationWithAuthors[]) => {
+    this.publicationService.listPublications({ type: 3 }).subscribe((res: PublicationWithAuthors[]) => {
       if (res) {
-        res.sort((a, b) =>
+        const sorted = res.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
         );
-        this.resumenes = res.map((pub) => {
-          const d = new Date(pub.publishedAt ?? "");
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          return {
-            ...pub,
-            fecha: this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? ""),
-          };
+        this.resumenes = sorted.map((pub) => {
+          const publishedAtDate = requireLocalDate(pub.publishedAt, "publication.publishedAt");
+          return Object.assign({} as PublicationWithAuthors, pub, {
+            fecha: this.titlecasePipe.transform(this.datePipe.transform(publishedAtDate, "MMMM, y", "es") ?? ""),
+          });
         });
         this.dataSource = new MatTableDataSource(this.resumenes);
         this.dataSource.sort = this.matSort();
@@ -106,7 +105,7 @@ export default class EventosComponent implements OnInit {
   }
 
   getEventos(): void {
-    this._eventService.listAdmin().subscribe((res: EventItem[]) => {
+    this.eventService.listAdmin().subscribe((res: EventItem[]) => {
       if (res) {
         this.eventos = res;
         this.dataSource2 = new MatTableDataSource(this.eventos);
@@ -139,24 +138,24 @@ export default class EventosComponent implements OnInit {
   }
 
   changedTab(event: number): void {
-    this._tabState.resumenTab.set(event);
+    this.tabState.resumenTab.set(event);
   }
 
   addResumen(): void {
-    this._session.setResumenBack("eventos");
-    this._router.navigate(["dashboard/add-resumen"]);
+    this.session.setResumenBack("eventos");
+    this.router.navigate(["dashboard/add-resumen"]);
   }
 
   editResumen(id: number): void {
-    this._session.setResumenBack("eventos");
-    this._router.navigate(["dashboard/edit-resumen/" + id]);
+    this.session.setResumenBack("eventos");
+    this.router.navigate(["dashboard/edit-resumen/" + id]);
   }
 
   addEvento(): void {
-    this._router.navigate(["dashboard/add-evento"]);
+    this.router.navigate(["dashboard/add-evento"]);
   }
 
   editEvento(id: number): void {
-    this._router.navigate(["dashboard/edit-evento/" + id]);
+    this.router.navigate(["dashboard/edit-evento/" + id]);
   }
 }

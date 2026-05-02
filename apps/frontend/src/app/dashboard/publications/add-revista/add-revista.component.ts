@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } 
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import type { JournalItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
@@ -17,11 +17,10 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _refService = inject(RefService);
+  private snackBar = inject(MatSnackBar);
+  private refService = inject(RefService);
 
   revista: JournalItem = { id: 0, name: "" };
   public revistaForm: FormGroup;
@@ -45,7 +44,7 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
 
   submitRevista(): void {
     if (!this.revistaForm.valid) return;
-    this._refService.createJournal({ name: this.revista.name }).subscribe((result) => {
+    this.refService.createJournal({ name: this.revista.name }).subscribe((result) => {
       if (result.id) {
         this.revistaForm.markAsPristine();
         this.return();
@@ -55,11 +54,11 @@ export default class AddRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/articulos"]);
+    this.router.navigate(["dashboard/articulos"]);
   }
 
   openSnackBar(msg = "Revista agregada exitosamente"): void {
-    this._snackBar.open(msg, undefined, {
+    this.snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

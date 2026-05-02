@@ -29,13 +29,13 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _refService = inject(RefService);
+  private snackBar = inject(MatSnackBar);
+  private refService = inject(RefService);
   private lookup = inject(LookupService);
-  private _publicationService = inject(PublicationService);
+  private publicationService = inject(PublicationService);
 
   revista: JournalItem = { id: 0, name: "" };
   public revistaForm: FormGroup;
@@ -58,7 +58,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   getRevista(): void {
-    const id = Number(this._route.snapshot.params["id"] ?? 0);
+    const id = Number(this.route.snapshot.params["id"] ?? 0);
     const found = this.lookup.journals().find((r) => r.id === id);
     if (found) {
       this.revista = { id: found.id, name: found.name };
@@ -68,14 +68,14 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   checkCanDelete(id: number): void {
-    this._publicationService.listAdminPublications().subscribe((pubs) => {
+    this.publicationService.listAdminPublications().subscribe((pubs) => {
       this.notCanDo = pubs.filter((p) => p.journalId === id).length === 0;
     });
   }
 
   submitRevista(): void {
     if (!this.revistaForm.valid) return;
-    this._refService.updateJournal(this.revista.id, { name: this.revista.name }).subscribe((result) => {
+    this.refService.updateJournal(this.revista.id, { name: this.revista.name }).subscribe((result) => {
       if (result.status === 1) {
         this.revistaForm.markAsPristine();
         this.return();
@@ -85,7 +85,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/articulos"]);
+    this.router.navigate(["dashboard/articulos"]);
   }
 
   private dialogRef2?: MatDialogRef<DialogErase3>;
@@ -111,7 +111,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -119,7 +119,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   eraseRevista(): void {
-    this._refService.deleteJournal(this.revista.id).subscribe((result) => {
+    this.refService.deleteJournal(this.revista.id).subscribe((result) => {
       if (result.status === 1) {
         this.revistaForm.markAsPristine();
         this.return();

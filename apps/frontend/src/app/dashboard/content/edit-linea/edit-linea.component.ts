@@ -30,11 +30,11 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _researchLinesService = inject(ResearchLinesService);
+  private snackBar = inject(MatSnackBar);
+  private researchLinesService = inject(ResearchLinesService);
 
   button_text = "Actualizar información";
   lineaInvestigacion: ResearchLine;
@@ -63,8 +63,8 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   getLinea(): void {
-    const idLinea = Number(this._route.snapshot.params["id"]);
-    this._researchLinesService.get(idLinea).subscribe((linea: ResearchLine) => {
+    const idLinea = Number(this.route.snapshot.params["id"]);
+    this.researchLinesService.get(idLinea).subscribe((linea: ResearchLine) => {
       if (linea) {
         this.lineaInvestigacion = linea;
         localStorage.setItem("lineaInvestigacionEdit", JSON.stringify(linea.name));
@@ -74,7 +74,7 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
 
   submitLinea(): void {
     if (this.lineaForm.valid) {
-      this._researchLinesService
+      this.researchLinesService
         .update(this.lineaInvestigacion.id, {
           name: this.lineaInvestigacion.name,
           nameEN: this.lineaInvestigacion.nameEN,
@@ -84,7 +84,7 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.status === 1) {
             if (this.fileData) {
-              this._researchLinesService.uploadPhoto(this.lineaInvestigacion.id, this.fileData).subscribe(() => {});
+              this.researchLinesService.uploadPhoto(this.lineaInvestigacion.id, this.fileData).subscribe();
             }
             this.lineaForm.markAsPristine();
             this.return();
@@ -95,11 +95,11 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -130,7 +130,7 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   eraseLinea(): void {
-    this._researchLinesService.delete(this.lineaInvestigacion.id).subscribe((result) => {
+    this.researchLinesService.delete(this.lineaInvestigacion.id).subscribe((result) => {
       if (result.status === 1) {
         this.lineaForm.markAsPristine();
         this.return();

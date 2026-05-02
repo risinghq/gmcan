@@ -18,7 +18,7 @@ export class ShareService {
    * @param title - Optional title for the share (used primarily in Twitter)
    */
   openShare(platform: SharePlatform, url: string, title?: string): void {
-    const shareUrl = this._generateShareUrl(platform, url, title);
+    const shareUrl = this.generateShareUrl(platform, url, title);
     this.browser.open(shareUrl, `${platform}-share-dialog`, "width=626,height=436");
   }
 
@@ -31,7 +31,7 @@ export class ShareService {
    * @param title - Optional title
    * @returns Platform-specific share URL
    */
-  private _generateShareUrl(platform: SharePlatform, url: string, title?: string): string {
+  private generateShareUrl(platform: SharePlatform, url: string, title?: string): string {
     const encodedUrl = encodeURIComponent(url);
 
     if (platform === "facebook") {

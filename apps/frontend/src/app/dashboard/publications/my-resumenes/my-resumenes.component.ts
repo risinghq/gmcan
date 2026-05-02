@@ -51,12 +51,12 @@ interface PublicationRow extends PublicationWithAuthors {
   ],
 })
 export default class MyResumenesComponent implements OnInit {
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
+  private router = inject(Router);
+  private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _auth = inject(AuthService);
-  private _session = inject(SessionService);
+  private auth = inject(AuthService);
+  private session = inject(SessionService);
   lookup = inject(LookupService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "evento"];
@@ -77,9 +77,9 @@ export default class MyResumenesComponent implements OnInit {
   }
 
   getUserResumenes(): void {
-    const user = this._auth.getUser();
+    const user = this.auth.getUser();
     if (!user) return;
-    this._publicationService.listPublications({ type: 3 }).subscribe((res) => {
+    this.publicationService.listPublications({ type: 3 }).subscribe((res) => {
       if (res) {
         const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
         const sorted = mine.toSorted((a, b) =>
@@ -113,12 +113,12 @@ export default class MyResumenesComponent implements OnInit {
   }
 
   addResumen(): void {
-    this._session.setResumenBack("my-abstracts");
-    this._router.navigate(["dashboard/add-resumen/"]);
+    this.session.setResumenBack("my-abstracts");
+    this.router.navigate(["dashboard/add-resumen/"]);
   }
 
   editResumen(id: number): void {
-    this._session.setResumenBack("my-abstracts");
-    this._router.navigate(["dashboard/edit-resumen/" + id]);
+    this.session.setResumenBack("my-abstracts");
+    this.router.navigate(["dashboard/edit-resumen/" + id]);
   }
 }

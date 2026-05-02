@@ -10,8 +10,17 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
-import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
+import { Router } from "@angular/router";
+import {
+  attachFilter,
+  buildCoAuthorSaveList,
+  type AuthorFormRow,
+  filterAuthors,
+  newAuthorRow,
+} from "@app/dashboard/publications/flow/authors";
+import { ARTICLE_BACK_KEY, resolveBackTarget } from "@app/dashboard/publications/flow/back-nav";
+import { buildArticlePayload } from "@app/dashboard/publications/flow/publication-payload";
+import type { AuthorSearchResult } from "@app/shared/models/author";
 import { createPublication } from "@app/shared/models/factories";
 import type { Publication } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -23,14 +32,6 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
-
-interface AuthorFormRow {
-  id: number;
-  name: string;
-  memberId: number | null;
-  myControl: FormControl<string>;
-  filteredOptions?: Observable<AuthorSearchResult[]>;
-}
 
 @Component({
   selector: "app-add-article",
@@ -58,13 +59,12 @@ interface AuthorFormRow {
 })
 export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
-  private _memberService = inject(MemberService);
+  private router = inject(Router);
+  private publicationService = inject(PublicationService);
+  private memberService = inject(MemberService);
   lookup = inject(LookupService);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
+  private snackBar = inject(MatSnackBar);
 
   publicacion: Publication;
   publishedAtObj?: Date;
@@ -104,38 +104,14 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   ngOnInit(): void {
-    this._memberService.searchAuthors("").subscribe((authors) => {
+    this.memberService.searchAuthors("").subscribe((authors) => {
       this.options = authors;
       this.filteredOptions = this.myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this.filterAuthors(value)),
+        map((value) => filterAuthors(this.options, value)),
       );
-      this.otrosAutores = [this.newCoAuthorRow()];
-      this.setupCoAuthorFilters();
+      this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
     });
-  }
-
-  private filterAuthors(value: string): AuthorSearchResult[] {
-    const lower = value.toLowerCase();
-    return this.options.filter((o) => o.name.toLowerCase().includes(lower));
-  }
-
-  private newCoAuthorRow(): AuthorFormRow {
-    return {
-      id: this.otrosAutores.length + 1,
-      name: "",
-      memberId: null,
-      myControl: new FormControl<string>("", { nonNullable: true }),
-    };
-  }
-
-  private setupCoAuthorFilters(): void {
-    for (const row of this.otrosAutores) {
-      row.filteredOptions = row.myControl.valueChanges.pipe(
-        startWith(""),
-        map((v) => this.filterAuthors(v)),
-      );
-    }
   }
 
   selectUser(evento: AuthorSearchResult | { value: string }, value: number): void {
@@ -166,21 +142,12 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   }
 
   addAnotherAuthor(): void {
-    const row = this.newCoAuthorRow();
-    row.filteredOptions = row.myControl.valueChanges.pipe(
-      startWith(""),
-      map((v) => this.filterAuthors(v)),
-    );
-    this.otrosAutores.push(row);
+    this.otrosAutores.push(attachFilter(newAuthorRow(this.otrosAutores.length + 1), this.options));
   }
 
   removeAnotherAuthor(i: number): void {
     if (this.otrosAutores.length === 1) {
-      this.otrosAutores[0] = this.newCoAuthorRow();
-      this.otrosAutores[0].filteredOptions = this.otrosAutores[0].myControl.valueChanges.pipe(
-        startWith(""),
-        map((v) => this.filterAuthors(v)),
-      );
+      this.otrosAutores[0] = attachFilter(newAuthorRow(1), this.options);
     } else {
       this.otrosAutores.splice(i, 1);
     }
@@ -189,23 +156,20 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
 
-    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : "";
-
-    const data = {
+    const data = buildArticlePayload({
       title: this.publicacion.title,
       abstractES: this.publicacion.abstractES ?? undefined,
       abstractEN: this.publicacion.abstractEN ?? undefined,
       doi: this.publicacion.doi ?? undefined,
-      publishedAt,
+      publishedAt: this.publishedAtObj,
       journalIssue: this.publicacion.journalIssue ?? undefined,
-      typeId: 1,
       journalId: this.publicacion.journalId ?? undefined,
-    };
+    });
 
-    this._publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
+    this.publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
       if (result.id != null) {
         if (this.fileData) {
-          this._publicationService.uploadFile(result.id, this.fileData).subscribe(() => {});
+          this.publicationService.uploadFile(result.id, this.fileData).subscribe();
         }
         this.publicacionForm.markAsPristine();
         this.return();
@@ -214,36 +178,23 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  private buildSaveList(): SaveAuthorEntry[] {
-    const entries: SaveAuthorEntry[] = [];
+  private buildSaveList() {
+    const entries = buildCoAuthorSaveList(this.otrosAutores, this.options, 1);
 
     const resolvedPrincipal = this.principalAuthor?.name === this.selectedUser ? this.principalAuthor : null;
     if (resolvedPrincipal?.id) {
-      entries.push({ kind: "registered", memberId: resolvedPrincipal.id, isPrincipal: 0 });
+      return [{ kind: "registered" as const, memberId: resolvedPrincipal.id, isPrincipal: 0 }, ...entries];
     } else {
-      entries.push({ kind: "external", externalName: this.selectedUser, isPrincipal: 0 });
+      return [{ kind: "external" as const, externalName: this.selectedUser, isPrincipal: 0 }, ...entries];
     }
-
-    this.otrosAutores.forEach((row, i) => {
-      if (!row.name) return;
-      const matchedAuthor = this.options.find((o) => o.name === row.name);
-      const memberId = row.memberId ?? matchedAuthor?.id ?? null;
-      if (memberId) {
-        entries.push({ kind: "registered", memberId, isPrincipal: i + 1 });
-      } else {
-        entries.push({ kind: "external", externalName: row.name, isPrincipal: i + 1 });
-      }
-    });
-
-    return entries;
   }
 
   return(): void {
-    this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
+    this.router.navigate(["dashboard/" + resolveBackTarget(ARTICLE_BACK_KEY, "my-articles")]);
   }
 
   openSnackBar(msg = "Publicación agregada exitosamente"): void {
-    this._snackBar.open(msg, undefined, {
+    this.snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

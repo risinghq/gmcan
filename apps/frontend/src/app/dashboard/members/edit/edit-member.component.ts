@@ -27,6 +27,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
 
 @Component({
@@ -53,11 +54,11 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _memberService = inject(MemberService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  private memberService = inject(MemberService);
   lookup = inject(LookupService);
-  private _snackBar = inject(MatSnackBar);
+  private snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
 
   url: string;
@@ -104,7 +105,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   hide = true;
   hide2 = true;
 
-  @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
+  @HostListener("window:beforeunload", ["$event"])
+  unloadHandler(event: Event): void {
     event.returnValue = false;
   }
 
@@ -117,17 +119,15 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   getUser(): void {
-    const id = Number(this._route.snapshot.params["id"] ?? 0);
-    this._memberService.getMemberFull(id).subscribe((result: MemberFull) => {
+    const id = Number(this.route.snapshot.params["id"] ?? 0);
+    this.memberService.getMemberFull(id).subscribe((result: MemberFull) => {
       if (result) {
         this.memberForm.controls["DNI"].disable();
         this.member = result;
         this.oldEmail = result.email ?? "";
 
         if (result.birthDate) {
-          const d = new Date(result.birthDate);
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.birthDateObj = d;
+          this.birthDateObj = parseLocalDate(result.birthDate);
         }
 
         const fullName =
@@ -168,7 +168,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       const firstName = this.segundoNombre
         ? `${this.member.firstName} ${this.segundoNombre}`.trim()
         : this.member.firstName;
-      const birthDate = this.birthDateObj ? new Date(this.birthDateObj).toLocaleDateString("sv") : undefined;
+      const birthDate = this.birthDateObj ? toIsoDate(this.birthDateObj) : undefined;
 
       let status: number;
       if (this.adHono === 3) {
@@ -188,7 +188,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
           this.errPass = true;
           return;
         }
-        this._memberService
+        this.memberService
           .updateMember(this.member.id, {
             email: this.member.email,
             firstName,
@@ -206,7 +206,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
           .subscribe((res) => {
             if (res.status === 1) {
               if (this.fileData) {
-                this._memberService.uploadPhoto(this.member.id, this.fileData).subscribe(() => {});
+                this.memberService.uploadPhoto(this.member.id, this.fileData).subscribe();
               }
               this.openSnackBar("Miembro actualizado exitosamente");
               this.memberForm.markAsPristine();
@@ -216,7 +216,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       };
 
       if (this.oldEmail !== this.member.email) {
-        this._memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
+        this.memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
           const list = result as unknown[];
           if (list.length === 0) {
             doUpdate();
@@ -251,7 +251,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   openSnackBar(text: string, panel?: string): void {
-    this._snackBar.open(text, undefined, {
+    this.snackBar.open(text, undefined, {
       panelClass: panel ? [panel] : [],
       duration: 2000,
       horizontalPosition: "right",
@@ -259,11 +259,11 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  return() {
+  return(): void {
     if (localStorage.getItem("active-member") === "1") {
-      this._router.navigate(["dashboard/miembros-activos"]);
+      this.router.navigate(["dashboard/miembros-activos"]);
     } else {
-      this._router.navigate(["dashboard/miembros-antiguos"]);
+      this.router.navigate(["dashboard/miembros-antiguos"]);
     }
   }
 
@@ -288,7 +288,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   eraseMember(): void {
-    this._memberService.deleteMember(this.member.id).subscribe((result) => {
+    this.memberService.deleteMember(this.member.id).subscribe((result) => {
       if (result.status === 1) {
         this.memberForm.markAsPristine();
         this.return();

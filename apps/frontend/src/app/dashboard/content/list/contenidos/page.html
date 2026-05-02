@@ -1,0 +1,32 @@
+<mat-tab-group class="noticias-div" [(selectedIndex)]="state.selectedTab" (selectedIndexChange)="state.setTab($event)">
+  <mat-tab label="¿Quiénes Somos?">
+    @if (state.selectedTab === 0) {
+    <app-contenidos-about-tab [state]="state" />
+    }
+  </mat-tab>
+  <mat-tab label="Líneas de investigación">
+    @if (state.selectedTab === 1) {
+    <app-contenidos-lines-tab [state]="state" mode="line" />
+    }
+  </mat-tab>
+  <mat-tab label="Métodos">
+    @if (state.selectedTab === 2) {
+    <app-contenidos-lines-tab [state]="state" mode="method" />
+    }
+  </mat-tab>
+  <mat-tab label="Facilidades y recursos">
+    @if (state.selectedTab === 3) {
+    <app-contenidos-resources-tab [state]="state" />
+    }
+  </mat-tab>
+  <mat-tab label="Trabajos futuros">
+    @if (state.selectedTab === 4) {
+    <app-contenidos-future-tab [state]="state" />
+    }
+  </mat-tab>
+  <mat-tab label="Otros">
+    @if (state.selectedTab === 5) {
+    <app-contenidos-other-tab [state]="state" />
+    }
+  </mat-tab>
+</mat-tab-group>

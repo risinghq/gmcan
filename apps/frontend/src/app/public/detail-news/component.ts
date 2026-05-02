@@ -5,6 +5,7 @@ import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
+import { Languages } from "@app/shared/models/languages";
 import type { News } from "@app/shared/models/news";
 import { GLOBAL } from "@app/shared/services/global";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
@@ -20,12 +21,12 @@ import type { DetailNewsViewModel } from "./types";
   imports: [MatProgressSpinner, MatIcon, NewsComponent, SharedShareButtonsComponent],
 })
 export default class DetailNewsComponent implements OnInit {
-  private readonly _route = inject(ActivatedRoute);
-  private readonly _navigationHistory = inject(NavigationHistoryService);
-  private readonly _previousService = inject(PreviousPageService);
-  private readonly _session = inject(SessionService);
-  private readonly _meta = inject(Meta);
-  private readonly _titleService = inject(Title);
+  private readonly route = inject(ActivatedRoute);
+  private readonly navigationHistory = inject(NavigationHistoryService);
+  private readonly previousService = inject(PreviousPageService);
+  private readonly session = inject(SessionService);
+  private readonly meta = inject(Meta);
+  private readonly titleService = inject(Title);
 
   noticia: News = {} as News;
   tipoNoticia = "";
@@ -39,11 +40,11 @@ export default class DetailNewsComponent implements OnInit {
   mes = "";
   anio = "";
   url = GLOBAL.url;
-  language: any = {};
+  language: (typeof Languages)[number] = Languages[0];
 
   ngOnInit(): void {
-    this.language = this._session.language();
-    const newsData = this._route.snapshot.data["news"] as DetailNewsViewModel;
+    this.language = this.session.language();
+    const newsData = this.route.snapshot.data["news"] as DetailNewsViewModel;
 
     this.noticia = newsData.noticia;
     this.tipoNoticia = newsData.tipoNoticia;
@@ -54,12 +55,12 @@ export default class DetailNewsComponent implements OnInit {
     this.mes = newsData.mes;
     this.anio = newsData.anio;
 
-    this._meta.updateTag({ name: "title", content: String(this.noticia.title) });
-    this._meta.updateTag({ property: "og:title", content: String(this.noticia.title) });
-    this._titleService.setTitle(String(this.noticia.title));
+    this.meta.updateTag({ name: "title", content: String(this.noticia.title) });
+    this.meta.updateTag({ property: "og:title", content: String(this.noticia.title) });
+    this.titleService.setTitle(String(this.noticia.title));
 
-    this.previouslink = this._navigationHistory.previousUrl();
-    this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
+    this.previouslink = this.navigationHistory.previousUrl();
+    this.previouspage = this.previousService.getPreviousPage(this.previouslink ?? "");
     this.cargado = true;
   }
 }

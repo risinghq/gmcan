@@ -18,7 +18,7 @@ import { forkJoin, map, switchMap } from "rxjs";
   imports: [MatChipSet, MatChip],
 })
 export default class FacilitiesComponent implements OnInit {
-  private _groupService = inject(GroupService);
+  private groupService = inject(GroupService);
   private browser = inject(BrowserService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
@@ -46,13 +46,13 @@ export default class FacilitiesComponent implements OnInit {
   }
 
   loadData(): void {
-    this._groupService
+    this.groupService
       .getGroup()
       .pipe(
         switchMap((group) =>
           forkJoin({
-            equipment: this._groupService.listEquipment(group.id),
-            software: this._groupService.listSoftware(group.id),
+            equipment: this.groupService.listEquipment(group.id),
+            software: this.groupService.listSoftware(group.id),
           }).pipe(
             map(({ equipment, software }) => ({
               group,

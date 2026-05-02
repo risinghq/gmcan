@@ -180,7 +180,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       <div class="flex-news">
-        <div id="titleDash" class="tool-text middle"></div>
+        <div class="tool-text middle" [innerHTML]="dashboardTitle"></div>
         <div class="publish-news" [hidden]="!noticiaPublicada">Noticia Publicada</div>
       </div>
       <div class="right user-div flex-news">

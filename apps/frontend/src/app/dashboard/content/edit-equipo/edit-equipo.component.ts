@@ -28,11 +28,11 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _groupService = inject(GroupService);
+  private snackBar = inject(MatSnackBar);
+  private groupService = inject(GroupService);
 
   edit = true;
   equipo: Equipment;
@@ -59,9 +59,8 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   getEquipo(): void {
-    const idEquipo = Number(this._route.snapshot.params["id"]);
-    this._groupService.getEquipment(idEquipo).subscribe((result: unknown) => {
-      const eq = result as Equipment;
+    const idEquipo = Number(this.route.snapshot.params["id"] ?? 0);
+    this.groupService.getEquipment(idEquipo).subscribe((eq: Equipment) => {
       if (eq) {
         this.equipo = eq;
         localStorage.setItem("equipoEdit", JSON.stringify(eq.name));
@@ -71,7 +70,7 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
 
   submitEquipo(): void {
     if (this.equipoForm.valid) {
-      this._groupService
+      this.groupService
         .updateEquipment(this.equipo.id, {
           name: this.equipo.name,
           cpu: this.equipo.cpu ?? undefined,
@@ -90,11 +89,11 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -122,7 +121,7 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   eraseEquipo(): void {
-    this._groupService.deleteEquipment(this.equipo.id).subscribe((result) => {
+    this.groupService.deleteEquipment(this.equipo.id).subscribe((result) => {
       if (result.status === 1) {
         this.equipoForm.markAsPristine();
         this.return();

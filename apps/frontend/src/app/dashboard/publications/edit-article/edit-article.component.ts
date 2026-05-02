@@ -30,6 +30,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+import { parseLocalDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
@@ -68,13 +69,13 @@ interface AuthorFormRow {
 })
 export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
-  private _memberService = inject(MemberService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly publicationService = inject(PublicationService);
+  private readonly memberService = inject(MemberService);
   lookup = inject(LookupService);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
+  private readonly snackBar = inject(MatSnackBar);
 
   publicacion: Publication;
   publishedAtObj?: Date;
@@ -111,16 +112,15 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    const id = Number(this._route.snapshot.params["id"] ?? 0);
-    this._publicationService.getPublication(id).subscribe((pub) => {
+    const id = Number(this.route.snapshot.params["id"] ?? 0);
+    this.publicationService.getPublication(id).subscribe((pub) => {
       this.publicacion = pub;
-      if (pub.publishedAt) {
-        const d = new Date(pub.publishedAt);
-        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.publishedAtObj = d;
+      const publishedAt = parseLocalDate(pub.publishedAt);
+      if (publishedAt) {
+        this.publishedAtObj = publishedAt;
       }
 
-      this._memberService.searchAuthors("").subscribe((allAuthors) => {
+      this.memberService.searchAuthors("").subscribe((allAuthors) => {
         this.options = allAuthors;
         this.filteredOptions = this.myControl.valueChanges.pipe(
           startWith(""),
@@ -248,18 +248,16 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       journalId: this.publicacion.journalId ?? undefined,
     };
 
-    this._publicationService
-      .updatePublication(this.publicacion.id, data, this.buildSaveList())
-      .subscribe((response) => {
-        if (response.status === 1) {
-          if (this.fileData) {
-            this._publicationService.uploadFile(this.publicacion.id, this.fileData).subscribe(() => {});
-          }
-          this.publicacionForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Artículo actualizado exitosamente");
+    this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((response) => {
+      if (response.status === 1) {
+        if (this.fileData) {
+          this.publicationService.uploadFile(this.publicacion.id, this.fileData).subscribe();
         }
-      });
+        this.publicacionForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Artículo actualizado exitosamente");
+      }
+    });
   }
 
   private buildSaveList(): SaveAuthorEntry[] {
@@ -287,7 +285,7 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   }
 
   erasePublicacion(): void {
-    this._publicationService.deletePublication(this.publicacion.id).subscribe((response) => {
+    this.publicationService.deletePublication(this.publicacion.id).subscribe((response) => {
       if (response.status === 1) {
         this.publicacionForm.markAsPristine();
         this.return();
@@ -317,11 +315,11 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
+    this.router.navigate(["dashboard/" + localStorage.getItem("article-back")]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

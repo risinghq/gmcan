@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } 
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { createSoftware } from "@app/shared/models/factories";
 import type { Software } from "@app/shared/models/software";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -19,11 +19,10 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _groupService = inject(GroupService);
+  private snackBar = inject(MatSnackBar);
+  private groupService = inject(GroupService);
 
   software: Software;
   softwareForm: FormGroup;
@@ -50,7 +49,7 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
 
   submitSoftware(): void {
     if (this.softwareForm.valid) {
-      this._groupService
+      this.groupService
         .createSoftware({
           name: this.software.name ?? undefined,
           description: this.software.description ?? undefined,
@@ -69,11 +68,11 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(): void {
-    this._snackBar.open("Software agregado exitosamente", undefined, {
+    this.snackBar.open("Software agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

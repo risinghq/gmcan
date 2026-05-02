@@ -31,11 +31,11 @@ import { ClassicEditor } from "ckeditor5";
 })
 export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _methodService = inject(MethodsService);
+  private snackBar = inject(MatSnackBar);
+  private methodService = inject(MethodsService);
 
   public Editor = ClassicEditor;
   button_text = "Actualizar información";
@@ -73,8 +73,8 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   }
 
   getMethod(): void {
-    const idMethod = Number(this._route.snapshot.params["id"]);
-    this._methodService.get(idMethod).subscribe((result: Method) => {
+    const idMethod = Number(this.route.snapshot.params["id"]);
+    this.methodService.get(idMethod).subscribe((result: Method) => {
       if (result) {
         this.metodo = result;
         localStorage.setItem("metodoEdit", JSON.stringify(result.name));
@@ -84,7 +84,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   submitMethod(): void {
     if (this.methodForm.valid) {
-      this._methodService
+      this.methodService
         .update(this.metodo.id, {
           name: this.metodo.name,
           nameEN: this.metodo.nameEN,
@@ -94,7 +94,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.status === 1) {
             if (this.fileData) {
-              this._methodService.uploadPhoto(this.metodo.id, this.fileData).subscribe(() => {});
+              this.methodService.uploadPhoto(this.metodo.id, this.fileData).subscribe();
             }
             this.methodForm.markAsPristine();
             this.return();
@@ -105,11 +105,11 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -119,7 +119,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   edit = true;
 
   eraseMethod(): void {
-    this._methodService.delete(this.metodo.id).subscribe((res) => {
+    this.methodService.delete(this.metodo.id).subscribe((res) => {
       if (res.status === 1) {
         this.methodForm.markAsPristine();
         this.return();
@@ -191,7 +191,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
       data: method,
     });
 
-    this.previewDialog.afterClosed().subscribe(() => {});
+    this.previewDialog.afterClosed().subscribe();
   }
 }
 

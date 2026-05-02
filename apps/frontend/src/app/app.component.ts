@@ -1,6 +1,6 @@
 import { Component, HostListener, inject } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
-import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
@@ -16,9 +16,7 @@ import { SessionService } from "@app/shared/services/session.service";
   imports: [RouterOutlet],
 })
 export default class AppComponent {
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  _grupoService = inject(GroupService);
+  private groupService = inject(GroupService);
   private session = inject(SessionService);
   private browser = inject(BrowserService);
   fb = inject(FormBuilder);
@@ -62,13 +60,13 @@ export default class AppComponent {
   }
 
   getGroupInfo(): void {
-    this._grupoService.getGroup().subscribe((res: Group) => {
+    this.groupService.getGroup().subscribe((res: Group) => {
       this.grupoinfo = res;
       this.session.setGroupInfo(res);
       this.grupoinfo.logoHeader = this.url + "api/group/files/header";
     });
   }
   searchGlobal(value: string): void {
-    this._router.navigate(["/search/" + value]);
+    this.router.navigate(["/search/" + value]);
   }
 }

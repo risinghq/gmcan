@@ -6,9 +6,9 @@ import type { GlobalSearchViewModel } from "./types";
 
 @Injectable({ providedIn: "root" })
 export class GlobalSearchDataService {
-  private readonly _searchService = inject(SearchService);
+  private readonly searchService = inject(SearchService);
 
   async load(searchId: string): Promise<GlobalSearchViewModel> {
-    return firstValueFrom(this._searchService.search(searchId));
+    return firstValueFrom(this.searchService.search(searchId));
   }
 }

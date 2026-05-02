@@ -4,44 +4,44 @@ import { SessionService } from "@app/shared/services/session.service";
 
 @Injectable()
 export class AboutFacade {
-  private readonly _language = signal<(typeof Languages)[number]>(Languages[0]);
-  private readonly _selectedCategory = signal("");
+  private readonly languageState = signal<(typeof Languages)[number]>(Languages[0]);
+  private readonly selectedCategoryState = signal("");
 
-  readonly language = this._language.asReadonly();
-  readonly selectedCategory = computed(() => this._selectedCategory());
+  readonly language = this.languageState.asReadonly();
+  readonly selectedCategory = computed(() => this.selectedCategoryState());
 
   constructor(private readonly session: SessionService) {}
 
   init(routeUrl: string): void {
-    this._language.set(this.session.language());
+    this.languageState.set(this.session.language());
     this.syncCategoryFromRoute(routeUrl);
   }
 
   setSelectedCategory(value: string): void {
-    this._selectedCategory.set(value);
+    this.selectedCategoryState.set(value);
   }
 
   private syncCategoryFromRoute(route: string): void {
-    const language = this._language();
+    const language = this.languageState();
     switch (route) {
       case "/home/about-us/about":
       case "/home/about-us":
-        this._selectedCategory.set(language.who);
+        this.selectedCategoryState.set(language.who);
         break;
       case "/home/about-us/lines-investigation":
-        this._selectedCategory.set(language.linesInvestigation);
+        this.selectedCategoryState.set(language.linesInvestigation);
         break;
       case "/home/about-us/methods":
-        this._selectedCategory.set(language.methods);
+        this.selectedCategoryState.set(language.methods);
         break;
       case "/home/about-us/facilities-resources":
-        this._selectedCategory.set(language.resources);
+        this.selectedCategoryState.set(language.resources);
         break;
       case "/home/about-us/works":
-        this._selectedCategory.set(language.futureWorks);
+        this.selectedCategoryState.set(language.futureWorks);
         break;
       default:
-        this._selectedCategory.set("");
+        this.selectedCategoryState.set("");
         break;
     }
   }

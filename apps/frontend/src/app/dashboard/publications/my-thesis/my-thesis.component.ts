@@ -17,6 +17,7 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
+import { setBackTarget, THESIS_BACK_KEY } from "@app/dashboard/publications/flow/back-nav";
 import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -51,12 +52,12 @@ interface PublicationRow extends PublicationWithAuthors {
   ],
 })
 export default class MyThesisComponent implements OnInit {
-  _router = inject(Router);
+  private router = inject(Router);
   lookup = inject(LookupService);
-  private _publicationService = inject(PublicationService);
+  private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _auth = inject(AuthService);
+  private auth = inject(AuthService);
 
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
   dataSource: MatTableDataSource<PublicationRow> = new MatTableDataSource<PublicationRow>([]);
@@ -75,9 +76,9 @@ export default class MyThesisComponent implements OnInit {
   }
 
   getUserThesis(): void {
-    const user = this._auth.getUser();
+    const user = this.auth.getUser();
     if (!user) return;
-    this._publicationService.listPublications({ type: 2 }).subscribe((res) => {
+    this.publicationService.listPublications({ type: 2 }).subscribe((res) => {
       if (res) {
         const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
         const sorted = mine.toSorted((a, b) =>
@@ -113,12 +114,12 @@ export default class MyThesisComponent implements OnInit {
   }
 
   addThesis(): void {
-    localStorage.setItem("thesis-back", "my-thesis");
-    this._router.navigate(["dashboard/add-thesis/"]);
+    setBackTarget(THESIS_BACK_KEY, "my-thesis");
+    this.router.navigate(["dashboard/add-thesis/"]);
   }
 
   editThesis(id: number): void {
-    localStorage.setItem("thesis-back", "my-thesis");
-    this._router.navigate(["dashboard/edit-thesis/" + id]);
+    setBackTarget(THESIS_BACK_KEY, "my-thesis");
+    this.router.navigate(["dashboard/edit-thesis/" + id]);
   }
 }

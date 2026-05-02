@@ -23,16 +23,16 @@ import type { HomeNoticia, HomeProyecto, HomePublicacion, HomeViewModel } from "
   imports: [MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
-  private _router = inject(Router);
-  private _route = inject(ActivatedRoute);
-  private _session = inject(SessionService);
-  private _browser = inject(BrowserService);
-  private _titleService = inject(Title);
-  private _meta = inject(Meta);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private session = inject(SessionService);
+  private browser = inject(BrowserService);
+  private titleService = inject(Title);
+  private meta = inject(Meta);
 
   language: any = {};
   url = GLOBAL.appUrl;
-  screenWidth = this._browser.innerWidth();
+  screenWidth = this.browser.innerWidth();
   expandedKey: string | null = null;
 
   progress = 100;
@@ -51,14 +51,14 @@ export default class HomeComponent implements OnInit {
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = this._browser.innerWidth();
+    this.screenWidth = this.browser.innerWidth();
   }
 
   ngOnInit(): void {
-    this.language = this._session.language();
-    this._titleService.setTitle("GMCAN | UNMSM");
+    this.language = this.session.language();
+    this.titleService.setTitle("GMCAN | UNMSM");
 
-    const home = this._route.snapshot.data["home"] as HomeViewModel;
+    const home = this.route.snapshot.data["home"] as HomeViewModel;
     this.info = home.info;
     this.publicaciones = home.publicaciones;
     this.proyectos = home.proyectos;
@@ -76,7 +76,7 @@ export default class HomeComponent implements OnInit {
   publicationLink(_value: unknown): void {}
 
   navigate(route: string): void {
-    this._router.navigate([route]);
+    this.router.navigate([route]);
   }
 
   toggleExpanded(section: string, index: number): void {
@@ -96,26 +96,26 @@ export default class HomeComponent implements OnInit {
     if (!user.id) {
       return;
     }
-    this._router.navigate(["/home/detail-member/" + user.id]);
+    this.router.navigate(["/home/detail-member/" + user.id]);
   }
 
   detalleNoticia(noticia: { id?: number }): void {
     if (!noticia.id) {
       return;
     }
-    this._router.navigate(["/home/detail-news/" + noticia.id]);
+    this.router.navigate(["/home/detail-news/" + noticia.id]);
     this.scroll();
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 
   fbsharing(i: number): boolean {
     const title = String(this.publicaciones[i]?.title ?? "");
-    this._meta.updateTag({ name: "description", content: title });
+    this.meta.updateTag({ name: "description", content: title });
 
-    this._browser.open(
+    this.browser.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.url)}`,
       "facebook-share-dialog",
       "width=626,height=436",

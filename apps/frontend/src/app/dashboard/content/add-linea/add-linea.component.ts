@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } 
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { createResearchLine } from "@app/shared/models/factories";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -20,11 +20,10 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _researchLinesService = inject(ResearchLinesService);
+  private snackBar = inject(MatSnackBar);
+  private researchLinesService = inject(ResearchLinesService);
 
   button_text = "Guardar línea";
   lineaInvestigacion: ResearchLine;
@@ -54,7 +53,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
 
   submitLinea(): void {
     if (this.lineaForm.valid) {
-      this._researchLinesService
+      this.researchLinesService
         .create({
           name: this.lineaInvestigacion.name,
           nameEN: this.lineaInvestigacion.nameEN,
@@ -65,7 +64,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.id) {
             if (this.fileData) {
-              this._researchLinesService.uploadPhoto(result.id, this.fileData).subscribe(() => {});
+              this.researchLinesService.uploadPhoto(result.id, this.fileData).subscribe();
             }
             this.lineaForm.markAsPristine();
             this.return();
@@ -76,11 +75,11 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(): void {
-    this._snackBar.open("Línea de investigación agregada exitosamente", undefined, {
+    this.snackBar.open("Línea de investigación agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

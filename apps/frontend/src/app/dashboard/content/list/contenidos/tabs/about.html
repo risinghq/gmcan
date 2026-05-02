@@ -1,0 +1,122 @@
+<div>
+  <div class="title mb-16">Descripción del grupo</div>
+  <form [formGroup]="state.descripcionForm">
+    <div class="mb-24">
+      <div class="text-category">Imagen del equipo <span class="red-text">*</span></div>
+      <div class="flex-news">
+        @if (state.files.previewMap.about) {
+        <div class="img-preview">
+          <img class="img-set" src="{{ state.files.previewMap.about }}" />
+        </div>
+        } @if (!state.files.previewMap.about && !state.aboutUs.photo) {
+        <div class="grupal-img">
+          <img class="img-set" src="../../assets/img/grupal.jpg" />
+        </div>
+        } @if (state.aboutUs.photo && !state.files.previewMap.about) {
+        <div class="img-preview">
+          <img class="img-set" src="{{ state.url + 'api/group/about/' + state.aboutUs.id + '/photo' }}" />
+        </div>
+        }
+        <div class="green-text ml-16 mt-auto">
+          <span class="plex-sans">Cambiar imagen</span>
+          <input
+            class="file_upload"
+            type="file"
+            accept="image/*"
+            required
+            (change)="state.fileProgress($event, 'about')"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="full-width mb-24">
+      <div class="flex-news">
+        <div class="text-category">Descripción en español <span class="red-text">*</span></div>
+        <div class="green-text right plex-sans" (click)="state.previewAbout(0)">Vista Previa</div>
+      </div>
+      <ckeditor
+        [editor]="state.Editor"
+        [(ngModel)]="state.aboutUs.descriptionES"
+        formControlName="descriptionES"
+        name="descriptionES"
+      />
+    </div>
+    <div class="full-width mb-24">
+      <div class="flex-news">
+        <div class="text-category">Descripción en inglés <span class="red-text">*</span></div>
+        <div class="green-text right plex-sans" (click)="state.previewAbout(1)">Vista Previa</div>
+      </div>
+      <ckeditor
+        [editor]="state.Editor"
+        [(ngModel)]="state.aboutUs.descriptionEN"
+        formControlName="descriptionEN"
+        name="descriptionEN"
+      />
+    </div>
+    <div class="right black-btn mb-12">
+      <div class="link link-set" (click)="state.submitQuienesSomos()">Actualizar información</div>
+    </div>
+  </form>
+
+  <div class="title mb-16">Objetivos</div>
+  <form [formGroup]="state.objetivosForm">
+    <div class="full-width mb-24">
+      <div class="flex-news">
+        <div class="text-category">Objetivos en español <span class="red-text">*</span></div>
+        <div class="green-text right plex-sans" (click)="state.previewAbout(0)">Vista Previa</div>
+      </div>
+      <ckeditor
+        [editor]="state.Editor"
+        [(ngModel)]="state.aboutUs.objectivesES"
+        formControlName="objectivesES"
+        name="objectivesES"
+      />
+    </div>
+    <div class="full-width mb-24">
+      <div class="flex-news">
+        <div class="text-category">Objetivos en inglés <span class="red-text">*</span></div>
+        <div class="green-text right plex-sans" (click)="state.previewAbout(1)">Vista Previa</div>
+      </div>
+      <ckeditor
+        [editor]="state.Editor"
+        [(ngModel)]="state.aboutUs.objectivesEN"
+        formControlName="objectivesEN"
+        name="objectivesEN"
+      />
+    </div>
+    <div class="right black-btn mb-12">
+      <div class="link link-set" (click)="state.submitObjetivos()">Actualizar información</div>
+    </div>
+  </form>
+
+  <div class="title mb-16">Servicios</div>
+  <form [formGroup]="state.serviciosForm">
+    <div class="full-width mb-24">
+      <div class="flex-news">
+        <div class="text-category">Servicios en español <span class="red-text">*</span></div>
+        <div class="green-text right plex-sans" (click)="state.previewAbout(0)">Vista Previa</div>
+      </div>
+      <ckeditor
+        [editor]="state.Editor"
+        [(ngModel)]="state.aboutUs.servicesES"
+        formControlName="servicesES"
+        name="servicesES"
+      />
+    </div>
+    <div class="full-width mb-24">
+      <div class="flex-news">
+        <div class="text-category">Servicios en inglés <span class="red-text">*</span></div>
+        <div class="green-text right plex-sans" (click)="state.previewAbout(1)">Vista Previa</div>
+      </div>
+      <ckeditor
+        [editor]="state.Editor"
+        [(ngModel)]="state.aboutUs.servicesEN"
+        formControlName="servicesEN"
+        name="servicesEN"
+      />
+    </div>
+    <div class="right black-btn mb-12">
+      <div class="link link-set" (click)="state.submitServicios()">Actualizar información</div>
+    </div>
+  </form>
+</div>

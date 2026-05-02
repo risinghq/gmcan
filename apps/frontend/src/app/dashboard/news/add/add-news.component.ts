@@ -68,13 +68,13 @@ interface NewsPreviewData {
 })
 export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _newsService = inject(NewsService);
-  private _snackBar = inject(MatSnackBar);
+  private newsService = inject(NewsService);
+  private snackBar = inject(MatSnackBar);
   lookup = inject(LookupService);
-  private _memberService = inject(MemberService);
+  private memberService = inject(MemberService);
 
   public Editor = ClassicEditor;
   url: string;
@@ -113,7 +113,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getAuthors(): void {
-    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
         this.autores = result;
       }
@@ -124,7 +124,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   return(): void {
-    this._router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/noticias"]);
   }
 
   submitNews(status: number): void {
@@ -149,10 +149,10 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
       authorId: this.noticia.authorId ?? undefined,
       newsTypeId: this.noticia.newsTypeId ?? undefined,
     };
-    this._newsService.createNews(body).subscribe((result) => {
+    this.newsService.createNews(body).subscribe((result) => {
       if (result.id) {
         if (this.fileData) {
-          this._newsService.uploadPhoto(result.id, this.fileData).subscribe(() => {});
+          this.newsService.uploadPhoto(result.id, this.fileData).subscribe();
         }
         this.newsForm.markAsPristine();
         this.return();
@@ -184,7 +184,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
       id: "previewNews",
       data,
     });
-    this.previewDialog.afterClosed().subscribe(() => {});
+    this.previewDialog.afterClosed().subscribe();
   }
 
   private dialogRef?: MatDialogRef<DialogPublish>;
@@ -208,7 +208,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   openSnackBar(msg: string): void {
-    this._snackBar.open(msg, undefined, {
+    this.snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

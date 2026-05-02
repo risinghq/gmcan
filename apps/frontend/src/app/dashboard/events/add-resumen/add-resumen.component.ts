@@ -10,8 +10,17 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
-import type { SaveAuthorEntry } from "@app/shared/models/author";
+import { Router } from "@angular/router";
+import {
+  attachFilter,
+  buildCoAuthorSaveList,
+  type AuthorFormRow,
+  filterAuthors,
+  newAuthorRow,
+} from "@app/dashboard/publications/flow/authors";
+import { RESUMEN_BACK_FALLBACK } from "@app/dashboard/publications/flow/back-nav";
+import { buildResumenPayload } from "@app/dashboard/publications/flow/publication-payload";
+import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
@@ -22,20 +31,6 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
-
-interface AuthorSearchResult {
-  id: number;
-  name: string;
-  photo: string | null;
-}
-
-interface AuthorFormRow {
-  id: number;
-  name: string;
-  memberId: number | null;
-  myControl: FormControl<string>;
-  filteredOptions?: Observable<AuthorSearchResult[]>;
-}
 
 @Component({
   selector: "app-add-resumen",
@@ -63,14 +58,13 @@ interface AuthorFormRow {
 })
 export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
-  private _memberService = inject(MemberService);
+  private router = inject(Router);
+  private publicationService = inject(PublicationService);
+  private memberService = inject(MemberService);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _eventService = inject(EventService);
-  private _session = inject(SessionService);
+  private snackBar = inject(MatSnackBar);
+  private eventService = inject(EventService);
+  private session = inject(SessionService);
 
   publicacion: PublicationFields & { publishedAtDate?: Date };
   public publicacionForm: FormGroup;
@@ -114,7 +108,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   getEventos(): void {
-    this._eventService.listAdmin().subscribe((result: EventItem[]) => {
+    this.eventService.listAdmin().subscribe((result: EventItem[]) => {
       if (result) {
         this.eventos = result;
         this.loadAuthors();
@@ -123,38 +117,14 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadAuthors(): void {
-    this._memberService.searchAuthors("").subscribe((authors) => {
+    this.memberService.searchAuthors("").subscribe((authors) => {
       this.options = authors as AuthorSearchResult[];
       this.filteredOptions = this.myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this.filterAuthors(value ?? "")),
+        map((value) => filterAuthors(this.options, value ?? "")),
       );
-      this.otrosAutores = [this.newCoAuthorRow()];
-      this.setupCoAuthorFilters();
+      this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
     });
-  }
-
-  private filterAuthors(value: string): AuthorSearchResult[] {
-    const lower = value.toLowerCase();
-    return this.options.filter((o) => o.name.toLowerCase().includes(lower));
-  }
-
-  private newCoAuthorRow(): AuthorFormRow {
-    return {
-      id: this.otrosAutores.length + 1,
-      name: "",
-      memberId: null,
-      myControl: new FormControl<string>("", { nonNullable: true }),
-    };
-  }
-
-  private setupCoAuthorFilters(): void {
-    for (const row of this.otrosAutores) {
-      row.filteredOptions = row.myControl.valueChanges.pipe(
-        startWith(""),
-        map((v) => this.filterAuthors(v ?? "")),
-      );
-    }
   }
 
   selectUser(author: AuthorSearchResult | { value: string }, value: number): void {
@@ -186,21 +156,12 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   addAnotherAuthor(): void {
-    const row = this.newCoAuthorRow();
-    row.filteredOptions = row.myControl.valueChanges.pipe(
-      startWith(""),
-      map((v) => this.filterAuthors(v ?? "")),
-    );
-    this.otrosAutores.push(row);
+    this.otrosAutores.push(attachFilter(newAuthorRow(this.otrosAutores.length + 1), this.options));
   }
 
   removeAnotherAuthor(i: number): void {
     if (this.otrosAutores.length === 1) {
-      this.otrosAutores[0] = this.newCoAuthorRow();
-      this.otrosAutores[0].filteredOptions = this.otrosAutores[0].myControl.valueChanges.pipe(
-        startWith(""),
-        map((v) => this.filterAuthors(v ?? "")),
-      );
+      this.otrosAutores[0] = attachFilter(newAuthorRow(1), this.options);
     } else {
       this.otrosAutores.splice(i, 1);
     }
@@ -209,20 +170,16 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
 
-    const momentDate = new Date(this.publicacion.publishedAtDate ?? new Date());
-    const publishedAt = new Date(momentDate).toLocaleDateString("sv");
-
-    const data: PublicationFields = {
+    const data: PublicationFields = buildResumenPayload({
       title: this.publicacion.title,
       abstractES: this.publicacion.abstractES,
       abstractEN: this.publicacion.abstractEN,
       doi: this.publicacion.doi,
-      publishedAt,
-      typeId: 3,
+      publishedAt: this.publicacion.publishedAtDate,
       eventId: this.publicacion.eventId,
-    };
+    });
 
-    this._publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
+    this.publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
       if (result.id) {
         this.publicacionForm.markAsPristine();
         this.return();
@@ -239,25 +196,17 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     } else if (this.selectedUser) {
       entries.push({ kind: "external", externalName: this.selectedUser, isPrincipal: 0 });
     }
-
-    this.otrosAutores.forEach((row, i) => {
-      if (!row.name) return;
-      if (row.memberId) {
-        entries.push({ kind: "registered", memberId: row.memberId, isPrincipal: i + 1 });
-      } else {
-        entries.push({ kind: "external", externalName: row.name, isPrincipal: i + 1 });
-      }
-    });
+    entries.push(...buildCoAuthorSaveList(this.otrosAutores, this.options, 1));
 
     return entries;
   }
 
   return(): void {
-    this._router.navigate(["dashboard/" + this._session.getResumenBack()]);
+    this.router.navigate(["dashboard/" + (this.session.getResumenBack() || RESUMEN_BACK_FALLBACK)]);
   }
 
   openSnackBar(): void {
-    this._snackBar.open("Publicación agregada exitosamente", undefined, {
+    this.snackBar.open("Publicación agregada exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

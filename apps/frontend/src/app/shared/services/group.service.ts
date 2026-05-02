@@ -3,7 +3,9 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 import type { About } from "../models/about";
+import type { Equipment } from "../models/equipment";
 import type { Group } from "../models/group";
+import type { Software } from "../models/software";
 import { GLOBAL } from "./global";
 
 @Injectable({ providedIn: "root" })
@@ -86,12 +88,12 @@ export class GroupService {
   }
 
   // Software (under group routes)
-  listSoftware(groupId: number): Observable<unknown[]> {
-    return this.http.get<unknown[]>(`${GLOBAL.url}admin/group/${groupId}/software`);
+  listSoftware(groupId: number): Observable<Software[]> {
+    return this.http.get<Software[]>(`${GLOBAL.url}admin/group/${groupId}/software`);
   }
 
-  getSoftwareItem(id: number): Observable<unknown> {
-    return this.http.get<unknown>(`${GLOBAL.url}admin/group/software/${id}`);
+  getSoftwareItem(id: number): Observable<Software> {
+    return this.http.get<Software>(`${GLOBAL.url}admin/group/software/${id}`);
   }
 
   createSoftware(data: {
@@ -116,12 +118,12 @@ export class GroupService {
   }
 
   // Equipment (under group routes)
-  listEquipment(groupId: number): Observable<unknown[]> {
-    return this.http.get<unknown[]>(`${GLOBAL.url}admin/group/${groupId}/equipment`);
+  listEquipment(groupId: number): Observable<Equipment[]> {
+    return this.http.get<Equipment[]>(`${GLOBAL.url}admin/group/${groupId}/equipment`);
   }
 
-  getEquipment(id: number): Observable<unknown> {
-    return this.http.get<unknown>(`${GLOBAL.url}admin/group/equipment/${id}`);
+  getEquipment(id: number): Observable<Equipment> {
+    return this.http.get<Equipment>(`${GLOBAL.url}admin/group/equipment/${id}`);
   }
 
   createEquipment(data: {

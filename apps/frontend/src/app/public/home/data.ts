@@ -20,26 +20,26 @@ import type { HomeNoticia, HomeProyecto, HomePublicacion, HomeViewModel } from "
 
 @Injectable({ providedIn: "root" })
 export class HomeDataService {
-  private readonly _groupService = inject(GroupService);
-  private readonly _publicationService = inject(PublicationService);
-  private readonly _projectService = inject(ProjectService);
-  private readonly _newsService = inject(NewsService);
-  private readonly _researchLinesService = inject(ResearchLinesService);
-  private readonly _methodsService = inject(MethodsService);
-  private readonly _memberService = inject(MemberService);
-  private readonly _lookup = inject(LookupService);
-  private readonly _datePipe = inject(DatePipe);
-  private readonly _titlecasePipe = inject(TitleCasePipe);
+  private readonly groupService = inject(GroupService);
+  private readonly publicationService = inject(PublicationService);
+  private readonly projectService = inject(ProjectService);
+  private readonly newsService = inject(NewsService);
+  private readonly researchLinesService = inject(ResearchLinesService);
+  private readonly methodsService = inject(MethodsService);
+  private readonly memberService = inject(MemberService);
+  private readonly lookup = inject(LookupService);
+  private readonly datePipe = inject(DatePipe);
+  private readonly titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<HomeViewModel> {
     const [group, publicacionesRaw, proyectosRaw, noticiasRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
-      firstValueFrom(this._groupService.getGroup()),
-      firstValueFrom(this._publicationService.listPublications()),
-      firstValueFrom(this._projectService.listProjects()),
-      firstValueFrom(this._newsService.listNews(1)),
-      firstValueFrom(this._researchLinesService.list()),
-      firstValueFrom(this._methodsService.list()),
-      firstValueFrom(this._memberService.listMembers()),
+      firstValueFrom(this.groupService.getGroup()),
+      firstValueFrom(this.publicationService.listPublications()),
+      firstValueFrom(this.projectService.listProjects()),
+      firstValueFrom(this.newsService.listNews(1)),
+      firstValueFrom(this.researchLinesService.list()),
+      firstValueFrom(this.methodsService.list()),
+      firstValueFrom(this.memberService.listMembers()),
     ]);
 
     const lineasInvestigacion = Array.isArray(lineasRaw) ? (lineasRaw as ResearchLine[]) : [];
@@ -49,14 +49,14 @@ export class HomeDataService {
     const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
     const noticiasSafe = Array.isArray(noticiasRaw) ? (noticiasRaw as News[]) : [];
 
-    const aboutUs = group?.id ? await this._loadAboutUs(group.id) : "";
+    const aboutUs = group?.id ? await this.loadAboutUs(group.id) : "";
 
-    const publicaciones = this._enrichPublicaciones(publicacionesSafe);
-    const proyectos = this._enrichProyectos(
+    const publicaciones = this.enrichPublicaciones(publicacionesSafe);
+    const proyectos = this.enrichProyectos(
       proyectosSafe.filter((p) => !p.endDate),
       lineasInvestigacion,
     );
-    const noticias = this._enrichNoticias(noticiasSafe, miembros);
+    const noticias = this.enrichNoticias(noticiasSafe, miembros);
 
     const orderedPublicaciones = publicaciones.toSorted((a, b) => {
       const left = new Date(a.publishedAt ?? "").getTime();
@@ -92,21 +92,21 @@ export class HomeDataService {
     };
   }
 
-  private async _loadAboutUs(groupId: number): Promise<string> {
+  private async loadAboutUs(groupId: number): Promise<string> {
     try {
-      const aboutList = await firstValueFrom(this._groupService.listAbout(groupId));
+      const aboutList = await firstValueFrom(this.groupService.listAbout(groupId));
       return Array.isArray(aboutList) ? (aboutList[0]?.servicesES ?? "") : "";
     } catch {
       return "";
     }
   }
 
-  private _enrichPublicaciones(publicaciones: PublicationWithAuthors[]): HomePublicacion[] {
-    const publicationTypes = this._lookup.publicationTypes();
-    const thesisTypes = this._lookup.thesisTypes();
-    const journals = this._lookup.journals();
-    const universities = this._lookup.universities();
-    const events = this._lookup.events();
+  private enrichPublicaciones(publicaciones: PublicationWithAuthors[]): HomePublicacion[] {
+    const publicationTypes = this.lookup.publicationTypes();
+    const thesisTypes = this.lookup.thesisTypes();
+    const journals = this.lookup.journals();
+    const universities = this.lookup.universities();
+    const events = this.lookup.events();
 
     const tiposMap = new Map(publicationTypes.map((t) => [t.id, t]));
     const tiposTesisMap = new Map(thesisTypes.map((t) => [t.id, t]));
@@ -115,18 +115,14 @@ export class HomeDataService {
     const eventosMap = new Map(events.map((e) => [e.id, e]));
 
     return publicaciones.map((pub) => {
-      const publishedAt = new Date(pub.publishedAt ?? "");
-      if (String(publishedAt) !== "Invalid Date") {
-        publishedAt.setMinutes(publishedAt.getMinutes() + publishedAt.getTimezoneOffset());
-      }
+      const publishedAt = this.normalizedDate(pub.publishedAt);
       const evento = pub.eventId ? eventosMap.get(pub.eventId) : undefined;
 
       return {
         ...pub,
-        fecha:
-          String(publishedAt) === "Invalid Date"
-            ? ""
-            : (this._titlecasePipe.transform(this._datePipe.transform(publishedAt, "MMMM y", "es") ?? "") ?? ""),
+        fecha: !publishedAt
+          ? ""
+          : (this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM y", "es") ?? "") ?? ""),
         tipoPublicacion: tiposMap.get(pub.typeId)?.name,
         tipoTesis: pub.thesisTypeId ? tiposTesisMap.get(pub.thesisTypeId)?.name : undefined,
         revista: pub.journalId ? revistasMap.get(pub.journalId)?.name : undefined,
@@ -138,35 +134,30 @@ export class HomeDataService {
     });
   }
 
-  private _enrichProyectos(proyectos: ProjectWithMembers[], lineas: ResearchLine[]): HomeProyecto[] {
-    const fundingSources = this._lookup.fundingSources();
-    const monedas = this._lookup.monedas();
+  private enrichProyectos(proyectos: ProjectWithMembers[], lineas: ResearchLine[]): HomeProyecto[] {
+    const fundingSources = this.lookup.fundingSources();
+    const monedas = this.lookup.monedas();
 
     const lineasMap = new Map(lineas.map((l) => [l.id, l]));
     const fuentesMap = new Map(fundingSources.map((f) => [f.id, f]));
     const monedasMap = new Map(monedas.map((m) => [m.idMoneda, m]));
 
     return proyectos.map((proyecto) => {
-      const startDate = new Date(proyecto.startDate ?? "");
-      if (String(startDate) !== "Invalid Date") {
-        startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
-      }
+      const startDate = this.normalizedDate(proyecto.startDate);
 
       let fechaF: string | undefined;
       if (proyecto.endDate) {
-        const endDate = new Date(proyecto.endDate);
-        if (String(endDate) !== "Invalid Date") {
-          endDate.setMinutes(endDate.getMinutes() + endDate.getTimezoneOffset());
-          fechaF = this._titlecasePipe.transform(this._datePipe.transform(endDate, "MMMM, y", "es") ?? "") ?? undefined;
+        const endDate = this.normalizedDate(proyecto.endDate);
+        if (endDate) {
+          fechaF = this.titlecasePipe.transform(this.datePipe.transform(endDate, "MMMM, y", "es") ?? "") ?? undefined;
         }
       }
 
       return {
         ...proyecto,
-        fechaI:
-          String(startDate) === "Invalid Date"
-            ? ""
-            : (this._titlecasePipe.transform(this._datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? ""),
+        fechaI: !startDate
+          ? ""
+          : (this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? ""),
         fechaF,
         lineasInvestigacion: lineasMap.get(proyecto.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(proyecto.fundingSourceId)?.name,
@@ -176,29 +167,30 @@ export class HomeDataService {
     });
   }
 
-  private _enrichNoticias(noticias: News[], miembros: Member[]): HomeNoticia[] {
-    const newsTypes = this._lookup.newsTypes();
+  private enrichNoticias(noticias: News[], miembros: Member[]): HomeNoticia[] {
+    const newsTypes = this.lookup.newsTypes();
     const tiposMap = new Map(newsTypes.map((t) => [t.id, t]));
     const miembrosMap = new Map(miembros.map((m) => [m.id, m]));
 
     return noticias.map((noticia) => {
-      const publishedAt = new Date(noticia.publishedAt ?? "");
-      if (String(publishedAt) !== "Invalid Date") {
-        publishedAt.setMinutes(publishedAt.getMinutes() + publishedAt.getTimezoneOffset());
-      }
+      const publishedAt = this.normalizedDate(noticia.publishedAt);
 
       const autor = noticia.authorId ? miembrosMap.get(noticia.authorId) : undefined;
       const autorName = autor ? `${autor.firstName} ${autor.lastName}`.trim() : "";
 
       return {
         ...noticia,
-        fechaPublicacion:
-          String(publishedAt) === "Invalid Date"
-            ? ""
-            : (this._datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? ""),
+        fechaPublicacion: !publishedAt ? "" : (this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? ""),
         nombreTipoNoticia: noticia.newsTypeId ? (tiposMap.get(noticia.newsTypeId)?.name ?? "") : "",
         autor: autorName,
       };
     });
+  }
+
+  private normalizedDate(value: string | null | undefined): Date | null {
+    const date = new Date(value ?? "");
+    if (Number.isNaN(date.getTime())) return null;
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+    return date;
   }
 }

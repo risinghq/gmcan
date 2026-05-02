@@ -23,12 +23,12 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class JoinUsComponent implements OnInit {
   fb = inject(FormBuilder);
-  _emailService = inject(EmailService);
+  emailService = inject(EmailService);
   dialog = inject(MatDialog);
-  _router = inject(Router);
-  private _browser = inject(BrowserService);
-  private _navigationHistory = inject(NavigationHistoryService);
-  private _session = inject(SessionService);
+  router = inject(Router);
+  private browser = inject(BrowserService);
+  private navigationHistory = inject(NavigationHistoryService);
+  private session = inject(SessionService);
   private titleService = inject(Title);
 
   public user: FormGroup;
@@ -47,16 +47,16 @@ export default class JoinUsComponent implements OnInit {
 
   public previouslink: string | null = null;
   ngOnInit(): void {
-    this.language = this._session.language();
+    this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.join);
-    this.previouslink = this._navigationHistory.previousUrl();
+    this.previouslink = this.navigationHistory.previousUrl();
   }
 
   return(): void {
     if (this.previouslink) {
-      this._router.navigate([this.previouslink]);
+      this.router.navigate([this.previouslink]);
     } else {
-      this._router.navigate(["/home"]);
+      this.router.navigate(["/home"]);
     }
   }
 
@@ -66,7 +66,7 @@ export default class JoinUsComponent implements OnInit {
       this.email.razon = this.user.controls["razon"].value;
       this.email.correo = this.user.controls["correo"].value;
       this.email.telefono = this.user.controls["telefono"].value;
-      this._emailService
+      this.emailService
         .sendMembershipApplication({
           nombre: this.email.nombre ?? "",
           razon: this.email.razon ?? "",
@@ -81,7 +81,7 @@ export default class JoinUsComponent implements OnInit {
 
   openDialog(): void {
     let width = "913px";
-    if (this._browser.innerWidth() < 960) {
+    if (this.browser.innerWidth() < 960) {
       width = "312px";
     }
     const dialogRef = this.dialog.open(EmailExitoso, {
@@ -91,7 +91,7 @@ export default class JoinUsComponent implements OnInit {
       id: "joinUs",
     });
 
-    dialogRef.afterClosed().subscribe(() => {});
+    dialogRef.afterClosed().subscribe();
   }
 }
 
@@ -102,10 +102,10 @@ export default class JoinUsComponent implements OnInit {
 })
 export class EmailExitoso {
   dialogRef = inject<MatDialogRef<EmailExitoso>>(MatDialogRef);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _browser = inject(BrowserService);
-  private _session = inject(SessionService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  private browser = inject(BrowserService);
+  private session = inject(SessionService);
 
   public url: string;
   grupoLogo = "";
@@ -113,15 +113,15 @@ export class EmailExitoso {
   screenWidth: number;
   language: any = {};
   constructor() {
-    this.language = this._session.language();
-    this.screenWidth = this._browser.innerWidth();
+    this.language = this.session.language();
+    this.screenWidth = this.browser.innerWidth();
     this.url = GLOBAL.url;
-    this.grupoInfo = this._session.getGroupInfo();
+    this.grupoInfo = this.session.getGroupInfo();
     this.grupoLogo = this.url + "api/group/files/header";
   }
 
   onNoClick(): void {
-    this._router.navigate(["/"]);
+    this.router.navigate(["/"]);
     this.dialogRef.close();
   }
 }

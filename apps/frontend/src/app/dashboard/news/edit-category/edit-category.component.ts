@@ -28,12 +28,12 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class EditCategoryComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   dialog = inject(MatDialog);
-  private _refService = inject(RefService);
-  private _newsService = inject(NewsService);
-  private _snackBar = inject(MatSnackBar);
+  private readonly refService = inject(RefService);
+  private readonly newsService = inject(NewsService);
+  private readonly snackBar = inject(MatSnackBar);
 
   category: RefItem = { id: 0, name: "", nameEN: "" };
   public categoryForm: FormGroup;
@@ -53,12 +53,11 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   getCategory(): void {
-    this.idCategory = Number(this._route.snapshot.params["id"] ?? 0);
-    this._refService.listNewsTypes().subscribe((types) => {
+    this.idCategory = Number(this.route.snapshot.params["id"] ?? 0);
+    this.refService.listNewsTypes().subscribe((types) => {
       const found = types.find((t) => t.id === this.idCategory);
       if (found) {
         this.category = found;
-        localStorage.setItem("categoryEdit", JSON.stringify(found.name ?? ""));
         this.getRelatedNews();
       }
     });
@@ -67,8 +66,8 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   notCanDo = false;
 
   getRelatedNews(): void {
-    this._newsService.listAdminNews().subscribe((news) => {
-      this.notCanDo = news.filter((n) => n.newsTypeId === this.idCategory).length === 0;
+    this.newsService.listAdminNews().subscribe((news) => {
+      this.notCanDo = !news.some((n) => n.newsTypeId === this.idCategory);
     });
   }
 
@@ -77,12 +76,12 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   return(): void {
-    this._router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/noticias"]);
   }
 
   submitCategory(): void {
     if (this.categoryForm.valid) {
-      this._refService
+      this.refService
         .updateNewsType(this.idCategory, { name: this.category.name, nameEN: this.category.nameEN })
         .subscribe((result) => {
           if (result.status === 1) {
@@ -95,7 +94,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   openSnackBar(text: string): void {
-    this._snackBar.open(text, undefined, {
+    this.snackBar.open(text, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -126,9 +125,9 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   eraseCategory(): void {
-    this._newsService.listAdminNews().subscribe((news) => {
-      if (news.filter((n) => n.newsTypeId === this.idCategory).length === 0) {
-        this._refService.deleteNewsType(this.idCategory).subscribe((result) => {
+    this.newsService.listAdminNews().subscribe((news) => {
+      if (!news.some((n) => n.newsTypeId === this.idCategory)) {
+        this.refService.deleteNewsType(this.idCategory).subscribe((result) => {
           if (result.status === 1) {
             this.categoryForm.markAsPristine();
             this.return();
@@ -152,8 +151,6 @@ export class DialogErase {
   data = inject<DialogData>(MAT_DIALOG_DATA);
 
   constructor() {
-    const dialogRef = this.dialogRef;
-
-    dialogRef.disableClose = true;
+    this.dialogRef.disableClose = true;
   }
 }

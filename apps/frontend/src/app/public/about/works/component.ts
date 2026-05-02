@@ -12,7 +12,7 @@ import { SessionService } from "@app/shared/services/session.service";
   styleUrl: "./component.scss",
 })
 export default class WorksComponent implements OnInit {
-  _grupoService = inject(GroupService);
+  private groupService = inject(GroupService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
@@ -29,7 +29,7 @@ export default class WorksComponent implements OnInit {
   }
 
   getGroupInfo(): void {
-    this._grupoService.getGroup().subscribe((res: Group) => {
+    this.groupService.getGroup().subscribe((res: Group) => {
       this.info = res;
     });
   }

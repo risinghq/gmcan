@@ -5,7 +5,7 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/material/sidenav";
 import { MatToolbar } from "@angular/material/toolbar";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
@@ -35,9 +35,8 @@ import { SessionService } from "@app/shared/services/session.service";
   ],
 })
 export default class LandingComponent implements OnInit {
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  _groupService = inject(GroupService);
+  private router = inject(Router);
+  private groupService = inject(GroupService);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
   fb = inject(FormBuilder);
@@ -87,7 +86,7 @@ export default class LandingComponent implements OnInit {
   }
 
   getGroupInfo(): void {
-    this._groupService.getGroup().subscribe((group: Group) => {
+    this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
       this.grupoinfo.logoHeader = this.url + "api/group/files/header";
       this.grupoinfo.logoFooter = this.url + "api/group/files/footer";
@@ -102,11 +101,11 @@ export default class LandingComponent implements OnInit {
   }
 
   searchGlobal(value: string): void {
-    this._router.navigate(["/home/search/" + value]);
+    this.router.navigate(["/home/search/" + value]);
   }
 
   loginLink(): void {
-    this._router.navigate(["/login"]);
+    this.router.navigate(["/login"]);
   }
 
   scroll(): void {

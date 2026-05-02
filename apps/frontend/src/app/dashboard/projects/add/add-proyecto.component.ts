@@ -66,13 +66,13 @@ interface ProjectMemberRow {
 })
 export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _snackBar = inject(MatSnackBar);
-  private _memberService = inject(MemberService);
-  private _researchLinesService = inject(ResearchLinesService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private memberService = inject(MemberService);
+  private researchLinesService = inject(ResearchLinesService);
   lookup = inject(LookupService);
-  private _projectService = inject(ProjectService);
+  private projectService = inject(ProjectService);
   dialog = inject(MatDialog);
 
   terminado = false;
@@ -123,7 +123,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadResearchLines(): void {
-    this._researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
+    this.researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
       if (result) {
         this.researchLines = result;
         this.loadMembers();
@@ -132,7 +132,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadMembers(): void {
-    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
         const sortedMembers = result.toSorted((a, b) => a.firstName.localeCompare(b.firstName));
         this.memberOptions = sortedMembers.map((m) => ({
@@ -169,11 +169,11 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/proyectos-ejecucion"]);
+    this.router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
   openSnackBar(): void {
-    this._snackBar.open("Proyecto agregado exitosamente", undefined, {
+    this.snackBar.open("Proyecto agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -234,7 +234,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
       fundingSourceId: this.proyecto.fundingSourceId,
     };
 
-    this._projectService
+    this.projectService
       .createProject(body)
       .pipe(
         switchMap((result) => {
@@ -244,7 +244,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
             ...new Set(this.miembrosProyecto.map((row) => row.memberId).filter((id): id is number => id != null)),
           ];
           if (memberIds.length === 0) return of(result);
-          return forkJoin(memberIds.map((memberId) => this._projectService.addProjectMember(projectId, memberId))).pipe(
+          return forkJoin(memberIds.map((memberId) => this.projectService.addProjectMember(projectId, memberId))).pipe(
             map(() => result),
           );
         }),
@@ -263,7 +263,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   }
 
   openSnackBarError(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 3000,
       horizontalPosition: "right",
       verticalPosition: "top",

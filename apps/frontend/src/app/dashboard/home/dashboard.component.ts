@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, inject } from "@angular/core";
-import { ActivatedRoute, Router, RouterLink, RouterLinkActive } from "@angular/router";
+import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -21,11 +21,9 @@ interface CountTypeItem {
 })
 export default class DashboardComponent implements OnInit {
   authService = inject(AuthService);
-  _groupService = inject(GroupService);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  groupService = inject(GroupService);
   private http = inject(HttpClient);
-  private _session = inject(SessionService);
+  private session = inject(SessionService);
 
   screenWidth = window.innerWidth;
   public url: string;
@@ -33,7 +31,7 @@ export default class DashboardComponent implements OnInit {
 
   constructor() {
     this.url = GLOBAL.url;
-    this.grupoinfo = this._session.groupInfo();
+    this.grupoinfo = this.session.groupInfo();
   }
 
   ngOnInit(): void {
@@ -42,7 +40,7 @@ export default class DashboardComponent implements OnInit {
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this._session.groupInfo();
+    this.grupoinfo = this.session.groupInfo();
     if (this.grupoinfo.id) {
       (this.grupoinfo as any).logoHeader = this.url + "api/group/" + this.grupoinfo.id + "/files/header";
     }

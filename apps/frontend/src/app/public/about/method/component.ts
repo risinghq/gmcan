@@ -13,7 +13,7 @@ import { SessionService } from "@app/shared/services/session.service";
   imports: [],
 })
 export default class MethodComponent implements OnInit {
-  _methodService = inject(MethodsService);
+  private methodService = inject(MethodsService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
@@ -33,7 +33,7 @@ export default class MethodComponent implements OnInit {
   }
 
   loadMethods(): void {
-    this._methodService.list().subscribe((res: Method[]) => {
+    this.methodService.list().subscribe((res: Method[]) => {
       this.methods = res;
     });
   }

@@ -17,6 +17,7 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
+import { ARTICLE_BACK_KEY, setBackTarget } from "@app/dashboard/publications/flow/back-nav";
 import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -48,11 +49,11 @@ interface PublicationRow extends PublicationWithAuthors {
   ],
 })
 export default class MyArticleComponent implements OnInit {
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
+  private router = inject(Router);
+  private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _auth = inject(AuthService);
+  private auth = inject(AuthService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
   dataSource: MatTableDataSource<PublicationRow> = new MatTableDataSource<PublicationRow>([]);
@@ -72,9 +73,9 @@ export default class MyArticleComponent implements OnInit {
   }
 
   getUserArticles(): void {
-    const user = this._auth.getUser();
+    const user = this.auth.getUser();
     if (!user) return;
-    this._publicationService.listPublications({ type: 1 }).subscribe((res) => {
+    this.publicationService.listPublications({ type: 1 }).subscribe((res) => {
       if (res) {
         const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
         const sorted = mine.toSorted((a, b) =>
@@ -106,12 +107,12 @@ export default class MyArticleComponent implements OnInit {
   }
 
   addArticle(): void {
-    localStorage.setItem("article-back", "my-articles");
-    this._router.navigate(["dashboard/add-article/"]);
+    setBackTarget(ARTICLE_BACK_KEY, "my-articles");
+    this.router.navigate(["dashboard/add-article/"]);
   }
 
   editArticulo(id: number): void {
-    localStorage.setItem("article-back", "my-articles");
-    this._router.navigate(["dashboard/edit-article/" + id]);
+    setBackTarget(ARTICLE_BACK_KEY, "my-articles");
+    this.router.navigate(["dashboard/edit-article/" + id]);
   }
 }

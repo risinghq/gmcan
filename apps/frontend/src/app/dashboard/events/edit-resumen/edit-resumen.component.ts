@@ -30,6 +30,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+import { requireLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
@@ -74,14 +75,14 @@ interface AuthorFormRow {
 })
 export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
-  private _memberService = inject(MemberService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  private publicationService = inject(PublicationService);
+  private memberService = inject(MemberService);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _eventService = inject(EventService);
-  private _session = inject(SessionService);
+  private snackBar = inject(MatSnackBar);
+  private eventService = inject(EventService);
+  private session = inject(SessionService);
 
   publicacion: PublicationWithAuthors & { publishedAtDate?: Date };
   public publicacionForm: FormGroup;
@@ -136,20 +137,18 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   getResumen(): void {
-    const idArticulo = Number(this._route.snapshot.params["id"]);
-    this._publicationService.getPublication(idArticulo).subscribe((result: PublicationWithAuthors) => {
+    const idArticulo = Number(this.route.snapshot.params["id"]);
+    this.publicationService.getPublication(idArticulo).subscribe((result: PublicationWithAuthors) => {
       if (result) {
         this.publicacion = result;
-        const d = new Date(result.publishedAt);
-        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.publicacion.publishedAtDate = d;
+        this.publicacion.publishedAtDate = requireLocalDate(result.publishedAt, "publication.publishedAt");
         this.getEventos(result.authors);
       }
     });
   }
 
   getEventos(authors: AuthorEntry[]): void {
-    this._eventService.listAdmin().subscribe((result: EventItem[]) => {
+    this.eventService.listAdmin().subscribe((result: EventItem[]) => {
       if (result) {
         this.eventos = result;
         this.loadAuthors(authors);
@@ -158,7 +157,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadAuthors(existingAuthors: AuthorEntry[]): void {
-    this._memberService.searchAuthors("").subscribe((allAuthors) => {
+    this.memberService.searchAuthors("").subscribe((allAuthors) => {
       this.options = allAuthors as AuthorSearchResult[];
       this.filteredOptions = this.myControl.valueChanges.pipe(
         startWith(""),
@@ -271,8 +270,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
 
-    const momentDate = new Date(this.publicacion.publishedAtDate ?? new Date());
-    const publishedAt = new Date(momentDate).toLocaleDateString("sv");
+    const publishedAt = toIsoDate(this.publicacion.publishedAtDate ?? new Date());
 
     const data: PublicationFields = {
       title: this.publicacion.title,
@@ -284,7 +282,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
       eventId: this.publicacion.eventId ?? undefined,
     };
 
-    this._publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((result) => {
+    this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((result) => {
       if (result.status === 1) {
         this.publicacionForm.markAsPristine();
         this.return();
@@ -315,7 +313,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   erasePublicacion(): void {
-    this._publicationService.deletePublication(this.publicacion.id).subscribe((result) => {
+    this.publicationService.deletePublication(this.publicacion.id).subscribe((result) => {
       if (result.status === 1) {
         this.publicacionForm.markAsPristine();
         this.return();
@@ -345,11 +343,11 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/" + this._session.getResumenBack()]);
+    this.router.navigate(["dashboard/" + this.session.getResumenBack()]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

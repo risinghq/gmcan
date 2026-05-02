@@ -34,15 +34,14 @@ import { SessionService } from "@app/shared/services/session.service";
   ],
 })
 export default class LogHomeComponent implements OnInit {
-  _authService = inject(AuthService);
-  _memberService = inject(MemberService);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  authService = inject(AuthService);
+  memberService = inject(MemberService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private router = inject(Router);
-  private _commonService = inject(CommonService);
-  private _groupService = inject(GroupService);
-  private _session = inject(SessionService);
+  private commonService = inject(CommonService);
+  private groupService = inject(GroupService);
+  private session = inject(SessionService);
   private titleService = inject(Title);
 
   user: Member | null = null;
@@ -51,6 +50,9 @@ export default class LogHomeComponent implements OnInit {
   public grupoinfo: Group;
 
   title = "Dashboard";
+  dashboardTitle = "Dashboard";
+  private static readonly DETAIL_NEWS_TITLE =
+    '<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span>';
 
   constructor() {
     this.screenWidth = window.innerWidth;
@@ -68,34 +70,24 @@ export default class LogHomeComponent implements OnInit {
   ngOnInit(): void {
     this.titleService.setTitle("GMCAN | Administrador");
     this.getGrupoInfo();
+    this.syncToolbarState();
   }
 
   noticiaPublicada = false;
 
   ngAfterViewChecked(): void {
-    const titleDash = document.getElementById("titleDash");
-    if (titleDash) {
-      titleDash.innerHTML = this._commonService.defineTitle(window.location.pathname);
-    }
-    if (
-      this._commonService.defineTitle(window.location.pathname) ==
-      '<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span>'
-    ) {
-      this.noticiaPublicada = this._session.noticiaPublicada();
-    } else {
-      this.noticiaPublicada = false;
-    }
-    if (this._commonService.getReset()) {
+    this.syncToolbarState();
+    if (this.commonService.getReset()) {
       this.getUser();
-      this._commonService.setReset(false);
+      this.commonService.setReset(false);
     }
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this._session.groupInfo();
-    this._groupService.getGroup().subscribe((group: Group) => {
+    this.grupoinfo = this.session.groupInfo();
+    this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
-      this._session.setGroupInfo(group);
+      this.session.setGroupInfo(group);
       (this.grupoinfo as any).logoHeader = this.url + "api/group/" + group.id + "/files/header";
       this.getUser();
     });
@@ -105,12 +97,12 @@ export default class LogHomeComponent implements OnInit {
   }
 
   getUser(): void {
-    const user = this._authService.getUser();
+    const user = this.authService.getUser();
     if (user == null) {
       this.logout();
     } else {
       this.user = user;
-      this._memberService.getMemberFull(user.id).subscribe((result) => {
+      this.memberService.getMemberFull(user.id).subscribe((result) => {
         if (result) {
           this.user = result;
         }
@@ -125,16 +117,16 @@ export default class LogHomeComponent implements OnInit {
   }
 
   logout(): void {
-    this._session.beginSessionEnd();
-    this._authService.logout().subscribe(() => {
-      this._router.navigate(["/login"]);
+    this.session.beginSessionEnd();
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(["/login"]);
     });
   }
 
   backToTop(): void {
-    this._session.beginSessionEnd();
-    this._authService.logout().subscribe(() => {
-      this._router.navigate(["/"]);
+    this.session.beginSessionEnd();
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(["/"]);
     });
   }
 
@@ -166,5 +158,12 @@ export default class LogHomeComponent implements OnInit {
         this.logout();
       }
     });
+  }
+
+  private syncToolbarState(): void {
+    const currentTitle = this.commonService.defineTitle(window.location.pathname);
+    this.dashboardTitle = currentTitle;
+    this.noticiaPublicada =
+      currentTitle === LogHomeComponent.DETAIL_NEWS_TITLE ? this.session.noticiaPublicada() : false;
   }
 }

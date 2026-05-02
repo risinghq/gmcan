@@ -29,12 +29,12 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _eventService = inject(EventService);
-  private _publicationService = inject(PublicationService);
+  private snackBar = inject(MatSnackBar);
+  private eventService = inject(EventService);
+  private publicationService = inject(PublicationService);
 
   evento: EventItem;
   public eventoForm: FormGroup;
@@ -57,8 +57,8 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   }
 
   getEvento(): void {
-    const idEvento = Number(this._route.snapshot.params["id"]);
-    this._eventService.get(idEvento).subscribe((result: EventItem) => {
+    const idEvento = Number(this.route.snapshot.params["id"]);
+    this.eventService.get(idEvento).subscribe((result: EventItem) => {
       if (result) {
         this.evento = result;
         localStorage.setItem("eventoEdit", JSON.stringify(result.name));
@@ -74,7 +74,7 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   notCanDo = false;
 
   checkCanDelete(idEvento: number): void {
-    this._publicationService.listPublications({ event: idEvento }).subscribe((result) => {
+    this.publicationService.listPublications({ event: idEvento }).subscribe((result) => {
       if (result.length === 0) {
         this.notCanDo = true;
       }
@@ -83,7 +83,7 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
 
   submitEvento(): void {
     if (this.eventoForm.valid) {
-      this._eventService
+      this.eventService
         .update(this.evento.id, {
           name: this.evento.name,
           city: this.evento.city ?? undefined,
@@ -102,11 +102,11 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/eventos"]);
+    this.router.navigate(["dashboard/eventos"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -137,7 +137,7 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
 
   eraseEvento(): void {
     if (this.notCanDo) {
-      this._eventService.delete(this.evento.id).subscribe((result) => {
+      this.eventService.delete(this.evento.id).subscribe((result) => {
         if (result.status === 1) {
           this.eventoForm.markAsPristine();
           this.return();

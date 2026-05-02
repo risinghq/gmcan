@@ -23,6 +23,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import type { FundingSourceItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import { requireLocalDate } from "@app/shared/utils/date";
 
 interface ProjectRow extends Project {
   fechaI?: string;
@@ -53,12 +54,12 @@ interface ProjectRow extends Project {
   ],
 })
 export default class ProyectosComponent implements OnInit {
-  _router = inject(Router);
+  router = inject(Router);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  _projectService = inject(ProjectService);
-  _lookup = inject(LookupService);
-  private _tabState = inject(TabStateService);
+  projectService = inject(ProjectService);
+  lookup = inject(LookupService);
+  private tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
   displayedColumns2: string[] = ["nombre"];
@@ -77,7 +78,7 @@ export default class ProyectosComponent implements OnInit {
   ejecucion = false;
 
   ngOnInit(): void {
-    this.selectedTab = this._tabState.projectTab();
+    this.selectedTab = this.tabState.projectTab();
     if (window.location.href.includes("ejecucion")) {
       this.ejecucion = true;
       this.loadFundingSources();
@@ -88,7 +89,7 @@ export default class ProyectosComponent implements OnInit {
   }
 
   loadFundingSources(): void {
-    const sources = this._lookup.fundingSources();
+    const sources = this.lookup.fundingSources();
     this.fundingSources = sources;
     this.dataSource2 = new MatTableDataSource(this.fundingSources);
     this.dataSource2.sort = this.sort2();
@@ -96,7 +97,7 @@ export default class ProyectosComponent implements OnInit {
   }
 
   getProyectos(status: number): void {
-    this._projectService.listAdminProjects().subscribe((res: Project[]) => {
+    this.projectService.listAdminProjects().subscribe((res: Project[]) => {
       if (res) {
         const filtered = (
           status === 1 ? res.filter((p) => p.status === 1) : res.filter((p) => p.status !== 1)
@@ -104,10 +105,9 @@ export default class ProyectosComponent implements OnInit {
           (a.startDate ?? "") < (b.startDate ?? "") ? 1 : (b.startDate ?? "") < (a.startDate ?? "") ? -1 : 0,
         );
         this.proyectos = filtered.map((p) => {
-          const d = new Date(p.startDate ?? "");
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+          const startDate = requireLocalDate(p.startDate, "project.startDate");
           return Object.assign({} as ProjectRow, p, {
-            fechaI: this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? ""),
+            fechaI: this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? ""),
           });
         });
         this.dataSource = new MatTableDataSource(this.proyectos);
@@ -115,7 +115,7 @@ export default class ProyectosComponent implements OnInit {
         this.dataSource.paginator = this.paginator();
 
         for (const proyecto of this.proyectos) {
-          this._projectService.getProjectMembers(proyecto.id).subscribe((members) => {
+          this.projectService.getProjectMembers(proyecto.id).subscribe((members) => {
             proyecto.members = members as { memberId: number; name: string }[];
           });
         }
@@ -125,7 +125,7 @@ export default class ProyectosComponent implements OnInit {
 
   displayedNotFound = false;
 
-  applyFilter(event: Event) {
+  applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
     if (this.dataSource.paginator) {
@@ -136,7 +136,7 @@ export default class ProyectosComponent implements OnInit {
 
   displayedNotFound2 = false;
 
-  applyFilter2(event: Event) {
+  applyFilter2(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource2.filter = filterValue.trim().toLowerCase();
     if (this.dataSource2.paginator) {
@@ -146,22 +146,22 @@ export default class ProyectosComponent implements OnInit {
   }
 
   changedTab(event: number): void {
-    this._tabState.projectTab.set(event);
+    this.tabState.projectTab.set(event);
   }
 
   addProject(): void {
-    this._router.navigate(["dashboard/add-project"]);
+    this.router.navigate(["dashboard/add-project"]);
   }
 
   editProject(id: number): void {
-    this._router.navigate(["dashboard/edit-project/" + id]);
+    this.router.navigate(["dashboard/edit-project/" + id]);
   }
 
   addFuente(): void {
-    this._router.navigate(["dashboard/add-fuente"]);
+    this.router.navigate(["dashboard/add-fuente"]);
   }
 
   editFuente(id: number): void {
-    this._router.navigate(["dashboard/edit-fuente/" + id]);
+    this.router.navigate(["dashboard/edit-fuente/" + id]);
   }
 }

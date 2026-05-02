@@ -64,8 +64,8 @@ export interface JournalTable {
 
 export interface UniversityTable {
   id: Generated<number>;
-  name: string | null;
-  nameEN: string | null;
+  name: string;
+  nameEN: string;
   createdAt: DateString | null;
   updatedAt: DateString | null;
 }

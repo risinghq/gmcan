@@ -19,8 +19,8 @@ export interface JournalItem {
 
 export interface UniversityItem {
   id: number;
-  name: string | null;
-  nameEN: string | null;
+  name: string;
+  nameEN: string;
 }
 
 export interface FundingSourceItem {
@@ -71,11 +71,11 @@ export class RefService {
     return this.http.get<UniversityItem[]>(`${GLOBAL.url}admin/ref/university`);
   }
 
-  createUniversity(body: { name: string; nameEN?: string }): Observable<{ id: number }> {
+  createUniversity(body: { name: string; nameEN: string }): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(`${GLOBAL.url}admin/ref/university`, body);
   }
 
-  updateUniversity(id: number, body: { name: string; nameEN?: string }): Observable<{ status: number }> {
+  updateUniversity(id: number, body: { name: string; nameEN: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/ref/university/${id}`, body);
   }
 

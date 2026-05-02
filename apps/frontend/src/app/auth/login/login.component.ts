@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
@@ -19,11 +19,10 @@ import { SessionService } from "@app/shared/services/session.service";
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class LoginComponent implements OnInit {
-  private _groupService = inject(GroupService);
+  private groupService = inject(GroupService);
   fb = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  _emailService = inject(EmailService);
+  private router = inject(Router);
+  private emailService = inject(EmailService);
   authService = inject(AuthService);
   private session = inject(SessionService);
   private titleService = inject(Title);
@@ -60,7 +59,7 @@ export default class LoginComponent implements OnInit {
   getGrupoInfo(): void {
     this.grupoinfo = this.session.getGroupInfo();
     this.grupoinfo.logoHeader = this.url + "api/group/files/header";
-    this._groupService.getGroup().subscribe((group: Group) => {
+    this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
       this.grupoinfo.logoHeader = this.url + "api/group/files/header";
       this.session.setGroupInfo(this.grupoinfo);
@@ -75,7 +74,7 @@ export default class LoginComponent implements OnInit {
       };
       this.authService.login(credentials).subscribe({
         next: () => {
-          this._router.navigate(["/dashboard"]);
+          this.router.navigate(["/dashboard"]);
         },
         error: () => {
           this.error = "Correo electrónico o contraseña incorrectos";
@@ -101,7 +100,7 @@ export default class LoginComponent implements OnInit {
     const request = {
       email: this.emailForm.controls["email"].value as string,
     };
-    this._emailService.sendPasswordReset(request).subscribe({
+    this.emailService.sendPasswordReset(request).subscribe({
       next: (res) => {
         if (res?.success) {
           this.exito = res.message;
@@ -116,6 +115,6 @@ export default class LoginComponent implements OnInit {
   }
 
   return(): void {
-    this._router.navigate(["/home"]);
+    this.router.navigate(["/home"]);
   }
 }

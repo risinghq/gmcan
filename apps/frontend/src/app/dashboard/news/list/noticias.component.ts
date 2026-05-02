@@ -17,14 +17,14 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import type { News } from "@app/shared/models/news";
 import { GLOBAL } from "@app/shared/services/global";
-import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import type { RefItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import { parseLocalDate } from "@app/shared/utils/date";
 
 interface NewsRow extends News {
   publishedAtDisplay?: string;
@@ -56,14 +56,12 @@ interface NewsRow extends News {
   ],
 })
 export default class NoticiasComponent implements OnInit {
-  private _newsService = inject(NewsService);
-  private _refService = inject(RefService);
-  lookup = inject(LookupService);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _tabState = inject(TabStateService);
+  private readonly newsService = inject(NewsService);
+  private readonly refService = inject(RefService);
+  private readonly titlecasePipe = inject(TitleCasePipe);
+  private readonly datePipe = inject(DatePipe);
+  private readonly router = inject(Router);
+  private readonly tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["title", "publishedAtDisplay", "newsTypeName", "statusText"];
   displayedColumns2: string[] = ["name"];
@@ -76,7 +74,7 @@ export default class NoticiasComponent implements OnInit {
   public newsTypes: RefItem[] = [];
 
   ngOnInit(): void {
-    this.selectedTab = this._tabState.newsTab();
+    this.selectedTab = this.tabState.newsTab();
     this.loadNewsTypes();
     this.getNews();
   }
@@ -92,7 +90,7 @@ export default class NoticiasComponent implements OnInit {
   }
 
   loadNewsTypes(): void {
-    this._refService.listNewsTypes().subscribe((types) => {
+    this.refService.listNewsTypes().subscribe((types) => {
       this.newsTypes = types;
       this.dataSource2 = new MatTableDataSource(this.newsTypes);
       this.dataSource2.sort = this.sort2();
@@ -101,7 +99,7 @@ export default class NoticiasComponent implements OnInit {
   }
 
   getNews(): void {
-    this._newsService.listAdminNews().subscribe((res: News[]) => {
+    this.newsService.listAdminNews().subscribe((res: News[]) => {
       if (res != null) {
         const sorted = res.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
@@ -111,10 +109,10 @@ export default class NoticiasComponent implements OnInit {
           const cat = this.newsTypes.find((t) => t.id === n.newsTypeId);
           row.newsTypeName = cat?.name ?? "";
           row.statusText = n.status === 1 ? "Activo" : "Inactivo";
-          if (n.publishedAt) {
-            const d = new Date(n.publishedAt);
-            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-            row.publishedAtDisplay = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM dd, y", "es") ?? "");
+          const publishedAt = parseLocalDate(n.publishedAt);
+          if (publishedAt) {
+            row.publishedAtDisplay =
+              this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? "") ?? "";
           }
           return row;
         });
@@ -128,41 +126,38 @@ export default class NoticiasComponent implements OnInit {
   displayedNotFound = false;
   displayedNotFound2 = false;
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-    this.displayedNotFound = this.dataSource.filteredData.length === 0;
+  applyFilter(event: Event): void {
+    this.displayedNotFound = this.applyFilterToSource(event, this.dataSource);
   }
 
-  applyFilter2(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource2.paginator) {
-      this.dataSource2.paginator.firstPage();
-    }
-    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
+  applyFilter2(event: Event): void {
+    this.displayedNotFound2 = this.applyFilterToSource(event, this.dataSource2);
   }
 
   addCategory(): void {
-    this._router.navigate(["dashboard/add-category"]);
+    this.router.navigate(["dashboard/add-category"]);
   }
 
   editCategory(id: number): void {
-    this._router.navigate(["dashboard/edit-category/" + id]);
+    this.router.navigate(["dashboard/edit-category/" + id]);
   }
 
   addNews(): void {
-    this._router.navigate(["dashboard/add-news"]);
+    this.router.navigate(["dashboard/add-news"]);
   }
 
   editNews(id: number): void {
-    this._router.navigate(["dashboard/edit-news/" + id]);
+    this.router.navigate(["dashboard/edit-news/" + id]);
   }
 
   changedTab(event: number): void {
-    this._tabState.newsTab.set(event);
+    this.tabState.newsTab.set(event);
+  }
+
+  private applyFilterToSource<T>(event: Event, dataSource: MatTableDataSource<T>): boolean {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    dataSource.filter = filterValue;
+    dataSource.paginator?.firstPage();
+    return dataSource.filteredData.length === 0;
   }
 }

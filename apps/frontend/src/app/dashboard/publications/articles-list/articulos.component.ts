@@ -53,12 +53,12 @@ interface PublicationRow extends PublicationWithAuthors {
   ],
 })
 export default class ArticulosComponent implements OnInit {
-  _router = inject(Router);
+  router = inject(Router);
   lookup = inject(LookupService);
-  private _publicationService = inject(PublicationService);
+  private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _tabState = inject(TabStateService);
+  private tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
   displayedColumns2: string[] = ["nombre"];
@@ -80,7 +80,7 @@ export default class ArticulosComponent implements OnInit {
 
   selectedTab = 0;
   ngOnInit(): void {
-    this.selectedTab = this._tabState.articleTab();
+    this.selectedTab = this.tabState.articleTab();
     const journals = this.lookup.journals();
     this.dataSource2 = new MatTableDataSource(journals);
     this.dataSource2.sort = this.sort2();
@@ -89,7 +89,7 @@ export default class ArticulosComponent implements OnInit {
   }
 
   getArticles(): void {
-    this._publicationService.listPublications({ type: 1 }).subscribe((res) => {
+    this.publicationService.listPublications({ type: 1 }).subscribe((res) => {
       if (res) {
         const sorted = res.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
@@ -131,24 +131,24 @@ export default class ArticulosComponent implements OnInit {
   }
 
   changedTab(event: number): void {
-    this._tabState.articleTab.set(event);
+    this.tabState.articleTab.set(event);
   }
 
   addRevista() {
-    this._router.navigate(["dashboard/add-revista"]);
+    this.router.navigate(["dashboard/add-revista"]);
   }
 
   editRevista(id: number): void {
-    this._router.navigate(["dashboard/edit-revista/" + id]);
+    this.router.navigate(["dashboard/edit-revista/" + id]);
   }
 
   addArticle() {
     localStorage.setItem("article-back", "articulos");
-    this._router.navigate(["dashboard/add-article/"]);
+    this.router.navigate(["dashboard/add-article/"]);
   }
 
   editArticulo(id: number): void {
     localStorage.setItem("article-back", "articulos");
-    this._router.navigate(["dashboard/edit-article/" + id]);
+    this.router.navigate(["dashboard/edit-article/" + id]);
   }
 }

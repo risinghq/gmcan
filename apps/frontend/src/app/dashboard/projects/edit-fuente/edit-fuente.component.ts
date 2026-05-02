@@ -28,12 +28,12 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _refService = inject(RefService);
-  private _projectService = inject(ProjectService);
+  private snackBar = inject(MatSnackBar);
+  private refService = inject(RefService);
+  private projectService = inject(ProjectService);
 
   fuente: FundingSourceItem = { id: 0, name: "" };
   public fuenteForm: FormGroup;
@@ -55,8 +55,8 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   }
 
   getFuente(): void {
-    const idFuente = Number(this._route.snapshot.params["id"] ?? 0);
-    this._refService.getFundingSource(idFuente).subscribe((result) => {
+    const idFuente = Number(this.route.snapshot.params["id"] ?? 0);
+    this.refService.getFundingSource(idFuente).subscribe((result) => {
       if (result) {
         this.fuente = result;
         localStorage.setItem("fuenteEdit", JSON.stringify(result.name ?? ""));
@@ -68,7 +68,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   notCanDo = false;
 
   checkCanDelete(fundingSourceId: number): void {
-    this._projectService.listAdminProjects().subscribe((projects) => {
+    this.projectService.listAdminProjects().subscribe((projects) => {
       const inUse = projects.some((p) => p.fundingSourceId === fundingSourceId);
       this.notCanDo = !inUse;
     });
@@ -76,7 +76,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
 
   submitFuente(): void {
     if (this.fuenteForm.valid) {
-      this._refService.updateFundingSource(this.fuente.id, { name: this.fuente.name }).subscribe((result) => {
+      this.refService.updateFundingSource(this.fuente.id, { name: this.fuente.name }).subscribe((result) => {
         if (result.status === 1) {
           this.fuenteForm.markAsPristine();
           this.return();
@@ -87,11 +87,11 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/proyectos-ejecucion"]);
+    this.router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -122,7 +122,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
 
   eraseFuente(): void {
     if (this.notCanDo) {
-      this._refService.deleteFundingSource(this.fuente.id).subscribe((result) => {
+      this.refService.deleteFundingSource(this.fuente.id).subscribe((result) => {
         if (result.status === 1) {
           this.fuenteForm.markAsPristine();
           this.return();

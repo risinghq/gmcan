@@ -70,10 +70,10 @@ export class SharedShareButtonsComponent {
 
   hoveredShare: "facebook" | "twitter" | null = null;
 
-  constructor(private _shareService: ShareService) {}
+  constructor(private shareService: ShareService) {}
 
   onShare(platform: "facebook" | "twitter"): void {
-    this._shareService.openShare(platform, this.url, this.title);
+    this.shareService.openShare(platform, this.url, this.title);
   }
 
   getShareIconPath(platform: "facebook" | "twitter"): string {

@@ -47,13 +47,13 @@ type NewsTypeFilter = { id: number; name: string };
   ],
 })
 export default class MainNewsComponent implements OnInit {
-  _newsService = inject(NewsService);
-  _memberService = inject(MemberService);
-  _route = inject(ActivatedRoute);
+  newsService = inject(NewsService);
+  memberService = inject(MemberService);
+  route = inject(ActivatedRoute);
   lookup = inject(LookupService);
-  _router = inject(Router);
-  private _browser = inject(BrowserService);
-  private _session = inject(SessionService);
+  router = inject(Router);
+  private browser = inject(BrowserService);
+  private session = inject(SessionService);
   private titleService = inject(Title);
 
   public allNoticias: NewsDisplay[] = [];
@@ -63,13 +63,13 @@ export default class MainNewsComponent implements OnInit {
   url: string;
 
   constructor() {
-    this.screenWidth = this._browser.innerWidth();
+    this.screenWidth = this.browser.innerWidth();
     this.url = GLOBAL.url;
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = this._browser.innerWidth();
+    this.screenWidth = this.browser.innerWidth();
   }
 
   public categorySelected = -1;
@@ -80,7 +80,7 @@ export default class MainNewsComponent implements OnInit {
   allCharged = false;
 
   ngOnInit(): void {
-    this.language = this._session.language();
+    this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.categoryNombre = this.language.newsText[0].categoryTitle;
     this.loadNews();
@@ -89,8 +89,8 @@ export default class MainNewsComponent implements OnInit {
   loadNews(): void {
     this.allCharged = false;
     forkJoin({
-      news: this._newsService.listNews(),
-      members: this._memberService.listMembers(),
+      news: this.newsService.listNews(),
+      members: this.memberService.listMembers(),
     }).subscribe(({ news, members }) => {
       const membersMap = new Map((members as Member[]).map((m) => [m.id, m]));
       const newsTypesMap = new Map(this.lookup.newsTypes().map((t) => [t.id, t]));
@@ -152,11 +152,11 @@ export default class MainNewsComponent implements OnInit {
   }
 
   detalleNoticia(noticia: NewsDisplay): void {
-    this._router.navigate(["/home/detail-news/" + noticia.id]);
+    this.router.navigate(["/home/detail-news/" + noticia.id]);
     this.scroll();
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 }

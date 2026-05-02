@@ -31,6 +31,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { NewsService, type NewsBody } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
 import { AutosizeModule } from "ngx-autosize";
@@ -69,14 +70,14 @@ interface NewsPreviewData {
 })
 export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _newsService = inject(NewsService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  private newsService = inject(NewsService);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
+  private snackBar = inject(MatSnackBar);
   lookup = inject(LookupService);
-  private _memberService = inject(MemberService);
-  private _session = inject(SessionService);
+  private memberService = inject(MemberService);
+  private session = inject(SessionService);
 
   public Editor = ClassicEditor;
   noticia: News;
@@ -116,17 +117,15 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getNews(): void {
-    const id = Number(this._route.snapshot.params["id"] ?? 0);
-    this._newsService.getAdminNews(id).subscribe((found: News) => {
+    const id = Number(this.route.snapshot.params["id"] ?? 0);
+    this.newsService.getAdminNews(id).subscribe((found: News) => {
       if (found) {
         this.noticia = found;
         this.newsForm.controls["cuerpo"].setValue(found.body);
         if (found.publishedAt) {
-          const d = new Date(found.publishedAt);
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.publishedAtObj = d;
+          this.publishedAtObj = parseLocalDate(found.publishedAt);
         }
-        this._session.setNoticiaPublicada((found.status ?? 0) === 1);
+        this.session.setNoticiaPublicada((found.status ?? 0) === 1);
         this.getAuthors();
         if (found.status === 0) {
           this.button_text = "Publicar noticia";
@@ -140,7 +139,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getAuthors(): void {
-    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
         this.autores = result;
       }
@@ -148,7 +147,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/noticias"]);
   }
 
   submitNews(status: number): void {
@@ -172,7 +171,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   publishMethod(status: number): void {
-    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : undefined;
+    const publishedAt = this.publishedAtObj ? toIsoDate(this.publishedAtObj) : undefined;
     const body: NewsBody = {
       title: this.noticia.title ?? undefined,
       titleEN: this.noticia.titleEN ?? undefined,
@@ -185,10 +184,10 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       authorId: this.noticia.authorId ?? undefined,
       newsTypeId: this.noticia.newsTypeId ?? undefined,
     };
-    this._newsService.updateNews(this.noticia.id, body).subscribe((result) => {
+    this.newsService.updateNews(this.noticia.id, body).subscribe((result) => {
       if (result.status === 1) {
         if (this.fileData) {
-          this._newsService.uploadPhoto(this.noticia.id, this.fileData).subscribe(() => {});
+          this.newsService.uploadPhoto(this.noticia.id, this.fileData).subscribe();
         }
         this.newsForm.markAsPristine();
         this.return();
@@ -202,7 +201,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   previewNews(value: number): void {
     const cat = this.categorias.find((x) => x.id === this.noticia.newsTypeId);
     const aut = this.autores.find((x) => x.id === this.noticia.authorId) ?? null;
-    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : null;
+    const publishedAt = this.publishedAtObj ? toIsoDate(this.publishedAtObj) : null;
     const data: NewsPreviewData = {
       language: value,
       title: value === 0 ? (this.noticia.title ?? null) : (this.noticia.titleEN ?? null),
@@ -220,7 +219,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       id: "previewNews",
       data,
     });
-    this.previewDialog.afterClosed().subscribe(() => {});
+    this.previewDialog.afterClosed().subscribe();
   }
 
   private dialogRef2?: MatDialogRef<DialogPublish2>;
@@ -267,7 +266,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -316,7 +315,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   eraseNews(): void {
-    this._newsService.deleteNews(this.noticia.id).subscribe((result) => {
+    this.newsService.deleteNews(this.noticia.id).subscribe((result) => {
       if (result.status === 1) {
         this.newsForm.markAsPristine();
         this.return();

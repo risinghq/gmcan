@@ -14,7 +14,7 @@ import { map, switchMap } from "rxjs";
   imports: [],
 })
 export default class AboutUsComponent implements OnInit {
-  private _groupService = inject(GroupService);
+  private groupService = inject(GroupService);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
@@ -33,10 +33,10 @@ export default class AboutUsComponent implements OnInit {
   }
 
   loadAboutUs(): void {
-    this._groupService
+    this.groupService
       .getGroup()
       .pipe(
-        switchMap((group) => this._groupService.listAbout(group.id)),
+        switchMap((group) => this.groupService.listAbout(group.id)),
         map((res: About[]) => res[0] ?? null),
       )
       .subscribe((about) => {

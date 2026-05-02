@@ -1,0 +1,29 @@
+<form [formGroup]="state.trabajosFuturosForm">
+  <div class="full-width mb-24">
+    <div class="flex-news">
+      <div class="text-category">Descripción en español <span class="red-text">*</span></div>
+      <div class="green-text right plex-sans" (click)="state.previewFuture(0)">Vista Previa</div>
+    </div>
+    <ckeditor
+      [editor]="state.Editor"
+      [(ngModel)]="state.group.futureWorkES"
+      formControlName="futureWorkES"
+      name="futureWorkES"
+    />
+  </div>
+  <div class="full-width mb-24">
+    <div class="flex-news">
+      <div class="text-category">Descripción en inglés <span class="red-text">*</span></div>
+      <div class="green-text right plex-sans" (click)="state.previewFuture(1)">Vista previa</div>
+    </div>
+    <ckeditor
+      [editor]="state.Editor"
+      [(ngModel)]="state.group.futureWorkEN"
+      formControlName="futureWorkEN"
+      name="futureWorkEN"
+    />
+  </div>
+  <div class="right black-btn mb-12">
+    <div class="link link-set" (click)="state.submitTrabajosFuturos()">Actualizar información</div>
+  </div>
+</form>

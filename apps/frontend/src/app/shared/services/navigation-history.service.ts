@@ -8,34 +8,42 @@ import { filter } from "rxjs/operators";
   providedIn: "root",
 })
 export class NavigationHistoryService {
-  private _router = inject(Router);
-  private _platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  private readonly _previousUrl = signal<string>("");
-  readonly previousUrl = this._previousUrl.asReadonly();
+  private readonly previousUrlState = signal<string>("");
+  readonly previousUrl = this.previousUrlState.asReadonly();
 
   constructor() {
-    this._router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
       const newUrl = event.urlAfterRedirects;
-      const previousUrl = this._previousUrl();
+      const previousUrl = this.previousUrlState();
 
-      // Store the current URL as the new previous URL for next navigation
       if (newUrl !== previousUrl) {
-        this._previousUrl.set(previousUrl);
-
-        // Persist to sessionStorage for SSR hydration
-        if (isPlatformBrowser(this._platformId)) {
-          sessionStorage.setItem("previous-page", previousUrl.startsWith("/") ? previousUrl.slice(1) : previousUrl);
-        }
+        this.previousUrlState.set(previousUrl);
+        this.persistPreviousUrl(previousUrl);
       }
     });
 
-    // Restore from sessionStorage on initialization
-    if (isPlatformBrowser(this._platformId)) {
-      const stored = sessionStorage.getItem("previous-page");
-      if (stored) {
-        this._previousUrl.set(stored);
-      }
+    this.restorePreviousUrl();
+  }
+
+  private persistPreviousUrl(previousUrl: string): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    sessionStorage.setItem("previous-page", previousUrl.startsWith("/") ? previousUrl.slice(1) : previousUrl);
+  }
+
+  private restorePreviousUrl(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const stored = sessionStorage.getItem("previous-page");
+    if (stored) {
+      this.previousUrlState.set(stored);
     }
   }
 }

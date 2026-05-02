@@ -1,6 +1,6 @@
 import { AsyncPipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -10,7 +10,15 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
+import {
+  attachFilter,
+  buildCoAuthorSaveList,
+  type AuthorFormRow,
+  newAuthorRow,
+} from "@app/dashboard/publications/flow/authors";
+import { resolveBackTarget, THESIS_BACK_KEY } from "@app/dashboard/publications/flow/back-nav";
+import { buildThesisPayload } from "@app/dashboard/publications/flow/publication-payload";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { createPublication } from "@app/shared/models/factories";
 import type { Publication } from "@app/shared/models/publication";
@@ -21,16 +29,6 @@ import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
-import { Observable } from "rxjs";
-import { startWith, map } from "rxjs/operators";
-
-interface AuthorFormRow {
-  id: number;
-  name: string;
-  memberId: number | null;
-  myControl: FormControl<string>;
-  filteredOptions?: Observable<AuthorSearchResult[]>;
-}
 
 @Component({
   selector: "app-add-tesis",
@@ -58,13 +56,12 @@ interface AuthorFormRow {
 })
 export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _publicationService = inject(PublicationService);
-  private _memberService = inject(MemberService);
+  private router = inject(Router);
+  private publicationService = inject(PublicationService);
+  private memberService = inject(MemberService);
   lookup = inject(LookupService);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
+  private snackBar = inject(MatSnackBar);
 
   publicacion: Publication;
   publishedAtObj?: Date;
@@ -98,34 +95,10 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   ngOnInit(): void {
-    this._memberService.searchAuthors("").subscribe((authors) => {
+    this.memberService.searchAuthors("").subscribe((authors) => {
       this.options = authors;
-      this.otrosAutores = [this.newCoAuthorRow()];
-      this.setupCoAuthorFilters();
+      this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
     });
-  }
-
-  private filterAuthors(value: string): AuthorSearchResult[] {
-    const lower = value.toLowerCase();
-    return this.options.filter((o) => o.name.toLowerCase().includes(lower));
-  }
-
-  private newCoAuthorRow(): AuthorFormRow {
-    return {
-      id: this.otrosAutores.length + 1,
-      name: "",
-      memberId: null,
-      myControl: new FormControl<string>("", { nonNullable: true }),
-    };
-  }
-
-  private setupCoAuthorFilters(): void {
-    for (const row of this.otrosAutores) {
-      row.filteredOptions = row.myControl.valueChanges.pipe(
-        startWith(""),
-        map((v) => this.filterAuthors(v)),
-      );
-    }
   }
 
   selectUserAutor(evento: AuthorSearchResult | { value: string }, value: number, i: number): void {
@@ -143,21 +116,12 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   }
 
   addAnotherAuthor(): void {
-    const row = this.newCoAuthorRow();
-    row.filteredOptions = row.myControl.valueChanges.pipe(
-      startWith(""),
-      map((v) => this.filterAuthors(v)),
-    );
-    this.otrosAutores.push(row);
+    this.otrosAutores.push(attachFilter(newAuthorRow(this.otrosAutores.length + 1), this.options));
   }
 
   removeAnotherAuthor(i: number): void {
     if (this.otrosAutores.length === 1) {
-      this.otrosAutores[0] = this.newCoAuthorRow();
-      this.otrosAutores[0].filteredOptions = this.otrosAutores[0].myControl.valueChanges.pipe(
-        startWith(""),
-        map((v) => this.filterAuthors(v)),
-      );
+      this.otrosAutores[0] = attachFilter(newAuthorRow(1), this.options);
     } else {
       this.otrosAutores.splice(i, 1);
     }
@@ -166,22 +130,19 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.otrosAutores[0]?.name) return;
 
-    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : "";
-
-    const data = {
+    const data = buildThesisPayload({
       title: this.publicacion.title,
       abstractES: this.publicacion.abstractES ?? undefined,
       abstractEN: this.publicacion.abstractEN ?? undefined,
-      publishedAt,
-      typeId: 2,
+      publishedAt: this.publishedAtObj,
       universityId: this.publicacion.universityId ?? undefined,
       thesisTypeId: this.publicacion.thesisTypeId ?? undefined,
-    };
+    });
 
-    this._publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
+    this.publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
       if (result.id != null) {
         if (this.fileData) {
-          this._publicationService.uploadFile(result.id, this.fileData).subscribe(() => {});
+          this.publicationService.uploadFile(result.id, this.fileData).subscribe();
         }
         this.publicacionForm.markAsPristine();
         this.return();
@@ -191,24 +152,15 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   }
 
   private buildSaveList(): SaveAuthorEntry[] {
-    return this.otrosAutores
-      .filter((row) => !!row.name)
-      .map((row, i) => {
-        const matchedAuthor = this.options.find((o) => o.name === row.name);
-        const memberId = row.memberId ?? matchedAuthor?.id ?? null;
-        if (memberId) {
-          return { kind: "registered" as const, memberId, isPrincipal: i };
-        }
-        return { kind: "external" as const, externalName: row.name, isPrincipal: i };
-      });
+    return buildCoAuthorSaveList(this.otrosAutores, this.options, 0);
   }
 
   return(): void {
-    this._router.navigate(["dashboard/" + localStorage.getItem("thesis-back")]);
+    this.router.navigate(["dashboard/" + resolveBackTarget(THESIS_BACK_KEY, "my-thesis")]);
   }
 
   openSnackBar(msg = "Tesis agregada exitosamente"): void {
-    this._snackBar.open(msg, undefined, {
+    this.snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

@@ -50,17 +50,17 @@ type MemberDisplay = SearchResults["members"][number];
   ],
 })
 export default class GlobalSearchComponent implements OnInit {
-  private readonly _titlecasePipe = inject(TitleCasePipe);
-  private readonly _datePipe = inject(DatePipe);
-  private readonly _route = inject(ActivatedRoute);
-  private readonly _router = inject(Router);
-  private readonly _lookup = inject(LookupService);
-  private readonly _fb = inject(FormBuilder);
-  private readonly _session = inject(SessionService);
-  private readonly _browser = inject(BrowserService);
-  private readonly _titleService = inject(Title);
-  private readonly _navigationHistory = inject(NavigationHistoryService);
-  private readonly _destroyRef = inject(DestroyRef);
+  private readonly titlecasePipe = inject(TitleCasePipe);
+  private readonly datePipe = inject(DatePipe);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly lookup = inject(LookupService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly session = inject(SessionService);
+  private readonly browser = inject(BrowserService);
+  private readonly titleService = inject(Title);
+  private readonly navigationHistory = inject(NavigationHistoryService);
+  private readonly destroyRef = inject(DestroyRef);
 
   proyectos: ProjectDisplay[] = [];
   publicaciones: PublicationDisplay[] = [];
@@ -80,25 +80,34 @@ export default class GlobalSearchComponent implements OnInit {
   memberExpanded = true;
   newsExpanded = true;
 
+  private publicationTypeById = new Map<number, string>();
+  private thesisTypeById = new Map<number, string>();
+  private journalById = new Map<number, string>();
+  private universityById = new Map<number, string>();
+  private eventById = new Map<number, { name: string; city: string | null; country: string | null }>();
+  private currencyById = new Map<number, string>();
+  private newsTypeById = new Map<number, string>();
+
   constructor() {
-    this.searchGlobalForm = this._fb.group({
+    this.searchGlobalForm = this.formBuilder.group({
       nombre: [""],
     });
   }
 
   ngOnInit(): void {
-    this.language = this._session.language();
+    this.language = this.session.language();
+    this.buildLookupMaps();
 
-    const searchData = this._route.snapshot.data["search"] as GlobalSearchViewModel;
+    const searchData = this.route.snapshot.data["search"] as GlobalSearchViewModel;
     this.proyectos = [...searchData.projects];
     this.publicaciones = [...searchData.publications];
     this.miembros = [...searchData.members];
     this.noticias = [...searchData.news];
 
-    this._route.params.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((params: Params) => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: Params) => {
       const nombre = params["id"];
       this.searchId = nombre;
-      this._titleService.setTitle("GMCAN | " + nombre);
+      this.titleService.setTitle("GMCAN | " + nombre);
       this.searchGlobalForm.controls["nombre"].setValue(nombre);
     });
 
@@ -106,55 +115,46 @@ export default class GlobalSearchComponent implements OnInit {
     for (const publicacion of this.publicaciones) this.fillPublicacion(publicacion);
     for (const noticia of this.noticias) this.fillNoticia(noticia);
 
-    this.previouslink = this._navigationHistory.previousUrl();
+    this.previouslink = this.navigationHistory.previousUrl();
   }
 
   searchGlobal(value: string): void {
-    this._router.navigate(["/home/search/" + value]);
+    this.router.navigate(["/home/search/" + value]);
   }
 
   fillProyecto(proyecto: ProjectDisplay): void {
-    const moneda = this._lookup.monedas().find((m) => m.idMoneda === proyecto.currencyId);
-    if (moneda) proyecto.moneda = moneda.simbolo;
+    proyecto.moneda = this.currencyById.get(proyecto.currencyId ?? -1);
 
-    const start = new Date(proyecto.startDate ?? "");
-    if (String(start) !== "Invalid Date") {
-      start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
-      proyecto.fechaI = this._titlecasePipe.transform(this._datePipe.transform(start, "MMMM, y", "es") ?? "");
+    const start = this.normalizedDate(proyecto.startDate);
+    if (start) {
+      proyecto.fechaI = this.titlecasePipe.transform(this.datePipe.transform(start, "MMMM, y", "es") ?? "");
     }
 
     if (proyecto.endDate) {
-      const end = new Date(proyecto.endDate);
-      if (String(end) !== "Invalid Date") {
-        end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
-        proyecto.fechaF = this._titlecasePipe.transform(this._datePipe.transform(end, "MMMM, y", "es") ?? "");
-      }
+      const end = this.normalizedDate(proyecto.endDate);
+      if (end) proyecto.fechaF = this.titlecasePipe.transform(this.datePipe.transform(end, "MMMM, y", "es") ?? "");
     }
   }
 
   fillPublicacion(pub: PublicationDisplay): void {
-    pub.tipoPublicacion = this._lookup.publicationTypes().find((t) => t.id === pub.typeId)?.name;
-    pub.revista = this._lookup.journals().find((j) => j.id === pub.journalId)?.name;
-    pub.universidad = this._lookup.universities().find((u) => u.id === pub.universityId)?.name ?? undefined;
-    pub.tipoTesis = this._lookup.thesisTypes().find((t) => t.id === pub.thesisTypeId)?.name;
-    const evento = this._lookup.events().find((e) => e.id === pub.eventId);
+    pub.tipoPublicacion = this.publicationTypeById.get(pub.typeId ?? -1);
+    pub.revista = this.journalById.get(pub.journalId ?? -1);
+    pub.universidad = this.universityById.get(pub.universityId ?? -1) ?? undefined;
+    pub.tipoTesis = this.thesisTypeById.get(pub.thesisTypeId ?? -1);
+    const evento = this.eventById.get(pub.eventId ?? -1);
     pub.evento = evento?.name;
     pub.ciudad = evento?.city ?? null;
     pub.pais = evento?.country ?? null;
-    const d = new Date(pub.publishedAt ?? "");
-    if (String(d) !== "Invalid Date") {
-      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    }
-    pub.fecha = this._titlecasePipe.transform(this._datePipe.transform(d, "MMMM y", "es") ?? "");
+    const publishedAt = this.normalizedDate(pub.publishedAt);
+    pub.fecha = publishedAt
+      ? this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM y", "es") ?? "")
+      : "";
   }
 
   fillNoticia(noticia: NewsDisplay): void {
-    noticia.nombreTipoNoticia = this._lookup.newsTypes().find((t) => t.id === noticia.newsTypeId)?.name;
-    const d = new Date(noticia.publishedAt ?? "");
-    if (String(d) !== "Invalid Date") {
-      d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-      noticia.fechaFormateada = this._datePipe.transform(d, "MM/dd/y", "es") ?? undefined;
-    }
+    noticia.nombreTipoNoticia = this.newsTypeById.get(noticia.newsTypeId ?? -1);
+    const publishedAt = this.normalizedDate(noticia.publishedAt);
+    if (publishedAt) noticia.fechaFormateada = this.datePipe.transform(publishedAt, "MM/dd/y", "es") ?? undefined;
   }
 
   toggleExpanded(section: string, index: number): void {
@@ -171,23 +171,23 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 
   profile(member: MemberDisplay): void {
-    this._router.navigate(["/home/detail-member/" + member.id]);
+    this.router.navigate(["/home/detail-member/" + member.id]);
   }
 
   detalleNoticia(noticia: { id: number }): void {
-    this._router.navigate(["/home/detail-news/" + noticia.id]);
+    this.router.navigate(["/home/detail-news/" + noticia.id]);
   }
 
   return(): void {
     if (this.previouslink) {
-      this._router.navigate([this.previouslink]);
+      this.router.navigate([this.previouslink]);
       return;
     }
-    this._router.navigate(["/home"]);
+    this.router.navigate(["/home"]);
   }
 
   toggleRotation(caso: number): void {
@@ -207,5 +207,26 @@ export default class GlobalSearchComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  private buildLookupMaps(): void {
+    this.publicationTypeById = new Map(this.lookup.publicationTypes().map((item) => [item.id, item.name]));
+    this.thesisTypeById = new Map(this.lookup.thesisTypes().map((item) => [item.id, item.name]));
+    this.journalById = new Map(this.lookup.journals().map((item) => [item.id, item.name]));
+    this.universityById = new Map(this.lookup.universities().map((item) => [item.id, item.name]));
+    this.eventById = new Map(
+      this.lookup
+        .events()
+        .map((item) => [item.id, { name: item.name, city: item.city ?? null, country: item.country ?? null }]),
+    );
+    this.currencyById = new Map(this.lookup.monedas().map((item) => [item.idMoneda, item.simbolo]));
+    this.newsTypeById = new Map(this.lookup.newsTypes().map((item) => [item.id, item.name]));
+  }
+
+  private normalizedDate(value: string | null | undefined): Date | null {
+    const date = new Date(value ?? "");
+    if (Number.isNaN(date.getTime())) return null;
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+    return date;
   }
 }

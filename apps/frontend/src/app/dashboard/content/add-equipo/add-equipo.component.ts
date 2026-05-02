@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } 
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute, Router } from "@angular/router";
+import { Router } from "@angular/router";
 import type { Equipment } from "@app/shared/models/equipment";
 import { createEquipment } from "@app/shared/models/factories";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -18,11 +18,10 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _groupService = inject(GroupService);
+  private snackBar = inject(MatSnackBar);
+  private groupService = inject(GroupService);
 
   equipo: Equipment;
   equipoForm: FormGroup;
@@ -50,7 +49,7 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
 
   submitEquipo(): void {
     if (this.equipoForm.valid) {
-      this._groupService
+      this.groupService
         .createEquipment({
           name: this.equipo.name,
           cpu: this.equipo.cpu ?? undefined,
@@ -70,11 +69,11 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(): void {
-    this._snackBar.open("Equipo agregado exitosamente", undefined, {
+    this.snackBar.open("Equipo agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",

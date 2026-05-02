@@ -21,11 +21,11 @@ import { ClassicEditor } from "ckeditor5";
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  private router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _methodService = inject(MethodsService);
+  private snackBar = inject(MatSnackBar);
+  private methodService = inject(MethodsService);
 
   public Editor = ClassicEditor;
   button_text = "Guardar método";
@@ -65,7 +65,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 
   submitMethod(): void {
     if (this.methodForm.valid) {
-      this._methodService
+      this.methodService
         .create({
           name: this.metodo.name,
           nameEN: this.metodo.nameEN,
@@ -76,7 +76,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.id) {
             if (this.fileData) {
-              this._methodService.uploadPhoto(result.id, this.fileData).subscribe(() => {});
+              this.methodService.uploadPhoto(result.id, this.fileData).subscribe();
             }
             this.methodForm.markAsPristine();
             this.return();
@@ -87,11 +87,11 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(): void {
-    this._snackBar.open("Método agregado exitosamente", undefined, {
+    this.snackBar.open("Método agregado exitosamente", undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -138,7 +138,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
       data: method,
     });
 
-    this.previewDialog.afterClosed().subscribe(() => {});
+    this.previewDialog.afterClosed().subscribe();
   }
 }
 

@@ -55,12 +55,12 @@ interface PublicationRow extends PublicationWithAuthors {
   ],
 })
 export default class TesisComponent implements OnInit {
-  _router = inject(Router);
+  router = inject(Router);
   lookup = inject(LookupService);
-  private _publicationService = inject(PublicationService);
+  private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private _tabState = inject(TabStateService);
+  private tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "tipo", "autores", "universidad", "publicacion"];
   displayedColumns2: string[] = ["nombre"];
@@ -82,7 +82,7 @@ export default class TesisComponent implements OnInit {
   selectedTab = 0;
 
   ngOnInit(): void {
-    this.selectedTab = this._tabState.thesisTab();
+    this.selectedTab = this.tabState.thesisTab();
     const universities = this.lookup.universities();
     this.dataSource2 = new MatTableDataSource(universities);
     this.dataSource2.sort = this.sort2();
@@ -91,7 +91,7 @@ export default class TesisComponent implements OnInit {
   }
 
   getThesis(): void {
-    this._publicationService.listPublications({ type: 2 }).subscribe((res) => {
+    this.publicationService.listPublications({ type: 2 }).subscribe((res) => {
       if (res) {
         const sorted = res.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
@@ -137,24 +137,24 @@ export default class TesisComponent implements OnInit {
   }
 
   changedTab(event: number): void {
-    this._tabState.thesisTab.set(event);
+    this.tabState.thesisTab.set(event);
   }
 
   addThesis(): void {
     localStorage.setItem("thesis-back", "tesis");
-    this._router.navigate(["dashboard/add-thesis"]);
+    this.router.navigate(["dashboard/add-thesis"]);
   }
 
   editThesis(id: number): void {
     localStorage.setItem("thesis-back", "tesis");
-    this._router.navigate(["dashboard/edit-thesis/" + id]);
+    this.router.navigate(["dashboard/edit-thesis/" + id]);
   }
 
   addUniversidad(): void {
-    this._router.navigate(["dashboard/add-universidad"]);
+    this.router.navigate(["dashboard/add-universidad"]);
   }
 
   editUniversidad(id: number): void {
-    this._router.navigate(["dashboard/edit-universidad/" + id]);
+    this.router.navigate(["dashboard/edit-universidad/" + id]);
   }
 }

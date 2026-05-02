@@ -2,7 +2,7 @@ import { TitleCasePipe, DatePipe, SlicePipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router } from "@angular/router";
 import type { ProjectWithMembers } from "@app/shared/models/project";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { GLOBAL } from "@app/shared/services/global";
@@ -47,14 +47,13 @@ const EMPTY_LINE: ResearchLineDisplay = {
   imports: [MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe],
 })
 export default class LinesInvestigationComponent implements OnInit {
-  private _researchLinesService = inject(ResearchLinesService);
-  private _projectService = inject(ProjectService);
-  private _titlecasePipe = inject(TitleCasePipe);
-  private _datePipe = inject(DatePipe);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private researchLinesService = inject(ResearchLinesService);
+  private projectService = inject(ProjectService);
+  private titlecasePipe = inject(TitleCasePipe);
+  private datePipe = inject(DatePipe);
+  router = inject(Router);
   lookup = inject(LookupService);
-  private _session = inject(SessionService);
+  private session = inject(SessionService);
   private titleService = inject(Title);
 
   language: any = {};
@@ -71,48 +70,26 @@ export default class LinesInvestigationComponent implements OnInit {
   expandedKey: string | null = null;
 
   ngOnInit(): void {
-    this.language = this._session.language();
+    this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.linesInvestigation);
     this.loadData();
   }
 
   loadData(): void {
     forkJoin({
-      lineas: this._researchLinesService.list(),
-      projects: this._projectService.listProjects(),
+      lineas: this.researchLinesService.list(),
+      projects: this.projectService.listProjects(),
     }).subscribe(({ lineas, projects }) => {
       const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.id, f]));
       const monedasMap = new Map(this.lookup.monedas().map((m) => [m.idMoneda, m]));
 
-      const enrichedProjects = projects.map((p): ProjectDisplay => {
-        const startDate = new Date(p.startDate ?? "");
-        if (String(startDate) !== "Invalid Date") {
-          startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
-        }
-        let fechaF: string | undefined;
-        if (p.endDate) {
-          const end = new Date(p.endDate);
-          if (String(end) !== "Invalid Date") {
-            end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
-            fechaF = this._titlecasePipe.transform(this._datePipe.transform(end, "MMMM, y", "es") ?? "") ?? undefined;
-          }
-        }
-        return {
-          ...p,
-          fechaI:
-            String(startDate) === "Invalid Date"
-              ? ""
-              : (this._titlecasePipe.transform(this._datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? ""),
-          fechaF,
-          lineasInvestigacion: lineas.find((l) => l.id === p.researchLineId)?.name,
-          fuenteFinanciamiento: fuentesMap.get(p.fundingSourceId)?.name,
-          moneda: monedasMap.get(p.currencyId)?.simbolo,
-        };
-      });
+      const enrichedProjects = projects.map(
+        (project): ProjectDisplay => this.enrichProject(project, lineas, fuentesMap, monedasMap),
+      );
 
-      const mapped: ResearchLineDisplay[] = lineas.slice(0, 3).map((l) =>
-        Object.assign({} as ResearchLineDisplay, l, {
-          proyectos: enrichedProjects.filter((p) => p.researchLineId === l.id && !p.endDate),
+      const mapped: ResearchLineDisplay[] = lineas.slice(0, 3).map((line) =>
+        Object.assign({} as ResearchLineDisplay, line, {
+          proyectos: enrichedProjects.filter((project) => project.researchLineId === line.id && !project.endDate),
         }),
       );
 
@@ -138,6 +115,36 @@ export default class LinesInvestigationComponent implements OnInit {
   }
 
   profile(member: { memberId: number }): void {
-    this._router.navigate(["/home/detail-member/" + member.memberId]);
+    this.router.navigate(["/home/detail-member/" + member.memberId]);
+  }
+
+  private enrichProject(
+    project: ProjectWithMembers,
+    lineas: ResearchLine[],
+    fuentesMap: Map<number, { name?: string }>,
+    monedasMap: Map<number, { simbolo?: string }>,
+  ): ProjectDisplay {
+    return {
+      ...project,
+      fechaI: this.formatMonth(project.startDate),
+      fechaF: project.endDate ? this.formatMonth(project.endDate) : undefined,
+      lineasInvestigacion: lineas.find((line) => line.id === project.researchLineId)?.name,
+      fuenteFinanciamiento: fuentesMap.get(project.fundingSourceId)?.name,
+      moneda: monedasMap.get(project.currencyId)?.simbolo,
+    };
+  }
+
+  private formatMonth(value?: string | null): string {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+    return this.titlecasePipe.transform(this.datePipe.transform(date, "MMMM, y", "es") ?? "") ?? "";
   }
 }

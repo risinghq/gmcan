@@ -64,7 +64,7 @@ export default [
         canDeactivate: [canDeactivateGuard],
       },
       { path: "perfil", loadComponent: () => import("./profile/perfil.component") },
-      { path: "contenidos", loadComponent: () => import("./content/list/contenidos.component") },
+      { path: "contenidos", loadComponent: () => import("./content/list/contenidos/page") },
       {
         path: "add-linea",
         loadComponent: () => import("./content/add-linea/add-linea.component"),

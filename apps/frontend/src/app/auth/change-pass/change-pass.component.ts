@@ -19,8 +19,8 @@ export default class ChangePassComponent implements OnInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private _emailService = inject(EmailService);
-  private _groupService = inject(GroupService);
+  private emailService = inject(EmailService);
+  private groupService = inject(GroupService);
   private session = inject(SessionService);
 
   public passwordForm: FormGroup;
@@ -29,7 +29,7 @@ export default class ChangePassComponent implements OnInit {
   public loading = false;
   public success = false;
   public error: string | null = null;
-  public language: any;
+  public language = this.session.language();
 
   private resetToken: string | null = null;
   public tokenValid = false;
@@ -60,7 +60,7 @@ export default class ChangePassComponent implements OnInit {
   }
 
   private loadGroupInfo(): void {
-    this._groupService.getGroup().subscribe({
+    this.groupService.getGroup().subscribe({
       next: (group: Group) => {
         this.grupoInfo = group;
         this.grupoInfo.logoHeader = this.url + "api/group/files/header";
@@ -86,7 +86,7 @@ export default class ChangePassComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this._emailService.verifyResetToken(token).subscribe({
+    this.emailService.verifyResetToken(token).subscribe({
       next: (response) => {
         this.tokenValid = response.valid;
         if (!response.valid) {
@@ -130,7 +130,7 @@ export default class ChangePassComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this._emailService.resetPassword(this.resetToken, this.passwordForm.value.password as string).subscribe({
+    this.emailService.resetPassword(this.resetToken, this.passwordForm.value.password as string).subscribe({
       next: (response) => {
         if (response.status === 1) {
           this.success = true;

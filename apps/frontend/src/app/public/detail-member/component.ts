@@ -1,11 +1,11 @@
 import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
-import { Location } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
 import type { Publication } from "@app/shared/models/publication";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -15,6 +15,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { parseLocalDate } from "@app/shared/utils/date";
 import {
   NgbPagination,
   NgbPaginationPrevious,
@@ -51,18 +52,17 @@ type PublicationDisplay = Publication & {
   ],
 })
 export default class DetailMemberComponent implements OnInit {
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private titlecasePipe = inject(TitleCasePipe);
-  private datePipe = inject(DatePipe);
-  _memberService = inject(MemberService);
-  lookup = inject(LookupService);
-  private _navigationHistory = inject(NavigationHistoryService);
-  _previousService = inject(PreviousPageService);
-  private _session = inject(SessionService);
-  private _browser = inject(BrowserService);
-  location = inject(Location);
-  private titleService = inject(Title);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly titlecasePipe = inject(TitleCasePipe);
+  private readonly datePipe = inject(DatePipe);
+  private readonly memberService = inject(MemberService);
+  private readonly lookup = inject(LookupService);
+  private readonly navigationHistory = inject(NavigationHistoryService);
+  private readonly previousService = inject(PreviousPageService);
+  private readonly session = inject(SessionService);
+  private readonly browser = inject(BrowserService);
+  private readonly titleService = inject(Title);
 
   public usuario: MemberDisplay | null = null;
   public publicaciones: PublicationDisplay[] = [];
@@ -73,16 +73,16 @@ export default class DetailMemberComponent implements OnInit {
   page = 1;
   pageSize = 5;
 
-  language: any = {};
+  language: (typeof Languages)[number] = Languages[0];
 
   constructor() {
     this.url = GLOBAL.url;
   }
 
   ngOnInit(): void {
-    this.language = this._session.language();
-    this.previouslink = this._navigationHistory.previousUrl();
-    this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
+    this.language = this.session.language();
+    this.previouslink = this.navigationHistory.previousUrl();
+    this.previouspage = this.previousService.getPreviousPage(this.previouslink ?? "");
     this.loadProfile();
   }
 
@@ -102,11 +102,11 @@ export default class DetailMemberComponent implements OnInit {
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 
   private loadProfile(): void {
-    const id = Number(this._route.snapshot.params["id"]);
+    const id = Number(this.route.snapshot.params["id"]);
     if (!id) return;
 
     const prefijos = this.lookup.prefijos();
@@ -124,7 +124,7 @@ export default class DetailMemberComponent implements OnInit {
     const events = this.lookup.events();
     const eventsMap = new Map(events.map((e) => [e.id, e]));
 
-    this._memberService.getMemberProfile(id).subscribe((res) => {
+    this.memberService.getMemberProfile(id).subscribe((res) => {
       if (!res?.member) return;
 
       const m = res.member;
@@ -140,14 +140,8 @@ export default class DetailMemberComponent implements OnInit {
       this.titleService.setTitle("GMCAN | " + m.firstName + " " + m.lastName);
 
       this.publicaciones = (res.publications ?? []).map((pub): PublicationDisplay => {
-        const d = new Date(pub.publishedAt ?? "");
-        if (String(d) !== "Invalid Date") {
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        }
-        const fecha =
-          String(d) === "Invalid Date"
-            ? ""
-            : (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "");
+        const d = parseLocalDate(pub.publishedAt);
+        const fecha = d ? (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "") : "";
 
         const evento = pub.eventId ? eventsMap.get(pub.eventId) : undefined;
 
@@ -168,12 +162,12 @@ export default class DetailMemberComponent implements OnInit {
   }
 
   return(): void {
-    this._router.navigate([this.previouslink ?? "/home"]);
+    this.router.navigate([this.previouslink ?? "/home"]);
   }
 
   profile(memberId: number | undefined): void {
     if (!memberId) return;
-    this._router.navigate(["/home/detail-member/" + memberId]);
+    this.router.navigate(["/home/detail-member/" + memberId]);
     this.loadProfile();
   }
 }

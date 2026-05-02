@@ -29,11 +29,11 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _groupService = inject(GroupService);
+  private snackBar = inject(MatSnackBar);
+  private groupService = inject(GroupService);
 
   edit = true;
   software: Software;
@@ -59,8 +59,8 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   }
 
   getSoftware(): void {
-    const idSoftware = Number(this._route.snapshot.params["id"]);
-    this._groupService.getSoftwareItem(idSoftware).subscribe((result: unknown) => {
+    const idSoftware = Number(this.route.snapshot.params["id"]);
+    this.groupService.getSoftwareItem(idSoftware).subscribe((result: unknown) => {
       const sw = result as Software;
       if (sw) {
         this.software = sw;
@@ -71,7 +71,7 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
 
   submitSoftware(): void {
     if (this.softwareForm.valid) {
-      this._groupService
+      this.groupService
         .updateSoftware(this.software.id, {
           name: this.software.name ?? undefined,
           description: this.software.description ?? undefined,
@@ -89,11 +89,11 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   }
 
   return(): void {
-    this._router.navigate(["dashboard/contenidos"]);
+    this.router.navigate(["dashboard/contenidos"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -109,8 +109,8 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
       data: {
         title: "Eliminar software",
         text: "¿Estás seguro que deseas eliminar este software?",
-        cancel: "Sí, eliminar",
-        yes: "No, cancelar",
+        cancel: "No, cancelar",
+        yes: "Sí, eliminar",
       },
     });
     this.dialogRef2.afterClosed().subscribe((result: boolean) => {
@@ -121,7 +121,7 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
   }
 
   eraseSoftware(): void {
-    this._groupService.deleteSoftware(this.software.id).subscribe((result) => {
+    this.groupService.deleteSoftware(this.software.id).subscribe((result) => {
       if (result.status === 1) {
         this.softwareForm.markAsPristine();
         this.return();

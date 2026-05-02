@@ -7,6 +7,7 @@ import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { SessionService } from "@app/shared/services/session.service";
@@ -39,12 +40,12 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   ],
 })
 export default class ProjectsComponent implements OnInit {
-  private readonly _fb = inject(FormBuilder);
-  private readonly _route = inject(ActivatedRoute);
-  private readonly _router = inject(Router);
-  private readonly _browser = inject(BrowserService);
-  private readonly _session = inject(SessionService);
-  private readonly _titleService = inject(Title);
+  private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly browser = inject(BrowserService);
+  private readonly session = inject(SessionService);
+  private readonly titleService = inject(Title);
 
   private allActive: ProjectDisplay[] = [];
   private allFinished: ProjectDisplay[] = [];
@@ -55,7 +56,7 @@ export default class ProjectsComponent implements OnInit {
   searchForm: FormGroup;
   url = GLOBAL.url;
   infoText = "";
-  language: any = {};
+  language: (typeof Languages)[number] = Languages[0];
   page = 1;
   pageSize = 5;
   screenWidth = 0;
@@ -63,41 +64,37 @@ export default class ProjectsComponent implements OnInit {
   expandedKey: string | null = null;
 
   constructor() {
-    this.searchForm = this._fb.group({
+    this.searchForm = this.fb.group({
       titulo: [""],
     });
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
-    this.screenWidth = this._browser.innerWidth();
+    this.screenWidth = this.browser.innerWidth();
     this.setSearchText();
   }
 
   ngOnInit(): void {
-    this.language = this._session.language();
-    this._titleService.setTitle("GMCAN | " + this.language.projects);
-    this.screenWidth = this._browser.innerWidth();
+    this.language = this.session.language();
+    this.titleService.setTitle("GMCAN | " + this.language.projects);
+    this.screenWidth = this.browser.innerWidth();
     this.page = 1;
     this.pageSize = 5;
     this.setSearchText();
 
-    const projectsData = this._route.snapshot.data["projects"] as ProjectsViewModel;
+    const projectsData = this.route.snapshot.data["projects"] as ProjectsViewModel;
     this.allActive = projectsData.active;
     this.allFinished = projectsData.finished;
     this.infoText = projectsData.infoText;
 
-    this.tipoProyectos.push(this.language.projectsText[0].projectsType1);
-    this.tipoProyectos.push(this.language.projectsText[0].projectsType2);
+    this.syncLabels();
     this.currentProjects = this.allActive;
     this.allCharged = true;
   }
 
   ngDoCheck(): void {
-    if (this.tipoProyectos) {
-      this.tipoProyectos[0] = this.language.projectsText[0].projectsType1;
-      this.tipoProyectos[1] = this.language.projectsText[0].projectsType2;
-    }
+    this.syncLabels();
   }
 
   setSearchText(): void {
@@ -115,7 +112,7 @@ export default class ProjectsComponent implements OnInit {
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 
   search(term: string): void {
@@ -148,6 +145,15 @@ export default class ProjectsComponent implements OnInit {
   }
 
   profile(member: { memberId: number }): void {
-    this._router.navigate(["/home/detail-member/" + member.memberId]);
+    this.router.navigate(["/home/detail-member/" + member.memberId]);
+  }
+
+  private syncLabels(): void {
+    const projectsText = this.language.projectsText?.[0];
+    if (!projectsText) {
+      return;
+    }
+
+    this.tipoProyectos = [projectsText.projectsType1, projectsText.projectsType2];
   }
 }

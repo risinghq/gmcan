@@ -43,14 +43,14 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class PerfilComponent implements OnInit {
   formBuilder = inject(FormBuilder);
-  _memberService = inject(MemberService);
-  _authService = inject(AuthService);
+  private memberService = inject(MemberService);
+  private authService = inject(AuthService);
   lookup = inject(LookupService);
-  private _snackBar = inject(MatSnackBar);
+  private snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
-  private _commonService = inject(CommonService);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  private commonService = inject(CommonService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   url: string;
   member: MemberFull & { birthDateObj?: Date };
@@ -87,11 +87,11 @@ export default class PerfilComponent implements OnInit {
   }
 
   getUser(): void {
-    const user = this._authService.getUser();
+    const user = this.authService.getUser();
     if (!user?.id) {
       return;
     }
-    this._memberService.getMemberFull(user.id).subscribe((result: MemberFull) => {
+    this.memberService.getMemberFull(user.id).subscribe((result: MemberFull) => {
       if (result) {
         this.memberForm.controls["dni"].disable();
         this.member = { ...result };
@@ -125,12 +125,12 @@ export default class PerfilComponent implements OnInit {
         genderId: this.member.genderId ?? undefined,
       };
 
-      this._memberService.updateMember(this.member.id, body).subscribe((result) => {
+      this.memberService.updateMember(this.member.id, body).subscribe((result) => {
         if (result.status === 1) {
           if (this.fileData) {
-            this._memberService.uploadPhoto(this.member.id, this.fileData).subscribe(() => {});
+            this.memberService.uploadPhoto(this.member.id, this.fileData).subscribe();
           }
-          this._commonService.setReset(true);
+          this.commonService.setReset(true);
           this.openSnackBar("Información actualizada exitosamente", undefined);
           this.getUser();
         }
@@ -166,7 +166,7 @@ export default class PerfilComponent implements OnInit {
 
   openSnackBar(text: string, panel?: string): void {
     const panelClass = panel ? [panel] : [];
-    this._snackBar.open(text, undefined, {
+    this.snackBar.open(text, undefined, {
       panelClass,
       duration: 2000,
       horizontalPosition: "right",

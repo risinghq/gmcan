@@ -76,15 +76,15 @@ interface ProjectMemberRow {
 })
 export default class EditProyectoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
-  private _snackBar = inject(MatSnackBar);
-  private _memberService = inject(MemberService);
-  private _researchLinesService = inject(ResearchLinesService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private memberService = inject(MemberService);
+  private researchLinesService = inject(ResearchLinesService);
   lookup = inject(LookupService);
-  private _projectService = inject(ProjectService);
+  private projectService = inject(ProjectService);
   dialog = inject(MatDialog);
-  private _tabState = inject(TabStateService);
+  private tabState = inject(TabStateService);
 
   edit = true;
   terminado = false;
@@ -134,8 +134,8 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   loadProject(): void {
-    const id = Number(this._route.snapshot.params["id"]);
-    this._projectService.getProject(id).subscribe((result: Project) => {
+    const id = Number(this.route.snapshot.params["id"]);
+    this.projectService.getProject(id).subscribe((result: Project) => {
       if (result) {
         const d = new Date(result.startDate ?? new Date());
         d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
@@ -165,7 +165,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   loadResearchLines(): void {
-    this._researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
+    this.researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
       if (result) {
         this.researchLines = result;
         this.loadMembers();
@@ -174,7 +174,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   loadMembers(): void {
-    this._memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
       if (result) {
         result.sort((a, b) => a.firstName.localeCompare(b.firstName));
         this.memberOptions = result.map((m) => ({
@@ -186,7 +186,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   loadProjectMembers(projectId: number): void {
-    this._projectService.getProjectMembers(projectId).subscribe((members) => {
+    this.projectService.getProjectMembers(projectId).subscribe((members) => {
       const rows = members as { memberId: number; name: string }[];
       this.originalMemberIds = rows.map((r) => r.memberId);
       if (rows.length > 0) {
@@ -254,12 +254,12 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   return(): void {
-    this._tabState.projectTab.set(0);
-    this._router.navigate(["dashboard/proyectos-ejecucion"]);
+    this.tabState.projectTab.set(0);
+    this.router.navigate(["dashboard/proyectos-ejecucion"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -269,33 +269,16 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   submitProyecto(): void {
     if (!this.proyectoForm.valid) return;
 
-    const startDate = new Date(this.proyecto.startDateObj ?? new Date()).toLocaleDateString("sv");
-    const endDate = this.proyecto.endDateObj ? new Date(this.proyecto.endDateObj).toLocaleDateString("sv") : undefined;
-
-    const body: ProjectBody = {
-      title: this.proyecto.title,
-      titleEN: this.proyecto.titleEN ?? undefined,
-      code: this.proyecto.code,
-      fundedAmount: this.proyecto.fundedAmount,
-      description: this.proyecto.description,
-      descriptionEN: this.proyecto.descriptionEN ?? undefined,
-      startDate,
-      endDate,
-      researchLineId: this.proyecto.researchLineId,
-      currencyId: this.proyecto.currencyId,
-      fundingSourceId: this.proyecto.fundingSourceId,
-    };
-
-    this._projectService.updateProject(this.proyecto.id, body).subscribe((res) => {
+    this.projectService.updateProject(this.proyecto.id, this.buildProjectBody()).subscribe((res) => {
       if (res.status === 1) {
         const newMemberIds = this.miembrosProyecto.filter((r) => r.memberId != null).map((r) => r.memberId as number);
         const toRemove = this.originalMemberIds.filter((id) => !newMemberIds.includes(id));
         const toAdd = newMemberIds.filter((id) => !this.originalMemberIds.includes(id));
         for (const memberId of toRemove) {
-          this._projectService.removeProjectMember(this.proyecto.id, memberId).subscribe(() => {});
+          this.projectService.removeProjectMember(this.proyecto.id, memberId).subscribe();
         }
         for (const memberId of toAdd) {
-          this._projectService.addProjectMember(this.proyecto.id, memberId).subscribe(() => {});
+          this.projectService.addProjectMember(this.proyecto.id, memberId).subscribe();
         }
         this.proyectoForm.markAsPristine();
         this.return();
@@ -306,33 +289,19 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
 
   projectEnd(): void {
     const newStatus = this.proyecto.status === 1 ? 0 : 1;
-    const startDate = new Date(this.proyecto.startDateObj ?? new Date()).toLocaleDateString("sv");
-    const endDate = this.proyecto.endDateObj ? new Date(this.proyecto.endDateObj).toLocaleDateString("sv") : undefined;
-    const body: ProjectBody = {
-      title: this.proyecto.title,
-      titleEN: this.proyecto.titleEN ?? undefined,
-      code: this.proyecto.code,
-      fundedAmount: this.proyecto.fundedAmount,
-      description: this.proyecto.description,
-      descriptionEN: this.proyecto.descriptionEN ?? undefined,
-      startDate,
-      endDate,
-      researchLineId: this.proyecto.researchLineId,
-      currencyId: this.proyecto.currencyId,
-      fundingSourceId: this.proyecto.fundingSourceId,
-      status: newStatus,
-    };
-    this._projectService.updateProject(this.proyecto.id, body).subscribe((result) => {
-      if (result.status === 1) {
-        this.proyectoForm.markAsPristine();
-        this.return();
-        this.openSnackBar(newStatus === 0 ? "Proyecto concluido exitosamente" : "Proyecto reactivado exitosamente");
-      }
-    });
+    this.projectService
+      .updateProject(this.proyecto.id, this.buildProjectBody({ status: newStatus }))
+      .subscribe((result) => {
+        if (result.status === 1) {
+          this.proyectoForm.markAsPristine();
+          this.return();
+          this.openSnackBar(newStatus === 0 ? "Proyecto concluido exitosamente" : "Proyecto reactivado exitosamente");
+        }
+      });
   }
 
   eraseProject(): void {
-    this._projectService.deleteProject(this.proyecto.id).subscribe((result) => {
+    this.projectService.deleteProject(this.proyecto.id).subscribe((result) => {
       if (result.status === 1) {
         this.proyectoForm.markAsPristine();
         this.return();
@@ -361,6 +330,27 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
         this.eraseProject();
       }
     });
+  }
+
+  private buildProjectBody(extra: Partial<ProjectBody> = {}): ProjectBody {
+    return {
+      title: this.proyecto.title,
+      titleEN: this.proyecto.titleEN ?? undefined,
+      code: this.proyecto.code,
+      fundedAmount: this.proyecto.fundedAmount,
+      description: this.proyecto.description,
+      descriptionEN: this.proyecto.descriptionEN ?? undefined,
+      startDate: this.toIsoDate(this.proyecto.startDateObj),
+      endDate: this.proyecto.endDateObj ? this.toIsoDate(this.proyecto.endDateObj) : undefined,
+      researchLineId: this.proyecto.researchLineId,
+      currencyId: this.proyecto.currencyId,
+      fundingSourceId: this.proyecto.fundingSourceId,
+      ...extra,
+    };
+  }
+
+  private toIsoDate(value: Date | undefined): string {
+    return new Date(value ?? new Date()).toLocaleDateString("sv");
   }
 }
 

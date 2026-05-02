@@ -29,15 +29,15 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class EditUniversidadComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _refService = inject(RefService);
+  private snackBar = inject(MatSnackBar);
+  private refService = inject(RefService);
   private lookup = inject(LookupService);
-  private _publicationService = inject(PublicationService);
+  private publicationService = inject(PublicationService);
 
-  universidad: UniversityItem = { id: 0, name: null, nameEN: null };
+  universidad: UniversityItem = { id: 0, name: "", nameEN: "" };
   public universidadForm: FormGroup;
   button_text = "Actualizar universidad";
   edit = true;
@@ -59,27 +59,27 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   }
 
   getUniversidad(): void {
-    const id = Number(this._route.snapshot.params["id"] ?? 0);
+    const id = Number(this.route.snapshot.params["id"] ?? 0);
     const found = this.lookup.universities().find((u) => u.id === id);
     if (found) {
       this.universidad = { id: found.id, name: found.name, nameEN: found.nameEN };
-      localStorage.setItem("universidadEdit", JSON.stringify(found.name ?? ""));
+      localStorage.setItem("universidadEdit", JSON.stringify(found.name));
       this.checkCanDelete(id);
     }
   }
 
   checkCanDelete(id: number): void {
-    this._publicationService.listAdminPublications().subscribe((pubs) => {
+    this.publicationService.listAdminPublications().subscribe((pubs) => {
       this.notCanDo = pubs.filter((p) => p.universityId === id).length === 0;
     });
   }
 
   submitUniversidad(): void {
     if (!this.universidadForm.valid) return;
-    this._refService
+    this.refService
       .updateUniversity(this.universidad.id, {
-        name: this.universidad.name ?? "",
-        nameEN: this.universidad.nameEN ?? undefined,
+        name: this.universidad.name,
+        nameEN: this.universidad.nameEN,
       })
       .subscribe((result) => {
         if (result.status === 1) {
@@ -91,11 +91,11 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   }
 
   return(): void {
-    this._router.navigate(["dashboard/tesis"]);
+    this.router.navigate(["dashboard/tesis"]);
   }
 
   openSnackBar(value: string): void {
-    this._snackBar.open(value, undefined, {
+    this.snackBar.open(value, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
@@ -125,7 +125,7 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   }
 
   eraseUniversidad(): void {
-    this._refService.deleteUniversity(this.universidad.id).subscribe((result) => {
+    this.refService.deleteUniversity(this.universidad.id).subscribe((result) => {
       if (result.status === 1) {
         this.universidadForm.markAsPristine();
         this.return();

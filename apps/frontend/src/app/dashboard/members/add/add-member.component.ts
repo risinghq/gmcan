@@ -43,10 +43,10 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  private _memberService = inject(MemberService);
+  private memberService = inject(MemberService);
   lookup = inject(LookupService);
-  private _snackBar = inject(MatSnackBar);
-  _router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
   dialog = inject(MatDialog);
 
   public memberForm: FormGroup;
@@ -134,11 +134,11 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
         status = 1;
       }
 
-      this._memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
+      this.memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
         const list = result as unknown[];
         if (list.length === 0) {
           if (this.password === this.memberForm.controls["confirmPassword"].value) {
-            this._memberService
+            this.memberService
               .createMember({
                 dni: this.member.dni,
                 email: this.member.email,
@@ -158,7 +158,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
               .subscribe((res) => {
                 if (res.id) {
                   if (this.fileData) {
-                    this._memberService.uploadPhoto(res.id, this.fileData).subscribe(() => {});
+                    this.memberService.uploadPhoto(res.id, this.fileData).subscribe();
                   }
                   this.openSnackBar("Miembro agregado exitosamente");
                   this.memberForm.markAsPristine();
@@ -179,7 +179,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   openSnackBar(text: string, panel: string = ""): void {
-    this._snackBar.open(text, undefined, {
+    this.snackBar.open(text, undefined, {
       panelClass: panel ? panel : undefined,
       duration: 2000,
       horizontalPosition: "right",
@@ -207,7 +207,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   return() {
-    this._router.navigate(["dashboard/miembros-activos"]);
+    this.router.navigate(["dashboard/miembros-activos"]);
   }
 
   openEraser() {}

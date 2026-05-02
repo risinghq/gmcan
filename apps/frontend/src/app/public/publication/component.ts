@@ -7,6 +7,7 @@ import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
@@ -41,14 +42,14 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
   ],
 })
 export default class PublicationComponent implements OnInit {
-  private readonly _fb = inject(FormBuilder);
-  private readonly _navigationHistory = inject(NavigationHistoryService);
-  private readonly _previousService = inject(PreviousPageService);
-  private readonly _route = inject(ActivatedRoute);
-  private readonly _router = inject(Router);
-  private readonly _session = inject(SessionService);
-  private readonly _browser = inject(BrowserService);
-  private readonly _titleService = inject(Title);
+  private readonly fb = inject(FormBuilder);
+  private readonly navigationHistory = inject(NavigationHistoryService);
+  private readonly previousService = inject(PreviousPageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly session = inject(SessionService);
+  private readonly browser = inject(BrowserService);
+  private readonly titleService = inject(Title);
 
   previouslink: string | null = null;
   previouspage = "";
@@ -67,22 +68,22 @@ export default class PublicationComponent implements OnInit {
   ];
   url = GLOBAL.url;
   infoText = "";
-  language: any = {};
+  language: (typeof Languages)[number] = Languages[0];
   expandedKey: string | null = null;
   page = 1;
   pageSize = 5;
 
   constructor() {
-    this.searchForm = this._fb.group({
+    this.searchForm = this.fb.group({
       titulo: [""],
     });
   }
 
   ngOnInit(): void {
-    this.language = this._session.language();
-    this._titleService.setTitle("GMCAN | " + this.language.publications);
+    this.language = this.session.language();
+    this.titleService.setTitle("GMCAN | " + this.language.publications);
 
-    const pubData = this._route.snapshot.data["publications"] as PublicationViewModel;
+    const pubData = this.route.snapshot.data["publications"] as PublicationViewModel;
     this.allArticulos = pubData.articulos;
     this.allTesis = pubData.tesis;
     this.allResumenes = pubData.resumenes;
@@ -91,29 +92,17 @@ export default class PublicationComponent implements OnInit {
     this.allCharged = true;
     this.cargado = true;
 
-    this.previouslink = this._navigationHistory.previousUrl();
-    this.previouspage = this._previousService.getPreviousPage(this.previouslink ?? "");
+    this.previouslink = this.navigationHistory.previousUrl();
+    this.previouspage = this.previousService.getPreviousPage(this.previouslink ?? "");
+    this.syncTabLabels();
   }
 
   ngDoCheck(): void {
-    if (this.language?.publicationsText?.[0]) {
-      this.tabLabels[0] = {
-        label: this.language.publicationsText[0].nameTab1,
-        search: this.language.publicationsText[0].search1,
-      };
-      this.tabLabels[1] = {
-        label: this.language.publicationsText[0].nameTab2,
-        search: this.language.publicationsText[0].search2,
-      };
-      this.tabLabels[2] = {
-        label: this.language.publicationsText[0].nameTab3,
-        search: this.language.publicationsText[0].search3,
-      };
-    }
+    this.syncTabLabels();
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 
   changeTab($event: { index: number }): void {
@@ -154,6 +143,19 @@ export default class PublicationComponent implements OnInit {
 
   profile(autor: { memberId?: number }): void {
     if (!autor.memberId) return;
-    this._router.navigate(["/home/detail-member/" + autor.memberId]);
+    this.router.navigate(["/home/detail-member/" + autor.memberId]);
+  }
+
+  private syncTabLabels(): void {
+    const publicationsText = this.language.publicationsText?.[0];
+    if (!publicationsText) {
+      return;
+    }
+
+    this.tabLabels = [
+      { label: publicationsText.nameTab1, search: publicationsText.search1 },
+      { label: publicationsText.nameTab2, search: publicationsText.search2 },
+      { label: publicationsText.nameTab3, search: publicationsText.search3 },
+    ];
   }
 }

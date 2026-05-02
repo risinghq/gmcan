@@ -10,6 +10,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { parseLocalDate } from "@app/shared/utils/date";
 import { forkJoin } from "rxjs";
 
 type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
@@ -21,14 +22,14 @@ type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; 
   imports: [SlicePipe],
 })
 export default class NewsComponent implements OnInit {
-  _newsService = inject(NewsService);
-  _memberService = inject(MemberService);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  newsService = inject(NewsService);
+  memberService = inject(MemberService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   lookup = inject(LookupService);
-  private _browser = inject(BrowserService);
-  private _navigationHistory = inject(NavigationHistoryService);
-  private _session = inject(SessionService);
+  private browser = inject(BrowserService);
+  private navigationHistory = inject(NavigationHistoryService);
+  private session = inject(SessionService);
 
   public noticias: NewsDisplay[] = [];
   public noticiaPrincipal: NewsDisplay | null = null;
@@ -41,8 +42,9 @@ export default class NewsComponent implements OnInit {
   numberShown = 5;
 
   @HostListener("window:resize", ["$event"])
-  onResize(_event: Event): void {
-    this.numberShown = this._browser.innerWidth() >= 1300 ? 10 : 5;
+  onResize(event: Event): void {
+    void event;
+    this.numberShown = this.browser.innerWidth() >= 1300 ? 10 : 5;
   }
 
   public title = "";
@@ -50,23 +52,23 @@ export default class NewsComponent implements OnInit {
   language: any = {};
 
   ngOnInit(): void {
-    this.language = this._session.language();
-    this.numberShown = this._browser.innerWidth() >= 1300 ? 10 : 5;
-    this.idNoticiaE = Number(this._route.snapshot.params["id"]) || 0;
+    this.language = this.session.language();
+    this.numberShown = this.browser.innerWidth() >= 1300 ? 10 : 5;
+    this.idNoticiaE = Number(this.route.snapshot.params["id"]) || 0;
     this.loadNoticias();
   }
 
   ngDoCheck(): void {
     this.title = this.language.news;
-    if (this._router.url.includes("/detail-news")) {
+    if (this.router.url.includes("/detail-news")) {
       this.title = this.language.moreNews;
     }
   }
 
   loadNoticias(): void {
     forkJoin({
-      news: this._newsService.listNews(),
-      members: this._memberService.listMembers(),
+      news: this.newsService.listNews(),
+      members: this.memberService.listMembers(),
     }).subscribe(({ news, members }) => {
       const membersMap = new Map((members as Member[]).map((m) => [m.id, m]));
       const newsTypesMap = new Map(this.lookup.newsTypes().map((t) => [t.id, t]));
@@ -74,19 +76,17 @@ export default class NewsComponent implements OnInit {
       const enriched = (news as News[])
         .filter((n) => n.status !== 0 && n.id !== this.idNoticiaE)
         .toSorted((a, b) => {
-          const left = new Date(a.publishedAt ?? "").getTime();
-          const right = new Date(b.publishedAt ?? "").getTime();
+          const left = parseLocalDate(a.publishedAt)?.getTime() ?? 0;
+          const right = parseLocalDate(b.publishedAt)?.getTime() ?? 0;
           return right - left;
         })
         .map((n): NewsDisplay => {
-          const d = new Date(n.publishedAt ?? "");
-          if (String(d) !== "Invalid Date") {
-            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          }
-          const fechaFormateada =
-            String(d) === "Invalid Date"
-              ? ""
-              : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
+          const publishedAtDate = parseLocalDate(n.publishedAt);
+          const fechaFormateada = !publishedAtDate
+            ? ""
+            : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(
+                publishedAtDate,
+              ) ?? "");
 
           const newsType = n.newsTypeId ? newsTypesMap.get(n.newsTypeId) : undefined;
           const member = n.authorId ? membersMap.get(n.authorId) : undefined;
@@ -105,11 +105,11 @@ export default class NewsComponent implements OnInit {
   }
 
   detalleNoticia(noticia: NewsDisplay): void {
-    this._router.navigate(["/home/detail-news/" + noticia.id]);
+    this.router.navigate(["/home/detail-news/" + noticia.id]);
     this.scroll();
   }
 
   scroll(): void {
-    this._browser.scrollIntoViewById("main-toolbar");
+    this.browser.scrollIntoViewById("main-toolbar");
   }
 }

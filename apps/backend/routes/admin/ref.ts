@@ -112,8 +112,8 @@ router.route(
   "/university",
   crudRouter(
     "university",
-    z.object({ name: z.string().optional(), nameEN: z.string().optional() }),
-    z.object({ name: z.string().optional(), nameEN: z.string().optional() }),
+    z.object({ name: z.string().min(1), nameEN: z.string().min(1) }),
+    z.object({ name: z.string().min(1), nameEN: z.string().min(1) }),
   ),
 );
 

@@ -5,52 +5,46 @@ import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import { parseLocalDate, requireLocalDate } from "@app/shared/utils/date";
 import { firstValueFrom } from "rxjs";
 
 import type { ProjectDisplay, ProjectsViewModel } from "./types";
 
 @Injectable({ providedIn: "root" })
 export class ProjectsDataService {
-  private readonly _projectService = inject(ProjectService);
-  private readonly _researchLinesService = inject(ResearchLinesService);
-  private readonly _groupService = inject(GroupService);
-  private readonly _lookup = inject(LookupService);
-  private readonly _datePipe = inject(DatePipe);
-  private readonly _titlecasePipe = inject(TitleCasePipe);
+  private readonly projectService = inject(ProjectService);
+  private readonly researchLinesService = inject(ResearchLinesService);
+  private readonly groupService = inject(GroupService);
+  private readonly lookup = inject(LookupService);
+  private readonly datePipe = inject(DatePipe);
+  private readonly titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<ProjectsViewModel> {
     const [projectsRaw, lineasRaw, group] = await Promise.all([
-      firstValueFrom(this._projectService.listProjects()),
-      firstValueFrom(this._researchLinesService.list()),
-      firstValueFrom(this._groupService.getGroup()),
+      firstValueFrom(this.projectService.listProjects()),
+      firstValueFrom(this.researchLinesService.list()),
+      firstValueFrom(this.groupService.getGroup()),
     ]);
 
     const projects = Array.isArray(projectsRaw) ? projectsRaw : [];
     const lineas = Array.isArray(lineasRaw) ? lineasRaw : [];
 
     const lineasMap = new Map(lineas.map((l) => [l.id, l]));
-    const fuentesMap = new Map(this._lookup.fundingSources().map((f) => [f.id, f]));
-    const monedasMap = new Map(this._lookup.monedas().map((m) => [m.idMoneda, m]));
+    const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.id, f]));
+    const monedasMap = new Map(this.lookup.monedas().map((m) => [m.idMoneda, m]));
 
     const enrich = (p: ProjectWithMembers): ProjectDisplay => {
-      const startDate = new Date(p.startDate ?? "");
-      if (String(startDate) !== "Invalid Date") {
-        startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
-      }
+      const startDate = requireLocalDate(p.startDate, "project.startDate");
       let fechaF: string | undefined;
       if (p.endDate) {
-        const end = new Date(p.endDate);
-        if (String(end) !== "Invalid Date") {
-          end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
-          fechaF = this._titlecasePipe.transform(this._datePipe.transform(end, "MMMM, y", "es") ?? "") ?? undefined;
-        }
+        const endDate = parseLocalDate(p.endDate);
+        fechaF = endDate
+          ? (this.titlecasePipe.transform(this.datePipe.transform(endDate, "MMMM, y", "es") ?? "") ?? undefined)
+          : undefined;
       }
       return {
         ...p,
-        fechaI:
-          String(startDate) === "Invalid Date"
-            ? ""
-            : (this._titlecasePipe.transform(this._datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? ""),
+        fechaI: this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? "",
         fechaF,
         lineasInvestigacion: lineasMap.get(p.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(p.fundingSourceId)?.name,

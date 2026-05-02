@@ -17,13 +17,13 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class AddUniversidadComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
-  _route = inject(ActivatedRoute);
-  _router = inject(Router);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
   dialog = inject(MatDialog);
-  private _snackBar = inject(MatSnackBar);
-  private _refService = inject(RefService);
+  private snackBar = inject(MatSnackBar);
+  private refService = inject(RefService);
 
-  universidad: UniversityItem = { id: 0, name: null, nameEN: null };
+  universidad: UniversityItem = { id: 0, name: "", nameEN: "" };
   public universidadForm: FormGroup;
   button_text = "Guardar universidad";
   notCanDo = false;
@@ -44,8 +44,8 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
 
   submitUniversidad(): void {
     if (!this.universidadForm.valid) return;
-    this._refService
-      .createUniversity({ name: this.universidad.name ?? "", nameEN: this.universidad.nameEN ?? undefined })
+    this.refService
+      .createUniversity({ name: this.universidad.name, nameEN: this.universidad.nameEN })
       .subscribe((result) => {
         if (result.id) {
           this.universidadForm.markAsPristine();
@@ -56,11 +56,11 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   }
 
   return(): void {
-    this._router.navigate(["dashboard/tesis"]);
+    this.router.navigate(["dashboard/tesis"]);
   }
 
   openSnackBar(msg = "Universidad agregada exitosamente"): void {
-    this._snackBar.open(msg, undefined, {
+    this.snackBar.open(msg, undefined, {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
