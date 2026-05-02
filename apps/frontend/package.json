@@ -21,7 +21,10 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
+    "test:ci": "ng test --watch=false --no-progress",
     "lint": "oxlint",
+    "typecheck": "bun x tsc -p tsconfig.app.json --noEmit",
+    "check": "bun run lint && bun run typecheck && bun run test:ci",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
   },

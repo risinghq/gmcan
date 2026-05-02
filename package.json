@@ -15,6 +15,9 @@
     "build:backend": "bun --filter backend build",
     "test": "bun --filter './apps/*' test",
     "lint": "oxlint .",
+    "typecheck": "bun run --filter frontend typecheck && bun run --filter backend typecheck",
+    "check:test": "bun run --filter frontend test:ci",
+    "check": "bun run lint && bun run typecheck && bun run check:test",
     "format": "oxfmt .",
     "format:check": "oxfmt --check ."
   },

@@ -23,6 +23,8 @@
     "dev": "bun run --env-file=../../.env --hot server.ts",
     "start": "bun --env-file=../../.env server.ts",
     "lint": "oxlint",
+    "typecheck": "bun x tsc -p tsconfig.json --noEmit",
+    "check": "bun run lint && bun run typecheck",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
   },
