@@ -10,6 +10,7 @@ import {
   getNewsItem,
   getNewsPhoto,
   listNews,
+  type NewsUpsertInput,
   setNewsPhoto,
   updateNews,
 } from "../../services/news.service.js";
@@ -19,16 +20,16 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const NEWS_FILE = { directory: "news", kind: "image" } as const;
 
 const NewsBody = z.object({
-  title: z.string().optional(),
-  titleEN: z.string().optional(),
-  summary: z.string().optional(),
-  summaryEN: z.string().optional(),
-  body: z.string().optional(),
-  bodyEN: z.string().optional(),
-  status: z.number().int().optional(),
+  title: z.string().trim().min(1),
+  titleEN: z.string().trim().min(1),
+  summary: z.string().trim().min(1),
+  summaryEN: z.string().trim().min(1),
+  body: z.string().trim().min(1),
+  bodyEN: z.string().trim().min(1),
+  status: z.number().int(),
   publishedAt: z.string().optional(),
-  authorId: z.number().int().optional(),
-  newsTypeId: z.number().int().optional(),
+  authorId: z.number().int(),
+  newsTypeId: z.number().int(),
   priority: z.number().int().optional(),
 });
 
@@ -45,14 +46,14 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 });
 
 router.post("/", zValidator("json", NewsBody), async (c) => {
-  const data = c.req.valid("json");
+  const data: NewsUpsertInput = c.req.valid("json");
   const id = await createNews(data);
   return c.json({ id }, 201);
 });
 
 router.put("/:id", zValidator("param", IdParam), zValidator("json", NewsBody), async (c) => {
   const { id } = c.req.valid("param");
-  const data = c.req.valid("json");
+  const data: NewsUpsertInput = c.req.valid("json");
   await updateNews(id, data);
   return c.json({ status: 1 });
 });

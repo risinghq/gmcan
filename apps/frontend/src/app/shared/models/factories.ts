@@ -44,7 +44,7 @@ export function createNews(): News {
     publishedAt: "",
     photo: null,
     priority: 0,
-    authorId: null,
+    authorId: 0,
     newsTypeId: 0,
     updatedAt: null,
     createdAt: null,

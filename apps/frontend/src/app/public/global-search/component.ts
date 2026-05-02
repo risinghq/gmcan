@@ -174,8 +174,10 @@ export default class GlobalSearchComponent implements OnInit {
     this.browser.scrollIntoViewById("main-toolbar");
   }
 
-  profile(member: MemberDisplay): void {
-    this.router.navigate(["/home/detail-member/" + member.id]);
+  profile(member: { id?: number; memberId?: number }): void {
+    const id = member.id ?? member.memberId;
+    if (!id) return;
+    this.router.navigate(["/home/detail-member/" + id]);
   }
 
   detalleNoticia(noticia: { id: number }): void {

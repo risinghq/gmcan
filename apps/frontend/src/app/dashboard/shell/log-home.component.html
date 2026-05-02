@@ -184,15 +184,15 @@
         <div class="publish-news" [hidden]="!noticiaPublicada">Noticia Publicada</div>
       </div>
       <div class="right user-div flex-news">
-        <div class="user-img" [hidden]="!user.foto">
-          <img class="img-css" src="{{ url + 'usuario/' + user.DNI + '/file }}" />
+        <div class="user-img" [hidden]="!user?.photo">
+          <img class="img-css" src="{{ url + 'api/members/' + user?.id + '/photo' }}" />
         </div>
         <div class="ml-16">
           <div class="user-name">
-            {{ user.nombreCompleto }}
+            {{ userDisplayName }}
           </div>
           <div class="user-email">
-            {{ user.correo }}
+            {{ user?.email }}
           </div>
         </div>
         <div class="ml-24">

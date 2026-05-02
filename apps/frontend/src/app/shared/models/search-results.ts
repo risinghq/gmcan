@@ -35,11 +35,11 @@ export interface SearchResults {
   }[];
   news: {
     id: number;
-    title: string | null;
-    publishedAt: string | null;
+    title: string;
+    publishedAt: string;
     photo: string | null;
-    newsTypeId: number | null;
-    status: number | null;
+    newsTypeId: number;
+    status: number;
     authorName: string;
   }[];
   projects: {

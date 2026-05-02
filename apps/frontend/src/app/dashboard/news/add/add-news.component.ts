@@ -28,11 +28,13 @@ import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
-import { NewsService, type NewsBody } from "@app/shared/services/news.service";
+import { NewsService } from "@app/shared/services/news.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { ClassicEditor } from "ckeditor5";
 import { AutosizeModule } from "ngx-autosize";
+
+import { toNewsUpsertBody } from "../flow/news-payload";
 
 interface NewsPreviewData {
   language: number;
@@ -137,18 +139,8 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
 
   publish(status: number): void {
     const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : undefined;
-    const body: NewsBody = {
-      title: this.noticia.title ?? undefined,
-      titleEN: this.noticia.titleEN ?? undefined,
-      summary: this.noticia.summary ?? undefined,
-      summaryEN: this.noticia.summaryEN ?? undefined,
-      body: this.noticia.body ?? undefined,
-      bodyEN: this.noticia.bodyEN ?? undefined,
-      status,
-      publishedAt,
-      authorId: this.noticia.authorId ?? undefined,
-      newsTypeId: this.noticia.newsTypeId ?? undefined,
-    };
+    const body = toNewsUpsertBody(this.noticia, status, publishedAt);
+    if (!body) return;
     this.newsService.createNews(body).subscribe((result) => {
       if (result.id) {
         if (this.fileData) {

@@ -1,23 +1,23 @@
 <div class="card-detail scroll">
   <div class="news-title-div">
-    @if (noticia.foto) {
-    <img class="detail-img" src="{{noticia.foto}}" />
+    @if (noticia.photo) {
+    <img class="detail-img" src="{{noticia.photo}}" />
     }
-    <div class="news-title">{{noticia.titulo}}</div>
+    <div class="news-title">{{noticia.title}}</div>
   </div>
   <div class="detail-text-div">
-    <div class="news-abstract">{{noticia.resumen}}</div>
+    <div class="news-abstract">{{noticia.summary}}</div>
     <div class="flex-news other-div"></div>
     <div class="autor-div">
       <div class="autor-img-div">
-        @if (noticia.usuario.foto) {
-        <img class="autor-img" src="{{noticia.usuario.foto}}" />
+        @if (noticia.author?.photo) {
+        <img class="autor-img" src="{{noticia.author?.photo}}" />
         }
       </div>
       <div class="autor-text">
-        <div class="news-type">{{noticia.nombreTipoNoticia}}</div>
+        <div class="news-type">{{noticia.newsTypeName}}</div>
         <div class="autor-name">
-          {{noticia.usuario.nombre}} {{noticia.usuario.apellidoPaterno}} {{noticia.usuario.apellidoMaterno}}
+          {{noticia.author?.firstName}} {{noticia.author?.lastName}} {{noticia.author?.maternalName}}
         </div>
         <div class="news-date">
           {{language?.detailNewsText?.[0]?.written1}} {{dia}} {{language?.detailNewsText?.[0]?.written2}} {{mes}}

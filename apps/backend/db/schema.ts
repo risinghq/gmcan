@@ -208,20 +208,20 @@ export interface AboutTable {
 
 export interface NewsTable {
   id: Generated<number>;
-  title: string | null;
-  titleEN: string | null;
-  summary: string | null;
-  summaryEN: string | null;
-  body: string | null;
-  bodyEN: string | null;
-  status: number | null;
-  publishedAt: DateString | null;
+  title: string;
+  titleEN: string;
+  summary: string;
+  summaryEN: string;
+  body: string;
+  bodyEN: string;
+  status: number;
+  publishedAt: DateString;
   updatedAt: DateString | null;
   createdAt: DateString | null;
   photo: string | null;
   priority: number | null;
-  authorId: number | null;
-  newsTypeId: number | null;
+  authorId: number;
+  newsTypeId: number;
 }
 
 export interface PublicationTable {
