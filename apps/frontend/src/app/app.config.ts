@@ -14,8 +14,8 @@ import {
 } from "@angular/core";
 import { provideClientHydration, withEventReplay } from "@angular/platform-browser";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
-import { provideRouter, withComponentInputBinding } from "@angular/router";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
+import { provideRouter, TitleStrategy, withComponentInputBinding } from "@angular/router";
+import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
@@ -39,13 +39,11 @@ export const appConfig: ApplicationConfig = {
     DatePipe,
     TitleCasePipe,
     provideAppInitializer(() => inject(SessionService).init()),
-    provideAppInitializer(() => {
-      inject(NavigationHistoryService);
-    }),
     {
       provide: LOCALE_ID,
       deps: [SessionService],
       useFactory: (session: SessionService) => session.locale,
     },
+    { provide: TitleStrategy, useClass: AppTitleStrategy },
   ],
 };

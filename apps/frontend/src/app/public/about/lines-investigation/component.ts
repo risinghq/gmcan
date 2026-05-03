@@ -115,7 +115,7 @@ export default class LinesInvestigationComponent implements OnInit {
   }
 
   profile(member: { memberId: number }): void {
-    this.router.navigate(["/home/detail-member/" + member.memberId]);
+    this.router.navigate(["/home/detail-member/" + member.memberId], { queryParams: { from: "about" } });
   }
 
   private enrichProject(

@@ -59,7 +59,6 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
     this.refService.getFundingSource(idFuente).subscribe((result) => {
       if (result) {
         this.fuente = result;
-        localStorage.setItem("fuenteEdit", JSON.stringify(result.name ?? ""));
         this.checkCanDelete(result.id);
       }
     });

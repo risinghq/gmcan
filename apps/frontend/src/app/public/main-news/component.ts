@@ -152,7 +152,7 @@ export default class MainNewsComponent implements OnInit {
   }
 
   detalleNoticia(noticia: NewsDisplay): void {
-    this.router.navigate(["/home/detail-news/" + noticia.id]);
+    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: "news" } });
     this.scroll();
   }
 

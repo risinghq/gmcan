@@ -23,7 +23,6 @@ import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { PublicationService } from "@app/shared/services/publication.service";
-import { SessionService } from "@app/shared/services/session.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { requireLocalDate } from "@app/shared/utils/date";
 
@@ -56,7 +55,6 @@ export default class EventosComponent implements OnInit {
   private publicationService = inject(PublicationService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
-  private session = inject(SessionService);
   private tabState = inject(TabStateService);
 
   eventos: EventItem[] = [];
@@ -142,13 +140,11 @@ export default class EventosComponent implements OnInit {
   }
 
   addResumen(): void {
-    this.session.setResumenBack("eventos");
-    this.router.navigate(["dashboard/add-resumen"]);
+    this.router.navigate(["dashboard/add-resumen"], { queryParams: { returnTo: "eventos" } });
   }
 
   editResumen(id: number): void {
-    this.session.setResumenBack("eventos");
-    this.router.navigate(["dashboard/edit-resumen/" + id]);
+    this.router.navigate(["dashboard/edit-resumen/" + id], { queryParams: { returnTo: "eventos" } });
   }
 
   addEvento(): void {

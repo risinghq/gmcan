@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "../../db/client.js";
+import { requirePermission } from "../../middleware/authz.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -13,6 +14,11 @@ const EventBody = z.object({
   country: z.string().optional(),
   cityEN: z.string().optional(),
   countryEN: z.string().optional(),
+});
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("publications.read")(c, next);
+  return requirePermission("publications.write")(c, next);
 });
 
 router.get("/", async (c) => {

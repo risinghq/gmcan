@@ -10,7 +10,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import {
   attachFilter,
   buildCoAuthorSaveList,
@@ -18,15 +18,14 @@ import {
   filterAuthors,
   newAuthorRow,
 } from "@app/dashboard/publications/flow/authors";
-import { RESUMEN_BACK_FALLBACK } from "@app/dashboard/publications/flow/back-nav";
 import { buildResumenPayload } from "@app/dashboard/publications/flow/publication-payload";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
-import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
@@ -58,13 +57,13 @@ import { startWith, map } from "rxjs/operators";
 })
 export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private publicationService = inject(PublicationService);
   private memberService = inject(MemberService);
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private eventService = inject(EventService);
-  private session = inject(SessionService);
 
   publicacion: PublicationFields & { publishedAtDate?: Date };
   public publicacionForm: FormGroup;
@@ -202,7 +201,8 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/" + (this.session.getResumenBack() || RESUMEN_BACK_FALLBACK)]);
+    const returnTo = resolveReturnTo(this.route, ["eventos", "my-abstracts"], "my-abstracts");
+    this.router.navigate(["dashboard/" + returnTo]);
   }
 
   openSnackBar(): void {

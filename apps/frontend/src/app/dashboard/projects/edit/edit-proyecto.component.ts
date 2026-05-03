@@ -126,42 +126,37 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   ngOnInit(): void {
-    this.loadProject();
+    const resolved = this.route.snapshot.data["project"] as Project;
+    this.bindProject(resolved);
+    this.loadResearchLines();
+    this.loadProjectMembers(resolved.id);
   }
 
   isDirty(): boolean {
     return this.proyectoForm.dirty;
   }
 
-  loadProject(): void {
-    const id = Number(this.route.snapshot.params["id"]);
-    this.projectService.getProject(id).subscribe((result: Project) => {
-      if (result) {
-        const d = new Date(result.startDate ?? new Date());
-        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-        this.proyecto = {
-          ...result,
-          startDateObj: d,
-          endDateObj: result.endDate
-            ? (() => {
-                const e = new Date(result.endDate!);
-                e.setMinutes(e.getMinutes() + e.getTimezoneOffset());
-                return e;
-              })()
-            : undefined,
-        };
-        localStorage.setItem("proyectoEdit", JSON.stringify(result.title ?? ""));
-        if (result.status === 0) {
-          this.terminado = true;
-          this.disableSelect = true;
-          this.button_text2 = "Reactivar proyecto";
-          this.proyectoForm.disable();
-          this.proyectoForm.controls["fechaFin"]?.enable();
-        }
-        this.loadResearchLines();
-        this.loadProjectMembers(id);
-      }
-    });
+  private bindProject(result: Project): void {
+    const d = new Date(result.startDate ?? new Date());
+    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+    this.proyecto = {
+      ...result,
+      startDateObj: d,
+      endDateObj: result.endDate
+        ? (() => {
+            const e = new Date(result.endDate!);
+            e.setMinutes(e.getMinutes() + e.getTimezoneOffset());
+            return e;
+          })()
+        : undefined,
+    };
+    if (result.status === 0) {
+      this.terminado = true;
+      this.disableSelect = true;
+      this.button_text2 = "Reactivar proyecto";
+      this.proyectoForm.disable();
+      this.proyectoForm.controls["fechaFin"]?.enable();
+    }
   }
 
   loadResearchLines(): void {

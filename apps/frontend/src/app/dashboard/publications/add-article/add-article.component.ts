@@ -10,7 +10,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import {
   attachFilter,
   buildCoAuthorSaveList,
@@ -18,12 +18,12 @@ import {
   filterAuthors,
   newAuthorRow,
 } from "@app/dashboard/publications/flow/authors";
-import { ARTICLE_BACK_KEY, resolveBackTarget } from "@app/dashboard/publications/flow/back-nav";
 import { buildArticlePayload } from "@app/dashboard/publications/flow/publication-payload";
 import type { AuthorSearchResult } from "@app/shared/models/author";
 import { createPublication } from "@app/shared/models/factories";
 import type { Publication } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -59,6 +59,7 @@ import { map, startWith } from "rxjs/operators";
 })
 export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private publicationService = inject(PublicationService);
   private memberService = inject(MemberService);
@@ -190,7 +191,8 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/" + resolveBackTarget(ARTICLE_BACK_KEY, "my-articles")]);
+    const returnTo = resolveReturnTo(this.route, ["articulos", "my-articles"], "my-articles");
+    this.router.navigate(["dashboard/" + returnTo]);
   }
 
   openSnackBar(msg = "Publicación agregada exitosamente"): void {

@@ -71,6 +71,6 @@ export default class MembersComponent implements OnInit {
   }
 
   profile(member: MemberDisplay): void {
-    this.router.navigate(["/home/detail-member/" + member.id]);
+    this.router.navigate(["/home/detail-member/" + member.id], { queryParams: { from: "members" } });
   }
 }

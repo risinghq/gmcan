@@ -8,6 +8,7 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 
 @Component({
   selector: "app-root",
@@ -18,6 +19,7 @@ import { SessionService } from "@app/shared/services/session.service";
 export default class AppComponent {
   private groupService = inject(GroupService);
   private session = inject(SessionService);
+  private uiState = inject(UiStateService);
   private browser = inject(BrowserService);
   fb = inject(FormBuilder);
   private router = inject(Router);
@@ -62,7 +64,7 @@ export default class AppComponent {
   getGroupInfo(): void {
     this.groupService.getGroup().subscribe((res: Group) => {
       this.grupoinfo = res;
-      this.session.setGroupInfo(res);
+      this.uiState.setGroupInfo(res);
       this.grupoinfo.logoHeader = this.url + "api/group/files/header";
     });
   }

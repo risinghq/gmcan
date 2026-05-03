@@ -3,17 +3,16 @@ import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
 import type { Publication } from "@app/shared/models/publication";
+import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
-import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
 import {
@@ -49,6 +48,7 @@ type PublicationDisplay = Publication & {
     NgbPaginationNext,
     NewsComponent,
     SlicePipe,
+    RouterLink,
   ],
 })
 export default class DetailMemberComponent implements OnInit {
@@ -58,8 +58,6 @@ export default class DetailMemberComponent implements OnInit {
   private readonly datePipe = inject(DatePipe);
   private readonly memberService = inject(MemberService);
   private readonly lookup = inject(LookupService);
-  private readonly navigationHistory = inject(NavigationHistoryService);
-  private readonly previousService = inject(PreviousPageService);
   private readonly session = inject(SessionService);
   private readonly browser = inject(BrowserService);
   private readonly titleService = inject(Title);
@@ -67,8 +65,8 @@ export default class DetailMemberComponent implements OnInit {
   public usuario: MemberDisplay | null = null;
   public publicaciones: PublicationDisplay[] = [];
   public cargado = false;
-  public previouspage = "";
-  public previouslink: string | null = null;
+  public previouspage = "Inicio";
+  public previouslink = "/home";
   public url: string;
   page = 1;
   pageSize = 5;
@@ -81,8 +79,11 @@ export default class DetailMemberComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    this.previouslink = this.navigationHistory.previousUrl();
-    this.previouspage = this.previousService.getPreviousPage(this.previouslink ?? "");
+    const isEnglish = (this.language.locale ?? "es").startsWith("en");
+    const origin = parsePublicOrigin(this.route);
+    const originInfo = getPublicOriginInfo(origin, isEnglish);
+    this.previouslink = originInfo.route;
+    this.previouspage = originInfo.label;
     this.loadProfile();
   }
 
@@ -162,12 +163,13 @@ export default class DetailMemberComponent implements OnInit {
   }
 
   return(): void {
-    this.router.navigate([this.previouslink ?? "/home"]);
+    this.router.navigateByUrl(this.previouslink);
   }
 
   profile(memberId: number | undefined): void {
     if (!memberId) return;
-    this.router.navigate(["/home/detail-member/" + memberId]);
+    const origin = parsePublicOrigin(this.route);
+    this.router.navigate(["/home/detail-member/" + memberId], { queryParams: { from: origin } });
     this.loadProfile();
   }
 }

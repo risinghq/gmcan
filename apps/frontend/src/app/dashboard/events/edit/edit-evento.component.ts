@@ -61,7 +61,6 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
     this.eventService.get(idEvento).subscribe((result: EventItem) => {
       if (result) {
         this.evento = result;
-        localStorage.setItem("eventoEdit", JSON.stringify(result.name));
         this.checkCanDelete(idEvento);
       }
     });

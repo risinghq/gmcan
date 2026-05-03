@@ -15,7 +15,7 @@ import {
   MatRowDef,
   MatRow,
 } from "@angular/material/table";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { Member } from "@app/shared/models/member";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -51,6 +51,7 @@ export default class MiembrosComponent implements OnInit {
   private memberService = inject(MemberService);
   lookup = inject(LookupService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   displayedColumns: string[] = ["firstName", "lastName", "maternalName", "memberTypeName", "prefixName", "email"];
   miembros: MemberRow[] = [];
@@ -68,12 +69,10 @@ export default class MiembrosComponent implements OnInit {
   readonly matSort = viewChild.required(MatSort);
 
   obtainingValue(): void {
-    if (window.location.href.includes("activos")) {
-      localStorage.setItem("active-member", "1");
+    if ((this.route.snapshot.routeConfig?.path ?? "").includes("activos")) {
       this.getMembers(1);
       this.canAdd = true;
     } else {
-      localStorage.setItem("active-member", "0");
       this.getMembers(0);
       this.getMembers(3);
     }
@@ -117,6 +116,9 @@ export default class MiembrosComponent implements OnInit {
   }
 
   editMember(id: number): void {
-    this.router.navigate(["dashboard/edit-member/" + id]);
+    const returnTo = (this.route.snapshot.routeConfig?.path ?? "").includes("activos")
+      ? "miembros-activos"
+      : "miembros-antiguos";
+    this.router.navigate(["dashboard/edit-member/" + id], { queryParams: { returnTo } });
   }
 }

@@ -67,7 +67,6 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
     this.researchLinesService.get(idLinea).subscribe((linea: ResearchLine) => {
       if (linea) {
         this.lineaInvestigacion = linea;
-        localStorage.setItem("lineaInvestigacionEdit", JSON.stringify(linea.name));
       }
     });
   }

@@ -8,6 +8,7 @@ import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 
 @Component({
   selector: "app-change-pass",
@@ -22,6 +23,7 @@ export default class ChangePassComponent implements OnInit {
   private emailService = inject(EmailService);
   private groupService = inject(GroupService);
   private session = inject(SessionService);
+  private uiState = inject(UiStateService);
 
   public passwordForm: FormGroup;
   public grupoInfo: Group;
@@ -64,7 +66,7 @@ export default class ChangePassComponent implements OnInit {
       next: (group: Group) => {
         this.grupoInfo = group;
         this.grupoInfo.logoHeader = this.url + "api/group/files/header";
-        this.session.setGroupInfo(this.grupoInfo);
+        this.uiState.setGroupInfo(this.grupoInfo);
       },
     });
     this.grupoInfo.logoHeader = this.url + "api/group/files/header";

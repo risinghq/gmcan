@@ -111,38 +111,29 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getUser();
+    this.bindUser(this.route.snapshot.data["member"] as MemberFull);
   }
 
   isDirty(): boolean {
     return this.memberForm.dirty;
   }
 
-  getUser(): void {
-    const id = Number(this.route.snapshot.params["id"] ?? 0);
-    this.memberService.getMemberFull(id).subscribe((result: MemberFull) => {
-      if (result) {
-        this.memberForm.controls["DNI"].disable();
-        this.member = result;
-        this.oldEmail = result.email ?? "";
+  private bindUser(result: MemberFull): void {
+    this.memberForm.controls["DNI"].disable();
+    this.member = result;
+    this.oldEmail = result.email ?? "";
 
-        if (result.birthDate) {
-          this.birthDateObj = parseLocalDate(result.birthDate);
-        }
+    if (result.birthDate) {
+      this.birthDateObj = parseLocalDate(result.birthDate);
+    }
 
-        const fullName =
-          `${result.firstName} ${result.lastName}${result.maternalName ? " " + result.maternalName : ""}`.trim();
-        localStorage.setItem("miembroEdit", JSON.stringify(fullName));
+    if (result.firstName.includes(" ")) {
+      const parts = result.firstName.split(" ");
+      this.member.firstName = parts[0] ?? "";
+      this.segundoNombre = parts.slice(1).join(" ");
+    }
 
-        if (result.firstName.includes(" ")) {
-          const parts = result.firstName.split(" ");
-          this.member.firstName = parts[0] ?? "";
-          this.segundoNombre = parts.slice(1).join(" ");
-        }
-
-        this.memberForm.controls["confirmPassword"].setValue("");
-      }
-    });
+    this.memberForm.controls["confirmPassword"].setValue("");
   }
 
   adHono = 0;
@@ -260,11 +251,11 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    if (localStorage.getItem("active-member") === "1") {
-      this.router.navigate(["dashboard/miembros-activos"]);
-    } else {
-      this.router.navigate(["dashboard/miembros-antiguos"]);
-    }
+    const returnTo =
+      this.route.snapshot.queryParamMap.get("returnTo") === "miembros-antiguos"
+        ? "miembros-antiguos"
+        : "miembros-activos";
+    this.router.navigate(["dashboard/" + returnTo]);
   }
 
   private dialogRef2?: MatDialogRef<DialogCancel5>;

@@ -3,7 +3,7 @@
     <div class="dashboard-card wd-1">
       <div class="dashboard-title">¡Bienvenido al administrador del sistema!</div>
       <div class="dashboard-subtitle">¿Qué deseas hacer?</div>
-      @if (permisos.noticiaPermiso) {
+      @if (authz.can("news.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/noticias">
           <img class="mr-16" src="../../assets/img/iconfinder_newspaper_3890941 1.svg" />
           <div>
@@ -12,7 +12,7 @@
           </div>
         </div>
       }
-      @if (permisos.miembroPermiso) {
+      @if (authz.can("members.read")) {
         <div class="flex-news item clickable" routerLink="/dashboard/miembros-activos">
           <img class="mr-16" src="../../assets/img/members.svg" />
           <div>
@@ -21,7 +21,7 @@
           </div>
         </div>
       }
-      @if (permisos.publicacionPermiso) {
+      @if (authz.can("publications.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/articulos">
           <img class="mr-16" src="../../assets/img/publicaciones.svg" />
           <div>
@@ -30,7 +30,7 @@
           </div>
         </div>
       }
-      @if (permisos.proyectoPermiso) {
+      @if (authz.can("projects.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/proyectos-ejecucion">
           <img class="mr-16" src="../../assets/img/proyectos.svg" />
           <div>
@@ -39,7 +39,7 @@
           </div>
         </div>
       }
-      @if (permisos.contenidoPermiso) {
+      @if (authz.can("content.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/contenidos">
           <img class="mr-16" src="../../assets/img/contenido.svg" />
           <div>
@@ -55,7 +55,7 @@
           <div class="item-subtitle">Puedes actualizar tu información personal.</div>
         </div>
       </div>
-      @if (permisos.analiticaPermiso) {
+      @if (authz.can("analytics.read")) {
         <div class="flex-news item no-border">
           <img class="mr-16" src="../../assets/img/analitica.svg" />
           <div>
@@ -64,7 +64,7 @@
           </div>
         </div>
       }
-      @if (permisos.analiticaPermiso) {
+      @if (authz.can("analytics.read")) {
         <div class="flex-news item" style="padding-top: 0px">
           <div class="center btn-black mr-8">
             <a

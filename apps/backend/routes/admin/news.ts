@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { requirePermission } from "../../middleware/authz.js";
 import {
   clearNewsPhoto,
   createNews,
@@ -31,6 +32,11 @@ const NewsBody = z.object({
   authorId: z.number().int(),
   newsTypeId: z.number().int(),
   priority: z.number().int().optional(),
+});
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("news.read")(c, next);
+  return requirePermission("news.write")(c, next);
 });
 
 router.get("/", async (c) => {

@@ -17,7 +17,6 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { ARTICLE_BACK_KEY, setBackTarget } from "@app/dashboard/publications/flow/back-nav";
 import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -107,12 +106,10 @@ export default class MyArticleComponent implements OnInit {
   }
 
   addArticle(): void {
-    setBackTarget(ARTICLE_BACK_KEY, "my-articles");
-    this.router.navigate(["dashboard/add-article/"]);
+    this.router.navigate(["dashboard/add-article/"], { queryParams: { returnTo: "my-articles" } });
   }
 
   editArticulo(id: number): void {
-    setBackTarget(ARTICLE_BACK_KEY, "my-articles");
-    this.router.navigate(["dashboard/edit-article/" + id]);
+    this.router.navigate(["dashboard/edit-article/" + id], { queryParams: { returnTo: "my-articles" } });
   }
 }

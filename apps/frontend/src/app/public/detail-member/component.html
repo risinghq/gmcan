@@ -8,10 +8,10 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="member-detail-links">
         <a class="member-detail-link-active" href="/">{{ language.home }}</a>
-        @if (previouslink != "home") {
+        @if (previouslink !== "/home") {
         <mat-icon class="member-detail-icon"> arrow_right </mat-icon>
-        } @if (previouslink != "home") {
-        <a class="member-detail-link-active" href="/{{ previouslink }}">{{ previouspage }}</a>
+        } @if (previouslink !== "/home") {
+        <a class="member-detail-link-active" [routerLink]="previouslink">{{ previouspage }}</a>
         }
         <mat-icon class="member-detail-icon"> arrow_right </mat-icon>
         <a class="member-detail-link">

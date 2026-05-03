@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToProject,
   createProject,
@@ -36,6 +37,11 @@ const ProjectBody = z.object({
 const FilterQuery = z.object({
   status: z.coerce.number().int().optional(),
   q: z.string().optional(),
+});
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("projects.read")(c, next);
+  return requirePermission("projects.write")(c, next);
 });
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {

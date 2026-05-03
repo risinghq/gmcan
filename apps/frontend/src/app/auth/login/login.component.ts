@@ -11,6 +11,7 @@ import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 
 @Component({
   selector: "app-login",
@@ -25,13 +26,13 @@ export default class LoginComponent implements OnInit {
   private emailService = inject(EmailService);
   authService = inject(AuthService);
   private session = inject(SessionService);
+  private uiState = inject(UiStateService);
   private titleService = inject(Title);
 
   public grupoinfo: Group;
   public url: string;
   public loginForm: FormGroup;
   public emailForm: FormGroup;
-  public previouslink: string | null = null;
   error: string | null = null;
   exito: string | null = null;
   language: (typeof Languages)[number] = Languages[0];
@@ -53,16 +54,15 @@ export default class LoginComponent implements OnInit {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.login);
     this.getGrupoInfo();
-    this.previouslink = this.session.getPreviousPage();
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this.session.getGroupInfo();
+    this.grupoinfo = this.uiState.groupInfo();
     this.grupoinfo.logoHeader = this.url + "api/group/files/header";
     this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
       this.grupoinfo.logoHeader = this.url + "api/group/files/header";
-      this.session.setGroupInfo(this.grupoinfo);
+      this.uiState.setGroupInfo(this.grupoinfo);
     });
   }
 

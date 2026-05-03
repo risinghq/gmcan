@@ -6,15 +6,17 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
+import { NavigationEnd } from "@angular/router";
+import type { ToolbarBadge } from "@app/dashboard/dashboard.resolvers";
 import { DialogIdle } from "@app/shared/modals/dialog-idle.component";
 import { createGroup, type Group } from "@app/shared/models/factories";
 import type { Member } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
-import { CommonService } from "@app/shared/services/common.service";
+import { AuthzService } from "@app/shared/services/authz.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
-import { MemberService } from "@app/shared/services/member.service";
-import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
+import { filter } from "rxjs";
 
 @Component({
   selector: "app-log-home",
@@ -35,13 +37,12 @@ import { SessionService } from "@app/shared/services/session.service";
 })
 export default class LogHomeComponent implements OnInit {
   authService = inject(AuthService);
-  memberService = inject(MemberService);
+  authz = inject(AuthzService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   dialog = inject(MatDialog);
-  private commonService = inject(CommonService);
   private groupService = inject(GroupService);
-  private session = inject(SessionService);
+  private uiState = inject(UiStateService);
   private titleService = inject(Title);
 
   user: Member | null = null;
@@ -49,10 +50,8 @@ export default class LogHomeComponent implements OnInit {
   public url: string;
   public grupoinfo: Group;
 
-  title = "Dashboard";
   dashboardTitle = "Dashboard";
-  private static readonly DETAIL_NEWS_TITLE =
-    '<span>Noticias </span><span class="grey-title">- Detalle de Noticia</span>';
+  toolbarBadge: ToolbarBadge | null = null;
 
   constructor() {
     this.screenWidth = window.innerWidth;
@@ -70,24 +69,19 @@ export default class LogHomeComponent implements OnInit {
   ngOnInit(): void {
     this.titleService.setTitle("GMCAN | Administrador");
     this.getGrupoInfo();
-    this.syncToolbarState();
-  }
-
-  noticiaPublicada = false;
-
-  ngAfterViewChecked(): void {
-    this.syncToolbarState();
-    if (this.commonService.getReset()) {
+    this.syncToolbarTitle();
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => this.syncToolbarTitle());
+    if (this.uiState.profileUpdated()) {
       this.getUser();
-      this.commonService.setReset(false);
+      this.uiState.setProfileUpdated(false);
     }
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this.session.groupInfo();
+    this.grupoinfo = this.uiState.groupInfo();
     this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
-      this.session.setGroupInfo(group);
+      this.uiState.setGroupInfo(group);
       (this.grupoinfo as any).logoHeader = this.url + "api/group/" + group.id + "/files/header";
       this.getUser();
     });
@@ -97,17 +91,13 @@ export default class LogHomeComponent implements OnInit {
   }
 
   getUser(): void {
-    const user = this.authService.getUser();
-    if (user == null) {
-      this.logout();
-    } else {
+    this.authService.tryRestoreSession().subscribe((user) => {
+      if (!user) {
+        this.logout();
+        return;
+      }
       this.user = user;
-      this.memberService.getMemberFull(user.id).subscribe((result) => {
-        if (result) {
-          this.user = result;
-        }
-      });
-    }
+    });
   }
 
   get userDisplayName(): string {
@@ -117,14 +107,14 @@ export default class LogHomeComponent implements OnInit {
   }
 
   logout(): void {
-    this.session.beginSessionEnd();
+    this.uiState.beginSessionEnd();
     this.authService.logout().subscribe(() => {
       this.router.navigate(["/login"]);
     });
   }
 
   backToTop(): void {
-    this.session.beginSessionEnd();
+    this.uiState.beginSessionEnd();
     this.authService.logout().subscribe(() => {
       this.router.navigate(["/"]);
     });
@@ -133,10 +123,6 @@ export default class LogHomeComponent implements OnInit {
   enterAny: boolean;
   enterAnyway(): void {
     this.enterAny = false;
-  }
-
-  textChange(text: string): void {
-    this.title = text;
   }
 
   private dialogRef?: MatDialogRef<DialogIdle>;
@@ -160,10 +146,10 @@ export default class LogHomeComponent implements OnInit {
     });
   }
 
-  private syncToolbarState(): void {
-    const currentTitle = this.commonService.defineTitle(window.location.pathname);
-    this.dashboardTitle = currentTitle;
-    this.noticiaPublicada =
-      currentTitle === LogHomeComponent.DETAIL_NEWS_TITLE ? this.session.noticiaPublicada() : false;
+  private syncToolbarTitle(): void {
+    let route = this.router.routerState.snapshot.root;
+    while (route.firstChild) route = route.firstChild;
+    this.dashboardTitle = (route.title as string) ?? "Dashboard";
+    this.toolbarBadge = (route.data["toolbarBadge"] as ToolbarBadge | undefined) ?? null;
   }
 }

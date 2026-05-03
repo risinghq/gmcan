@@ -13,10 +13,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { createMemberFull } from "@app/shared/models/factories";
 import type { MemberFull } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
-import { CommonService } from "@app/shared/services/common.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService, type MemberUpdateBody } from "@app/shared/services/member.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
 
 @Component({
@@ -48,7 +48,7 @@ export default class PerfilComponent implements OnInit {
   lookup = inject(LookupService);
   private snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
-  private commonService = inject(CommonService);
+  private uiState = inject(UiStateService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
@@ -87,19 +87,14 @@ export default class PerfilComponent implements OnInit {
   }
 
   getUser(): void {
-    const user = this.authService.getUser();
-    if (!user?.id) {
-      return;
-    }
-    this.memberService.getMemberFull(user.id).subscribe((result: MemberFull) => {
-      if (result) {
-        this.memberForm.controls["dni"].disable();
-        this.member = { ...result };
-        if (result.birthDate) {
-          const d = new Date(result.birthDate);
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          this.member.birthDateObj = d;
-        }
+    this.authService.tryRestoreSession().subscribe((result) => {
+      if (!result) return;
+      this.memberForm.controls["dni"].disable();
+      this.member = { ...result };
+      if (result.birthDate) {
+        const d = new Date(result.birthDate);
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        this.member.birthDateObj = d;
       }
     });
   }
@@ -130,7 +125,7 @@ export default class PerfilComponent implements OnInit {
           if (this.fileData) {
             this.memberService.uploadPhoto(this.member.id, this.fileData).subscribe();
           }
-          this.commonService.setReset(true);
+          this.uiState.setProfileUpdated(true);
           this.openSnackBar("Información actualizada exitosamente", undefined);
           this.getUser();
         }

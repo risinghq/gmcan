@@ -1,3 +1,4 @@
+import type { Capability } from "./capabilities";
 import type { Project } from "./project";
 import type { Publication } from "./publication";
 
@@ -16,6 +17,7 @@ export interface Member {
   roleId: number;
   memberTypeId: number;
   prefixId: number | null;
+  capabilities?: Capability[];
 }
 
 export interface MemberFull extends Member {

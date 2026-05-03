@@ -24,11 +24,11 @@ import type { AuthorEntry, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
-import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { requireLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
@@ -82,7 +82,6 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private eventService = inject(EventService);
-  private session = inject(SessionService);
 
   publicacion: PublicationWithAuthors & { publishedAtDate?: Date };
   public publicacionForm: FormGroup;
@@ -133,18 +132,13 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getResumen();
+    this.bindResumen(this.route.snapshot.data["publication"] as PublicationWithAuthors);
   }
 
-  getResumen(): void {
-    const idArticulo = Number(this.route.snapshot.params["id"]);
-    this.publicationService.getPublication(idArticulo).subscribe((result: PublicationWithAuthors) => {
-      if (result) {
-        this.publicacion = result;
-        this.publicacion.publishedAtDate = requireLocalDate(result.publishedAt, "publication.publishedAt");
-        this.getEventos(result.authors);
-      }
-    });
+  private bindResumen(result: PublicationWithAuthors): void {
+    this.publicacion = result;
+    this.publicacion.publishedAtDate = requireLocalDate(result.publishedAt, "publication.publishedAt");
+    this.getEventos(result.authors);
   }
 
   getEventos(authors: AuthorEntry[]): void {
@@ -343,7 +337,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/" + this.session.getResumenBack()]);
+    const returnTo = resolveReturnTo(this.route, ["eventos", "my-abstracts"], "my-abstracts");
+    this.router.navigate(["dashboard/" + returnTo]);
   }
 
   openSnackBar(value: string): void {

@@ -77,7 +77,6 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
     this.methodService.get(idMethod).subscribe((result: Method) => {
       if (result) {
         this.metodo = result;
-        localStorage.setItem("metodoEdit", JSON.stringify(result.name));
       }
     });
   }
@@ -175,20 +174,20 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   previewMethod(value: number): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
-    localStorage.setItem("langLocale", "0");
     method.photo = this.url + "admin/methods/" + this.metodo.id + "/photo";
+    let languageIndex: 0 | 1 = 0;
     if (this.previewUrl) {
       method.photo = typeof this.previewUrl === "string" ? this.previewUrl : null;
     }
     if (value == 1) {
       method.name = method.nameEN;
       method.description = method.descriptionEN ?? method.description;
-      localStorage.setItem("langLocale", "1");
+      languageIndex = 1;
     }
     this.previewDialog = this.dialog.open(DialogPreview5, {
       width: "871px",
       id: "previewMethod",
-      data: method,
+      data: { method, languageIndex },
     });
 
     this.previewDialog.afterClosed().subscribe();
@@ -219,7 +218,8 @@ export class DialogErase12 {
 })
 export class DialogPreview5 {
   dialogRef = inject<MatDialogRef<DialogPreview5>>(MatDialogRef);
-  method = inject<Method>(MAT_DIALOG_DATA);
+  data = inject<{ method: Method; languageIndex: 0 | 1 }>(MAT_DIALOG_DATA);
+  method = this.data.method;
 
   url: string;
   language: (typeof Languages)[number] = Languages[0];
@@ -228,11 +228,7 @@ export class DialogPreview5 {
   }
 
   ngOnInit(): void {
-    if (localStorage.getItem("langLocale") == "0") {
-      this.language = Languages[0];
-    } else {
-      this.language = Languages[1];
-    }
+    this.language = Languages[this.data.languageIndex];
     const descripcion = document.getElementById("descripcion");
     if (descripcion) {
       descripcion.innerHTML = this.method.description ?? "";

@@ -22,7 +22,6 @@ import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
-import { SessionService } from "@app/shared/services/session.service";
 
 interface PublicationRow extends PublicationWithAuthors {
   fecha?: string;
@@ -56,7 +55,6 @@ export default class MyResumenesComponent implements OnInit {
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
   private auth = inject(AuthService);
-  private session = inject(SessionService);
   lookup = inject(LookupService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "evento"];
@@ -113,12 +111,10 @@ export default class MyResumenesComponent implements OnInit {
   }
 
   addResumen(): void {
-    this.session.setResumenBack("my-abstracts");
-    this.router.navigate(["dashboard/add-resumen/"]);
+    this.router.navigate(["dashboard/add-resumen/"], { queryParams: { returnTo: "my-abstracts" } });
   }
 
   editResumen(id: number): void {
-    this.session.setResumenBack("my-abstracts");
-    this.router.navigate(["dashboard/edit-resumen/" + id]);
+    this.router.navigate(["dashboard/edit-resumen/" + id], { queryParams: { returnTo: "my-abstracts" } });
   }
 }

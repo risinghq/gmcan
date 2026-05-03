@@ -141,13 +141,11 @@ export default class TesisComponent implements OnInit {
   }
 
   addThesis(): void {
-    localStorage.setItem("thesis-back", "tesis");
-    this.router.navigate(["dashboard/add-thesis"]);
+    this.router.navigate(["dashboard/add-thesis"], { queryParams: { returnTo: "tesis" } });
   }
 
   editThesis(id: number): void {
-    localStorage.setItem("thesis-back", "tesis");
-    this.router.navigate(["dashboard/edit-thesis/" + id]);
+    this.router.navigate(["dashboard/edit-thesis/" + id], { queryParams: { returnTo: "tesis" } });
   }
 
   addUniversidad(): void {

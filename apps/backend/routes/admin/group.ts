@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { requirePermission } from "../../middleware/authz.js";
 import {
   createEquipment,
   createSoftware,
@@ -37,6 +38,11 @@ const SLOT_CONFIG = {
   header: { column: "logoHeader" as const, kind: "brandImage" as const },
   footer: { column: "logoFooter" as const, kind: "brandImage" as const },
 };
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("content.read")(c, next);
+  return requirePermission("content.write")(c, next);
+});
 
 router.get("/", async (c) => {
   const rows = await listGroups();

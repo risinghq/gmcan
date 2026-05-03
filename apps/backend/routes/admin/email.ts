@@ -2,9 +2,11 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { requirePermission } from "../../middleware/authz.js";
 import { getMemberByEmail, updatePassword } from "../../services/member.service.js";
 
 const router = new Hono();
+router.use("*", requirePermission("content.write"));
 
 router.put(
   "/member-password",

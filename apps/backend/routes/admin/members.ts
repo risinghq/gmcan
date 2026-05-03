@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToGroup,
   clearMemberPhoto,
@@ -67,6 +68,11 @@ const FilterQuery = z.object({
   email: z.string().optional(),
   dni: z.string().optional(),
   names: z.coerce.boolean().optional(),
+});
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("members.read")(c, next);
+  return requirePermission("members.write")(c, next);
 });
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {

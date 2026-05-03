@@ -3,11 +3,11 @@ import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
 import type { Member } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
+import { parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
@@ -28,7 +28,6 @@ export default class NewsComponent implements OnInit {
   router = inject(Router);
   lookup = inject(LookupService);
   private browser = inject(BrowserService);
-  private navigationHistory = inject(NavigationHistoryService);
   private session = inject(SessionService);
 
   public noticias: NewsDisplay[] = [];
@@ -105,7 +104,8 @@ export default class NewsComponent implements OnInit {
   }
 
   detalleNoticia(noticia: NewsDisplay): void {
-    this.router.navigate(["/home/detail-news/" + noticia.id]);
+    const origin = parsePublicOrigin(this.route);
+    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: origin } });
     this.scroll();
   }
 

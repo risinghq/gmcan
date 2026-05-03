@@ -62,7 +62,6 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
     const found = this.lookup.journals().find((r) => r.id === id);
     if (found) {
       this.revista = { id: found.id, name: found.name };
-      localStorage.setItem("revistaEdit", JSON.stringify(found.name));
       this.checkCanDelete(id);
     }
   }

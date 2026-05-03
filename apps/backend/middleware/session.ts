@@ -10,11 +10,10 @@ declare module "hono" {
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
 import { db } from "../db/client.js";
+import { AUTH_EXEMPT_PATHS } from "./auth-exempt.js";
 
 const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 const IDLE_TIMEOUT_MS = 2 * 60 * 60 * 1000;
-
-const AUTH_EXEMPT = new Set(["/admin/auth/login", "/admin/auth/logout"]);
 
 export async function createSession(c: Context, memberId: number, email: string): Promise<void> {
   const id = crypto.randomUUID();
@@ -44,7 +43,7 @@ export async function destroySession(c: Context): Promise<void> {
 }
 
 export const requireSession = async (c: Context, next: Next) => {
-  if (AUTH_EXEMPT.has(c.req.path)) return next();
+  if (AUTH_EXEMPT_PATHS.has(c.req.path)) return next();
 
   const id = getCookie(c, "sid");
   if (!id) return c.json({ error: "Unauthorized" }, 401);

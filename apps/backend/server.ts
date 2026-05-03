@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 
 import { getFrontendUrl } from "./config.js";
 import { bootstrap } from "./db/bootstrap.js";
+import { loadActor } from "./middleware/authz.js";
 import { onError } from "./middleware/error.js";
 import { requireSession } from "./middleware/session.js";
 import AdminAccountRoutes from "./routes/admin/account.js";
@@ -66,6 +67,7 @@ app.route("/api/email", PublicEmailRoutes);
 // Admin API
 // All routes under /admin/* require session (login/logout exempted in middleware)
 app.use("/admin/*", requireSession);
+app.use("/admin/*", loadActor);
 app.route("/admin/auth", AdminAuthRoutes);
 app.route("/admin/account", AdminAccountRoutes);
 app.route("/admin/email", AdminEmailRoutes);

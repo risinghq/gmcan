@@ -2,14 +2,13 @@ import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Meta, Title } from "@angular/platform-browser";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
 import { Languages } from "@app/shared/models/languages";
 import type { News } from "@app/shared/models/news";
+import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { GLOBAL } from "@app/shared/services/global";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
-import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 import type { DetailNewsViewModel } from "./types";
@@ -18,12 +17,10 @@ import type { DetailNewsViewModel } from "./types";
   selector: "app-detail-news",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
-  imports: [MatProgressSpinner, MatIcon, NewsComponent, SharedShareButtonsComponent],
+  imports: [MatProgressSpinner, MatIcon, RouterLink, NewsComponent, SharedShareButtonsComponent],
 })
 export default class DetailNewsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly navigationHistory = inject(NavigationHistoryService);
-  private readonly previousService = inject(PreviousPageService);
   private readonly session = inject(SessionService);
   private readonly meta = inject(Meta);
   private readonly titleService = inject(Title);
@@ -33,8 +30,8 @@ export default class DetailNewsComponent implements OnInit {
   autorName = "";
   autorPhoto: string | null = null;
   autorId: number | null = null;
-  previouspage = "";
-  previouslink: string | null = null;
+  previouspage = "Inicio";
+  previouslink = "/home";
   cargado = false;
   dia = "";
   mes = "";
@@ -59,8 +56,11 @@ export default class DetailNewsComponent implements OnInit {
     this.meta.updateTag({ property: "og:title", content: String(this.noticia.title) });
     this.titleService.setTitle(String(this.noticia.title));
 
-    this.previouslink = this.navigationHistory.previousUrl();
-    this.previouspage = this.previousService.getPreviousPage(this.previouslink ?? "");
+    const isEnglish = (this.language.locale ?? "es").startsWith("en");
+    const origin = parsePublicOrigin(this.route);
+    const originInfo = getPublicOriginInfo(origin, isEnglish);
+    this.previouslink = originInfo.route;
+    this.previouspage = originInfo.label;
     this.cargado = true;
   }
 }

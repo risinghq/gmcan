@@ -5,12 +5,12 @@ import { map } from "rxjs/operators";
 
 import ConfirmLeaveComponent from "../modals/confirm-leave.component";
 import { HasUnsavedChanges } from "../models/unsaved-changes";
-import { SessionService } from "../services/session.service";
+import { UiStateService } from "../services/ui-state.service";
 
 export const canDeactivateGuard: CanDeactivateFn<HasUnsavedChanges> = (component) => {
-  const session = inject(SessionService);
-  if (session.sessionEnding()) {
-    session.acknowledgeSessionEnd();
+  const uiState = inject(UiStateService);
+  if (uiState.sessionEnding()) {
+    uiState.acknowledgeSessionEnd();
     return true;
   }
   if (!component.isDirty()) return true;

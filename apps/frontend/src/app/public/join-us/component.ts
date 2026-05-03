@@ -8,11 +8,12 @@ import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import type { EmailBody } from "@app/shared/models/emailBody";
 import { createEmailBody } from "@app/shared/models/factories";
+import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
 
 @Component({
@@ -26,9 +27,10 @@ export default class JoinUsComponent implements OnInit {
   emailService = inject(EmailService);
   dialog = inject(MatDialog);
   router = inject(Router);
+  route = inject(ActivatedRoute);
   private browser = inject(BrowserService);
-  private navigationHistory = inject(NavigationHistoryService);
   private session = inject(SessionService);
+  private uiState = inject(UiStateService);
   private titleService = inject(Title);
 
   public user: FormGroup;
@@ -45,19 +47,17 @@ export default class JoinUsComponent implements OnInit {
 
   language: any = {};
 
-  public previouslink: string | null = null;
+  public previouslink = "/home";
   ngOnInit(): void {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.join);
-    this.previouslink = this.navigationHistory.previousUrl();
+    const isEnglish = (this.language.locale ?? "es").startsWith("en");
+    const origin = parsePublicOrigin(this.route);
+    this.previouslink = getPublicOriginInfo(origin, isEnglish).route;
   }
 
   return(): void {
-    if (this.previouslink) {
-      this.router.navigate([this.previouslink]);
-    } else {
-      this.router.navigate(["/home"]);
-    }
+    this.router.navigateByUrl(this.previouslink);
   }
 
   sendEmail(): void {
@@ -106,6 +106,7 @@ export class EmailExitoso {
   router = inject(Router);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
+  private uiState = inject(UiStateService);
 
   public url: string;
   grupoLogo = "";
@@ -116,7 +117,7 @@ export class EmailExitoso {
     this.language = this.session.language();
     this.screenWidth = this.browser.innerWidth();
     this.url = GLOBAL.url;
-    this.grupoInfo = this.session.getGroupInfo();
+    this.grupoInfo = this.uiState.groupInfo();
     this.grupoLogo = this.url + "api/group/files/header";
   }
 

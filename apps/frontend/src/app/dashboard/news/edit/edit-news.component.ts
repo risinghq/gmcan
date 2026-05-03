@@ -29,7 +29,6 @@ import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
-import { SessionService } from "@app/shared/services/session.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
@@ -79,7 +78,6 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
   lookup = inject(LookupService);
   private memberService = inject(MemberService);
-  private session = inject(SessionService);
 
   public Editor = ClassicEditor;
   noticia: News;
@@ -111,33 +109,28 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getNews();
+    this.initFromResolver();
+    this.getAuthors();
   }
 
   isDirty(): boolean {
     return this.newsForm.dirty;
   }
 
-  getNews(): void {
-    const id = Number(this.route.snapshot.params["id"] ?? 0);
-    this.newsService.getAdminNews(id).subscribe((found: News) => {
-      if (found) {
-        this.noticia = found;
-        this.newsForm.controls["cuerpo"].setValue(found.body);
-        if (found.publishedAt) {
-          this.publishedAtObj = parseLocalDate(found.publishedAt);
-        }
-        this.session.setNoticiaPublicada((found.status ?? 0) === 1);
-        this.getAuthors();
-        if (found.status === 0) {
-          this.button_text = "Publicar noticia";
-          this.button_text2 = "Guardar sin publicar";
-        } else {
-          this.button_text = "Actualizar noticia";
-          this.button_text2 = "Dejar de publicar y guardar cambios";
-        }
-      }
-    });
+  private initFromResolver(): void {
+    const found = this.route.snapshot.data["news"] as News;
+    this.noticia = found;
+    this.newsForm.controls["cuerpo"].setValue(found.body);
+    if (found.publishedAt) {
+      this.publishedAtObj = parseLocalDate(found.publishedAt);
+    }
+    if (found.status === 0) {
+      this.button_text = "Publicar noticia";
+      this.button_text2 = "Guardar sin publicar";
+      return;
+    }
+    this.button_text = "Actualizar noticia";
+    this.button_text2 = "Dejar de publicar y guardar cambios";
   }
 
   getAuthors(): void {

@@ -63,7 +63,6 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     const found = this.lookup.universities().find((u) => u.id === id);
     if (found) {
       this.universidad = { id: found.id, name: found.name, nameEN: found.nameEN };
-      localStorage.setItem("universidadEdit", JSON.stringify(found.name));
       this.checkCanDelete(id);
     }
   }

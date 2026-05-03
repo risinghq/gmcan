@@ -10,8 +10,6 @@ import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
-import { PreviousPageService } from "@app/shared/services/previouspage.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,
@@ -43,16 +41,12 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
 })
 export default class PublicationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly navigationHistory = inject(NavigationHistoryService);
-  private readonly previousService = inject(PreviousPageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly session = inject(SessionService);
   private readonly browser = inject(BrowserService);
   private readonly titleService = inject(Title);
 
-  previouslink: string | null = null;
-  previouspage = "";
   private allArticulos: PublicationDisplay[] = [];
   private allTesis: PublicationDisplay[] = [];
   private allResumenes: PublicationDisplay[] = [];
@@ -92,8 +86,6 @@ export default class PublicationComponent implements OnInit {
     this.allCharged = true;
     this.cargado = true;
 
-    this.previouslink = this.navigationHistory.previousUrl();
-    this.previouspage = this.previousService.getPreviousPage(this.previouslink ?? "");
     this.syncTabLabels();
   }
 
@@ -143,7 +135,7 @@ export default class PublicationComponent implements OnInit {
 
   profile(autor: { memberId?: number }): void {
     if (!autor.memberId) return;
-    this.router.navigate(["/home/detail-member/" + autor.memberId]);
+    this.router.navigate(["/home/detail-member/" + autor.memberId], { queryParams: { from: "publications" } });
   }
 
   private syncTabLabels(): void {

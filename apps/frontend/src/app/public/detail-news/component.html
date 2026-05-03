@@ -9,9 +9,9 @@
       <div class="detail-links">
         <a class="detail-link-active" href="/">{{ language.home }}</a>
         <mat-icon class="detail-icon"> arrow_right </mat-icon>
-        @if (previouslink != "home") {
-        <a class="detail-link-active" href="/{{ previouslink }}">{{ previouspage }}</a>
-        } @if (previouslink != "home") {
+        @if (previouslink !== "/home") {
+        <a class="detail-link-active" [routerLink]="previouslink">{{ previouspage }}</a>
+        } @if (previouslink !== "/home") {
         <mat-icon class="detail-icon"> arrow_right </mat-icon>
         }
         <a class="detail-link">{{ language.detailNews }}</a>

@@ -22,9 +22,9 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { createPublication } from "@app/shared/models/factories";
-import type { Publication } from "@app/shared/models/publication";
+import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -77,7 +77,7 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
-  publicacion: Publication;
+  publicacion: PublicationWithAuthors;
   publishedAtObj?: Date;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
@@ -97,7 +97,7 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
       abstractES: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       abstractEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.publicacion = createPublication();
+    this.publicacion = this.route.snapshot.data["publication"] as PublicationWithAuthors;
     this.url = GLOBAL.url;
   }
 
@@ -106,36 +106,37 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.params["id"] ?? 0);
-    this.publicationService.getPublication(id).subscribe((pub) => {
-      this.publicacion = pub;
-      const publishedAt = parseLocalDate(pub.publishedAt);
-      if (publishedAt) {
-        this.publishedAtObj = publishedAt;
-      }
+    this.bindPublication(this.publicacion);
+  }
 
-      this.memberService.searchAuthors("").subscribe((allAuthors) => {
-        this.options = allAuthors;
-        const sorted = pub.authors.toSorted((a, b) => a.isPrincipal - b.isPrincipal);
-        this.otrosAutores = sorted.map((a, i) => {
-          const row: AuthorFormRow = {
-            id: i + 1,
-            name: a.name,
-            memberId: a.memberId ?? null,
-            myControl: new FormControl<string>(a.name, { nonNullable: true }),
-          };
-          row.filteredOptions = row.myControl.valueChanges.pipe(
-            startWith(""),
-            map((v) => this.filterAuthors(v)),
-          );
-          return row;
-        });
+  private bindPublication(pub: PublicationWithAuthors): void {
+    this.publicacion = pub;
+    const publishedAt = parseLocalDate(pub.publishedAt);
+    if (publishedAt) {
+      this.publishedAtObj = publishedAt;
+    }
 
-        if (this.otrosAutores.length === 0) {
-          this.otrosAutores = [this.newCoAuthorRow()];
-          this.setupFilters();
-        }
+    this.memberService.searchAuthors("").subscribe((allAuthors) => {
+      this.options = allAuthors;
+      const sorted = pub.authors.toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+      this.otrosAutores = sorted.map((a, i) => {
+        const row: AuthorFormRow = {
+          id: i + 1,
+          name: a.name,
+          memberId: a.memberId ?? null,
+          myControl: new FormControl<string>(a.name, { nonNullable: true }),
+        };
+        row.filteredOptions = row.myControl.valueChanges.pipe(
+          startWith(""),
+          map((v) => this.filterAuthors(v)),
+        );
+        return row;
       });
+
+      if (this.otrosAutores.length === 0) {
+        this.otrosAutores = [this.newCoAuthorRow()];
+        this.setupFilters();
+      }
     });
   }
 
@@ -268,7 +269,8 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/" + localStorage.getItem("thesis-back")]);
+    const returnTo = resolveReturnTo(this.route, ["tesis", "my-thesis"], "my-thesis");
+    this.router.navigate(["dashboard/" + returnTo]);
   }
 
   openSnackBar(value: string): void {

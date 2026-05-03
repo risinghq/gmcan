@@ -17,7 +17,6 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { setBackTarget, THESIS_BACK_KEY } from "@app/dashboard/publications/flow/back-nav";
 import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -114,12 +113,10 @@ export default class MyThesisComponent implements OnInit {
   }
 
   addThesis(): void {
-    setBackTarget(THESIS_BACK_KEY, "my-thesis");
-    this.router.navigate(["dashboard/add-thesis/"]);
+    this.router.navigate(["dashboard/add-thesis/"], { queryParams: { returnTo: "my-thesis" } });
   }
 
   editThesis(id: number): void {
-    setBackTarget(THESIS_BACK_KEY, "my-thesis");
-    this.router.navigate(["dashboard/edit-thesis/" + id]);
+    this.router.navigate(["dashboard/edit-thesis/" + id], { queryParams: { returnTo: "my-thesis" } });
   }
 }

@@ -2,10 +2,10 @@ import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, inject } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
-import { AuthService } from "@app/shared/services/auth.service";
+import { AuthzService } from "@app/shared/services/authz.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
-import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 import { BaseChartDirective } from "ng2-charts";
 
 interface CountTypeItem {
@@ -20,10 +20,10 @@ interface CountTypeItem {
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export default class DashboardComponent implements OnInit {
-  authService = inject(AuthService);
+  authz = inject(AuthzService);
   groupService = inject(GroupService);
   private http = inject(HttpClient);
-  private session = inject(SessionService);
+  private uiState = inject(UiStateService);
 
   screenWidth = window.innerWidth;
   public url: string;
@@ -31,7 +31,7 @@ export default class DashboardComponent implements OnInit {
 
   constructor() {
     this.url = GLOBAL.url;
-    this.grupoinfo = this.session.groupInfo();
+    this.grupoinfo = this.uiState.groupInfo();
   }
 
   ngOnInit(): void {
@@ -40,7 +40,7 @@ export default class DashboardComponent implements OnInit {
   }
 
   getGrupoInfo(): void {
-    this.grupoinfo = this.session.groupInfo();
+    this.grupoinfo = this.uiState.groupInfo();
     if (this.grupoinfo.id) {
       (this.grupoinfo as any).logoHeader = this.url + "api/group/" + this.grupoinfo.id + "/files/header";
     }

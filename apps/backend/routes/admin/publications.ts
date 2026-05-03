@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { requirePermission } from "../../middleware/authz.js";
 import {
   createPublication,
   deletePublication,
@@ -39,6 +40,11 @@ const PublicationFields = z.object({
 
 const CreateBody = z.object({ data: PublicationFields, authors: z.array(AuthorEntry) });
 const UpdateBody = z.object({ data: PublicationFields, authors: z.array(AuthorEntry) });
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("publications.read")(c, next);
+  return requirePermission("publications.write")(c, next);
+});
 
 router.get("/", async (c) => {
   const rows = await listPublications();

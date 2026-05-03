@@ -13,6 +13,7 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { UiStateService } from "@app/shared/services/ui-state.service";
 
 @Component({
   selector: "app-landing",
@@ -39,6 +40,7 @@ export default class LandingComponent implements OnInit {
   private groupService = inject(GroupService);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
+  private uiState = inject(UiStateService);
   fb = inject(FormBuilder);
   private titleService = inject(Title);
 
@@ -90,7 +92,7 @@ export default class LandingComponent implements OnInit {
       this.grupoinfo = group;
       this.grupoinfo.logoHeader = this.url + "api/group/files/header";
       this.grupoinfo.logoFooter = this.url + "api/group/files/footer";
-      this.session.setGroupInfo(this.grupoinfo);
+      this.uiState.setGroupInfo(this.grupoinfo);
     });
   }
 
@@ -101,7 +103,7 @@ export default class LandingComponent implements OnInit {
   }
 
   searchGlobal(value: string): void {
-    this.router.navigate(["/home/search/" + value]);
+    this.router.navigate(["/home/search/" + value], { queryParams: { from: "home" } });
   }
 
   loginLink(): void {

@@ -4,6 +4,7 @@ import { z, type ZodType } from "zod";
 
 import { db } from "../../db/client.js";
 import type { Database } from "../../db/schema.js";
+import { requirePermission } from "../../middleware/authz.js";
 
 function crudRouter<T extends keyof Database>(table: T, createSchema: ZodType, updateSchema: ZodType): Hono {
   const router = new Hono();
@@ -44,6 +45,10 @@ function crudRouter<T extends keyof Database>(table: T, createSchema: ZodType, u
 }
 
 const router = new Hono();
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("refs.read")(c, next);
+  return requirePermission("refs.write")(c, next);
+});
 
 router.route(
   "/gender",

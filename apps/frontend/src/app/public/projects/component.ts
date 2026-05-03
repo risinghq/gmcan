@@ -145,7 +145,7 @@ export default class ProjectsComponent implements OnInit {
   }
 
   profile(member: { memberId: number }): void {
-    this.router.navigate(["/home/detail-member/" + member.memberId]);
+    this.router.navigate(["/home/detail-member/" + member.memberId], { queryParams: { from: "projects" } });
   }
 
   private syncLabels(): void {

@@ -143,12 +143,10 @@ export default class ArticulosComponent implements OnInit {
   }
 
   addArticle() {
-    localStorage.setItem("article-back", "articulos");
-    this.router.navigate(["dashboard/add-article/"]);
+    this.router.navigate(["dashboard/add-article/"], { queryParams: { returnTo: "articulos" } });
   }
 
   editArticulo(id: number): void {
-    localStorage.setItem("article-back", "articulos");
-    this.router.navigate(["dashboard/edit-article/" + id]);
+    this.router.navigate(["dashboard/edit-article/" + id], { queryParams: { returnTo: "articulos" } });
   }
 }

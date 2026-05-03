@@ -6,10 +6,10 @@ import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Params, Router } from "@angular/router";
 import type { SearchResults } from "@app/shared/models/search-results";
+import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { NavigationHistoryService } from "@app/shared/services/navigation-history.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,
@@ -59,7 +59,6 @@ export default class GlobalSearchComponent implements OnInit {
   private readonly session = inject(SessionService);
   private readonly browser = inject(BrowserService);
   private readonly titleService = inject(Title);
-  private readonly navigationHistory = inject(NavigationHistoryService);
   private readonly destroyRef = inject(DestroyRef);
 
   proyectos: ProjectDisplay[] = [];
@@ -72,7 +71,7 @@ export default class GlobalSearchComponent implements OnInit {
   page2 = 1;
   pageSize = 5;
   url = GLOBAL.url;
-  previouslink: string | null = null;
+  previouslink = "/home";
   searchId = "";
   expandedKey: string | null = null;
   publicationExpanded = true;
@@ -115,11 +114,14 @@ export default class GlobalSearchComponent implements OnInit {
     for (const publicacion of this.publicaciones) this.fillPublicacion(publicacion);
     for (const noticia of this.noticias) this.fillNoticia(noticia);
 
-    this.previouslink = this.navigationHistory.previousUrl();
+    const origin = parsePublicOrigin(this.route);
+    const isEnglish = (this.language.locale ?? "es").startsWith("en");
+    this.previouslink = getPublicOriginInfo(origin, isEnglish).route;
   }
 
   searchGlobal(value: string): void {
-    this.router.navigate(["/home/search/" + value]);
+    const origin = parsePublicOrigin(this.route);
+    this.router.navigate(["/home/search/" + value], { queryParams: { from: origin } });
   }
 
   fillProyecto(proyecto: ProjectDisplay): void {
@@ -177,19 +179,15 @@ export default class GlobalSearchComponent implements OnInit {
   profile(member: { id?: number; memberId?: number }): void {
     const id = member.id ?? member.memberId;
     if (!id) return;
-    this.router.navigate(["/home/detail-member/" + id]);
+    this.router.navigate(["/home/detail-member/" + id], { queryParams: { from: "search" } });
   }
 
   detalleNoticia(noticia: { id: number }): void {
-    this.router.navigate(["/home/detail-news/" + noticia.id]);
+    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: "search" } });
   }
 
   return(): void {
-    if (this.previouslink) {
-      this.router.navigate([this.previouslink]);
-      return;
-    }
-    this.router.navigate(["/home"]);
+    this.router.navigateByUrl(this.previouslink);
   }
 
   toggleRotation(caso: number): void {

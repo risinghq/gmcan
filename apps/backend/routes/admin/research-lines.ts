@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { requirePermission } from "../../middleware/authz.js";
 import {
   createResearchLine,
   deleteResearchLine,
@@ -30,6 +31,11 @@ const UpdateBody = z.object({
   nameEN: z.string().min(1),
   description: z.string().optional(),
   descriptionEN: z.string().optional(),
+});
+
+router.use("*", async (c, next) => {
+  if (c.req.method === "GET") return requirePermission("content.read")(c, next);
+  return requirePermission("content.write")(c, next);
 });
 
 router.get("/", async (c) => {

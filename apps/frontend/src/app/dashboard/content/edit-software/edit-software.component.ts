@@ -64,7 +64,6 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
       const sw = result as Software;
       if (sw) {
         this.software = sw;
-        localStorage.setItem("softwareEdit", JSON.stringify(sw.name));
       }
     });
   }

@@ -63,7 +63,6 @@ export default class EditEquipoComponent implements OnInit, HasUnsavedChanges {
     this.groupService.getEquipment(idEquipo).subscribe((eq: Equipment) => {
       if (eq) {
         this.equipo = eq;
-        localStorage.setItem("equipoEdit", JSON.stringify(eq.name));
       }
     });
   }
