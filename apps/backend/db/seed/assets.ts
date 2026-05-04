@@ -65,8 +65,9 @@ export async function importSeedAssetsAndRewriteReferences() {
   const map = readMap();
   for (const { table, column } of ASSET_COLUMNS) {
     const rows = await db.selectFrom(table as never).select(["id", column] as never).execute();
-    for (const row of rows as Array<{ id: number; [k: string]: string | null }>) {
-      const value = row[column];
+    for (const row of rows as Array<Record<string, unknown>>) {
+      const rowId = Number(row.id);
+      const value = (row[column] as string | null) ?? null;
       if (!value) continue;
 
       const normalizedRuntime = normalizeAssetKey(value);
@@ -77,7 +78,7 @@ export async function importSeedAssetsAndRewriteReferences() {
       await db
         .updateTable(table as never)
         .set({ [column]: imported } as never)
-        .where("id", "=", row.id)
+        .where("id" as never, "=", rowId as any)
         .execute();
     }
   }
@@ -88,8 +89,8 @@ export async function auditAndQuarantineOrphans() {
   const referenced = new Set<string>();
   for (const { table, column } of ASSET_COLUMNS) {
     const rows = await db.selectFrom(table as never).select(column as never).where(column as never, "is not", null).execute();
-    for (const row of rows as Array<Record<string, string>>) {
-      const key = normalizeAssetKey(row[column]);
+    for (const row of rows as Array<Record<string, unknown>>) {
+      const key = normalizeAssetKey(String(row[column] ?? ""));
       if (key) referenced.add(key);
     }
   }

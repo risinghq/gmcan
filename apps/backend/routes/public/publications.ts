@@ -41,9 +41,6 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         thesisTypeId: row.thesisTypeId,
         updatedAt: row.updatedAt,
         createdAt: row.createdAt,
-        authors: row.authors?.map((author) =>
-          author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
-        ),
       })),
     );
   }
@@ -64,8 +61,8 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       thesisTypeId: row.thesisTypeId,
       updatedAt: row.updatedAt,
       createdAt: row.createdAt,
-      authors: row.authors.map((author) =>
-        author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+      authors: (row.authors as any[]).map((author) =>
+        author.kind === "registered" ? { ...author, photo: assetUrl(author.photo) } : author,
       ),
     })),
   );
@@ -91,8 +88,8 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     thesisTypeId: pub.thesisTypeId,
     updatedAt: pub.updatedAt,
     createdAt: pub.createdAt,
-    authors: pub.authors.map((author) =>
-      author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+    authors: (pub.authors as any[]).map((author) =>
+      author.kind === "registered" ? { ...author, photo: assetUrl(author.photo) } : author,
     ),
   });
 });

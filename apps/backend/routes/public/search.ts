@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
+import { assetUrl } from "../../lib/upload.js";
 import { globalSearch } from "../../services/search.service.js";
 
 const router = new Hono();
@@ -28,7 +29,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       id: row.id,
       title: row.title,
       abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-      file: row.fileUrl,
+      file: assetUrl(row.file),
       journalIssue: row.journalIssue,
       doi: row.doi,
       publishedAt: row.publishedAt,
@@ -38,7 +39,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       eventId: row.eventId,
       thesisTypeId: row.thesisTypeId,
       authors: row.authors.map((author) =>
-        author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+        author.kind === "registered" ? { ...author, photo: assetUrl(author.photo) } : author,
       ),
     })),
     members: result.members.map((row) => ({
@@ -49,7 +50,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       id: row.id,
       title: localizeField(row, locale, { es: "title", en: "titleEN" }),
       publishedAt: row.publishedAt,
-      photo: row.photoUrl,
+      photo: assetUrl(row.photo),
       newsTypeId: row.newsTypeId,
       status: row.status,
       authorName: row.authorName,
@@ -68,7 +69,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       currencyId: row.currencyId,
       researchLine: localizeField(row, locale, { es: "researchLine", en: "researchLine" }),
       fundingSource: localizeField(row, locale, { es: "fundingSource", en: "fundingSource" }),
-      members: row.members.map((member) => ({ ...member, photo: member.photoUrl })),
+      members: row.members.map((member) => ({ ...member, photo: assetUrl(member.photo) })),
     })),
   });
 });
