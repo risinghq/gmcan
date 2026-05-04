@@ -15,8 +15,9 @@ export async function seedNews() {
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         summaryEN:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        body: "",
-        bodyEN: "",
+        body: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
+        bodyEN:
+          "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
         status: 1,
         publishedAt: "2021-01-15",
         updatedAt: null,
@@ -34,7 +35,7 @@ export async function seedNews() {
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         summaryEN:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        body: "",
+        body: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
         bodyEN:
           "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
         status: 0,
@@ -54,8 +55,9 @@ export async function seedNews() {
           '"No tengo tiempo", "Desearía tener más tiempo para presentar este trabajo", "Espero que el profe cambie la fecha de entrega." Estas son frases comunes que hemos escuchado siendo estudiantes de pregrado. Independientemente de la ubicación geográfica, ser estudiante universitario me ha mostrado problemas que los estudiantes de pregrado enfrentan comúnmente referido a su gestión del tiempo.',
         summaryEN:
           "'I don't have enough time', 'I wish I had two more days for doing this', 'I hope the professor gives us an extension.' These are common phrases I heard as an undergraduate student in physics and engineering. Regardless on the location, being a student in both the US and Peru showed me common problems undergrads face regularly.",
-        body: "",
-        bodyEN: "",
+        body: '<p>"No tengo tiempo", "Desearía tener más tiempo para presentar este trabajo", "Espero que el profe cambie la fecha de entrega." Estas son frases comunes que hemos escuchado siendo estudiantes de pregrado.</p><p>Independientemente de la ubicación geográfica, ser estudiante universitario me ha mostrado problemas que los estudiantes de pregrado enfrentan comúnmente referido a su gestión del tiempo.</p>',
+        bodyEN:
+          "<p>'I don't have enough time', 'I wish I had two more days for doing this', 'I hope the professor gives us an extension.' These are common phrases I heard as an undergraduate student in physics and engineering.</p><p>Regardless of location, being a student in both the US and Peru showed me common time-management problems undergrads face regularly.</p>",
         status: 1,
         publishedAt: "2021-01-21",
         updatedAt: null,
@@ -73,8 +75,9 @@ export async function seedNews() {
           "A medida que los investigadores y las empresas de todo el mundo se dispusieron a luchar contra la pandemia del coronavirus, muchos están revisando el grafeno como un material con potencial para ayudar a ganar esta lucha. Las razones de tal potencial podrían encontrarse en las conocidas propiedades antibacterianas / antivirales del grafeno, sus rasgos beneficiosos para sensores y dispositivos médicos y más.",
         summaryEN:
           "As researchers and companies all over the world set out to battle the Coronavirus pandemic, many are revisiting graphene as a material with potential for helping to win this fight. The reasons for such potential could be found in graphene's known antibacterial/antiviral properties, its beneficial traits for medical sensors and devices and more.",
-        body: "",
-        bodyEN: "",
+        body: "<p>A medida que los investigadores y las empresas de todo el mundo se dispusieron a luchar contra la pandemia del coronavirus, muchos están revisando el grafeno como un material con potencial para ayudar a ganar esta lucha.</p><p>Las razones de tal potencial podrían encontrarse en las conocidas propiedades antibacterianas y antivirales del grafeno, así como en sus rasgos beneficiosos para sensores y dispositivos médicos.</p>",
+        bodyEN:
+          "<p>As researchers and companies around the world set out to battle the Coronavirus pandemic, many are revisiting graphene as a material with potential to help in this fight.</p><p>The reasons include graphene's known antibacterial and antiviral properties, as well as beneficial traits for medical sensors and devices.</p>",
         status: 1,
         publishedAt: "2021-01-22",
         updatedAt: null,
@@ -92,8 +95,9 @@ export async function seedNews() {
           "El Dr. Gustavo Cuba Supanta nos acompañará en la primera sesión de Workshop del Club de Nanotecnología promovido por nuestra universidad y el grupo de Métodos Computacionales Aplicado a Nanomateriales.",
         summaryEN:
           "Dr. Gustavo Cuba Supanta will join us in the first workshop session of the Nanotechnology Club promoted by our university and the GMCAN.",
-        body: "",
-        bodyEN: "",
+        body: "<p>El Dr. Gustavo Cuba Supanta nos acompañará en la primera sesión de Workshop del Club de Nanotecnología promovido por nuestra universidad y el GMCAN.</p><p>Durante la sesión se abordarán fundamentos teóricos y aplicaciones del diseño y simulación de nanomateriales.</p>",
+        bodyEN:
+          "<p>Dr. Gustavo Cuba Supanta will join us in the first workshop session of the Nanotechnology Club promoted by our university and GMCAN.</p><p>The session will cover theoretical foundations and applications of nanomaterials design and simulation.</p>",
         status: 1,
         publishedAt: "2021-01-23",
         updatedAt: null,
