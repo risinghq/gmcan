@@ -54,11 +54,11 @@ export default class MembersComponent implements OnInit {
         const prefijosMap = new Map(prefijos.map((p) => [p.idPrefijo, p]));
 
         const processed = res.map((m): MemberDisplay => {
-          const photo = m.photo ?? "/img/placeholders/user.png";
+          const asset = m.asset ?? "/img/placeholders/user.png";
           const prefijo = m.prefixId ? prefijosMap.get(m.prefixId) : undefined;
           const prefix =
             prefijo && prefijo.nombre !== "Ninguno" && prefijo.nombre !== "Bachiller" ? prefijo.nombre : "";
-          return { ...m, photo, prefix };
+          return { ...m, asset, prefix };
         });
 
         for (const tipoMiembro of this.tipoMiembros) {

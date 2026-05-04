@@ -124,7 +124,7 @@ router.put(
   },
 );
 
-router.put("/:id/files/:slot", zValidator("param", IdParam.extend(SlotParam.shape)), async (c) => {
+router.put("/:id/assets/:slot", zValidator("param", IdParam.extend(SlotParam.shape)), async (c) => {
   const { id, slot } = c.req.valid("param");
   const config = SLOT_CONFIG[slot];
   const current = await getGroupFile(id, config.column);
@@ -187,7 +187,7 @@ router.put(
   },
 );
 
-router.put("/about/:id/photo", zValidator("param", IdParam), async (c) => {
+router.put("/about/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);

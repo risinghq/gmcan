@@ -3,7 +3,7 @@ import type { AuthorEntry } from "./author";
 export interface Publication {
   id: number;
   title: string;
-  file: string | null;
+  asset: string | null;
   abstract: string | null;
   journalIssue: number | null;
   doi: string | null;

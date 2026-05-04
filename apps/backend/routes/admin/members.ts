@@ -117,7 +117,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getMemberPhoto(id);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -135,7 +135,7 @@ router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.delete("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.delete("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMemberPhoto(id);
   if (!row?.photo) return c.json({ error: "File not found" }, 404);

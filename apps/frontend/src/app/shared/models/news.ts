@@ -5,7 +5,7 @@ export interface News {
   body: string;
   status: number;
   publishedAt: string;
-  photo: string | null;
+  asset: string | null;
   priority: number | null;
   authorId: number;
   newsTypeId: number;

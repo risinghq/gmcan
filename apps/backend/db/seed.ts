@@ -1,9 +1,9 @@
+import { auditAndQuarantineOrphans, importSeedAssetsAndRewriteReferences } from "./seed/assets.js";
 import { seedNews, seedJournals, seedUniversities, seedEvents, seedProject, seedPublications } from "./seed/content.js";
 import { seedEquipment, seedSoftware, seedAbout } from "./seed/infrastructure.js";
 import { seedLookups } from "./seed/lookups.js";
 import { seedMembers } from "./seed/members.js";
 import { seedResearchGroup, seedResearchLines, seedMethods } from "./seed/research.js";
-import { auditAndQuarantineOrphans, importSeedAssetsAndRewriteReferences } from "./seed/assets.js";
 
 export async function seed() {
   await seedLookups();

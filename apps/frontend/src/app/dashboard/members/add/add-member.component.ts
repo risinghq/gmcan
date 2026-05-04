@@ -156,7 +156,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
               .subscribe((res) => {
                 if (res.id) {
                   if (this.fileData) {
-                    this.memberService.uploadPhoto(res.id, this.fileData).subscribe();
+                    this.memberService.uploadAsset(res.id, this.fileData).subscribe();
                   }
                   this.openSnackBar("Miembro agregado exitosamente");
                   this.memberForm.markAsPristine();

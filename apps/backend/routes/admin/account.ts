@@ -43,7 +43,7 @@ router.put(
   },
 );
 
-router.put("/photo", requirePermission("account.self.write"), async (c) => {
+router.put("/asset", requirePermission("account.self.write"), async (c) => {
   const memberId = c.get("memberId") as number;
   const current = await getMemberPhoto(memberId);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -61,7 +61,7 @@ router.put("/photo", requirePermission("account.self.write"), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.delete("/photo", requirePermission("account.self.write"), async (c) => {
+router.delete("/asset", requirePermission("account.self.write"), async (c) => {
   const memberId = c.get("memberId") as number;
   const row = await getMemberPhoto(memberId);
   if (!row?.photo) return c.json({ error: "File not found" }, 404);

@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { assetUrl } from "../../lib/upload.js";
 import { localizeField } from "../../lib/public-locale.js";
+import { assetUrl } from "../../lib/upload.js";
 import { getMethod, listMethods } from "../../services/group.service.js";
 
 const router = new Hono();
@@ -17,7 +17,7 @@ router.get("/", async (c) => {
       id: row.id,
       name: localizeField(row, locale, { es: "name", en: "nameEN" }),
       description: localizeField(row, locale, { es: "description", en: "descriptionEN" }),
-      photo: assetUrl(row.photo),
+      asset: assetUrl(row.photo),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -34,7 +34,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: row.id,
     name: localizeField(row, locale, { es: "name", en: "nameEN" }),
     description: localizeField(row, locale, { es: "description", en: "descriptionEN" }),
-    photo: assetUrl(row.photo),
+    asset: assetUrl(row.photo),
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

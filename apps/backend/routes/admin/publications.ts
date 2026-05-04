@@ -78,7 +78,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/file", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getPublicationFile(id);
   if (!current) return c.json({ error: "Not found" }, 404);

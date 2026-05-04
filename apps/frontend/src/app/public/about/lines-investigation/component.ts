@@ -31,7 +31,7 @@ const EMPTY_LINE: ResearchLineDisplay = {
   id: 0,
   name: "",
   description: "",
-  photo: null,
+  asset: null,
   groupId: 0,
   createdAt: null,
   updatedAt: null,

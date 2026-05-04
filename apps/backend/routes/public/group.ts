@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { assetUrl } from "../../lib/upload.js";
 import { localizeField } from "../../lib/public-locale.js";
+import { assetUrl } from "../../lib/upload.js";
 import { listAbout, listGroups } from "../../services/group.service.js";
 
 const router = new Hono();
@@ -22,11 +22,13 @@ router.get("/", async (c) => {
     phone: row.phone,
     name: row.name,
     fullName: row.fullName,
-    facilitiesPhoto: assetUrl(row.facilitiesPhoto),
+    assets: {
+      facilities: assetUrl(row.facilitiesPhoto),
+      header: assetUrl(row.logoHeader),
+      footer: assetUrl(row.logoFooter),
+    },
     facilities: localizeField(row, locale, { es: "facilitiesES", en: "facilitiesEN", required: false }),
     futureWork: localizeField(row, locale, { es: "futureWorkES", en: "futureWorkEN", required: false }),
-    logoFooter: assetUrl(row.logoFooter),
-    logoHeader: assetUrl(row.logoHeader),
     publicationsSection: localizeField(row, locale, {
       es: "publicationsSectionES",
       en: "publicationsSectionEN",
@@ -48,7 +50,7 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
       description: localizeField(row, locale, { es: "descriptionES", en: "descriptionEN" }),
       objectives: localizeField(row, locale, { es: "objectivesES", en: "objectivesEN", required: false }),
       services: localizeField(row, locale, { es: "servicesES", en: "servicesEN", required: false }),
-      photo: assetUrl(row.photo),
+      asset: assetUrl(row.photo),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

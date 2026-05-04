@@ -1,8 +1,8 @@
 <div class="card-facilities">
-  @if (!grupo.facilitiesPhoto) {
+  @if (!grupo.assets.facilities) {
   <img class="facilities-img" src="/img/grupal.jpg" />
-  } @if (grupo.facilitiesPhoto) {
-  <img class="facilities-img" src="{{ grupo.facilitiesPhoto }}" />
+  } @if (grupo.assets.facilities) {
+  <img class="facilities-img" src="{{ grupo.assets.facilities }}" />
   }
   <div class="facilities-text-div">
     <div class="facilities-title">{{ language.facilitiesText[0].title }}</div>

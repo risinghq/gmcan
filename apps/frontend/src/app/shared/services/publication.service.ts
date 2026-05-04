@@ -41,11 +41,11 @@ export class PublicationService {
     return this.http.get<PublicationWithAuthors>(`${GLOBAL.url}api/publications/${id}`);
   }
 
-  getFile(fileName: string): Observable<Blob> {
+  getAsset(fileName: string): Observable<Blob> {
     return this.http.get(`${GLOBAL.url}api/assets/${fileName}`, { responseType: "blob" });
   }
 
-  downloadFile(fileName: string): Observable<Blob> {
+  downloadAsset(fileName: string): Observable<Blob> {
     return this.http.get(`${GLOBAL.url}api/assets/${fileName}?download=true`, { responseType: "blob" });
   }
 
@@ -66,9 +66,9 @@ export class PublicationService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/publications/${id}`);
   }
 
-  uploadFile(id: number, file: File): Observable<{ status: number }> {
+  uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/publications/${id}/file`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/publications/${id}/asset`, formData);
   }
 }

@@ -46,7 +46,7 @@ export class DetailNewsDataService {
         const autor = (members as Member[]).find((m) => m.id === noticia.authorId);
         if (autor) {
           autorName = `${autor.firstName} ${autor.lastName}`.trim();
-          autorPhoto = autor.photo;
+          autorPhoto = autor.asset;
           autorId = autor.id;
         }
       } catch {

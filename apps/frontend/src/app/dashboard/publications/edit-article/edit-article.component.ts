@@ -132,7 +132,7 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       if (principal) {
         this.selectedUser = principal.name;
         this.principalAuthor = principal.memberId
-          ? { id: principal.memberId, name: principal.name, photo: principal.photo ?? null }
+          ? { id: principal.memberId, name: principal.name, asset: principal.asset ?? null }
           : null;
         this.myControl.setValue(principal.name);
       }
@@ -248,7 +248,7 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
     this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((response) => {
       if (response.status === 1) {
         if (this.fileData) {
-          this.publicationService.uploadFile(this.publicacion.id, this.fileData).subscribe();
+          this.publicationService.uploadAsset(this.publicacion.id, this.fileData).subscribe();
         }
         this.publicacionForm.markAsPristine();
         this.return();

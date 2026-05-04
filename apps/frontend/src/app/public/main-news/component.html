@@ -44,10 +44,10 @@
               class="img-hover-zoom-2 img-div-zoom right pl-24"
               [style.display]="screenWidth < 960 ? 'block' : 'none'"
             >
-              @if (!noticia.photo) {
+              @if (!noticia.asset) {
               <img class="news-img" src="/img/grupal.jpg" />
-              } @if (noticia.photo) {
-              <img class="news-img" src="{{ noticia.photo }}" />
+              } @if (noticia.asset) {
+              <img class="news-img" src="{{ noticia.asset }}" />
               }
             </div>
             <div class="news-text-div">
@@ -60,10 +60,10 @@
               <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
             </div>
             <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-              @if (!noticia.photo) {
+              @if (!noticia.asset) {
               <img class="news-img" src="/img/grupal.jpg" />
-              } @if (noticia.photo) {
-              <img class="news-img" src="{{ noticia.photo }}" />
+              } @if (noticia.asset) {
+              <img class="news-img" src="{{ noticia.asset }}" />
               }
             </div>
           </div>

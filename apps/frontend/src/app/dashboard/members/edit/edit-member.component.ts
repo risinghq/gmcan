@@ -194,7 +194,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
           .subscribe((res) => {
             if (res.status === 1) {
               if (this.fileData) {
-                this.memberService.uploadPhoto(this.member.id, this.fileData).subscribe();
+                this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
               }
               this.openSnackBar("Miembro actualizado exitosamente");
               this.memberForm.markAsPristine();

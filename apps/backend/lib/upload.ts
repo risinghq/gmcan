@@ -43,7 +43,8 @@ export function normalizeAssetKey(assetKey: string): string | null {
   const normalized = assetKey.replaceAll("\\", "/").replace(/^\/+/, "");
   const segments = normalized.split("/").filter(Boolean);
   if (segments.length === 0) return null;
-  if (!segments.every((segment) => SAFE_ASSET_SEGMENT.test(segment) && segment !== "." && segment !== "..")) return null;
+  if (!segments.every((segment) => SAFE_ASSET_SEGMENT.test(segment) && segment !== "." && segment !== ".."))
+    return null;
   return segments.join("/");
 }
 
@@ -94,7 +95,10 @@ async function serveFile(c: Context, filePath: string): Promise<Response> {
   });
 }
 
-export async function saveUploadedFile(file: File, options: { domain: string; kind: UploadFileKind }): Promise<string | null> {
+export async function saveUploadedFile(
+  file: File,
+  options: { domain: string; kind: UploadFileKind },
+): Promise<string | null> {
   const ext = extensionOf(file.name);
   const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind] as readonly string[];
   if (!allowedExtensions.includes(ext)) return null;
@@ -135,15 +139,19 @@ async function isReferenced(key: string, exclude?: ReferenceExclusion): Promise<
     { table: "about", column: "photo" },
   ];
 
-  for (const check of checks) {
-    let query = db.selectFrom(check.table as never).select("id" as never).where(check.column as never, "=", key as never);
+  const queries = checks.map((check) => {
+    let query = db
+      .selectFrom(check.table as never)
+      .select("id" as never)
+      .where(check.column as never, "=", key as never);
     if (exclude && exclude.table === check.table && exclude.column === check.column) {
       query = query.where("id" as never, "!=", exclude.id as never);
     }
-    const row = await query.executeTakeFirst();
-    if (row) return true;
-  }
-  return false;
+    return query.executeTakeFirst();
+  });
+
+  const results = await Promise.all(queries);
+  return results.some((r) => !!r);
 }
 
 export async function quarantineAsset(options: { assetKey: string; reason: string }): Promise<boolean> {

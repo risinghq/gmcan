@@ -108,9 +108,9 @@
                 @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered") {
                 <div class="publication-members">
                   <div class="member-img-round">
-                    @if (autor.photo) {
-                    <img class="member-img" src="{{ autor.photo }}" alt="User photo" />
-                    } @if (!autor.photo) {
+                    @if (autor.asset) {
+                    <img class="member-img" src="{{ autor.asset }}" alt="User photo" />
+                    } @if (!autor.asset) {
                     <img class="member-img" src="/img/placeholders/user.png" alt="" />
                     }
                   </div>
@@ -121,15 +121,12 @@
                 } }
               </div>
               <div class="flex-news mt-16">
-                @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
-                <a class="publication-green" href="{{ publicacion.file }}" target="_blank">
+                @if (publicacion.typeId != 3 && publicacion.asset && publicacion.asset != "") {
+                <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
                   {{ this.language.publicationsText[0].preview }}
                 </a>
-                } @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
-                <a
-                  class="publication-green"
-                  href="{{ publicacion.file + '?download=true' }}"
-                >
+                } @if (publicacion.typeId != 3 && publicacion.asset && publicacion.asset != "") {
+                <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
                   {{ this.language.publicationsText[0].download }}
                 </a>
                 }
@@ -218,9 +215,9 @@
                   @for (member of proyecto.members; track member) {
                   <div class="project-members">
                     <div class="member-img-round">
-                      @if (member.photo) {
-                      <img class="member-img" src="{{ member.photo }}" />
-                      } @if (!member.photo) {
+                      @if (member.asset) {
+                      <img class="member-img" src="{{ member.asset }}" />
+                      } @if (!member.asset) {
                       <img class="member-img" src="/img/placeholders/user.png" alt="" />
                       }
                     </div>
@@ -323,9 +320,9 @@
             } @for (miembro of miembros; track miembro; let i = $index) {
             <div class="flex-news" [class.mb-24]="i + 1 != miembros.length">
               <div class="miembro-img-div">
-                @if (miembro.photo) {
-                <img class="member-img" src="{{ miembro.photo }}" alt="User photo" />
-                } @if (!miembro.photo) {
+                @if (miembro.asset) {
+                <img class="member-img" src="{{ miembro.asset }}" alt="User photo" />
+                } @if (!miembro.asset) {
                 <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
               </div>
@@ -370,10 +367,10 @@
             } @for (noticia of noticias; track noticia) {
             <div class="news-div-list">
               <div class="img-hover-zoom">
-                @if (!noticia.photo) {
+                @if (!noticia.asset) {
                 <img class="card-img-div" src="/img/grupal.jpg" />
-                } @if (noticia.photo) {
-                <img class="card-img-div" src="{{ noticia.photo }}" />
+                } @if (noticia.asset) {
+                <img class="card-img-div" src="{{ noticia.asset }}" />
                 }
               </div>
               <div class="card-text-div card-text-div-3">

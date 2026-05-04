@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { assetUrl } from "../../lib/upload.js";
 import { localizeField } from "../../lib/public-locale.js";
+import { assetUrl } from "../../lib/upload.js";
 import { getPublication, listPublications, listPublicationsByFilter } from "../../services/publication.service.js";
 
 const router = new Hono();
@@ -30,7 +30,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         id: row.id,
         title: row.title,
         abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-        file: assetUrl(row.file),
+        asset: assetUrl(row.file),
         journalIssue: row.journalIssue,
         doi: row.doi,
         publishedAt: row.publishedAt,
@@ -50,7 +50,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       id: row.id,
       title: row.title,
       abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-      file: assetUrl(row.file),
+      asset: assetUrl(row.file),
       journalIssue: row.journalIssue,
       doi: row.doi,
       publishedAt: row.publishedAt,
@@ -62,7 +62,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       updatedAt: row.updatedAt,
       createdAt: row.createdAt,
       authors: (row.authors as any[]).map((author) =>
-        author.kind === "registered" ? { ...author, photo: assetUrl(author.photo) } : author,
+        author.kind === "registered" ? Object.assign(author, { asset: assetUrl(author.photo) }) : author,
       ),
     })),
   );
@@ -77,7 +77,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: pub.id,
     title: pub.title,
     abstract: localizeField(pub, locale, { es: "abstractES", en: "abstractEN", required: false }),
-    file: assetUrl(pub.file),
+    asset: assetUrl(pub.file),
     journalIssue: pub.journalIssue,
     doi: pub.doi,
     publishedAt: pub.publishedAt,
@@ -89,7 +89,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     updatedAt: pub.updatedAt,
     createdAt: pub.createdAt,
     authors: (pub.authors as any[]).map((author) =>
-      author.kind === "registered" ? { ...author, photo: assetUrl(author.photo) } : author,
+      author.kind === "registered" ? Object.assign(author, { asset: assetUrl(author.photo) }) : author,
     ),
   });
 });

@@ -70,7 +70,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getMethodPhoto(id);
   if (!current) return c.json({ error: "Not found" }, 404);

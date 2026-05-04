@@ -2,8 +2,8 @@
   <div class="lines-text-div">
     <div class="line-mb">
       <div class="line-img-div">
-        @if (lineasProyecto[0].photo) {
-        <img class="line-img" src="{{ lineasProyecto[0].photo }}" />
+        @if (lineasProyecto[0].asset) {
+        <img class="line-img" src="{{ lineasProyecto[0].asset }}" />
         }
       </div>
       <div class="lines-title">{{ lineasProyecto[0].name }}</div>
@@ -28,9 +28,9 @@
               @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
-                  @if (member.photo) {
-                  <img class="member-img" src="{{ member.photo }}" />
-                  } @if (!member.photo) {
+                  @if (member.asset) {
+                  <img class="member-img" src="{{ member.asset }}" />
+                  } @if (!member.asset) {
                   <img class="member-img" src="/img/placeholders/user.png" alt="" />
                   }
                 </div>
@@ -109,8 +109,8 @@
     </div>
     <div class="line-mb">
       <div class="line-img-div">
-        @if (lineasProyecto[1].photo) {
-        <img class="line-img" src="{{ lineasProyecto[1].photo }}" />
+        @if (lineasProyecto[1].asset) {
+        <img class="line-img" src="{{ lineasProyecto[1].asset }}" />
         }
       </div>
       <div class="lines-title">{{ lineasProyecto[1].name }}</div>
@@ -135,9 +135,9 @@
               @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
-                  @if (member.photo) {
-                  <img class="member-img" src="{{ member.photo }}" />
-                  } @if (!member.photo) {
+                  @if (member.asset) {
+                  <img class="member-img" src="{{ member.asset }}" />
+                  } @if (!member.asset) {
                   <img class="member-img" src="/img/placeholders/user.png" alt="" />
                   }
                 </div>
@@ -216,8 +216,8 @@
     </div>
     <div>
       <div class="line-img-div">
-        @if (lineasProyecto[2].photo) {
-        <img class="line-img" src="{{ lineasProyecto[2].photo }}" />
+        @if (lineasProyecto[2].asset) {
+        <img class="line-img" src="{{ lineasProyecto[2].asset }}" />
         }
       </div>
       <div class="lines-title">{{ lineasProyecto[2].name }}</div>
@@ -242,9 +242,9 @@
               @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
-                  @if (member.photo) {
-                  <img class="member-img" src="{{ member.photo }}" />
-                  } @if (!member.photo) {
+                  @if (member.asset) {
+                  <img class="member-img" src="{{ member.asset }}" />
+                  } @if (!member.asset) {
                   <img class="member-img" src="/img/placeholders/user.png" alt="" />
                   }
                 </div>

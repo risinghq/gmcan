@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { assetUrl } from "../../lib/upload.js";
 import { localizeField } from "../../lib/public-locale.js";
+import { assetUrl } from "../../lib/upload.js";
 import { getMemberProfile, listMembers } from "../../services/member.service.js";
 
 const router = new Hono();
@@ -14,11 +14,10 @@ router.get("/", async (c) => {
   const rows = await listMembers();
   return c.json(
     rows.map((row) => {
-      return {
-        ...row,
+      return Object.assign(row, {
         bio: localizeField(row, locale, { es: "bio", en: "bioEN", required: false }),
-        photo: assetUrl(row.photo),
-      };
+        asset: assetUrl(row.photo),
+      });
     }),
   );
 });
@@ -33,12 +32,12 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     member: {
       ...profile.member,
       bio: localizeField(profile.member, locale, { es: "bio", en: "bioEN", required: false }),
-      photo: assetUrl(profile.member.photo),
+      asset: assetUrl(profile.member.photo),
     },
     projects: profile.projects,
     publications: profile.publications.map((publication) => ({
       ...publication,
-      file: assetUrl(publication.file),
+      asset: assetUrl(publication.file),
     })),
   });
 });

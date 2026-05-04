@@ -20,7 +20,7 @@ export type HomePublicacion = PublicationWithAuthors & {
 export type HomeProjectMember = {
   memberId: number;
   name: string;
-  photo: string | null;
+  asset: string | null;
 };
 
 export type HomeProyecto = Project & {

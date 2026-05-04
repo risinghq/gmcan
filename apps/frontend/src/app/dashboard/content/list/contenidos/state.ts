@@ -52,7 +52,7 @@ export class ContenidosState {
     description: "",
     objectives: null,
     services: null,
-    photo: null,
+    asset: null,
     groupId: 0,
     createdAt: null,
     updatedAt: null,
@@ -61,7 +61,7 @@ export class ContenidosState {
 
   descripcionForm: FormGroup = this.formBuilder.group({
     description: ["", Validators.required],
-    photo: ["", Validators.required],
+    asset: ["", Validators.required],
   });
   objetivosForm: FormGroup = this.formBuilder.group({
     objectives: ["", Validators.required],
@@ -182,7 +182,7 @@ export class ContenidosState {
       .subscribe((res) => {
         if (res.status === 1) {
           const file = this.files.get("about");
-          if (file) this.groupService.uploadAboutPhoto(this.aboutUs.id, file).subscribe();
+          if (file) this.groupService.uploadAboutAsset(this.aboutUs.id, file).subscribe();
           this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
         }
       });
@@ -216,7 +216,7 @@ export class ContenidosState {
       .subscribe((res) => {
         if (res.status === 1) {
           const file = this.files.get("fac");
-          if (file) this.groupService.uploadFile(this.group.id, "facilities", file).subscribe();
+          if (file) this.groupService.uploadAsset(this.group.id, "facilities", file).subscribe();
           this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
         }
       });
@@ -242,8 +242,8 @@ export class ContenidosState {
         if (res.status === 1) {
           const headFile = this.files.get("head");
           const footFile = this.files.get("foot");
-          if (headFile) this.groupService.uploadFile(this.group.id, "header", headFile).subscribe();
-          if (footFile) this.groupService.uploadFile(this.group.id, "footer", footFile).subscribe();
+          if (headFile) this.groupService.uploadAsset(this.group.id, "header", headFile).subscribe();
+          if (footFile) this.groupService.uploadAsset(this.group.id, "footer", footFile).subscribe();
           this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
         }
       });

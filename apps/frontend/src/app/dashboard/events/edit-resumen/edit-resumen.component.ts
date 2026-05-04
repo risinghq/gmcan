@@ -39,7 +39,7 @@ import { startWith, map } from "rxjs/operators";
 interface AuthorSearchResult {
   id: number;
   name: string;
-  photo: string | null;
+  asset: string | null;
 }
 
 interface AuthorFormRow {
@@ -111,7 +111,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     this.publicacion = {
       id: 0,
       title: "",
-      file: null,
+      asset: null,
       abstract: null,
       journalIssue: null,
       doi: null,

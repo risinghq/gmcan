@@ -17,7 +17,11 @@ const COLUMNS: Array<{ table: string; column: string }> = [
 async function validateReferences() {
   const missing: Array<{ table: string; id: number; column: string; key: string }> = [];
   for (const { table, column } of COLUMNS) {
-    const rows = await db.selectFrom(table as never).select(["id", column] as never).where(column as never, "is not", null).execute();
+    const rows = await db
+      .selectFrom(table as never)
+      .select(["id", column] as never)
+      .where(column as never, "is not", null)
+      .execute();
     for (const row of rows as Array<Record<string, unknown>>) {
       const rowId = Number(row.id);
       const value = String(row[column] ?? "");

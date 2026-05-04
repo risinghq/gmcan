@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { assetUrl } from "../../lib/upload.js";
 import { localizeField, type Locale } from "../../lib/public-locale.js";
+import { assetUrl } from "../../lib/upload.js";
 import { getNewsItem, listNews } from "../../services/news.service.js";
 
 const router = new Hono();
@@ -19,7 +19,7 @@ function toPublicNews(row: Awaited<ReturnType<typeof getNewsItem>>, locale: Loca
     body: localizeField(row, locale, { es: "body", en: "bodyEN" }),
     status: row.status,
     publishedAt: row.publishedAt,
-    photo: assetUrl(row.photo),
+    asset: assetUrl(row.photo),
     priority: row.priority,
     authorId: row.authorId,
     newsTypeId: row.newsTypeId,

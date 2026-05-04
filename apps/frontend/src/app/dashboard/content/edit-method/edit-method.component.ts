@@ -51,7 +51,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
       id: 0,
       name: "",
       description: "",
-      photo: null,
+      asset: null,
       groupId: 1,
       createdAt: null,
       updatedAt: null,
@@ -86,7 +86,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.status === 1) {
             if (this.fileData) {
-              this.methodService.uploadPhoto(this.metodo.id, this.fileData).subscribe();
+              this.methodService.uploadAsset(this.metodo.id, this.fileData).subscribe();
             }
             this.methodForm.markAsPristine();
             this.return();
@@ -167,9 +167,9 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   previewMethod(): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
-    method.photo = this.url + "admin/methods/" + this.metodo.id + "/photo";
+    method.asset = this.url + "admin/methods/" + this.metodo.id + "/asset";
     if (this.previewUrl) {
-      method.photo = typeof this.previewUrl === "string" ? this.previewUrl : null;
+      method.asset = typeof this.previewUrl === "string" ? this.previewUrl : null;
     }
     this.previewDialog = this.dialog.open(DialogPreview5, {
       width: "871px",

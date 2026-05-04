@@ -1,8 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import {
+  STORAGE_ROOT,
+  assetExists,
+  buildAssetKey,
+  normalizeAssetKey,
+  quarantineAsset,
+  sha256Buffer,
+} from "../../lib/upload.js";
 import { db } from "../client.js";
-import { STORAGE_ROOT, assetExists, buildAssetKey, normalizeAssetKey, quarantineAsset, sha256Buffer } from "../../lib/upload.js";
 
 const SEED_SOURCE_ROOT = path.resolve(process.cwd(), "assets/seed-src");
 const MAP_FILE = path.join(STORAGE_ROOT, ".seed-import-map.json");
@@ -64,7 +71,10 @@ function importSourceAsset(sourceKey: string, map: MapJson): string | null {
 export async function importSeedAssetsAndRewriteReferences() {
   const map = readMap();
   for (const { table, column } of ASSET_COLUMNS) {
-    const rows = await db.selectFrom(table as never).select(["id", column] as never).execute();
+    const rows = await db
+      .selectFrom(table as never)
+      .select(["id", column] as never)
+      .execute();
     for (const row of rows as Array<Record<string, unknown>>) {
       const rowId = Number(row.id);
       const value = (row[column] as string | null) ?? null;
@@ -88,7 +98,11 @@ export async function importSeedAssetsAndRewriteReferences() {
 export async function auditAndQuarantineOrphans() {
   const referenced = new Set<string>();
   for (const { table, column } of ASSET_COLUMNS) {
-    const rows = await db.selectFrom(table as never).select(column as never).where(column as never, "is not", null).execute();
+    const rows = await db
+      .selectFrom(table as never)
+      .select(column as never)
+      .where(column as never, "is not", null)
+      .execute();
     for (const row of rows as Array<Record<string, unknown>>) {
       const key = normalizeAssetKey(String(row[column] ?? ""));
       if (key) referenced.add(key);
