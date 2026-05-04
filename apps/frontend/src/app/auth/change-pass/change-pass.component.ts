@@ -65,11 +65,9 @@ export default class ChangePassComponent implements OnInit {
     this.groupService.getGroup().subscribe({
       next: (group: Group) => {
         this.grupoInfo = group;
-        this.grupoInfo.logoHeader = this.url + "api/group/files/header";
         this.uiState.setGroupInfo(this.grupoInfo);
       },
     });
-    this.grupoInfo.logoHeader = this.url + "api/group/files/header";
   }
 
   private extractAndVerifyToken(): void {

@@ -90,8 +90,6 @@ export default class LandingComponent implements OnInit {
   getGroupInfo(): void {
     this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
-      this.grupoinfo.logoHeader = this.url + "api/group/files/header";
-      this.grupoinfo.logoFooter = this.url + "api/group/files/footer";
       this.uiState.setGroupInfo(this.grupoinfo);
     });
   }

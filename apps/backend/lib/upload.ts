@@ -67,7 +67,10 @@ export async function serveFile(c: Context, filePath: string): Promise<Response>
   if (!fs.existsSync(absolutePath)) return c.json({ error: "File not found" }, 404);
   const data = await fs.promises.readFile(absolutePath);
   const ext = extensionOf(absolutePath);
-  return c.body(data, 200, { "Content-Type": MIME_TYPES[ext] ?? "application/octet-stream" });
+  return c.body(data, 200, {
+    "Content-Type": MIME_TYPES[ext] ?? "application/octet-stream",
+    "Cache-Control": "public, max-age=31536000, immutable",
+  });
 }
 
 export async function saveUploadedFile(

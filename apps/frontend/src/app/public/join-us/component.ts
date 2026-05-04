@@ -108,7 +108,6 @@ export class EmailExitoso {
   private uiState = inject(UiStateService);
 
   public url: string;
-  grupoLogo = "";
   grupoInfo: any = {};
   screenWidth: number;
   language: any = {};
@@ -117,7 +116,6 @@ export class EmailExitoso {
     this.screenWidth = this.browser.innerWidth();
     this.url = GLOBAL.url;
     this.grupoInfo = this.uiState.groupInfo();
-    this.grupoLogo = this.url + "api/group/files/header";
   }
 
   onNoClick(): void {

@@ -41,9 +41,6 @@ export default class DashboardComponent implements OnInit {
 
   getGrupoInfo(): void {
     this.grupoinfo = this.uiState.groupInfo();
-    if (this.grupoinfo.id) {
-      (this.grupoinfo as any).logoHeader = this.url + "api/group/" + this.grupoinfo.id + "/files/header";
-    }
   }
 
   total = 0;

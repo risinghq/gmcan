@@ -65,7 +65,6 @@ export default class AppComponent {
     this.groupService.getGroup().subscribe((res: Group) => {
       this.grupoinfo = res;
       this.uiState.setGroupInfo(res);
-      this.grupoinfo.logoHeader = this.url + "api/group/files/header";
     });
   }
   searchGlobal(value: string): void {

@@ -58,10 +58,8 @@ export default class LoginComponent implements OnInit {
 
   getGrupoInfo(): void {
     this.grupoinfo = this.uiState.groupInfo();
-    this.grupoinfo.logoHeader = this.url + "api/group/files/header";
     this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
-      this.grupoinfo.logoHeader = this.url + "api/group/files/header";
       this.uiState.setGroupInfo(this.grupoinfo);
     });
   }

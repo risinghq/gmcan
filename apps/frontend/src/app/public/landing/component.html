@@ -115,7 +115,7 @@
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
       <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
-        <img class="logo-nav" src="{{ grupoinfo.logoHeader }}" alt="logo" />
+        <img class="logo-nav" src="{{ url + 'api/group/files/header' }}" alt="logo" />
       </div>
       <div class="full-width ml-16" [style.display]="screenWidth < 1050 ? 'none' : 'block'">
         <div class="top-bar-div">
@@ -244,11 +244,7 @@
       <div class="footer-flex">
         <div class="flex-news">
           <div class="link-logo-div" (click)="scroll()" routerLink="/">
-            @if (!grupoinfo.logoFooter) {
-            <img class="img-logo-white" src="../assets/img/logoWhite.png" />
-            } @if (grupoinfo.logoFooter) {
-            <img class="img-logo-white" src="{{ grupoinfo.logoFooter }}" />
-            }
+            <img class="img-logo-white" src="{{ url + 'api/group/files/footer' }}" />
           </div>
           <div class="link-logo-div">
             <img class="img-logo-white" src="../../assets/img/logoUNMSM.png" />

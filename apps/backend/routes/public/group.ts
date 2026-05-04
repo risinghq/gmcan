@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
 import { serveUploadedFile } from "../../lib/upload.js";
-import { getGroupFile, listAbout, listGroups } from "../../services/group.service.js";
+import { getAboutPhoto, getGroupFile, listAbout, listGroups } from "../../services/group.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -45,6 +45,18 @@ router.get("/", async (c) => {
   });
 });
 
+router.get("/files/:slot", zValidator("param", SlotParam), async (c) => {
+  const { slot } = c.req.valid("param");
+  const column = SLOT_COLUMN[slot];
+  const groups = await listGroups();
+  const defaultGroup = groups[0];
+  if (!defaultGroup) return c.json({ error: "Not found" }, 404);
+  const row = await getGroupFile(defaultGroup.id, column);
+  const fileName = row?.[column];
+  if (!fileName) return c.json({ error: "File not found" }, 404);
+  return serveUploadedFile(c, { directory: "group", fileName });
+});
+
 router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
@@ -61,6 +73,13 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
       updatedAt: row.updatedAt,
     })),
   );
+});
+
+router.get("/about/:id/photo", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const row = await getAboutPhoto(id);
+  if (!row?.photo) return c.json({ error: "File not found" }, 404);
+  return serveUploadedFile(c, { directory: "about", fileName: row.photo });
 });
 
 router.get("/:id/files/:slot", zValidator("param", IdParam.extend(SlotParam.shape)), async (c) => {

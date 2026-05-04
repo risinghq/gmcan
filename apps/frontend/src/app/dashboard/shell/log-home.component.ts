@@ -82,12 +82,8 @@ export default class LogHomeComponent implements OnInit {
     this.groupService.getGroup().subscribe((group: Group) => {
       this.grupoinfo = group;
       this.uiState.setGroupInfo(group);
-      (this.grupoinfo as any).logoHeader = this.url + "api/group/" + group.id + "/files/header";
       this.getUser();
     });
-    if (this.grupoinfo.id) {
-      (this.grupoinfo as any).logoHeader = this.url + "api/group/" + this.grupoinfo.id + "/files/header";
-    }
   }
 
   getUser(): void {
