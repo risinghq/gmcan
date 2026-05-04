@@ -20,9 +20,9 @@
             <div class="members-container">
               @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
               <div class="member-type-container">
-                @if ((tipoMiembro.members?.length ?? 0) > 0) {
+                @if (tipoMiembro.members.length > 0) {
                 <div class="member-type-title">{{ tipoMiembro.name }}</div>
-                } @if ((tipoMiembro.members?.length ?? 0) > 0) {
+                } @if (tipoMiembro.members.length > 0) {
                 <div class="row">
                   @for (miembro of tipoMiembro.members; track miembro) {
                   <div class="col-12 col-sm-6">

@@ -88,12 +88,8 @@
             }
           </div>
         </div>
-        } @if ((lineasProyecto[0].proyectos?.length ?? 0) > 5) {
-        <ngb-pagination
-          [(page)]="page0"
-          [pageSize]="pageSize"
-          [collectionSize]="lineasProyecto[0].proyectos?.length ?? 0"
-        >
+        } @if (lineasProyecto[0].proyectos.length > 5) {
+        <ngb-pagination [(page)]="page0" [pageSize]="pageSize" [collectionSize]="lineasProyecto[0].proyectos.length">
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -199,12 +195,8 @@
             }
           </div>
         </div>
-        } @if ((lineasProyecto[1].proyectos?.length ?? 0) > 5) {
-        <ngb-pagination
-          [(page)]="page1"
-          [pageSize]="pageSize"
-          [collectionSize]="lineasProyecto[1].proyectos?.length ?? 0"
-        >
+        } @if (lineasProyecto[1].proyectos.length > 5) {
+        <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="lineasProyecto[1].proyectos.length">
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -310,12 +302,8 @@
             }
           </div>
         </div>
-        } @if ((lineasProyecto[2].proyectos?.length ?? 0) > 5) {
-        <ngb-pagination
-          [(page)]="page2"
-          [pageSize]="pageSize"
-          [collectionSize]="lineasProyecto[2].proyectos?.length ?? 0"
-        >
+        } @if (lineasProyecto[2].proyectos.length > 5) {
+        <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="lineasProyecto[2].proyectos.length">
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>

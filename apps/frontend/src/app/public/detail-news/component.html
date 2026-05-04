@@ -42,7 +42,7 @@
           </div>
           <app-shared-share-buttons [url]="url + 'api/news/' + noticia.id" [title]="noticia.title" />
 
-          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.body ?? ''"></div>
+          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.body"></div>
         </div>
       </div>
     </div>

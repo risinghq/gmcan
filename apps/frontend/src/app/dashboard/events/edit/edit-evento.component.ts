@@ -10,9 +10,7 @@ import {
   MatDialogActions,
   MatDialogClose,
 } from "@angular/material/dialog";
-import { MatFormField, MatLabel } from "@angular/material/form-field";
 import { MatIcon } from "@angular/material/icon";
-import { MatInput } from "@angular/material/input";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
@@ -25,7 +23,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-edit-evento",
   templateUrl: "../add/add-evento.component.html",
   styleUrl: "../add/add-evento.component.scss",
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, MatFormField, MatInput, MatLabel],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

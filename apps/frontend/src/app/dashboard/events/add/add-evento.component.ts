@@ -1,9 +1,7 @@
 import { Component, OnInit, inject } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
-import { MatFormField, MatLabel } from "@angular/material/form-field";
 import { MatIcon } from "@angular/material/icon";
-import { MatInput } from "@angular/material/input";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -14,7 +12,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-evento",
   templateUrl: "./add-evento.component.html",
   styleUrl: "./add-evento.component.scss",
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, MatFormField, MatInput, MatLabel],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);

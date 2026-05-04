@@ -3,7 +3,6 @@ import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
-import { MatProgressBar } from "@angular/material/progress-bar";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
@@ -31,7 +30,6 @@ type NewsTypeFilter = { id: number; name: string };
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   imports: [
-    MatProgressBar,
     MatIcon,
     MatProgressSpinner,
     MatButton,
