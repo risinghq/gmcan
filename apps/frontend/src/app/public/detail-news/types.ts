@@ -5,7 +5,6 @@ export type DetailNewsViewModel = {
   tipoNoticia: string;
   autorName: string;
   autorPhoto: string | null;
-  autorPhotoUrl?: string | null;
   autorId: number | null;
   dia: string;
   mes: string;

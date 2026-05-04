@@ -30,8 +30,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         id: row.id,
         title: row.title,
         abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-        file: row.file,
-        fileUrl: assetUrl(row.file),
+        file: assetUrl(row.file),
         journalIssue: row.journalIssue,
         doi: row.doi,
         publishedAt: row.publishedAt,
@@ -42,6 +41,9 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         thesisTypeId: row.thesisTypeId,
         updatedAt: row.updatedAt,
         createdAt: row.createdAt,
+        authors: row.authors?.map((author) =>
+          author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+        ),
       })),
     );
   }
@@ -51,8 +53,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       id: row.id,
       title: row.title,
       abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-      file: row.file,
-      fileUrl: assetUrl(row.file),
+      file: assetUrl(row.file),
       journalIssue: row.journalIssue,
       doi: row.doi,
       publishedAt: row.publishedAt,
@@ -63,7 +64,9 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       thesisTypeId: row.thesisTypeId,
       updatedAt: row.updatedAt,
       createdAt: row.createdAt,
-      authors: row.authors,
+      authors: row.authors.map((author) =>
+        author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+      ),
     })),
   );
 });
@@ -77,8 +80,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: pub.id,
     title: pub.title,
     abstract: localizeField(pub, locale, { es: "abstractES", en: "abstractEN", required: false }),
-    file: pub.file,
-    fileUrl: assetUrl(pub.file),
+    file: assetUrl(pub.file),
     journalIssue: pub.journalIssue,
     doi: pub.doi,
     publishedAt: pub.publishedAt,
@@ -89,7 +91,9 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     thesisTypeId: pub.thesisTypeId,
     updatedAt: pub.updatedAt,
     createdAt: pub.createdAt,
-    authors: pub.authors,
+    authors: pub.authors.map((author) =>
+      author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+    ),
   });
 });
 

@@ -29,7 +29,6 @@ export default class DetailNewsComponent implements OnInit {
   tipoNoticia = "";
   autorName = "";
   autorPhoto: string | null = null;
-  autorPhotoUrl: string | null = null;
   autorId: number | null = null;
   previouspage = "Inicio";
   previouslink = "/home";
@@ -48,7 +47,6 @@ export default class DetailNewsComponent implements OnInit {
     this.tipoNoticia = newsData.tipoNoticia;
     this.autorName = newsData.autorName;
     this.autorPhoto = newsData.autorPhoto;
-    this.autorPhotoUrl = newsData.autorPhotoUrl ?? null;
     this.autorId = newsData.autorId;
     this.dia = newsData.dia;
     this.mes = newsData.mes;

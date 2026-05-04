@@ -136,9 +136,9 @@ async function isReferenced(key: string, exclude?: ReferenceExclusion): Promise<
   ];
 
   for (const check of checks) {
-    let query = db.selectFrom(check.table as never).select("id").where(check.column as never, "=", key);
+    let query = db.selectFrom(check.table as never).select("id" as never).where(check.column as never, "=", key as never);
     if (exclude && exclude.table === check.table && exclude.column === check.column) {
-      query = query.where("id", "!=", exclude.id);
+      query = query.where("id" as never, "!=", exclude.id as never);
     }
     const row = await query.executeTakeFirst();
     if (row) return true;

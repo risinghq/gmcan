@@ -42,7 +42,7 @@
       <mat-card class="line-card center">
         <div class="line-img-div">
           @if (linea.photo) {
-          <img class="line-img" src="{{ linea.photoUrl }}" />
+          <img class="line-img" src="{{ linea.photo }}" />
           } @if (!linea.photo) {
           <img class="line-img" src="/img/prop_estruc.jpg" />
           }
@@ -68,7 +68,7 @@
           @if (!noticiaPrincipal.photo) {
           <img class="main-img-news" src="/img/grupal.jpg" alt="nada" />
           } @if (noticiaPrincipal.photo) {
-          <img class="main-img-news" src="{{ noticiaPrincipal.photoUrl }}" alt="imagen" />
+          <img class="main-img-news" src="{{ noticiaPrincipal.photo }}" alt="imagen" />
           }
         </div>
         <div class="news-div mt-main" style="height: 100%">
@@ -89,7 +89,7 @@
       <div class="news-box" [class.mb-other]="i == 0">
         <div class="img-hover-zoom" [style.display]="screenWidth < 960 ? 'none' : 'block'">
           @if (noticia.photo) {
-          <img class="other-img-news" src="{{ noticia.photoUrl }}" />
+          <img class="other-img-news" src="{{ noticia.photo }}" />
           }
         </div>
         <div class="flex-news">
@@ -103,7 +103,7 @@
           </div>
           <div class="img-hover-zoom ml-16 other-img-news-div" [style.display]="screenWidth > 960 ? 'none' : 'block'">
             @if (noticia.photo) {
-            <img class="other-img-news" src="{{ noticia.photoUrl }}" />
+            <img class="other-img-news" src="{{ noticia.photo }}" />
             }
           </div>
         </div>
@@ -217,11 +217,11 @@
           >
         </div>
         } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-        <a class="publication-green" href="{{ publicacion.fileUrl }}" target="_blank">
+        <a class="publication-green" href="{{ publicacion.file }}" target="_blank">
           {{ this.language.publicationsText[0].preview }}
         </a>
         } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-        <a class="publication-green" href="{{ publicacion.fileUrl + '?download=true' }}">
+        <a class="publication-green" href="{{ publicacion.file + '?download=true' }}">
           {{ this.language.publicationsText[0].download }}
         </a>
         }
@@ -279,7 +279,7 @@
             <div class="publication-members">
               <div class="member-img-round">
                 @if (autor.photo) {
-                <img class="member-img" src="{{ autor.photoUrl }}" alt="User photo" />
+                <img class="member-img" src="{{ autor.photo }}" alt="User photo" />
                 } @if (!autor.photo) {
                 <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
@@ -295,11 +295,11 @@
           <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
             @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-            <a class="publication-green" href="{{ publicacion.fileUrl }}" target="_blank">
+            <a class="publication-green" href="{{ publicacion.file }}" target="_blank">
               {{ this.language.publicationsText[0].preview }}
             </a>
             } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-            <a class="publication-green" href="{{ publicacion.fileUrl + '?download=true' }}">
+            <a class="publication-green" href="{{ publicacion.file + '?download=true' }}">
               {{ this.language.publicationsText[0].download }}
             </a>
             }
@@ -384,7 +384,7 @@
             <div class="project-members">
               <div class="member-img-round">
                 @if (member.photo) {
-                <img class="member-img" src="{{ member.photoUrl }}" />
+                <img class="member-img" src="{{ member.photo }}" />
                 } @if (!member.photo) {
                 <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }

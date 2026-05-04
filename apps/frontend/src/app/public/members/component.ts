@@ -12,7 +12,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
 
-type MemberDisplay = Member & { photoUrl: string; prefix: string };
+type MemberDisplay = Member & { prefix: string };
 type MemberTypeGroup = { id: number; name: string; members: MemberDisplay[] };
 
 @Component({
@@ -54,11 +54,11 @@ export default class MembersComponent implements OnInit {
         const prefijosMap = new Map(prefijos.map((p) => [p.idPrefijo, p]));
 
         const processed = res.map((m): MemberDisplay => {
-          const photoUrl = m.photoUrl ?? "/img/placeholders/user.png";
+          const photo = m.photo ?? "/img/placeholders/user.png";
           const prefijo = m.prefixId ? prefijosMap.get(m.prefixId) : undefined;
           const prefix =
             prefijo && prefijo.nombre !== "Ninguno" && prefijo.nombre !== "Bachiller" ? prefijo.nombre : "";
-          return { ...m, photoUrl, prefix };
+          return { ...m, photo, prefix };
         });
 
         for (const tipoMiembro of this.tipoMiembros) {

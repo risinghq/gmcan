@@ -98,7 +98,7 @@
                   <div class="publication-members">
                     <div class="member-img-round">
                       @if (autor.photo) {
-                      <img class="member-img" src="{{ autor.photoUrl }}" alt="User photo" />
+                      <img class="member-img" src="{{ autor.photo }}" alt="User photo" />
                       } @if (!autor.photo) {
                       <img class="member-img" src="/img/placeholders/user.png" alt="" />
                       }
@@ -111,13 +111,13 @@
                 </div>
                 <div class="flex-news mt-16">
                   @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
-                  <a class="publication-green" href="{{ publicacion.fileUrl }}" target="_blank">
+                  <a class="publication-green" href="{{ publicacion.file }}" target="_blank">
                     {{ this.language.publicationsText[0].preview }}
                   </a>
                   } @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
                   <a
                     class="publication-green"
-                    href="{{ publicacion.fileUrl + '?download=true' }}"
+                    href="{{ publicacion.file + '?download=true' }}"
                   >
                     {{ this.language.publicationsText[0].download }}
                   </a>

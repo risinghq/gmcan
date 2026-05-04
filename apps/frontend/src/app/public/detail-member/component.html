@@ -26,7 +26,7 @@
         <div class="flex-detail member-title-div">
           <div class="member-detail-img-div">
             @if (usuario.photo != null) {
-            <img class="member-detail-img" src="{{ usuario.photoUrl }}" alt="" />
+            <img class="member-detail-img" src="{{ usuario.photo }}" alt="" />
             } @if (usuario.photo == null) {
             <img class="member-detail-img" src="/img/placeholders/user.png" alt="" />
             }
@@ -103,11 +103,11 @@
             }
             <div class="flex-news mt-16">
               @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-              <a class="publication-green" href="{{ publicacion.fileUrl }}" target="_blank">
+              <a class="publication-green" href="{{ publicacion.file }}" target="_blank">
                 {{ this.language.publicationsText[0].preview }}
               </a>
               } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-              <a class="publication-green" href="{{ publicacion.fileUrl + '?download=true' }}">
+              <a class="publication-green" href="{{ publicacion.file + '?download=true' }}">
                 {{ this.language.publicationsText[0].download }}
               </a>
               }

@@ -28,7 +28,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       id: row.id,
       title: row.title,
       abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-      file: row.file,
+      file: row.fileUrl,
       journalIssue: row.journalIssue,
       doi: row.doi,
       publishedAt: row.publishedAt,
@@ -37,7 +37,9 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       universityId: row.universityId,
       eventId: row.eventId,
       thesisTypeId: row.thesisTypeId,
-      authors: row.authors,
+      authors: row.authors.map((author) =>
+        author.kind === "registered" ? { ...author, photo: author.photoUrl ?? null, photoUrl: undefined } : author,
+      ),
     })),
     members: result.members.map((row) => ({
       ...row,
@@ -47,7 +49,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       id: row.id,
       title: localizeField(row, locale, { es: "title", en: "titleEN" }),
       publishedAt: row.publishedAt,
-      photo: row.photo,
+      photo: row.photoUrl,
       newsTypeId: row.newsTypeId,
       status: row.status,
       authorName: row.authorName,
@@ -66,7 +68,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       currencyId: row.currencyId,
       researchLine: localizeField(row, locale, { es: "researchLine", en: "researchLine" }),
       fundingSource: localizeField(row, locale, { es: "fundingSource", en: "fundingSource" }),
-      members: row.members,
+      members: row.members.map((member) => ({ ...member, photo: member.photoUrl })),
     })),
   });
 });
