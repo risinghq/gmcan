@@ -38,6 +38,7 @@ export class DetailNewsDataService {
 
     let autorName = "";
     let autorPhoto: string | null = null;
+    let autorPhotoUrl: string | null = null;
     let autorId: number | null = null;
 
     if (noticia.authorId != null) {
@@ -47,6 +48,7 @@ export class DetailNewsDataService {
         if (autor) {
           autorName = `${autor.firstName} ${autor.lastName}`.trim();
           autorPhoto = autor.photo;
+          autorPhotoUrl = autor.photoUrl ?? null;
           autorId = autor.id;
         }
       } catch {
@@ -59,6 +61,7 @@ export class DetailNewsDataService {
       tipoNoticia,
       autorName,
       autorPhoto,
+      autorPhotoUrl,
       autorId,
       dia,
       mes,

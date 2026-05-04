@@ -4,6 +4,7 @@ export interface About {
   objectives: string | null;
   services: string | null;
   photo: string | null;
+  photoUrl?: string | null;
   groupId: number;
   createdAt: string | null;
   updatedAt: string | null;

@@ -5,6 +5,7 @@ export interface SearchResults {
     id: number;
     title: string;
     file: string | null;
+    fileUrl?: string | null;
     abstract: string | null;
     journalIssue: number | null;
     doi: string | null;
@@ -26,6 +27,7 @@ export interface SearchResults {
     birthDate: string | null;
     bio: string | null;
     photo: string | null;
+    photoUrl?: string | null;
     status: number;
     roleId: number;
     memberTypeId: number;
@@ -36,6 +38,7 @@ export interface SearchResults {
     title: string;
     publishedAt: string;
     photo: string | null;
+    photoUrl?: string | null;
     newsTypeId: number;
     status: number;
     authorName: string;
@@ -54,6 +57,6 @@ export interface SearchResults {
     currencyId: number;
     researchLine: string;
     fundingSource: string;
-    members: { memberId: number; name: string; photo: string | null }[];
+    members: { memberId: number; name: string; photo: string | null; photoUrl?: string | null }[];
   }[];
 }

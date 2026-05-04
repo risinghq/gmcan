@@ -2,7 +2,7 @@
   @if (!grupo.facilitiesPhoto) {
   <img class="facilities-img" src="/img/grupal.jpg" />
   } @if (grupo.facilitiesPhoto) {
-  <img class="facilities-img" src="{{ url + 'api/assets/group-facilities.png' }}" />
+  <img class="facilities-img" src="{{ grupo.facilitiesPhotoUrl }}" />
   }
   <div class="facilities-text-div">
     <div class="facilities-title">{{ language.facilitiesText[0].title }}</div>

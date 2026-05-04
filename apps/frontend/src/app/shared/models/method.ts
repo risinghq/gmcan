@@ -3,6 +3,7 @@ export interface Method {
   name: string;
   description: string;
   photo: string | null;
+  photoUrl?: string | null;
   groupId: number;
   createdAt: string | null;
   updatedAt: string | null;
