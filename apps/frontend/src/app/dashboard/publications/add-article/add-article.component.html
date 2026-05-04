@@ -98,13 +98,13 @@
               >
                 @for (option of filteredOptions | async; track option) {
                   <mat-option class="mdc-list-item" [value]="option.name">
-                    @if (!option.photo) {
+                    @if (!option.asset) {
                       <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                     }
-                    @if (option.photo) {
+                    @if (option.asset) {
                       <img
                         class="mdc-list-item__graphic mr-12 img-user"
-                        src="{{ url + 'api/assets/' + option.photo }}"
+                        src="{{ option.asset }}"
                       />
                     }
                     <span class="mdc-list-item__text">{{ option.name }}</span>
@@ -116,13 +116,13 @@
               <mat-select (selectionChange)="selectUser($event.value, 1)">
                 @for (option of options; track option) {
                   <mat-option class="mdc-list-item" [value]="option">
-                    @if (!option.photo) {
+                    @if (!option.asset) {
                       <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                     }
-                    @if (option.photo) {
+                    @if (option.asset) {
                       <img
                         class="mdc-list-item__graphic mr-12 img-user"
-                        src="{{ url + 'api/assets/' + option.photo }}"
+                        src="{{ option.asset }}"
                       />
                     }
                     <span class="mdc-list-item__text">{{ option.name }}</span>
@@ -158,13 +158,13 @@
                   >
                     @for (option of otroAutor.filteredOptions | async; track option) {
                       <mat-option class="mdc-list-item" [value]="option.name">
-                        @if (!option.photo) {
+                        @if (!option.asset) {
                           <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                         }
-                        @if (option.photo) {
+                        @if (option.asset) {
                           <img
                             class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'api/assets/' + option.photo }}"
+                            src="{{ option.asset }}"
                           />
                         }
                         <span class="mdc-list-item__text">{{ option.name }}</span>
@@ -176,13 +176,13 @@
                   <mat-select (selectionChange)="selectUserAutor($event.value, 1, i)">
                     @for (option of options; track option) {
                       <mat-option class="mdc-list-item" [value]="option">
-                        @if (!option.photo) {
+                        @if (!option.asset) {
                           <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                         }
-                        @if (option.photo) {
+                        @if (option.asset) {
                           <img
                             class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'api/assets/' + option.photo }}"
+                            src="{{ option.asset }}"
                           />
                         }
                         <span class="mdc-list-item__text">{{ option.name }}</span>
@@ -214,21 +214,21 @@
           <div class="flex-news">
             <div class="gray-box flex-news mr-16">
               <img class="upload-icon mr-16" src="/img/icons/upload.svg" />
-              @if (!fileData && !publicacion.file) {
+              @if (!fileData && !publicacion.asset) {
                 <span class="gray-pdf plex-sans">PDF</span>
               }
               @if (fileData) {
                 <span class="gray-pdf plex-sans">{{ fileData.name }}</span>
               }
-              @if (!fileData && publicacion.file) {
-                <span class="gray-pdf plex-sans">{{ publicacion.file }}</span>
+              @if (!fileData && publicacion.asset) {
+                <span class="gray-pdf plex-sans">{{ publicacion.asset }}</span>
               }
             </div>
             <div class="green-text">
-              @if (!fileData && !publicacion.file) {
+              @if (!fileData && !publicacion.asset) {
                 <span class="plex-sans">Seleccionar PDF</span>
               }
-              @if (fileData || publicacion.file) {
+              @if (fileData || publicacion.asset) {
                 <span class="plex-sans">Cambiar</span>
               }
               <input

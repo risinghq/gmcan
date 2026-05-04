@@ -18,14 +18,14 @@
               <img class="img-set" src="{{ previewUrl }}" />
             </div>
           }
-          @if (!previewUrl && !noticia.photo) {
+          @if (!previewUrl && !noticia.asset) {
             <div class="news-img">
               <img src="/img/icons/upload.svg" />
             </div>
           }
-          @if (noticia.photo && !previewUrl) {
+          @if (noticia.asset && !previewUrl) {
             <div class="img-preview">
-              <img class="img-set" src="{{ url + 'api/assets/' + noticia.photo }}" />
+              <img class="img-set" src="{{ noticia.asset }}" />
             </div>
           }
           <div class="green-text mt-16">
@@ -86,11 +86,11 @@
               <mat-select [(ngModel)]="noticia.authorId" formControlName="authorId" name="authorId">
                 @for (autor of autores; track autor) {
                   <mat-option [value]="autor.id" class="mdc-list-item">
-                    @if (!autor.photo) {
+                    @if (!autor.asset) {
                       <img class="mdc-list-item__graphic img-user" src="/img/placeholders/user.png" />
                     }
-                    @if (autor.photo) {
-                      <img class="mdc-list-item__graphic img-user" src="{{ url + 'api/assets/' + autor.photo }}" />
+                    @if (autor.asset) {
+                      <img class="mdc-list-item__graphic img-user" src="{{ autor.asset }}" />
                     }
                     <span class="mdc-list-item__text"
                       >{{ autor.firstName }} {{ autor.lastName
@@ -138,8 +138,8 @@
         </div>
         <div
           [class]="{
-            'black-btn': newsForm.valid && (noticia.photo || fileData != null || previewUrl),
-            'btn-grey': !(newsForm.valid && (noticia.photo || fileData != null || previewUrl)),
+            'black-btn': newsForm.valid && (noticia.asset || fileData != null || previewUrl),
+            'btn-grey': !(newsForm.valid && (noticia.asset || fileData != null || previewUrl)),
           }"
         >
           <div class="link link-set" (click)="submitNews(1)">

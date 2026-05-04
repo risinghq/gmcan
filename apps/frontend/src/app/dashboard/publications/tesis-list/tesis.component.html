@@ -35,10 +35,10 @@
             <div class="flex-news">
               @if (autor.memberId) {
                 <div class="member-img-round mr-8">
-                  @if (autor.photo) {
-                    <img class="member-img" src="{{ url + 'api/assets/' + autor.photo }}" alt="User photo" />
+                  @if (autor.asset) {
+                    <img class="member-img" src="{{ autor.asset }}" alt="User photo" />
                   }
-                  @if (!autor.photo) {
+                  @if (!autor.asset) {
                     <img class="member-img" src="/img/placeholders/user.png" alt="" />
                   }
                 </div>

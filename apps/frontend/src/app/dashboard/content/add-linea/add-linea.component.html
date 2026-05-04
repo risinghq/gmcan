@@ -28,14 +28,14 @@
               <img class="img-set" src="{{ previewUrl }}" />
             </div>
           }
-          @if (!previewUrl && !lineaInvestigacion.photo) {
+          @if (!previewUrl && !lineaInvestigacion.asset) {
             <div class="news-img">
               <img class="icon-upload" src="/img/icons/upload.svg" />
             </div>
           }
-          @if (lineaInvestigacion.photo && !previewUrl) {
+          @if (lineaInvestigacion.asset && !previewUrl) {
             <div class="img-preview">
-              <img class="img-set" src="{{ url + 'api/assets/' + lineaInvestigacion.photo }}" />
+              <img class="img-set" src="{{ lineaInvestigacion.asset }}" />
             </div>
           }
           <div class="green-text mt-16">
