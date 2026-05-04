@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { Bilingual } from "../lib/admin-translations.js";
+import { assetUrl } from "../lib/upload.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -65,6 +66,7 @@ async function attachAuthors(publicationId: number) {
         memberId: row.memberId,
         name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
         photo: row.memberPhoto ?? null,
+        photoUrl: assetUrl(row.memberPhoto),
         isPrincipal: row.isPrincipal,
       };
     }
@@ -107,6 +109,7 @@ export async function listPublications() {
           memberId: row.memberId,
           name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
           photo: row.memberPhoto ?? null,
+          photoUrl: assetUrl(row.memberPhoto),
           isPrincipal: row.isPrincipal,
         }
       : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal };

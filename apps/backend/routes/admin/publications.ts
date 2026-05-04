@@ -86,12 +86,12 @@ router.put("/:id/file", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { kind: "document" });
+  const fileName = await saveUploadedFile(file, { domain: "publications", kind: "document" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setPublicationFile(id, fileName);
   if (current.file && current.file !== fileName) {
-    await deleteUploadedFile({ fileName: current.file });
+    await deleteUploadedFile({ assetKey: current.file });
   }
   return c.json({ status: 1 });
 });

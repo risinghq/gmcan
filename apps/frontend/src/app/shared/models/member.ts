@@ -12,6 +12,7 @@ export interface Member {
   birthDate: string | null;
   bio: string | null;
   photo: string | null;
+  photoUrl?: string | null;
   status: number;
   roleId: number;
   memberTypeId: number;

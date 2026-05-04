@@ -78,12 +78,12 @@ router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { kind: "image" });
+  const fileName = await saveUploadedFile(file, { domain: "research-lines", kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setResearchLinePhoto(id, fileName);
   if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ fileName: current.photo });
+    await deleteUploadedFile({ assetKey: current.photo });
   }
   return c.json({ status: 1 });
 });

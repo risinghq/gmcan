@@ -4,6 +4,7 @@ import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
 import { hashPassword } from "../lib/password.js";
+import { assetUrl } from "../lib/upload.js";
 
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
@@ -108,6 +109,7 @@ export async function searchAuthorPool(q: string) {
       memberId: m.id,
       name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
       photo: m.photo ?? null,
+      photoUrl: assetUrl(m.photo),
     })),
     ...externals
       .filter((e) => e.externalName != null)

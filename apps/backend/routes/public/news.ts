@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { assetUrl } from "../../lib/upload.js";
 import { localizeField, type Locale } from "../../lib/public-locale.js";
 import { getNewsItem, listNews } from "../../services/news.service.js";
 
@@ -19,6 +20,7 @@ function toPublicNews(row: Awaited<ReturnType<typeof getNewsItem>>, locale: Loca
     status: row.status,
     publishedAt: row.publishedAt,
     photo: row.photo,
+    photoUrl: assetUrl(row.photo),
     priority: row.priority,
     authorId: row.authorId,
     newsTypeId: row.newsTypeId,

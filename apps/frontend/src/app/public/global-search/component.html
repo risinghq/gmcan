@@ -109,7 +109,7 @@
                 <div class="publication-members">
                   <div class="member-img-round">
                     @if (autor.photo) {
-                    <img class="member-img" src="{{ url + 'api/assets/' + autor.photo }}" alt="User photo" />
+                    <img class="member-img" src="{{ autor.photoUrl }}" alt="User photo" />
                     } @if (!autor.photo) {
                     <img class="member-img" src="/img/placeholders/user.png" alt="" />
                     }
@@ -122,13 +122,13 @@
               </div>
               <div class="flex-news mt-16">
                 @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
-                <a class="publication-green" href="{{ this.url + 'api/assets/' + publicacion.file }}" target="_blank">
+                <a class="publication-green" href="{{ publicacion.fileUrl }}" target="_blank">
                   {{ this.language.publicationsText[0].preview }}
                 </a>
                 } @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
                 <a
                   class="publication-green"
-                  href="{{ this.url + 'api/assets/' + publicacion.file + '?download=true' }}"
+                  href="{{ publicacion.fileUrl + '?download=true' }}"
                 >
                   {{ this.language.publicationsText[0].download }}
                 </a>
@@ -219,7 +219,7 @@
                   <div class="project-members">
                     <div class="member-img-round">
                       @if (member.photo) {
-                      <img class="member-img" src="{{ url + 'api/assets/' + member.photo }}" />
+                      <img class="member-img" src="{{ member.photoUrl }}" />
                       } @if (!member.photo) {
                       <img class="member-img" src="/img/placeholders/user.png" alt="" />
                       }
@@ -324,7 +324,7 @@
             <div class="flex-news" [class.mb-24]="i + 1 != miembros.length">
               <div class="miembro-img-div">
                 @if (miembro.photo) {
-                <img class="member-img" src="{{ url + 'api/assets/' + miembro.photo }}" alt="User photo" />
+                <img class="member-img" src="{{ miembro.photoUrl }}" alt="User photo" />
                 } @if (!miembro.photo) {
                 <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
@@ -373,7 +373,7 @@
                 @if (!noticia.photo) {
                 <img class="card-img-div" src="/img/grupal.jpg" />
                 } @if (noticia.photo) {
-                <img class="card-img-div" src="{{ url + 'api/assets/' + noticia.photo }}" />
+                <img class="card-img-div" src="{{ noticia.photoUrl }}" />
                 }
               </div>
               <div class="card-text-div card-text-div-3">

@@ -6,6 +6,7 @@ export interface News {
   status: number;
   publishedAt: string;
   photo: string | null;
+  photoUrl?: string | null;
   priority: number | null;
   authorId: number;
   newsTypeId: number;

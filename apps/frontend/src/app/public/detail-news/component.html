@@ -19,7 +19,7 @@
       <div class="card-detail">
         <div class="news-title-div">
           @if (noticia.photo) {
-          <img class="detail-img" src="{{ url + 'api/assets/' + noticia.photo }}" />
+          <img class="detail-img" src="{{ noticia.photoUrl }}" />
           }
           <div class="news-title">{{ noticia.title }}</div>
         </div>

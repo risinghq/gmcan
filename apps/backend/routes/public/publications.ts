@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { assetUrl } from "../../lib/upload.js";
 import { localizeField } from "../../lib/public-locale.js";
 import { getPublication, listPublications, listPublicationsByFilter } from "../../services/publication.service.js";
 
@@ -30,6 +31,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         title: row.title,
         abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
         file: row.file,
+        fileUrl: assetUrl(row.file),
         journalIssue: row.journalIssue,
         doi: row.doi,
         publishedAt: row.publishedAt,
@@ -50,6 +52,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       title: row.title,
       abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
       file: row.file,
+      fileUrl: assetUrl(row.file),
       journalIssue: row.journalIssue,
       doi: row.doi,
       publishedAt: row.publishedAt,
@@ -75,6 +78,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     title: pub.title,
     abstract: localizeField(pub, locale, { es: "abstractES", en: "abstractEN", required: false }),
     file: pub.file,
+    fileUrl: assetUrl(pub.file),
     journalIssue: pub.journalIssue,
     doi: pub.doi,
     publishedAt: pub.publishedAt,

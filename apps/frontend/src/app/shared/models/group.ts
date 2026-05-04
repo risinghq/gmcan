@@ -7,10 +7,13 @@ export interface Group {
   name: string | null;
   fullName: string | null;
   facilitiesPhoto: string | null;
+  facilitiesPhotoUrl?: string | null;
   facilities: string | null;
   futureWork: string | null;
   logoFooter: string | null;
+  logoFooterUrl?: string | null;
   logoHeader: string | null;
+  logoHeaderUrl?: string | null;
   publicationsSection: string | null;
   projectsSection: string | null;
   createdAt: string;
@@ -27,10 +30,13 @@ export function createGroup(): Group {
     name: null,
     fullName: null,
     facilitiesPhoto: null,
+    facilitiesPhotoUrl: null,
     facilities: null,
     futureWork: null,
     logoFooter: null,
+    logoFooterUrl: null,
     logoHeader: null,
+    logoHeaderUrl: null,
     publicationsSection: null,
     projectsSection: null,
     createdAt: "",

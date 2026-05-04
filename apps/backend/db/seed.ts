@@ -3,6 +3,7 @@ import { seedEquipment, seedSoftware, seedAbout } from "./seed/infrastructure.js
 import { seedLookups } from "./seed/lookups.js";
 import { seedMembers } from "./seed/members.js";
 import { seedResearchGroup, seedResearchLines, seedMethods } from "./seed/research.js";
+import { auditAndQuarantineOrphans, importSeedAssetsAndRewriteReferences } from "./seed/assets.js";
 
 export async function seed() {
   await seedLookups();
@@ -19,4 +20,6 @@ export async function seed() {
   await seedEvents();
   await seedProject();
   await seedPublications();
+  await importSeedAssetsAndRewriteReferences();
+  await auditAndQuarantineOrphans();
 }
