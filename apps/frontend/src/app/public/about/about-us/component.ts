@@ -36,7 +36,7 @@ export default class AboutUsComponent implements OnInit {
     this.groupService
       .getGroup()
       .pipe(
-        switchMap((group) => this.groupService.listAbout(group.id)),
+        switchMap((group) => this.groupService.listPublicAbout(group.id)),
         map((res: About[]) => res[0] ?? null),
       )
       .subscribe((about) => {

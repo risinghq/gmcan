@@ -9,12 +9,15 @@ import {
   publicationEditTitleResolver,
   publicationResolver,
 } from "@app/dashboard/dashboard.resolvers";
+import { adminCanActivateChildGuard, adminCanMatchGuard } from "@app/shared/guards/admin-auth.guard";
 import { canDeactivateGuard } from "@app/shared/guards/deactivate.guard";
 
 export default [
   {
     path: "",
     loadComponent: () => import("./shell/log-home.component"),
+    canMatch: [adminCanMatchGuard],
+    canActivateChild: [adminCanActivateChildGuard],
     title: "Administrador",
     children: [
       { path: "", loadComponent: () => import("./home/dashboard.component"), title: "Dashboard" },

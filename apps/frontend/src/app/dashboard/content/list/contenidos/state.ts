@@ -167,7 +167,7 @@ export class ContenidosState {
   }
 
   getContenidos(): void {
-    this.groupService.listAbout(this.group.id).subscribe((res) => {
+    this.groupService.listAdminAbout(this.group.id).subscribe((res) => {
       if (res.length > 0) {
         this.aboutUs = res[0];
       }

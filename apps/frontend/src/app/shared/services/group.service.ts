@@ -17,6 +17,10 @@ export class GroupService {
     return this.http.get<Group>(`${GLOBAL.url}api/group`);
   }
 
+  listPublicAbout(groupId: number): Observable<About[]> {
+    return this.http.get<About[]>(`${GLOBAL.url}api/group/${groupId}/about`);
+  }
+
   // Admin
   listGroups(): Observable<Group[]> {
     return this.http.get<Group[]>(`${GLOBAL.url}admin/group`);
@@ -52,8 +56,8 @@ export class GroupService {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/files/${slot}`, formData);
   }
 
-  // About
-  listAbout(groupId: number): Observable<About[]> {
+  // About (admin)
+  listAdminAbout(groupId: number): Observable<About[]> {
     return this.http.get<About[]>(`${GLOBAL.url}admin/group/${groupId}/about`);
   }
 

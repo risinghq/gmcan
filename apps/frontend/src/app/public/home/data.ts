@@ -94,7 +94,7 @@ export class HomeDataService {
 
   private async loadAboutUs(groupId: number): Promise<string> {
     try {
-      const aboutList = await firstValueFrom(this.groupService.listAbout(groupId));
+      const aboutList = await firstValueFrom(this.groupService.listPublicAbout(groupId));
       return Array.isArray(aboutList) ? (aboutList[0]?.services ?? "") : "";
     } catch {
       return "";

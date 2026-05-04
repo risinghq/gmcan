@@ -21,7 +21,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       if (isAdminRequest && error instanceof HttpErrorResponse && error.status === 401) {
         auth.clearSessionState();
-        router.navigate(["/login"]);
+        if (router.url.startsWith("/dashboard")) {
+          router.navigate(["/login"]);
+        }
       }
       return throwError(() => error);
     }),
