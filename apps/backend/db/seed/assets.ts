@@ -92,6 +92,7 @@ export async function importSeedAssetsAndRewriteReferences() {
         .execute();
     }
   }
+
   writeMap(map);
 }
 
