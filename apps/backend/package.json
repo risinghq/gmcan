@@ -29,11 +29,11 @@
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.14",
+    "@hono/node-server": "^2.0.1",
     "@hono/zod-validator": "^0.7.6",
     "@libsql/client": "^0.17.2",
     "bcrypt": "^6.0.0",
-    "hono": "^4.12.14",
+    "hono": "^4.12.16",
     "kysely": "^0.28.16",
     "kysely-libsql": "^0.7.1",
     "resend": "^6.12.0",
