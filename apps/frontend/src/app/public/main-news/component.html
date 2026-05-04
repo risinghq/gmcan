@@ -45,9 +45,9 @@
               [style.display]="screenWidth < 960 ? 'block' : 'none'"
             >
               @if (!noticia.photo) {
-              <img class="news-img" src="../../assets/img/grupal.jpg" />
+              <img class="news-img" src="/img/grupal.jpg" />
               } @if (noticia.photo) {
-              <img class="news-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+              <img class="news-img" src="{{ url + 'api/assets/' + noticia.photo }}" />
               }
             </div>
             <div class="news-text-div">
@@ -61,9 +61,9 @@
             </div>
             <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
               @if (!noticia.photo) {
-              <img class="news-img" src="../../assets/img/grupal.jpg" />
+              <img class="news-img" src="/img/grupal.jpg" />
               } @if (noticia.photo) {
-              <img class="news-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+              <img class="news-img" src="{{ url + 'api/assets/' + noticia.photo }}" />
               }
             </div>
           </div>

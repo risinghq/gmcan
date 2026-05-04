@@ -6,7 +6,7 @@ import { Directive, HostBinding, HostListener, Input, OnChanges } from "@angular
 })
 export class AppImgDirective implements OnChanges {
   @Input() appImg: string | null = null;
-  @Input() fallbackSrc: string = "/img/user.png";
+  @Input() fallbackSrc: string = "/img/placeholders/user.png";
 
   @HostBinding("src") src: string = this.fallbackSrc;
 

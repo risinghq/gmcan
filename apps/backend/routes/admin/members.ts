@@ -27,7 +27,6 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const MEMBER_FILE = { directory: "member", kind: "image" } as const;
 
 const CreateBody = z.object({
   dni: z.string().min(1),
@@ -126,12 +125,12 @@ router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, MEMBER_FILE);
+  const fileName = await saveUploadedFile(file, { kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setMemberPhoto(id, fileName);
   if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ directory: MEMBER_FILE.directory, fileName: current.photo });
+    await deleteUploadedFile({ fileName: current.photo });
   }
   return c.json({ status: 1 });
 });
@@ -140,7 +139,7 @@ router.delete("/:id/photo", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMemberPhoto(id);
   if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  await deleteUploadedFile({ directory: MEMBER_FILE.directory, fileName: row.photo });
+  await deleteUploadedFile({ fileName: row.photo });
   await clearMemberPhoto(id);
   return c.json({ status: 1 });
 });

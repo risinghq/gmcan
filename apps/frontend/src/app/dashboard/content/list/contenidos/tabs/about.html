@@ -10,11 +10,11 @@
         </div>
         } @if (!state.files.previewMap.about && !state.aboutUs.photo) {
         <div class="grupal-img">
-          <img class="img-set" src="../../assets/img/grupal.jpg" />
+          <img class="img-set" src="/img/grupal.jpg" />
         </div>
         } @if (state.aboutUs.photo && !state.files.previewMap.about) {
         <div class="img-preview">
-          <img class="img-set" src="{{ state.url + 'api/group/about/' + state.aboutUs.id + '/photo' }}" />
+          <img class="img-set" src="{{ state.url + 'api/assets/' + state.aboutUs.photo }}" />
         </div>
         }
         <div class="green-text ml-16 mt-auto">

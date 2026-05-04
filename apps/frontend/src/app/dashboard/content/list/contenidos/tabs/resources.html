@@ -7,9 +7,9 @@
         @if (state.files.previewMap.fac) {
         <div class="img-preview"><img class="img-set" src="{{ state.files.previewMap.fac }}" /></div>
         } @if (!state.files.previewMap.fac && !state.group.facilitiesPhoto) {
-        <div class="grupal-img"><img class="img-set" src="../../assets/img/grupal.jpg" /></div>
+        <div class="grupal-img"><img class="img-set" src="/img/grupal.jpg" /></div>
         } @if (state.group.facilitiesPhoto && !state.files.previewMap.fac) {
-        <div class="img-preview"><img class="img-set" src="{{ state.url + 'api/group/files/facilities' }}" /></div>
+        <div class="img-preview"><img class="img-set" src="{{ state.url + 'api/assets/group-facilities.png' }}" /></div>
         }
         <div class="green-text ml-16 mt-auto">
           <span class="plex-sans">Cambiar imagen</span>

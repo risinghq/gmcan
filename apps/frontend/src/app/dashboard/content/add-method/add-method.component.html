@@ -24,12 +24,12 @@
           }
           @if (!previewUrl && !metodo.photo) {
             <div class="news-img">
-              <img class="icon-upload" src="../../assets/img/upload.svg" />
+              <img class="icon-upload" src="/img/icons/upload.svg" />
             </div>
           }
           @if (metodo.photo && !previewUrl) {
             <div class="img-preview">
-              <img class="img-set" src="{{ url + 'api/methods/' + metodo.id + '/photo' }}" />
+              <img class="img-set" src="{{ url + 'api/assets/' + metodo.photo }}" />
             </div>
           }
           <div class="green-text mt-16">

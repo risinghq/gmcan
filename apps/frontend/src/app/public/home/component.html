@@ -42,9 +42,9 @@
       <mat-card class="line-card center">
         <div class="line-img-div">
           @if (linea.photo) {
-          <img class="line-img" src="{{ url + 'api/research-lines/' + linea.id + '/photo' }}" />
+          <img class="line-img" src="{{ url + 'api/assets/' + linea.photo }}" />
           } @if (!linea.photo) {
-          <img class="line-img" src="../../assets/img/prop_estruc.jpg" />
+          <img class="line-img" src="/img/prop_estruc.jpg" />
           }
         </div>
         <div class="linea-title">{{ linea.name }}</div>
@@ -66,9 +66,9 @@
       <div class="news-box display-sub-flex">
         <div class="img-hover-zoom img-hover-zoom-s">
           @if (!noticiaPrincipal.photo) {
-          <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada" />
+          <img class="main-img-news" src="/img/grupal.jpg" alt="nada" />
           } @if (noticiaPrincipal.photo) {
-          <img class="main-img-news" src="{{ url + 'api/news/' + noticiaPrincipal.id + '/photo' }}" alt="imagen" />
+          <img class="main-img-news" src="{{ url + 'api/assets/' + noticiaPrincipal.photo }}" alt="imagen" />
           }
         </div>
         <div class="news-div mt-main" style="height: 100%">
@@ -89,7 +89,7 @@
       <div class="news-box" [class.mb-other]="i == 0">
         <div class="img-hover-zoom" [style.display]="screenWidth < 960 ? 'none' : 'block'">
           @if (noticia.photo) {
-          <img class="other-img-news" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+          <img class="other-img-news" src="{{ url + 'api/assets/' + noticia.photo }}" />
           }
         </div>
         <div class="flex-news">
@@ -103,7 +103,7 @@
           </div>
           <div class="img-hover-zoom ml-16 other-img-news-div" [style.display]="screenWidth > 960 ? 'none' : 'block'">
             @if (noticia.photo) {
-            <img class="other-img-news" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+            <img class="other-img-news" src="{{ url + 'api/assets/' + noticia.photo }}" />
             }
           </div>
         </div>
@@ -115,7 +115,7 @@
     <a class="btn-text2"> {{ language.seeNews }} </a>
   </div>
   <div class="services-card">
-    <img class="services-icon" src="../../assets/img/bulb.svg" />
+    <img class="services-icon" src="/img/icons/bulb.svg" />
     <div class="mt-services about-text" [innerHTML]="aboutUs"></div>
     <div
       class="btn-black align-center"
@@ -217,15 +217,11 @@
           >
         </div>
         } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-        <a
-          class="publication-green"
-          href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
-          target="_blank"
-        >
+        <a class="publication-green" href="{{ this.url + 'api/assets/' + publicacion.file }}" target="_blank">
           {{ this.language.publicationsText[0].preview }}
         </a>
         } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-        <a class="publication-green" href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}">
+        <a class="publication-green" href="{{ this.url + 'api/assets/' + publicacion.file + '?download=true' }}">
           {{ this.language.publicationsText[0].download }}
         </a>
         }
@@ -283,13 +279,9 @@
             <div class="publication-members">
               <div class="member-img-round">
                 @if (autor.photo) {
-                <img
-                  class="member-img"
-                  src="{{ url + 'api/members/' + autor.memberId + '/photo' }}"
-                  alt="../../assets/img/user.png"
-                />
+                <img class="member-img" src="{{ url + 'api/assets/' + autor.photo }}" alt="User photo" />
                 } @if (!autor.photo) {
-                <img class="member-img" src="../../assets/img/user.png" alt="" />
+                <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
               </div>
               <div class="member-name" (click)="profile({ id: autor.memberId })">
@@ -303,18 +295,11 @@
           <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
             @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-            <a
-              class="publication-green"
-              href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
-              target="_blank"
-            >
+            <a class="publication-green" href="{{ this.url + 'api/assets/' + publicacion.file }}" target="_blank">
               {{ this.language.publicationsText[0].preview }}
             </a>
             } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-            <a
-              class="publication-green"
-              href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}"
-            >
+            <a class="publication-green" href="{{ this.url + 'api/assets/' + publicacion.file + '?download=true' }}">
               {{ this.language.publicationsText[0].download }}
             </a>
             }
@@ -399,9 +384,9 @@
             <div class="project-members">
               <div class="member-img-round">
                 @if (member.photo) {
-                <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
+                <img class="member-img" src="{{ url + 'api/assets/' + member.photo }}" />
                 } @if (!member.photo) {
-                <img class="member-img" src="../../assets/img/user.png" alt="" />
+                <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
               </div>
               <div class="member-name" (click)="profile({ id: member.memberId })">{{ member.name }}</div>

@@ -275,15 +275,15 @@ export class DialogPreview {
     this.anio = this.datePipe.transform(this.datere, "y") ?? "";
   }
 
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
+  public fbicon = "/img/icons/Facebook.svg";
+  public twitter = "/img/icons/twitter.svg";
   mouseEnter(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook2.svg";
+        this.fbicon = "/img/icons/Facebook2.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter2.svg";
+        this.twitter = "/img/icons/twitter2.svg";
         break;
     }
   }
@@ -291,10 +291,10 @@ export class DialogPreview {
   mouseLeave(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook.svg";
+        this.fbicon = "/img/icons/Facebook.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter.svg";
+        this.twitter = "/img/icons/twitter.svg";
         break;
     }
   }

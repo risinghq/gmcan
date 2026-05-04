@@ -18,7 +18,6 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const FILE_CONFIG = { directory: "publications", kind: "document" } as const;
 
 const AuthorEntry = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("registered"), memberId: z.number().int(), isPrincipal: z.number().int() }),
@@ -87,12 +86,12 @@ router.put("/:id/file", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, FILE_CONFIG);
+  const fileName = await saveUploadedFile(file, { kind: "document" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setPublicationFile(id, fileName);
   if (current.file && current.file !== fileName) {
-    await deleteUploadedFile({ directory: FILE_CONFIG.directory, fileName: current.file });
+    await deleteUploadedFile({ fileName: current.file });
   }
   return c.json({ status: 1 });
 });

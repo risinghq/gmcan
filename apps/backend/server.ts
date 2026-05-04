@@ -20,6 +20,7 @@ import AdminProjectsRoutes from "./routes/admin/projects.js";
 import AdminPublicationsRoutes from "./routes/admin/publications.js";
 import AdminRefRoutes from "./routes/admin/ref.js";
 import AdminResearchLinesRoutes from "./routes/admin/research-lines.js";
+import PublicAssetsRoutes from "./routes/public/assets.js";
 import PublicEmailRoutes from "./routes/public/email.js";
 import PublicEquipmentRoutes from "./routes/public/equipment.js";
 import PublicEventsRoutes from "./routes/public/events.js";
@@ -65,6 +66,7 @@ app.route("/api/group", PublicGroupRoutes);
 app.route("/api/lookup", PublicLookupRoutes);
 app.route("/api/search", PublicSearchRoutes);
 app.route("/api/email", PublicEmailRoutes);
+app.route("/api/assets", PublicAssetsRoutes);
 
 // Admin API
 // All routes under /admin/* require session (login/logout exempted in middleware)

@@ -5,7 +5,7 @@
       <div class="dashboard-subtitle">¿Qué deseas hacer?</div>
       @if (authz.can("news.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/noticias">
-          <img class="mr-16" src="../../assets/img/iconfinder_newspaper_3890941 1.svg" />
+          <img class="mr-16" src="/img/icons/newspaper.svg" />
           <div>
             <div class="item-title">Gestionar noticias</div>
             <div class="item-subtitle">Puedes crear, editar o eliminar una noticia.</div>
@@ -14,7 +14,7 @@
       }
       @if (authz.can("members.read")) {
         <div class="flex-news item clickable" routerLink="/dashboard/miembros-activos">
-          <img class="mr-16" src="../../assets/img/members.svg" />
+          <img class="mr-16" src="/img/icons/members.svg" />
           <div>
             <div class="item-title">Gestionar miembros del grupo</div>
             <div class="item-subtitle">Puedes crear, editar o eliminar a un miembro del grupo.</div>
@@ -23,7 +23,7 @@
       }
       @if (authz.can("publications.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/articulos">
-          <img class="mr-16" src="../../assets/img/publicaciones.svg" />
+          <img class="mr-16" src="/img/icons/publicaciones.svg" />
           <div>
             <div class="item-title">Gestionar publicaciones</div>
             <div class="item-subtitle">Puedes crear, editar o eliminar una publicación del grupo.</div>
@@ -32,7 +32,7 @@
       }
       @if (authz.can("projects.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/proyectos-ejecucion">
-          <img class="mr-16" src="../../assets/img/proyectos.svg" />
+          <img class="mr-16" src="/img/icons/proyectos.svg" />
           <div>
             <div class="item-title">Gestionar proyectos</div>
             <div class="item-subtitle">Puedes crear, editar o eliminar un proyecto del grupo.</div>
@@ -41,7 +41,7 @@
       }
       @if (authz.can("content.write")) {
         <div class="flex-news item clickable" routerLink="/dashboard/contenidos">
-          <img class="mr-16" src="../../assets/img/contenido.svg" />
+          <img class="mr-16" src="/img/icons/contenido.svg" />
           <div>
             <div class="item-title">Gestionar contenidos</div>
             <div class="item-subtitle">Puedes modificar algunos contenidos de la plataforma.</div>
@@ -49,7 +49,7 @@
         </div>
       }
       <div class="flex-news item clickable" routerLink="/dashboard/perfil">
-        <img class="mr-16" src="../../assets/img/perfil.svg" />
+        <img class="mr-16" src="/img/icons/perfil.svg" />
         <div>
           <div class="item-title">Gestionar perfil</div>
           <div class="item-subtitle">Puedes actualizar tu información personal.</div>
@@ -57,7 +57,7 @@
       </div>
       @if (authz.can("analytics.read")) {
         <div class="flex-news item no-border">
-          <img class="mr-16" src="../../assets/img/analitica.svg" />
+          <img class="mr-16" src="/img/icons/analitica.svg" />
           <div>
             <div class="item-title">Visualizar analíticas de uso</div>
             <div class="item-subtitle">Puedes visualizar cómo está siendo utilizada la plataforma.</div>
@@ -89,7 +89,7 @@
         </div>
       }
       <div class="flex-news item last-item">
-        <img class="mr-16" src="../../assets/img/book.svg" />
+        <img class="mr-16" src="/img/icons/book.svg" />
         <a
           class="item-title"
           style="margin-top: auto; margin-bottom: auto"
@@ -104,7 +104,7 @@
       <div class="dashboard-card pd-8 wd-2">
         <div class="flex-news">
           <div>
-            <img class="mt-8" src="../../assets/img/members.svg" />
+            <img class="mt-8" src="/img/icons/members.svg" />
             <div class="mt-8 item-title bold">Miembros del grupo</div>
           </div>
           <div class="gray-box right">
@@ -129,7 +129,7 @@
       <div class="dashboard-card pd-8 wd-2 mt-16">
         <div class="flex-news">
           <div>
-            <img class="mt-8" src="../../assets/img/publicaciones.svg" />
+            <img class="mt-8" src="/img/icons/publicaciones.svg" />
             <div class="mt-8 item-title bold">Publicaciones</div>
           </div>
           <div class="gray-box right">

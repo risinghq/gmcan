@@ -36,14 +36,10 @@
               @if (autor.memberId) {
                 <div class="member-img-round mr-8">
                   @if (autor.photo) {
-                    <img
-                      class="member-img"
-                      src="{{ url + 'api/members/' + autor.memberId + '/photo' }}"
-                      alt="../../assets/img/user.png"
-                    />
+                    <img class="member-img" src="{{ url + 'api/assets/' + autor.photo }}" alt="User photo" />
                   }
                   @if (!autor.photo) {
-                    <img class="member-img" src="../../assets/img/user.png" alt="" />
+                    <img class="member-img" src="/img/placeholders/user.png" alt="" />
                   }
                 </div>
               }

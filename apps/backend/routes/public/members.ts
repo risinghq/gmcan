@@ -3,8 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
-import { serveUploadedFile } from "../../lib/upload.js";
-import { getMemberPhoto, getMemberProfile, listMembers } from "../../services/member.service.js";
+import { getMemberProfile, listMembers } from "../../services/member.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -32,13 +31,6 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
       bio: localizeField(profile.member, locale, { es: "bio", en: "bioEN", required: false }),
     },
   });
-});
-
-router.get("/:id/photo", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const row = await getMemberPhoto(id);
-  if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  return serveUploadedFile(c, { directory: "member", fileName: row.photo });
 });
 
 export default router;

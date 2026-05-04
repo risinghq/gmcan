@@ -22,25 +22,11 @@ export type UploadFileKind = keyof typeof UPLOAD_FILE_KIND_EXTENSIONS;
 
 const UPLOADS_ROOT = path.resolve(process.cwd(), "uploads");
 const SAFE_FILE_NAME = /^[A-Za-z0-9._-]+$/;
-const SAFE_DIRECTORY = /^[A-Za-z0-9/_-]+$/;
 
-function resolveUploadDirectory(directory: string): string {
-  if (!SAFE_DIRECTORY.test(directory) || directory.includes("..")) {
-    throw new Error("Invalid upload directory");
-  }
-  const directoryPath = path.resolve(UPLOADS_ROOT, directory);
-  const relative = path.relative(UPLOADS_ROOT, directoryPath);
-  if (relative.startsWith("..") || path.isAbsolute(relative)) {
-    throw new Error("Invalid upload directory");
-  }
-  return directoryPath;
-}
-
-function resolveUploadFilePath(directory: string, fileName: string): string | null {
+function resolveUploadFilePath(fileName: string): string | null {
   if (!SAFE_FILE_NAME.test(fileName)) return null;
-  const directoryPath = resolveUploadDirectory(directory);
-  const filePath = path.resolve(directoryPath, fileName);
-  const relative = path.relative(directoryPath, filePath);
+  const filePath = path.resolve(UPLOADS_ROOT, fileName);
+  const relative = path.relative(UPLOADS_ROOT, filePath);
   if (relative.startsWith("..") || path.isAbsolute(relative)) return null;
   return filePath;
 }
@@ -73,29 +59,25 @@ export async function serveFile(c: Context, filePath: string): Promise<Response>
   });
 }
 
-export async function saveUploadedFile(
-  file: File,
-  options: { directory: string; kind: UploadFileKind },
-): Promise<string | null> {
+export async function saveUploadedFile(file: File, options: { kind: UploadFileKind }): Promise<string | null> {
   const ext = extensionOf(file.name);
   const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind] as readonly string[];
   if (!allowedExtensions.includes(ext)) return null;
 
   const fileName = `${Date.now()}-${randomUUID()}.${ext}`;
-  const directoryPath = resolveUploadDirectory(options.directory);
-  const filePath = resolveUploadFilePath(options.directory, fileName);
+  const filePath = resolveUploadFilePath(fileName);
   if (!filePath) throw new Error("Unable to build file path");
 
-  await fs.promises.mkdir(directoryPath, { recursive: true });
+  await fs.promises.mkdir(UPLOADS_ROOT, { recursive: true });
   await fs.promises.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
   return fileName;
 }
 
 export async function serveUploadedFile(
   c: Context,
-  options: { directory: string; fileName: string; asAttachment?: boolean },
+  options: { fileName: string; asAttachment?: boolean },
 ): Promise<Response> {
-  const filePath = resolveUploadFilePath(options.directory, options.fileName);
+  const filePath = resolveUploadFilePath(options.fileName);
   if (!filePath) return c.json({ error: "Invalid file path" }, 400);
   if (!options.asAttachment) return serveFile(c, filePath);
 
@@ -108,8 +90,8 @@ export async function serveUploadedFile(
   });
 }
 
-export async function deleteUploadedFile(options: { directory: string; fileName: string }): Promise<boolean> {
-  const filePath = resolveUploadFilePath(options.directory, options.fileName);
+export async function deleteUploadedFile(options: { fileName: string }): Promise<boolean> {
+  const filePath = resolveUploadFilePath(options.fileName);
   if (!filePath || !fs.existsSync(filePath)) return false;
   await fs.promises.unlink(filePath);
   return true;

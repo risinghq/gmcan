@@ -185,7 +185,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     const data: NewsPreviewData = {
       title: this.noticia.title ?? null,
       summary: this.noticia.summary ?? null,
-      photo: this.previewUrl ?? (this.noticia.photo ? this.url + "api/news/" + this.noticia.id + "/photo" : null),
+      photo: this.previewUrl ?? (this.noticia.photo ? this.url + "api/assets/" + this.noticia.photo : null),
       newsTypeName: cat?.name ?? null,
       author: aut
         ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, photo: aut.photo }
@@ -371,15 +371,15 @@ export class DialogPreview2 {
     this.anio = this.datePipe.transform(this.datere, "y") ?? "";
   }
 
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
+  public fbicon = "/img/icons/Facebook.svg";
+  public twitter = "/img/icons/twitter.svg";
   mouseEnter(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook2.svg";
+        this.fbicon = "/img/icons/Facebook2.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter2.svg";
+        this.twitter = "/img/icons/twitter2.svg";
         break;
     }
   }
@@ -387,10 +387,10 @@ export class DialogPreview2 {
   mouseLeave(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook.svg";
+        this.fbicon = "/img/icons/Facebook.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter.svg";
+        this.twitter = "/img/icons/twitter.svg";
         break;
     }
   }

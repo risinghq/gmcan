@@ -75,7 +75,7 @@
       </div>
       <div class="login-div" (click)="sidenav.close(); loginLink()">
         <div class="login">{{ language.login }}</div>
-        <img class="login-icon" src="../assets/img/login.svg" />
+        <img class="login-icon" src="/img/icons/login.svg" />
       </div>
       <a class="link-box" routerLink="/join-us" routerLinkActive="active" (click)="sidenav.close()">
         {{ language.join }}
@@ -88,11 +88,11 @@
       <div class="languages">
         <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
           <div class="fitter">EN</div>
-          <img class="flag" src="../../assets/img/usa.jpg" />
+          <img class="flag" src="/img/flags/usa.jpg" />
         </div>
         <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
           <div class="fitter">ES</div>
-          <img class="flag" src="../../assets/img/spain.png" />
+          <img class="flag" src="/img/flags/spain.png" />
         </div>
       </div>
       }
@@ -115,7 +115,7 @@
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
       <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
-        <img class="logo-nav" src="{{ url + 'api/group/files/header' }}" alt="logo" />
+        <img class="logo-nav" src="{{ url + 'api/assets/group-header.png' }}" alt="logo" />
       </div>
       <div class="full-width ml-16" [style.display]="screenWidth < 1050 ? 'none' : 'block'">
         <div class="top-bar-div">
@@ -134,16 +134,16 @@
           <div class="languages mr-12">
             <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
               <div class="fitter">EN</div>
-              <img class="flag" src="../../assets/img/usa.jpg" />
+              <img class="flag" src="/img/flags/usa.jpg" />
             </div>
             <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
               <div class="fitter">ES</div>
-              <img class="flag" src="../../assets/img/spain.png" />
+              <img class="flag" src="/img/flags/spain.png" />
             </div>
           </div>
           <div class="login-div" (click)="sidenav.close(); loginLink()">
             <div class="login link">{{ language.login }}</div>
-            <img class="login-icon" src="../../assets/img/login.svg" />
+            <img class="login-icon" src="/img/icons/login.svg" />
           </div>
         </div>
         <div class="down-bar-div text-right">
@@ -244,10 +244,10 @@
       <div class="footer-flex">
         <div class="flex-news">
           <div class="link-logo-div" (click)="scroll()" routerLink="/">
-            <img class="img-logo-white" src="{{ url + 'api/group/files/footer' }}" />
+            <img class="img-logo-white" src="{{ url + 'api/assets/group-footer.png' }}" />
           </div>
           <div class="link-logo-div">
-            <img class="img-logo-white" src="../../assets/img/logoUNMSM.png" />
+            <img class="img-logo-white" src="/img/logoUNMSM.png" />
           </div>
         </div>
         <div class="footer-down-bar">
@@ -298,7 +298,7 @@
             <div class="footer-title">{{ language.contactUs }}</div>
             <div class="footer-info">
               <div class="footer-icon-div">
-                <img class="footer-icon" src="../assets/img/location.svg" />
+                <img class="footer-icon" src="/img/icons/location.svg" />
               </div>
               <div class="footer-text">
                 <div class="footer-text-title">
@@ -310,7 +310,7 @@
             <div class="footer-info footer-info-2 footerdiflex">
               <div class="flex-news">
                 <div class="footer-icon-div">
-                  <img class="footer-icon" src="../assets/img/mail.svg" />
+                  <img class="footer-icon" src="/img/icons/mail.svg" />
                 </div>
                 <div class="footer-text" style="display: flex">
                   <div class="footer-direction footer-email">{{ grupoinfo.email }}</div>
@@ -319,7 +319,7 @@
               <div class="flex-news">
                 @if (grupoinfo.phone && grupoinfo.phone != "") {
                 <div class="footer-icon-div ml-footer">
-                  <img class="footer-icon" src="../assets/img/phone.svg" />
+                  <img class="footer-icon" src="/img/icons/phone.svg" />
                 </div>
                 }
                 <div class="footer-text" style="display: flex">

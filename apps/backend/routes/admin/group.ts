@@ -133,13 +133,13 @@ router.put("/:id/files/:slot", zValidator("param", IdParam.extend(SlotParam.shap
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { directory: "group", kind: config.kind });
+  const fileName = await saveUploadedFile(file, { kind: config.kind });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   const previousFileName = current[config.column];
   await setGroupFile(id, config.column, fileName);
   if (previousFileName && previousFileName !== fileName) {
-    await deleteUploadedFile({ directory: "group", fileName: previousFileName });
+    await deleteUploadedFile({ fileName: previousFileName });
   }
   return c.json({ status: 1 });
 });
@@ -192,7 +192,7 @@ router.put("/about/:id/photo", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { directory: "about", kind: "image" });
+  const fileName = await saveUploadedFile(file, { kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
   await setAboutPhoto(id, fileName);
   return c.json({ status: 1 });

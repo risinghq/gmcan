@@ -41,12 +41,12 @@ export class PublicationService {
     return this.http.get<PublicationWithAuthors>(`${GLOBAL.url}api/publications/${id}`);
   }
 
-  getFile(id: number): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}api/publications/${id}/file`, { responseType: "blob" });
+  getFile(fileName: string): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}api/assets/${fileName}`, { responseType: "blob" });
   }
 
-  downloadFile(id: number): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}api/publications/${id}/file/download`, { responseType: "blob" });
+  downloadFile(fileName: string): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}api/assets/${fileName}?download=true`, { responseType: "blob" });
   }
 
   // Admin

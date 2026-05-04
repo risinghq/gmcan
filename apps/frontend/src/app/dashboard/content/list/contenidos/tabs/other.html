@@ -6,7 +6,9 @@
         @if (state.files.previewMap.head) {
         <div class="logo-preview mb-16"><img class="img-logo" src="{{ state.files.previewMap.head }}" /></div>
         } @if (state.group.logoHeader && !state.files.previewMap.head) {
-        <div class="logo-preview mb-16"><img class="img-logo" src="{{ state.url + 'api/group/files/header' }}" /></div>
+        <div class="logo-preview mb-16">
+          <img class="img-logo" src="{{ state.url + 'api/assets/group-header.png' }}" />
+        </div>
         }
         <div class="green-text text-left">
           <span class="plex-sans">Cambiar imagen</span>
@@ -25,7 +27,7 @@
         <div class="logo-preview-inverse mb-16"><img class="img-logo" src="{{ state.files.previewMap.foot }}" /></div>
         } @if (state.group.logoFooter && !state.files.previewMap.foot) {
         <div class="logo-preview-inverse mb-16">
-          <img class="img-logo" src="{{ state.url + 'api/group/files/footer' }}" />
+          <img class="img-logo" src="{{ state.url + 'api/assets/group-footer.png' }}" />
         </div>
         }
         <div class="green-text text-left">

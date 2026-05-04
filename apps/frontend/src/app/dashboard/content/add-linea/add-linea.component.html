@@ -30,12 +30,12 @@
           }
           @if (!previewUrl && !lineaInvestigacion.photo) {
             <div class="news-img">
-              <img class="icon-upload" src="../../assets/img/upload.svg" />
+              <img class="icon-upload" src="/img/icons/upload.svg" />
             </div>
           }
           @if (lineaInvestigacion.photo && !previewUrl) {
             <div class="img-preview">
-              <img class="img-set" src="{{ url + 'api/research-lines/' + lineaInvestigacion.id + '/photo' }}" />
+              <img class="img-set" src="{{ url + 'api/assets/' + lineaInvestigacion.photo }}" />
             </div>
           }
           <div class="green-text mt-16">
