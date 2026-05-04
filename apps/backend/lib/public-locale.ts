@@ -4,8 +4,6 @@ import { z } from "zod";
 export const LocaleSchema = z.enum(["es", "en"]);
 export type Locale = z.infer<typeof LocaleSchema>;
 
-export const LangQuerySchema = z.object({ lang: LocaleSchema });
-
 export function localizeField<T extends Record<string, unknown>>(
   row: T,
   locale: Locale,

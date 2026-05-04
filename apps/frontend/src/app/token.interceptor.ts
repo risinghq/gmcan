@@ -2,13 +2,22 @@ import { HttpErrorResponse, HttpInterceptorFn } from "@angular/common/http";
 import { inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { AuthService } from "@app/shared/services/auth.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { catchError, throwError } from "rxjs";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const auth = inject(AuthService);
+  const session = inject(SessionService);
   const isAdminRequest = req.url.includes("/admin/");
-  return next(req.clone({ withCredentials: true })).pipe(
+  const isPublicApiRequest = req.url.includes("/api/");
+  const language = session.language().locale === "en" ? "en" : "es";
+  const request = req.clone({
+    withCredentials: true,
+    ...(isPublicApiRequest ? { setHeaders: { "Accept-Language": language } } : {}),
+  });
+
+  return next(request).pipe(
     catchError((error) => {
       if (isAdminRequest && error instanceof HttpErrorResponse && error.status === 401) {
         auth.clearSessionState();

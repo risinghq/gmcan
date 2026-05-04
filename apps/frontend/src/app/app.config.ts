@@ -1,5 +1,5 @@
 import { DatePipe, TitleCasePipe, registerLocaleData } from "@angular/common";
-import { provideHttpClient, withInterceptors } from "@angular/common/http";
+import { provideHttpClient, withFetch, withInterceptors } from "@angular/common/http";
 import localeEn from "@angular/common/locales/en";
 import localeEsAr from "@angular/common/locales/es-AR";
 import localePy from "@angular/common/locales/es-PY";
@@ -32,7 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),
     provideCharts(withDefaultRegisterables()),
