@@ -129,23 +129,12 @@
           </div>
         </div>
         <div class="full-width mt-16 mb-16">
-          <div class="text-category">Resumen en español <span class="red-text">*</span></div>
+          <div class="text-category">Resumen <span class="red-text">*</span></div>
           <textarea
-            [(ngModel)]="publicacion.abstractES"
+            [(ngModel)]="publicacion.abstract"
             placeholder="Insertar resumen"
-            formControlName="abstractES"
-            name="abstractES"
-            autosize
-            class="input-category"
-          ></textarea>
-        </div>
-        <div class="full-width mb-16">
-          <div class="text-category">Resumen en inglés <span class="red-text">*</span></div>
-          <textarea
-            [(ngModel)]="publicacion.abstractEN"
-            placeholder="Insertar resumen"
-            formControlName="abstractEN"
-            name="abstractEN"
+            formControlName="abstract"
+            name="abstract"
             autosize
             class="input-category"
           ></textarea>

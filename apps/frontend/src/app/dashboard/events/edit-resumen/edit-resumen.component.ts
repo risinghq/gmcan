@@ -27,6 +27,7 @@ import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
+import { GLOBAL } from "@app/shared/services/global";
 import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -87,6 +88,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
   eventos: EventItem[] = [];
+  url = GLOBAL.url;
   edit = true;
 
   selectedUser: string | null = null;
@@ -99,20 +101,18 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.publicacionForm = this.formBuilder.group({
-      título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaPublicacionDate: ["", [Validators.required]],
-      evento_idEvento: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      DOI: [""],
-      resumen: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      title: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      publishedAtDate: ["", [Validators.required]],
+      eventId: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      doi: [""],
+      abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
     this.publicacion = {
       id: 0,
       title: "",
       file: null,
-      abstractES: null,
-      abstractEN: null,
+      abstract: null,
       journalIssue: null,
       doi: null,
       publishedAt: "",
@@ -268,8 +268,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
 
     const data: PublicationFields = {
       title: this.publicacion.title,
-      abstractES: this.publicacion.abstractES ?? undefined,
-      abstractEN: this.publicacion.abstractEN ?? undefined,
+      abstract: this.publicacion.abstract ?? undefined,
       doi: this.publicacion.doi ?? undefined,
       publishedAt,
       typeId: 3,

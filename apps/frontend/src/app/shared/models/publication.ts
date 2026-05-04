@@ -4,8 +4,7 @@ export interface Publication {
   id: number;
   title: string;
   file: string | null;
-  abstractES: string | null;
-  abstractEN: string | null;
+  abstract: string | null;
   journalIssue: number | null;
   doi: string | null;
   publishedAt: string;

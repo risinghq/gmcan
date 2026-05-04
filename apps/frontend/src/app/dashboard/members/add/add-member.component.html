@@ -16,8 +16,8 @@
                 <div class="text-category">Primer nombre <span class="red-text">*</span></div>
                 <input
                   [(ngModel)]="member.firstName"
-                  formControlName="nombre"
-                  name="nombre"
+                  formControlName="firstName"
+                  name="firstName"
                   class="input-category"
                   placeholder="Insertar primer nombre"
                   required
@@ -27,8 +27,8 @@
                 <div class="text-category">Segundo nombre</div>
                 <input
                   [(ngModel)]="segundoNombre"
-                  formControlName="segundoNombre"
-                  name="segundoNombre"
+                  formControlName="middleName"
+                  name="middleName"
                   placeholder="Insertar segundo nombre"
                   class="input-category"
                 />
@@ -39,8 +39,8 @@
                 <div class="text-category">Apellido paterno <span class="red-text">*</span></div>
                 <input
                   [(ngModel)]="member.lastName"
-                  formControlName="apellidoPaterno"
-                  name="apellidoPaterno"
+                  formControlName="lastName"
+                  name="lastName"
                   class="input-category"
                   placeholder="Inserar apellido paterno"
                   required
@@ -50,8 +50,8 @@
                 <div class="text-category">Apellido materno</div>
                 <input
                   [(ngModel)]="member.maternalName"
-                  formControlName="apellidoMaterno"
-                  name="apellidoMaterno"
+                  formControlName="maternalName"
+                  name="maternalName"
                   placeholder="Insertar apellido materno"
                   class="input-category"
                 />
@@ -66,8 +66,8 @@
                     matInput
                     [(ngModel)]="birthDateObj"
                     [matDatepicker]="dp"
-                    formControlName="fechaNacimiento"
-                    name="fechaNacimiento"
+                    formControlName="birthDate"
+                    name="birthDate"
                     placeholder="Insertar fecha de nacimiento"
                   />
                   <mat-datepicker-toggle matSuffix [for]="dp" />
@@ -79,8 +79,8 @@
                 <input
                   [(ngModel)]="member.email"
                   type="email"
-                  formControlName="correo"
-                  name="correo"
+                  formControlName="email"
+                  name="email"
                   placeholder="Insertar correo electrónico"
                   class="input-category"
                   required
@@ -92,7 +92,7 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Género</div>
                 <mat-form-field class="input-category">
-                  <mat-select [(ngModel)]="member.genderId" formControlName="genero_idGenero" name="genero_idGenero">
+                  <mat-select [(ngModel)]="member.genderId" formControlName="genderId" name="genderId">
                     @for (genero of generos; track genero) {
                       <mat-option [value]="genero.idGenero">{{ genero.nombre }}</mat-option>
                     }
@@ -102,11 +102,7 @@
               <div class="full-width">
                 <div class="text-category">Máximo nivel académico alcanzado</div>
                 <mat-form-field class="input-category">
-                  <mat-select
-                    [(ngModel)]="member.prefixId"
-                    formControlName="prefijo_idPrefijo"
-                    name="prefijo_idPrefijo"
-                  >
+                  <mat-select [(ngModel)]="member.prefixId" formControlName="prefixId" name="prefixId">
                     @for (prefijo of prefijos; track prefijo) {
                       <mat-option [value]="prefijo.idPrefijo">{{ prefijo.nombre }}</mat-option>
                     }
@@ -118,11 +114,7 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Cargo <span class="red-text">*</span></div>
                 <mat-form-field class="input-category">
-                  <mat-select
-                    [(ngModel)]="member.memberTypeId"
-                    formControlName="tipoMiembro_idTipoMiembro"
-                    name="tipoMiembro_idTipoMiembro"
-                  >
+                  <mat-select [(ngModel)]="member.memberTypeId" formControlName="memberTypeId" name="memberTypeId">
                     @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
                       <mat-option [value]="tipoMiembro.id">{{ tipoMiembro.nameSingular }}</mat-option>
                     }
@@ -133,8 +125,8 @@
                 <div class="text-category">N° DNI / Pasaporte <span class="red-text">*</span></div>
                 <input
                   [(ngModel)]="member.dni"
-                  formControlName="DNI"
-                  name="DNI"
+                  formControlName="dni"
+                  name="dni"
                   [disabled]="edit"
                   placeholder="Insertar DNI/Pasaporte"
                   class="input-category"
@@ -218,25 +210,12 @@
         </div>
         <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional en español <span>({{ member.bio?.length ?? 0 }}/500)</span>
+            Resumen profesional <span>({{ member.bio?.length ?? 0 }}/500)</span>
           </div>
           <textarea
             [(ngModel)]="member.bio"
             formControlName="bio"
             name="bio"
-            autosize
-            class="input-category"
-            maxlength="500"
-          ></textarea>
-        </div>
-        <div class="full-width mb-16">
-          <div class="text-category">
-            Resumen profesional en inglés <span>({{ member.bioEN?.length ?? 0 }}/500)</span>
-          </div>
-          <textarea
-            [(ngModel)]="member.bioEN"
-            formControlName="bioEN"
-            name="bioEN"
             autosize
             class="input-category"
             maxlength="500"

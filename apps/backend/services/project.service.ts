@@ -2,11 +2,64 @@ import { sql } from "kysely";
 
 import { db } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
+import type { ProjectRow } from "../db/schema.js";
+import type { Bilingual } from "../lib/admin-translations.js";
+
+export interface ProjectAdminInput {
+  code: string;
+  fundedAmount: string;
+  status?: number;
+  startDate: string;
+  endDate?: string;
+  researchLineId: number;
+  currencyId: number;
+  fundingSourceId: number;
+  translations: Bilingual<{ title: string; description: string }>;
+}
+
+function toProjectRow(data: ProjectAdminInput) {
+  const es = data.translations["es"];
+  const en = data.translations["en"];
+  return {
+    title: es.title,
+    titleEN: en?.title,
+    code: data.code,
+    fundedAmount: data.fundedAmount,
+    description: es.description,
+    descriptionEN: en?.description,
+    status: data.status,
+    startDate: data.startDate,
+    endDate: data.endDate,
+    researchLineId: data.researchLineId,
+    currencyId: data.currencyId,
+    fundingSourceId: data.fundingSourceId,
+  };
+}
 
 export async function listProjects(status?: number) {
   let query = db.selectFrom("project").selectAll();
   if (status !== undefined) query = query.where("status", "=", status);
   return query.execute();
+}
+
+export function toAdminProjectView(project: ProjectRow) {
+  return {
+    id: project.id,
+    code: project.code,
+    fundedAmount: project.fundedAmount,
+    status: project.status,
+    startDate: project.startDate,
+    endDate: project.endDate,
+    researchLineId: project.researchLineId,
+    currencyId: project.currencyId,
+    fundingSourceId: project.fundingSourceId,
+    createdAt: project.createdAt,
+    updatedAt: project.updatedAt,
+    translations: {
+      es: { title: project.title, description: project.description },
+      en: { title: project.titleEN ?? "", description: project.descriptionEN ?? "" },
+    },
+  };
 }
 
 export async function getProject(id: number) {
@@ -23,42 +76,13 @@ export async function searchProjects(q: string, status?: number) {
   return query.execute();
 }
 
-export async function createProject(data: {
-  title: string;
-  titleEN?: string;
-  code: string;
-  fundedAmount: string;
-  description: string;
-  descriptionEN?: string;
-  status?: number;
-  startDate: string;
-  endDate?: string;
-  researchLineId: number;
-  currencyId: number;
-  fundingSourceId: number;
-}) {
-  const result = await db.insertInto("project").values(data).executeTakeFirst();
+export async function createProject(data: ProjectAdminInput) {
+  const result = await db.insertInto("project").values(toProjectRow(data)).executeTakeFirst();
   return Number(result.insertId);
 }
 
-export async function updateProject(
-  id: number,
-  data: {
-    title: string;
-    titleEN?: string;
-    code: string;
-    fundedAmount: string;
-    description: string;
-    descriptionEN?: string;
-    status?: number;
-    startDate: string;
-    endDate?: string;
-    researchLineId: number;
-    currencyId: number;
-    fundingSourceId: number;
-  },
-) {
-  await db.updateTable("project").set(data).where("id", "=", id).execute();
+export async function updateProject(id: number, data: ProjectAdminInput) {
+  await db.updateTable("project").set(toProjectRow(data)).where("id", "=", id).execute();
 }
 
 export async function deleteProject(id: number) {

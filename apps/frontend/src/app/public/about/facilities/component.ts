@@ -64,9 +64,6 @@ export default class FacilitiesComponent implements OnInit {
       )
       .subscribe(({ group, equipment, software }) => {
         this.grupo = group;
-        if (this.language.locale === "en" && group.facilitiesEN) {
-          this.grupo = { ...group, facilitiesES: group.facilitiesEN };
-        }
         this.equipos = equipment;
         this.software = software;
       });

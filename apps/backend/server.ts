@@ -6,6 +6,7 @@ import { getFrontendUrl } from "./config.js";
 import { bootstrap } from "./db/bootstrap.js";
 import { loadActor } from "./middleware/authz.js";
 import { onError } from "./middleware/error.js";
+import { requirePublicLocale } from "./middleware/public-locale.js";
 import { requireSession } from "./middleware/session.js";
 import AdminAccountRoutes from "./routes/admin/account.js";
 import AdminAuthRoutes from "./routes/admin/auth.js";
@@ -50,6 +51,7 @@ app.use(
 );
 
 // Public API
+app.use("/api/*", requirePublicLocale);
 app.route("/api/publications", PublicPublicationsRoutes);
 app.route("/api/members", PublicMembersRoutes);
 app.route("/api/projects", PublicProjectsRoutes);

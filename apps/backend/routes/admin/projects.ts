@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { translationsSchema } from "../../lib/admin-translations.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToProject,
@@ -13,6 +14,7 @@ import {
   removeMemberFromProject,
   restartProject,
   searchProjects,
+  toAdminProjectView,
   updateProject,
 } from "../../services/project.service.js";
 
@@ -20,18 +22,18 @@ const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
 
 const ProjectBody = z.object({
-  title: z.string().min(1),
-  titleEN: z.string().optional(),
   code: z.string().min(1),
   fundedAmount: z.string(),
-  description: z.string(),
-  descriptionEN: z.string().optional(),
   status: z.number().int().optional(),
   startDate: z.string(),
   endDate: z.string().optional(),
   researchLineId: z.number().int(),
   currencyId: z.number().int(),
   fundingSourceId: z.number().int(),
+  translations: translationsSchema({
+    title: z.string().min(1),
+    description: z.string().min(1),
+  }),
 });
 
 const FilterQuery = z.object({
@@ -46,8 +48,8 @@ router.use("*", async (c, next) => {
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
   const { status, q } = c.req.valid("query");
-  if (q) return c.json(await searchProjects(q, status));
-  return c.json(await listProjects(status));
+  const rows = q ? await searchProjects(q, status) : await listProjects(status);
+  return c.json(rows.map(toAdminProjectView));
 });
 
 router.post("/", zValidator("json", ProjectBody), async (c) => {

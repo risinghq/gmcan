@@ -30,9 +30,7 @@ type ResearchLineDisplay = ResearchLine & { proyectos: ProjectDisplay[] };
 const EMPTY_LINE: ResearchLineDisplay = {
   id: 0,
   name: "",
-  nameEN: "",
   description: "",
-  descriptionEN: "",
   photo: null,
   groupId: 0,
   createdAt: null,

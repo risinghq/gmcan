@@ -33,11 +33,11 @@ export default class AddEquipoComponent implements OnInit, HasUnsavedChanges {
   constructor() {
     this.equipo = createEquipment();
     this.equipoForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       cpu: [""],
       gpu: [""],
       ram: [""],
-      hd: [""],
+      storage: [""],
     });
   }
 

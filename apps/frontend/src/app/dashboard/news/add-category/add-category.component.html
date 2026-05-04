@@ -10,24 +10,13 @@
       </div>
       <form [formGroup]="categoryForm" class="flex-news mt-24 mb-32">
         <div class="mr-32 full-width">
-          <div class="text-category">Categoría en español <span class="red-text">*</span></div>
+          <div class="text-category">Categoría <span class="red-text">*</span></div>
           <input
             [(ngModel)]="category.name"
-            formControlName="nombre"
-            name="nombre"
+            formControlName="name"
+            name="name"
             class="input-category"
-            placeholder="Agregar categoría en español"
-            required
-          />
-        </div>
-        <div class="full-width">
-          <div class="text-category">Categoría en ingles <span class="red-text">*</span></div>
-          <input
-            [(ngModel)]="category.nameEN"
-            formControlName="nombreEN"
-            name="nombreEN"
-            class="input-category"
-            placeholder="Agregar categoría en inglés"
+            placeholder="Agregar categoría"
             required
           />
         </div>

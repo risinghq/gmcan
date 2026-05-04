@@ -51,9 +51,8 @@ export default class JoinUsComponent implements OnInit {
   ngOnInit(): void {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.join);
-    const isEnglish = (this.language.locale ?? "es").startsWith("en");
     const origin = parsePublicOrigin(this.route);
-    this.previouslink = getPublicOriginInfo(origin, isEnglish).route;
+    this.previouslink = getPublicOriginInfo(origin).route;
   }
 
   return(): void {

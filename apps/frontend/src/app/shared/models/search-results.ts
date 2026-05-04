@@ -5,8 +5,7 @@ export interface SearchResults {
     id: number;
     title: string;
     file: string | null;
-    abstractES: string | null;
-    abstractEN: string | null;
+    abstract: string | null;
     journalIssue: number | null;
     doi: string | null;
     publishedAt: string;
@@ -26,7 +25,6 @@ export interface SearchResults {
     maternalName: string | null;
     birthDate: string | null;
     bio: string | null;
-    bioEN: string | null;
     photo: string | null;
     status: number;
     roleId: number;
@@ -45,11 +43,9 @@ export interface SearchResults {
   projects: {
     id: number;
     title: string;
-    titleEN: string | null;
     code: string;
     fundedAmount: string;
     description: string;
-    descriptionEN: string | null;
     status: number | null;
     startDate: string;
     endDate: string | null;

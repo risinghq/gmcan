@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { translationsSchema } from "../../lib/admin-translations.js";
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
@@ -11,6 +12,7 @@ import {
   getMethodPhoto,
   listMethods,
   setMethodPhoto,
+  toAdminMethodView,
   updateMethod,
 } from "../../services/group.service.js";
 
@@ -19,18 +21,18 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const FILE_CONFIG = { directory: "method", kind: "image" } as const;
 
 const Body = z.object({
-  name: z.string().min(1),
-  nameEN: z.string().min(1),
-  description: z.string(),
-  descriptionEN: z.string().optional(),
   groupId: z.number().int(),
+  translations: translationsSchema({
+    name: z.string().min(1),
+    description: z.string().min(1),
+  }),
 });
 
 const UpdateBody = z.object({
-  name: z.string().min(1),
-  nameEN: z.string().min(1),
-  description: z.string(),
-  descriptionEN: z.string().optional(),
+  translations: translationsSchema({
+    name: z.string().min(1),
+    description: z.string().min(1),
+  }),
 });
 
 router.use("*", async (c, next) => {
@@ -40,14 +42,14 @@ router.use("*", async (c, next) => {
 
 router.get("/", async (c) => {
   const rows = await listMethods();
-  return c.json(rows);
+  return c.json(rows.map(toAdminMethodView));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMethod(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(row);
+  return c.json(toAdminMethodView(row));
 });
 
 router.post("/", zValidator("json", Body), async (c) => {

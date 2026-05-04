@@ -34,9 +34,8 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
   constructor() {
     this.software = createSoftware();
     this.softwareForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      description: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       moreInfo: [""],
     });
   }
@@ -53,7 +52,6 @@ export default class AddSoftwareComponent implements OnInit, HasUnsavedChanges {
         .createSoftware({
           name: this.software.name ?? undefined,
           description: this.software.description ?? undefined,
-          descriptionEN: this.software.descriptionEN ?? undefined,
           moreInfo: this.software.moreInfo ?? undefined,
           groupId: this.software.groupId,
         })

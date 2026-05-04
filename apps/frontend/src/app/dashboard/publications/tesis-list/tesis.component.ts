@@ -22,7 +22,7 @@ import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
-import type { UniversityItem } from "@app/shared/services/ref.service";
+import { RefService, type UniversityItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
 interface PublicationRow extends PublicationWithAuthors {
@@ -58,6 +58,7 @@ export default class TesisComponent implements OnInit {
   router = inject(Router);
   lookup = inject(LookupService);
   private publicationService = inject(PublicationService);
+  private refService = inject(RefService);
   titlecasePipe = inject(TitleCasePipe);
   datePipe = inject(DatePipe);
   private tabState = inject(TabStateService);
@@ -83,10 +84,11 @@ export default class TesisComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedTab = this.tabState.thesisTab();
-    const universities = this.lookup.universities();
-    this.dataSource2 = new MatTableDataSource(universities);
-    this.dataSource2.sort = this.sort2();
-    this.dataSource2.paginator = this.paginator2();
+    this.refService.listUniversities().subscribe((universities) => {
+      this.dataSource2 = new MatTableDataSource(universities);
+      this.dataSource2.sort = this.sort2();
+      this.dataSource2.paginator = this.paginator2();
+    });
     this.getThesis();
   }
 

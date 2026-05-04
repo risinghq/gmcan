@@ -13,8 +13,8 @@
           <div class="text-category">Título <span class="red-text">*</span></div>
           <input
             [(ngModel)]="publicacion.title"
-            formControlName="título"
-            name="título"
+            formControlName="title"
+            name="title"
             class="input-category"
             placeholder="Ingresar título"
             required
@@ -25,7 +25,7 @@
             <div class="text-category">Evento <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar evento</mat-label>
-              <mat-select [(ngModel)]="publicacion.eventId" formControlName="evento_idEvento" name="evento_idEvento">
+              <mat-select [(ngModel)]="publicacion.eventId" formControlName="eventId" name="eventId">
                 @for (ev of eventos; track ev) {
                   <mat-option [value]="ev.id">{{ ev.name }}, {{ ev.city }}, {{ ev.country }}.</mat-option>
                 }
@@ -41,8 +41,8 @@
                   matInput
                   [(ngModel)]="publicacion.publishedAtDate"
                   [matDatepicker]="dp"
-                  formControlName="fechaPublicacionDate"
-                  name="fechaPublicacionDate"
+                  formControlName="publishedAtDate"
+                  name="publishedAtDate"
                 />
 
                 <mat-datepicker-toggle matSuffix [for]="dp" />
@@ -55,8 +55,8 @@
           <div class="text-category">DOI</div>
           <input
             [(ngModel)]="publicacion.doi"
-            formControlName="DOI"
-            name="DOI"
+            formControlName="doi"
+            name="doi"
             class="input-category"
             placeholder="Insertar DOI"
           />
@@ -188,23 +188,12 @@
           </div>
         </div>
         <div class="full-width mt-16 mb-16">
-          <div class="text-category">Resumen en español <span class="red-text">*</span></div>
+          <div class="text-category">Resumen <span class="red-text">*</span></div>
           <textarea
-            [(ngModel)]="publicacion.abstractES"
+            [(ngModel)]="publicacion.abstract"
             placeholder="Insertar resumen"
-            formControlName="resumen"
-            name="resumen"
-            autosize
-            class="input-category"
-          ></textarea>
-        </div>
-        <div class="full-width mb-16">
-          <div class="text-category">Resumen en inglés <span class="red-text">*</span></div>
-          <textarea
-            [(ngModel)]="publicacion.abstractEN"
-            placeholder="Insertar resumen"
-            formControlName="resumenEN"
-            name="resumenEN"
+            formControlName="abstract"
+            name="abstract"
             autosize
             class="input-category"
           ></textarea>

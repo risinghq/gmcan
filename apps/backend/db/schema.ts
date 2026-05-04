@@ -1,4 +1,4 @@
-import type { Generated } from "kysely";
+import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 type DateString = string;
 
@@ -310,3 +310,19 @@ export interface Database {
   member_project: MemberProjectTable;
   member_group: MemberGroupTable;
 }
+
+export type ProjectRow = Selectable<ProjectTable>;
+export type ProjectInsert = Insertable<ProjectTable>;
+export type ProjectUpdate = Updateable<ProjectTable>;
+
+export type NewsRow = Selectable<NewsTable>;
+export type NewsInsert = Insertable<NewsTable>;
+export type NewsUpdate = Updateable<NewsTable>;
+
+export type ResearchLineRow = Selectable<ResearchLineTable>;
+export type ResearchLineInsert = Insertable<ResearchLineTable>;
+export type ResearchLineUpdate = Updateable<ResearchLineTable>;
+
+export type MethodRow = Selectable<MethodTable>;
+export type MethodInsert = Insertable<MethodTable>;
+export type MethodUpdate = Updateable<MethodTable>;

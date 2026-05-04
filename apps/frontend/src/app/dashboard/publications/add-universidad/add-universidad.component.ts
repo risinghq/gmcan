@@ -23,7 +23,7 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   private snackBar = inject(MatSnackBar);
   private refService = inject(RefService);
 
-  universidad: UniversityItem = { id: 0, name: "", nameEN: "" };
+  universidad: UniversityItem = { id: 0, name: "" };
   public universidadForm: FormGroup;
   button_text = "Guardar universidad";
   notCanDo = false;
@@ -32,7 +32,6 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
   constructor() {
     this.universidadForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
@@ -44,15 +43,13 @@ export default class AddUniversidadComponent implements OnInit, HasUnsavedChange
 
   submitUniversidad(): void {
     if (!this.universidadForm.valid) return;
-    this.refService
-      .createUniversity({ name: this.universidad.name, nameEN: this.universidad.nameEN })
-      .subscribe((result) => {
-        if (result.id) {
-          this.universidadForm.markAsPristine();
-          this.return();
-          this.openSnackBar("Universidad agregada exitosamente");
-        }
-      });
+    this.refService.createUniversity({ name: this.universidad.name }).subscribe((result) => {
+      if (result.id) {
+        this.universidadForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Universidad agregada exitosamente");
+      }
+    });
   }
 
   return(): void {

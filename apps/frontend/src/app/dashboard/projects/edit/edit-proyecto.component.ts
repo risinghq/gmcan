@@ -1,7 +1,7 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { AsyncPipe } from "@angular/common";
 import { Component, OnInit, inject } from "@angular/core";
-import { FormBuilder, FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -21,18 +21,17 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { createProject } from "@app/shared/models/factories";
 import type { Member } from "@app/shared/models/member";
 import type { Project } from "@app/shared/models/project";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import { parseLocalDate, requireLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
@@ -57,7 +56,6 @@ interface ProjectMemberRow {
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,
-    FormsModule,
     ReactiveFormsModule,
     MatFormField,
     MatLabel,
@@ -92,7 +90,6 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   button_text2 = "Concluir proyecto";
   memberOptions: MemberOption[] = [];
   researchLines: ResearchLine[] = [];
-  proyecto: Project & { startDateObj?: Date; endDateObj?: Date };
   proyectoForm: FormGroup;
   get monedas() {
     return this.lookup.monedas();
@@ -100,36 +97,33 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   get fundingSources() {
     return this.lookup.fundingSources();
   }
-  url: string;
 
   disableSelect = false;
+  private projectId = 0;
+  private projectStatus: number | null = null;
 
   miembrosProyecto: ProjectMemberRow[] = [];
   private originalMemberIds: number[] = [];
 
   constructor() {
     this.proyectoForm = this.formBuilder.group({
-      título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      títuloEN: [""],
-      codigo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaInicio: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      title: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      code: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      startDate: [null, [Validators.required]],
       researchLineId: ["", [Validators.required]],
       fundingSourceId: ["", [Validators.required]],
       currencyId: ["", [Validators.required]],
-      descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcionEN: [""],
-      montoFinanciado: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaFin: [""],
+      description: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fundedAmount: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      endDate: [null],
     });
-    this.proyecto = { ...createProject() };
-    this.url = GLOBAL.url;
   }
 
   ngOnInit(): void {
     const resolved = this.route.snapshot.data["project"] as Project;
     this.bindProject(resolved);
     this.loadResearchLines();
-    this.loadProjectMembers(resolved.id);
+    this.loadProjectMembers(this.projectId);
   }
 
   isDirty(): boolean {
@@ -137,25 +131,25 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   private bindProject(result: Project): void {
-    const d = new Date(result.startDate ?? new Date());
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    this.proyecto = {
-      ...result,
-      startDateObj: d,
-      endDateObj: result.endDate
-        ? (() => {
-            const e = new Date(result.endDate!);
-            e.setMinutes(e.getMinutes() + e.getTimezoneOffset());
-            return e;
-          })()
-        : undefined,
-    };
+    this.projectId = result.id;
+    this.projectStatus = result.status;
+    this.proyectoForm.patchValue({
+      title: result.title,
+      code: result.code,
+      startDate: requireLocalDate(result.startDate, "project.startDate"),
+      researchLineId: result.researchLineId,
+      fundingSourceId: result.fundingSourceId,
+      currencyId: result.currencyId,
+      description: result.description,
+      fundedAmount: result.fundedAmount,
+      endDate: parseLocalDate(result.endDate ?? undefined) ?? null,
+    });
     if (result.status === 0) {
       this.terminado = true;
       this.disableSelect = true;
       this.button_text2 = "Reactivar proyecto";
       this.proyectoForm.disable();
-      this.proyectoForm.controls["fechaFin"]?.enable();
+      this.proyectoForm.controls["endDate"]?.enable();
     }
   }
 
@@ -235,8 +229,13 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
     }
   }
 
-  selectMember(option: MemberOption | { value?: string }, i: number): void {
-    if ("id" in option) {
+  selectMember(option: MemberOption | { value?: string } | string, i: number): void {
+    if (typeof option === "string") {
+      const found = this.memberOptions.find((m) => m.name === option) ?? null;
+      this.miembrosProyecto[i].memberId = found?.id ?? null;
+      this.miembrosProyecto[i].name = option;
+      this.miembrosProyecto[i].myControl.setValue(option);
+    } else if ("id" in option) {
       this.miembrosProyecto[i].memberId = option.id;
       this.miembrosProyecto[i].name = option.name;
       this.miembrosProyecto[i].myControl.setValue(option.name);
@@ -264,16 +263,16 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   submitProyecto(): void {
     if (!this.proyectoForm.valid) return;
 
-    this.projectService.updateProject(this.proyecto.id, this.buildProjectBody()).subscribe((res) => {
+    this.projectService.updateProject(this.projectId, this.buildProjectBody()).subscribe((res) => {
       if (res.status === 1) {
         const newMemberIds = this.miembrosProyecto.filter((r) => r.memberId != null).map((r) => r.memberId as number);
         const toRemove = this.originalMemberIds.filter((id) => !newMemberIds.includes(id));
         const toAdd = newMemberIds.filter((id) => !this.originalMemberIds.includes(id));
         for (const memberId of toRemove) {
-          this.projectService.removeProjectMember(this.proyecto.id, memberId).subscribe();
+          this.projectService.removeProjectMember(this.projectId, memberId).subscribe();
         }
         for (const memberId of toAdd) {
-          this.projectService.addProjectMember(this.proyecto.id, memberId).subscribe();
+          this.projectService.addProjectMember(this.projectId, memberId).subscribe();
         }
         this.proyectoForm.markAsPristine();
         this.return();
@@ -283,9 +282,9 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   projectEnd(): void {
-    const newStatus = this.proyecto.status === 1 ? 0 : 1;
+    const newStatus = this.projectStatus === 1 ? 0 : 1;
     this.projectService
-      .updateProject(this.proyecto.id, this.buildProjectBody({ status: newStatus }))
+      .updateProject(this.projectId, this.buildProjectBody({ status: newStatus }))
       .subscribe((result) => {
         if (result.status === 1) {
           this.proyectoForm.markAsPristine();
@@ -296,7 +295,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   eraseProject(): void {
-    this.projectService.deleteProject(this.proyecto.id).subscribe((result) => {
+    this.projectService.deleteProject(this.projectId).subscribe((result) => {
       if (result.status === 1) {
         this.proyectoForm.markAsPristine();
         this.return();
@@ -328,24 +327,30 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   private buildProjectBody(extra: Partial<ProjectBody> = {}): ProjectBody {
+    const form = this.proyectoForm.getRawValue() as {
+      title: string;
+      code: string;
+      startDate: Date | null;
+      researchLineId: number;
+      fundingSourceId: number;
+      currencyId: number;
+      description: string;
+      fundedAmount: string;
+      endDate: Date | null;
+    };
+
     return {
-      title: this.proyecto.title,
-      titleEN: this.proyecto.titleEN ?? undefined,
-      code: this.proyecto.code,
-      fundedAmount: this.proyecto.fundedAmount,
-      description: this.proyecto.description,
-      descriptionEN: this.proyecto.descriptionEN ?? undefined,
-      startDate: this.toIsoDate(this.proyecto.startDateObj),
-      endDate: this.proyecto.endDateObj ? this.toIsoDate(this.proyecto.endDateObj) : undefined,
-      researchLineId: this.proyecto.researchLineId,
-      currencyId: this.proyecto.currencyId,
-      fundingSourceId: this.proyecto.fundingSourceId,
+      title: form.title,
+      code: form.code,
+      fundedAmount: form.fundedAmount,
+      description: form.description,
+      startDate: toIsoDate(form.startDate ?? new Date()),
+      endDate: form.endDate ? toIsoDate(form.endDate) : undefined,
+      researchLineId: form.researchLineId,
+      currencyId: form.currencyId,
+      fundingSourceId: form.fundingSourceId,
       ...extra,
     };
-  }
-
-  private toIsoDate(value: Date | undefined): string {
-    return new Date(value ?? new Date()).toLocaleDateString("sv");
   }
 }
 

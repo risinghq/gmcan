@@ -55,10 +55,8 @@ export default class DetailNewsComponent implements OnInit {
     this.meta.updateTag({ name: "title", content: String(this.noticia.title) });
     this.meta.updateTag({ property: "og:title", content: String(this.noticia.title) });
     this.titleService.setTitle(String(this.noticia.title));
-
-    const isEnglish = (this.language.locale ?? "es").startsWith("en");
     const origin = parsePublicOrigin(this.route);
-    const originInfo = getPublicOriginInfo(origin, isEnglish);
+    const originInfo = getPublicOriginInfo(origin);
     this.previouslink = originInfo.route;
     this.previouspage = originInfo.label;
     this.cargado = true;

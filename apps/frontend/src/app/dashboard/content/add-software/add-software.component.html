@@ -11,25 +11,14 @@
       <form [formGroup]="softwareForm" class="mt-24 mb-32">
         <div class="full-width">
           <div class="text-category">Nombre del software <span class="red-text">*</span></div>
-          <input [(ngModel)]="software.nombre" formControlName="nombre" name="nombre" class="input-category" required />
+          <input [(ngModel)]="software.name" formControlName="name" name="name" class="input-category" required />
         </div>
         <div class="full-width">
-          <div class="text-category">Descripción en español</div>
+          <div class="text-category">Descripción</div>
           <textarea
-            [(ngModel)]="software.descripcion"
-            formControlName="descripcion"
-            name="descripcion"
-            class="input-category"
-            required
-            autosize
-          ></textarea>
-        </div>
-        <div class="full-width">
-          <div class="text-category">Descripción en inglés</div>
-          <textarea
-            [(ngModel)]="software.descripcionEN"
-            formControlName="descripcionEN"
-            name="descripcionEN"
+            [(ngModel)]="software.description"
+            formControlName="description"
+            name="description"
             class="input-category"
             required
             autosize

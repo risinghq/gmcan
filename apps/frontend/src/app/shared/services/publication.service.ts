@@ -8,8 +8,7 @@ import { GLOBAL } from "./global";
 
 export interface PublicationFields {
   title: string;
-  abstractES?: string;
-  abstractEN?: string;
+  abstract?: string;
   doi?: string;
   publishedAt: string;
   journalIssue?: number;

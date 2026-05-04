@@ -10,51 +10,27 @@
       </div>
       <form [formGroup]="proyectoForm" class="mt-24 mb-32">
         <div class="full-width">
-          <div class="text-category">Título del proyecto en español <span class="red-text">*</span></div>
+          <div class="text-category">Título del proyecto <span class="red-text">*</span></div>
           <input
-            [(ngModel)]="proyecto.titulo"
-            formControlName="título"
-            name="título"
+            formControlName="title"
+            name="title"
             class="input-category"
-            placeholder="Insertar título del proyecto en español"
-            required
-          />
-        </div>
-        <div class="full-width">
-          <div class="text-category">Título del proyecto en inglés <span class="red-text">*</span></div>
-          <input
-            [(ngModel)]="proyecto.tituloEN"
-            formControlName="títuloEN"
-            name="títuloEN"
-            class="input-category"
-            placeholder="Insertar título del proyecto en inglés"
+            placeholder="Insertar título del proyecto"
             required
           />
         </div>
         <div class="flex-news mt-8">
           <div class="mr-32 full-width">
             <div class="text-category">Código <span class="red-text">*</span></div>
-            <input
-              [(ngModel)]="proyecto.codigo"
-              formControlName="codigo"
-              name="codigo"
-              class="input-category"
-              required
-            />
+            <input formControlName="code" name="code" class="input-category" required />
           </div>
           <div class="full-width">
             <div class="text-category">Línea de investigación <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar línea</mat-label>
-              <mat-select
-                [(ngModel)]="proyecto.lineasInvestigacion_idLineasInvestigacion"
-                formControlName="lineasInvestigacion_idLineasInvestigacion"
-                name="lineasInvestigacion_idLineasInvestigacion"
-              >
-                @for (lineaInvestigacion of lineasInvestigacion; track lineaInvestigacion) {
-                  <mat-option [value]="lineaInvestigacion.idLineasInvestigacion">{{
-                    lineaInvestigacion.nombre
-                  }}</mat-option>
+              <mat-select formControlName="researchLineId" name="researchLineId">
+                @for (researchLine of researchLines; track researchLine) {
+                  <mat-option [value]="researchLine.id">{{ researchLine.name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -63,66 +39,43 @@
         <div class="full-width mt-16">
           <div class="text-category mb-0">Responsable(s) <span class="red-text">*</span></div>
           <div class="flex-flow flex-news mt-16">
-            @for (otroAutor of otrosAutores; track otroAutor; let i = $index) {
+            @for (miembro of miembrosProyecto; track miembro.id; let i = $index) {
               <section class="relative mr-80 mb-8">
                 <mat-form-field class="input-category width-normal" floatLabel="auto">
                   <input
-                    id="autorId"
+                    id="miembroId-{{ i }}"
                     class="text-autocomplete text-autocomplete-normal"
                     type="text"
                     matInput
-                    [(ngModel)]="otroAutor.nombre"
-                    [disabled]="true"
-                    [ngModelOptions]="{ standalone: true }"
+                    [formControl]="miembro.myControl"
+                    [matAutocomplete]="auto"
+                    [disabled]="disableSelect"
                   />
                   <mat-label>Seleccionar autor</mat-label>
-                </mat-form-field>
-                <mat-form-field class="input-category selector-users-input">
-                  <mat-select [disabled]="disableSelect" (selectionChange)="selectUserAutor($event.value, 1, i)">
-                    @for (option of options; track option) {
-                      <mat-option class="mdc-list-item" [value]="option">
-                        @if (!option.foto && option.apellidoPaterno) {
-                          <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
-                        }
-                        @if (option.foto) {
-                          <img
-                            class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'usuario/' + option.DNI + '/file }}"
-                          />
-                        }
-                        <span class="mdc-list-item__text">{{ option.nombre }}</span>
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectMember($event.option.value, i)">
+                    @for (option of miembro.filteredOptions | async; track option.id) {
+                      <mat-option [value]="option.name">
+                        <span class="mdc-list-item__text">{{ option.name }}</span>
                       </mat-option>
                     }
-                  </mat-select>
+                  </mat-autocomplete>
                 </mat-form-field>
-                @if (otroAutor.nombre && proyecto.estado != 0) {
-                  <mat-icon class="erase-icon" (click)="removeAnotherAuthor(i)">clear</mat-icon>
+                @if (miembro.name && !terminado) {
+                  <mat-icon class="erase-icon" (click)="removeAnotherMember(i)">clear</mat-icon>
                 }
               </section>
             }
-            @if (proyecto.estado != 0) {
-              <div class="green-text plex-sans mb-8" (click)="addAnotherAuthor()">Agregar responsable</div>
+            @if (!terminado) {
+              <div class="green-text plex-sans mb-8" (click)="addAnotherMember()">Agregar responsable</div>
             }
           </div>
         </div>
         <div class="full-width mt-16 mb-16">
-          <div class="text-category">Descripción en español <span class="red-text">*</span></div>
+          <div class="text-category">Descripción <span class="red-text">*</span></div>
           <textarea
-            [(ngModel)]="proyecto.descripcion"
             placeholder="Insertar descripcion"
-            formControlName="descripcion"
-            name="descripcion"
-            autosize
-            class="input-category"
-          ></textarea>
-        </div>
-        <div class="full-width mb-16">
-          <div class="text-category">Descripción en inglés <span class="red-text">*</span></div>
-          <textarea
-            [(ngModel)]="proyecto.descripcionEN"
-            placeholder="Insertar descripcion"
-            formControlName="descripcionEN"
-            name="descripcionEN"
+            formControlName="description"
+            name="description"
             autosize
             class="input-category"
           ></textarea>
@@ -132,15 +85,9 @@
             <div class="text-category">Fuente de financiamiento <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar fuente de financiamiento</mat-label>
-              <mat-select
-                [(ngModel)]="proyecto.fuenteFinanciamiento_idFuenteFinanciamiento"
-                formControlName="fuenteFinanciamiento_idFuenteFinanciamiento"
-                name="fuenteFinanciamiento_idFuenteFinanciamiento"
-              >
-                @for (fuenteFinaciamiento of fuentesFinaciamiento; track fuenteFinaciamiento) {
-                  <mat-option [value]="fuenteFinaciamiento.idFuenteFinanciamiento">{{
-                    fuenteFinaciamiento.nombre
-                  }}</mat-option>
+              <mat-select formControlName="fundingSourceId" name="fundingSourceId">
+                @for (fundingSource of fundingSources; track fundingSource) {
+                  <mat-option [value]="fundingSource.id">{{ fundingSource.name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -149,11 +96,7 @@
             <div class="text-category">Moneda <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Tipo</mat-label>
-              <mat-select
-                [(ngModel)]="proyecto.moneda_idMoneda"
-                formControlName="moneda_idMoneda"
-                name="moneda_idMoneda"
-              >
+              <mat-select formControlName="currencyId" name="currencyId">
                 @for (moneda of monedas; track moneda) {
                   <mat-option [value]="moneda.idMoneda">{{ moneda.simbolo }}</mat-option>
                 }
@@ -163,13 +106,7 @@
           <div class="full-width">
             <div class="full-width">
               <div class="text-category">Monto financiado <span class="red-text">*</span></div>
-              <input
-                [(ngModel)]="proyecto.montoFinanciado"
-                formControlName="montoFinanciado"
-                name="montoFinanciado"
-                class="input-category"
-                required
-              />
+              <input formControlName="fundedAmount" name="fundedAmount" class="input-category" required />
             </div>
           </div>
         </div>
@@ -178,13 +115,7 @@
             <div class="text-category">Fecha de inicio <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar fecha de inicio</mat-label>
-              <input
-                matInput
-                [(ngModel)]="proyecto.fechaInicio"
-                [matDatepicker]="dp"
-                formControlName="fechaInicio"
-                name="fechaInicio"
-              />
+              <input matInput [matDatepicker]="dp" formControlName="startDate" name="startDate" />
               <mat-datepicker-toggle matSuffix [for]="dp" />
               <mat-datepicker #dp />
             </mat-form-field>
@@ -194,13 +125,7 @@
               <div class="text-category">Fecha de fin <span class="red-text">*</span></div>
               <mat-form-field class="input-category" floatLabel="auto">
                 <mat-label>Seleccionar fecha de fin</mat-label>
-                <input
-                  matInput
-                  [(ngModel)]="proyecto.fechaFin"
-                  [matDatepicker]="dp2"
-                  formControlName="fechaFin"
-                  name="fechaFin"
-                />
+                <input matInput [matDatepicker]="dp2" formControlName="endDate" name="endDate" />
                 <mat-datepicker-toggle matSuffix [for]="dp2" />
                 <mat-datepicker #dp2 />
               </mat-form-field>

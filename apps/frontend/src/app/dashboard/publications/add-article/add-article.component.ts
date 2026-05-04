@@ -89,8 +89,7 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
       journalId: ["", [Validators.required]],
       journalIssue: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       doi: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      abstractES: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      abstractEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
     this.publicacion = createPublication();
@@ -159,8 +158,7 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
 
     const data = buildArticlePayload({
       title: this.publicacion.title,
-      abstractES: this.publicacion.abstractES ?? undefined,
-      abstractEN: this.publicacion.abstractEN ?? undefined,
+      abstract: this.publicacion.abstract ?? undefined,
       doi: this.publicacion.doi ?? undefined,
       publishedAt: this.publishedAtObj,
       journalIssue: this.publicacion.journalIssue ?? undefined,

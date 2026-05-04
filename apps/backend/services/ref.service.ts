@@ -10,7 +10,7 @@ export async function getLookupData() {
       db.selectFrom("funding_source").select(["id", "name"]).execute(),
       db.selectFrom("university").select(["id", "name", "nameEN"]).execute(),
       db.selectFrom("journal").select(["id", "name"]).execute(),
-      db.selectFrom("event").select(["id", "name", "city", "country"]).execute(),
+      db.selectFrom("event").select(["id", "name", "city", "cityEN", "country", "countryEN"]).execute(),
     ]);
 
   return { memberTypes, publicationTypes, thesisTypes, newsTypes, fundingSources, universities, journals, events };

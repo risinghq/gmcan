@@ -11,7 +11,6 @@ export interface Member {
   maternalName: string | null;
   birthDate: string | null;
   bio: string | null;
-  bioEN: string | null;
   photo: string | null;
   status: number;
   roleId: number;

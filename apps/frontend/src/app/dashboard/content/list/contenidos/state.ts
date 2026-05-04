@@ -49,12 +49,9 @@ export class ContenidosState {
 
   aboutUs: About = {
     id: 0,
-    descriptionES: "",
-    descriptionEN: "",
-    objectivesES: null,
-    objectivesEN: null,
-    servicesES: null,
-    servicesEN: null,
+    description: "",
+    objectives: null,
+    services: null,
     photo: null,
     groupId: 0,
     createdAt: null,
@@ -63,42 +60,34 @@ export class ContenidosState {
   group: Group = createGroup();
 
   descripcionForm: FormGroup = this.formBuilder.group({
-    descriptionES: ["", Validators.required],
-    descriptionEN: ["", Validators.required],
+    description: ["", Validators.required],
     photo: ["", Validators.required],
   });
   objetivosForm: FormGroup = this.formBuilder.group({
-    objectivesES: ["", Validators.required],
-    objectivesEN: ["", Validators.required],
+    objectives: ["", Validators.required],
   });
   serviciosForm: FormGroup = this.formBuilder.group({
-    servicesES: ["", Validators.required],
-    servicesEN: ["", Validators.required],
+    services: ["", Validators.required],
   });
   facilidadesRecursosForm: FormGroup = this.formBuilder.group({
-    facilitiesES: ["", Validators.required],
-    facilitiesEN: ["", Validators.required],
+    facilities: ["", Validators.required],
     facilitiesPhoto: ["", Validators.required],
   });
   trabajosFuturosForm: FormGroup = this.formBuilder.group({
-    futureWorkES: ["", Validators.required],
-    futureWorkEN: ["", Validators.required],
+    futureWork: ["", Validators.required],
   });
   footerForm: FormGroup = this.formBuilder.group({
     email: ["", Validators.required],
     phone: ["", Validators.required],
   });
   presentacionForm: FormGroup = this.formBuilder.group({
-    summaryES: ["", Validators.required],
-    summaryEN: ["", Validators.required],
+    summary: ["", Validators.required],
   });
   publicacionesForm: FormGroup = this.formBuilder.group({
-    publicationsSectionES: ["", Validators.required],
-    publicationsSectionEN: ["", Validators.required],
+    publicationsSection: ["", Validators.required],
   });
   proyectosForm: FormGroup = this.formBuilder.group({
-    projectsSectionES: ["", Validators.required],
-    projectsSectionEN: ["", Validators.required],
+    projectsSection: ["", Validators.required],
   });
 
   dataSource = new MatTableDataSource<ResearchLine>([]);
@@ -188,8 +177,7 @@ export class ContenidosState {
   submitQuienesSomos(): void {
     this.groupService
       .updateAboutDescription(this.aboutUs.id, {
-        descriptionES: this.aboutUs.descriptionES,
-        descriptionEN: this.aboutUs.descriptionEN,
+        description: this.aboutUs.description,
       })
       .subscribe((res) => {
         if (res.status === 1) {
@@ -203,8 +191,7 @@ export class ContenidosState {
   submitObjetivos(): void {
     this.groupService
       .updateAboutObjectives(this.aboutUs.id, {
-        objectivesES: this.aboutUs.objectivesES ?? undefined,
-        objectivesEN: this.aboutUs.objectivesEN ?? undefined,
+        objectives: this.aboutUs.objectives ?? undefined,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
@@ -214,8 +201,7 @@ export class ContenidosState {
   submitServicios(): void {
     this.groupService
       .updateAboutServices(this.aboutUs.id, {
-        servicesES: this.aboutUs.servicesES ?? undefined,
-        servicesEN: this.aboutUs.servicesEN ?? undefined,
+        services: this.aboutUs.services ?? undefined,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
@@ -225,8 +211,7 @@ export class ContenidosState {
   submitFacilidadesyRecursos(): void {
     this.groupService
       .updateFacilities(this.group.id, {
-        facilitiesES: this.group.facilitiesES ?? undefined,
-        facilitiesEN: this.group.facilitiesEN ?? undefined,
+        facilities: this.group.facilities ?? undefined,
       })
       .subscribe((res) => {
         if (res.status === 1) {
@@ -240,8 +225,7 @@ export class ContenidosState {
   submitTrabajosFuturos(): void {
     this.groupService
       .updateFutureWork(this.group.id, {
-        futureWorkES: this.group.futureWorkES ?? undefined,
-        futureWorkEN: this.group.futureWorkEN ?? undefined,
+        futureWork: this.group.futureWork ?? undefined,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
@@ -266,18 +250,15 @@ export class ContenidosState {
   }
 
   submitSeccionPresentacion(): void {
-    this.groupService
-      .updateSummary(this.group.id, { summaryES: this.group.summaryES, summaryEN: this.group.summaryEN })
-      .subscribe((res) => {
-        if (res.status === 1) this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
-      });
+    this.groupService.updateSummary(this.group.id, { summary: this.group.summary }).subscribe((res) => {
+      if (res.status === 1) this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
+    });
   }
 
   submitSeccionPublicaciones(): void {
     this.groupService
       .updatePublicationsSection(this.group.id, {
-        publicationsSectionES: this.group.publicationsSectionES ?? undefined,
-        publicationsSectionEN: this.group.publicationsSectionEN ?? undefined,
+        publicationsSection: this.group.publicationsSection ?? undefined,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
@@ -287,8 +268,7 @@ export class ContenidosState {
   submitSeccionProyectos(): void {
     this.groupService
       .updateProjectsSection(this.group.id, {
-        projectsSectionES: this.group.projectsSectionES ?? undefined,
-        projectsSectionEN: this.group.projectsSectionEN ?? undefined,
+        projectsSection: this.group.projectsSection ?? undefined,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.INFO_UPDATED_MESSAGE);
@@ -309,21 +289,15 @@ export class ContenidosState {
     });
   }
 
-  previewAbout(languageIndex: 0 | 1): void {
+  previewAbout(): void {
     const about = structuredClone(this.aboutUs);
-    if (languageIndex === 1) {
-      about.objectivesES = about.objectivesEN;
-      about.servicesES = about.servicesEN;
-      about.descriptionES = about.descriptionEN;
-    }
-    const data: PreviewAboutData = { about, languageIndex };
+    const data: PreviewAboutData = { about };
     this.dialog.open(DialogAboutPreview, { width: "871px", id: "previewAboutUs", data }).afterClosed().subscribe();
   }
 
-  previewFuture(languageIndex: 0 | 1): void {
+  previewFuture(): void {
     const group = structuredClone(this.group);
-    if (languageIndex === 1) group.futureWorkES = group.futureWorkEN;
-    const data: PreviewFutureData = { group, languageIndex };
+    const data: PreviewFutureData = { group };
     this.dialog
       .open(DialogFuturePreview, { width: "871px", id: "previewTrabajosFuturos", data })
       .afterClosed()

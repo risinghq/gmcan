@@ -36,10 +36,8 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.lineaForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      description: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.lineaInvestigacion = createResearchLine();
     this.url = GLOBAL.url;
@@ -56,9 +54,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
       this.researchLinesService
         .create({
           name: this.lineaInvestigacion.name,
-          nameEN: this.lineaInvestigacion.nameEN,
           description: this.lineaInvestigacion.description ?? undefined,
-          descriptionEN: this.lineaInvestigacion.descriptionEN ?? undefined,
           groupId: this.lineaInvestigacion.groupId,
         })
         .subscribe((result) => {

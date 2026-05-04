@@ -41,6 +41,12 @@ export class AuthService {
     );
   }
 
+  updateMyPassword(params: { newPassword: string }): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/account/password`, {
+      password: params.newPassword,
+    });
+  }
+
   tryRestoreSession(): Observable<MemberFull | null> {
     if (this.currentUser) return of(this.currentUser as MemberFull);
     return this.fetchCurrentUser().pipe(catchError(() => of(null)));

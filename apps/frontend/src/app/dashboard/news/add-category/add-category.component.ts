@@ -21,15 +21,14 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   private refService = inject(RefService);
   private snackBar = inject(MatSnackBar);
 
-  category = { id: 0, name: "", nameEN: "" };
+  category = { id: 0, name: "" };
   public categoryForm: FormGroup;
   button_text = "Agregar categoría";
   notCanDo = false;
 
   constructor() {
     this.categoryForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
@@ -49,7 +48,7 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
 
   submitCategory(): void {
     if (this.categoryForm.valid) {
-      this.refService.createNewsType({ name: this.category.name, nameEN: this.category.nameEN }).subscribe((result) => {
+      this.refService.createNewsType({ name: this.category.name }).subscribe((result) => {
         if (result.id) {
           this.categoryForm.markAsPristine();
           this.return();

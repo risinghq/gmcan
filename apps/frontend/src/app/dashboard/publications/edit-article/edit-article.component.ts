@@ -99,8 +99,7 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       journalId: ["", [Validators.required]],
       journalIssue: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       doi: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      abstractES: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      abstractEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
     this.publicacion = this.route.snapshot.data["publication"] as PublicationWithAuthors;
@@ -238,8 +237,7 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
 
     const data = {
       title: this.publicacion.title,
-      abstractES: this.publicacion.abstractES ?? undefined,
-      abstractEN: this.publicacion.abstractEN ?? undefined,
+      abstract: this.publicacion.abstract ?? undefined,
       doi: this.publicacion.doi ?? undefined,
       publishedAt,
       journalIssue: this.publicacion.journalIssue ?? undefined,

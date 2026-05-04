@@ -2,6 +2,7 @@ import { sql } from "kysely";
 
 import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
+import type { Bilingual } from "../lib/admin-translations.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -11,9 +12,7 @@ export interface AuthorInput {
 }
 
 export interface PublicationFields {
-  title: string;
-  abstractES?: string;
-  abstractEN?: string;
+  translations: Bilingual<{ title: string; abstract?: string }>;
   doi?: string;
   publishedAt: string;
   journalIssue?: number;
@@ -22,6 +21,24 @@ export interface PublicationFields {
   universityId?: number;
   thesisTypeId?: number;
   eventId?: number;
+}
+
+function toPublicationRow(data: PublicationFields) {
+  const es = data.translations.es;
+  const en = data.translations.en;
+  return {
+    title: es.title,
+    abstractES: es.abstract ?? null,
+    abstractEN: en.abstract ?? null,
+    doi: data.doi,
+    publishedAt: data.publishedAt,
+    journalIssue: data.journalIssue,
+    typeId: data.typeId,
+    journalId: data.journalId,
+    universityId: data.universityId,
+    thesisTypeId: data.thesisTypeId,
+    eventId: data.eventId,
+  };
 }
 
 async function attachAuthors(publicationId: number) {
@@ -137,7 +154,7 @@ export async function searchPublications(q: string) {
 
 export async function createPublication(data: PublicationFields, authors: AuthorInput[]) {
   return db.transaction().execute(async (trx) => {
-    const result = await trx.insertInto("publication").values(data).executeTakeFirstOrThrow();
+    const result = await trx.insertInto("publication").values(toPublicationRow(data)).executeTakeFirstOrThrow();
     const id = Number(result.insertId);
     if (authors.length > 0) {
       await trx
@@ -158,7 +175,7 @@ export async function createPublication(data: PublicationFields, authors: Author
 
 export async function updatePublication(id: number, data: PublicationFields, authors: AuthorInput[]) {
   await db.transaction().execute(async (trx) => {
-    await trx.updateTable("publication").set(data).where("id", "=", id).execute();
+    await trx.updateTable("publication").set(toPublicationRow(data)).where("id", "=", id).execute();
     await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
     if (authors.length > 0) {
       await trx

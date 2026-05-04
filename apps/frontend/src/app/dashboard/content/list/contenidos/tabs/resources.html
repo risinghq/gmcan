@@ -25,24 +25,12 @@
     </div>
     <div class="full-width mb-24">
       <div class="flex-news">
-        <div class="text-category">Descripción en español <span class="red-text">*</span></div>
+        <div class="text-category">Descripción <span class="red-text">*</span></div>
       </div>
       <textarea
-        [(ngModel)]="state.group.facilitiesES"
-        formControlName="facilitiesES"
-        name="facilitiesES"
-        autosize
-        class="input-category"
-      ></textarea>
-    </div>
-    <div class="full-width mb-24">
-      <div class="flex-news">
-        <div class="text-category">Descripción en inglés <span class="red-text">*</span></div>
-      </div>
-      <textarea
-        [(ngModel)]="state.group.facilitiesEN"
-        formControlName="facilitiesEN"
-        name="facilitiesEN"
+        [(ngModel)]="state.group.facilities"
+        formControlName="facilities"
+        name="facilities"
         autosize
         class="input-category"
       ></textarea>

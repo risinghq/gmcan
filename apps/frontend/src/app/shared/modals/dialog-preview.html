@@ -19,10 +19,7 @@
         <div class="autor-name">
           {{noticia.author?.firstName}} {{noticia.author?.lastName}} {{noticia.author?.maternalName}}
         </div>
-        <div class="news-date">
-          {{language?.detailNewsText?.[0]?.written1}} {{dia}} {{language?.detailNewsText?.[0]?.written2}} {{mes}}
-          {{language?.detailNewsText?.[0]?.written3}} {{anio}}
-        </div>
+        <div class="news-date">{{dia}} {{mes}} {{anio}}</div>
       </div>
     </div>
     <div id="newsBody" class="detail-text" style="white-space: pre-wrap"></div>

@@ -9,16 +9,12 @@ export interface EventItem {
   name: string;
   city: string | null;
   country: string | null;
-  cityEN: string | null;
-  countryEN: string | null;
 }
 
 export interface EventBody {
   name: string;
   city?: string;
   country?: string;
-  cityEN?: string;
-  countryEN?: string;
 }
 
 @Injectable({ providedIn: "root" })

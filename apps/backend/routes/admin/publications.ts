@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { translationsSchema } from "../../lib/admin-translations.js";
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
@@ -25,9 +26,6 @@ const AuthorEntry = z.discriminatedUnion("kind", [
 ]);
 
 const PublicationFields = z.object({
-  title: z.string().min(1),
-  abstractES: z.string().optional(),
-  abstractEN: z.string().optional(),
   doi: z.string().optional(),
   publishedAt: z.string(),
   journalIssue: z.number().optional(),
@@ -36,6 +34,10 @@ const PublicationFields = z.object({
   universityId: z.number().int().optional(),
   thesisTypeId: z.number().int().optional(),
   eventId: z.number().int().optional(),
+  translations: translationsSchema({
+    title: z.string().min(1),
+    abstract: z.string().optional(),
+  }),
 });
 
 const CreateBody = z.object({ data: PublicationFields, authors: z.array(AuthorEntry) });

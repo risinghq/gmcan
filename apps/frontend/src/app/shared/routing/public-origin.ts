@@ -17,26 +17,16 @@ export function parsePublicOrigin(route: ActivatedRoute): PublicOrigin {
   return "home";
 }
 
-export function getPublicOriginInfo(origin: PublicOrigin, isEnglish: boolean): PublicOriginInfo {
-  const labels = isEnglish
-    ? {
-        home: "Home",
-        news: "News",
-        members: "Members",
-        projects: "Projects",
-        publications: "Publications",
-        search: "Search Results",
-        about: "About Us",
-      }
-    : {
-        home: "Inicio",
-        news: "Noticias",
-        members: "Miembros",
-        projects: "Proyectos",
-        publications: "Publicaciones",
-        search: "Resultados de Búsqueda",
-        about: "¿Quiénes Somos?",
-      };
+export function getPublicOriginInfo(origin: PublicOrigin): PublicOriginInfo {
+  const labels = {
+    home: "Inicio",
+    news: "Noticias",
+    members: "Miembros",
+    projects: "Proyectos",
+    publications: "Publicaciones",
+    search: "Resultados de Búsqueda",
+    about: "¿Quiénes Somos?",
+  };
 
   const routes: Record<PublicOrigin, string> = {
     home: "/home",

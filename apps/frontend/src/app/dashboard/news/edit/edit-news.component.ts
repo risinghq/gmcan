@@ -21,7 +21,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createNews } from "@app/shared/models/factories";
-import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -38,7 +37,6 @@ import { AutosizeModule } from "ngx-autosize";
 import { toNewsUpsertBody } from "../flow/news-payload";
 
 interface NewsPreviewData {
-  language: number;
   title: string | null;
   summary: string | null;
   photo: string | ArrayBuffer | null;
@@ -94,15 +92,12 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.newsForm = this.formBuilder.group({
-      titulo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      tituloEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumen: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      cuerpo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      cuerpoEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaPublicacion: ["", [Validators.required]],
-      autorPublicacion: [null, [Validators.required]],
-      tipoNoticia_idtipoNoticia: ["", [Validators.required]],
+      title: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      summary: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      body: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      publishedAt: ["", [Validators.required]],
+      authorId: [null, [Validators.required]],
+      newsTypeId: ["", [Validators.required]],
     });
     this.noticia = createNews();
     this.url = GLOBAL.url;
@@ -120,7 +115,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   private initFromResolver(): void {
     const found = this.route.snapshot.data["news"] as News;
     this.noticia = found;
-    this.newsForm.controls["cuerpo"].setValue(found.body);
+    this.newsForm.controls["body"].setValue(found.body);
     if (found.publishedAt) {
       this.publishedAtObj = parseLocalDate(found.publishedAt);
     }
@@ -183,20 +178,19 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 
   private previewDialog?: MatDialogRef<DialogPreview2>;
 
-  previewNews(value: number): void {
+  previewNews(): void {
     const cat = this.categorias.find((x) => x.id === this.noticia.newsTypeId);
     const aut = this.autores.find((x) => x.id === this.noticia.authorId) ?? null;
     const publishedAt = this.publishedAtObj ? toIsoDate(this.publishedAtObj) : null;
     const data: NewsPreviewData = {
-      language: value,
-      title: value === 0 ? (this.noticia.title ?? null) : (this.noticia.titleEN ?? null),
-      summary: value === 0 ? (this.noticia.summary ?? null) : (this.noticia.summaryEN ?? null),
+      title: this.noticia.title ?? null,
+      summary: this.noticia.summary ?? null,
       photo: this.previewUrl ?? (this.noticia.photo ? this.url + "api/news/" + this.noticia.id + "/photo" : null),
       newsTypeName: cat?.name ?? null,
       author: aut
         ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, photo: aut.photo }
         : null,
-      body: value === 0 ? (this.noticia.body ?? null) : (this.noticia.bodyEN ?? null),
+      body: this.noticia.body ?? null,
       publishedAt,
     };
     this.previewDialog = this.dialog.open(DialogPreview2, {
@@ -357,7 +351,6 @@ export class DialogPreview2 {
   datePipe = inject(DatePipe);
 
   url: string;
-  language: (typeof Languages)[number] | undefined;
   dia = "";
   mes = "";
   anio = "";
@@ -368,7 +361,6 @@ export class DialogPreview2 {
   }
 
   ngOnInit(): void {
-    this.language = Languages[this.noticia.language];
     const newsBody = document.getElementById("newsBody");
     if (newsBody) {
       newsBody.innerHTML = this.noticia.body ?? "";

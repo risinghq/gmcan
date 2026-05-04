@@ -79,9 +79,8 @@ export default class DetailMemberComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    const isEnglish = (this.language.locale ?? "es").startsWith("en");
     const origin = parsePublicOrigin(this.route);
-    const originInfo = getPublicOriginInfo(origin, isEnglish);
+    const originInfo = getPublicOriginInfo(origin);
     this.previouslink = originInfo.route;
     this.previouspage = originInfo.label;
     this.loadProfile();

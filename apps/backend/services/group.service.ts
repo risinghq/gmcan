@@ -1,4 +1,6 @@
 import { db } from "../db/client.js";
+import type { MethodRow, ResearchLineRow } from "../db/schema.js";
+import type { Bilingual } from "../lib/admin-translations.js";
 
 export async function getGroup(id: number) {
   return db.selectFrom("research_group").selectAll().where("id", "=", id).executeTakeFirst();
@@ -86,22 +88,51 @@ export async function getResearchLine(id: number) {
   return db.selectFrom("research_line").selectAll().where("id", "=", id).executeTakeFirst();
 }
 
+export function toAdminResearchLineView(row: ResearchLineRow) {
+  return {
+    id: row.id,
+    photo: row.photo,
+    groupId: row.groupId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    translations: {
+      es: { name: row.name, description: row.description ?? "" },
+      en: { name: row.nameEN, description: row.descriptionEN ?? "" },
+    },
+  };
+}
+
 export async function createResearchLine(data: {
-  name: string;
-  nameEN: string;
-  description?: string;
-  descriptionEN?: string;
   groupId: number;
+  translations: Bilingual<{ name: string; description?: string }>;
 }) {
-  const result = await db.insertInto("research_line").values(data).executeTakeFirst();
+  const result = await db
+    .insertInto("research_line")
+    .values({
+      name: data.translations.es.name,
+      nameEN: data.translations.en.name,
+      description: data.translations.es.description ?? null,
+      descriptionEN: data.translations.en.description ?? null,
+      groupId: data.groupId,
+    })
+    .executeTakeFirst();
   return Number(result.insertId);
 }
 
 export async function updateResearchLine(
   id: number,
-  data: { name: string; nameEN: string; description?: string; descriptionEN?: string },
+  data: { translations: Bilingual<{ name: string; description?: string }> },
 ) {
-  await db.updateTable("research_line").set(data).where("id", "=", id).execute();
+  await db
+    .updateTable("research_line")
+    .set({
+      name: data.translations.es.name,
+      nameEN: data.translations.en.name,
+      description: data.translations.es.description ?? null,
+      descriptionEN: data.translations.en.description ?? null,
+    })
+    .where("id", "=", id)
+    .execute();
 }
 
 export async function deleteResearchLine(id: number) {
@@ -127,22 +158,51 @@ export async function getMethod(id: number) {
   return db.selectFrom("method").selectAll().where("id", "=", id).executeTakeFirst();
 }
 
+export function toAdminMethodView(row: MethodRow) {
+  return {
+    id: row.id,
+    photo: row.photo,
+    groupId: row.groupId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    translations: {
+      es: { name: row.name, description: row.description },
+      en: { name: row.nameEN, description: row.descriptionEN ?? "" },
+    },
+  };
+}
+
 export async function createMethod(data: {
-  name: string;
-  nameEN: string;
-  description: string;
-  descriptionEN?: string;
   groupId: number;
+  translations: Bilingual<{ name: string; description: string }>;
 }) {
-  const result = await db.insertInto("method").values(data).executeTakeFirst();
+  const result = await db
+    .insertInto("method")
+    .values({
+      name: data.translations.es.name,
+      nameEN: data.translations.en.name,
+      description: data.translations.es.description,
+      descriptionEN: data.translations.en.description,
+      groupId: data.groupId,
+    })
+    .executeTakeFirst();
   return Number(result.insertId);
 }
 
 export async function updateMethod(
   id: number,
-  data: { name: string; nameEN: string; description: string; descriptionEN?: string },
+  data: { translations: Bilingual<{ name: string; description: string }> },
 ) {
-  await db.updateTable("method").set(data).where("id", "=", id).execute();
+  await db
+    .updateTable("method")
+    .set({
+      name: data.translations.es.name,
+      nameEN: data.translations.en.name,
+      description: data.translations.es.description,
+      descriptionEN: data.translations.en.description,
+    })
+    .where("id", "=", id)
+    .execute();
 }
 
 export async function deleteMethod(id: number) {

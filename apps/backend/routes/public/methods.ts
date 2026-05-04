@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { localizeField } from "../../lib/public-locale.js";
 import { serveUploadedFile } from "../../lib/upload.js";
 import { getMethod, getMethodPhoto, listMethods } from "../../services/group.service.js";
 
@@ -9,15 +10,35 @@ const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
 
 router.get("/", async (c) => {
+  const locale = c.get("locale");
   const rows = await listMethods();
-  return c.json(rows);
+  return c.json(
+    rows.map((row) => ({
+      id: row.id,
+      name: localizeField(row, locale, { es: "name", en: "nameEN" }),
+      description: localizeField(row, locale, { es: "description", en: "descriptionEN" }),
+      photo: row.photo,
+      groupId: row.groupId,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    })),
+  );
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
+  const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const row = await getMethod(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(row);
+  return c.json({
+    id: row.id,
+    name: localizeField(row, locale, { es: "name", en: "nameEN" }),
+    description: localizeField(row, locale, { es: "description", en: "descriptionEN" }),
+    photo: row.photo,
+    groupId: row.groupId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  });
 });
 
 router.get("/:id/photo", zValidator("param", IdParam), async (c) => {

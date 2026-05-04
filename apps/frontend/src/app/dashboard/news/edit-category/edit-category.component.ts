@@ -35,7 +35,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   private readonly newsService = inject(NewsService);
   private readonly snackBar = inject(MatSnackBar);
 
-  category: RefItem = { id: 0, name: "", nameEN: "" };
+  category: RefItem = { id: 0, name: "" };
   public categoryForm: FormGroup;
   button_text = "Actualizar categoría";
   edit = true;
@@ -44,7 +44,6 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   constructor() {
     this.categoryForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
@@ -81,15 +80,13 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
 
   submitCategory(): void {
     if (this.categoryForm.valid) {
-      this.refService
-        .updateNewsType(this.idCategory, { name: this.category.name, nameEN: this.category.nameEN })
-        .subscribe((result) => {
-          if (result.status === 1) {
-            this.categoryForm.markAsPristine();
-            this.return();
-            this.openSnackBar("Categoría actualizada exitosamente");
-          }
-        });
+      this.refService.updateNewsType(this.idCategory, { name: this.category.name }).subscribe((result) => {
+        if (result.status === 1) {
+          this.categoryForm.markAsPristine();
+          this.return();
+          this.openSnackBar("Categoría actualizada exitosamente");
+        }
+      });
     }
   }
 

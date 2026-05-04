@@ -7,11 +7,9 @@ import { GLOBAL } from "./global";
 
 export interface ProjectBody {
   title: string;
-  titleEN?: string;
   code: string;
   fundedAmount: string;
   description: string;
-  descriptionEN?: string;
   status?: number;
   startDate: string;
   endDate?: string;

@@ -71,20 +71,19 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.memberForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      segundoNombre: [""],
-      apellidoPaterno: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      apellidoMaterno: [""],
-      fechaNacimiento: [""],
-      correo: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      genero_idGenero: [""],
-      prefijo_idPrefijo: [""],
-      tipoMiembro_idTipoMiembro: ["", [Validators.required]],
-      DNI: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      firstName: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      middleName: [""],
+      lastName: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      maternalName: [""],
+      birthDate: [""],
+      email: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      genderId: [""],
+      prefixId: [""],
+      memberTypeId: ["", [Validators.required]],
+      dni: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       password: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       confirmPassword: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       bio: [""],
-      bioEN: [""],
     });
     this.url = GLOBAL.url;
     this.member = createMemberFull();
@@ -148,7 +147,6 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
                 maternalName: this.member.maternalName ?? undefined,
                 birthDate,
                 bio: this.member.bio ?? undefined,
-                bioEN: this.member.bioEN ?? undefined,
                 status,
                 roleId: this.member.roleId,
                 memberTypeId: this.member.memberTypeId,

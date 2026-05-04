@@ -53,7 +53,7 @@ export class PublicationDataService {
       articulos: sorted.filter((p) => p.typeId === 1).map(enrich),
       tesis: sorted.filter((p) => p.typeId === 2).map(enrich),
       resumenes: sorted.filter((p) => p.typeId === 3).map(enrich),
-      infoText: group.publicationsSectionES ?? "",
+      infoText: group.publicationsSection ?? "",
     };
   }
 }

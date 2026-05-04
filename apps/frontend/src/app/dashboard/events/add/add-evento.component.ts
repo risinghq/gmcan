@@ -28,13 +28,11 @@ export default class AddEventoComponent implements OnInit, HasUnsavedChanges {
   button_text = "Guardar evento";
 
   constructor() {
-    this.evento = { name: "", country: "", countryEN: "", city: "", cityEN: "" };
+    this.evento = { name: "", country: "", city: "" };
     this.eventoForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      pais: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      paisEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      ciudad: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      ciudadEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      country: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      city: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 

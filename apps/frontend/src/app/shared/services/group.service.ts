@@ -26,29 +26,23 @@ export class GroupService {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/info`, data);
   }
 
-  updateSummary(id: number, data: { summaryES: string; summaryEN: string }): Observable<{ status: number }> {
+  updateSummary(id: number, data: { summary: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/summary`, data);
   }
 
-  updateFacilities(id: number, data: { facilitiesES?: string; facilitiesEN?: string }): Observable<{ status: number }> {
+  updateFacilities(id: number, data: { facilities?: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/facilities`, data);
   }
 
-  updateFutureWork(id: number, data: { futureWorkES?: string; futureWorkEN?: string }): Observable<{ status: number }> {
+  updateFutureWork(id: number, data: { futureWork?: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/future-work`, data);
   }
 
-  updatePublicationsSection(
-    id: number,
-    data: { publicationsSectionES?: string; publicationsSectionEN?: string },
-  ): Observable<{ status: number }> {
+  updatePublicationsSection(id: number, data: { publicationsSection?: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/publications-section`, data);
   }
 
-  updateProjectsSection(
-    id: number,
-    data: { projectsSectionES?: string; projectsSectionEN?: string },
-  ): Observable<{ status: number }> {
+  updateProjectsSection(id: number, data: { projectsSection?: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/projects-section`, data);
   }
 
@@ -63,21 +57,15 @@ export class GroupService {
     return this.http.get<About[]>(`${GLOBAL.url}admin/group/${groupId}/about`);
   }
 
-  updateAboutDescription(
-    id: number,
-    data: { descriptionES: string; descriptionEN: string },
-  ): Observable<{ status: number }> {
+  updateAboutDescription(id: number, data: { description: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/description`, data);
   }
 
-  updateAboutObjectives(
-    id: number,
-    data: { objectivesES?: string; objectivesEN?: string },
-  ): Observable<{ status: number }> {
+  updateAboutObjectives(id: number, data: { objectives?: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/objectives`, data);
   }
 
-  updateAboutServices(id: number, data: { servicesES?: string; servicesEN?: string }): Observable<{ status: number }> {
+  updateAboutServices(id: number, data: { services?: string }): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/services`, data);
   }
 
@@ -99,7 +87,6 @@ export class GroupService {
   createSoftware(data: {
     name?: string;
     description?: string;
-    descriptionEN?: string;
     moreInfo?: string;
     groupId: number;
   }): Observable<{ id: number }> {
@@ -108,7 +95,7 @@ export class GroupService {
 
   updateSoftware(
     id: number,
-    data: { name?: string; description?: string; descriptionEN?: string; moreInfo?: string },
+    data: { name?: string; description?: string; moreInfo?: string },
   ): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/software/${id}`, data);
   }

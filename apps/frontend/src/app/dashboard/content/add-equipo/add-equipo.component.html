@@ -12,7 +12,7 @@
         <div class="flex-news">
           <div class="mr-32 full-width">
             <div class="text-category">Nombre del equipo <span class="red-text">*</span></div>
-            <input [(ngModel)]="equipo.nombre" formControlName="nombre" name="nombre" class="input-category" required />
+            <input [(ngModel)]="equipo.name" formControlName="name" name="name" class="input-category" required />
           </div>
           <div class="full-width">
             <div class="text-category">CPU</div>
@@ -22,16 +22,22 @@
         <div class="flex-news">
           <div class="mr-32 full-width">
             <div class="text-category">RAM</div>
-            <input [(ngModel)]="equipo.gpu" formControlName="gpu" name="gpu" class="input-category" required />
+            <input [(ngModel)]="equipo.ram" formControlName="ram" name="ram" class="input-category" required />
           </div>
           <div class="full-width">
             <div class="text-category">GPU</div>
-            <input [(ngModel)]="equipo.ram" formControlName="ram" name="ram" class="input-category" required />
+            <input [(ngModel)]="equipo.gpu" formControlName="gpu" name="gpu" class="input-category" required />
           </div>
         </div>
         <div class="mr-32 mid-width">
           <div class="text-category">HD</div>
-          <input [(ngModel)]="equipo.hd" formControlName="hd" name="hd" class="input-category" required />
+          <input
+            [(ngModel)]="equipo.storage"
+            formControlName="storage"
+            name="storage"
+            class="input-category"
+            required
+          />
         </div>
       </form>
       <div class="flex-news">

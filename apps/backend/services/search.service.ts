@@ -37,6 +37,7 @@ export async function globalSearch(q: string, types: Set<string>) {
           .select([
             "news.id",
             "news.title",
+            "news.titleEN",
             "news.publishedAt",
             "news.photo",
             "news.authorId",

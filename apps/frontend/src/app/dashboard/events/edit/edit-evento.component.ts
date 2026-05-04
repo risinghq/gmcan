@@ -42,13 +42,11 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
   edit = true;
 
   constructor() {
-    this.evento = { id: 0, name: "", country: null, countryEN: null, city: null, cityEN: null };
+    this.evento = { id: 0, name: "", country: null, city: null };
     this.eventoForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      pais: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      paisEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      ciudad: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      ciudadEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      country: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      city: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
@@ -87,8 +85,6 @@ export default class EditEventoComponent implements OnInit, HasUnsavedChanges {
           name: this.evento.name,
           city: this.evento.city ?? undefined,
           country: this.evento.country ?? undefined,
-          cityEN: this.evento.cityEN ?? undefined,
-          countryEN: this.evento.countryEN ?? undefined,
         })
         .subscribe((result) => {
           if (result.status === 1) {

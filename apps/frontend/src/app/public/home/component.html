@@ -3,7 +3,7 @@
 }
 <div class="home-div primer-box">
   <div class="center">
-    <div class="description-info">{{ info.summaryES }}</div>
+    <div class="description-info">{{ info.summary }}</div>
     <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">
       {{ language.knowAboutUs }}
     </button>
@@ -300,7 +300,7 @@
             <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>
             } }
           </div>
-          <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstractES }}</div>
+          <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
             @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
             <a
@@ -340,7 +340,7 @@
           </div>
           <div class="collapse collapsed-resumen" id="publication{{ i }}">
             <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
-            <div class="abstract">{{ publicacion.abstractES }}</div>
+            <div class="abstract">{{ publicacion.abstract }}</div>
           </div>
         </div>
       </div>

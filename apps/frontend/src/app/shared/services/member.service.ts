@@ -15,7 +15,6 @@ export interface MemberCreateBody {
   maternalName?: string;
   birthDate?: string;
   bio?: string;
-  bioEN?: string;
   status: number;
   roleId: number;
   memberTypeId: number;
@@ -30,7 +29,6 @@ export interface MemberUpdateBody {
   maternalName?: string;
   birthDate?: string;
   bio?: string;
-  bioEN?: string;
   status: number;
   roleId: number;
   memberTypeId: number;

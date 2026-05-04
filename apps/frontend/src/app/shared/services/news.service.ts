@@ -7,11 +7,8 @@ import { GLOBAL } from "./global";
 
 export interface NewsUpsertBody {
   title: string;
-  titleEN: string;
   summary: string;
-  summaryEN: string;
   body: string;
-  bodyEN: string;
   status: number;
   publishedAt?: string;
   authorId: number;

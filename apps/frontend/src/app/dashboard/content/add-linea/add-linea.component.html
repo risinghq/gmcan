@@ -11,22 +11,12 @@
       <div class="flex-news full-width">
         <div class="full-width mr-32">
           <div class="full-width">
-            <div class="text-category">Nombre de línea en español <span class="red-text">*</span></div>
+            <div class="text-category">Nombre de línea <span class="red-text">*</span></div>
             <input
               class="input-category"
-              [(ngModel)]="lineaInvestigacion.nombre"
-              formControlName="nombre"
-              name="nombre"
-              required
-            />
-          </div>
-          <div class="full-width">
-            <div class="text-category">Nombre de línea en inglés <span class="red-text">*</span></div>
-            <input
-              class="input-category"
-              [(ngModel)]="lineaInvestigacion.nombreEN"
-              formControlName="nombreEN"
-              name="nombreEN"
+              [(ngModel)]="lineaInvestigacion.name"
+              formControlName="name"
+              name="name"
               required
             />
           </div>
@@ -38,17 +28,14 @@
               <img class="img-set" src="{{ previewUrl }}" />
             </div>
           }
-          @if (!previewUrl && !lineaInvestigacion.foto) {
+          @if (!previewUrl && !lineaInvestigacion.photo) {
             <div class="news-img">
               <img class="icon-upload" src="../../assets/img/upload.svg" />
             </div>
           }
-          @if (lineaInvestigacion.foto && !previewUrl) {
+          @if (lineaInvestigacion.photo && !previewUrl) {
             <div class="img-preview">
-              <img
-                class="img-set"
-                src="{{ url + 'lineasinvestigacion/' + lineaInvestigacion.idLineasInvestigacion + '/file }}"
-              />
+              <img class="img-set" src="{{ url + 'api/research-lines/' + lineaInvestigacion.id + '/photo' }}" />
             </div>
           }
           <div class="green-text mt-16">
@@ -63,22 +50,11 @@
         </div>
       </div>
       <div class="full-width mb-32">
-        <div class="text-category">Descripcion en español <span class="red-text">*</span></div>
+        <div class="text-category">Descripcion <span class="red-text">*</span></div>
         <textarea
-          [(ngModel)]="lineaInvestigacion.descripcion"
-          formControlName="descripcion"
-          name="descripcion"
-          autosize
-          class="input-category"
-          required
-        ></textarea>
-      </div>
-      <div class="full-width mb-32">
-        <div class="text-category">Descripcion en inglés <span class="red-text">*</span></div>
-        <textarea
-          [(ngModel)]="lineaInvestigacion.descripcionEN"
-          formControlName="descripcionEN"
-          name="descripcionEN"
+          [(ngModel)]="lineaInvestigacion.description"
+          formControlName="description"
+          name="description"
           autosize
           class="input-category"
           required

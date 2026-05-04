@@ -7,17 +7,13 @@ import { GLOBAL } from "./global";
 
 export interface MethodBody {
   name: string;
-  nameEN: string;
   description: string;
-  descriptionEN?: string;
   groupId: number;
 }
 
 export interface MethodUpdateBody {
   name: string;
-  nameEN: string;
   description: string;
-  descriptionEN?: string;
 }
 
 @Injectable({ providedIn: "root" })

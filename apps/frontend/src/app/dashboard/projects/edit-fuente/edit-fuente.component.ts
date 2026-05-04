@@ -42,7 +42,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.fuenteForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 

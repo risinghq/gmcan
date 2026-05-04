@@ -24,6 +24,7 @@ import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
+import { GLOBAL } from "@app/shared/services/global";
 import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -69,6 +70,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   public publicacionForm: FormGroup;
   button_text = "Guardar resumen";
   eventos: EventItem[] = [];
+  url = GLOBAL.url;
   edit = false;
 
   selectedUser: string | null = null;
@@ -81,12 +83,11 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.publicacionForm = this.formBuilder.group({
-      título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fechaPublicacionDate: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      evento_idEvento: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      DOI: [""],
-      resumen: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      resumenEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      title: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      publishedAtDate: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      eventId: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      doi: [""],
+      abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
     this.publicacion = {
@@ -171,8 +172,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
 
     const data: PublicationFields = buildResumenPayload({
       title: this.publicacion.title,
-      abstractES: this.publicacion.abstractES,
-      abstractEN: this.publicacion.abstractEN,
+      abstract: this.publicacion.abstract,
       doi: this.publicacion.doi,
       publishedAt: this.publicacion.publishedAtDate,
       eventId: this.publicacion.eventId,

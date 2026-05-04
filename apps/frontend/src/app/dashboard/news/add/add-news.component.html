@@ -41,28 +41,14 @@
         <div class="full-width">
           <div class="full-width">
             <div class="text-category">
-              Título en español <span>({{ noticia.title?.length ?? 0 }}/100) </span>
+              Título <span>({{ noticia.title?.length ?? 0 }}/100) </span>
               <span class="red-text">*</span>
             </div>
             <input
               class="input-category"
               [(ngModel)]="noticia.title"
-              formControlName="titulo"
-              name="titulo"
-              maxlength="100"
-              required
-            />
-          </div>
-          <div class="full-width">
-            <div class="text-category">
-              Título en inglés <span>({{ noticia.titleEN?.length ?? 0 }}/100) </span>
-              <span class="red-text">*</span>
-            </div>
-            <input
-              class="input-category"
-              [(ngModel)]="noticia.titleEN"
-              formControlName="tituloEN"
-              name="tituloEN"
+              formControlName="title"
+              name="title"
               maxlength="100"
               required
             />
@@ -75,8 +61,8 @@
                   matInput
                   [(ngModel)]="publishedAtObj"
                   [matDatepicker]="dp"
-                  formControlName="fechaPublicacion"
-                  name="fechaPublicacion"
+                  formControlName="publishedAt"
+                  name="publishedAt"
                   required
                 />
                 <mat-datepicker-toggle matSuffix [for]="dp" />
@@ -86,11 +72,7 @@
             <div class="full-width ml-26">
               <div class="text-category">Categoría <span class="red-text">*</span></div>
               <mat-form-field class="input-category">
-                <mat-select
-                  [(ngModel)]="noticia.newsTypeId"
-                  formControlName="tipoNoticia_idtipoNoticia"
-                  name="tipoNoticia_idtipoNoticia"
-                >
+                <mat-select [(ngModel)]="noticia.newsTypeId" formControlName="newsTypeId" name="newsTypeId">
                   @for (categoria of categorias; track categoria) {
                     <mat-option [value]="categoria.id">{{ categoria.name }}</mat-option>
                   }
@@ -101,7 +83,7 @@
           <div class="full-width">
             <div class="text-category">Autor <span class="red-text">*</span></div>
             <mat-form-field class="input-category">
-              <mat-select [(ngModel)]="noticia.authorId" formControlName="autorPublicacion" name="autorPublicacion">
+              <mat-select [(ngModel)]="noticia.authorId" formControlName="authorId" name="authorId">
                 @for (autor of autores; track autor) {
                   <mat-option [value]="autor.id" class="mdc-list-item">
                     @if (!autor.photo) {
@@ -126,28 +108,13 @@
       </div>
       <div class="full-width mb-32">
         <div class="text-category">
-          Resumen en español <span>({{ noticia.summary?.length ?? 0 }}/500) </span>
+          Resumen <span>({{ noticia.summary?.length ?? 0 }}/500) </span>
           <span class="red-text">*</span>
         </div>
         <textarea
           [(ngModel)]="noticia.summary"
-          formControlName="resumen"
-          name="resumen"
-          autosize
-          class="input-category"
-          maxlength="500"
-          required
-        ></textarea>
-      </div>
-      <div class="full-width mb-32">
-        <div class="text-category">
-          Resumen en inglés <span>({{ noticia.summaryEN?.length ?? 0 }}/500) </span>
-          <span class="red-text">*</span>
-        </div>
-        <textarea
-          [(ngModel)]="noticia.summaryEN"
-          formControlName="resumenEN"
-          name="resumenEN"
+          formControlName="summary"
+          name="summary"
           autosize
           class="input-category"
           maxlength="500"
@@ -156,17 +123,10 @@
       </div>
       <div class="full-width mb-32">
         <div class="flex-news">
-          <div class="text-category">Contenido en español <span class="red-text">*</span></div>
-          <div class="green-text right plex-sans" (click)="previewNews(0)">Vista Previa</div>
+          <div class="text-category">Contenido <span class="red-text">*</span></div>
+          <div class="green-text right plex-sans" (click)="previewNews()">Vista Previa</div>
         </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="noticia.body" formControlName="cuerpo" name="cuerpo" />
-      </div>
-      <div class="full-width mb-32">
-        <div class="flex-news">
-          <div class="text-category">Contenido en inglés <span class="red-text">*</span></div>
-          <div class="green-text right plex-sans" (click)="previewNews(1)">Vista Previa</div>
-        </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="noticia.bodyEN" formControlName="cuerpoEN" name="cuerpoEN" />
+        <ckeditor [editor]="Editor" [(ngModel)]="noticia.body" formControlName="body" name="body" />
       </div>
       <div class="flex-news">
         @if (edit) {

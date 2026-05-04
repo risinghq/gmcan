@@ -6,8 +6,7 @@ export function toIsoDateString(date?: Date): string {
 
 export function buildArticlePayload(input: {
   title: string;
-  abstractES?: string;
-  abstractEN?: string;
+  abstract?: string;
   doi?: string;
   publishedAt?: Date;
   journalIssue?: number;
@@ -15,8 +14,7 @@ export function buildArticlePayload(input: {
 }): PublicationFields {
   return {
     title: input.title,
-    abstractES: input.abstractES ?? undefined,
-    abstractEN: input.abstractEN ?? undefined,
+    abstract: input.abstract ?? undefined,
     doi: input.doi ?? undefined,
     publishedAt: toIsoDateString(input.publishedAt),
     journalIssue: input.journalIssue ?? undefined,
@@ -27,16 +25,14 @@ export function buildArticlePayload(input: {
 
 export function buildThesisPayload(input: {
   title: string;
-  abstractES?: string;
-  abstractEN?: string;
+  abstract?: string;
   publishedAt?: Date;
   universityId?: number;
   thesisTypeId?: number;
 }): PublicationFields {
   return {
     title: input.title,
-    abstractES: input.abstractES ?? undefined,
-    abstractEN: input.abstractEN ?? undefined,
+    abstract: input.abstract ?? undefined,
     publishedAt: toIsoDateString(input.publishedAt),
     typeId: 2,
     universityId: input.universityId ?? undefined,
@@ -46,16 +42,14 @@ export function buildThesisPayload(input: {
 
 export function buildResumenPayload(input: {
   title: string;
-  abstractES?: string;
-  abstractEN?: string;
+  abstract?: string;
   doi?: string;
   publishedAt?: Date;
   eventId?: number;
 }): PublicationFields {
   return {
     title: input.title,
-    abstractES: input.abstractES,
-    abstractEN: input.abstractEN,
+    abstract: input.abstract,
     doi: input.doi,
     publishedAt: toIsoDateString(input.publishedAt),
     typeId: 3,

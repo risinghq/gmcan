@@ -7,17 +7,13 @@ import { GLOBAL } from "./global";
 
 export interface ResearchLineBody {
   name: string;
-  nameEN: string;
   description?: string;
-  descriptionEN?: string;
   groupId: number;
 }
 
 export interface ResearchLineUpdateBody {
   name: string;
-  nameEN: string;
   description?: string;
-  descriptionEN?: string;
 }
 
 @Injectable({ providedIn: "root" })

@@ -81,8 +81,7 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
       publishedAt: ["", [Validators.required]],
       universityId: ["", [Validators.required]],
       thesisTypeId: ["", [Validators.required]],
-      abstractES: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      abstractEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.publicacion = createPublication();
     this.publicacion.typeId = 2;
@@ -133,8 +132,7 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
 
     const data = buildThesisPayload({
       title: this.publicacion.title,
-      abstractES: this.publicacion.abstractES ?? undefined,
-      abstractEN: this.publicacion.abstractEN ?? undefined,
+      abstract: this.publicacion.abstract ?? undefined,
       publishedAt: this.publishedAtObj,
       universityId: this.publicacion.universityId ?? undefined,
       thesisTypeId: this.publicacion.thesisTypeId ?? undefined,

@@ -11,18 +11,8 @@
       <div class="flex-news full-width">
         <div class="full-width mr-32">
           <div class="full-width">
-            <div class="text-category">Nombre del método en español <span class="red-text">*</span></div>
-            <input class="input-category" [(ngModel)]="metodo.nombre" formControlName="nombre" name="nombre" required />
-          </div>
-          <div class="full-width">
-            <div class="text-category">Nombre del método en inglés <span class="red-text">*</span></div>
-            <input
-              class="input-category"
-              [(ngModel)]="metodo.nombreEN"
-              formControlName="nombreEN"
-              name="nombreEN"
-              required
-            />
+            <div class="text-category">Nombre del método <span class="red-text">*</span></div>
+            <input class="input-category" [(ngModel)]="metodo.name" formControlName="name" name="name" required />
           </div>
         </div>
         <div class="">
@@ -32,14 +22,14 @@
               <img class="img-set" src="{{ previewUrl }}" />
             </div>
           }
-          @if (!previewUrl && !metodo.foto) {
+          @if (!previewUrl && !metodo.photo) {
             <div class="news-img">
               <img class="icon-upload" src="../../assets/img/upload.svg" />
             </div>
           }
-          @if (metodo.foto && !previewUrl) {
+          @if (metodo.photo && !previewUrl) {
             <div class="img-preview">
-              <img class="img-set" src="{{ url + 'metodo/' + metodo.idMetodo + '/file }}" />
+              <img class="img-set" src="{{ url + 'api/methods/' + metodo.id + '/photo' }}" />
             </div>
           }
           <div class="green-text mt-16">
@@ -55,22 +45,10 @@
       </div>
       <div class="full-width mb-32">
         <div class="flex-news">
-          <div class="text-category">Descripcion en español <span class="red-text">*</span></div>
-          <div class="green-text top-auto right plex-sans" (click)="previewMethod(0)">Vista Previa</div>
+          <div class="text-category">Descripcion <span class="red-text">*</span></div>
+          <div class="green-text top-auto right plex-sans" (click)="previewMethod()">Vista Previa</div>
         </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="metodo.descripcion" formControlName="descripcion" name="descripcion" />
-      </div>
-      <div class="full-width mb-32">
-        <div class="flex-news">
-          <div class="text-category">Descripcion en inglés <span class="red-text">*</span></div>
-          <div class="green-text top-auto right plex-sans" (click)="previewMethod(1)">Vista Previa</div>
-        </div>
-        <ckeditor
-          [editor]="Editor"
-          [(ngModel)]="metodo.descripcionEN"
-          formControlName="descripcionEN"
-          name="descripcionEN"
-        />
+        <ckeditor [editor]="Editor" [(ngModel)]="metodo.description" formControlName="description" name="description" />
       </div>
       <div class="flex-news">
         @if (edit) {

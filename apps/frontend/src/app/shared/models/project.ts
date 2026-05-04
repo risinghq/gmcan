@@ -1,11 +1,9 @@
 export interface Project {
   id: number;
   title: string;
-  titleEN: string | null;
   code: string;
   fundedAmount: string;
   description: string;
-  descriptionEN: string | null;
   status: number | null;
   startDate: string;
   endDate: string | null;

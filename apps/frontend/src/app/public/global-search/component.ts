@@ -115,8 +115,7 @@ export default class GlobalSearchComponent implements OnInit {
     for (const noticia of this.noticias) this.fillNoticia(noticia);
 
     const origin = parsePublicOrigin(this.route);
-    const isEnglish = (this.language.locale ?? "es").startsWith("en");
-    this.previouslink = getPublicOriginInfo(origin, isEnglish).route;
+    this.previouslink = getPublicOriginInfo(origin).route;
   }
 
   searchGlobal(value: string): void {

@@ -59,7 +59,7 @@ export class ProjectsDataService {
     return {
       active,
       finished,
-      infoText: group.projectsSectionES ?? "",
+      infoText: group.projectsSection ?? "",
     };
   }
 }

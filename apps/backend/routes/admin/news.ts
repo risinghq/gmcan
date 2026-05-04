@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { translationsSchema } from "../../lib/admin-translations.js";
 import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
@@ -12,6 +13,7 @@ import {
   getNewsPhoto,
   listNews,
   type NewsUpsertInput,
+  toAdminNewsView,
   setNewsPhoto,
   updateNews,
 } from "../../services/news.service.js";
@@ -21,17 +23,16 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const NEWS_FILE = { directory: "news", kind: "image" } as const;
 
 const NewsBody = z.object({
-  title: z.string().trim().min(1),
-  titleEN: z.string().trim().min(1),
-  summary: z.string().trim().min(1),
-  summaryEN: z.string().trim().min(1),
-  body: z.string().trim().min(1),
-  bodyEN: z.string().trim().min(1),
   status: z.number().int(),
   publishedAt: z.string().optional(),
   authorId: z.number().int(),
   newsTypeId: z.number().int(),
   priority: z.number().int().optional(),
+  translations: translationsSchema({
+    title: z.string().trim().min(1),
+    summary: z.string().trim().min(1),
+    body: z.string().trim().min(1),
+  }),
 });
 
 router.use("*", async (c, next) => {
@@ -41,14 +42,14 @@ router.use("*", async (c, next) => {
 
 router.get("/", async (c) => {
   const rows = await listNews();
-  return c.json(rows);
+  return c.json(rows.map(toAdminNewsView));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getNewsItem(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(row);
+  return c.json(toAdminNewsView(row));
 });
 
 router.post("/", zValidator("json", NewsBody), async (c) => {

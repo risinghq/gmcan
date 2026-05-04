@@ -15,7 +15,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import type { UniversityItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
@@ -34,10 +33,9 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private refService = inject(RefService);
-  private lookup = inject(LookupService);
   private publicationService = inject(PublicationService);
 
-  universidad: UniversityItem = { id: 0, name: "", nameEN: "" };
+  universidad: UniversityItem = { id: 0, name: "" };
   public universidadForm: FormGroup;
   button_text = "Actualizar universidad";
   edit = true;
@@ -46,7 +44,6 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   constructor() {
     this.universidadForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
   }
 
@@ -60,11 +57,12 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
 
   getUniversidad(): void {
     const id = Number(this.route.snapshot.params["id"] ?? 0);
-    const found = this.lookup.universities().find((u) => u.id === id);
-    if (found) {
-      this.universidad = { id: found.id, name: found.name, nameEN: found.nameEN };
+    this.refService.listUniversities().subscribe((universities) => {
+      const found = universities.find((u) => u.id === id);
+      if (!found) return;
+      this.universidad = { id: found.id, name: found.name };
       this.checkCanDelete(id);
-    }
+    });
   }
 
   checkCanDelete(id: number): void {
@@ -78,7 +76,6 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
     this.refService
       .updateUniversity(this.universidad.id, {
         name: this.universidad.name,
-        nameEN: this.universidad.nameEN,
       })
       .subscribe((result) => {
         if (result.status === 1) {

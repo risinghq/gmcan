@@ -94,8 +94,7 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
       publishedAt: ["", [Validators.required]],
       universityId: ["", [Validators.required]],
       thesisTypeId: ["", [Validators.required]],
-      abstractES: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      abstractEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.publicacion = this.route.snapshot.data["publication"] as PublicationWithAuthors;
     this.url = GLOBAL.url;
@@ -205,8 +204,7 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
 
     const data = {
       title: this.publicacion.title,
-      abstractES: this.publicacion.abstractES ?? undefined,
-      abstractEN: this.publicacion.abstractEN ?? undefined,
+      abstract: this.publicacion.abstract ?? undefined,
       publishedAt,
       typeId: 2,
       universityId: this.publicacion.universityId ?? undefined,

@@ -14,7 +14,6 @@ import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import { Languages } from "@app/shared/models/languages";
 import type { Method } from "@app/shared/models/method";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
@@ -46,16 +45,12 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   constructor() {
     this.methodForm = this.formBuilder.group({
       nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      nombreEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcionEN: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.metodo = {
       id: 0,
       name: "",
-      nameEN: "",
       description: "",
-      descriptionEN: null,
       photo: null,
       groupId: 1,
       createdAt: null,
@@ -86,9 +81,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
       this.methodService
         .update(this.metodo.id, {
           name: this.metodo.name,
-          nameEN: this.metodo.nameEN,
           description: this.metodo.description,
-          descriptionEN: this.metodo.descriptionEN ?? undefined,
         })
         .subscribe((result) => {
           if (result.status === 1) {
@@ -172,22 +165,16 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   private previewDialog?: MatDialogRef<DialogPreview5>;
 
-  previewMethod(value: number): void {
+  previewMethod(): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
     method.photo = this.url + "admin/methods/" + this.metodo.id + "/photo";
-    let languageIndex: 0 | 1 = 0;
     if (this.previewUrl) {
       method.photo = typeof this.previewUrl === "string" ? this.previewUrl : null;
-    }
-    if (value == 1) {
-      method.name = method.nameEN;
-      method.description = method.descriptionEN ?? method.description;
-      languageIndex = 1;
     }
     this.previewDialog = this.dialog.open(DialogPreview5, {
       width: "871px",
       id: "previewMethod",
-      data: { method, languageIndex },
+      data: { method },
     });
 
     this.previewDialog.afterClosed().subscribe();
@@ -218,17 +205,15 @@ export class DialogErase12 {
 })
 export class DialogPreview5 {
   dialogRef = inject<MatDialogRef<DialogPreview5>>(MatDialogRef);
-  data = inject<{ method: Method; languageIndex: 0 | 1 }>(MAT_DIALOG_DATA);
+  data = inject<{ method: Method }>(MAT_DIALOG_DATA);
   method = this.data.method;
 
   url: string;
-  language: (typeof Languages)[number] = Languages[0];
   constructor() {
     this.url = GLOBAL.url;
   }
 
   ngOnInit(): void {
-    this.language = Languages[this.data.languageIndex];
     const descripcion = document.getElementById("descripcion");
     if (descripcion) {
       descripcion.innerHTML = this.method.description ?? "";

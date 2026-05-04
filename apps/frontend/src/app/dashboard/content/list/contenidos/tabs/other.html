@@ -58,20 +58,11 @@
   <div class="title mb-16">Presentación del grupo</div>
   <form [formGroup]="state.presentacionForm">
     <div class="full-width mb-24">
-      <div class="text-category">Descripción en español</div>
+      <div class="text-category">Descripción</div>
       <textarea
-        [(ngModel)]="state.group.summaryES"
-        formControlName="summaryES"
-        name="summaryES"
-        class="input-category"
-      ></textarea>
-    </div>
-    <div class="full-width mb-24">
-      <div class="text-category">Descripción en inglés</div>
-      <textarea
-        [(ngModel)]="state.group.summaryEN"
-        formControlName="summaryEN"
-        name="summaryEN"
+        [(ngModel)]="state.group.summary"
+        formControlName="summary"
+        name="summary"
         class="input-category"
       ></textarea>
     </div>
@@ -83,20 +74,11 @@
   <div class="title mb-16">Sección Publicaciones</div>
   <form [formGroup]="state.publicacionesForm">
     <div class="full-width mb-24">
-      <div class="text-category">Descripción en español</div>
+      <div class="text-category">Descripción</div>
       <textarea
-        [(ngModel)]="state.group.publicationsSectionES"
-        formControlName="publicationsSectionES"
-        name="publicationsSectionES"
-        class="input-category"
-      ></textarea>
-    </div>
-    <div class="full-width mb-24">
-      <div class="text-category">Descripción en inglés</div>
-      <textarea
-        [(ngModel)]="state.group.publicationsSectionEN"
-        formControlName="publicationsSectionEN"
-        name="publicationsSectionEN"
+        [(ngModel)]="state.group.publicationsSection"
+        formControlName="publicationsSection"
+        name="publicationsSection"
         class="input-category"
       ></textarea>
     </div>
@@ -108,20 +90,11 @@
   <div class="title mb-16">Sección Proyectos</div>
   <form [formGroup]="state.proyectosForm">
     <div class="full-width mb-24">
-      <div class="text-category">Descripción en español</div>
+      <div class="text-category">Descripción</div>
       <textarea
-        [(ngModel)]="state.group.projectsSectionES"
-        formControlName="projectsSectionES"
-        name="projectsSectionES"
-        class="input-category"
-      ></textarea>
-    </div>
-    <div class="full-width mb-24">
-      <div class="text-category">Descripción en inglés</div>
-      <textarea
-        [(ngModel)]="state.group.projectsSectionEN"
-        formControlName="projectsSectionEN"
-        name="projectsSectionEN"
+        [(ngModel)]="state.group.projectsSection"
+        formControlName="projectsSection"
+        name="projectsSection"
         class="input-category"
       ></textarea>
     </div>
