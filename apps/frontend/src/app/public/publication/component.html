@@ -97,14 +97,10 @@
                   {
                   <div class="publication-members">
                     <div class="member-img-round">
-                      @if (autor.photo) {
-                      <img
-                        class="member-img"
-                        src="{{ url + 'api/members/' + autor.memberId + '/photo' }}"
-                        alt="../../assets/img/user.png"
-                      />
-                      } @if (!autor.photo) {
-                      <img class="member-img" src="../../assets/img/user.png" alt="" />
+                      @if (autor.asset) {
+                      <img class="member-img" src="{{ autor.asset }}" alt="User photo" />
+                      } @if (!autor.asset) {
+                      <img class="member-img" src="/img/placeholders/user.png" alt="" />
                       }
                     </div>
                     <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
@@ -114,19 +110,12 @@
                   } }
                 </div>
                 <div class="flex-news mt-16">
-                  @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
-                  <a
-                    class="publication-green"
-                    href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
-                    target="_blank"
-                  >
+                  @if (publicacion.typeId != 3 && publicacion.asset && publicacion.asset != "") {
+                  <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
                     {{ this.language.publicationsText[0].preview }}
                   </a>
-                  } @if (publicacion.typeId != 3 && publicacion.file && publicacion.file != "") {
-                  <a
-                    class="publication-green"
-                    href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}"
-                  >
+                  } @if (publicacion.typeId != 3 && publicacion.asset && publicacion.asset != "") {
+                  <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
                     {{ this.language.publicationsText[0].download }}
                   </a>
                   }

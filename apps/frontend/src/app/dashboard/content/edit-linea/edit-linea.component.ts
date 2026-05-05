@@ -79,7 +79,7 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.status === 1) {
             if (this.fileData) {
-              this.researchLinesService.uploadPhoto(this.lineaInvestigacion.id, this.fileData).subscribe();
+              this.researchLinesService.uploadAsset(this.lineaInvestigacion.id, this.fileData).subscribe();
             }
             this.lineaForm.markAsPristine();
             this.return();

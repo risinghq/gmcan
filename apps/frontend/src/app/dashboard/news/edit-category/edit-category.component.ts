@@ -15,10 +15,11 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { NewsService } from "@app/shared/services/news.service";
 import type { RefItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+
+import { NewsCategoryUsecase } from "./news-category.usecase";
 
 @Component({
   selector: "app-edit-category",
@@ -32,7 +33,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   private readonly router = inject(Router);
   dialog = inject(MatDialog);
   private readonly refService = inject(RefService);
-  private readonly newsService = inject(NewsService);
+  private readonly newsCategoryUsecase = inject(NewsCategoryUsecase);
   private readonly snackBar = inject(MatSnackBar);
 
   category: RefItem = { id: 0, name: "" };
@@ -65,8 +66,8 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   notCanDo = false;
 
   getRelatedNews(): void {
-    this.newsService.listAdminNews().subscribe((news) => {
-      this.notCanDo = !news.some((n) => n.newsTypeId === this.idCategory);
+    this.newsCategoryUsecase.canDelete(this.idCategory).subscribe((canDelete) => {
+      this.notCanDo = canDelete;
     });
   }
 
@@ -75,7 +76,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   return(): void {
-    this.router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/news"]);
   }
 
   submitCategory(): void {
@@ -122,17 +123,13 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   eraseCategory(): void {
-    this.newsService.listAdminNews().subscribe((news) => {
-      if (!news.some((n) => n.newsTypeId === this.idCategory)) {
-        this.refService.deleteNewsType(this.idCategory).subscribe((result) => {
-          if (result.status === 1) {
-            this.categoryForm.markAsPristine();
-            this.return();
-            this.openSnackBar("Categoría eliminada exitosamente");
-          } else {
-            this.openSnackBar("Hubo un problema al eliminar");
-          }
-        });
+    this.newsCategoryUsecase.deleteIfAllowed(this.idCategory).subscribe((result) => {
+      if (result.deleted) {
+        this.categoryForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Categoría eliminada exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
       }
     });
   }

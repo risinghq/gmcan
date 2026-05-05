@@ -116,8 +116,8 @@ export default class PerfilComponent implements OnInit {
 
   get photoUrl(): string | null {
     if (this.previewUrl && typeof this.previewUrl === "string") return this.previewUrl;
-    if (!this.member.photo || this.memberId === null) return null;
-    return `${this.url}api/members/${this.memberId}/photo`;
+    if (!this.member.asset) return null;
+    return `${this.url}api/assets/${this.member.asset}`;
   }
 
   ngOnInit(): void {
@@ -200,7 +200,7 @@ export default class PerfilComponent implements OnInit {
         if (result.status !== 1) return;
 
         if (this.fileData) {
-          this.memberService.uploadPhoto(this.memberId!, this.fileData).subscribe({
+          this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
             next: () => {
               this.fileData = null;
               this.previewUrl = null;

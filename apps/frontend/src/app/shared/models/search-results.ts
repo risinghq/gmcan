@@ -4,7 +4,7 @@ export interface SearchResults {
   publications: {
     id: number;
     title: string;
-    file: string | null;
+    asset: string | null;
     abstract: string | null;
     journalIssue: number | null;
     doi: string | null;
@@ -25,7 +25,7 @@ export interface SearchResults {
     maternalName: string | null;
     birthDate: string | null;
     bio: string | null;
-    photo: string | null;
+    asset: string | null;
     status: number;
     roleId: number;
     memberTypeId: number;
@@ -35,7 +35,7 @@ export interface SearchResults {
     id: number;
     title: string;
     publishedAt: string;
-    photo: string | null;
+    asset: string | null;
     newsTypeId: number;
     status: number;
     authorName: string;
@@ -54,6 +54,6 @@ export interface SearchResults {
     currencyId: number;
     researchLine: string;
     fundingSource: string;
-    members: { memberId: number; name: string; photo: string | null }[];
+    members: { memberId: number; name: string; asset: string | null }[];
   }[];
 }

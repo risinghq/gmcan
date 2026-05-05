@@ -60,7 +60,7 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.id) {
             if (this.fileData) {
-              this.researchLinesService.uploadPhoto(result.id, this.fileData).subscribe();
+              this.researchLinesService.uploadAsset(result.id, this.fileData).subscribe();
             }
             this.lineaForm.markAsPristine();
             this.return();

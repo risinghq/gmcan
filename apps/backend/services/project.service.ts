@@ -4,6 +4,9 @@ import { db } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
+import { monthYearEs } from "../lib/date-label.js";
+import { assetUrl } from "../lib/upload.js";
+import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
 
 export interface ProjectAdminInput {
   code: string;
@@ -40,6 +43,62 @@ export async function listProjects(status?: number) {
   let query = db.selectFrom("project").selectAll();
   if (status !== undefined) query = query.where("status", "=", status);
   return query.execute();
+}
+
+export async function listAdminProjects(status?: number, q?: string): Promise<AdminProjectListItem[]> {
+  let query = db.selectFrom("project").selectAll();
+  if (status !== undefined) query = query.where("project.status", "=", status);
+  if (q) {
+    const like = `%${q}%`;
+    query = query.where((eb) =>
+      eb.or([eb("project.title", "like", like), eb("project.titleEN", "like", like), eb("project.code", "like", like)]),
+    );
+  }
+  const projects = await query.orderBy("project.startDate", "desc").execute();
+  if (projects.length === 0) return [];
+
+  const projectIds = projects.map((project) => project.id);
+  const memberRows = await db
+    .selectFrom("member_project")
+    .innerJoin("member", "member.id", "member_project.memberId")
+    .select([
+      "member_project.projectId as projectId",
+      "member.id as memberId",
+      "member.firstName as firstName",
+      "member.lastName as lastName",
+      "member.maternalName as maternalName",
+      "member.photo as photo",
+    ])
+    .where("member_project.projectId", "in", projectIds)
+    .orderBy("member_project.projectId", "asc")
+    .execute();
+
+  const membersByProject = new Map<number, AdminProjectMemberListItem[]>();
+  for (const row of memberRows) {
+    const current = membersByProject.get(row.projectId) ?? [];
+    current.push({
+      memberId: row.memberId,
+      name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+      asset: assetUrl(row.photo),
+    });
+    membersByProject.set(row.projectId, current);
+  }
+
+  return projects.map((project) => ({
+    id: project.id,
+    title: project.title,
+    code: project.code,
+    fundedAmount: project.fundedAmount,
+    description: project.description,
+    status: project.status,
+    startDate: project.startDate,
+    endDate: project.endDate,
+    researchLineId: project.researchLineId,
+    currencyId: project.currencyId,
+    fundingSourceId: project.fundingSourceId,
+    startDateLabel: monthYearEs(project.startDate),
+    members: membersByProject.get(project.id) ?? [],
+  }));
 }
 
 export function toAdminProjectView(project: ProjectRow) {

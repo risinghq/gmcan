@@ -15,7 +15,6 @@ import {
 } from "../../services/member.service.js";
 
 const router = new Hono();
-const MEMBER_FILE = { directory: "member", kind: "image" } as const;
 
 router.get("/me", requirePermission("account.self.read"), async (c) => {
   const memberId = c.get("memberId") as number;
@@ -44,7 +43,7 @@ router.put(
   },
 );
 
-router.put("/photo", requirePermission("account.self.write"), async (c) => {
+router.put("/asset", requirePermission("account.self.write"), async (c) => {
   const memberId = c.get("memberId") as number;
   const current = await getMemberPhoto(memberId);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -52,21 +51,21 @@ router.put("/photo", requirePermission("account.self.write"), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, MEMBER_FILE);
+  const fileName = await saveUploadedFile(file, { domain: "members", kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setMemberPhoto(memberId, fileName);
   if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ directory: MEMBER_FILE.directory, fileName: current.photo });
+    await deleteUploadedFile({ assetKey: current.photo });
   }
   return c.json({ status: 1 });
 });
 
-router.delete("/photo", requirePermission("account.self.write"), async (c) => {
+router.delete("/asset", requirePermission("account.self.write"), async (c) => {
   const memberId = c.get("memberId") as number;
   const row = await getMemberPhoto(memberId);
   if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  await deleteUploadedFile({ directory: MEMBER_FILE.directory, fileName: row.photo });
+  await deleteUploadedFile({ assetKey: row.photo });
   await clearMemberPhoto(memberId);
   return c.json({ status: 1 });
 });

@@ -41,10 +41,10 @@
     <div class="col-lg-4 col-md-6 col-sm-12">
       <mat-card class="line-card center">
         <div class="line-img-div">
-          @if (linea.photo) {
-          <img class="line-img" src="{{ url + 'api/research-lines/' + linea.id + '/photo' }}" />
-          } @if (!linea.photo) {
-          <img class="line-img" src="../../assets/img/prop_estruc.jpg" />
+          @if (linea.asset) {
+          <img class="line-img" src="{{ linea.asset }}" />
+          } @if (!linea.asset) {
+          <img class="line-img" src="/img/prop_estruc.jpg" />
           }
         </div>
         <div class="linea-title">{{ linea.name }}</div>
@@ -65,45 +65,45 @@
     <div class="col-lg-8 grid">
       <div class="news-box display-sub-flex">
         <div class="img-hover-zoom img-hover-zoom-s">
-          @if (!noticiaPrincipal.photo) {
-          <img class="main-img-news" src="../../assets/img/grupal.jpg" alt="nada" />
-          } @if (noticiaPrincipal.photo) {
-          <img class="main-img-news" src="{{ url + 'api/news/' + noticiaPrincipal.id + '/photo' }}" alt="imagen" />
+          @if (!featuredNews.asset) {
+          <img class="main-img-news" src="/img/grupal.jpg" alt="nada" />
+          } @if (featuredNews.asset) {
+          <img class="main-img-news" src="{{ featuredNews.asset }}" alt="imagen" />
           }
         </div>
         <div class="news-div mt-main" style="height: 100%">
           <div class="flex-news mt-mb-flex">
-            <div class="news-type">{{ noticiaPrincipal.nombreTipoNoticia }}</div>
-            <div class="news-date">{{ noticiaPrincipal.fechaPublicacion }}</div>
+            <div class="news-type">{{ featuredNews.newsTypeNameLabel }}</div>
+            <div class="news-date">{{ featuredNews.publishedAtLabel }}</div>
           </div>
-          <div class="main-news-title" (click)="detalleNoticia(noticiaPrincipal)">{{ noticiaPrincipal.title }}</div>
+          <div class="main-news-title" (click)="openNewsDetail(featuredNews)">{{ featuredNews.title }}</div>
           <div class="main-news-res" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-            {{ noticiaPrincipal.summary }}
+            {{ featuredNews.summary }}
           </div>
-          <div class="news-author main-author">{{ language.newsText[0].by }} {{ noticiaPrincipal.autor }}</div>
+          <div class="news-author main-author">{{ language.newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
         </div>
       </div>
     </div>
     <div class="col-lg-4">
-      @for (noticia of noticias | slice: 1 : 3; track noticia; let i = $index) {
+      @for (newsItem of newsItems | slice: 1 : 3; track newsItem; let i = $index) {
       <div class="news-box" [class.mb-other]="i == 0">
         <div class="img-hover-zoom" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-          @if (noticia.photo) {
-          <img class="other-img-news" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+          @if (newsItem.asset) {
+          <img class="other-img-news" src="{{ newsItem.asset }}" />
           }
         </div>
         <div class="flex-news">
           <div class="news-div mt-other full-width">
             <div class="flex-news mt-mb-flex">
-              <div class="other-news-type">{{ noticia.nombreTipoNoticia }}</div>
-              <div class="other-news-date">{{ noticia.fechaPublicacion }}</div>
+              <div class="other-news-type">{{ newsItem.newsTypeNameLabel }}</div>
+              <div class="other-news-date">{{ newsItem.publishedAtLabel }}</div>
             </div>
-            <div class="other-news-title" (click)="detalleNoticia(noticia)">{{ noticia.title }}</div>
-            <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
+            <div class="other-news-title" (click)="openNewsDetail(newsItem)">{{ newsItem.title }}</div>
+            <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
           </div>
           <div class="img-hover-zoom ml-16 other-img-news-div" [style.display]="screenWidth > 960 ? 'none' : 'block'">
-            @if (noticia.photo) {
-            <img class="other-img-news" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+            @if (newsItem.asset) {
+            <img class="other-img-news" src="{{ newsItem.asset }}" />
             }
           </div>
         </div>
@@ -115,7 +115,7 @@
     <a class="btn-text2"> {{ language.seeNews }} </a>
   </div>
   <div class="services-card">
-    <img class="services-icon" src="../../assets/img/bulb.svg" />
+    <img class="services-icon" src="/img/icons/bulb.svg" />
     <div class="mt-services about-text" [innerHTML]="aboutUs"></div>
     <div
       class="btn-black align-center"
@@ -216,16 +216,12 @@
             >{{ publicacion.doi }}</a
           >
         </div>
-        } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-        <a
-          class="publication-green"
-          href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
-          target="_blank"
-        >
+        } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
+        <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
           {{ this.language.publicationsText[0].preview }}
         </a>
-        } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-        <a class="publication-green" href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}">
+        } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
+        <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
           {{ this.language.publicationsText[0].download }}
         </a>
         }
@@ -279,42 +275,31 @@
           </div>
           }
           <div class="flex-news publication-mt" style="flex-flow: wrap">
-            @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered") {
+            @for (author of publicacion.authors; track author; let last = $last) { @if (author.kind === "registered") {
             <div class="publication-members">
               <div class="member-img-round">
-                @if (autor.photo) {
-                <img
-                  class="member-img"
-                  src="{{ url + 'api/members/' + autor.memberId + '/photo' }}"
-                  alt="../../assets/img/user.png"
-                />
-                } @if (!autor.photo) {
-                <img class="member-img" src="../../assets/img/user.png" alt="" />
+                @if (author.asset) {
+                <img class="member-img" src="{{ author.asset }}" alt="User photo" />
+                } @if (!author.asset) {
+                <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
               </div>
-              <div class="member-name" (click)="profile({ id: autor.memberId })">
-                {{ autor.name }}{{ !last ? "," : "" }}
+              <div class="member-name" (click)="profile({ id: author.memberId })">
+                {{ author.name }}{{ !last ? "," : "" }}
               </div>
             </div>
-            } @if (autor.kind === "external") {
-            <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>
+            } @if (author.kind === "external") {
+            <div class="publication-authors">{{ author.name }}{{ !last ? "," : "" }}</div>
             } }
           </div>
           <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
-            @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-            <a
-              class="publication-green"
-              href="{{ this.url + 'api/publications/' + publicacion.id + '/file' }}"
-              target="_blank"
-            >
+            @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
+            <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
               {{ this.language.publicationsText[0].preview }}
             </a>
-            } @if (publicacion.typeId !== 3 && publicacion.file && publicacion.file !== "") {
-            <a
-              class="publication-green"
-              href="{{ this.url + 'api/publications/' + publicacion.id + '/file/download' }}"
-            >
+            } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
+            <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
               {{ this.language.publicationsText[0].download }}
             </a>
             }
@@ -398,10 +383,10 @@
             @for (member of proyecto.members; track member) {
             <div class="project-members">
               <div class="member-img-round">
-                @if (member.photo) {
-                <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
-                } @if (!member.photo) {
-                <img class="member-img" src="../../assets/img/user.png" alt="" />
+                @if (member.asset) {
+                <img class="member-img" src="{{ member.asset }}" />
+                } @if (!member.asset) {
+                <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
               </div>
               <div class="member-name" (click)="profile({ id: member.memberId })">{{ member.name }}</div>

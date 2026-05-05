@@ -1,7 +1,7 @@
 <div class="card-detail scroll">
   <div class="news-title-div">
-    @if (noticia.photo) {
-    <img class="detail-img" src="{{noticia.photo}}" />
+    @if (noticia.asset) {
+    <img class="detail-img" src="{{noticia.asset}}" />
     }
     <div class="news-title">{{noticia.title}}</div>
   </div>
@@ -10,8 +10,8 @@
     <div class="flex-news other-div"></div>
     <div class="autor-div">
       <div class="autor-img-div">
-        @if (noticia.author?.photo) {
-        <img class="autor-img" src="{{noticia.author?.photo}}" />
+        @if (noticia.author?.asset) {
+        <img class="autor-img" src="{{noticia.author?.asset}}" />
         }
       </div>
       <div class="autor-text">

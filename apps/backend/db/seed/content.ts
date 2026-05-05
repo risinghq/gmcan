@@ -8,46 +8,6 @@ export async function seedNews() {
     .insertInto("news")
     .values([
       {
-        id: 50,
-        title: "Esta es otra noticia de prueba, ¡muy pronto habrán novedades!",
-        titleEN: "This is another test news. Upgrades soon!",
-        summary:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        summaryEN:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        body: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
-        bodyEN:
-          "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
-        status: 1,
-        publishedAt: "2021-01-15",
-        updatedAt: null,
-        createdAt: null,
-        photo: null,
-        priority: null,
-        authorId: 1,
-        newsTypeId: NewsType.GENERAL,
-      },
-      {
-        id: 51,
-        title: "Esta es la última noticia de prueba",
-        titleEN: "This is the last test news",
-        summary:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        summaryEN:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        body: "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
-        bodyEN:
-          "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>",
-        status: 0,
-        publishedAt: "2021-01-20",
-        updatedAt: null,
-        createdAt: null,
-        photo: null,
-        priority: null,
-        authorId: 1,
-        newsTypeId: NewsType.GENERAL,
-      },
-      {
         id: 53,
         title: "¿Cómo gestionar tu tiempo como estudiante de ciencias e ingeniería?",
         titleEN: "Managing your Time as a Science & Engineering Student",
@@ -102,7 +62,7 @@ export async function seedNews() {
         publishedAt: "2021-01-23",
         updatedAt: null,
         createdAt: null,
-        photo: "ndKNxjxt9rHPMFfKdWDqYbgn.jpg",
+        photo: "seed/news/news-56.jpg",
         priority: null,
         authorId: 1,
         newsTypeId: NewsType.GENERAL,
@@ -226,7 +186,7 @@ export async function seedPublications() {
       {
         id: 2,
         title: "Formaldehyde trapping by radical initiated reaction on hydrogenated boron nitride",
-        file: "GymxaQPxRqoXvImvfZcKWAfw.pdf",
+        file: "seed/publications/GymxaQPxRqoXvImvfZcKWAfw.pdf",
         abstractES:
           "Using density functional theory, we have studied the trapping of formaldehyde on hydrogenated boron nitride nanosheets. On the nitrogen terminated side, the formaldehyde molecule is physisorbed at a distance of ~3.1Å on top of a N atom. A calculation of the adsorption energy, as function of vertical separation between the molecule and the substrate, shows that closer to the surface, there is a strong repulsion due to the electronegativity of the N and O atoms. On the other hand, the trapping of formaldehyde by the substrate on the boron terminated surface is very favorable. The reaction of a single molecule is described by calculating the minimum energy pathway. It begins with the formaldehyde molecule and the boron nitride substrate far away from each other. In the following state of the reaction, the molecule attaches to the boron side of the substrate, gaining a large amount of energy. Through this interaction, the double bond of the oxygen atom breaks down, turning the molecule into a highly reactive carbon centered radical. In the final state of the reaction, a neighbor hydrogen atom is abstracted. In this state, there is an additional energy gain of 0.06eV. Once the stable molecule is formed by the abstraction of the hydrogen atom, a new dangling bond is created at a neighbor boron atom, which it may serve as a new site for the following molecule to attach. In this way, a chain reaction is possible. This self-propagating reaction is more viable for hydrogenated boron nitride than for graphane, opening an avenue to use hydrogenated h-BN in the indoor air pollution control. When there are two or more neighboring hydrogen vacancies in the substrate, the formaldehyde molecule prefers to attach forming Osingle bondB and Csingle bondB bonds with the substrate.",
         abstractEN:
@@ -245,7 +205,7 @@ export async function seedPublications() {
       {
         id: 3,
         title: "Doping engineering of thermoelectric transport in BNC heteronanotubes",
-        file: "N3eSqMJvE1F0HWXspbEfplB6.pdf",
+        file: "seed/publications/N3eSqMJvE1F0HWXspbEfplB6.pdf",
         abstractES:
           "BNC heteronanotubes are promising materials for the design of nanoscale thermoelectric devices. In particular, the structural BN doping pattern can be exploited to control the electrical and thermal transport properties of BNC nanostructures. We here address the thermoelectric transport properties of (6,6)-BNC heteronanotubes with helical and horizontal BN doping patterns. For this, we use a density functional tight-binding method combined with the Green's function technique. Our results show that the electron transmission is reduced and the electronic bandgap increased as a function of the BN concentration for different doping distribution patterns, so that (6,6)-BNC heteronanotubes become semiconducting with a tunable bandgap. The thermal conductance of helical (6,6)-BNC heteronanotubes, which is dominated by phonons, is weakly dependent on BN concentration in the range of 30–80%. Also, the Seebeck coefficient is enhanced by increasing the concentration of helical BN strips. In particular, helical (6,6)-BNC heteronanotubes with a high BN concentration (>20%) display a larger figure of merit compared to other doping distributions and, for a concentration of 50%, reach values up to 2.3 times and 3.4 times the corresponding values of a CNT at 300 K and 800 K, respectively. Our study yields new insights into the parameters tuning the thermoelectric efficiency and thus provides a starting point for designing thermoelectric devices based on BNC nanostructures.",
         abstractEN:

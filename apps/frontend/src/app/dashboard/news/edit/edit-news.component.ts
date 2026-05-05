@@ -39,9 +39,9 @@ import { toNewsUpsertBody } from "../flow/news-payload";
 interface NewsPreviewData {
   title: string | null;
   summary: string | null;
-  photo: string | ArrayBuffer | null;
+  asset: string | ArrayBuffer | null;
   newsTypeName: string | null;
-  author: { firstName: string; lastName: string; maternalName: string | null; photo: string | null } | null;
+  author: { firstName: string; lastName: string; maternalName: string | null; asset: string | null } | null;
   body: string | null;
   publishedAt: string | null;
 }
@@ -137,11 +137,11 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/news"]);
   }
 
   submitNews(status: number): void {
-    if (status === 1 && this.newsForm.valid && (this.noticia.photo || this.fileData)) {
+    if (status === 1 && this.newsForm.valid && (this.noticia.asset || this.fileData)) {
       this.publishDialog(status);
     } else if (status === 0) {
       if (this.noticia.status === 0) {
@@ -153,7 +153,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   publish(status: number): void {
-    if (status === 1 && this.newsForm.valid && (this.noticia.photo || this.fileData)) {
+    if (status === 1 && this.newsForm.valid && (this.noticia.asset || this.fileData)) {
       this.publishMethod(status);
     } else if (status === 0) {
       this.publishMethod(status);
@@ -167,7 +167,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     this.newsService.updateNews(this.noticia.id, body).subscribe((result) => {
       if (result.status === 1) {
         if (this.fileData) {
-          this.newsService.uploadPhoto(this.noticia.id, this.fileData).subscribe();
+          this.newsService.uploadAsset(this.noticia.id, this.fileData).subscribe();
         }
         this.newsForm.markAsPristine();
         this.return();
@@ -185,10 +185,10 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     const data: NewsPreviewData = {
       title: this.noticia.title ?? null,
       summary: this.noticia.summary ?? null,
-      photo: this.previewUrl ?? (this.noticia.photo ? this.url + "api/news/" + this.noticia.id + "/photo" : null),
+      asset: this.previewUrl ?? this.noticia.asset,
       newsTypeName: cat?.name ?? null,
       author: aut
-        ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, photo: aut.photo }
+        ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, asset: aut.asset }
         : null,
       body: this.noticia.body ?? null,
       publishedAt,
@@ -371,15 +371,15 @@ export class DialogPreview2 {
     this.anio = this.datePipe.transform(this.datere, "y") ?? "";
   }
 
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
+  public fbicon = "/img/icons/Facebook.svg";
+  public twitter = "/img/icons/twitter.svg";
   mouseEnter(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook2.svg";
+        this.fbicon = "/img/icons/Facebook2.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter2.svg";
+        this.twitter = "/img/icons/twitter2.svg";
         break;
     }
   }
@@ -387,10 +387,10 @@ export class DialogPreview2 {
   mouseLeave(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook.svg";
+        this.fbicon = "/img/icons/Facebook.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter.svg";
+        this.twitter = "/img/icons/twitter.svg";
         break;
     }
   }

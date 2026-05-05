@@ -18,31 +18,31 @@
       </div>
       <div class="card-detail">
         <div class="news-title-div">
-          @if (noticia.photo) {
-          <img class="detail-img" src="{{ url + 'api/news/' + noticia.id + '/photo' }}" />
+          @if (newsItem.asset) {
+          <img class="detail-img" src="{{ newsItem.asset }}" />
           }
-          <div class="news-title">{{ noticia.title }}</div>
+          <div class="news-title">{{ newsItem.title }}</div>
         </div>
         <div class="detail-text-div">
-          <div class="news-abstract">{{ noticia.summary }}</div>
-          <div class="autor-div">
-            <div class="autor-img-div">
-              @if (autorPhoto && autorId) {
-              <img class="autor-img" src="{{ url + 'api/members/' + autorId + '/photo' }}" />
+          <div class="news-abstract">{{ newsItem.summary }}</div>
+          <div class="author-div">
+            <div class="author-img-div">
+              @if (authorPhoto) {
+              <img class="author-img" src="{{ authorPhoto }}" />
               }
             </div>
-            <div class="autor-text">
-              <div class="news-type">{{ tipoNoticia }}</div>
-              <div class="autor-name">{{ autorName }}</div>
+            <div class="author-text">
+              <div class="news-type">{{ newsTypeNameLabel }}</div>
+              <div class="author-name">{{ authorNameLabel }}</div>
               <div class="news-date">
-                {{ language.detailNewsText[0].written1 }} {{ dia }} {{ language.detailNewsText[0].written2 }} {{ mes }}
-                {{ language.detailNewsText[0].written3 }} {{ anio }}
+                {{ language.detailNewsText[0].written1 }} {{ day }} {{ language.detailNewsText[0].written2 }} {{ month
+                }} {{ language.detailNewsText[0].written3 }} {{ year }}
               </div>
             </div>
           </div>
-          <app-shared-share-buttons [url]="url + 'api/news/' + noticia.id" [title]="noticia.title" />
+          <app-shared-share-buttons [url]="url + 'api/news/' + newsItem.id" [title]="newsItem.title" />
 
-          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="noticia.body"></div>
+          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="newsItem.body"></div>
         </div>
       </div>
     </div>

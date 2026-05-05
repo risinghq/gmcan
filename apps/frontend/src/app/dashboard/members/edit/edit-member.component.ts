@@ -92,8 +92,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       prefixId: [""],
       memberTypeId: ["", [Validators.required]],
       dni: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      password: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      confirmPassword: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      password: ["", [SpaceValidator.cannotContainSpace]],
+      confirmPassword: ["", [SpaceValidator.cannotContainSpace]],
       bio: [""],
     });
     this.member = createMemberFull();
@@ -194,7 +194,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
           .subscribe((res) => {
             if (res.status === 1) {
               if (this.fileData) {
-                this.memberService.uploadPhoto(this.member.id, this.fileData).subscribe();
+                this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
               }
               this.openSnackBar("Miembro actualizado exitosamente");
               this.memberForm.markAsPristine();
@@ -204,9 +204,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       };
 
       if (this.oldEmail !== this.member.email) {
-        this.memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
-          const list = result as unknown[];
-          if (list.length === 0) {
+        this.memberService.verifyEmail(this.member.email).subscribe((result) => {
+          if (!result.exists) {
             doUpdate();
           } else {
             this.openSnackBar("Este usuario ya se encuentra registrado", "err-snackbar");

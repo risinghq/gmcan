@@ -50,10 +50,10 @@ export class GroupService {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/projects-section`, data);
   }
 
-  uploadFile(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
+  uploadAsset(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/files/${slot}`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/assets/${slot}`, formData);
   }
 
   // About (admin)
@@ -73,10 +73,10 @@ export class GroupService {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/services`, data);
   }
 
-  uploadAboutPhoto(id: number, file: File): Observable<{ status: number }> {
+  uploadAboutAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/photo`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/asset`, formData);
   }
 
   // Software (under group routes)

@@ -2,7 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
-import type { News } from "../models/news";
+import type { AdminNewsListQuery, AdminNewsListResponse } from "../models/admin-list";
+import type { News, PublicNewsDetail, PublicNewsListQuery, PublicNewsListResponse } from "../models/news";
 import { GLOBAL } from "./global";
 
 export interface NewsUpsertBody {
@@ -21,19 +22,17 @@ export class NewsService {
   private http = inject(HttpClient);
 
   // Public
-  listNews(status?: number): Observable<News[]> {
-    const params: Record<string, string | number> = {};
-    if (status !== undefined) params["status"] = status;
-    return this.http.get<News[]>(`${GLOBAL.url}api/news`, { params });
+  listNews(query: PublicNewsListQuery = {}): Observable<PublicNewsListResponse> {
+    return this.http.get<PublicNewsListResponse>(`${GLOBAL.url}api/news`, { params: { ...query } });
   }
 
-  getNews(id: number): Observable<News> {
-    return this.http.get<News>(`${GLOBAL.url}api/news/${id}`);
+  getNews(id: number): Observable<PublicNewsDetail> {
+    return this.http.get<PublicNewsDetail>(`${GLOBAL.url}api/news/${id}`);
   }
 
   // Admin
-  listAdminNews(): Observable<News[]> {
-    return this.http.get<News[]>(`${GLOBAL.url}admin/news`);
+  listAdminNews(query: AdminNewsListQuery): Observable<AdminNewsListResponse> {
+    return this.http.get<AdminNewsListResponse>(`${GLOBAL.url}admin/news`, { params: { ...query } });
   }
 
   getAdminNews(id: number): Observable<News> {
@@ -52,13 +51,13 @@ export class NewsService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/news/${id}`);
   }
 
-  uploadPhoto(id: number, file: File): Observable<{ status: number }> {
+  uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/news/${id}/photo`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/news/${id}/asset`, formData);
   }
 
-  deletePhoto(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/news/${id}/photo`);
+  deleteAsset(id: number): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/news/${id}/asset`);
   }
 }

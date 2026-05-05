@@ -87,14 +87,11 @@
               >
                 @for (option of filteredOptions | async; track option) {
                   <mat-option class="mdc-list-item" [value]="option.name">
-                    @if (!option.photo) {
-                      <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
+                    @if (!option.asset) {
+                      <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                     }
-                    @if (option.photo) {
-                      <img
-                        class="mdc-list-item__graphic mr-12 img-user"
-                        src="{{ url + 'api/members/' + option.id + '/photo' }}"
-                      />
+                    @if (option.asset) {
+                      <img class="mdc-list-item__graphic mr-12 img-user" src="{{ option.asset }}" />
                     }
                     <span class="mdc-list-item__text">{{ option.name }}</span>
                   </mat-option>
@@ -105,14 +102,11 @@
               <mat-select (selectionChange)="selectUser($event.value, 1)">
                 @for (option of options; track option) {
                   <mat-option class="mdc-list-item" [value]="option">
-                    @if (!option.photo) {
-                      <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
+                    @if (!option.asset) {
+                      <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                     }
-                    @if (option.photo) {
-                      <img
-                        class="mdc-list-item__graphic mr-12 img-user"
-                        src="{{ url + 'api/members/' + option.id + '/photo' }}"
-                      />
+                    @if (option.asset) {
+                      <img class="mdc-list-item__graphic mr-12 img-user" src="{{ option.asset }}" />
                     }
                     <span class="mdc-list-item__text">{{ option.name }}</span>
                   </mat-option>
@@ -147,14 +141,11 @@
                   >
                     @for (option of otroAutor.filteredOptions | async; track option) {
                       <mat-option class="mdc-list-item" [value]="option.name">
-                        @if (!option.photo) {
-                          <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
+                        @if (!option.asset) {
+                          <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                         }
-                        @if (option.photo) {
-                          <img
-                            class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'api/members/' + option.id + '/photo' }}"
-                          />
+                        @if (option.asset) {
+                          <img class="mdc-list-item__graphic mr-12 img-user" src="{{ option.asset }}" />
                         }
                         <span class="mdc-list-item__text">{{ option.name }}</span>
                       </mat-option>
@@ -165,14 +156,11 @@
                   <mat-select (selectionChange)="selectUserAutor($event.value, 1, i)">
                     @for (option of options; track option) {
                       <mat-option class="mdc-list-item" [value]="option">
-                        @if (!option.photo) {
-                          <img class="mdc-list-item__graphic mr-12 img-user" src="../../assets/img/user.png" />
+                        @if (!option.asset) {
+                          <img class="mdc-list-item__graphic mr-12 img-user" src="/img/placeholders/user.png" />
                         }
-                        @if (option.photo) {
-                          <img
-                            class="mdc-list-item__graphic mr-12 img-user"
-                            src="{{ url + 'api/members/' + option.id + '/photo' }}"
-                          />
+                        @if (option.asset) {
+                          <img class="mdc-list-item__graphic mr-12 img-user" src="{{ option.asset }}" />
                         }
                         <span class="mdc-list-item__text">{{ option.name }}</span>
                       </mat-option>

@@ -141,7 +141,7 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
     this.publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
       if (result.id != null) {
         if (this.fileData) {
-          this.publicationService.uploadFile(result.id, this.fileData).subscribe();
+          this.publicationService.uploadAsset(result.id, this.fileData).subscribe();
         }
         this.publicacionForm.markAsPristine();
         this.return();

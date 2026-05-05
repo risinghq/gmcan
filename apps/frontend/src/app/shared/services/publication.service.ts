@@ -2,8 +2,9 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
+import type { AdminPublicationListItem } from "../models/admin-list";
 import type { SaveAuthorEntry } from "../models/author";
-import type { Publication, PublicationWithAuthors } from "../models/publication";
+import type { PublicationWithAuthors } from "../models/publication";
 import { GLOBAL } from "./global";
 
 export interface PublicationFields {
@@ -26,6 +27,10 @@ export interface PublicationFilters {
   university?: number;
 }
 
+export interface AdminPublicationFilters {
+  type?: number;
+}
+
 @Injectable({ providedIn: "root" })
 export class PublicationService {
   private http = inject(HttpClient);
@@ -41,17 +46,19 @@ export class PublicationService {
     return this.http.get<PublicationWithAuthors>(`${GLOBAL.url}api/publications/${id}`);
   }
 
-  getFile(id: number): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}api/publications/${id}/file`, { responseType: "blob" });
+  getAsset(fileName: string): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}api/assets/${fileName}`, { responseType: "blob" });
   }
 
-  downloadFile(id: number): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}api/publications/${id}/file/download`, { responseType: "blob" });
+  downloadAsset(fileName: string): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}api/assets/${fileName}?download=true`, { responseType: "blob" });
   }
 
   // Admin
-  listAdminPublications(): Observable<Publication[]> {
-    return this.http.get<Publication[]>(`${GLOBAL.url}admin/publications`);
+  listAdminPublications(filters?: AdminPublicationFilters): Observable<AdminPublicationListItem[]> {
+    return this.http.get<AdminPublicationListItem[]>(`${GLOBAL.url}admin/publications`, {
+      params: filters as Record<string, string | number> | undefined,
+    });
   }
 
   createPublication(data: PublicationFields, authors: SaveAuthorEntry[]): Observable<{ id: number }> {
@@ -66,9 +73,9 @@ export class PublicationService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/publications/${id}`);
   }
 
-  uploadFile(id: number, file: File): Observable<{ status: number }> {
+  uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/publications/${id}/file`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/publications/${id}/asset`, formData);
   }
 }

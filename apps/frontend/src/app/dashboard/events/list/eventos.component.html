@@ -17,47 +17,41 @@
       <!-- ID Column -->
       <ng-container matColumnDef="titulo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
-        <td mat-cell *matCellDef="let row" (click)="editResumen(row.idPublicacion)">
-          {{ row.titulo }}
+        <td mat-cell *matCellDef="let row" (click)="editResumen(row.id)">
+          {{ row.title }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="primerAutor">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Primer autor</th>
-        <td mat-cell *matCellDef="let row" (click)="editResumen(row.idPublicacion)">
-          @if (row.autor && row.autor.length != 0) {
-            <div class="flex-news">
-              @if (row.autor[0].kind === "registered") {
-                <div class="member-img-round mr-8">
-                  @if (row.autor[0].foto) {
-                    <img
-                      class="member-img"
-                      src="{{ url + 'usuario/' + row.autor[0].DNI + '/file }}"
-                      alt="../../assets/img/user.png"
-                    />
-                  }
-                  @if (!row.autor[0].foto) {
-                    <img class="member-img" src="../../assets/img/user.png" alt="" />
-                  }
-                </div>
-              }
-              {{ row.autor[0].nombre }}
-            </div>
-          }
+        <td mat-cell *matCellDef="let row" (click)="editResumen(row.id)">
+          <div class="flex-news">
+            @if (row.firstAuthorAsset) {
+              <div class="member-img-round mr-8">
+                <img class="member-img" src="{{ row.firstAuthorAsset }}" alt="User photo" />
+              </div>
+            }
+            @if (!row.firstAuthorAsset) {
+              <div class="member-img-round mr-8">
+                <img class="member-img" src="/img/placeholders/user.png" alt="" />
+              </div>
+            }
+            {{ row.firstAuthorName }}
+          </div>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="presentacion">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Publicación</th>
-        <td mat-cell *matCellDef="let row" (click)="editResumen(row.idPublicacion)">
-          {{ row.fecha }}
+        <td mat-cell *matCellDef="let row" (click)="editResumen(row.id)">
+          {{ row.publishedAtLabel }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="evento">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Evento</th>
-        <td mat-cell *matCellDef="let row" (click)="editResumen(row.idPublicacion)">
-          {{ row.evento }}
+        <td mat-cell *matCellDef="let row" (click)="editResumen(row.id)">
+          {{ row.eventName }}
         </td>
       </ng-container>
 
@@ -88,17 +82,17 @@
       <!-- ID Column -->
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-        <td mat-cell *matCellDef="let row" (click)="editEvento(row.idEvento)">{{ row.nombre }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editEvento(row.id)">{{ row.name }}</td>
       </ng-container>
 
       <ng-container matColumnDef="pais">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>País</th>
-        <td mat-cell *matCellDef="let row" (click)="editEvento(row.idEvento)">{{ row.pais }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editEvento(row.id)">{{ row.country }}</td>
       </ng-container>
 
       <ng-container matColumnDef="ciudad">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Ciudad</th>
-        <td mat-cell *matCellDef="let row" (click)="editEvento(row.idEvento)">{{ row.ciudad }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editEvento(row.id)">{{ row.city }}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>

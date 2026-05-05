@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
+import type { AdminMemberListItem } from "../models/admin-list";
 import type { AuthorSearchResult } from "../models/author";
 import type { Member, MemberFull, MemberProfile } from "../models/member";
 import { GLOBAL } from "./global";
@@ -50,8 +51,10 @@ export class MemberService {
   }
 
   // Admin
-  listAdminMembers(params?: { status?: number; memberTypeId?: number }): Observable<Member[]> {
-    return this.http.get<Member[]>(`${GLOBAL.url}admin/members`, { params: params as Record<string, string | number> });
+  listAdminMembers(params?: { status?: number; memberTypeId?: number }): Observable<AdminMemberListItem[]> {
+    return this.http.get<AdminMemberListItem[]>(`${GLOBAL.url}admin/members`, {
+      params: params as Record<string, string | number>,
+    });
   }
 
   getMemberFull(id: number): Observable<MemberFull> {
@@ -70,14 +73,14 @@ export class MemberService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/members/${id}`);
   }
 
-  uploadPhoto(id: number, file: File): Observable<{ status: number }> {
+  uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/members/${id}/photo`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/members/${id}/asset`, formData);
   }
 
-  deletePhoto(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/members/${id}/photo`);
+  deleteAsset(id: number): Observable<{ status: number }> {
+    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/members/${id}/asset`);
   }
 
   searchAuthors(q: string): Observable<AuthorSearchResult[]> {
@@ -96,11 +99,7 @@ export class MemberService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/members/${id}/groups/${groupId}`);
   }
 
-  verifyEmail(email: string): Observable<unknown> {
-    return this.http.get(`${GLOBAL.url}admin/members`, { params: { email } });
-  }
-
-  verifyDni(dni: string): Observable<unknown> {
-    return this.http.get(`${GLOBAL.url}admin/members`, { params: { dni } });
+  verifyEmail(email: string): Observable<{ exists: boolean }> {
+    return this.http.get<{ exists: boolean }>(`${GLOBAL.url}admin/members/exists/email`, { params: { email } });
   }
 }

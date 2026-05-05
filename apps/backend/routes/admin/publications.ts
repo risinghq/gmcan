@@ -10,7 +10,7 @@ import {
   deletePublication,
   getPublicationEditView,
   getPublicationFile,
-  listPublications,
+  listAdminPublications,
   replaceAuthors,
   setPublicationFile,
   updatePublication,
@@ -18,7 +18,7 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const FILE_CONFIG = { directory: "publications", kind: "document" } as const;
+const ListQuery = z.object({ type: z.coerce.number().int().optional() });
 
 const AuthorEntry = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("registered"), memberId: z.number().int(), isPrincipal: z.number().int() }),
@@ -48,9 +48,9 @@ router.use("*", async (c, next) => {
   return requirePermission("publications.write")(c, next);
 });
 
-router.get("/", async (c) => {
-  const rows = await listPublications();
-  return c.json(rows);
+router.get("/", zValidator("query", ListQuery), async (c) => {
+  const { type } = c.req.valid("query");
+  return c.json(await listAdminPublications(type));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
@@ -79,7 +79,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/file", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getPublicationFile(id);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -87,12 +87,12 @@ router.put("/:id/file", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, FILE_CONFIG);
+  const fileName = await saveUploadedFile(file, { domain: "publications", kind: "document" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setPublicationFile(id, fileName);
   if (current.file && current.file !== fileName) {
-    await deleteUploadedFile({ directory: FILE_CONFIG.directory, fileName: current.file });
+    await deleteUploadedFile({ assetKey: current.file });
   }
   return c.json({ status: 1 });
 });

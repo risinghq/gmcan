@@ -11,7 +11,7 @@ import {
   deleteNews,
   getNewsItem,
   getNewsPhoto,
-  listNews,
+  listAdminNews,
   type NewsUpsertInput,
   toAdminNewsView,
   setNewsPhoto,
@@ -20,7 +20,16 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const NEWS_FILE = { directory: "news", kind: "image" } as const;
+const ListQuery = z.object({
+  q: z.string().trim().optional(),
+  status: z.coerce.number().int().optional(),
+  newsTypeId: z.coerce.number().int().optional(),
+  authorId: z.coerce.number().int().optional(),
+  sortBy: z.enum(["publishedAt", "title", "status", "authorName", "categoryName"]).default("publishedAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().default(10),
+});
 
 const NewsBody = z.object({
   status: z.number().int(),
@@ -40,9 +49,9 @@ router.use("*", async (c, next) => {
   return requirePermission("news.write")(c, next);
 });
 
-router.get("/", async (c) => {
-  const rows = await listNews();
-  return c.json(rows.map(toAdminNewsView));
+router.get("/", zValidator("query", ListQuery), async (c) => {
+  const query = c.req.valid("query");
+  return c.json(await listAdminNews(query));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
@@ -71,7 +80,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getNewsPhoto(id);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -79,21 +88,21 @@ router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, NEWS_FILE);
+  const fileName = await saveUploadedFile(file, { domain: "news", kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setNewsPhoto(id, fileName);
   if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ directory: NEWS_FILE.directory, fileName: current.photo });
+    await deleteUploadedFile({ assetKey: current.photo });
   }
   return c.json({ status: 1 });
 });
 
-router.delete("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.delete("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getNewsPhoto(id);
   if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  await deleteUploadedFile({ directory: NEWS_FILE.directory, fileName: row.photo });
+  await deleteUploadedFile({ assetKey: row.photo });
   await clearNewsPhoto(id);
   return c.json({ status: 1 });
 });

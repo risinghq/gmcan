@@ -57,10 +57,10 @@
                     @for (member of proyecto.members; track member) {
                     <div class="project-members">
                       <div class="member-img-round">
-                        @if (member.photo) {
-                        <img class="member-img" src="{{ url + 'api/members/' + member.memberId + '/photo' }}" />
-                        } @if (!member.photo) {
-                        <img class="member-img" src="../../assets/img/user.png" alt="" />
+                        @if (member.asset) {
+                        <img class="member-img" src="{{ member.asset }}" />
+                        } @if (!member.asset) {
+                        <img class="member-img" src="/img/placeholders/user.png" alt="" />
                         }
                       </div>
                       <div class="member-name" (click)="profile(member)">{{ member.name }}</div>

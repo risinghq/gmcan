@@ -43,7 +43,7 @@ export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/news"]);
   }
 
   submitCategory(): void {

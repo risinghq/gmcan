@@ -1,7 +1,7 @@
 <mat-drawer-container class="example-container" style="height: 100%" [hidden]="enterAny">
   <mat-drawer #drawer class="example-sidenav mdc-drawer" mode="side" [opened]="!enterAny">
     <nav class="mdc-list">
-      <img class="dashboard-icon" src="{{ url + 'api/group/' + grupoinfo.id + '/files/header' }}" alt="logo" />
+      <img class="dashboard-icon" src="{{ grupoinfo.assets.header }}" alt="logo" />
       <a
         class="mdc-list-item"
         routerLink="/dashboard"
@@ -14,7 +14,7 @@
       @if (authz.can("news.write")) {
         <a
           class="mdc-list-item"
-          routerLink="/dashboard/noticias"
+          routerLink="/dashboard/news"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
@@ -185,8 +185,8 @@
         }
       </div>
       <div class="right user-div flex-news">
-        <div class="user-img" [hidden]="!user?.photo">
-          <img class="img-css" src="{{ url + 'api/members/' + user?.id + '/photo' }}" />
+        <div class="user-img" [hidden]="!user?.asset">
+          <img class="img-css" src="{{ user?.asset }}" />
         </div>
         <div class="ml-16">
           <div class="user-name">
@@ -228,7 +228,7 @@
   </div>
 </mat-drawer-container>
 <div class="block-div" [hidden]="!enterAny">
-  <img class="icon-bad mb-56" src="{{ url + 'api/group/' + grupoinfo.id + '/files/header' }}" alt="logo" />
+  <img class="icon-bad mb-56" src="{{ grupoinfo.assets.header }}" alt="logo" />
   <div class="bad-experience mb-64">
     Para brindarte una mejor experiencia, recomendamos acceder al administrador desde una computadora de escritorio o
     laptop

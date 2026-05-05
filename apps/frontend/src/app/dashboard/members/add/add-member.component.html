@@ -182,9 +182,9 @@
           </div>
           <div class="ml-24">
             <div class="text-category center">Imagen de perfil</div>
-            @if (!previewUrl && !member.photo) {
+            @if (!previewUrl && !member.asset) {
               <div class="img-div">
-                <img class="img-src" src="../../assets/img/upload.svg" />
+                <img class="img-src" src="/img/icons/upload.svg" />
               </div>
             }
             @if (previewUrl) {
@@ -192,9 +192,9 @@
                 <img class="img-set" src="{{ previewUrl }}" />
               </div>
             }
-            @if (member.photo && !previewUrl) {
+            @if (member.asset && !previewUrl) {
               <div class="img-preview">
-                <img class="img-set" src="{{ url + 'api/members/' + member.id + '/photo' }}" />
+                <img class="img-set" src="{{ member.asset }}" />
               </div>
             }
             <div class="green-text mt-16">

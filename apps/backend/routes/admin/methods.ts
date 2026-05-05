@@ -18,7 +18,6 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const FILE_CONFIG = { directory: "method", kind: "image" } as const;
 
 const Body = z.object({
   groupId: z.number().int(),
@@ -71,7 +70,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getMethodPhoto(id);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -79,12 +78,12 @@ router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, FILE_CONFIG);
+  const fileName = await saveUploadedFile(file, { domain: "methods", kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setMethodPhoto(id, fileName);
   if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ directory: FILE_CONFIG.directory, fileName: current.photo });
+    await deleteUploadedFile({ assetKey: current.photo });
   }
   return c.json({ status: 1 });
 });

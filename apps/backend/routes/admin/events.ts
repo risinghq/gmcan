@@ -22,7 +22,7 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", async (c) => {
-  const rows = await db.selectFrom("event").selectAll().execute();
+  const rows = await db.selectFrom("event").select(["id", "name", "country", "city"]).orderBy("name", "asc").execute();
   return c.json(rows);
 });
 

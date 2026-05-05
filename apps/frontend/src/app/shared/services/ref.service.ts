@@ -25,6 +25,12 @@ export interface FundingSourceItem {
   name: string;
 }
 
+export interface RefDependencyCount {
+  newsTypeId: number;
+  count: number;
+  canDelete: boolean;
+}
+
 @Injectable({ providedIn: "root" })
 export class RefService {
   private http = inject(HttpClient);
@@ -44,6 +50,10 @@ export class RefService {
 
   deleteNewsType(id: number): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/news-type/${id}`);
+  }
+
+  getNewsTypeCount(id: number): Observable<RefDependencyCount> {
+    return this.http.get<RefDependencyCount>(`${GLOBAL.url}admin/ref/news-type/${id}/count`);
   }
 
   // Journals

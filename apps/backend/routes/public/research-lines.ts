@@ -3,8 +3,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
-import { serveUploadedFile } from "../../lib/upload.js";
-import { getResearchLine, getResearchLinePhoto, listResearchLines } from "../../services/group.service.js";
+import { assetUrl } from "../../lib/upload.js";
+import { getResearchLine, listResearchLines } from "../../services/group.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -17,7 +17,7 @@ router.get("/", async (c) => {
       id: row.id,
       name: localizeField(row, locale, { es: "name", en: "nameEN" }),
       description: localizeField(row, locale, { es: "description", en: "descriptionEN", required: false }),
-      photo: row.photo,
+      asset: assetUrl(row.photo),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -34,18 +34,11 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: row.id,
     name: localizeField(row, locale, { es: "name", en: "nameEN" }),
     description: localizeField(row, locale, { es: "description", en: "descriptionEN", required: false }),
-    photo: row.photo,
+    asset: assetUrl(row.photo),
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   });
-});
-
-router.get("/:id/photo", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const row = await getResearchLinePhoto(id);
-  if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  return serveUploadedFile(c, { directory: "research-line", fileName: row.photo });
 });
 
 export default router;

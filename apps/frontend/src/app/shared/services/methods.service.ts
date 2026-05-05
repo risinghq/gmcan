@@ -46,9 +46,9 @@ export class MethodsService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/methods/${id}`);
   }
 
-  uploadPhoto(id: number, file: File): Observable<{ status: number }> {
+  uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
-    formData.append("file", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/methods/${id}/photo`, formData);
+    formData.append("asset", file, file.name);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/methods/${id}/asset`, formData);
   }
 }

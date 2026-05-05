@@ -38,9 +38,9 @@ import { toNewsUpsertBody } from "../flow/news-payload";
 interface NewsPreviewData {
   title: string | null;
   summary: string | null;
-  photo: string | ArrayBuffer | null;
+  asset: string | ArrayBuffer | null;
   newsTypeName: string | null;
-  author: { firstName: string; lastName: string; maternalName: string | null; photo: string | null } | null;
+  author: { firstName: string; lastName: string; maternalName: string | null; asset: string | null } | null;
   body: string | null;
   publishedAt: string | null;
 }
@@ -121,7 +121,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   return(): void {
-    this.router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/news"]);
   }
 
   submitNews(status: number): void {
@@ -139,7 +139,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
     this.newsService.createNews(body).subscribe((result) => {
       if (result.id) {
         if (this.fileData) {
-          this.newsService.uploadPhoto(result.id, this.fileData).subscribe();
+          this.newsService.uploadAsset(result.id, this.fileData).subscribe();
         }
         this.newsForm.markAsPristine();
         this.return();
@@ -157,10 +157,10 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
     const data: NewsPreviewData = {
       title: this.noticia.title ?? null,
       summary: this.noticia.summary ?? null,
-      photo: this.previewUrl,
+      asset: this.previewUrl,
       newsTypeName: cat?.name ?? null,
       author: aut
-        ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, photo: aut.photo }
+        ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, asset: aut.asset }
         : null,
       body: this.noticia.body ?? null,
       publishedAt,
@@ -275,15 +275,15 @@ export class DialogPreview {
     this.anio = this.datePipe.transform(this.datere, "y") ?? "";
   }
 
-  public fbicon = "../../assets/img/Facebook.svg";
-  public twitter = "../../assets/img/twitter.svg";
+  public fbicon = "/img/icons/Facebook.svg";
+  public twitter = "/img/icons/twitter.svg";
   mouseEnter(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook2.svg";
+        this.fbicon = "/img/icons/Facebook2.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter2.svg";
+        this.twitter = "/img/icons/twitter2.svg";
         break;
     }
   }
@@ -291,10 +291,10 @@ export class DialogPreview {
   mouseLeave(int: number): void {
     switch (int) {
       case 1:
-        this.fbicon = "../../assets/img/Facebook.svg";
+        this.fbicon = "/img/icons/Facebook.svg";
         break;
       case 2:
-        this.twitter = "../../assets/img/twitter.svg";
+        this.twitter = "/img/icons/twitter.svg";
         break;
     }
   }

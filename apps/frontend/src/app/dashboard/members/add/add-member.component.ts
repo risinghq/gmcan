@@ -133,9 +133,8 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
         status = 1;
       }
 
-      this.memberService.verifyEmail(this.member.email).subscribe((result: unknown) => {
-        const list = result as unknown[];
-        if (list.length === 0) {
+      this.memberService.verifyEmail(this.member.email).subscribe((result) => {
+        if (!result.exists) {
           if (this.password === this.memberForm.controls["confirmPassword"].value) {
             this.memberService
               .createMember({
@@ -156,7 +155,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
               .subscribe((res) => {
                 if (res.id) {
                   if (this.fileData) {
-                    this.memberService.uploadPhoto(res.id, this.fileData).subscribe();
+                    this.memberService.uploadAsset(res.id, this.fileData).subscribe();
                   }
                   this.openSnackBar("Miembro agregado exitosamente");
                   this.memberForm.markAsPristine();

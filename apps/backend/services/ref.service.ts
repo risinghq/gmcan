@@ -15,3 +15,13 @@ export async function getLookupData() {
 
   return { memberTypes, publicationTypes, thesisTypes, newsTypes, fundingSources, universities, journals, events };
 }
+
+export async function getNewsTypeReferenceCount(newsTypeId: number) {
+  const row = await db
+    .selectFrom("news")
+    .select(({ fn }) => fn.count<number>("id").as("count"))
+    .where("newsTypeId", "=", newsTypeId)
+    .executeTakeFirstOrThrow();
+  const count = Number(row.count);
+  return { newsTypeId, count, canDelete: count === 0 };
+}

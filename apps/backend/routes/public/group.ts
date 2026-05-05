@@ -3,18 +3,11 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
-import { serveUploadedFile } from "../../lib/upload.js";
-import { getAboutPhoto, getGroupFile, listAbout, listGroups } from "../../services/group.service.js";
+import { assetUrl } from "../../lib/upload.js";
+import { listAbout, listGroups } from "../../services/group.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const SlotParam = z.object({ slot: z.enum(["facilities", "header", "footer"]) });
-
-const SLOT_COLUMN = {
-  facilities: "facilitiesPhoto" as const,
-  header: "logoHeader" as const,
-  footer: "logoFooter" as const,
-};
 
 router.get("/", async (c) => {
   const locale = c.get("locale");
@@ -29,11 +22,13 @@ router.get("/", async (c) => {
     phone: row.phone,
     name: row.name,
     fullName: row.fullName,
-    facilitiesPhoto: row.facilitiesPhoto,
+    assets: {
+      facilities: assetUrl(row.facilitiesPhoto),
+      header: assetUrl(row.logoHeader),
+      footer: assetUrl(row.logoFooter),
+    },
     facilities: localizeField(row, locale, { es: "facilitiesES", en: "facilitiesEN", required: false }),
     futureWork: localizeField(row, locale, { es: "futureWorkES", en: "futureWorkEN", required: false }),
-    logoFooter: row.logoFooter,
-    logoHeader: row.logoHeader,
     publicationsSection: localizeField(row, locale, {
       es: "publicationsSectionES",
       en: "publicationsSectionEN",
@@ -43,18 +38,6 @@ router.get("/", async (c) => {
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   });
-});
-
-router.get("/files/:slot", zValidator("param", SlotParam), async (c) => {
-  const { slot } = c.req.valid("param");
-  const column = SLOT_COLUMN[slot];
-  const groups = await listGroups();
-  const defaultGroup = groups[0];
-  if (!defaultGroup) return c.json({ error: "Not found" }, 404);
-  const row = await getGroupFile(defaultGroup.id, column);
-  const fileName = row?.[column];
-  if (!fileName) return c.json({ error: "File not found" }, 404);
-  return serveUploadedFile(c, { directory: "group", fileName });
 });
 
 router.get("/:id/about", zValidator("param", IdParam), async (c) => {
@@ -67,28 +50,12 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
       description: localizeField(row, locale, { es: "descriptionES", en: "descriptionEN" }),
       objectives: localizeField(row, locale, { es: "objectivesES", en: "objectivesEN", required: false }),
       services: localizeField(row, locale, { es: "servicesES", en: "servicesEN", required: false }),
-      photo: row.photo,
+      asset: assetUrl(row.photo),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     })),
   );
-});
-
-router.get("/about/:id/photo", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const row = await getAboutPhoto(id);
-  if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  return serveUploadedFile(c, { directory: "about", fileName: row.photo });
-});
-
-router.get("/:id/files/:slot", zValidator("param", IdParam.extend(SlotParam.shape)), async (c) => {
-  const { id, slot } = c.req.valid("param");
-  const column = SLOT_COLUMN[slot];
-  const row = await getGroupFile(id, column);
-  const fileName = row?.[column];
-  if (!fileName) return c.json({ error: "File not found" }, 404);
-  return serveUploadedFile(c, { directory: "group", fileName });
 });
 
 export default router;

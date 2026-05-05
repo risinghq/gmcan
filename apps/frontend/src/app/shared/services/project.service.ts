@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
+import type { AdminProjectListItem } from "../models/admin-list";
 import type { Project, ProjectWithMembers } from "../models/project";
 import { GLOBAL } from "./global";
 
@@ -28,8 +29,8 @@ export class ProjectService {
   }
 
   // Admin
-  listAdminProjects(): Observable<Project[]> {
-    return this.http.get<Project[]>(`${GLOBAL.url}admin/projects`);
+  listAdminProjects(): Observable<AdminProjectListItem[]> {
+    return this.http.get<AdminProjectListItem[]>(`${GLOBAL.url}admin/projects`);
   }
 
   getProject(id: number): Observable<Project> {
@@ -48,8 +49,8 @@ export class ProjectService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/projects/${id}`);
   }
 
-  getProjectMembers(id: number): Observable<unknown[]> {
-    return this.http.get<unknown[]>(`${GLOBAL.url}admin/projects/${id}/members`);
+  getProjectMembers(id: number): Observable<AdminProjectListItem["members"]> {
+    return this.http.get<AdminProjectListItem["members"]>(`${GLOBAL.url}admin/projects/${id}/members`);
   }
 
   addProjectMember(id: number, memberId: number): Observable<{ status: number }> {

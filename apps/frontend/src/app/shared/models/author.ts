@@ -1,14 +1,14 @@
 export interface AuthorSearchResult {
   id: number;
   name: string;
-  photo: string | null;
+  asset: string | null;
 }
 
 export interface AuthorEntry {
   kind: "registered" | "external";
   memberId?: number;
   name: string;
-  photo?: string | null;
+  asset?: string | null;
   isPrincipal: number;
 }
 

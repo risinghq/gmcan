@@ -6,11 +6,9 @@ export interface Group {
   phone: string | null;
   name: string | null;
   fullName: string | null;
-  facilitiesPhoto: string | null;
+  assets: { facilities: string | null; header: string | null; footer: string | null };
   facilities: string | null;
   futureWork: string | null;
-  logoFooter: string | null;
-  logoHeader: string | null;
   publicationsSection: string | null;
   projectsSection: string | null;
   createdAt: string;
@@ -26,11 +24,9 @@ export function createGroup(): Group {
     phone: null,
     name: null,
     fullName: null,
-    facilitiesPhoto: null,
+    assets: { facilities: null, header: null, footer: null },
     facilities: null,
     futureWork: null,
-    logoFooter: null,
-    logoHeader: null,
     publicationsSection: null,
     projectsSection: null,
     createdAt: "",

@@ -10,11 +10,9 @@ import {
   deleteProject,
   endProject,
   listProjectMembers,
-  listProjects,
+  listAdminProjects,
   removeMemberFromProject,
   restartProject,
-  searchProjects,
-  toAdminProjectView,
   updateProject,
 } from "../../services/project.service.js";
 
@@ -48,8 +46,7 @@ router.use("*", async (c, next) => {
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
   const { status, q } = c.req.valid("query");
-  const rows = q ? await searchProjects(q, status) : await listProjects(status);
-  return c.json(rows.map(toAdminProjectView));
+  return c.json(await listAdminProjects(status, q));
 });
 
 router.post("/", zValidator("json", ProjectBody), async (c) => {

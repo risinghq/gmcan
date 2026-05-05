@@ -3,7 +3,7 @@ export interface About {
   description: string;
   objectives: string | null;
   services: string | null;
-  photo: string | null;
+  asset: string | null;
   groupId: number;
   createdAt: string | null;
   updatedAt: string | null;

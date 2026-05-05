@@ -1,4 +1,3 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -18,13 +17,11 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { AdminPublicationListItem } from "@app/shared/models/admin-list";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { requireLocalDate } from "@app/shared/utils/date";
 
 @Component({
   selector: "app-eventos",
@@ -53,17 +50,14 @@ export default class EventosComponent implements OnInit {
   eventService = inject(EventService);
   router = inject(Router);
   private publicationService = inject(PublicationService);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
   private tabState = inject(TabStateService);
 
   eventos: EventItem[] = [];
-  resumenes: PublicationWithAuthors[] = [];
-  url: string;
+  items: AdminPublicationListItem[] = [];
 
   displayedColumns: string[] = ["titulo", "primerAutor", "presentacion", "evento"];
   displayedColumns2: string[] = ["nombre", "pais", "ciudad"];
-  dataSource = new MatTableDataSource<PublicationWithAuthors>([]);
+  dataSource = new MatTableDataSource<AdminPublicationListItem>([]);
   dataSource2 = new MatTableDataSource<EventItem>([]);
 
   readonly paginator = viewChild.required(MatPaginator);
@@ -73,10 +67,6 @@ export default class EventosComponent implements OnInit {
   readonly sort2 = viewChild.required(MatSort);
   selectedTab = 0;
 
-  constructor() {
-    this.url = GLOBAL.url;
-  }
-
   ngOnInit(): void {
     this.selectedTab = this.tabState.resumenTab();
     this.getEventos();
@@ -84,21 +74,20 @@ export default class EventosComponent implements OnInit {
   }
 
   getResumenes(): void {
-    this.publicationService.listPublications({ type: 3 }).subscribe((res: PublicationWithAuthors[]) => {
-      if (res) {
-        const sorted = res.toSorted((a, b) =>
-          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
+    this.publicationService.listAdminPublications({ type: 3 }).subscribe((rows) => {
+      this.items = rows;
+      this.dataSource = new MatTableDataSource(this.items);
+      this.dataSource.filterPredicate = (row, filter) => {
+        const normalized = filter.trim().toLowerCase();
+        return (
+          row.title.toLowerCase().includes(normalized) ||
+          row.firstAuthorName.toLowerCase().includes(normalized) ||
+          row.publishedAtLabel.toLowerCase().includes(normalized) ||
+          row.eventName.toLowerCase().includes(normalized)
         );
-        this.resumenes = sorted.map((pub) => {
-          const publishedAtDate = requireLocalDate(pub.publishedAt, "publication.publishedAt");
-          return Object.assign({} as PublicationWithAuthors, pub, {
-            fecha: this.titlecasePipe.transform(this.datePipe.transform(publishedAtDate, "MMMM, y", "es") ?? ""),
-          });
-        });
-        this.dataSource = new MatTableDataSource(this.resumenes);
-        this.dataSource.sort = this.matSort();
-        this.dataSource.paginator = this.paginator();
-      }
+      };
+      this.dataSource.sort = this.matSort();
+      this.dataSource.paginator = this.paginator();
     });
   }
 

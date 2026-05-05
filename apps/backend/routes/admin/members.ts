@@ -11,23 +11,17 @@ import {
   deleteMember,
   getMemberFull,
   getMemberPhoto,
-  listActiveMembers,
+  listAdminMembers,
   listMemberGroups,
-  listMemberNames,
-  listMembers,
-  listMembersByType,
   removeMemberFromGroup,
-  searchMembers,
   searchAuthorPool,
   setMemberPhoto,
   updateMember,
-  verifyDniExists,
   verifyEmailExists,
 } from "../../services/member.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const MEMBER_FILE = { directory: "member", kind: "image" } as const;
 
 const CreateBody = z.object({
   dni: z.string().min(1),
@@ -65,9 +59,6 @@ const FilterQuery = z.object({
   q: z.string().optional(),
   status: z.coerce.number().int().optional(),
   memberTypeId: z.coerce.number().int().optional(),
-  email: z.string().optional(),
-  dni: z.string().optional(),
-  names: z.coerce.boolean().optional(),
 });
 
 router.use("*", async (c, next) => {
@@ -76,14 +67,17 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
-  const { q, status, memberTypeId, email, dni, names } = c.req.valid("query");
-  if (q) return c.json(await searchMembers(q));
-  if (email) return c.json(await verifyEmailExists(email));
-  if (dni) return c.json(await verifyDniExists(dni));
-  if (status !== undefined) return c.json(await listActiveMembers(status));
-  if (memberTypeId !== undefined) return c.json(await listMembersByType(memberTypeId));
-  if (names) return c.json(await listMemberNames());
-  return c.json(await listMembers());
+  const { q, status, memberTypeId } = c.req.valid("query");
+  if (q) return c.json(await listAdminMembers({ q }));
+  if (status !== undefined) return c.json(await listAdminMembers({ status }));
+  if (memberTypeId !== undefined) return c.json(await listAdminMembers({ memberTypeId }));
+  return c.json(await listAdminMembers());
+});
+
+router.get("/exists/email", zValidator("query", z.object({ email: z.string().min(1) })), async (c) => {
+  const { email } = c.req.valid("query");
+  const found = await verifyEmailExists(email);
+  return c.json({ exists: !!found });
 });
 
 router.get("/authors/search", zValidator("query", z.object({ q: z.string().default("") })), async (c) => {
@@ -118,7 +112,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ status: 1 });
 });
 
-router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const current = await getMemberPhoto(id);
   if (!current) return c.json({ error: "Not found" }, 404);
@@ -126,21 +120,21 @@ router.put("/:id/photo", zValidator("param", IdParam), async (c) => {
   const body = await c.req.parseBody({ all: true });
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, MEMBER_FILE);
+  const fileName = await saveUploadedFile(file, { domain: "members", kind: "image" });
   if (!fileName) return c.json({ error: "Invalid file type" }, 400);
 
   await setMemberPhoto(id, fileName);
   if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ directory: MEMBER_FILE.directory, fileName: current.photo });
+    await deleteUploadedFile({ assetKey: current.photo });
   }
   return c.json({ status: 1 });
 });
 
-router.delete("/:id/photo", zValidator("param", IdParam), async (c) => {
+router.delete("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMemberPhoto(id);
   if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  await deleteUploadedFile({ directory: MEMBER_FILE.directory, fileName: row.photo });
+  await deleteUploadedFile({ assetKey: row.photo });
   await clearMemberPhoto(id);
   return c.json({ status: 1 });
 });
