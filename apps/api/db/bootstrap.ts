@@ -38,7 +38,7 @@ export async function bootstrap() {
     console.error("\n[DB] Schema drift detected:");
     issues.forEach((issue) => console.error(issue));
     console.error("\n[DB] Delete the database file and restart to reset:");
-    console.error("  rm apps/backend/data/gmcan.db\n");
+    console.error("  rm apps/api/data/gmcan.db\n");
     process.exit(1);
   }
 
