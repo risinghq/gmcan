@@ -6,7 +6,7 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
 import { Languages } from "@app/shared/models/languages";
-import type { News } from "@app/shared/models/news";
+import type { PublicNewsDetail } from "@app/shared/models/news";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { GLOBAL } from "@app/shared/services/global";
 import { SessionService } from "@app/shared/services/session.service";
@@ -25,7 +25,7 @@ export default class DetailNewsComponent implements OnInit {
   private readonly meta = inject(Meta);
   private readonly titleService = inject(Title);
 
-  noticia: News = {} as News;
+  noticia: PublicNewsDetail = {} as PublicNewsDetail;
   tipoNoticia = "";
   autorName = "";
   autorPhoto: string | null = null;

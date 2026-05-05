@@ -1,7 +1,7 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
-import type { News } from "@app/shared/models/news";
+import type { PublicNewsListItem } from "@app/shared/models/news";
 import { parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -9,7 +9,7 @@ import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
 
-type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
+type NewsDisplay = PublicNewsListItem & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
 
 @Component({
   selector: "app-news",
@@ -59,32 +59,40 @@ export default class NewsComponent implements OnInit {
   }
 
   loadNoticias(): void {
-    this.newsService.listNews().subscribe((news) => {
-      const enriched = (news as News[])
-        .filter((n) => n.status !== 0 && n.id !== this.idNoticiaE)
-        .toSorted((a, b) => {
-          const left = parseLocalDate(a.publishedAt)?.getTime() ?? 0;
-          const right = parseLocalDate(b.publishedAt)?.getTime() ?? 0;
-          return right - left;
-        })
-        .map((n): NewsDisplay => {
-          const publishedAtDate = parseLocalDate(n.publishedAt);
-          const fechaFormateada = !publishedAtDate
-            ? ""
-            : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(
-                publishedAtDate,
-              ) ?? "");
+    this.newsService
+      .listNews({
+        status: 1,
+        sortBy: "publishedAt",
+        sortOrder: "desc",
+        page: 1,
+        pageSize: 30,
+      })
+      .subscribe((response) => {
+        const enriched = response.items
+          .filter((n) => n.id !== this.idNoticiaE)
+          .toSorted((a, b) => {
+            const left = parseLocalDate(a.publishedAt)?.getTime() ?? 0;
+            const right = parseLocalDate(b.publishedAt)?.getTime() ?? 0;
+            return right - left;
+          })
+          .map((n): NewsDisplay => {
+            const publishedAtDate = parseLocalDate(n.publishedAt);
+            const fechaFormateada = !publishedAtDate
+              ? ""
+              : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(
+                  publishedAtDate,
+                ) ?? "");
 
-          return Object.assign({} as NewsDisplay, n, {
-            nombreTipoNoticia: n.newsTypeName ?? "",
-            fechaFormateada,
-            autor: n.authorName ?? "",
+            return Object.assign({} as NewsDisplay, n, {
+              nombreTipoNoticia: n.newsTypeName,
+              fechaFormateada,
+              autor: n.authorName,
+            });
           });
-        });
 
-      this.noticiaPrincipal = enriched[0] ?? null;
-      this.noticias = enriched.slice(1);
-    });
+        this.noticiaPrincipal = enriched[0] ?? null;
+        this.noticias = enriched.slice(1);
+      });
   }
 
   detalleNoticia(noticia: NewsDisplay): void {

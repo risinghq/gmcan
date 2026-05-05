@@ -3,7 +3,7 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 import type { AdminNewsListQuery, AdminNewsListResponse } from "../models/admin-list";
-import type { News } from "../models/news";
+import type { News, PublicNewsDetail, PublicNewsListQuery, PublicNewsListResponse } from "../models/news";
 import { GLOBAL } from "./global";
 
 export interface NewsUpsertBody {
@@ -22,14 +22,12 @@ export class NewsService {
   private http = inject(HttpClient);
 
   // Public
-  listNews(status?: number): Observable<News[]> {
-    const params: Record<string, string | number> = {};
-    if (status !== undefined) params["status"] = status;
-    return this.http.get<News[]>(`${GLOBAL.url}api/news`, { params });
+  listNews(query: PublicNewsListQuery = {}): Observable<PublicNewsListResponse> {
+    return this.http.get<PublicNewsListResponse>(`${GLOBAL.url}api/news`, { params: { ...query } });
   }
 
-  getNews(id: number): Observable<News> {
-    return this.http.get<News>(`${GLOBAL.url}api/news/${id}`);
+  getNews(id: number): Observable<PublicNewsDetail> {
+    return this.http.get<PublicNewsDetail>(`${GLOBAL.url}api/news/${id}`);
   }
 
   // Admin

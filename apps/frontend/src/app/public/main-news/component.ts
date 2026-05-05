@@ -6,9 +6,10 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
-import type { News } from "@app/shared/models/news";
+import type { PublicNewsListItem } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
@@ -18,7 +19,7 @@ import {
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 
-type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
+type NewsDisplay = PublicNewsListItem & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
 type NewsTypeFilter = { id: number; name: string };
 
 @Component({
@@ -43,15 +44,16 @@ type NewsTypeFilter = { id: number; name: string };
 export default class MainNewsComponent implements OnInit {
   newsService = inject(NewsService);
   route = inject(ActivatedRoute);
+  lookup = inject(LookupService);
   router = inject(Router);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
   private titleService = inject(Title);
 
-  public allNoticias: NewsDisplay[] = [];
   public noticias: NewsDisplay[] = [];
   public tiponoticias: NewsTypeFilter[] = [];
   public screenWidth: number;
+  public total = 0;
   url: string;
 
   constructor() {
@@ -75,20 +77,23 @@ export default class MainNewsComponent implements OnInit {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.categoryNombre = this.language.newsText[0].categoryTitle;
+    this.tiponoticias = this.lookup.newsTypes().toSorted((a, b) => (a.name > b.name ? 1 : -1));
     this.loadNews();
   }
 
   loadNews(): void {
     this.allCharged = false;
-    this.newsService.listNews().subscribe((news) => {
-      const enriched = (news as News[])
-        .filter((n) => n.status !== 0)
-        .toSorted((a, b) => {
-          const left = new Date(a.publishedAt ?? "").getTime();
-          const right = new Date(b.publishedAt ?? "").getTime();
-          return right - left;
-        })
-        .map((n): NewsDisplay => {
+    this.newsService
+      .listNews({
+        status: 1,
+        newsTypeId: this.categorySelected === -1 ? undefined : this.categorySelected,
+        sortBy: "publishedAt",
+        sortOrder: "desc",
+        page: this.page,
+        pageSize: this.pageSize,
+      })
+      .subscribe((response) => {
+        this.noticias = response.items.map((n): NewsDisplay => {
           const d = new Date(n.publishedAt ?? "");
           if (String(d) !== "Invalid Date") {
             d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
@@ -99,40 +104,27 @@ export default class MainNewsComponent implements OnInit {
               : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
 
           return Object.assign({} as NewsDisplay, n, {
-            nombreTipoNoticia: n.newsTypeName ?? "",
+            nombreTipoNoticia: n.newsTypeName,
             fechaFormateada,
-            autor: n.authorName ?? "",
+            autor: n.authorName,
           });
         });
-
-      this.allNoticias = enriched;
-
-      const categories = new Map<number, NewsTypeFilter>();
-      for (const item of enriched) {
-        if (item.newsTypeId && item.nombreTipoNoticia && !categories.has(item.newsTypeId)) {
-          categories.set(item.newsTypeId, { id: item.newsTypeId, name: item.nombreTipoNoticia });
-        }
-      }
-      this.tiponoticias = [...categories.values()].toSorted((a, b) => (a.name > b.name ? 1 : -1));
-
-      this.applyFilter();
-      this.allCharged = true;
-    });
-  }
-
-  applyFilter(): void {
-    if (this.categorySelected === -1) {
-      this.noticias = this.allNoticias;
-    } else {
-      this.noticias = this.allNoticias.filter((n) => n.newsTypeId === this.categorySelected);
-    }
+        this.total = response.total;
+        this.allCharged = true;
+      });
   }
 
   selectCategory(id: number, nombre: string): void {
     this.categorySelected = id;
     this.categoryNombre = nombre;
-    this.applyFilter();
     this.page = 1;
+    this.loadNews();
+  }
+
+  onPageChange(page: number): void {
+    this.page = page;
+    this.loadNews();
+    this.scroll();
   }
 
   detalleNoticia(noticia: NewsDisplay): void {

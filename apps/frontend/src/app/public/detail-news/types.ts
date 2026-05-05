@@ -1,7 +1,7 @@
-import type { News } from "@app/shared/models/news";
+import type { PublicNewsDetail } from "@app/shared/models/news";
 
 export type DetailNewsViewModel = {
-  noticia: News;
+  noticia: PublicNewsDetail;
   tipoNoticia: string;
   autorName: string;
   autorPhoto: string | null;

@@ -37,8 +37,7 @@
         </div>
         } @if (noticias.length > 0 && allCharged) {
         <div>
-          @for ( noticia of noticias | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize; track noticia )
-          {
+          @for ( noticia of noticias; track noticia ) {
           <div class="news flex-news">
             <div
               class="img-hover-zoom-2 img-div-zoom right pl-24"
@@ -67,8 +66,8 @@
               }
             </div>
           </div>
-          } @if (noticias.length > 10) {
-          <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="noticias.length">
+          } @if (total > pageSize) {
+          <ngb-pagination [page]="page" [pageSize]="pageSize" [collectionSize]="total" (pageChange)="onPageChange($event)">
             <ng-template class="unique-left" ngbPaginationPrevious>
               <div (click)="scroll()" class="h-ih">
                 <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>

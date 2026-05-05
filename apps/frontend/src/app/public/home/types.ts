@@ -1,7 +1,7 @@
 import type { Group } from "@app/shared/models/group";
 import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
-import type { News } from "@app/shared/models/news";
+import type { PublicNewsListItem } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
 import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import type { ResearchLine } from "@app/shared/models/research-line";
@@ -32,7 +32,7 @@ export type HomeProyecto = Project & {
   members: HomeProjectMember[];
 };
 
-export type HomeNoticia = News & {
+export type HomeNoticia = PublicNewsListItem & {
   nombreTipoNoticia: string;
   autor: string;
   fechaPublicacion: string;

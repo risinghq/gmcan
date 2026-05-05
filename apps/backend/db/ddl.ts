@@ -1,4 +1,5 @@
 import type { Kysely } from "kysely";
+import { sql } from "kysely";
 
 import type { Database } from "./schema.js";
 
@@ -467,4 +468,102 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
     .execute();
+
+  await sql`
+    CREATE VIRTUAL TABLE IF NOT EXISTS news_search USING fts5(
+      title,
+      titleEN,
+      summary,
+      summaryEN,
+      authorName,
+      categoryName,
+      categoryNameEN
+    )
+  `.execute(db);
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_news_status_published_at
+    ON news(status, publishedAt DESC)
+  `.execute(db);
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_news_type_published_at
+    ON news(newsTypeId, publishedAt DESC)
+  `.execute(db);
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_news_author
+    ON news(authorId)
+  `.execute(db);
+
+  await sql`
+    CREATE TRIGGER IF NOT EXISTS news_ai AFTER INSERT ON news BEGIN
+      INSERT INTO news_search(rowid, title, titleEN, summary, summaryEN, authorName, categoryName, categoryNameEN)
+      VALUES (
+        NEW.id,
+        NEW.title,
+        NEW.titleEN,
+        NEW.summary,
+        NEW.summaryEN,
+        COALESCE((SELECT TRIM(COALESCE(firstName, '') || ' ' || COALESCE(lastName, '') || ' ' || COALESCE(maternalName, '')) FROM member WHERE id = NEW.authorId), ''),
+        COALESCE((SELECT name FROM news_type WHERE id = NEW.newsTypeId), ''),
+        COALESCE((SELECT nameEN FROM news_type WHERE id = NEW.newsTypeId), '')
+      );
+    END
+  `.execute(db);
+
+  await sql`
+    CREATE TRIGGER IF NOT EXISTS news_au AFTER UPDATE ON news BEGIN
+      INSERT OR REPLACE INTO news_search(rowid, title, titleEN, summary, summaryEN, authorName, categoryName, categoryNameEN)
+      VALUES (
+        NEW.id,
+        NEW.title,
+        NEW.titleEN,
+        NEW.summary,
+        NEW.summaryEN,
+        COALESCE((SELECT TRIM(COALESCE(firstName, '') || ' ' || COALESCE(lastName, '') || ' ' || COALESCE(maternalName, '')) FROM member WHERE id = NEW.authorId), ''),
+        COALESCE((SELECT name FROM news_type WHERE id = NEW.newsTypeId), ''),
+        COALESCE((SELECT nameEN FROM news_type WHERE id = NEW.newsTypeId), '')
+      );
+    END
+  `.execute(db);
+
+  await sql`
+    CREATE TRIGGER IF NOT EXISTS news_ad AFTER DELETE ON news BEGIN
+      DELETE FROM news_search WHERE rowid = OLD.id;
+    END
+  `.execute(db);
+
+  await sql`
+    CREATE TRIGGER IF NOT EXISTS member_au_news_search AFTER UPDATE ON member BEGIN
+      UPDATE news_search
+      SET authorName = COALESCE(TRIM(COALESCE(NEW.firstName, '') || ' ' || COALESCE(NEW.lastName, '') || ' ' || COALESCE(NEW.maternalName, '')), '')
+      WHERE rowid IN (SELECT id FROM news WHERE authorId = NEW.id);
+    END
+  `.execute(db);
+
+  await sql`
+    CREATE TRIGGER IF NOT EXISTS news_type_au_news_search AFTER UPDATE ON news_type BEGIN
+      UPDATE news_search
+      SET categoryName = COALESCE(NEW.name, ''),
+          categoryNameEN = COALESCE(NEW.nameEN, '')
+      WHERE rowid IN (SELECT id FROM news WHERE newsTypeId = NEW.id);
+    END
+  `.execute(db);
+
+  await sql`
+    INSERT OR REPLACE INTO news_search(rowid, title, titleEN, summary, summaryEN, authorName, categoryName, categoryNameEN)
+    SELECT
+      news.id,
+      news.title,
+      news.titleEN,
+      news.summary,
+      news.summaryEN,
+      COALESCE(TRIM(COALESCE(member.firstName, '') || ' ' || COALESCE(member.lastName, '') || ' ' || COALESCE(member.maternalName, '')), ''),
+      COALESCE(news_type.name, ''),
+      COALESCE(news_type.nameEN, '')
+    FROM news
+    LEFT JOIN member ON member.id = news.authorId
+    LEFT JOIN news_type ON news_type.id = news.newsTypeId
+  `.execute(db);
 }
