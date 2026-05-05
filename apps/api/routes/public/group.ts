@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
-import { listAbout, listGroups } from "../../services/group.service.js";
+import { listAbout, listEquipment, listGroups, listSoftware } from "../../services/group.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -62,5 +62,36 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   );
   return c.json(shaped);
 });
+
+router.get(
+  "/:groupId/software",
+  zValidator("param", z.object({ groupId: z.coerce.number().int().positive() })),
+  async (c) => {
+    const locale = c.get("locale");
+    const { groupId } = c.req.valid("param");
+    const rows = await listSoftware(groupId);
+    return c.json(
+      rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        description: localizeField(row, locale, { es: "description", en: "descriptionEN", required: false }),
+        moreInfo: row.moreInfo,
+        groupId: row.groupId,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+      })),
+    );
+  },
+);
+
+router.get(
+  "/:groupId/equipment",
+  zValidator("param", z.object({ groupId: z.coerce.number().int().positive() })),
+  async (c) => {
+    const { groupId } = c.req.valid("param");
+    const rows = await listEquipment(groupId);
+    return c.json(rows);
+  },
+);
 
 export default router;

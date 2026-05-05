@@ -21,6 +21,14 @@ export class GroupService {
     return this.http.get<About[]>(`${GLOBAL.url}api/group/${groupId}/about`);
   }
 
+  listPublicSoftware(groupId: number): Observable<Software[]> {
+    return this.http.get<Software[]>(`${GLOBAL.url}api/group/${groupId}/software`);
+  }
+
+  listPublicEquipment(groupId: number): Observable<Equipment[]> {
+    return this.http.get<Equipment[]>(`${GLOBAL.url}api/group/${groupId}/equipment`);
+  }
+
   // Admin
   listGroups(): Observable<Group[]> {
     return this.http.get<Group[]>(`${GLOBAL.url}admin/group`);

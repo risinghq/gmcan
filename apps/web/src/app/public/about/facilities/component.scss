@@ -1,15 +1,7 @@
 @use "../../publication/component.scss";
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
 
 .no-border {
   border-bottom: unset;
-}
-
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-  @extend .plex-sans;
 }
 
 .card-facilities {
@@ -66,7 +58,7 @@
 
 .equipment {
   margin-top: 24px;
-  @extend .plex-sans;
+  font-family: "IBM Plex Sans", serif;
   font-weight: 500;
   letter-spacing: 0.3px;
   color: #30393a;
@@ -80,19 +72,35 @@
 }
 
 .equipo-chip {
-  display: unset;
-  border-radius: 4px;
-  font-weight: 600;
-  background-color: #e8e8e8;
+  padding: 0;
   line-height: 1.33;
   letter-spacing: 0.3px;
-  color: #939393;
-  height: max-content;
+  font-size: 15px;
+  font-family: "IBM Plex Sans", serif;
+  border-radius: 4px;
+}
+
+.equipo-chip-label {
+  font-weight: 600;
+  color: rgb(147, 147, 147) !important;
 }
 
 .equipo-chip-slick {
-  font-weight: normal;
+  font-weight: 400;
+  color: rgb(147, 147, 147);
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-decoration: none;
   margin-left: 4px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  gap: 8px;
 }
 
 .soft-description {

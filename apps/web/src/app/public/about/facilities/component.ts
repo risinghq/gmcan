@@ -51,8 +51,8 @@ export default class FacilitiesComponent implements OnInit {
       .pipe(
         switchMap((group) =>
           forkJoin({
-            equipment: this.groupService.listEquipment(group.id),
-            software: this.groupService.listSoftware(group.id),
+            equipment: this.groupService.listPublicEquipment(group.id),
+            software: this.groupService.listPublicSoftware(group.id),
           }).pipe(
             map(({ equipment, software }) => ({
               group,
