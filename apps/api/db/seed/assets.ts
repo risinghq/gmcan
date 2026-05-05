@@ -1,11 +1,11 @@
+/* eslint-disable no-await-in-loop */
 import fs from "node:fs";
 import path from "node:path";
 
-import { STORAGE_ROOT, assetExists, buildAssetKey, quarantineAsset, sha256Buffer } from "../../lib/upload.js";
+import { STORAGE_ROOT, assetExists, quarantineAsset, sha256Buffer } from "../../lib/upload.js";
 import { db } from "../client.js";
 
 const SEED_SOURCE_ROOT = path.resolve(process.cwd(), "assets/seed-src");
-const MAP_FILE = path.join(STORAGE_ROOT, ".seed-import-map.json");
 
 type SeedBinding = {
   resourceType: "member" | "news" | "method" | "research_line" | "publication" | "research_group" | "about";
@@ -52,18 +52,7 @@ const SEED_BINDINGS: SeedBinding[] = [
   { resourceType: "research_group", resourceId: 1, slot: "footer", source: "seed/group/footer.png" },
 ];
 
-type MapJson = { bySource: Record<string, string>; byHash: Record<string, string> };
 const SEED_CONCURRENCY = 8;
-
-function readMap(): MapJson {
-  if (!fs.existsSync(MAP_FILE)) return { bySource: {}, byHash: {} };
-  return JSON.parse(fs.readFileSync(MAP_FILE, "utf8")) as MapJson;
-}
-
-function writeMap(map: MapJson): void {
-  fs.mkdirSync(STORAGE_ROOT, { recursive: true });
-  fs.writeFileSync(MAP_FILE, JSON.stringify(map, null, 2), "utf8");
-}
 
 function resolveSeedPath(source: string): string {
   const normalized = source.replace(/^seed\//, "").replace(/^seed-src\//, "");
@@ -91,24 +80,8 @@ function guessMimeByExt(ext: string): string {
   }
 }
 
-function importSourceAsset(source: string, map: MapJson): string {
-  if (map.bySource[source]) return map.bySource[source];
-  const filePath = resolveSeedPath(source);
-  const data = fs.readFileSync(filePath);
-  const hash = sha256Buffer(data);
-  const existing = map.byHash[hash];
-  if (existing && assetExists(existing)) {
-    map.bySource[source] = existing;
-    return existing;
-  }
-
-  const ext = path.extname(filePath).slice(1).toLowerCase();
-  const key = buildAssetKey(ext);
-  fs.mkdirSync(STORAGE_ROOT, { recursive: true });
-  fs.writeFileSync(path.join(STORAGE_ROOT, key), data);
-  map.bySource[source] = key;
-  map.byHash[hash] = key;
-  return key;
+function storageKeyFromHash(sha256: string, ext: string): string {
+  return `${sha256}.${ext}`;
 }
 
 async function mapConcurrent<T>(
@@ -139,89 +112,93 @@ async function resolveResourceId(binding: SeedBinding): Promise<number> {
 }
 
 export async function seedAssetsAndBindings() {
-  const map = readMap();
   const now = new Date().toISOString();
+  fs.mkdirSync(STORAGE_ROOT, { recursive: true });
 
-  await mapConcurrent(SEED_BINDINGS, async (binding) => {
-    const storageKey = importSourceAsset(binding.source, map);
+  for (const binding of SEED_BINDINGS) {
+    const resourceId = await resolveResourceId(binding);
     const filePath = resolveSeedPath(binding.source);
     const buffer = fs.readFileSync(filePath);
     const ext = path.extname(filePath).slice(1).toLowerCase();
-    const resourceId = await resolveResourceId(binding);
+    const sha256 = sha256Buffer(buffer);
+    const storageKey = storageKeyFromHash(sha256, ext);
+    const mimeDetected = guessMimeByExt(ext);
 
-    const existingAsset = await db
-      .selectFrom("asset")
-      .select("id")
-      .where("storageKey", "=", storageKey)
-      .executeTakeFirst();
-    let assetId: number;
-    if (existingAsset) {
-      assetId = existingAsset.id;
-      await db
-        .updateTable("asset")
-        .set({ status: "active", deletedAt: null, deleteAfter: null })
-        .where("id", "=", assetId)
-        .execute();
-    } else {
-      const inserted = await db
-        .insertInto("asset")
-        .values({
-          storageKey,
-          bucket: "local",
-          mimeDetected: guessMimeByExt(ext),
-          ext,
-          sizeBytes: buffer.byteLength,
-          sha256: sha256Buffer(buffer),
-          visibility: "public",
-          status: "active",
-          createdBy: null,
-          createdAt: now,
-          deletedAt: null,
-          deleteAfter: null,
-        })
-        .executeTakeFirst();
-      assetId = Number(inserted.insertId);
+    if (!assetExists(storageKey)) {
+      fs.writeFileSync(path.join(STORAGE_ROOT, storageKey), buffer);
     }
 
     await db
-      .updateTable("asset_binding")
-      .set({ isCurrent: 0, replacedAt: now })
-      .where("resourceType", "=", binding.resourceType)
-      .where("resourceId", "=", resourceId)
-      .where("slot", "=", binding.slot)
-      .where("isCurrent", "=", 1)
-      .where("deletedAt", "is", null)
+      .insertInto("asset")
+      .values({
+        storageKey,
+        bucket: "local",
+        mimeDetected,
+        ext,
+        sizeBytes: buffer.byteLength,
+        sha256,
+        visibility: "public",
+        status: "active",
+        createdBy: null,
+        createdAt: now,
+        deletedAt: null,
+        deleteAfter: null,
+      })
+      .onConflict((oc) =>
+        oc.column("storageKey").doUpdateSet({
+          mimeDetected,
+          ext,
+          sizeBytes: buffer.byteLength,
+          sha256,
+          status: "active",
+          deletedAt: null,
+          deleteAfter: null,
+        }),
+      )
       .execute();
 
-    const existingBinding = await db
-      .selectFrom("asset_binding")
-      .select("id")
-      .where("resourceType", "=", binding.resourceType)
-      .where("resourceId", "=", resourceId)
-      .where("slot", "=", binding.slot)
-      .where("assetId", "=", assetId)
-      .where("isCurrent", "=", 1)
-      .where("deletedAt", "is", null)
-      .executeTakeFirst();
-    if (!existingBinding) {
-      await db
-        .insertInto("asset_binding")
-        .values({
-          resourceType: binding.resourceType,
-          resourceId,
-          slot: binding.slot,
-          assetId,
-          isCurrent: 1,
-          replacedByBindingId: null,
-          replacedAt: null,
-          createdAt: now,
-          deletedAt: null,
-        })
-        .execute();
-    }
-  });
+    const asset = await db.selectFrom("asset").select("id").where("storageKey", "=", storageKey).executeTakeFirst();
+    if (!asset) throw new Error(`Asset row not found for storageKey=${storageKey}`);
 
-  writeMap(map);
+    await db.transaction().execute(async (trx) => {
+      await trx
+        .updateTable("asset_binding")
+        .set({ isCurrent: 0, replacedAt: now })
+        .where("resourceType", "=", binding.resourceType)
+        .where("resourceId", "=", resourceId)
+        .where("slot", "=", binding.slot)
+        .where("isCurrent", "=", 1)
+        .where("deletedAt", "is", null)
+        .execute();
+
+      const reactivateResult = await trx
+        .updateTable("asset_binding")
+        .set({ isCurrent: 1, replacedAt: null, deletedAt: null })
+        .where("resourceType", "=", binding.resourceType)
+        .where("resourceId", "=", resourceId)
+        .where("slot", "=", binding.slot)
+        .where("assetId", "=", asset.id)
+        .executeTakeFirst();
+
+      const updated = Number(reactivateResult.numUpdatedRows ?? 0);
+      if (updated === 0) {
+        await trx
+          .insertInto("asset_binding")
+          .values({
+            resourceType: binding.resourceType,
+            resourceId,
+            slot: binding.slot,
+            assetId: asset.id,
+            isCurrent: 1,
+            replacedByBindingId: null,
+            replacedAt: null,
+            createdAt: now,
+            deletedAt: null,
+          })
+          .execute();
+      }
+    });
+  }
 }
 
 export async function auditAndQuarantineOrphans() {
