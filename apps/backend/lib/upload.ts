@@ -95,10 +95,7 @@ async function serveFile(c: Context, filePath: string): Promise<Response> {
   });
 }
 
-export async function saveUploadedFile(
-  file: File,
-  options: { domain: string; kind: UploadFileKind },
-): Promise<string | null> {
+export async function saveUploadedFile(file: File, options: { kind: UploadFileKind }): Promise<string | null> {
   const ext = extensionOf(file.name);
   const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind] as readonly string[];
   if (!allowedExtensions.includes(ext)) return null;

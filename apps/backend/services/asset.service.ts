@@ -11,7 +11,6 @@ export type AssetVisibility = "public" | "private";
 export type ResourceType = "member" | "news" | "method" | "research_line" | "publication" | "research_group" | "about";
 
 type SlotPolicy = {
-  storageDomain: string;
   kind: "image" | "brandImage" | "document";
   visibility: AssetVisibility;
 };
@@ -20,15 +19,15 @@ const RETENTION_DAYS = 90;
 const SIGN_SECRET = process.env.ASSET_SIGNING_SECRET ?? "dev-asset-secret";
 
 const SLOT_POLICIES: Record<string, SlotPolicy> = {
-  "member.photo": { storageDomain: "members", kind: "image", visibility: "public" },
-  "news.photo": { storageDomain: "news", kind: "image", visibility: "public" },
-  "method.photo": { storageDomain: "methods", kind: "image", visibility: "public" },
-  "research_line.photo": { storageDomain: "research-lines", kind: "image", visibility: "public" },
-  "publication.file": { storageDomain: "publications", kind: "document", visibility: "public" },
-  "research_group.facilitiesPhoto": { storageDomain: "group", kind: "image", visibility: "public" },
-  "research_group.logoHeader": { storageDomain: "group", kind: "brandImage", visibility: "public" },
-  "research_group.logoFooter": { storageDomain: "group", kind: "brandImage", visibility: "public" },
-  "about.photo": { storageDomain: "about", kind: "image", visibility: "public" },
+  "member.photo": { kind: "image", visibility: "public" },
+  "news.photo": { kind: "image", visibility: "public" },
+  "method.photo": { kind: "image", visibility: "public" },
+  "research_line.photo": { kind: "image", visibility: "public" },
+  "publication.file": { kind: "document", visibility: "public" },
+  "research_group.facilitiesPhoto": { kind: "image", visibility: "public" },
+  "research_group.logoHeader": { kind: "brandImage", visibility: "public" },
+  "research_group.logoFooter": { kind: "brandImage", visibility: "public" },
+  "about.photo": { kind: "image", visibility: "public" },
 };
 
 function nowIso(): string {
@@ -83,7 +82,7 @@ export async function uploadAndReplaceCurrent(input: {
   await ensureResourceExists(input.resourceType, input.resourceId);
   const policy = getSlotPolicy(input.resourceType, input.slot);
 
-  const storageKey = await saveUploadedFile(input.file, { domain: policy.storageDomain, kind: policy.kind });
+  const storageKey = await saveUploadedFile(input.file, { kind: policy.kind });
   if (!storageKey) throw new Error("Invalid file type");
 
   const buffer = Buffer.from(await input.file.arrayBuffer());
