@@ -275,7 +275,7 @@
           </div>
           }
           <div class="flex-news publication-mt" style="flex-flow: wrap">
-            @for (author of publicacion.authors; track author; let last = ) { @if (author.kind === "registered") {
+            @for (author of publicacion.authors; track author; let last = $last) { @if (author.kind === "registered") {
             <div class="publication-members">
               <div class="member-img-round">
                 @if (author.asset) {

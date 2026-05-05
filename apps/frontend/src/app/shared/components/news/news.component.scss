@@ -78,17 +78,6 @@ figure:hover::before {
   object-fit: cover;
   border-radius: 4px;
 }
-.other-news-text:hover {
-  cursor: pointer;
-  text-decoration: underline;
-}
-.other-news-text {
-  @extend .plex-sans;
-  font-weight: 500;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
 
 .other-news-text-2 {
   cursor: pointer;
@@ -113,9 +102,6 @@ figure:hover::before {
   letter-spacing: 0.3px;
   color: #000000;
   margin-bottom: 16px;
-}
-.other-news-text {
-  font-size: 15px !important;
 }
 .other-news-text-2 {
   font-size: 15px !important;
@@ -149,10 +135,6 @@ figure:hover::before {
     height: 70px !important;
   }
 
-  .other-news-ending {
-    padding-bottom: 32px !important;
-    padding-top: 24px !important;
-  }
   .card-img-div {
     height: 159px;
   }
@@ -183,9 +165,5 @@ figure:hover::before {
   .other-news-img {
     width: 60px;
     height: 60px;
-  }
-  .other-news-ending {
-    padding-bottom: 16px;
-    padding-top: 16px;
   }
 }
