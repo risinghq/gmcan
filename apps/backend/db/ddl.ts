@@ -25,13 +25,10 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "phone",
     "name",
     "fullName",
-    "facilitiesPhoto",
     "facilitiesES",
     "facilitiesEN",
     "futureWorkES",
     "futureWorkEN",
-    "logoFooter",
-    "logoHeader",
     "publicationsSectionES",
     "publicationsSectionEN",
     "projectsSectionES",
@@ -50,7 +47,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "birthDate",
     "bio",
     "bioEN",
-    "photo",
+
     "status",
     "resetPassword",
     "createdAt",
@@ -63,8 +60,8 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "resetExpires",
   ],
   session: ["id", "memberId", "email", "expiresAt", "lastActive"],
-  research_line: ["id", "name", "nameEN", "description", "descriptionEN", "photo", "groupId", "createdAt", "updatedAt"],
-  method: ["id", "name", "nameEN", "description", "descriptionEN", "photo", "groupId", "createdAt", "updatedAt"],
+  research_line: ["id", "name", "nameEN", "description", "descriptionEN", "groupId", "createdAt", "updatedAt"],
+  method: ["id", "name", "nameEN", "description", "descriptionEN", "groupId", "createdAt", "updatedAt"],
   equipment: ["id", "name", "cpu", "gpu", "ram", "storage", "groupId", "createdAt", "updatedAt"],
   software: ["id", "name", "description", "descriptionEN", "moreInfo", "groupId", "createdAt", "updatedAt"],
   about: [
@@ -77,7 +74,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "servicesEN",
     "createdAt",
     "updatedAt",
-    "photo",
+
     "groupId",
   ],
   news: [
@@ -92,7 +89,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "publishedAt",
     "updatedAt",
     "createdAt",
-    "photo",
+
     "priority",
     "authorId",
     "newsTypeId",
@@ -100,7 +97,6 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   publication: [
     "id",
     "title",
-    "file",
     "abstractES",
     "abstractEN",
     "journalIssue",
@@ -287,13 +283,10 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("phone", "text")
     .addColumn("name", "text")
     .addColumn("fullName", "text")
-    .addColumn("facilitiesPhoto", "text")
     .addColumn("facilitiesES", "text")
     .addColumn("facilitiesEN", "text")
     .addColumn("futureWorkES", "text")
     .addColumn("futureWorkEN", "text")
-    .addColumn("logoFooter", "text")
-    .addColumn("logoHeader", "text")
     .addColumn("publicationsSectionES", "text")
     .addColumn("publicationsSectionEN", "text")
     .addColumn("projectsSectionES", "text")
@@ -315,7 +308,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("birthDate", "text")
     .addColumn("bio", "text")
     .addColumn("bioEN", "text")
-    .addColumn("photo", "text")
+
     .addColumn("status", "integer", (c) => c.notNull())
     .addColumn("resetPassword", "integer", (c) => c.notNull())
     .addColumn("createdAt", "text")
@@ -346,7 +339,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("description", "text")
     .addColumn("descriptionEN", "text")
-    .addColumn("photo", "text")
+
     .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
@@ -360,7 +353,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("description", "text", (c) => c.notNull())
     .addColumn("descriptionEN", "text")
-    .addColumn("photo", "text")
+
     .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
@@ -405,7 +398,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("servicesEN", "text")
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
-    .addColumn("photo", "text")
+
     .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
     .execute();
 
@@ -423,7 +416,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("publishedAt", "text", (c) => c.notNull())
     .addColumn("updatedAt", "text")
     .addColumn("createdAt", "text")
-    .addColumn("photo", "text")
+
     .addColumn("priority", "integer")
     .addColumn("authorId", "integer", (c) => c.notNull().references("member.id"))
     .addColumn("newsTypeId", "integer", (c) => c.notNull().references("news_type.id"))
@@ -434,7 +427,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("file", "text")
     .addColumn("abstractES", "text")
     .addColumn("abstractEN", "text")
     .addColumn("journalIssue", "integer")

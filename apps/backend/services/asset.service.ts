@@ -24,9 +24,9 @@ const SLOT_POLICIES: Record<string, SlotPolicy> = {
   "method.photo": { kind: "image", visibility: "public" },
   "research_line.photo": { kind: "image", visibility: "public" },
   "publication.file": { kind: "document", visibility: "public" },
-  "research_group.facilitiesPhoto": { kind: "image", visibility: "public" },
-  "research_group.logoHeader": { kind: "brandImage", visibility: "public" },
-  "research_group.logoFooter": { kind: "brandImage", visibility: "public" },
+  "research_group.facilities": { kind: "image", visibility: "public" },
+  "research_group.header": { kind: "brandImage", visibility: "public" },
+  "research_group.footer": { kind: "brandImage", visibility: "public" },
   "about.photo": { kind: "image", visibility: "public" },
 };
 

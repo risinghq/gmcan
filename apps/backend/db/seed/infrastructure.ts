@@ -180,7 +180,6 @@ export async function seedAbout() {
       servicesEN: null,
       createdAt: today,
       updatedAt: today,
-      photo: null,
       groupId: 1,
     })
     .onConflict((oc) => oc.doNothing())

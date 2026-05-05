@@ -71,7 +71,6 @@ export class ContenidosState {
   });
   facilidadesRecursosForm: FormGroup = this.formBuilder.group({
     facilities: ["", Validators.required],
-    facilitiesPhoto: ["", Validators.required],
   });
   trabajosFuturosForm: FormGroup = this.formBuilder.group({
     futureWork: ["", Validators.required],

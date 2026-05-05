@@ -26,10 +26,10 @@ router.get("/", async (c) => {
       facilities: await resolveAssetAccessUrl({
         resourceType: "research_group",
         resourceId: row.id,
-        slot: "facilitiesPhoto",
+        slot: "facilities",
       }),
-      header: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "logoHeader" }),
-      footer: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "logoFooter" }),
+      header: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "header" }),
+      footer: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "footer" }),
     },
     facilities: localizeField(row, locale, { es: "facilitiesES", en: "facilitiesEN", required: false }),
     futureWork: localizeField(row, locale, { es: "futureWorkES", en: "futureWorkEN", required: false }),

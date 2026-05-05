@@ -98,13 +98,10 @@ export interface ResearchGroupTable {
   phone: string | null;
   name: string | null;
   fullName: string | null;
-  facilitiesPhoto: string | null;
   facilitiesES: string | null;
   facilitiesEN: string | null;
   futureWorkES: string | null;
   futureWorkEN: string | null;
-  logoFooter: string | null;
-  logoHeader: string | null;
   publicationsSectionES: string | null;
   publicationsSectionEN: string | null;
   projectsSectionES: string | null;
@@ -124,7 +121,7 @@ export interface MemberTable {
   birthDate: DateString | null;
   bio: string | null;
   bioEN: string | null;
-  photo: string | null;
+
   status: number;
   resetPassword: number;
   createdAt: DateString | null;
@@ -151,7 +148,7 @@ export interface ResearchLineTable {
   nameEN: string;
   description: string | null;
   descriptionEN: string | null;
-  photo: string | null;
+
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
@@ -163,7 +160,7 @@ export interface MethodTable {
   nameEN: string;
   description: string;
   descriptionEN: string | null;
-  photo: string | null;
+
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
@@ -202,7 +199,7 @@ export interface AboutTable {
   servicesEN: string | null;
   createdAt: DateString | null;
   updatedAt: DateString | null;
-  photo: string | null;
+
   groupId: number;
 }
 
@@ -218,7 +215,7 @@ export interface NewsTable {
   publishedAt: DateString;
   updatedAt: DateString | null;
   createdAt: DateString | null;
-  photo: string | null;
+
   priority: number | null;
   authorId: number;
   newsTypeId: number;
@@ -227,7 +224,6 @@ export interface NewsTable {
 export interface PublicationTable {
   id: Generated<number>;
   title: string;
-  file: string | null;
   abstractES: string | null;
   abstractEN: string | null;
   journalIssue: number | null;

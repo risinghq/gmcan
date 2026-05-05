@@ -53,8 +53,7 @@ export class GroupService {
   uploadAsset(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    const mappedSlot = slot === "facilities" ? "facilitiesPhoto" : slot === "header" ? "logoHeader" : "logoFooter";
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/research_group/${id}/${mappedSlot}`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/research_group/${id}/${slot}`, formData);
   }
 
   // About (admin)
