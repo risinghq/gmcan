@@ -18,8 +18,7 @@ type SeedBinding = {
 const SEED_BINDINGS: SeedBinding[] = [
   { resourceType: "member", memberDni: "06766048", slot: "photo", source: "seed/members/justo.jpg" },
   { resourceType: "member", memberDni: "09934476", slot: "photo", source: "seed/members/chachi.png" },
-  { resourceType: "member", memberDni: "71752895", slot: "photo", source: "seed/members/renzo-vizarreta.jpg" },
-  { resourceType: "member", memberDni: "71774958", slot: "photo", source: "seed/members/renzo-velasquez.jpg" },
+  { resourceType: "member", memberDni: "73184556", slot: "photo", source: "seed/members/renzo-vizarreta.jpg" },
   { resourceType: "news", resourceId: 56, slot: "photo", source: "seed/news/news-56.jpg" },
   {
     resourceType: "research_line",
