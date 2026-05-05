@@ -33,6 +33,8 @@ const SEED_BINDINGS: SeedBinding[] = [
     source: "seed/research-lines/hexagonal-nanosystems.jpg",
   },
   { resourceType: "research_line", resourceId: 3, slot: "photo", source: "seed/research-lines/nanomagnetism.jpg" },
+  { resourceType: "method", resourceId: 1, slot: "photo", source: "seed/methods/molecular-dynamics.jpg" },
+  { resourceType: "method", resourceId: 2, slot: "photo", source: "seed/methods/dft.jpg" },
   { resourceType: "method", resourceId: 3, slot: "photo", source: "seed/methods/monte-carlo.jpeg" },
   { resourceType: "method", resourceId: 4, slot: "photo", source: "seed/methods/spin-dynamics.jpg" },
   {
