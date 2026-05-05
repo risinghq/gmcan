@@ -4,8 +4,8 @@ import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
 import { hashPassword } from "../lib/password.js";
-import { resolveAssetAccessUrl } from "./asset.service.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
@@ -252,7 +252,6 @@ export async function updateMember(
 export async function deleteMember(id: number) {
   await db.deleteFrom("member").where("id", "=", id).execute();
 }
-
 
 export async function updatePassword(email: string, newPassword: string) {
   await db

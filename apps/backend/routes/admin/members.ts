@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   addMemberToGroup,
   createMember,
@@ -84,7 +85,10 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const member = await getMemberFull(id);
   if (!member) return c.json({ error: "Not found" }, 404);
-  return c.json(member);
+  return c.json({
+    ...member,
+    asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: member.id, slot: "photo" }),
+  });
 });
 
 router.post("/", zValidator("json", CreateBody), async (c) => {

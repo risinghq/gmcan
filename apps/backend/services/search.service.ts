@@ -117,22 +117,25 @@ export async function globalSearch(q: string, types: Set<string>) {
           .execute()
       : [];
 
+  const resolvedPublicationAuthors = await Promise.all(
+    publicationAuthors.map(async (row) => ({
+      publicationId: row.publicationId,
+      entry: row.memberId
+        ? {
+            kind: "registered" as const,
+            memberId: row.memberId,
+            name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+            photo: row.memberPhoto ?? null,
+            photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+            isPrincipal: row.isPrincipal,
+          }
+        : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
+    })),
+  );
   const authorsByPublication = new Map<number, unknown[]>();
-  for (const row of publicationAuthors) {
-    const entry = row.memberId
-      ? {
-          kind: "registered" as const,
-          memberId: row.memberId,
-          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-          photo: row.memberPhoto ?? null,
-          photoUrl: row.memberId
-            ? await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" })
-            : null,
-          isPrincipal: row.isPrincipal,
-        }
-      : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal };
+  for (const row of resolvedPublicationAuthors) {
     const current = authorsByPublication.get(row.publicationId) ?? [];
-    current.push(entry);
+    current.push(row.entry);
     authorsByPublication.set(row.publicationId, current);
   }
 
@@ -150,16 +153,21 @@ export async function globalSearch(q: string, types: Set<string>) {
           .execute()
       : [];
 
+  const resolvedProjectMembers = await Promise.all(
+    projectMembers.map(async (row) => ({
+      projectId: row.projectId,
+      entry: {
+        memberId: row.id,
+        name: row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName,
+        photo: row.photo,
+        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+      },
+    })),
+  );
   const membersByProject = new Map<number, unknown[]>();
-  for (const row of projectMembers) {
+  for (const row of resolvedProjectMembers) {
     const current = membersByProject.get(row.projectId) ?? [];
-    const shortName = row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName;
-    current.push({
-      memberId: row.id,
-      name: shortName,
-      photo: row.photo,
-      photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
-    });
+    current.push(row.entry);
     membersByProject.set(row.projectId, current);
   }
 

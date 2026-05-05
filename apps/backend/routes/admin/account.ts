@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { Actor } from "../../authz/types.js";
 import { okStatus } from "../../lib/contracts.js";
 import { capabilitiesForActor, requirePermission } from "../../middleware/authz.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import { getMemberFull, getResetPasswordStatus, updatePassword } from "../../services/member.service.js";
 
 const router = new Hono();
@@ -14,7 +15,11 @@ router.get("/me", requirePermission("account.self.read"), async (c) => {
   const member = await getMemberFull(memberId);
   if (!member) return c.json({ error: "Not found" }, 404);
   const actor = c.get("actor") as Actor;
-  return c.json({ ...member, capabilities: capabilitiesForActor(actor) });
+  return c.json({
+    ...member,
+    asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: member.id, slot: "photo" }),
+    capabilities: capabilitiesForActor(actor),
+  });
 });
 
 router.get("/reset-status", requirePermission("account.self.read"), async (c) => {

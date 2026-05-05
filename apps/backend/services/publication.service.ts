@@ -61,23 +61,25 @@ async function attachAuthors(publicationId: number) {
     .orderBy("publication_author.isPrincipal", "asc")
     .execute();
 
-  return Promise.all(rows.map(async (row) => {
-    if (row.memberId) {
+  return Promise.all(
+    rows.map(async (row) => {
+      if (row.memberId) {
+        return {
+          kind: "registered" as const,
+          memberId: row.memberId,
+          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+          photo: row.memberPhoto ?? null,
+          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+          isPrincipal: row.isPrincipal,
+        };
+      }
       return {
-        kind: "registered" as const,
-        memberId: row.memberId,
-        name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-        photo: row.memberPhoto ?? null,
-        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+        kind: "external" as const,
+        name: row.externalName ?? "",
         isPrincipal: row.isPrincipal,
       };
-    }
-    return {
-      kind: "external" as const,
-      name: row.externalName ?? "",
-      isPrincipal: row.isPrincipal,
-    };
-  }));
+    }),
+  );
 }
 
 export async function listPublications() {
@@ -103,20 +105,25 @@ export async function listPublications() {
     .orderBy("publication_author.isPrincipal", "asc")
     .execute();
 
+  const resolvedAuthorRows = await Promise.all(
+    authorRows.map(async (row) => ({
+      publicationId: row.publicationId,
+      entry: row.memberId
+        ? {
+            kind: "registered" as const,
+            memberId: row.memberId,
+            name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+            photo: row.memberPhoto ?? null,
+            photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+            isPrincipal: row.isPrincipal,
+          }
+        : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
+    })),
+  );
   const authorsByPublication = new Map<number, ReturnType<typeof authorRows.map>>();
-  for (const row of authorRows) {
-    const entry = row.memberId
-      ? {
-          kind: "registered" as const,
-          memberId: row.memberId,
-          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-          photo: row.memberPhoto ?? null,
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-          isPrincipal: row.isPrincipal,
-        }
-      : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal };
+  for (const row of resolvedAuthorRows) {
     const current = authorsByPublication.get(row.publicationId) ?? [];
-    current.push(entry);
+    current.push(row.entry);
     authorsByPublication.set(row.publicationId, current);
   }
 
@@ -154,16 +161,20 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
 
   const eventsById = new Map(eventRows.map((eventRow) => [eventRow.id, eventRow.name]));
   const firstAuthorByPublication = new Map<number, { name: string; asset: string | null }>();
-  for (const row of authorRows) {
+  const firstAuthorCandidates = await Promise.all(
+    authorRows.map(async (row) => ({
+      publicationId: row.publicationId,
+      value: row.memberId
+        ? {
+            name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+            asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+          }
+        : { name: row.externalName ?? "", asset: null },
+    })),
+  );
+  for (const row of firstAuthorCandidates) {
     if (firstAuthorByPublication.has(row.publicationId)) continue;
-    if (row.memberId) {
-      firstAuthorByPublication.set(row.publicationId, {
-        name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-      });
-      continue;
-    }
-    firstAuthorByPublication.set(row.publicationId, { name: row.externalName ?? "", asset: null });
+    firstAuthorByPublication.set(row.publicationId, row.value);
   }
 
   return publications.map((publication) => {
@@ -266,14 +277,6 @@ export async function deletePublication(id: number) {
     await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
     await trx.deleteFrom("publication").where("id", "=", id).execute();
   });
-}
-
-export async function getPublicationFile(id: number) {
-  return db.selectFrom("publication").select("file").where("id", "=", id).executeTakeFirst();
-}
-
-export async function setPublicationFile(id: number, file: string) {
-  await db.updateTable("publication").set({ file }).where("id", "=", id).execute();
 }
 
 export async function replaceAuthors(publicationId: number, authors: AuthorInput[]) {

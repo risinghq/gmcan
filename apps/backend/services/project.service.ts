@@ -73,14 +73,20 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
     .orderBy("member_project.projectId", "asc")
     .execute();
 
+  const memberEntries = await Promise.all(
+    memberRows.map(async (row) => ({
+      projectId: row.projectId,
+      entry: {
+        memberId: row.memberId,
+        name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+      } satisfies AdminProjectMemberListItem,
+    })),
+  );
   const membersByProject = new Map<number, AdminProjectMemberListItem[]>();
-  for (const row of memberRows) {
+  for (const row of memberEntries) {
     const current = membersByProject.get(row.projectId) ?? [];
-    current.push({
-      memberId: row.memberId,
-      name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-      asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-    });
+    current.push(row.entry);
     membersByProject.set(row.projectId, current);
   }
 

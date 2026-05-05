@@ -167,7 +167,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   previewMethod(): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
-    method.asset = this.url + "admin/methods/" + this.metodo.id + "/asset";
+    method.asset = this.metodo.asset;
     if (this.previewUrl) {
       method.asset = typeof this.previewUrl === "string" ? this.previewUrl : null;
     }

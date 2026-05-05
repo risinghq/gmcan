@@ -5,6 +5,7 @@ import { z } from "zod";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   createNews,
   deleteNews,
@@ -55,7 +56,11 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getNewsItem(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(toAdminNewsView(row));
+  const view = toAdminNewsView(row);
+  return c.json({
+    ...view,
+    asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: view.id, slot: "photo" }),
+  });
 });
 
 router.post("/", zValidator("json", NewsBody), async (c) => {

@@ -42,7 +42,11 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
         row.authors.map(async (author) =>
           author.kind === "registered"
             ? Object.assign({}, author, {
-                asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: author.memberId, slot: "photo" }),
+                asset: await resolveAssetAccessUrl({
+                  resourceType: "member",
+                  resourceId: author.memberId,
+                  slot: "photo",
+                }),
               })
             : author,
         ),
