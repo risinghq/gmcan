@@ -4,7 +4,7 @@ import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
 import { hashPassword } from "../lib/password.js";
-import { assetUrl } from "../lib/upload.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 
 export async function listMembers() {
@@ -53,23 +53,25 @@ export async function listAdminMembers(filter?: {
   }
 
   const rows = await query.orderBy("member.lastName", "asc").execute();
-  return rows.map((row) => ({
-    id: row.id,
-    dni: row.dni,
-    email: row.email,
-    firstName: row.firstName,
-    lastName: row.lastName,
-    maternalName: row.maternalName,
-    birthDate: row.birthDate,
-    bio: row.bio,
-    status: row.status,
-    roleId: row.roleId,
-    memberTypeId: row.memberTypeId,
-    memberTypeName: row.memberTypeName,
-    prefixId: row.prefixId,
-    prefixName: row.prefixName,
-    asset: assetUrl(row.photo),
-  }));
+  return Promise.all(
+    rows.map(async (row) => ({
+      id: row.id,
+      dni: row.dni,
+      email: row.email,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      maternalName: row.maternalName,
+      birthDate: row.birthDate,
+      bio: row.bio,
+      status: row.status,
+      roleId: row.roleId,
+      memberTypeId: row.memberTypeId,
+      memberTypeName: row.memberTypeName,
+      prefixId: row.prefixId,
+      prefixName: row.prefixName,
+      asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+    })),
+  );
 }
 
 export async function listMemberNames() {
@@ -165,14 +167,18 @@ export async function searchAuthorPool(q: string) {
       .execute(),
   ]);
 
-  return [
-    ...members.map((m) => ({
+  const resolvedMembers = await Promise.all(
+    members.map(async (m) => ({
       kind: "registered" as const,
       memberId: m.id,
       name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
       photo: m.photo ?? null,
-      photoUrl: assetUrl(m.photo),
+      photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: m.id, slot: "photo" }),
     })),
+  );
+
+  return [
+    ...resolvedMembers,
     ...externals
       .filter((e) => e.externalName != null)
       .map((e) => ({ kind: "external" as const, name: e.externalName! })),
@@ -247,17 +253,6 @@ export async function deleteMember(id: number) {
   await db.deleteFrom("member").where("id", "=", id).execute();
 }
 
-export async function getMemberPhoto(id: number) {
-  return db.selectFrom("member").select("photo").where("id", "=", id).executeTakeFirst();
-}
-
-export async function setMemberPhoto(id: number, photo: string) {
-  await db.updateTable("member").set({ photo }).where("id", "=", id).execute();
-}
-
-export async function clearMemberPhoto(id: number) {
-  await db.updateTable("member").set({ photo: null }).where("id", "=", id).execute();
-}
 
 export async function updatePassword(email: string, newPassword: string) {
   await db

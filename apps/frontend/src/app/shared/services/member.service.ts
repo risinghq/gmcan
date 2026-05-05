@@ -76,11 +76,11 @@ export class MemberService {
   uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/members/${id}/asset`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/member/${id}/photo`, formData);
   }
 
   deleteAsset(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/members/${id}/asset`);
+    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/assets/member/${id}/photo`);
   }
 
   searchAuthors(q: string): Observable<AuthorSearchResult[]> {

@@ -4,8 +4,8 @@ import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { assetUrl } from "../lib/upload.js";
 import type { AdminPublicationListItem } from "./admin-list.types.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -61,14 +61,14 @@ async function attachAuthors(publicationId: number) {
     .orderBy("publication_author.isPrincipal", "asc")
     .execute();
 
-  return rows.map((row) => {
+  return Promise.all(rows.map(async (row) => {
     if (row.memberId) {
       return {
         kind: "registered" as const,
         memberId: row.memberId,
         name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
         photo: row.memberPhoto ?? null,
-        photoUrl: assetUrl(row.memberPhoto),
+        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
         isPrincipal: row.isPrincipal,
       };
     }
@@ -77,7 +77,7 @@ async function attachAuthors(publicationId: number) {
       name: row.externalName ?? "",
       isPrincipal: row.isPrincipal,
     };
-  });
+  }));
 }
 
 export async function listPublications() {
@@ -111,7 +111,7 @@ export async function listPublications() {
           memberId: row.memberId,
           name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
           photo: row.memberPhoto ?? null,
-          photoUrl: assetUrl(row.memberPhoto),
+          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
           isPrincipal: row.isPrincipal,
         }
       : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal };
@@ -159,7 +159,7 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
     if (row.memberId) {
       firstAuthorByPublication.set(row.publicationId, {
         name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-        asset: assetUrl(row.photo),
+        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
       });
       continue;
     }

@@ -49,6 +49,6 @@ export class ResearchLinesService {
   uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/research-lines/${id}/asset`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/research_line/${id}/photo`, formData);
   }
 }

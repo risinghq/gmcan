@@ -7,7 +7,7 @@
         <div class="logo-preview mb-16"><img class="img-logo" src="{{ state.files.previewMap.head }}" /></div>
         } @if (state.group.assets.header && !state.files.previewMap.head) {
         <div class="logo-preview mb-16">
-          <img class="img-logo" src="{{ state.url + 'api/assets/group-header.png' }}" />
+          <img class="img-logo" src="{{ state.group.assets.header }}" />
         </div>
         }
         <div class="green-text text-left">
@@ -27,7 +27,7 @@
         <div class="logo-preview-inverse mb-16"><img class="img-logo" src="{{ state.files.previewMap.foot }}" /></div>
         } @if (state.group.assets.footer && !state.files.previewMap.foot) {
         <div class="logo-preview-inverse mb-16">
-          <img class="img-logo" src="{{ state.url + 'api/assets/group-footer.png' }}" />
+          <img class="img-logo" src="{{ state.group.assets.footer }}" />
         </div>
         }
         <div class="green-text text-left">

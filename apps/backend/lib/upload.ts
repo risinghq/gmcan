@@ -4,7 +4,6 @@ import path from "node:path";
 
 import type { Context } from "hono";
 
-import { getBackendUrl } from "../config.js";
 import { db } from "../db/client.js";
 
 export const MIME_TYPES: Record<string, string> = {
@@ -63,12 +62,6 @@ function extensionOf(fileName: string): string {
 
 export function buildAssetKey(ext: string): string {
   return `${randomUuidV7()}.${ext}`;
-}
-
-export function assetUrl(assetKey: string | null | undefined): string | null {
-  const key = assetKey ? normalizeAssetKey(assetKey) : null;
-  if (!key) return null;
-  return `${getBackendUrl()}/api/assets/${encodeURIComponent(key)}`;
 }
 
 export function extractFirstFile(body: Record<string, string | File | (string | File)[]>): File | undefined {

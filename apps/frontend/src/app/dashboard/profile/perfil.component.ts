@@ -116,8 +116,7 @@ export default class PerfilComponent implements OnInit {
 
   get photoUrl(): string | null {
     if (this.previewUrl && typeof this.previewUrl === "string") return this.previewUrl;
-    if (!this.member.asset) return null;
-    return `${this.url}api/assets/${this.member.asset}`;
+    return this.member.asset;
   }
 
   ngOnInit(): void {

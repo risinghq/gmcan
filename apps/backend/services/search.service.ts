@@ -2,8 +2,7 @@ import { sql } from "kysely";
 
 import { db } from "../db/client.js";
 import { MEMBER_PUBLIC } from "../db/projections.js";
-import { assetUrl } from "../lib/upload.js";
-import { withMemberPhotoUrl, withNewsPhotoUrl, withPublicationAssetUrl } from "./search.mapper.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export async function globalSearch(q: string, types: Set<string>) {
   const like = `%${q}%`;
@@ -126,7 +125,9 @@ export async function globalSearch(q: string, types: Set<string>) {
           memberId: row.memberId,
           name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
           photo: row.memberPhoto ?? null,
-          photoUrl: assetUrl(row.memberPhoto),
+          photoUrl: row.memberId
+            ? await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" })
+            : null,
           isPrincipal: row.isPrincipal,
         }
       : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal };
@@ -153,16 +154,33 @@ export async function globalSearch(q: string, types: Set<string>) {
   for (const row of projectMembers) {
     const current = membersByProject.get(row.projectId) ?? [];
     const shortName = row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName;
-    current.push({ memberId: row.id, name: shortName, photo: row.photo, photoUrl: assetUrl(row.photo) });
+    current.push({
+      memberId: row.id,
+      name: shortName,
+      photo: row.photo,
+      photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+    });
     membersByProject.set(row.projectId, current);
   }
 
   const projects = projectRows.map((p) => Object.assign(p, { members: membersByProject.get(p.id) ?? [] }));
 
   return {
-    publications: publications.map(withPublicationAssetUrl),
-    members: members.map(withMemberPhotoUrl),
-    news: newsRows.map(withNewsPhotoUrl),
+    publications,
+    members: await Promise.all(
+      members.map(async (row) =>
+        Object.assign({}, row, {
+          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        }),
+      ),
+    ),
+    news: await Promise.all(
+      newsRows.map(async (row) =>
+        Object.assign({}, row, {
+          photoUrl: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
+        }),
+      ),
+    ),
     projects,
   };
 }

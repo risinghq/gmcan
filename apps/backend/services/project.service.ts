@@ -5,8 +5,8 @@ import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { assetUrl } from "../lib/upload.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export interface ProjectAdminInput {
   code: string;
@@ -79,7 +79,7 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
     current.push({
       memberId: row.memberId,
       name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-      asset: assetUrl(row.photo),
+      asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
     });
     membersByProject.set(row.projectId, current);
   }

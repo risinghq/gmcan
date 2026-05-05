@@ -46,12 +46,12 @@ export class PublicationService {
     return this.http.get<PublicationWithAuthors>(`${GLOBAL.url}api/publications/${id}`);
   }
 
-  getAsset(fileName: string): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}api/assets/${fileName}`, { responseType: "blob" });
+  getAsset(assetId: number): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}api/assets/${assetId}`, { responseType: "blob" });
   }
 
-  downloadAsset(fileName: string): Observable<Blob> {
-    return this.http.get(`${GLOBAL.url}api/assets/${fileName}?download=true`, { responseType: "blob" });
+  downloadAsset(assetId: number): Observable<Blob> {
+    return this.http.get(`${GLOBAL.url}api/assets/${assetId}?download=true`, { responseType: "blob" });
   }
 
   // Admin
@@ -76,6 +76,6 @@ export class PublicationService {
   uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/publications/${id}/asset`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/publication/${id}/file`, formData);
   }
 }
