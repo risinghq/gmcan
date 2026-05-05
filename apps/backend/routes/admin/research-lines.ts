@@ -3,15 +3,14 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   createResearchLine,
   deleteResearchLine,
   getResearchLine,
-  getResearchLinePhoto,
   listResearchLines,
-  setResearchLinePhoto,
   toAdminResearchLineView,
   updateResearchLine,
 } from "../../services/group.service.js";
@@ -41,14 +40,28 @@ router.use("*", async (c, next) => {
 
 router.get("/", async (c) => {
   const rows = await listResearchLines();
-  return c.json(rows.map(toAdminResearchLineView));
+  return c.json(
+    await Promise.all(
+      rows.map(async (row) => {
+        const view = toAdminResearchLineView(row);
+        return Object.assign({}, view, {
+          asset: await resolveAssetAccessUrl({ resourceType: "research_line", resourceId: view.id, slot: "photo" }),
+        });
+      }),
+    ),
+  );
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getResearchLine(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(toAdminResearchLineView(row));
+  const view = toAdminResearchLineView(row);
+  return c.json(
+    Object.assign({}, view, {
+      asset: await resolveAssetAccessUrl({ resourceType: "research_line", resourceId: view.id, slot: "photo" }),
+    }),
+  );
 });
 
 router.post("/", zValidator("json", Body), async (c) => {
@@ -61,31 +74,13 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody),
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateResearchLine(id, data);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteResearchLine(id);
-  return c.json({ status: 1 });
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const current = await getResearchLinePhoto(id);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "research-lines", kind: "image" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  await setResearchLinePhoto(id, fileName);
-  if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ assetKey: current.photo });
-  }
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 export default router;

@@ -40,18 +40,6 @@ export async function updateGroupProjectsSection(
   await db.updateTable("research_group").set(data).where("id", "=", id).execute();
 }
 
-export async function getGroupFile(id: number, column: "facilitiesPhoto" | "logoHeader" | "logoFooter") {
-  return db.selectFrom("research_group").select(column).where("id", "=", id).executeTakeFirst();
-}
-
-export async function setGroupFile(id: number, column: "facilitiesPhoto" | "logoHeader" | "logoFooter", value: string) {
-  await db
-    .updateTable("research_group")
-    .set({ [column]: value })
-    .where("id", "=", id)
-    .execute();
-}
-
 // About (sobrenosotros)
 export async function listAbout(groupId: number) {
   return db.selectFrom("about").selectAll().where("groupId", "=", groupId).execute();
@@ -69,14 +57,6 @@ export async function updateAboutServices(id: number, data: { servicesES?: strin
   await db.updateTable("about").set(data).where("id", "=", id).execute();
 }
 
-export async function getAboutPhoto(id: number) {
-  return db.selectFrom("about").select("photo").where("id", "=", id).executeTakeFirst();
-}
-
-export async function setAboutPhoto(id: number, photo: string) {
-  await db.updateTable("about").set({ photo }).where("id", "=", id).execute();
-}
-
 // Research lines
 export async function listResearchLines(groupId?: number) {
   let query = db.selectFrom("research_line").selectAll();
@@ -91,7 +71,6 @@ export async function getResearchLine(id: number) {
 export function toAdminResearchLineView(row: ResearchLineRow) {
   return {
     id: row.id,
-    photo: row.photo,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -139,14 +118,6 @@ export async function deleteResearchLine(id: number) {
   await db.deleteFrom("research_line").where("id", "=", id).execute();
 }
 
-export async function getResearchLinePhoto(id: number) {
-  return db.selectFrom("research_line").select("photo").where("id", "=", id).executeTakeFirst();
-}
-
-export async function setResearchLinePhoto(id: number, photo: string) {
-  await db.updateTable("research_line").set({ photo }).where("id", "=", id).execute();
-}
-
 // Methods
 export async function listMethods(groupId?: number) {
   let query = db.selectFrom("method").selectAll();
@@ -161,7 +132,6 @@ export async function getMethod(id: number) {
 export function toAdminMethodView(row: MethodRow) {
   return {
     id: row.id,
-    photo: row.photo,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -207,14 +177,6 @@ export async function updateMethod(
 
 export async function deleteMethod(id: number) {
   await db.deleteFrom("method").where("id", "=", id).execute();
-}
-
-export async function getMethodPhoto(id: number) {
-  return db.selectFrom("method").select("photo").where("id", "=", id).executeTakeFirst();
-}
-
-export async function setMethodPhoto(id: number, photo: string) {
-  await db.updateTable("method").set({ photo }).where("id", "=", id).execute();
 }
 
 // Software

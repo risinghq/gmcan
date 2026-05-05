@@ -9,7 +9,7 @@
         } @if (!state.files.previewMap.fac && !state.group.assets.facilities) {
         <div class="grupal-img"><img class="img-set" src="/img/grupal.jpg" /></div>
         } @if (state.group.assets.facilities && !state.files.previewMap.fac) {
-        <div class="img-preview"><img class="img-set" src="{{ state.url + 'api/assets/group-facilities.png' }}" /></div>
+        <div class="img-preview"><img class="img-set" src="{{ state.group.assets.facilities }}" /></div>
         }
         <div class="green-text ml-16 mt-auto">
           <span class="plex-sans">Cambiar imagen</span>

@@ -1,7 +1,5 @@
 import { db } from "../client.js";
 
-const today = new Date().toISOString().split("T")[0];
-
 export async function seedLookups() {
   await seedGender();
   await seedPrefix();
@@ -18,8 +16,8 @@ async function seedGender() {
   await db
     .insertInto("gender")
     .values([
-      { id: 1, name: "Male", createdAt: today, updatedAt: today },
-      { id: 2, name: "Female", createdAt: today, updatedAt: today },
+      { id: 1, name: "Male" },
+      { id: 2, name: "Female" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -29,13 +27,13 @@ async function seedPrefix() {
   await db
     .insertInto("prefix")
     .values([
-      { id: 1, name: "Dr.", createdAt: today, updatedAt: today },
-      { id: 2, name: "Dra.", createdAt: today, updatedAt: today },
-      { id: 3, name: "Mg.", createdAt: today, updatedAt: today },
-      { id: 4, name: "Lic.", createdAt: today, updatedAt: today },
-      { id: 5, name: "Bach.", createdAt: today, updatedAt: today },
-      { id: 6, name: "Ing.", createdAt: today, updatedAt: today },
-      { id: 7, name: "-", createdAt: today, updatedAt: today },
+      { id: 1, name: "Dr." },
+      { id: 2, name: "Dra." },
+      { id: 3, name: "Mg." },
+      { id: 4, name: "Lic." },
+      { id: 5, name: "Bach." },
+      { id: 6, name: "Ing." },
+      { id: 7, name: "-" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -45,9 +43,9 @@ async function seedRole() {
   await db
     .insertInto("role")
     .values([
-      { id: 1, name: "Administrator", createdAt: today, updatedAt: today },
-      { id: 2, name: "Researcher", createdAt: today, updatedAt: today },
-      { id: 3, name: "Visitor", createdAt: today, updatedAt: today },
+      { id: 1, name: "Administrator" },
+      { id: 2, name: "Researcher" },
+      { id: 3, name: "Visitor" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -63,8 +61,6 @@ async function seedMemberType() {
         nameEN: "Researchers",
         nameSingular: "Investigador",
         nameSingularEN: "Researcher",
-        createdAt: today,
-        updatedAt: today,
       },
       {
         id: 2,
@@ -72,8 +68,6 @@ async function seedMemberType() {
         nameEN: "PhD Students",
         nameSingular: "Estudiante de Doctorado",
         nameSingularEN: "PhD Student",
-        createdAt: today,
-        updatedAt: today,
       },
       {
         id: 3,
@@ -81,8 +75,6 @@ async function seedMemberType() {
         nameEN: "Master Students",
         nameSingular: "Estudiante de Maestría",
         nameSingularEN: "Master Student",
-        createdAt: today,
-        updatedAt: today,
       },
       {
         id: 4,
@@ -90,8 +82,6 @@ async function seedMemberType() {
         nameEN: "Undergraduate Students",
         nameSingular: "Estudiante de Pregrado",
         nameSingularEN: "Undergraduate Student",
-        createdAt: today,
-        updatedAt: today,
       },
       {
         id: 5,
@@ -99,8 +89,6 @@ async function seedMemberType() {
         nameEN: "Collaborators",
         nameSingular: "Colaborador",
         nameSingularEN: "Collaborator",
-        createdAt: today,
-        updatedAt: today,
       },
     ])
     .onConflict((oc) => oc.doNothing())
@@ -111,9 +99,9 @@ async function seedPublicationType() {
   await db
     .insertInto("publication_type")
     .values([
-      { id: 1, name: "Journal Article", nameEN: "Journal Article", createdAt: today, updatedAt: today },
-      { id: 2, name: "Conference Paper", nameEN: "Conference Paper", createdAt: today, updatedAt: today },
-      { id: 3, name: "Thesis", nameEN: "Thesis", createdAt: today, updatedAt: today },
+      { id: 1, name: "Journal Article", nameEN: "Journal Article" },
+      { id: 2, name: "Conference Paper", nameEN: "Conference Paper" },
+      { id: 3, name: "Thesis", nameEN: "Thesis" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -123,8 +111,8 @@ async function seedThesisType() {
   await db
     .insertInto("thesis_type")
     .values([
-      { id: 1, name: "PhD", nameEN: "PhD", createdAt: today, updatedAt: today },
-      { id: 2, name: "Master's", nameEN: "Master's", createdAt: today, updatedAt: today },
+      { id: 1, name: "PhD", nameEN: "PhD" },
+      { id: 2, name: "Master's", nameEN: "Master's" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -134,9 +122,9 @@ async function seedNewsType() {
   await db
     .insertInto("news_type")
     .values([
-      { id: 1, name: "General", nameEN: "General", createdAt: today, updatedAt: today },
-      { id: 2, name: "Research", nameEN: "Research", createdAt: today, updatedAt: today },
-      { id: 3, name: "Event", nameEN: "Event", createdAt: today, updatedAt: today },
+      { id: 1, name: "General", nameEN: "General" },
+      { id: 2, name: "Research", nameEN: "Research" },
+      { id: 3, name: "Event", nameEN: "Event" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();

@@ -53,7 +53,7 @@ export class GroupService {
   uploadAsset(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/assets/${slot}`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/research_group/${id}/${slot}`, formData);
   }
 
   // About (admin)
@@ -76,7 +76,7 @@ export class GroupService {
   uploadAboutAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/asset`, formData);
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/about/${id}/photo`, formData);
   }
 
   // Software (under group routes)

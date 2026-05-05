@@ -5,22 +5,16 @@ type DateString = string;
 export interface GenderTable {
   id: Generated<number>;
   name: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface PrefixTable {
   id: Generated<number>;
   name: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface RoleTable {
   id: Generated<number>;
   name: string;
-  createdAt: DateString;
-  updatedAt: DateString;
 }
 
 export interface MemberTypeTable {
@@ -29,32 +23,24 @@ export interface MemberTypeTable {
   nameEN: string;
   nameSingular: string;
   nameSingularEN: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface PublicationTypeTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString;
-  updatedAt: DateString;
 }
 
 export interface ThesisTypeTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString;
-  updatedAt: DateString;
 }
 
 export interface NewsTypeTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface JournalTable {
@@ -66,8 +52,6 @@ export interface UniversityTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface EventTable {
@@ -98,13 +82,10 @@ export interface ResearchGroupTable {
   phone: string | null;
   name: string | null;
   fullName: string | null;
-  facilitiesPhoto: string | null;
   facilitiesES: string | null;
   facilitiesEN: string | null;
   futureWorkES: string | null;
   futureWorkEN: string | null;
-  logoFooter: string | null;
-  logoHeader: string | null;
   publicationsSectionES: string | null;
   publicationsSectionEN: string | null;
   projectsSectionES: string | null;
@@ -124,7 +105,7 @@ export interface MemberTable {
   birthDate: DateString | null;
   bio: string | null;
   bioEN: string | null;
-  photo: string | null;
+
   status: number;
   resetPassword: number;
   createdAt: DateString | null;
@@ -151,7 +132,7 @@ export interface ResearchLineTable {
   nameEN: string;
   description: string | null;
   descriptionEN: string | null;
-  photo: string | null;
+
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
@@ -163,7 +144,7 @@ export interface MethodTable {
   nameEN: string;
   description: string;
   descriptionEN: string | null;
-  photo: string | null;
+
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
@@ -202,7 +183,7 @@ export interface AboutTable {
   servicesEN: string | null;
   createdAt: DateString | null;
   updatedAt: DateString | null;
-  photo: string | null;
+
   groupId: number;
 }
 
@@ -218,7 +199,7 @@ export interface NewsTable {
   publishedAt: DateString;
   updatedAt: DateString | null;
   createdAt: DateString | null;
-  photo: string | null;
+
   priority: number | null;
   authorId: number;
   newsTypeId: number;
@@ -227,7 +208,6 @@ export interface NewsTable {
 export interface PublicationTable {
   id: Generated<number>;
   title: string;
-  file: string | null;
   abstractES: string | null;
   abstractEN: string | null;
   journalIssue: number | null;
@@ -282,6 +262,45 @@ export interface MemberGroupTable {
   updatedAt: DateString;
 }
 
+export interface AssetTable {
+  id: Generated<number>;
+  storageKey: string;
+  bucket: string;
+  mimeDetected: string;
+  ext: string;
+  sizeBytes: number;
+  sha256: string;
+  visibility: "public" | "private";
+  status: "active" | "soft_deleted" | "hard_deleted" | "quarantined";
+  createdBy: number | null;
+  createdAt: DateString;
+  deletedAt: DateString | null;
+  deleteAfter: DateString | null;
+}
+
+export interface AssetBindingTable {
+  id: Generated<number>;
+  resourceType: string;
+  resourceId: number;
+  slot: string;
+  assetId: number;
+  isCurrent: number;
+  replacedByBindingId: number | null;
+  replacedAt: DateString | null;
+  createdAt: DateString;
+  deletedAt: DateString | null;
+}
+
+export interface AssetAuditTable {
+  id: Generated<number>;
+  assetId: number | null;
+  bindingId: number | null;
+  action: string;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+
 export interface Database {
   gender: GenderTable;
   prefix: PrefixTable;
@@ -309,6 +328,9 @@ export interface Database {
   project: ProjectTable;
   member_project: MemberProjectTable;
   member_group: MemberGroupTable;
+  asset: AssetTable;
+  asset_binding: AssetBindingTable;
+  asset_audit: AssetAuditTable;
 }
 
 export type ProjectRow = Selectable<ProjectTable>;

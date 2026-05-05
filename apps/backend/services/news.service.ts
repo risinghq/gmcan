@@ -3,13 +3,13 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
-import { assetUrl } from "../lib/upload.js";
 import type {
   AdminNewsListItem,
   AdminNewsListQuery,
   AdminNewsListResponse,
   AdminNewsSortBy,
 } from "./admin-list.types.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export interface NewsUpsertInput {
   translations: Bilingual<{ title: string; summary: string; body: string }>;
@@ -120,14 +120,12 @@ export async function listPublicNews(locale: "es" | "en", query: PublicNewsListQ
       "news.title as title",
       "news.summary as summary",
       "news.publishedAt as publishedAt",
-      "news.photo as photo",
       "news.priority as priority",
       "news.authorId as authorId",
       "news.newsTypeId as newsTypeId",
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as authorPhoto",
       sql<string>`coalesce(${sql.ref(newsTypeNameField)}, '')`.as("newsTypeName"),
     ])
     .orderBy(PUBLIC_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
@@ -137,19 +135,21 @@ export async function listPublicNews(locale: "es" | "en", query: PublicNewsListQ
     .execute();
 
   return {
-    items: rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      summary: row.summary,
-      publishedAt: row.publishedAt,
-      asset: assetUrl(row.photo),
-      priority: row.priority,
-      authorId: row.authorId,
-      newsTypeId: row.newsTypeId,
-      authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-      authorAsset: assetUrl(row.authorPhoto),
-      newsTypeName: row.newsTypeName,
-    })),
+    items: await Promise.all(
+      rows.map(async (row) => ({
+        id: row.id,
+        title: row.title,
+        summary: row.summary,
+        publishedAt: row.publishedAt,
+        asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
+        priority: row.priority,
+        authorId: row.authorId,
+        newsTypeId: row.newsTypeId,
+        authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+        authorAsset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.authorId, slot: "photo" }),
+        newsTypeName: row.newsTypeName,
+      })),
+    ),
     total: Number(totalRow.count),
     page: query.page,
     pageSize: query.pageSize,
@@ -169,7 +169,6 @@ export async function getPublicNewsDetail(id: number, locale: "es" | "en"): Prom
       "news.body as body",
       "news.status as status",
       "news.publishedAt as publishedAt",
-      "news.photo as photo",
       "news.priority as priority",
       "news.authorId as authorId",
       "news.newsTypeId as newsTypeId",
@@ -178,7 +177,6 @@ export async function getPublicNewsDetail(id: number, locale: "es" | "en"): Prom
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as authorPhoto",
       sql<string>`coalesce(${sql.ref(newsTypeNameField)}, '')`.as("newsTypeName"),
     ])
     .where("news.id", "=", id)
@@ -193,14 +191,14 @@ export async function getPublicNewsDetail(id: number, locale: "es" | "en"): Prom
     body: row.body,
     status: row.status,
     publishedAt: row.publishedAt,
-    asset: assetUrl(row.photo),
+    asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
     priority: row.priority,
     authorId: row.authorId,
     newsTypeId: row.newsTypeId,
     updatedAt: row.updatedAt,
     createdAt: row.createdAt,
     authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-    authorAsset: assetUrl(row.authorPhoto),
+    authorAsset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.authorId, slot: "photo" }),
     newsTypeName: row.newsTypeName,
   };
 }
@@ -249,7 +247,6 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as authorPhoto",
     ])
     .orderBy(NEWS_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
     .orderBy("news.id", "desc")
@@ -257,18 +254,20 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
     .offset(offset)
     .execute();
 
-  const items: AdminNewsListItem[] = rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    publishedAt: row.publishedAt,
-    status: row.status,
-    authorId: row.authorId,
-    newsTypeId: row.newsTypeId,
-    statusLabel: row.status === 1 ? "Activo" : "Inactivo",
-    categoryName: row.categoryName,
-    authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-    authorAsset: assetUrl(row.authorPhoto),
-  }));
+  const items: AdminNewsListItem[] = await Promise.all(
+    rows.map(async (row) => ({
+      id: row.id,
+      title: row.title,
+      publishedAt: row.publishedAt,
+      status: row.status,
+      authorId: row.authorId,
+      newsTypeId: row.newsTypeId,
+      statusLabel: row.status === 1 ? "Activo" : "Inactivo",
+      categoryName: row.categoryName,
+      authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+      authorAsset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.authorId, slot: "photo" }),
+    })),
+  );
 
   return {
     items,
@@ -289,7 +288,6 @@ export function toAdminNewsView(row: NewsRow) {
     publishedAt: row.publishedAt,
     updatedAt: row.updatedAt,
     createdAt: row.createdAt,
-    photo: row.photo,
     priority: row.priority,
     authorId: row.authorId,
     newsTypeId: row.newsTypeId,
@@ -311,16 +309,4 @@ export async function updateNews(id: number, data: NewsUpsertInput) {
 
 export async function deleteNews(id: number) {
   await db.deleteFrom("news").where("id", "=", id).execute();
-}
-
-export async function getNewsPhoto(id: number) {
-  return db.selectFrom("news").select("photo").where("id", "=", id).executeTakeFirst();
-}
-
-export async function setNewsPhoto(id: number, photo: string) {
-  await db.updateTable("news").set({ photo }).where("id", "=", id).execute();
-}
-
-export async function clearNewsPhoto(id: number) {
-  await db.updateTable("news").set({ photo: null }).where("id", "=", id).execute();
 }

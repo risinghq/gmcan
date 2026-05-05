@@ -12,21 +12,15 @@ export const MEMBER_PUBLIC = [
   "birthDate",
   "bio",
   "bioEN",
-  "photo",
   "status",
   "roleId",
   "memberTypeId",
   "prefixId",
 ] as const satisfies ReadonlyArray<SelectExpression<Database, "member">>;
 
-export const MEMBER_NAME = [
-  "id",
-  "dni",
-  "firstName",
-  "lastName",
-  "maternalName",
-  "photo",
-] as const satisfies ReadonlyArray<SelectExpression<Database, "member">>;
+export const MEMBER_NAME = ["id", "dni", "firstName", "lastName", "maternalName"] as const satisfies ReadonlyArray<
+  SelectExpression<Database, "member">
+>;
 
 export const MEMBER_ACTIVE = [
   "id",
@@ -35,7 +29,6 @@ export const MEMBER_ACTIVE = [
   "lastName",
   "maternalName",
   "email",
-  "photo",
   "memberTypeId",
   "prefixId",
 ] as const satisfies ReadonlyArray<SelectExpression<Database, "member">>;

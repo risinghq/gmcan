@@ -7,7 +7,6 @@ export interface AuthorEntry {
   kind: "registered" | "external";
   memberId?: number;
   name: string;
-  photo?: string | null;
   isPrincipal: number;
 }
 
@@ -27,7 +26,6 @@ export async function publicationWithAuthors(id: number): Promise<{
         sql<string>`member.firstName`.as("memberFirstName"),
         sql<string>`member.lastName`.as("memberLastName"),
         sql<string | null>`member.maternalName`.as("memberMaternalName"),
-        sql<string | null>`member.photo`.as("memberPhoto"),
       ])
       .where("publication_author.publicationId", "=", id)
       .orderBy("publication_author.isPrincipal", "asc")
@@ -40,7 +38,6 @@ export async function publicationWithAuthors(id: number): Promise<{
         kind: "registered" as const,
         memberId: row.memberId,
         name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-        photo: row.memberPhoto ?? null,
         isPrincipal: row.isPrincipal,
       };
     }

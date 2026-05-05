@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
-import { assetUrl } from "../../lib/upload.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import { listAbout, listGroups } from "../../services/group.service.js";
 
 const router = new Hono();
@@ -23,9 +23,13 @@ router.get("/", async (c) => {
     name: row.name,
     fullName: row.fullName,
     assets: {
-      facilities: assetUrl(row.facilitiesPhoto),
-      header: assetUrl(row.logoHeader),
-      footer: assetUrl(row.logoFooter),
+      facilities: await resolveAssetAccessUrl({
+        resourceType: "research_group",
+        resourceId: row.id,
+        slot: "facilities",
+      }),
+      header: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "header" }),
+      footer: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "footer" }),
     },
     facilities: localizeField(row, locale, { es: "facilitiesES", en: "facilitiesEN", required: false }),
     futureWork: localizeField(row, locale, { es: "futureWorkES", en: "futureWorkEN", required: false }),
@@ -44,18 +48,19 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const rows = await listAbout(id);
-  return c.json(
-    rows.map((row) => ({
+  const shaped = await Promise.all(
+    rows.map(async (row) => ({
       id: row.id,
       description: localizeField(row, locale, { es: "descriptionES", en: "descriptionEN" }),
       objectives: localizeField(row, locale, { es: "objectivesES", en: "objectivesEN", required: false }),
       services: localizeField(row, locale, { es: "servicesES", en: "servicesEN", required: false }),
-      asset: assetUrl(row.photo),
+      asset: await resolveAssetAccessUrl({ resourceType: "about", resourceId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     })),
   );
+  return c.json(shaped);
 });
 
 export default router;

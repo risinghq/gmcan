@@ -4,15 +4,15 @@ import { sql } from "kysely";
 import type { Database } from "./schema.js";
 
 export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
-  gender: ["id", "name", "createdAt", "updatedAt"],
-  prefix: ["id", "name", "createdAt", "updatedAt"],
-  role: ["id", "name", "createdAt", "updatedAt"],
-  member_type: ["id", "name", "nameEN", "nameSingular", "nameSingularEN", "createdAt", "updatedAt"],
-  publication_type: ["id", "name", "nameEN", "createdAt", "updatedAt"],
-  thesis_type: ["id", "name", "nameEN", "createdAt", "updatedAt"],
-  news_type: ["id", "name", "nameEN", "createdAt", "updatedAt"],
+  gender: ["id", "name"],
+  prefix: ["id", "name"],
+  role: ["id", "name"],
+  member_type: ["id", "name", "nameEN", "nameSingular", "nameSingularEN"],
+  publication_type: ["id", "name", "nameEN"],
+  thesis_type: ["id", "name", "nameEN"],
+  news_type: ["id", "name", "nameEN"],
   journal: ["id", "name"],
-  university: ["id", "name", "nameEN", "createdAt", "updatedAt"],
+  university: ["id", "name", "nameEN"],
   event: ["id", "name", "city", "country", "cityEN", "countryEN"],
   funding_source: ["id", "name"],
   currency: ["id", "symbol"],
@@ -25,13 +25,10 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "phone",
     "name",
     "fullName",
-    "facilitiesPhoto",
     "facilitiesES",
     "facilitiesEN",
     "futureWorkES",
     "futureWorkEN",
-    "logoFooter",
-    "logoHeader",
     "publicationsSectionES",
     "publicationsSectionEN",
     "projectsSectionES",
@@ -50,7 +47,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "birthDate",
     "bio",
     "bioEN",
-    "photo",
+
     "status",
     "resetPassword",
     "createdAt",
@@ -63,8 +60,8 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "resetExpires",
   ],
   session: ["id", "memberId", "email", "expiresAt", "lastActive"],
-  research_line: ["id", "name", "nameEN", "description", "descriptionEN", "photo", "groupId", "createdAt", "updatedAt"],
-  method: ["id", "name", "nameEN", "description", "descriptionEN", "photo", "groupId", "createdAt", "updatedAt"],
+  research_line: ["id", "name", "nameEN", "description", "descriptionEN", "groupId", "createdAt", "updatedAt"],
+  method: ["id", "name", "nameEN", "description", "descriptionEN", "groupId", "createdAt", "updatedAt"],
   equipment: ["id", "name", "cpu", "gpu", "ram", "storage", "groupId", "createdAt", "updatedAt"],
   software: ["id", "name", "description", "descriptionEN", "moreInfo", "groupId", "createdAt", "updatedAt"],
   about: [
@@ -77,7 +74,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "servicesEN",
     "createdAt",
     "updatedAt",
-    "photo",
+
     "groupId",
   ],
   news: [
@@ -92,7 +89,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "publishedAt",
     "updatedAt",
     "createdAt",
-    "photo",
+
     "priority",
     "authorId",
     "newsTypeId",
@@ -100,7 +97,6 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   publication: [
     "id",
     "title",
-    "file",
     "abstractES",
     "abstractEN",
     "journalIssue",
@@ -134,6 +130,34 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   ],
   member_project: ["projectId", "memberId", "createdAt", "updatedAt"],
   member_group: ["memberId", "groupId", "createdAt", "updatedAt"],
+  asset: [
+    "id",
+    "storageKey",
+    "bucket",
+    "mimeDetected",
+    "ext",
+    "sizeBytes",
+    "sha256",
+    "visibility",
+    "status",
+    "createdBy",
+    "createdAt",
+    "deletedAt",
+    "deleteAfter",
+  ],
+  asset_binding: [
+    "id",
+    "resourceType",
+    "resourceId",
+    "slot",
+    "assetId",
+    "isCurrent",
+    "replacedByBindingId",
+    "replacedAt",
+    "createdAt",
+    "deletedAt",
+  ],
+  asset_audit: ["id", "assetId", "bindingId", "action", "actorId", "reason", "createdAt"],
 };
 
 export async function createTables(db: Kysely<Database>) {
@@ -142,8 +166,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -151,8 +173,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -160,8 +180,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -172,8 +190,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("nameSingular", "text", (c) => c.notNull())
     .addColumn("nameSingularEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -182,8 +198,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -192,8 +206,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
@@ -202,8 +214,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
@@ -244,8 +254,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -259,13 +267,10 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("phone", "text")
     .addColumn("name", "text")
     .addColumn("fullName", "text")
-    .addColumn("facilitiesPhoto", "text")
     .addColumn("facilitiesES", "text")
     .addColumn("facilitiesEN", "text")
     .addColumn("futureWorkES", "text")
     .addColumn("futureWorkEN", "text")
-    .addColumn("logoFooter", "text")
-    .addColumn("logoHeader", "text")
     .addColumn("publicationsSectionES", "text")
     .addColumn("publicationsSectionEN", "text")
     .addColumn("projectsSectionES", "text")
@@ -287,7 +292,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("birthDate", "text")
     .addColumn("bio", "text")
     .addColumn("bioEN", "text")
-    .addColumn("photo", "text")
+
     .addColumn("status", "integer", (c) => c.notNull())
     .addColumn("resetPassword", "integer", (c) => c.notNull())
     .addColumn("createdAt", "text")
@@ -318,7 +323,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("description", "text")
     .addColumn("descriptionEN", "text")
-    .addColumn("photo", "text")
+
     .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
@@ -332,7 +337,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("description", "text", (c) => c.notNull())
     .addColumn("descriptionEN", "text")
-    .addColumn("photo", "text")
+
     .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
@@ -377,7 +382,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("servicesEN", "text")
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
-    .addColumn("photo", "text")
+
     .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
     .execute();
 
@@ -395,7 +400,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("publishedAt", "text", (c) => c.notNull())
     .addColumn("updatedAt", "text")
     .addColumn("createdAt", "text")
-    .addColumn("photo", "text")
+
     .addColumn("priority", "integer")
     .addColumn("authorId", "integer", (c) => c.notNull().references("member.id"))
     .addColumn("newsTypeId", "integer", (c) => c.notNull().references("news_type.id"))
@@ -406,7 +411,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("file", "text")
     .addColumn("abstractES", "text")
     .addColumn("abstractEN", "text")
     .addColumn("journalIssue", "integer")
@@ -468,6 +472,62 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
     .execute();
+
+  await db.schema
+    .createTable("asset")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("storageKey", "text", (c) => c.notNull().unique())
+    .addColumn("bucket", "text", (c) => c.notNull())
+    .addColumn("mimeDetected", "text", (c) => c.notNull())
+    .addColumn("ext", "text", (c) => c.notNull())
+    .addColumn("sizeBytes", "integer", (c) => c.notNull())
+    .addColumn("sha256", "text", (c) => c.notNull())
+    .addColumn("visibility", "text", (c) => c.notNull())
+    .addColumn("status", "text", (c) => c.notNull())
+    .addColumn("createdBy", "integer", (c) => c.references("member.id"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("deletedAt", "text")
+    .addColumn("deleteAfter", "text")
+    .execute();
+
+  await db.schema
+    .createTable("asset_binding")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("resourceType", "text", (c) => c.notNull())
+    .addColumn("resourceId", "integer", (c) => c.notNull())
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id"))
+    .addColumn("isCurrent", "integer", (c) => c.notNull())
+    .addColumn("replacedByBindingId", "integer", (c) => c.references("asset_binding.id"))
+    .addColumn("replacedAt", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("deletedAt", "text")
+    .execute();
+
+  await db.schema
+    .createTable("asset_audit")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("assetId", "integer", (c) => c.references("asset.id"))
+    .addColumn("bindingId", "integer", (c) => c.references("asset_binding.id"))
+    .addColumn("action", "text", (c) => c.notNull())
+    .addColumn("actorId", "integer", (c) => c.references("member.id"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .execute();
+
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_asset_binding_current_unique
+    ON asset_binding(resourceType, resourceId, slot)
+    WHERE isCurrent = 1 AND deletedAt IS NULL
+  `.execute(db);
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_asset_binding_lookup
+    ON asset_binding(resourceType, resourceId, slot, isCurrent)
+  `.execute(db);
 
   await sql`
     CREATE VIRTUAL TABLE IF NOT EXISTS news_search USING fts5(

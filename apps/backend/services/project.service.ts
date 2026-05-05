@@ -5,8 +5,8 @@ import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { assetUrl } from "../lib/upload.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
+import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export interface ProjectAdminInput {
   code: string;
@@ -67,20 +67,25 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as photo",
     ])
     .where("member_project.projectId", "in", projectIds)
     .orderBy("member_project.projectId", "asc")
     .execute();
 
+  const memberEntries = await Promise.all(
+    memberRows.map(async (row) => ({
+      projectId: row.projectId,
+      entry: {
+        memberId: row.memberId,
+        name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+      } satisfies AdminProjectMemberListItem,
+    })),
+  );
   const membersByProject = new Map<number, AdminProjectMemberListItem[]>();
-  for (const row of memberRows) {
+  for (const row of memberEntries) {
     const current = membersByProject.get(row.projectId) ?? [];
-    current.push({
-      memberId: row.memberId,
-      name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-      asset: assetUrl(row.photo),
-    });
+    current.push(row.entry);
     membersByProject.set(row.projectId, current);
   }
 

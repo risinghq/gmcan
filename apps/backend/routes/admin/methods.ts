@@ -3,15 +3,14 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   createMethod,
   deleteMethod,
   getMethod,
-  getMethodPhoto,
   listMethods,
-  setMethodPhoto,
   toAdminMethodView,
   updateMethod,
 } from "../../services/group.service.js";
@@ -41,14 +40,28 @@ router.use("*", async (c, next) => {
 
 router.get("/", async (c) => {
   const rows = await listMethods();
-  return c.json(rows.map(toAdminMethodView));
+  return c.json(
+    await Promise.all(
+      rows.map(async (row) => {
+        const view = toAdminMethodView(row);
+        return Object.assign({}, view, {
+          asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: view.id, slot: "photo" }),
+        });
+      }),
+    ),
+  );
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMethod(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(toAdminMethodView(row));
+  const view = toAdminMethodView(row);
+  return c.json(
+    Object.assign({}, view, {
+      asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: view.id, slot: "photo" }),
+    }),
+  );
 });
 
 router.post("/", zValidator("json", Body), async (c) => {
@@ -61,31 +74,13 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody),
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateMethod(id, data);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMethod(id);
-  return c.json({ status: 1 });
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const current = await getMethodPhoto(id);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "methods", kind: "image" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  await setMethodPhoto(id, fileName);
-  if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ assetKey: current.photo });
-  }
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 export default router;
