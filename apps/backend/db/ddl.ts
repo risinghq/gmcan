@@ -4,15 +4,15 @@ import { sql } from "kysely";
 import type { Database } from "./schema.js";
 
 export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
-  gender: ["id", "name", "createdAt", "updatedAt"],
-  prefix: ["id", "name", "createdAt", "updatedAt"],
-  role: ["id", "name", "createdAt", "updatedAt"],
-  member_type: ["id", "name", "nameEN", "nameSingular", "nameSingularEN", "createdAt", "updatedAt"],
-  publication_type: ["id", "name", "nameEN", "createdAt", "updatedAt"],
-  thesis_type: ["id", "name", "nameEN", "createdAt", "updatedAt"],
-  news_type: ["id", "name", "nameEN", "createdAt", "updatedAt"],
+  gender: ["id", "name"],
+  prefix: ["id", "name"],
+  role: ["id", "name"],
+  member_type: ["id", "name", "nameEN", "nameSingular", "nameSingularEN"],
+  publication_type: ["id", "name", "nameEN"],
+  thesis_type: ["id", "name", "nameEN"],
+  news_type: ["id", "name", "nameEN"],
   journal: ["id", "name"],
-  university: ["id", "name", "nameEN", "createdAt", "updatedAt"],
+  university: ["id", "name", "nameEN"],
   event: ["id", "name", "city", "country", "cityEN", "countryEN"],
   funding_source: ["id", "name"],
   currency: ["id", "symbol"],
@@ -166,8 +166,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -175,8 +173,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -184,8 +180,6 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -196,8 +190,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("nameSingular", "text", (c) => c.notNull())
     .addColumn("nameSingularEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -206,8 +198,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema
@@ -216,8 +206,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
@@ -226,8 +214,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
@@ -268,8 +254,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("nameEN", "text", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
     .execute();
 
   await db.schema

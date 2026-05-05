@@ -94,10 +94,8 @@ export async function seedUniversities() {
         id: 1,
         name: "Universidad Nacional Mayor San Marcos",
         nameEN: "University",
-        createdAt: "2020-02-11",
-        updatedAt: "2020-02-11",
       },
-      { id: 2, name: "Universidad de Piura", nameEN: "University of Piura", createdAt: null, updatedAt: null },
+      { id: 2, name: "Universidad de Piura", nameEN: "University of Piura" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();

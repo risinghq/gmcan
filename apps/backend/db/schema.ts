@@ -5,22 +5,16 @@ type DateString = string;
 export interface GenderTable {
   id: Generated<number>;
   name: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface PrefixTable {
   id: Generated<number>;
   name: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface RoleTable {
   id: Generated<number>;
   name: string;
-  createdAt: DateString;
-  updatedAt: DateString;
 }
 
 export interface MemberTypeTable {
@@ -29,32 +23,24 @@ export interface MemberTypeTable {
   nameEN: string;
   nameSingular: string;
   nameSingularEN: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface PublicationTypeTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString;
-  updatedAt: DateString;
 }
 
 export interface ThesisTypeTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString;
-  updatedAt: DateString;
 }
 
 export interface NewsTypeTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface JournalTable {
@@ -66,8 +52,6 @@ export interface UniversityTable {
   id: Generated<number>;
   name: string;
   nameEN: string;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
 }
 
 export interface EventTable {
