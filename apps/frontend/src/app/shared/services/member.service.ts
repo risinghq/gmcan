@@ -99,11 +99,7 @@ export class MemberService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/members/${id}/groups/${groupId}`);
   }
 
-  verifyEmail(email: string): Observable<unknown> {
-    return this.http.get(`${GLOBAL.url}admin/members`, { params: { email } });
-  }
-
-  verifyDni(dni: string): Observable<unknown> {
-    return this.http.get(`${GLOBAL.url}admin/members`, { params: { dni } });
+  verifyEmail(email: string): Observable<{ exists: boolean }> {
+    return this.http.get<{ exists: boolean }>(`${GLOBAL.url}admin/members/exists/email`, { params: { email } });
   }
 }

@@ -73,17 +73,8 @@
   display: none;
 }
 
-::ng-deep .mat-form-field-appearance-legacy .mat-form-field-wrapper {
-  padding-bottom: 0;
-  height: 18px;
-}
-
 ::ng-deep .mat-form-field-infix {
   border-top: none;
-}
-
-::ng-deep .mat-form-field-appearance-legacy .mat-form-field-infix {
-  padding: 0;
 }
 
 ::ng-deep .mat-select-value {
@@ -149,11 +140,6 @@
 
 ::ng-deep .mat-calendar-body-selected {
   background-color: var(--deep-green);
-}
-
-::ng-deep .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-datepicker-toggle-default-icon {
-  width: 28px !important;
-  margin-top: -4px;
 }
 
 ::ng-deep .mat-select-value,

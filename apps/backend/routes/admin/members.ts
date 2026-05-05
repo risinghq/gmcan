@@ -13,12 +13,10 @@ import {
   getMemberPhoto,
   listAdminMembers,
   listMemberGroups,
-  listMemberNames,
   removeMemberFromGroup,
   searchAuthorPool,
   setMemberPhoto,
   updateMember,
-  verifyDniExists,
   verifyEmailExists,
 } from "../../services/member.service.js";
 
@@ -61,9 +59,6 @@ const FilterQuery = z.object({
   q: z.string().optional(),
   status: z.coerce.number().int().optional(),
   memberTypeId: z.coerce.number().int().optional(),
-  email: z.string().optional(),
-  dni: z.string().optional(),
-  names: z.coerce.boolean().optional(),
 });
 
 router.use("*", async (c, next) => {
@@ -72,14 +67,17 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
-  const { q, status, memberTypeId, email, dni, names } = c.req.valid("query");
+  const { q, status, memberTypeId } = c.req.valid("query");
   if (q) return c.json(await listAdminMembers({ q }));
-  if (email) return c.json(await verifyEmailExists(email));
-  if (dni) return c.json(await verifyDniExists(dni));
   if (status !== undefined) return c.json(await listAdminMembers({ status }));
   if (memberTypeId !== undefined) return c.json(await listAdminMembers({ memberTypeId }));
-  if (names) return c.json(await listMemberNames());
   return c.json(await listAdminMembers());
+});
+
+router.get("/exists/email", zValidator("query", z.object({ email: z.string().min(1) })), async (c) => {
+  const { email } = c.req.valid("query");
+  const found = await verifyEmailExists(email);
+  return c.json({ exists: !!found });
 });
 
 router.get("/authors/search", zValidator("query", z.object({ q: z.string().default("") })), async (c) => {
