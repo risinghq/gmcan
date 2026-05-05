@@ -64,13 +64,13 @@ async function attachAuthors(publicationId: number) {
     rows.map(async (row) => {
       if (row.memberId) {
         return {
-        kind: "registered" as const,
-        memberId: row.memberId,
-        name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-        photo: null,
-        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-        isPrincipal: row.isPrincipal,
-      };
+          kind: "registered" as const,
+          memberId: row.memberId,
+          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+          photo: null,
+          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+          isPrincipal: row.isPrincipal,
+        };
       }
       return {
         kind: "external" as const,
@@ -108,13 +108,13 @@ export async function listPublications() {
       publicationId: row.publicationId,
       entry: row.memberId
         ? {
-          kind: "registered" as const,
-          memberId: row.memberId,
-          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-          photo: null,
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-          isPrincipal: row.isPrincipal,
-        }
+            kind: "registered" as const,
+            memberId: row.memberId,
+            name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+            photo: null,
+            photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+            isPrincipal: row.isPrincipal,
+          }
         : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
     })),
   );

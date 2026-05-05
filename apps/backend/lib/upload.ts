@@ -4,7 +4,6 @@ import path from "node:path";
 
 import type { Context } from "hono";
 
-
 export const MIME_TYPES: Record<string, string> = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
