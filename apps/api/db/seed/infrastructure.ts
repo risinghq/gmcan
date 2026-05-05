@@ -303,13 +303,41 @@ export async function seedAbout() {
     .values({
       id: 1,
       descriptionES:
-        "<p>La investigaci&oacute;n en el &aacute;rea de nanomateriales es uno de los componentes principales del desarrollo de la nanotecnolog&iacute;a que permite el dominio y la modificaci&oacute;n de las propiedades de los materiales mediante el cambio en sus estructuras at&oacute;micas. El grupo de investigaci&oacute;n de m&eacute;todos computacionales aplicado a nanomateriales (GMCAN), adscrito a la Facultad de Ciencias F&iacute;sicas de la UNMSM, aplica y desarrolla modernas herramientas computacionales para entender, predecir y controlar los procesos f&iacute;sicos y qu&iacute;micos en el rango de Tama&ntilde;os moleculares hasta la mesoescala. Los integrantes del GMCAN vienen realizando investigaciones sobre nuevos materiales en los &uacute;ltimos 15 a&ntilde;os. Hasta la actualidad se han estudiado las propiedades estructurales, energ&eacute;ticas, estructura electr&oacute;nica de diversas nanopart&iacute;culas, propiedades mec&aacute;nicas de nanoestructuras, transiciones de fase y procesos de ordenaci&oacute;n qu&iacute;mica en aleaciones binarias. El GMCAN mantiene&nbsp; estrecha colaboraci&oacute;n con varios laboratorios y grupos de modelamiento y simulaci&oacute;n. Formamos parte de la Red Iberoamericana de Divulgaci&oacute;n&nbsp; y Formaci&oacute;n en Nanotecnolog&iacute;a (NANODYF).</p>",
+        "<p>La investigación en el área de nanomateriales es uno de los componentes principales del desarrollo de la nanotecnología que permite el dominio y la modificación de las propiedades de los materiales mediante el cambio en sus estructuras atómicas. El grupo de investigación de métodos computacionales aplicado a nanomateriales (GMCAN), adscrito a la Facultad de Ciencias Físicas de la UNMSM, aplica y desarrolla modernas herramientas computacionales para entender, predecir y controlar los procesos físicos y químicos en el rango de tamaños moleculares hasta la mesoescala. Los integrantes del GMCAN vienen realizando investigaciones sobre nuevos materiales en los últimos 15 años. Hasta la actualidad se han estudiado las propiedades estructurales, energéticas, estructura electrónica de diversas nanopartículas, propiedades mecánicas de nanoestructuras, transiciones de fase y procesos de ordenación química en aleaciones binarias. El GMCAN mantiene estrecha colaboración con varios laboratorios y grupos de modelamiento y simulación. Formamos parte de la Red Iberoamericana de Divulgación y Formación en Nanotecnología (NANODYF).</p>",
       descriptionEN:
-        "<p>Research in the area of &nbsp;nanomaterials is one of the main components of the development of nanotechnology that allows the domain and modification of the properties of materials by changing their atomic structures. The research group of computational methods applied to nanomaterials (GMCAN), attached to the Faculty of Physical Sciences of the UNMSM, applies and develops modern computational tools to understand, predict and control physical and chemical processes in the range of molecular sizes up to mesoscale. GMCAN members have been conducting research on new materials for the past 15 years. Until now the structural and energetic properties, electronic structure of various nanoparticles, mechanical properties of nanostructures, phase transitions and chemical ordering processes in binary alloys have been studied. GMCAN maintains&nbsp; close collaboration with several laboratories and modeling and simulation groups. We are part of the Iberoamerican Network of Dissemination&nbsp; and Training in Nanotechnology (NANODYF).</p>",
-      objectivesES: null,
-      objectivesEN: null,
-      servicesES: null,
-      servicesEN: null,
+        "<p>Research in the area of nanomaterials is one of the main components of the development of nanotechnology, enabling control and modification of material properties by changing their atomic structures. The research group on computational methods applied to nanomaterials (GMCAN), affiliated with the Faculty of Physical Sciences at UNMSM, develops and applies modern computational tools to understand, predict and control physical and chemical processes from molecular scales up to the mesoscale. GMCAN members have been carrying out research on new materials for the past 15 years. To date, we have studied structural and energetic properties, electronic structure of various nanoparticles, mechanical properties of nanostructures, phase transitions and chemical ordering processes in binary alloys. GMCAN maintains close collaboration with several laboratories and modeling and simulation groups. We are part of the Iberoamerican Network for Dissemination and Training in Nanotechnology (NANODYF).</p>",
+      objectivesES:
+        "<p><strong>¿Qué hacemos?</strong></p>\
+        <ul>\
+          <li>Estudiar mediante la simulación con Dinámica Molecular (MD) diferentes propiedades físicas y químicas de las nanopartículas y nanoestructuras.</li>\
+          <li>Estudiar mediante la teoría del funcional de la densidad (DFT) procesos de funcionalización y fenómenos superficiales de nanosistemas.</li>\
+          <li>Estudiar mediante Monte Carlo (MC) y dinámica de espín (SD) los procesos de transformaciones de fase en sistemas magnéticos nanoestructurados.</li>\
+          <li>Contribuir con la formación de recursos humanos altamente calificados en el estudio de diversos sistemas nanoestructurados empleando diversas herramientas computacionales.</li>\
+        </ul>",
+      objectivesEN:
+        "<p><strong>What we do</strong></p>\
+        <ul>\
+          <li>Study, via Molecular Dynamics (MD) simulation, different physical and chemical properties of nanoparticles and nanostructures.</li>\
+          <li>Study functionalization processes and surface phenomena of nanosystems using Density Functional Theory (DFT).</li>\
+          <li>Investigate phase transformation processes in nanostructured magnetic systems using Monte Carlo (MC) and spin dynamics (SD).</li>\
+          <li>Contribute to the training of highly qualified human resources in the study of various nanostructured systems using diverse computational tools.</li>\
+        </ul>",
+      servicesES:
+        "<p><strong>¿Qué ofrecemos?</strong></p>\
+        <ul>\
+          <li>Brindar servicios a los <strong>grupos experimentales</strong> de la Universidad Nacional Mayor de San Marcos y otras instituciones académicas.</li>\
+          <li>Brindar servicios y asesoría a la <strong>comunidad académica y empresarial</strong>.</li>\
+          <li>Brindar el servicio de <strong>diseño e implementación de programas especializados</strong>.</li>\
+          <li>Promover los métodos computacionales de investigación de los nanomateriales en los diferentes <strong>niveles de enseñanza secundaria y universitaria</strong>.</li>\
+        </ul>",
+      servicesEN:
+        "<p><strong>What we offer</strong></p>\
+        <ul>\
+          <li>Provide services to experimental groups at Universidad Nacional Mayor de San Marcos and other academic institutions.</li>\
+          <li>Offer services and consultancy to the academic and business community.</li>\
+          <li>Provide design and implementation of specialized software programs.</li>\
+          <li>Promote computational research methods for nanomaterials at secondary and university education levels.</li>\
+        </ul>",
       createdAt: today,
       updatedAt: today,
       groupId: 1,
