@@ -50,6 +50,7 @@ export interface AdminProjectListItem {
   researchLineId: number;
   currencyId: number;
   fundingSourceId: number;
+  startDateLabel: string;
   members: AdminProjectMemberListItem[];
 }
 
@@ -64,6 +65,25 @@ export interface AdminPublicationListItem {
   doi: string | null;
   eventId: number | null;
   eventName: string;
+  publishedAtLabel: string;
   firstAuthorName: string;
   firstAuthorAsset: string | null;
+}
+
+export interface AdminMemberListItem {
+  id: number;
+  dni: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  maternalName: string | null;
+  birthDate: string | null;
+  bio: string | null;
+  status: number;
+  roleId: number;
+  memberTypeId: number;
+  memberTypeName: string;
+  prefixId: number | null;
+  prefixName: string | null;
+  asset: string | null;
 }

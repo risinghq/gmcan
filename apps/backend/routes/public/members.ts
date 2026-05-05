@@ -2,9 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { localizeField } from "../../lib/public-locale.js";
-import { assetUrl } from "../../lib/upload.js";
 import { getMemberProfile, listMembers } from "../../services/member.service.js";
+import { toPublicMemberRow, toPublicProfilePublication } from "./member.mapper.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -12,14 +11,7 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 router.get("/", async (c) => {
   const locale = c.get("locale");
   const rows = await listMembers();
-  return c.json(
-    rows.map((row) => {
-      return Object.assign(row, {
-        bio: localizeField(row, locale, { es: "bio", en: "bioEN", required: false }),
-        asset: assetUrl(row.photo),
-      });
-    }),
-  );
+  return c.json(rows.map((row) => toPublicMemberRow(row, locale)));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
@@ -29,16 +21,9 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   if (!profile.member) return c.json({ error: "Not found" }, 404);
   return c.json({
     ...profile,
-    member: {
-      ...profile.member,
-      bio: localizeField(profile.member, locale, { es: "bio", en: "bioEN", required: false }),
-      asset: assetUrl(profile.member.photo),
-    },
+    member: toPublicMemberRow(profile.member, locale),
     projects: profile.projects,
-    publications: profile.publications.map((publication) => ({
-      ...publication,
-      asset: assetUrl(publication.file),
-    })),
+    publications: profile.publications.map(toPublicProfilePublication),
   });
 });
 

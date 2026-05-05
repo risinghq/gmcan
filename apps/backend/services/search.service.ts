@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import { MEMBER_PUBLIC } from "../db/projections.js";
 import { assetUrl } from "../lib/upload.js";
+import { withMemberPhotoUrl, withNewsPhotoUrl, withPublicationAssetUrl } from "./search.mapper.js";
 
 export async function globalSearch(q: string, types: Set<string>) {
   const like = `%${q}%`;
@@ -159,9 +160,9 @@ export async function globalSearch(q: string, types: Set<string>) {
   const projects = projectRows.map((p) => Object.assign(p, { members: membersByProject.get(p.id) ?? [] }));
 
   return {
-    publications: publications.map((publication) => ({ ...publication, fileUrl: assetUrl(publication.file) })),
-    members: members.map((member) => ({ ...member, photoUrl: assetUrl(member.photo) })),
-    news: newsRows.map((news) => ({ ...news, photoUrl: assetUrl(news.photo) })),
+    publications: publications.map(withPublicationAssetUrl),
+    members: members.map(withMemberPhotoUrl),
+    news: newsRows.map(withNewsPhotoUrl),
     projects,
   };
 }

@@ -4,6 +4,7 @@ import { db } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
+import { monthYearEs } from "../lib/date-label.js";
 import { assetUrl } from "../lib/upload.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
 
@@ -95,6 +96,7 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
     researchLineId: project.researchLineId,
     currencyId: project.currencyId,
     fundingSourceId: project.fundingSourceId,
+    startDateLabel: monthYearEs(project.startDate),
     members: membersByProject.get(project.id) ?? [],
   }));
 }

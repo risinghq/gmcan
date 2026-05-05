@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
+import type { AdminMemberListItem } from "../models/admin-list";
 import type { AuthorSearchResult } from "../models/author";
 import type { Member, MemberFull, MemberProfile } from "../models/member";
 import { GLOBAL } from "./global";
@@ -50,8 +51,10 @@ export class MemberService {
   }
 
   // Admin
-  listAdminMembers(params?: { status?: number; memberTypeId?: number }): Observable<Member[]> {
-    return this.http.get<Member[]>(`${GLOBAL.url}admin/members`, { params: params as Record<string, string | number> });
+  listAdminMembers(params?: { status?: number; memberTypeId?: number }): Observable<AdminMemberListItem[]> {
+    return this.http.get<AdminMemberListItem[]>(`${GLOBAL.url}admin/members`, {
+      params: params as Record<string, string | number>,
+    });
   }
 
   getMemberFull(id: number): Observable<MemberFull> {

@@ -16,14 +16,8 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { Member } from "@app/shared/models/member";
-import { LookupService } from "@app/shared/services/lookup.service";
+import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { MemberService } from "@app/shared/services/member.service";
-
-interface MemberRow extends Member {
-  memberTypeName?: string;
-  prefixName?: string;
-}
 
 @Component({
   selector: "app-miembros",
@@ -48,14 +42,12 @@ interface MemberRow extends Member {
 })
 export default class MiembrosComponent implements OnInit {
   private memberService = inject(MemberService);
-  lookup = inject(LookupService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   displayedColumns: string[] = ["firstName", "lastName", "maternalName", "memberTypeName", "prefixName", "email"];
-  items: MemberRow[] = [];
-  dataSource = new MatTableDataSource<MemberRow>([]);
-  constructor() {}
+  items: AdminMemberListItem[] = [];
+  dataSource = new MatTableDataSource<AdminMemberListItem>([]);
 
   ngOnInit(): void {
     this.loadListByMode();
@@ -71,19 +63,10 @@ export default class MiembrosComponent implements OnInit {
   }
 
   loadList(isActiveMode: boolean): void {
-    this.memberService.listAdminMembers().subscribe((rows: Member[]) => {
-      const memberTypesById = new Map(this.lookup.memberTypes().map((type) => [type.id, type.nameSingular]));
-      const prefixesById = new Map(this.lookup.prefijos().map((prefix) => [prefix.idPrefijo, prefix.nombre]));
-      const filtered = rows.filter((member) =>
-        isActiveMode ? member.status === 1 : member.status === 0 || member.status === 3,
-      );
-      this.items = filtered
-        .toSorted((a, b) => a.lastName.localeCompare(b.lastName))
-        .map((member) => ({
-          ...member,
-          memberTypeName: memberTypesById.get(member.memberTypeId),
-          prefixName: member.prefixId != null ? prefixesById.get(member.prefixId) : undefined,
-        }));
+    this.memberService.listAdminMembers().subscribe((rows) => {
+      this.items = isActiveMode
+        ? rows.filter((member) => member.status === 1)
+        : rows.filter((member) => member.status === 0 || member.status === 3);
 
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {

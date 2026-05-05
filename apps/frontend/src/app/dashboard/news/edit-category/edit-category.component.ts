@@ -19,6 +19,8 @@ import type { RefItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 
+import { NewsCategoryUsecase } from "./news-category.usecase";
+
 @Component({
   selector: "app-edit-category",
   templateUrl: "../add-category/add-category.component.html",
@@ -31,6 +33,7 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   private readonly router = inject(Router);
   dialog = inject(MatDialog);
   private readonly refService = inject(RefService);
+  private readonly newsCategoryUsecase = inject(NewsCategoryUsecase);
   private readonly snackBar = inject(MatSnackBar);
 
   category: RefItem = { id: 0, name: "" };
@@ -63,8 +66,8 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   notCanDo = false;
 
   getRelatedNews(): void {
-    this.refService.getNewsTypeCount(this.idCategory).subscribe((result) => {
-      this.notCanDo = result.canDelete;
+    this.newsCategoryUsecase.canDelete(this.idCategory).subscribe((canDelete) => {
+      this.notCanDo = canDelete;
     });
   }
 
@@ -120,17 +123,13 @@ export default class EditCategoryComponent implements OnInit, HasUnsavedChanges 
   }
 
   eraseCategory(): void {
-    this.refService.getNewsTypeCount(this.idCategory).subscribe((result) => {
-      if (result.canDelete) {
-        this.refService.deleteNewsType(this.idCategory).subscribe((result) => {
-          if (result.status === 1) {
-            this.categoryForm.markAsPristine();
-            this.return();
-            this.openSnackBar("Categoría eliminada exitosamente");
-          } else {
-            this.openSnackBar("Hubo un problema al eliminar");
-          }
-        });
+    this.newsCategoryUsecase.deleteIfAllowed(this.idCategory).subscribe((result) => {
+      if (result.deleted) {
+        this.categoryForm.markAsPristine();
+        this.return();
+        this.openSnackBar("Categoría eliminada exitosamente");
+      } else {
+        this.openSnackBar("Hubo un problema al eliminar");
       }
     });
   }

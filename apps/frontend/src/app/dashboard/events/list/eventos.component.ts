@@ -1,4 +1,3 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -23,11 +22,6 @@ import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { requireLocalDate } from "@app/shared/utils/date";
-
-interface ResumenListItem extends AdminPublicationListItem {
-  publishedAtLabel: string;
-}
 
 @Component({
   selector: "app-eventos",
@@ -56,16 +50,14 @@ export default class EventosComponent implements OnInit {
   eventService = inject(EventService);
   router = inject(Router);
   private publicationService = inject(PublicationService);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
   private tabState = inject(TabStateService);
 
   eventos: EventItem[] = [];
-  items: ResumenListItem[] = [];
+  items: AdminPublicationListItem[] = [];
 
   displayedColumns: string[] = ["titulo", "primerAutor", "presentacion", "evento"];
   displayedColumns2: string[] = ["nombre", "pais", "ciudad"];
-  dataSource = new MatTableDataSource<ResumenListItem>([]);
+  dataSource = new MatTableDataSource<AdminPublicationListItem>([]);
   dataSource2 = new MatTableDataSource<EventItem>([]);
 
   readonly paginator = viewChild.required(MatPaginator);
@@ -75,8 +67,6 @@ export default class EventosComponent implements OnInit {
   readonly sort2 = viewChild.required(MatSort);
   selectedTab = 0;
 
-  constructor() {}
-
   ngOnInit(): void {
     this.selectedTab = this.tabState.resumenTab();
     this.getEventos();
@@ -85,14 +75,7 @@ export default class EventosComponent implements OnInit {
 
   getResumenes(): void {
     this.publicationService.listAdminPublications({ type: 3 }).subscribe((rows) => {
-      this.items = rows.map((row) => {
-        const publishedAtDate = requireLocalDate(row.publishedAt, "publication.publishedAt");
-        return {
-          ...row,
-          publishedAtLabel:
-            this.titlecasePipe.transform(this.datePipe.transform(publishedAtDate, "MMMM, y", "es") ?? "") ?? "",
-        };
-      });
+      this.items = rows;
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();

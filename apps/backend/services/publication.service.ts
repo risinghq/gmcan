@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { Bilingual } from "../lib/admin-translations.js";
+import { monthYearEs } from "../lib/date-label.js";
 import { assetUrl } from "../lib/upload.js";
 import type { AdminPublicationListItem } from "./admin-list.types.js";
 
@@ -178,6 +179,7 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
       doi: publication.doi,
       eventId: publication.eventId,
       eventName: publication.eventId ? (eventsById.get(publication.eventId) ?? "") : "",
+      publishedAtLabel: monthYearEs(publication.publishedAt),
       firstAuthorName: firstAuthor?.name ?? "",
       firstAuthorAsset: firstAuthor?.asset ?? null,
     };

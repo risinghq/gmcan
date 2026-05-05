@@ -1,4 +1,3 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, inject, viewChild } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -23,11 +22,6 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import type { FundingSourceItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { requireLocalDate } from "@app/shared/utils/date";
-
-interface ProjectListItem extends AdminProjectListItem {
-  startDateLabel: string;
-}
 
 @Component({
   selector: "app-proyectos",
@@ -54,18 +48,16 @@ interface ProjectListItem extends AdminProjectListItem {
 })
 export default class ProyectosComponent implements OnInit {
   router = inject(Router);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
   projectService = inject(ProjectService);
   lookup = inject(LookupService);
   private tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
   displayedColumns2: string[] = ["nombre"];
-  dataSource = new MatTableDataSource<ProjectListItem>([]);
+  dataSource = new MatTableDataSource<AdminProjectListItem>([]);
   dataSource2: MatTableDataSource<FundingSourceItem> = new MatTableDataSource<FundingSourceItem>([]);
   fundingSources: FundingSourceItem[] = [];
-  items: ProjectListItem[] = [];
+  items: AdminProjectListItem[] = [];
   selectedTab = 0;
 
   readonly paginator = viewChild.required(MatPaginator);
@@ -97,18 +89,7 @@ export default class ProyectosComponent implements OnInit {
 
   loadList(status: number): void {
     this.projectService.listAdminProjects().subscribe((rows) => {
-      const filtered = (
-        status === 1 ? rows.filter((item) => item.status === 1) : rows.filter((item) => item.status !== 1)
-      ).toSorted((a, b) =>
-        (a.startDate ?? "") < (b.startDate ?? "") ? 1 : (b.startDate ?? "") < (a.startDate ?? "") ? -1 : 0,
-      );
-      this.items = filtered.map((item) => {
-        const startDate = requireLocalDate(item.startDate, "project.startDate");
-        return {
-          ...item,
-          startDateLabel: this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? "",
-        };
-      });
+      this.items = status === 1 ? rows.filter((item) => item.status === 1) : rows.filter((item) => item.status !== 1);
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();

@@ -27,6 +27,7 @@ const ASSET_COLUMNS: Array<{ table: string; column: string }> = [
 ];
 
 type MapJson = { bySource: Record<string, string>; byHash: Record<string, string> };
+const SEED_CONCURRENCY = 8;
 
 function readMap(): MapJson {
   if (!fs.existsSync(MAP_FILE)) return { bySource: {}, byHash: {} };
@@ -68,47 +69,76 @@ function importSourceAsset(sourceKey: string, map: MapJson): string | null {
   return key;
 }
 
+async function mapConcurrent<T>(
+  items: T[],
+  run: (item: T) => Promise<void>,
+  concurrency = SEED_CONCURRENCY,
+): Promise<void> {
+  let index = 0;
+  const runNext = async (): Promise<void> => {
+    const currentIndex = index++;
+    if (currentIndex >= items.length) return;
+    const current = items[currentIndex];
+    if (current !== undefined) await run(current);
+    return runNext();
+  };
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => runNext());
+  await Promise.all(workers);
+}
+
 export async function importSeedAssetsAndRewriteReferences() {
   const map = readMap();
-  for (const { table, column } of ASSET_COLUMNS) {
-    const rows = await db
-      .selectFrom(table as never)
-      .select(["id", column] as never)
-      .execute();
-    for (const row of rows as Array<Record<string, unknown>>) {
+  const rowsByColumn = await Promise.all(
+    ASSET_COLUMNS.map(async ({ table, column }) => ({
+      table,
+      column,
+      rows: (await db
+        .selectFrom(table as never)
+        .select(["id", column] as never)
+        .execute()) as Array<Record<string, unknown>>,
+    })),
+  );
+  await mapConcurrent(rowsByColumn, async ({ table, column, rows }) => {
+    await mapConcurrent(rows, async (row) => {
       const rowId = Number(row.id);
       const value = (row[column] as string | null) ?? null;
-      if (!value) continue;
+      if (!value) return;
 
       const normalizedRuntime = normalizeAssetKey(value);
-      if (normalizedRuntime && assetExists(normalizedRuntime)) continue;
+      if (normalizedRuntime && assetExists(normalizedRuntime)) return;
 
       const imported = importSourceAsset(value, map);
-      if (!imported || imported === value) continue;
+      if (!imported || imported === value) return;
+
       await db
         .updateTable(table as never)
         .set({ [column]: imported } as never)
         .where("id" as never, "=", rowId as any)
         .execute();
-    }
-  }
+    });
+  });
 
   writeMap(map);
 }
 
 export async function auditAndQuarantineOrphans() {
   const referenced = new Set<string>();
-  for (const { table, column } of ASSET_COLUMNS) {
-    const rows = await db
-      .selectFrom(table as never)
-      .select(column as never)
-      .where(column as never, "is not", null)
-      .execute();
-    for (const row of rows as Array<Record<string, unknown>>) {
+  const rowsByColumn = await Promise.all(
+    ASSET_COLUMNS.map(async ({ table, column }) => ({
+      column,
+      rows: (await db
+        .selectFrom(table as never)
+        .select(column as never)
+        .where(column as never, "is not", null)
+        .execute()) as Array<Record<string, unknown>>,
+    })),
+  );
+  rowsByColumn.forEach(({ column, rows }) => {
+    rows.forEach((row) => {
       const key = normalizeAssetKey(String(row[column] ?? ""));
       if (key) referenced.add(key);
-    }
-  }
+    });
+  });
 
   fs.mkdirSync(STORAGE_ROOT, { recursive: true });
   const files = fs
@@ -123,11 +153,11 @@ export async function auditAndQuarantineOrphans() {
   }
 
   const moved: string[] = [];
-  for (const file of files) {
-    if (referenced.has(file)) continue;
+  await mapConcurrent(files, async (file) => {
+    if (referenced.has(file)) return;
     const ok = await quarantineAsset({ assetKey: file, reason: "orphan-audit" });
     if (ok) moved.push(file);
-  }
+  });
 
   return { missingReferenced, moved };
 }

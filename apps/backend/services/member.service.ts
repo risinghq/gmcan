@@ -5,9 +5,71 @@ import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js"
 import { publicProfile } from "../db/views.js";
 import { hashPassword } from "../lib/password.js";
 import { assetUrl } from "../lib/upload.js";
+import type { AdminMemberListItem } from "./admin-list.types.js";
 
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
+}
+
+export async function listAdminMembers(filter?: {
+  status?: number;
+  memberTypeId?: number;
+  q?: string;
+}): Promise<AdminMemberListItem[]> {
+  let query = db
+    .selectFrom("member")
+    .leftJoin("member_type", "member_type.id", "member.memberTypeId")
+    .leftJoin("prefix", "prefix.id", "member.prefixId")
+    .select([
+      "member.id",
+      "member.dni",
+      "member.email",
+      "member.firstName",
+      "member.lastName",
+      "member.maternalName",
+      "member.birthDate",
+      "member.bio",
+      "member.status",
+      "member.roleId",
+      "member.memberTypeId",
+      "member.prefixId",
+      "member.photo",
+      sql<string>`COALESCE(member_type.nameSingular, '')`.as("memberTypeName"),
+      sql<string | null>`prefix.nombre`.as("prefixName"),
+    ]);
+
+  if (filter?.status !== undefined) query = query.where("member.status", "=", filter.status);
+  if (filter?.memberTypeId !== undefined) query = query.where("member.memberTypeId", "=", filter.memberTypeId);
+  if (filter?.q) {
+    const like = `%${filter.q}%`;
+    query = query.where((eb) =>
+      eb.or([
+        eb("member.firstName", "like", like),
+        eb("member.lastName", "like", like),
+        eb("member.maternalName", "like", like),
+        eb("member.email", "like", like),
+      ]),
+    );
+  }
+
+  const rows = await query.orderBy("member.lastName", "asc").execute();
+  return rows.map((row) => ({
+    id: row.id,
+    dni: row.dni,
+    email: row.email,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    maternalName: row.maternalName,
+    birthDate: row.birthDate,
+    bio: row.bio,
+    status: row.status,
+    roleId: row.roleId,
+    memberTypeId: row.memberTypeId,
+    memberTypeName: row.memberTypeName,
+    prefixId: row.prefixId,
+    prefixName: row.prefixName,
+    asset: assetUrl(row.photo),
+  }));
 }
 
 export async function listMemberNames() {
