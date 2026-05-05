@@ -102,7 +102,6 @@ export async function getMemberFull(id: number) {
       "birthDate",
       "bio",
       "bioEN",
-      "photo",
       "status",
       "roleId",
       "memberTypeId",

@@ -71,7 +71,6 @@ export async function getResearchLine(id: number) {
 export function toAdminResearchLineView(row: ResearchLineRow) {
   return {
     id: row.id,
-    photo: row.photo,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -133,7 +132,6 @@ export async function getMethod(id: number) {
 export function toAdminMethodView(row: MethodRow) {
   return {
     id: row.id,
-    photo: row.photo,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

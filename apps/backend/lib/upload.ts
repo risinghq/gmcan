@@ -4,7 +4,6 @@ import path from "node:path";
 
 import type { Context } from "hono";
 
-import { db } from "../db/client.js";
 
 export const MIME_TYPES: Record<string, string> = {
   jpg: "image/jpeg",
@@ -22,8 +21,6 @@ export const UPLOAD_FILE_KIND_EXTENSIONS = {
 } as const;
 
 export type UploadFileKind = keyof typeof UPLOAD_FILE_KIND_EXTENSIONS;
-
-type ReferenceExclusion = { table: string; id: number; column: string };
 
 export const STORAGE_ROOT = path.resolve(process.cwd(), ".storage");
 const QUARANTINE_ROOT = path.join(STORAGE_ROOT, ".quarantine");
@@ -116,34 +113,6 @@ export async function serveAsset(c: Context, options: { assetKey: string; asAtta
   });
 }
 
-async function isReferenced(key: string, exclude?: ReferenceExclusion): Promise<boolean> {
-  const checks: Array<{ table: string; column: string }> = [
-    { table: "member", column: "photo" },
-    { table: "news", column: "photo" },
-    { table: "method", column: "photo" },
-    { table: "research_line", column: "photo" },
-    { table: "publication", column: "file" },
-    { table: "research_group", column: "logoHeader" },
-    { table: "research_group", column: "logoFooter" },
-    { table: "research_group", column: "facilitiesPhoto" },
-    { table: "about", column: "photo" },
-  ];
-
-  const queries = checks.map((check) => {
-    let query = db
-      .selectFrom(check.table as never)
-      .select("id" as never)
-      .where(check.column as never, "=", key as never);
-    if (exclude && exclude.table === check.table && exclude.column === check.column) {
-      query = query.where("id" as never, "!=", exclude.id as never);
-    }
-    return query.executeTakeFirst();
-  });
-
-  const results = await Promise.all(queries);
-  return results.some((r) => !!r);
-}
-
 export async function quarantineAsset(options: { assetKey: string; reason: string }): Promise<boolean> {
   const resolved = resolveAssetPath(options.assetKey);
   if (!resolved || !fs.existsSync(resolved.path)) return false;
@@ -154,17 +123,6 @@ export async function quarantineAsset(options: { assetKey: string; reason: strin
   const reportLine = `${new Date().toISOString()}\t${resolved.key}\t${options.reason}\n`;
   await fs.promises.appendFile(path.join(QUARANTINE_ROOT, "report.tsv"), reportLine, "utf8");
   return true;
-}
-
-export async function deleteUploadedFile(options: {
-  assetKey: string | null | undefined;
-  exclude?: ReferenceExclusion;
-}): Promise<boolean> {
-  if (!options.assetKey) return false;
-  const key = normalizeAssetKey(options.assetKey);
-  if (!key) return false;
-  if (await isReferenced(key, options.exclude)) return false;
-  return quarantineAsset({ assetKey: key, reason: "unreferenced" });
 }
 
 export function assetExists(assetKey: string): boolean {
