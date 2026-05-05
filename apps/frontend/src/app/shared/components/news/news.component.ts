@@ -9,7 +9,11 @@ import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
 
-type NewsDisplay = PublicNewsListItem & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
+type NewsDisplay = PublicNewsListItem & {
+  newsTypeNameLabel: string;
+  publishedAtLabel: string;
+  authorNameLabel: string;
+};
 
 @Component({
   selector: "app-news",
@@ -24,8 +28,8 @@ export default class NewsComponent implements OnInit {
   private browser = inject(BrowserService);
   private session = inject(SessionService);
 
-  public noticias: NewsDisplay[] = [];
-  public noticiaPrincipal: NewsDisplay | null = null;
+  public newsItems: NewsDisplay[] = [];
+  public featuredNews: NewsDisplay | null = null;
   url: string;
 
   constructor() {
@@ -41,13 +45,13 @@ export default class NewsComponent implements OnInit {
   }
 
   public title = "";
-  public idNoticiaE = 0;
+  public selectedNewsId = 0;
   language: any = {};
 
   ngOnInit(): void {
     this.language = this.session.language();
     this.numberShown = this.browser.innerWidth() >= 1300 ? 10 : 5;
-    this.idNoticiaE = Number(this.route.snapshot.params["id"]) || 0;
+    this.selectedNewsId = Number(this.route.snapshot.params["id"]) || 0;
     this.loadNoticias();
   }
 
@@ -69,7 +73,7 @@ export default class NewsComponent implements OnInit {
       })
       .subscribe((response) => {
         const enriched = response.items
-          .filter((n) => n.id !== this.idNoticiaE)
+          .filter((n) => n.id !== this.selectedNewsId)
           .toSorted((a, b) => {
             const left = parseLocalDate(a.publishedAt)?.getTime() ?? 0;
             const right = parseLocalDate(b.publishedAt)?.getTime() ?? 0;
@@ -84,20 +88,20 @@ export default class NewsComponent implements OnInit {
                 ) ?? "");
 
             return Object.assign({} as NewsDisplay, n, {
-              nombreTipoNoticia: n.newsTypeName,
-              fechaFormateada,
-              autor: n.authorName,
+              newsTypeNameLabel: n.newsTypeName,
+              publishedAtLabel: fechaFormateada,
+              authorNameLabel: n.authorName,
             });
           });
 
-        this.noticiaPrincipal = enriched[0] ?? null;
-        this.noticias = enriched.slice(1);
+        this.featuredNews = enriched[0] ?? null;
+        this.newsItems = enriched.slice(1);
       });
   }
 
-  detalleNoticia(noticia: NewsDisplay): void {
+  openNewsDetail(newsItem: NewsDisplay): void {
     const origin = parsePublicOrigin(this.route);
-    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: origin } });
+    this.router.navigate(["/home/detail-news/" + newsItem.id], { queryParams: { from: origin } });
     this.scroll();
   }
 

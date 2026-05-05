@@ -32,18 +32,18 @@ export type HomeProyecto = Project & {
   members: HomeProjectMember[];
 };
 
-export type HomeNoticia = PublicNewsListItem & {
-  nombreTipoNoticia: string;
-  autor: string;
-  fechaPublicacion: string;
+export type HomeNewsItem = PublicNewsListItem & {
+  newsTypeNameLabel: string;
+  authorNameLabel: string;
+  publishedAtLabel: string;
 };
 
 export type HomeViewModel = {
   info: Group;
   publicaciones: HomePublicacion[];
   proyectos: HomeProyecto[];
-  noticias: HomeNoticia[];
-  noticiaPrincipal: HomeNoticia | null;
+  newsItems: HomeNewsItem[];
+  featuredNews: HomeNewsItem | null;
   lineasInvestigacion: ResearchLine[];
   metodos: Method[];
   miembros: Member[];

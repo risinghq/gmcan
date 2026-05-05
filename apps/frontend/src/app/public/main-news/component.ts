@@ -19,7 +19,11 @@ import {
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 
-type NewsDisplay = PublicNewsListItem & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
+type PublicNewsCard = PublicNewsListItem & {
+  newsTypeNameLabel: string;
+  publishedAtLabel: string;
+  authorNameLabel: string;
+};
 type NewsTypeFilter = { id: number; name: string };
 
 @Component({
@@ -50,8 +54,8 @@ export default class MainNewsComponent implements OnInit {
   private session = inject(SessionService);
   private titleService = inject(Title);
 
-  public noticias: NewsDisplay[] = [];
-  public tiponoticias: NewsTypeFilter[] = [];
+  public newsItems: PublicNewsCard[] = [];
+  public newsTypes: NewsTypeFilter[] = [];
   public screenWidth: number;
   public total = 0;
   url: string;
@@ -66,8 +70,8 @@ export default class MainNewsComponent implements OnInit {
     this.screenWidth = this.browser.innerWidth();
   }
 
-  public categorySelected = -1;
-  public categoryNombre = "";
+  public selectedCategoryId = -1;
+  public selectedCategoryName = "";
   public page = 1;
   public pageSize = 10;
   language: any = {};
@@ -76,8 +80,8 @@ export default class MainNewsComponent implements OnInit {
   ngOnInit(): void {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.news);
-    this.categoryNombre = this.language.newsText[0].categoryTitle;
-    this.tiponoticias = this.lookup.newsTypes().toSorted((a, b) => (a.name > b.name ? 1 : -1));
+    this.selectedCategoryName = this.language.newsText[0].categoryTitle;
+    this.newsTypes = this.lookup.newsTypes().toSorted((a, b) => (a.name > b.name ? 1 : -1));
     this.loadNews();
   }
 
@@ -86,14 +90,14 @@ export default class MainNewsComponent implements OnInit {
     this.newsService
       .listNews({
         status: 1,
-        newsTypeId: this.categorySelected === -1 ? undefined : this.categorySelected,
+        newsTypeId: this.selectedCategoryId === -1 ? undefined : this.selectedCategoryId,
         sortBy: "publishedAt",
         sortOrder: "desc",
         page: this.page,
         pageSize: this.pageSize,
       })
       .subscribe((response) => {
-        this.noticias = response.items.map((n): NewsDisplay => {
+        this.newsItems = response.items.map((n): PublicNewsCard => {
           const d = new Date(n.publishedAt ?? "");
           if (String(d) !== "Invalid Date") {
             d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
@@ -103,10 +107,10 @@ export default class MainNewsComponent implements OnInit {
               ? ""
               : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
 
-          return Object.assign({} as NewsDisplay, n, {
-            nombreTipoNoticia: n.newsTypeName,
-            fechaFormateada,
-            autor: n.authorName,
+          return Object.assign({} as PublicNewsCard, n, {
+            newsTypeNameLabel: n.newsTypeName,
+            publishedAtLabel: fechaFormateada,
+            authorNameLabel: n.authorName,
           });
         });
         this.total = response.total;
@@ -114,9 +118,9 @@ export default class MainNewsComponent implements OnInit {
       });
   }
 
-  selectCategory(id: number, nombre: string): void {
-    this.categorySelected = id;
-    this.categoryNombre = nombre;
+  selectCategory(id: number, name: string): void {
+    this.selectedCategoryId = id;
+    this.selectedCategoryName = name;
     this.page = 1;
     this.loadNews();
   }
@@ -127,8 +131,8 @@ export default class MainNewsComponent implements OnInit {
     this.scroll();
   }
 
-  detalleNoticia(noticia: NewsDisplay): void {
-    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: "news" } });
+  openNewsDetail(newsItem: PublicNewsCard): void {
+    this.router.navigate(["/home/detail-news/" + newsItem.id], { queryParams: { from: "news" } });
     this.scroll();
   }
 

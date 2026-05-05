@@ -16,7 +16,7 @@ import { PublicationService } from "@app/shared/services/publication.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { firstValueFrom } from "rxjs";
 
-import type { HomeNoticia, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
+import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
 @Injectable({ providedIn: "root" })
 export class HomeDataService {
@@ -32,7 +32,7 @@ export class HomeDataService {
   private readonly titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<HomeViewModel> {
-    const [group, publicacionesRaw, proyectosRaw, noticiasRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
+    const [group, publicacionesRaw, proyectosRaw, newsRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
       firstValueFrom(this.groupService.getGroup()),
       firstValueFrom(this.publicationService.listPublications()),
       firstValueFrom(this.projectService.listProjects()),
@@ -49,7 +49,7 @@ export class HomeDataService {
     const miembros = Array.isArray(miembrosRaw) ? (miembrosRaw as Member[]) : [];
     const publicacionesSafe = Array.isArray(publicacionesRaw) ? (publicacionesRaw as PublicationWithAuthors[]) : [];
     const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
-    const noticiasSafe = Array.isArray(noticiasRaw?.items) ? (noticiasRaw.items as PublicNewsListItem[]) : [];
+    const newsSafe = Array.isArray(newsRaw?.items) ? (newsRaw.items as PublicNewsListItem[]) : [];
 
     const aboutUs = group?.id ? await this.loadAboutUs(group.id) : "";
 
@@ -58,7 +58,7 @@ export class HomeDataService {
       proyectosSafe.filter((p) => !p.endDate),
       lineasInvestigacion,
     );
-    const noticias = this.enrichNoticias(noticiasSafe);
+    const newsItems = this.enrichNews(newsSafe);
 
     const orderedPublicaciones = publicaciones.toSorted((a, b) => {
       const left = new Date(a.publishedAt ?? "").getTime();
@@ -72,7 +72,7 @@ export class HomeDataService {
       return right - left;
     });
 
-    const orderedNoticias = noticias.toSorted((a, b) => {
+    const orderedNews = newsItems.toSorted((a, b) => {
       const left = new Date(a.publishedAt ?? "").getTime();
       const right = new Date(b.publishedAt ?? "").getTime();
       return right - left;
@@ -82,8 +82,8 @@ export class HomeDataService {
       info: group,
       publicaciones: orderedPublicaciones,
       proyectos: orderedProyectos,
-      noticias: orderedNoticias,
-      noticiaPrincipal: orderedNoticias[0] ?? null,
+      newsItems: orderedNews,
+      featuredNews: orderedNews[0] ?? null,
       lineasInvestigacion,
       metodos,
       miembros,
@@ -169,15 +169,15 @@ export class HomeDataService {
     });
   }
 
-  private enrichNoticias(noticias: PublicNewsListItem[]): HomeNoticia[] {
-    return noticias.map((noticia) => {
-      const publishedAt = this.normalizedDate(noticia.publishedAt);
+  private enrichNews(newsItems: PublicNewsListItem[]): HomeNewsItem[] {
+    return newsItems.map((newsItem) => {
+      const publishedAt = this.normalizedDate(newsItem.publishedAt);
 
       return {
-        ...noticia,
-        fechaPublicacion: !publishedAt ? "" : (this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? ""),
-        nombreTipoNoticia: noticia.newsTypeName,
-        autor: noticia.authorName,
+        ...newsItem,
+        publishedAtLabel: !publishedAt ? "" : (this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? ""),
+        newsTypeNameLabel: newsItem.newsTypeName,
+        authorNameLabel: newsItem.authorName,
       };
     });
   }

@@ -25,17 +25,17 @@ export default class DetailNewsComponent implements OnInit {
   private readonly meta = inject(Meta);
   private readonly titleService = inject(Title);
 
-  noticia: PublicNewsDetail = {} as PublicNewsDetail;
-  tipoNoticia = "";
-  autorName = "";
-  autorPhoto: string | null = null;
-  autorId: number | null = null;
+  newsItem: PublicNewsDetail = {} as PublicNewsDetail;
+  newsTypeNameLabel = "";
+  authorNameLabel = "";
+  authorPhoto: string | null = null;
+  authorId: number | null = null;
   previouspage = "Inicio";
   previouslink = "/home";
   cargado = false;
-  dia = "";
-  mes = "";
-  anio = "";
+  day = "";
+  month = "";
+  year = "";
   url = GLOBAL.url;
   language: (typeof Languages)[number] = Languages[0];
 
@@ -43,18 +43,18 @@ export default class DetailNewsComponent implements OnInit {
     this.language = this.session.language();
     const newsData = this.route.snapshot.data["news"] as DetailNewsViewModel;
 
-    this.noticia = newsData.noticia;
-    this.tipoNoticia = newsData.tipoNoticia;
-    this.autorName = newsData.autorName;
-    this.autorPhoto = newsData.autorPhoto;
-    this.autorId = newsData.autorId;
-    this.dia = newsData.dia;
-    this.mes = newsData.mes;
-    this.anio = newsData.anio;
+    this.newsItem = newsData.newsItem;
+    this.newsTypeNameLabel = newsData.newsTypeNameLabel;
+    this.authorNameLabel = newsData.authorNameLabel;
+    this.authorPhoto = newsData.authorPhoto;
+    this.authorId = newsData.authorId;
+    this.day = newsData.day;
+    this.month = newsData.month;
+    this.year = newsData.year;
 
-    this.meta.updateTag({ name: "title", content: String(this.noticia.title) });
-    this.meta.updateTag({ property: "og:title", content: String(this.noticia.title) });
-    this.titleService.setTitle(String(this.noticia.title));
+    this.meta.updateTag({ name: "title", content: String(this.newsItem.title) });
+    this.meta.updateTag({ property: "og:title", content: String(this.newsItem.title) });
+    this.titleService.setTitle(String(this.newsItem.title));
     const origin = parsePublicOrigin(this.route);
     const originInfo = getPublicOriginInfo(origin);
     this.previouslink = originInfo.route;

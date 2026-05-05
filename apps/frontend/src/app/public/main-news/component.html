@@ -21,48 +21,46 @@
             [matMenuTriggerFor]="menu"
             [style.display]="screenWidth < 960 ? 'block' : 'none'"
           >
-            {{ categoryNombre }}
+            {{ selectedCategoryName }}
             <mat-icon> keyboard_arrow_down </mat-icon>
           </button>
           <mat-menu #menu="matMenu" xPosition="before">
             <button mat-menu-item (click)="selectCategory(-1, language.newsText[0].allNews)">
               {{ language.newsText[0].allNews }}
             </button>
-            @for (tiponoticia of tiponoticias; track tiponoticia) {
-            <button mat-menu-item (click)="selectCategory(tiponoticia.id, tiponoticia.name)">
-              {{ tiponoticia.name }}
-            </button>
+            @for (newsType of newsTypes; track newsType) {
+            <button mat-menu-item (click)="selectCategory(newsType.id, newsType.name)">{{ newsType.name }}</button>
             }
           </mat-menu>
         </div>
-        } @if (noticias.length > 0 && allCharged) {
+        } @if (newsItems.length > 0 && allCharged) {
         <div>
-          @for ( noticia of noticias; track noticia ) {
+          @for (newsItem of newsItems; track newsItem) {
           <div class="news flex-news">
             <div
               class="img-hover-zoom-2 img-div-zoom right pl-24"
               [style.display]="screenWidth < 960 ? 'block' : 'none'"
             >
-              @if (!noticia.asset) {
+              @if (!newsItem.asset) {
               <img class="news-img" src="/img/grupal.jpg" />
-              } @if (noticia.asset) {
-              <img class="news-img" src="{{ noticia.asset }}" />
+              } @if (newsItem.asset) {
+              <img class="news-img" src="{{ newsItem.asset }}" />
               }
             </div>
             <div class="news-text-div">
               <div class="columna">
-                <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
-                <div class="news-date right">{{ noticia.fechaFormateada }}</div>
+                <div class="news-type">{{ newsItem.newsTypeNameLabel }}</div>
+                <div class="news-date right">{{ newsItem.publishedAtLabel }}</div>
               </div>
-              <div class="news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.title }}</div>
-              <div class="news-abstract">{{ noticia.summary }}</div>
-              <div class="news-author">{{ language.newsText[0].by }} {{ noticia.autor }}</div>
+              <div class="news-text-2" (click)="openNewsDetail(newsItem)">{{ newsItem.title }}</div>
+              <div class="news-abstract">{{ newsItem.summary }}</div>
+              <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
             </div>
             <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-              @if (!noticia.asset) {
+              @if (!newsItem.asset) {
               <img class="news-img" src="/img/grupal.jpg" />
-              } @if (noticia.asset) {
-              <img class="news-img" src="{{ noticia.asset }}" />
+              } @if (newsItem.asset) {
+              <img class="news-img" src="{{ newsItem.asset }}" />
               }
             </div>
           </div>
@@ -96,18 +94,18 @@
       <div class="category-title">{{ language.newsText[0].categoryTitle }}</div>
       <div
         class="category"
-        [ngClass]="categorySelected == -1 ? 'active' : 'category'"
+        [ngClass]="selectedCategoryId == -1 ? 'active' : 'category'"
         (click)="selectCategory(-1, language.newsText[0].allNews)"
       >
         {{ language.newsText[0].allNews }}
       </div>
-      @for (tiponoticia of tiponoticias; track tiponoticia) {
+      @for (newsType of newsTypes; track newsType) {
       <div
         class="category"
-        [ngClass]="categorySelected == tiponoticia.id ? 'active' : 'category'"
-        (click)="selectCategory(tiponoticia.id, tiponoticia.name)"
+        [ngClass]="selectedCategoryId == newsType.id ? 'active' : 'category'"
+        (click)="selectCategory(newsType.id, newsType.name)"
       >
-        {{ tiponoticia.name }}
+        {{ newsType.name }}
       </div>
       }
     </div>

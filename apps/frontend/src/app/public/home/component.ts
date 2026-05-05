@@ -14,7 +14,7 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { SessionService } from "@app/shared/services/session.service";
 
-import type { HomeNoticia, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
+import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
 @Component({
   selector: "app-home",
@@ -42,8 +42,8 @@ export default class HomeComponent implements OnInit {
   tesis = 0;
   resumenes = 0;
   lineasInvestigacion: HomeViewModel["lineasInvestigacion"] = [];
-  noticias: HomeNoticia[] = [];
-  noticiaPrincipal: HomeNoticia = {} as HomeNoticia;
+  newsItems: HomeNewsItem[] = [];
+  featuredNews: HomeNewsItem = {} as HomeNewsItem;
   aboutUs = "";
   metodos: Method[] = [];
   publicaciones: HomePublicacion[] = [];
@@ -62,8 +62,8 @@ export default class HomeComponent implements OnInit {
     this.info = home.info;
     this.publicaciones = home.publicaciones;
     this.proyectos = home.proyectos;
-    this.noticias = home.noticias;
-    this.noticiaPrincipal = home.noticiaPrincipal ?? ({} as HomeNoticia);
+    this.newsItems = home.newsItems;
+    this.featuredNews = home.featuredNews ?? ({} as HomeNewsItem);
     this.lineasInvestigacion = home.lineasInvestigacion;
     this.metodos = home.metodos;
     this.miembros = home.miembros;
@@ -99,11 +99,11 @@ export default class HomeComponent implements OnInit {
     this.router.navigate(["/home/detail-member/" + user.id], { queryParams: { from: "home" } });
   }
 
-  detalleNoticia(noticia: { id?: number }): void {
-    if (!noticia.id) {
+  openNewsDetail(newsItem: { id?: number }): void {
+    if (!newsItem.id) {
       return;
     }
-    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: "home" } });
+    this.router.navigate(["/home/detail-news/" + newsItem.id], { queryParams: { from: "home" } });
     this.scroll();
   }
 

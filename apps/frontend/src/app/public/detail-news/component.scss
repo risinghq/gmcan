@@ -81,25 +81,25 @@
   color: #000000;
 }
 
-.autor-div {
+.author-div {
   display: flex;
 }
-.autor-img-div {
+.author-img-div {
   align-self: center;
   border-radius: 40.5px;
   background-color: #c4c4c4;
   overflow: hidden;
 }
-.autor-img {
+.author-img {
   height: inherit;
   width: inherit;
   object-fit: cover;
 }
-.autor-text {
+.author-text {
   padding-left: 8px;
 }
 
-.autor-name {
+.author-name {
   @extend .plex-sans;
   font-size: 13px;
   font-weight: 500;
@@ -156,7 +156,7 @@
   .detail-text {
     margin-top: 24px;
   }
-  .autor-img-div {
+  .author-img-div {
     width: 51px;
     height: 51px;
   }
@@ -205,7 +205,7 @@
   .detail-text {
     margin-top: 24px;
   }
-  .autor-img-div {
+  .author-img-div {
     width: 51px;
     height: 51px;
   }
@@ -254,7 +254,7 @@
   .detail-text {
     margin-top: 16px;
   }
-  .autor-img-div {
+  .author-img-div {
     width: 40px;
     height: 40px;
   }

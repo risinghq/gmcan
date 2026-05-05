@@ -1,12 +1,12 @@
 import type { PublicNewsDetail } from "@app/shared/models/news";
 
 export type DetailNewsViewModel = {
-  noticia: PublicNewsDetail;
-  tipoNoticia: string;
-  autorName: string;
-  autorPhoto: string | null;
-  autorId: number | null;
-  dia: string;
-  mes: string;
-  anio: string;
+  newsItem: PublicNewsDetail;
+  newsTypeNameLabel: string;
+  authorNameLabel: string;
+  authorPhoto: string | null;
+  authorId: number | null;
+  day: string;
+  month: string;
+  year: string;
 };

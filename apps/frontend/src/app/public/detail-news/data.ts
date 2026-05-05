@@ -11,37 +11,37 @@ export class DetailNewsDataService {
   private readonly datePipe = inject(DatePipe);
 
   async load(id: number): Promise<DetailNewsViewModel> {
-    const noticia = await firstValueFrom(this.newsService.getNews(id));
+    const newsItem = await firstValueFrom(this.newsService.getNews(id));
 
-    if (!noticia) {
+    if (!newsItem) {
       throw new Error(`News with ID ${id} not found`);
     }
 
-    const publishedAt = new Date(noticia.publishedAt ?? "");
+    const publishedAt = new Date(newsItem.publishedAt ?? "");
     const publishedAtTime = publishedAt.getTime();
     if (!Number.isNaN(publishedAtTime)) {
       publishedAt.setMinutes(publishedAt.getMinutes() + publishedAt.getTimezoneOffset());
     }
 
     const isPublishedAtValid = !Number.isNaN(publishedAt.getTime());
-    const dia = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "dd") ?? "") : "";
-    const mes = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "MMMM", "es") ?? "") : "";
-    const anio = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "y") ?? "") : "";
+    const day = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "dd") ?? "") : "";
+    const month = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "MMMM", "es") ?? "") : "";
+    const year = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "y") ?? "") : "";
 
-    const tipoNoticia = noticia.newsTypeName ?? "";
-    const autorName = noticia.authorName ?? "";
-    const autorPhoto = noticia.authorAsset ?? null;
-    const autorId = noticia.authorId ?? null;
+    const newsTypeNameLabel = newsItem.newsTypeName ?? "";
+    const authorNameLabel = newsItem.authorName ?? "";
+    const authorPhoto = newsItem.authorAsset ?? null;
+    const authorId = newsItem.authorId ?? null;
 
     return {
-      noticia,
-      tipoNoticia,
-      autorName,
-      autorPhoto,
-      autorId,
-      dia,
-      mes,
-      anio,
+      newsItem,
+      newsTypeNameLabel,
+      authorNameLabel,
+      authorPhoto,
+      authorId,
+      day,
+      month,
+      year,
     };
   }
 }
