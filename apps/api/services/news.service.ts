@@ -3,7 +3,8 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
-import { type Locale } from "../lib/public-locale.js";
+import { SUPPORTED_LOCALES, type LocaleCode } from "../lib/locales.js";
+import { throwMissingTranslation, type Locale } from "../lib/public-locale.js";
 import type {
   AdminNewsListItem,
   AdminNewsListQuery,
@@ -74,12 +75,6 @@ export interface PublicNewsDetail {
 
 function toNewsRow(data: NewsUpsertInput) {
   return {
-    title: data.translations.es.title,
-    titleEN: data.translations.en.title,
-    summary: data.translations.es.summary,
-    summaryEN: data.translations.en.summary,
-    body: data.translations.es.body,
-    bodyEN: data.translations.en.body,
     status: data.status,
     publishedAt: data.publishedAt,
     authorId: data.authorId,
@@ -90,8 +85,29 @@ function toNewsRow(data: NewsUpsertInput) {
 
 const PUBLIC_SORT_COLUMN: Record<PublicNewsSortBy, string> = {
   publishedAt: "news.publishedAt",
-  title: "news.title",
+  title: "news_translation.title",
 };
+
+async function replaceNewsTranslations(
+  newsId: number,
+  translations: Record<string, { title: string; summary: string; body: string }>,
+) {
+  await db.transaction().execute(async (trx) => {
+    await trx.deleteFrom("news_translation").where("newsId", "=", newsId).execute();
+    await trx
+      .insertInto("news_translation")
+      .values(
+        Object.entries(translations).map(([locale, tr]) => ({
+          newsId,
+          locale,
+          title: tr.title,
+          summary: tr.summary,
+          body: tr.body,
+        })),
+      )
+      .execute();
+  });
+}
 
 export async function listPublicNews(locale: Locale, query: PublicNewsListQuery): Promise<PublicNewsListResponse> {
   const offset = (query.page - 1) * query.pageSize;
@@ -99,6 +115,9 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
 
   let base = db
     .selectFrom("news")
+    .innerJoin("news_translation", (join) =>
+      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", locale),
+    )
     .leftJoin("member", "member.id", "news.authorId")
     .leftJoin("news_type", "news_type.id", "news.newsTypeId")
     .where("news.status", "=", query.status);
@@ -118,8 +137,8 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
   const rows = await base
     .select([
       "news.id as id",
-      "news.title as title",
-      "news.summary as summary",
+      "news_translation.title as title",
+      "news_translation.summary as summary",
       "news.publishedAt as publishedAt",
       "news.priority as priority",
       "news.authorId as authorId",
@@ -161,13 +180,16 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
   const newsTypeNameField = locale === "en" ? "news_type.nameEN" : "news_type.name";
   const row = await db
     .selectFrom("news")
+    .innerJoin("news_translation", (join) =>
+      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", locale),
+    )
     .leftJoin("member", "member.id", "news.authorId")
     .leftJoin("news_type", "news_type.id", "news.newsTypeId")
     .select([
       "news.id as id",
-      "news.title as title",
-      "news.summary as summary",
-      "news.body as body",
+      "news_translation.title as title",
+      "news_translation.summary as summary",
+      "news_translation.body as body",
       "news.status as status",
       "news.publishedAt as publishedAt",
       "news.priority as priority",
@@ -206,7 +228,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
 
 const NEWS_SORT_COLUMN: Record<AdminNewsSortBy, string> = {
   publishedAt: "news.publishedAt",
-  title: "news.title",
+  title: "news_translation.title",
   status: "news.status",
   authorName: "member.firstName",
   categoryName: "news_type.name",
@@ -216,6 +238,9 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
   const offset = (query.page - 1) * query.pageSize;
   const base = db
     .selectFrom("news")
+    .innerJoin("news_translation", (join) =>
+      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", "es"),
+    )
     .innerJoin("news_type", "news_type.id", "news.newsTypeId")
     .innerJoin("member", "member.id", "news.authorId")
     .$if(query.status !== undefined, (qb) => qb.where("news.status", "=", query.status as number))
@@ -224,8 +249,8 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
     .$if(Boolean(query.q), (qb) =>
       qb.where((eb) =>
         eb.or([
-          eb("news.title", "like", `%${query.q}%`),
-          eb("news.summary", "like", `%${query.q}%`),
+          eb("news_translation.title", "like", `%${query.q}%`),
+          eb("news_translation.summary", "like", `%${query.q}%`),
           eb("member.firstName", "like", `%${query.q}%`),
           eb("member.lastName", "like", `%${query.q}%`),
           eb("member.maternalName", "like", `%${query.q}%`),
@@ -239,7 +264,7 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
   const rows = await base
     .select([
       "news.id as id",
-      "news.title as title",
+      "news_translation.title as title",
       "news.publishedAt as publishedAt",
       "news.status as status",
       "news.authorId as authorId",
@@ -282,7 +307,19 @@ export async function getNewsItem(id: number) {
   return db.selectFrom("news").selectAll().where("id", "=", id).executeTakeFirst();
 }
 
-export function toAdminNewsView(row: NewsRow) {
+export async function toAdminNewsView(row: NewsRow) {
+  const translations = await db
+    .selectFrom("news_translation")
+    .select(["locale", "title", "summary", "body"])
+    .where("newsId", "=", row.id)
+    .execute();
+
+  for (const locale of SUPPORTED_LOCALES) {
+    if (!translations.find((tr) => tr.locale === locale)) {
+      throwMissingTranslation(`news:${row.id}:${locale}`);
+    }
+  }
+
   return {
     id: row.id,
     status: row.status,
@@ -292,20 +329,22 @@ export function toAdminNewsView(row: NewsRow) {
     priority: row.priority,
     authorId: row.authorId,
     newsTypeId: row.newsTypeId,
-    translations: {
-      es: { title: row.title, summary: row.summary, body: row.body },
-      en: { title: row.titleEN, summary: row.summaryEN, body: row.bodyEN },
-    },
+    translations: Object.fromEntries(
+      translations.map((tr) => [tr.locale, { title: tr.title, summary: tr.summary, body: tr.body }]),
+    ) as Record<LocaleCode, { title: string; summary: string; body: string }>,
   };
 }
 
 export async function createNews(data: NewsUpsertInput) {
-  const result = await db.insertInto("news").values(toNewsRow(data)).executeTakeFirst();
-  return Number(result.insertId);
+  const result = await db.insertInto("news").values(toNewsRow(data)).executeTakeFirstOrThrow();
+  const id = Number(result.insertId);
+  await replaceNewsTranslations(id, data.translations);
+  return id;
 }
 
 export async function updateNews(id: number, data: NewsUpsertInput) {
   await db.updateTable("news").set(toNewsRow(data)).where("id", "=", id).execute();
+  await replaceNewsTranslations(id, data.translations);
 }
 
 export async function deleteNews(id: number) {

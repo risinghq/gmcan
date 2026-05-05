@@ -292,7 +292,7 @@ export async function seedSoftware() {
         createdAt: today,
         updatedAt: today,
       },
-    ])
+    ] as any)
     .onConflict((oc) => oc.doNothing())
     .execute();
 }
@@ -363,7 +363,7 @@ export async function seedAbout() {
       createdAt: today,
       updatedAt: today,
       groupId: 1,
-    })
+    } as any)
     .onConflict((oc) => oc.doNothing())
     .execute();
 }

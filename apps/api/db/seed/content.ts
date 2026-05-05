@@ -64,7 +64,7 @@ export async function seedNews() {
         authorId: 1,
         newsTypeId: NewsType.GENERAL,
       },
-    ])
+    ] as any)
     .onConflict((oc) => oc.doNothing())
     .execute();
 }

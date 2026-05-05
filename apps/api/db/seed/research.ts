@@ -52,7 +52,7 @@ export async function seedResearchGroup() {
       projectsSectionEN: null,
       createdAt: today,
       updatedAt: today,
-    })
+    } as any)
     .onConflict((oc) => oc.doNothing())
     .execute();
 }
@@ -97,7 +97,7 @@ export async function seedResearchLines() {
         createdAt: "2020-03-18",
         updatedAt: "2020-03-18",
       },
-    ])
+    ] as any)
     .onConflict((oc) => oc.doNothing())
     .execute();
 }
@@ -154,7 +154,7 @@ export async function seedMethods() {
         createdAt: today,
         updatedAt: today,
       },
-    ])
+    ] as any)
     .onConflict((oc) => oc.doNothing())
     .execute();
 }

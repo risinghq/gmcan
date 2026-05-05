@@ -128,26 +128,32 @@ export interface SessionTable {
 
 export interface ResearchLineTable {
   id: Generated<number>;
-  name: string;
-  nameEN: string;
-  description: string | null;
-  descriptionEN: string | null;
-
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
 }
 
+export interface ResearchLineTranslationTable {
+  id: Generated<number>;
+  researchLineId: number;
+  locale: string;
+  name: string;
+  description: string | null;
+}
+
 export interface MethodTable {
   id: Generated<number>;
-  name: string;
-  nameEN: string;
-  description: string;
-  descriptionEN: string | null;
-
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
+}
+
+export interface MethodTranslationTable {
+  id: Generated<number>;
+  methodId: number;
+  locale: string;
+  name: string;
+  description: string | null;
 }
 
 export interface EquipmentTable {
@@ -164,36 +170,51 @@ export interface EquipmentTable {
 
 export interface SoftwareTable {
   id: Generated<number>;
-  name: string | null;
-  description: string | null;
-  descriptionEN: string | null;
   moreInfo: string | null;
   groupId: number;
   createdAt: DateString | null;
   updatedAt: DateString | null;
 }
 
+export interface SoftwareTranslationTable {
+  id: Generated<number>;
+  softwareId: number;
+  locale: string;
+  name: string | null;
+  description: string | null;
+}
+
 export interface AboutTable {
   id: Generated<number>;
-  descriptionES: string;
-  descriptionEN: string;
-  objectivesContent: string | null;
-  servicesContent: string | null;
-  homeServicesTeaserContent: string | null;
   createdAt: DateString | null;
   updatedAt: DateString | null;
 
   groupId: number;
 }
 
+export interface AboutTranslationTable {
+  id: Generated<number>;
+  aboutId: number;
+  locale: string;
+  description: string;
+  objectivesContent: string | null;
+  servicesContent: string | null;
+  homeServicesTeaserContent: string | null;
+}
+
+export interface GroupTranslationTable {
+  id: Generated<number>;
+  groupId: number;
+  locale: string;
+  summary: string;
+  facilities: string | null;
+  futureWork: string | null;
+  publicationsSection: string | null;
+  projectsSection: string | null;
+}
+
 export interface NewsTable {
   id: Generated<number>;
-  title: string;
-  titleEN: string;
-  summary: string;
-  summaryEN: string;
-  body: string;
-  bodyEN: string;
   status: number;
   publishedAt: DateString;
   updatedAt: DateString | null;
@@ -202,6 +223,15 @@ export interface NewsTable {
   priority: number | null;
   authorId: number;
   newsTypeId: number;
+}
+
+export interface NewsTranslationTable {
+  id: Generated<number>;
+  newsId: number;
+  locale: string;
+  title: string;
+  summary: string;
+  body: string;
 }
 
 export interface PublicationTable {
@@ -317,11 +347,17 @@ export interface Database {
   member: MemberTable;
   session: SessionTable;
   research_line: ResearchLineTable;
+  research_line_translation: ResearchLineTranslationTable;
   method: MethodTable;
+  method_translation: MethodTranslationTable;
   equipment: EquipmentTable;
   software: SoftwareTable;
+  software_translation: SoftwareTranslationTable;
   about: AboutTable;
+  about_translation: AboutTranslationTable;
+  group_translation: GroupTranslationTable;
   news: NewsTable;
+  news_translation: NewsTranslationTable;
   publication: PublicationTable;
   publication_author: PublicationAuthorTable;
   project: ProjectTable;

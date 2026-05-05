@@ -361,7 +361,10 @@ export class ContenidosState {
       | AboutSectionContent
       | LocalizedAboutSectionContent
       | undefined;
-    const servicesAny = raw.servicesContent as unknown as AboutSectionContent | LocalizedAboutSectionContent | undefined;
+    const servicesAny = raw.servicesContent as unknown as
+      | AboutSectionContent
+      | LocalizedAboutSectionContent
+      | undefined;
     const teaserAny = raw.homeServicesTeaserContent as unknown as
       | HomeServicesTeaserContent
       | LocalizedHomeServicesTeaserContent
@@ -371,7 +374,9 @@ export class ContenidosState {
         ? objectivesAny[this.locale]
         : (objectivesAny ?? { introParagraphs: [], items: [] });
     const servicesContent =
-      servicesAny && "es" in servicesAny ? servicesAny[this.locale] : (servicesAny ?? { introParagraphs: [], items: [] });
+      servicesAny && "es" in servicesAny
+        ? servicesAny[this.locale]
+        : (servicesAny ?? { introParagraphs: [], items: [] });
     const homeServicesTeaserContent =
       teaserAny && "es" in teaserAny ? teaserAny[this.locale] : (teaserAny ?? { paragraphs: [] });
     return {

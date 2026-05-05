@@ -56,7 +56,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getNewsItem(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  const view = toAdminNewsView(row);
+  const view = await toAdminNewsView(row);
   return c.json({
     ...view,
     asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: view.id, slot: "photo" }),

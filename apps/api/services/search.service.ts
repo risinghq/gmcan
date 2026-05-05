@@ -34,11 +34,13 @@ export async function globalSearch(q: string, types: Set<string>) {
     types.has("news")
       ? db
           .selectFrom("news")
+          .leftJoin("news_translation", (join) =>
+            join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", "es"),
+          )
           .leftJoin("member", "member.id", "news.authorId")
           .select([
             "news.id",
-            "news.title",
-            "news.titleEN",
+            "news_translation.title as title",
             "news.publishedAt",
             "news.authorId",
             "news.newsTypeId",
@@ -46,11 +48,7 @@ export async function globalSearch(q: string, types: Set<string>) {
             sql<string>`TRIM(COALESCE(member.firstName, '') || ' ' || COALESCE(member.lastName, ''))`.as("authorName"),
           ])
           .where((eb) =>
-            eb.or([
-              eb("news.title", "like", like),
-              eb("news.summary", "like", like),
-              eb("news.summaryEN", "like", like),
-            ]),
+            eb.or([eb("news_translation.title", "like", like), eb("news_translation.summary", "like", like)]),
           )
           .execute()
       : Promise.resolve([]),
@@ -73,7 +71,7 @@ export async function globalSearch(q: string, types: Set<string>) {
             "project.researchLineId",
             "project.currencyId",
             "project.fundingSourceId",
-            sql<string>`research_line.name`.as("researchLine"),
+            sql<string>`''`.as("researchLine"),
             sql<string>`funding_source.name`.as("fundingSource"),
           ])
           .where("project.status", "=", 1)
@@ -84,8 +82,6 @@ export async function globalSearch(q: string, types: Set<string>) {
               eb("project.code", "like", like),
               eb("project.description", "like", like),
               eb("project.descriptionEN", "like", like),
-              eb("research_line.name", "like", like),
-              eb("research_line.nameEN", "like", like),
               eb("funding_source.name", "like", like),
             ]),
           )

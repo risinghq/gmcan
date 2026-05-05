@@ -43,7 +43,7 @@ router.get("/", async (c) => {
   return c.json(
     await Promise.all(
       rows.map(async (row) => {
-        const view = toAdminMethodView(row);
+        const view = await toAdminMethodView(row);
         return Object.assign({}, view, {
           asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: view.id, slot: "photo" }),
         });
@@ -56,7 +56,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMethod(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  const view = toAdminMethodView(row);
+  const view = await toAdminMethodView(row);
   return c.json(
     Object.assign({}, view, {
       asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: view.id, slot: "photo" }),

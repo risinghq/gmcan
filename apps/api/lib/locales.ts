@@ -19,7 +19,7 @@ const configuredDefault = (env.DEFAULT_LOCALE ?? "").trim().toLowerCase();
 export const DEFAULT_LOCALE =
   configuredDefault.length > 0 && SUPPORTED_LOCALES.includes(configuredDefault)
     ? configuredDefault
-    : SUPPORTED_LOCALES[0] ?? "es";
+    : (SUPPORTED_LOCALES[0] ?? "es");
 
 export const LocaleCodeSchema = z
   .string()
@@ -47,20 +47,18 @@ export function assertLocale(locale: string): LocaleCode {
 }
 
 export function makeLocalizedMapSchema<T extends z.ZodTypeAny>(valueSchema: T) {
-  return z
-    .record(z.string(), valueSchema)
-    .superRefine((value, ctx) => {
-      const keys = new Set(Object.keys(value));
-      for (const locale of SUPPORTED_LOCALES) {
-        if (!keys.has(locale)) {
-          ctx.addIssue({ code: "custom", message: `Missing translations.${locale}` });
-        }
+  return z.record(z.string(), valueSchema).superRefine((value, ctx) => {
+    const keys = new Set(Object.keys(value));
+    for (const locale of SUPPORTED_LOCALES) {
+      if (!keys.has(locale)) {
+        ctx.addIssue({ code: "custom", message: `Missing translations.${locale}` });
       }
+    }
 
-      for (const key of keys) {
-        if (!SUPPORTED_LOCALES.includes(key)) {
-          ctx.addIssue({ code: "custom", message: `Unsupported locale key: ${key}` });
-        }
+    for (const key of keys) {
+      if (!SUPPORTED_LOCALES.includes(key)) {
+        ctx.addIssue({ code: "custom", message: `Unsupported locale key: ${key}` });
       }
-    });
+    }
+  });
 }

@@ -66,7 +66,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const news = await Promise.all(
     result.news.map(async (row) => ({
       id: row.id,
-      title: localizeField(row, locale, { es: "title", en: "titleEN" }),
+      title: row.title,
       publishedAt: row.publishedAt,
       asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
       newsTypeId: row.newsTypeId,

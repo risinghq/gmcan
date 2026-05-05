@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
@@ -32,14 +33,6 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const AboutSectionSchema = z.object({
   introParagraphs: z.array(z.string().trim().min(1)),
   items: z.array(z.string().trim().min(1)),
-});
-const LocalizedSectionSchema = z.object({
-  es: AboutSectionSchema,
-  en: AboutSectionSchema,
-});
-const LocalizedTeaserSchema = z.object({
-  es: z.object({ paragraphs: z.array(z.string().trim().min(1)).min(1) }),
-  en: z.object({ paragraphs: z.array(z.string().trim().min(1)).min(1) }),
 });
 
 function parseJsonContent<T>(raw: string | null, schema: z.ZodType<T>, fallback: T): T {
@@ -76,7 +69,7 @@ router.put(
 router.put(
   "/:id/summary",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ summaryES: z.string(), summaryEN: z.string() })),
+  zValidator("json", z.object({ translations: translationsSchema({ summary: z.string().min(1) }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -88,7 +81,7 @@ router.put(
 router.put(
   "/:id/facilities",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ facilitiesES: z.string().optional(), facilitiesEN: z.string().optional() })),
+  zValidator("json", z.object({ translations: translationsSchema({ facilities: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -100,7 +93,7 @@ router.put(
 router.put(
   "/:id/future-work",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ futureWorkES: z.string().optional(), futureWorkEN: z.string().optional() })),
+  zValidator("json", z.object({ translations: translationsSchema({ futureWork: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -112,10 +105,7 @@ router.put(
 router.put(
   "/:id/publications-section",
   zValidator("param", IdParam),
-  zValidator(
-    "json",
-    z.object({ publicationsSectionES: z.string().optional(), publicationsSectionEN: z.string().optional() }),
-  ),
+  zValidator("json", z.object({ translations: translationsSchema({ publicationsSection: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -127,7 +117,7 @@ router.put(
 router.put(
   "/:id/projects-section",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ projectsSectionES: z.string().optional(), projectsSectionEN: z.string().optional() })),
+  zValidator("json", z.object({ translations: translationsSchema({ projectsSection: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -143,20 +133,26 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   return c.json(
     rows.map((row) =>
       Object.assign(row, {
-        objectivesContent: parseJsonContent(
-          row.objectivesContent,
-          LocalizedSectionSchema,
-          { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
-        ),
-        servicesContent: parseJsonContent(
-          row.servicesContent,
-          LocalizedSectionSchema,
-          { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
-        ),
-        homeServicesTeaserContent: parseJsonContent(
-          row.homeServicesTeaserContent,
-          LocalizedTeaserSchema,
-          { es: { paragraphs: [] }, en: { paragraphs: [] } },
+        translations: Object.fromEntries(
+          row.translations.map((tr) => [
+            tr.locale,
+            {
+              description: tr.description,
+              objectivesContent: parseJsonContent(tr.objectivesContent, AboutSectionSchema, {
+                introParagraphs: [],
+                items: [],
+              }),
+              servicesContent: parseJsonContent(tr.servicesContent, AboutSectionSchema, {
+                introParagraphs: [],
+                items: [],
+              }),
+              homeServicesTeaserContent: parseJsonContent(
+                tr.homeServicesTeaserContent,
+                z.object({ paragraphs: z.array(z.string().trim().min(1)) }),
+                { paragraphs: [] },
+              ),
+            },
+          ]),
         ),
       }),
     ),
@@ -166,7 +162,7 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
 router.put(
   "/about/:id/description",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ descriptionES: z.string(), descriptionEN: z.string() })),
+  zValidator("json", z.object({ translations: translationsSchema({ description: z.string().min(1) }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -178,11 +174,18 @@ router.put(
 router.put(
   "/about/:id/objectives",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ objectivesContent: LocalizedSectionSchema })),
+  zValidator("json", z.object({ translations: translationsSchema({ objectivesContent: AboutSectionSchema }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
-    await updateAboutObjectives(id, { objectivesContent: JSON.stringify(data.objectivesContent) });
+    await updateAboutObjectives(id, {
+      translations: Object.fromEntries(
+        Object.entries(data.translations).map(([locale, tr]) => [
+          locale,
+          { objectivesContent: JSON.stringify(tr.objectivesContent) },
+        ]),
+      ) as any,
+    });
     return c.json(okStatus());
   },
 );
@@ -190,11 +193,18 @@ router.put(
 router.put(
   "/about/:id/services",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ servicesContent: LocalizedSectionSchema })),
+  zValidator("json", z.object({ translations: translationsSchema({ servicesContent: AboutSectionSchema }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
-    await updateAboutServices(id, { servicesContent: JSON.stringify(data.servicesContent) });
+    await updateAboutServices(id, {
+      translations: Object.fromEntries(
+        Object.entries(data.translations).map(([locale, tr]) => [
+          locale,
+          { servicesContent: JSON.stringify(tr.servicesContent) },
+        ]),
+      ) as any,
+    });
     return c.json(okStatus());
   },
 );
@@ -202,12 +212,24 @@ router.put(
 router.put(
   "/about/:id/home-services-teaser",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ homeServicesTeaserContent: LocalizedTeaserSchema })),
+  zValidator(
+    "json",
+    z.object({
+      translations: translationsSchema({
+        homeServicesTeaserContent: z.object({ paragraphs: z.array(z.string().trim().min(1)).min(1) }),
+      }),
+    }),
+  ),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateAboutHomeServicesTeaser(id, {
-      homeServicesTeaserContent: JSON.stringify(data.homeServicesTeaserContent),
+      translations: Object.fromEntries(
+        Object.entries(data.translations).map(([locale, tr]) => [
+          locale,
+          { homeServicesTeaserContent: JSON.stringify(tr.homeServicesTeaserContent) },
+        ]),
+      ) as any,
     });
     return c.json(okStatus());
   },
@@ -229,9 +251,10 @@ router.post(
   zValidator(
     "json",
     z.object({
-      name: z.string().optional(),
-      description: z.string().optional(),
-      descriptionEN: z.string().optional(),
+      translations: translationsSchema({
+        name: z.string().optional(),
+        description: z.string().optional(),
+      }),
       moreInfo: z.string().optional(),
       groupId: z.number().int(),
     }),
@@ -249,9 +272,10 @@ router.put(
   zValidator(
     "json",
     z.object({
-      name: z.string().optional(),
-      description: z.string().optional(),
-      descriptionEN: z.string().optional(),
+      translations: translationsSchema({
+        name: z.string().optional(),
+        description: z.string().optional(),
+      }),
       moreInfo: z.string().optional(),
     }),
   ),
