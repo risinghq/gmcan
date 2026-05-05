@@ -9,6 +9,7 @@ import {
 import express from "express";
 
 const browserDistFolder = join(import.meta.dirname, "../browser");
+const SERVER_PORT = 4200;
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -28,14 +29,13 @@ app.use((req, res, next) => {
     .catch(next);
 });
 
-if (isMainModule(import.meta.url) || process.env["pm_id"]) {
-  const port = process.env["PORT"] || 4000;
-  app.listen(port, (error) => {
+if (isMainModule(import.meta.url)) {
+  app.listen(SERVER_PORT, (error) => {
     if (error) {
       throw error;
     }
 
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`Node Express server listening on http://localhost:${SERVER_PORT}`);
   });
 }
 

@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { z } from "zod";
 
 import { getFrontendUrl } from "../../config.js";
+import { env } from "../../config/env.js";
 import {
   consumeResetToken,
   getMemberByEmail,
@@ -13,15 +14,14 @@ import {
   setResetToken,
 } from "../../services/member.service.js";
 
-const { RESEND_API_KEY, INSTITUTIONAL_EMAIL, NODE_ENV } = process.env;
 const router = new Hono();
-const resend = new Resend(RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY);
 
 function getEmailConfig() {
-  const isDev = NODE_ENV === "development" || !NODE_ENV;
+  const isDev = env.NODE_ENV === "development";
   return {
     from: isDev ? "Development <onboarding@resend.dev>" : "GMCAN <gmcan@unmsm.edu.pe>",
-    institutionalTo: isDev ? "delivered@resend.dev" : INSTITUTIONAL_EMAIL!,
+    institutionalTo: isDev ? "delivered@resend.dev" : env.INSTITUTIONAL_EMAIL!,
   };
 }
 

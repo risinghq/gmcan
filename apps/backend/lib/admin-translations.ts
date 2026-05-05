@@ -1,16 +1,8 @@
 import { z } from "zod";
 
-function parseLocales(raw: string | undefined): Array<"es" | "en"> {
-  const values = raw
-    ?.split(",")
-    .map((v) => v.trim())
-    .filter((v): v is "es" | "en" => v === "es" || v === "en");
-  if (!values || values.length === 0) return ["es", "en"];
-  if (!values.includes("es") || !values.includes("en")) return ["es", "en"];
-  return values;
-}
+import { env } from "../config/env.js";
 
-export const ADMIN_LOCALES = parseLocales(process.env["ADMIN_LOCALES"]);
+export const ADMIN_LOCALES = env.ADMIN_LOCALES;
 export const LocaleSchema = z.enum(["es", "en"]);
 export type AdminLocale = z.infer<typeof LocaleSchema>;
 
