@@ -1,5 +1,6 @@
 import { sql } from "kysely";
 
+import { env } from "../config/env.js";
 import { db } from "./client.js";
 import { createTables, EXPECTED_COLUMNS } from "./ddl.js";
 import { seed } from "./seed.js";
@@ -13,7 +14,7 @@ async function sweepExpiredSessions() {
 }
 
 export async function bootstrap() {
-  if (process.env.NODE_ENV === "production") return;
+  if (env.NODE_ENV === "production") return;
 
   await sql`PRAGMA foreign_keys = ON`.execute(db);
 

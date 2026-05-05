@@ -4,6 +4,7 @@ import path from "node:path";
 import type { Context } from "hono";
 
 import { getBackendUrl } from "../config.js";
+import { env } from "../config/env.js";
 import { db } from "../db/client.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../lib/upload.js";
 
@@ -16,7 +17,7 @@ type SlotPolicy = {
 };
 
 const RETENTION_DAYS = 90;
-const SIGN_SECRET = process.env.ASSET_SIGNING_SECRET ?? "dev-asset-secret";
+const SIGN_SECRET = env.ASSET_SIGNING_SECRET;
 
 const SLOT_POLICIES: Record<string, SlotPolicy> = {
   "member.photo": { kind: "image", visibility: "public" },

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { env } from "../config/env.js";
+
 function parseLocales(raw: string | undefined): Array<"es" | "en"> {
   const values = raw
     ?.split(",")
@@ -10,7 +12,7 @@ function parseLocales(raw: string | undefined): Array<"es" | "en"> {
   return values;
 }
 
-export const ADMIN_LOCALES = parseLocales(process.env["ADMIN_LOCALES"]);
+export const ADMIN_LOCALES = parseLocales(env.ADMIN_LOCALES);
 export const LocaleSchema = z.enum(["es", "en"]);
 export type AdminLocale = z.infer<typeof LocaleSchema>;
 
@@ -24,7 +26,7 @@ export function translationsSchema<TShape extends z.ZodRawShape>(shape: TShape) 
     for (const locale of ADMIN_LOCALES) {
       if (!keys.includes(locale)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: `Missing translations.${locale}`,
         });
       }

@@ -9,6 +9,7 @@ declare module "hono" {
 
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
+import { env } from "../config/env.js";
 import { db } from "../db/client.js";
 import { AUTH_EXEMPT_PATHS } from "./auth-exempt.js";
 
@@ -30,7 +31,7 @@ export async function createSession(c: Context, memberId: number, email: string)
     sameSite: "Strict",
     path: "/",
     maxAge: SESSION_MAX_AGE_MS / 1000,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
   });
 }
 
