@@ -18,38 +18,38 @@
         <!-- ID Column -->
         <ng-container matColumnDef="titulo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
-          <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">
-            {{ row.titulo }}
+          <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
+            {{ row.title }}
           </td>
         </ng-container>
         <ng-container matColumnDef="primerAutor">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Responsable(s)</th>
-          <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">
-            @for (usuario of row.usuario; track usuario) {
+          <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
+            @for (usuario of row.members; track usuario.memberId) {
               <div class="flex-news">
                 <div class="member-img-round mr-8">
-                  @if (usuario.foto) {
-                    <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" alt="User photo" />
+                  @if (usuario.asset) {
+                    <img class="member-img" src="{{ usuario.asset }}" alt="User photo" />
                   }
-                  @if (!usuario.foto) {
+                  @if (!usuario.asset) {
                     <img class="member-img" src="/img/placeholders/user.png" alt="" />
                   }
                 </div>
-                {{ usuario.nombreCompleto }}
+                {{ usuario.name }}
               </div>
             }
           </td>
         </ng-container>
         <ng-container matColumnDef="fechaInicio">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de Inicio</th>
-          <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">
+          <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
             {{ row.fechaI }}
           </td>
         </ng-container>
         <ng-container matColumnDef="codigo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
-          <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">
-            {{ row.codigo }}
+          <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
+            {{ row.code }}
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -74,8 +74,8 @@
         <!-- ID Column -->
         <ng-container matColumnDef="nombre">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-          <td mat-cell *matCellDef="let row" (click)="editFuente(row.idFuenteFinanciamiento)">
-            {{ row.nombre }}
+          <td mat-cell *matCellDef="let row" (click)="editFuente(row.id)">
+            {{ row.name }}
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
@@ -104,33 +104,33 @@
       <!-- ID Column -->
       <ng-container matColumnDef="titulo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
-        <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">{{ row.titulo }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">{{ row.title }}</td>
       </ng-container>
       <ng-container matColumnDef="primerAutor">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Responsable(s)</th>
-        <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">
-          @for (usuario of row.usuario; track usuario) {
+        <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
+          @for (usuario of row.members; track usuario.memberId) {
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                @if (usuario.foto) {
-                  <img class="member-img" src="{{ url + 'usuario/' + usuario.DNI + '/file }}" alt="User photo" />
+                @if (usuario.asset) {
+                  <img class="member-img" src="{{ usuario.asset }}" alt="User photo" />
                 }
-                @if (!usuario.foto) {
+                @if (!usuario.asset) {
                   <img class="member-img" src="/img/placeholders/user.png" alt="" />
                 }
               </div>
-              {{ usuario.nombreCompleto }}
+              {{ usuario.name }}
             </div>
           }
         </td>
       </ng-container>
       <ng-container matColumnDef="fechaInicio">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de Inicio</th>
-        <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">{{ row.fechaI }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">{{ row.fechaI }}</td>
       </ng-container>
       <ng-container matColumnDef="codigo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>
-        <td mat-cell *matCellDef="let row" (click)="editProject(row.idProyecto)">{{ row.codigo }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">{{ row.code }}</td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>

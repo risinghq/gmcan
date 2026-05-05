@@ -185,7 +185,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     const data: NewsPreviewData = {
       title: this.noticia.title ?? null,
       summary: this.noticia.summary ?? null,
-      asset: this.previewUrl ?? (this.noticia.asset ? this.url + "api/assets/" + this.noticia.asset : null),
+      asset: this.previewUrl ?? this.noticia.asset,
       newsTypeName: cat?.name ?? null,
       author: aut
         ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, asset: aut.asset }
