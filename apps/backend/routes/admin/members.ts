@@ -2,7 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { replaceAssetFile, removeAssetFile } from "../../lib/asset-route.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToGroup,
@@ -68,10 +69,7 @@ router.use("*", async (c, next) => {
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
   const { q, status, memberTypeId } = c.req.valid("query");
-  if (q) return c.json(await listAdminMembers({ q }));
-  if (status !== undefined) return c.json(await listAdminMembers({ status }));
-  if (memberTypeId !== undefined) return c.json(await listAdminMembers({ memberTypeId }));
-  return c.json(await listAdminMembers());
+  return c.json(await listAdminMembers({ q, status, memberTypeId }));
 });
 
 router.get("/exists/email", zValidator("query", z.object({ email: z.string().min(1) })), async (c) => {
@@ -103,40 +101,33 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody),
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateMember(id, data);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMember(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const current = await getMemberPhoto(id);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "members", kind: "image" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  await setMemberPhoto(id, fileName);
-  if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ assetKey: current.photo });
-  }
-  return c.json({ status: 1 });
+  return replaceAssetFile(c, {
+    domain: "members",
+    kind: "image",
+    current: await getMemberPhoto(id),
+    column: "photo",
+    set: (assetKey) => setMemberPhoto(id, assetKey),
+  });
 });
 
 router.delete("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const row = await getMemberPhoto(id);
-  if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  await deleteUploadedFile({ assetKey: row.photo });
-  await clearMemberPhoto(id);
-  return c.json({ status: 1 });
+  return removeAssetFile(c, {
+    current: await getMemberPhoto(id),
+    column: "photo",
+    clear: () => clearMemberPhoto(id),
+  });
 });
 
 router.get("/:id/groups", zValidator("param", IdParam), async (c) => {
@@ -153,7 +144,7 @@ router.post(
     const { id } = c.req.valid("param");
     const { groupId } = c.req.valid("json");
     await addMemberToGroup(id, groupId);
-    return c.json({ status: 1 }, 201);
+    return c.json(okStatus(), 201);
   },
 );
 
@@ -163,7 +154,7 @@ router.delete(
   async (c) => {
     const { id, groupId } = c.req.valid("param");
     await removeMemberFromGroup(id, groupId);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 

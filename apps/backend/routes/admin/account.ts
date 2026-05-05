@@ -3,7 +3,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import type { Actor } from "../../authz/types.js";
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { replaceAssetFile, removeAssetFile } from "../../lib/asset-route.js";
+import { okStatus } from "../../lib/contracts.js";
 import { capabilitiesForActor, requirePermission } from "../../middleware/authz.js";
 import {
   clearMemberPhoto,
@@ -39,35 +40,28 @@ router.put(
     const { password } = c.req.valid("json");
     const email = c.get("email") as string;
     await updatePassword(email, password);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
 router.put("/asset", requirePermission("account.self.write"), async (c) => {
   const memberId = c.get("memberId") as number;
-  const current = await getMemberPhoto(memberId);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "members", kind: "image" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  await setMemberPhoto(memberId, fileName);
-  if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ assetKey: current.photo });
-  }
-  return c.json({ status: 1 });
+  return replaceAssetFile(c, {
+    domain: "members",
+    kind: "image",
+    current: await getMemberPhoto(memberId),
+    column: "photo",
+    set: (assetKey) => setMemberPhoto(memberId, assetKey),
+  });
 });
 
 router.delete("/asset", requirePermission("account.self.write"), async (c) => {
   const memberId = c.get("memberId") as number;
-  const row = await getMemberPhoto(memberId);
-  if (!row?.photo) return c.json({ error: "File not found" }, 404);
-  await deleteUploadedFile({ assetKey: row.photo });
-  await clearMemberPhoto(memberId);
-  return c.json({ status: 1 });
+  return removeAssetFile(c, {
+    current: await getMemberPhoto(memberId),
+    column: "photo",
+    clear: () => clearMemberPhoto(memberId),
+  });
 });
 
 export default router;

@@ -2,13 +2,15 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { replaceAssetFile } from "../../lib/asset-route.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createEquipment,
   createSoftware,
   deleteEquipment,
   deleteSoftware,
+  getAboutPhoto,
   getGroupFile,
   listAbout,
   listEquipment,
@@ -57,7 +59,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateGroupInfo(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -69,7 +71,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateGroupSummary(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -81,7 +83,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateGroupFacilities(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -93,7 +95,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateGroupFutureWork(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -108,7 +110,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateGroupPublicationsSection(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -120,28 +122,20 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateGroupProjectsSection(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
 router.put("/:id/assets/:slot", zValidator("param", IdParam.extend(SlotParam.shape)), async (c) => {
   const { id, slot } = c.req.valid("param");
   const config = SLOT_CONFIG[slot];
-  const current = await getGroupFile(id, config.column);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "group", kind: config.kind });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  const previousFileName = current[config.column];
-  await setGroupFile(id, config.column, fileName);
-  if (previousFileName && previousFileName !== fileName) {
-    await deleteUploadedFile({ assetKey: previousFileName });
-  }
-  return c.json({ status: 1 });
+  return replaceAssetFile(c, {
+    domain: "group",
+    kind: config.kind,
+    current: await getGroupFile(id, config.column),
+    column: config.column,
+    set: (assetKey) => setGroupFile(id, config.column, assetKey),
+  });
 });
 
 // About
@@ -159,7 +153,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateAboutDescription(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -171,7 +165,7 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateAboutObjectives(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
@@ -183,19 +177,19 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateAboutServices(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
 router.put("/about/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "about", kind: "image" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-  await setAboutPhoto(id, fileName);
-  return c.json({ status: 1 });
+  return replaceAssetFile(c, {
+    domain: "about",
+    kind: "image",
+    current: await getAboutPhoto(id),
+    column: "photo",
+    set: (assetKey) => setAboutPhoto(id, assetKey),
+  });
 });
 
 // Software
@@ -244,14 +238,14 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateSoftware(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
 router.delete("/software/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteSoftware(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 // Equipment
@@ -302,14 +296,14 @@ router.put(
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
     await updateEquipment(id, data);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 
 router.delete("/equipment/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteEquipment(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 export default router;

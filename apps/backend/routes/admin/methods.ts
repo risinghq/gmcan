@@ -3,7 +3,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { replaceAssetFile } from "../../lib/asset-route.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createMethod,
@@ -61,31 +62,24 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody),
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateMethod(id, data);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMethod(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const current = await getMethodPhoto(id);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "methods", kind: "image" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  await setMethodPhoto(id, fileName);
-  if (current.photo && current.photo !== fileName) {
-    await deleteUploadedFile({ assetKey: current.photo });
-  }
-  return c.json({ status: 1 });
+  return replaceAssetFile(c, {
+    domain: "methods",
+    kind: "image",
+    current: await getMethodPhoto(id),
+    column: "photo",
+    set: (assetKey) => setMethodPhoto(id, assetKey),
+  });
 });
 
 export default router;

@@ -3,7 +3,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { deleteUploadedFile, extractFirstFile, saveUploadedFile } from "../../lib/upload.js";
+import { replaceAssetFile } from "../../lib/asset-route.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createPublication,
@@ -70,38 +71,31 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody),
   const { id } = c.req.valid("param");
   const { data, authors } = c.req.valid("json");
   await updatePublication(id, data, authors);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deletePublication(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const current = await getPublicationFile(id);
-  if (!current) return c.json({ error: "Not found" }, 404);
-
-  const body = await c.req.parseBody({ all: true });
-  const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
-  const fileName = await saveUploadedFile(file, { domain: "publications", kind: "document" });
-  if (!fileName) return c.json({ error: "Invalid file type" }, 400);
-
-  await setPublicationFile(id, fileName);
-  if (current.file && current.file !== fileName) {
-    await deleteUploadedFile({ assetKey: current.file });
-  }
-  return c.json({ status: 1 });
+  return replaceAssetFile(c, {
+    domain: "publications",
+    kind: "document",
+    current: await getPublicationFile(id),
+    column: "file",
+    set: (assetKey) => setPublicationFile(id, assetKey),
+  });
 });
 
 router.put("/:id/authors", zValidator("param", IdParam), zValidator("json", z.array(AuthorEntry)), async (c) => {
   const { id } = c.req.valid("param");
   const authors = c.req.valid("json");
   await replaceAuthors(id, authors);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 export default router;
