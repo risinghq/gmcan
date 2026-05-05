@@ -121,7 +121,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   return(): void {
-    this.router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/news"]);
   }
 
   submitNews(status: number): void {

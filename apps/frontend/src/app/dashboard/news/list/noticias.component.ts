@@ -1,10 +1,9 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject, viewChild } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { MatPaginator } from "@angular/material/paginator";
-import { MatSort, MatSortHeader } from "@angular/material/sort";
+import { MatPaginator, PageEvent } from "@angular/material/paginator";
+import { MatSort, MatSortHeader, Sort } from "@angular/material/sort";
 import {
-  MatTableDataSource,
   MatTable,
   MatColumnDef,
   MatHeaderCellDef,
@@ -18,7 +17,7 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { AdminNewsListItem } from "@app/shared/models/admin-list";
+import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admin-list";
 import { NewsService } from "@app/shared/services/news.service";
 import type { RefItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
@@ -37,7 +36,7 @@ interface NewsListItem {
 }
 
 @Component({
-  selector: "app-noticias",
+  selector: "app-news-list",
   templateUrl: "./noticias.component.html",
   styleUrl: "./noticias.component.scss",
   imports: [
@@ -59,7 +58,7 @@ interface NewsListItem {
     MatPaginator,
   ],
 })
-export default class NoticiasComponent implements OnInit {
+export default class NewsListComponent implements OnInit {
   private readonly newsService = inject(NewsService);
   private readonly refService = inject(RefService);
   private readonly titlecasePipe = inject(TitleCasePipe);
@@ -69,42 +68,44 @@ export default class NoticiasComponent implements OnInit {
 
   displayedColumns: string[] = ["title", "publishedAtLabel", "categoryName", "authorName", "status"];
   displayedColumns2: string[] = ["name"];
-  dataSource = new MatTableDataSource<NewsListItem>([]);
-  dataSource2 = new MatTableDataSource<RefItem>([]);
   selectedTab = 0;
+
   items: NewsListItem[] = [];
+  total = 0;
+  pageSize = 10;
+  pageIndex = 0;
+  search = "";
+  statusFilter = "";
+  newsTypeFilter = "";
+  sortBy: AdminNewsSortBy = "publishedAt";
+  sortOrder: "asc" | "desc" = "desc";
+
   newsTypes: RefItem[] = [];
+  filteredNewsTypes: RefItem[] = [];
+  categorySearch = "";
 
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly matSort = viewChild.required(MatSort);
-
-  readonly paginator2 = viewChild.required(MatPaginator);
-  readonly sort2 = viewChild.required(MatSort);
-  constructor() {}
-
-  private loadList(): void {
+  private loadNewsTypes(): void {
     this.refService.listNewsTypes().subscribe((newsTypes: RefItem[]) => {
       this.newsTypes = newsTypes;
-      this.dataSource2 = new MatTableDataSource(this.newsTypes);
-      this.dataSource2.sort = this.sort2();
-      this.dataSource2.paginator = this.paginator2();
+      this.filteredNewsTypes = newsTypes;
     });
-    this.newsService.listAdminNews().subscribe((news) => {
-      this.items = news.map((item) => this.mapNewsItem(item));
-      this.dataSource = new MatTableDataSource(this.items);
-      this.dataSource.filterPredicate = (row, filter) => {
-        const normalized = filter.trim().toLowerCase();
-        return (
-          row.title.toLowerCase().includes(normalized) ||
-          row.publishedAtLabel.toLowerCase().includes(normalized) ||
-          row.categoryName.toLowerCase().includes(normalized) ||
-          row.authorName.toLowerCase().includes(normalized) ||
-          row.statusLabel.toLowerCase().includes(normalized)
-        );
-      };
-      this.dataSource.paginator = this.paginator();
-      this.dataSource.sort = this.matSort();
-    });
+  }
+
+  private loadNews(): void {
+    this.newsService
+      .listAdminNews({
+        q: this.search || undefined,
+        status: this.statusFilter === "" ? undefined : Number(this.statusFilter),
+        newsTypeId: this.newsTypeFilter === "" ? undefined : Number(this.newsTypeFilter),
+        sortBy: this.sortBy,
+        sortOrder: this.sortOrder,
+        page: this.pageIndex + 1,
+        pageSize: this.pageSize,
+      })
+      .subscribe((response) => {
+        this.items = response.items.map((item) => this.mapNewsItem(item));
+        this.total = response.total;
+      });
   }
 
   private mapNewsItem(news: AdminNewsListItem): NewsListItem {
@@ -124,15 +125,48 @@ export default class NoticiasComponent implements OnInit {
     };
   }
 
-  displayedNotFound = false;
-  displayedNotFound2 = false;
-
-  applyFilter(event: Event): void {
-    this.displayedNotFound = this.applyFilterToSource(event, this.dataSource);
+  onSearchChange(event: Event): void {
+    this.search = (event.target as HTMLInputElement).value.trim();
+    this.pageIndex = 0;
+    this.loadNews();
   }
 
-  applyFilter2(event: Event): void {
-    this.displayedNotFound2 = this.applyFilterToSource(event, this.dataSource2);
+  onStatusChange(event: Event): void {
+    this.statusFilter = (event.target as HTMLSelectElement).value;
+    this.pageIndex = 0;
+    this.loadNews();
+  }
+
+  onNewsTypeChange(event: Event): void {
+    this.newsTypeFilter = (event.target as HTMLSelectElement).value;
+    this.pageIndex = 0;
+    this.loadNews();
+  }
+
+  onSortChange(event: Sort): void {
+    const order = event.direction === "asc" || event.direction === "desc" ? event.direction : "desc";
+    const map: Record<string, AdminNewsSortBy> = {
+      title: "title",
+      publishedAtLabel: "publishedAt",
+      categoryName: "categoryName",
+      authorName: "authorName",
+      status: "status",
+    };
+    this.sortBy = map[event.active] ?? "publishedAt";
+    this.sortOrder = order;
+    this.pageIndex = 0;
+    this.loadNews();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadNews();
+  }
+
+  onCategorySearch(event: Event): void {
+    this.categorySearch = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.filteredNewsTypes = this.newsTypes.filter((x) => x.name.toLowerCase().includes(this.categorySearch));
   }
 
   addCategory(): void {
@@ -157,13 +191,7 @@ export default class NoticiasComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedTab = this.tabState.newsTab();
-    this.loadList();
-  }
-
-  private applyFilterToSource<T>(event: Event, dataSource: MatTableDataSource<T>): boolean {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    dataSource.filter = filterValue;
-    dataSource.paginator?.firstPage();
-    return dataSource.filteredData.length === 0;
+    this.loadNewsTypes();
+    this.loadNews();
   }
 }

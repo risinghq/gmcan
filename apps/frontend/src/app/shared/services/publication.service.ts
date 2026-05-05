@@ -2,8 +2,8 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
-import type { SaveAuthorEntry } from "../models/author";
 import type { AdminPublicationListItem } from "../models/admin-list";
+import type { SaveAuthorEntry } from "../models/author";
 import type { PublicationWithAuthors } from "../models/publication";
 import { GLOBAL } from "./global";
 

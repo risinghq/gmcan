@@ -11,8 +11,7 @@ import {
   deleteNews,
   getNewsItem,
   getNewsPhoto,
-  listAdminNewsItems,
-  listNews,
+  listAdminNews,
   type NewsUpsertInput,
   toAdminNewsView,
   setNewsPhoto,
@@ -21,6 +20,16 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const ListQuery = z.object({
+  q: z.string().trim().optional(),
+  status: z.coerce.number().int().optional(),
+  newsTypeId: z.coerce.number().int().optional(),
+  authorId: z.coerce.number().int().optional(),
+  sortBy: z.enum(["publishedAt", "title", "status", "authorName", "categoryName"]).default("publishedAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().default(10),
+});
 
 const NewsBody = z.object({
   status: z.number().int(),
@@ -40,8 +49,9 @@ router.use("*", async (c, next) => {
   return requirePermission("news.write")(c, next);
 });
 
-router.get("/", async (c) => {
-  return c.json(await listAdminNewsItems());
+router.get("/", zValidator("query", ListQuery), async (c) => {
+  const query = c.req.valid("query");
+  return c.json(await listAdminNews(query));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

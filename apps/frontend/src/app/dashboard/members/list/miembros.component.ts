@@ -17,7 +17,6 @@ import {
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { Member } from "@app/shared/models/member";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 
@@ -54,50 +53,52 @@ export default class MiembrosComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   displayedColumns: string[] = ["firstName", "lastName", "maternalName", "memberTypeName", "prefixName", "email"];
-  miembros: MemberRow[] = [];
+  items: MemberRow[] = [];
   dataSource = new MatTableDataSource<MemberRow>([]);
-  url: string;
-  constructor() {
-    this.url = GLOBAL.url;
-  }
+  constructor() {}
 
   ngOnInit(): void {
-    this.obtainingValue();
+    this.loadListByMode();
   }
   canAdd = false;
   readonly paginator = viewChild.required(MatPaginator);
   readonly matSort = viewChild.required(MatSort);
 
-  obtainingValue(): void {
-    if ((this.route.snapshot.routeConfig?.path ?? "").includes("activos")) {
-      this.getMembers(1);
-      this.canAdd = true;
-    } else {
-      this.getMembers(0);
-      this.getMembers(3);
-    }
+  loadListByMode(): void {
+    const isActiveMode = (this.route.snapshot.routeConfig?.path ?? "").includes("activos");
+    this.canAdd = isActiveMode;
+    this.loadList(isActiveMode);
   }
 
-  getMembers(status: number): void {
-    this.memberService.listAdminMembers({ status }).subscribe((res: Member[]) => {
-      if (res.length > 0) {
-        const memberTypesById = new Map(this.lookup.memberTypes().map((type) => [type.id, type.nameSingular]));
-        const prefixesById = new Map(this.lookup.prefijos().map((prefix) => [prefix.idPrefijo, prefix.nombre]));
-        const sorted = res.toSorted((a, b) => a.lastName.localeCompare(b.lastName));
-        for (const m of sorted) {
-          const row: MemberRow = { ...m };
-          const memberTypeName = memberTypesById.get(m.memberTypeId);
-          if (memberTypeName) row.memberTypeName = memberTypeName;
-          if (m.prefixId != null) {
-            const prefixName = prefixesById.get(m.prefixId);
-            if (prefixName) row.prefixName = prefixName;
-          }
-          this.miembros.push(row);
-        }
-        this.dataSource = new MatTableDataSource(this.miembros);
-        this.dataSource.paginator = this.paginator();
-        this.dataSource.sort = this.matSort();
-      }
+  loadList(isActiveMode: boolean): void {
+    this.memberService.listAdminMembers().subscribe((rows: Member[]) => {
+      const memberTypesById = new Map(this.lookup.memberTypes().map((type) => [type.id, type.nameSingular]));
+      const prefixesById = new Map(this.lookup.prefijos().map((prefix) => [prefix.idPrefijo, prefix.nombre]));
+      const filtered = rows.filter((member) =>
+        isActiveMode ? member.status === 1 : member.status === 0 || member.status === 3,
+      );
+      this.items = filtered
+        .toSorted((a, b) => a.lastName.localeCompare(b.lastName))
+        .map((member) => ({
+          ...member,
+          memberTypeName: memberTypesById.get(member.memberTypeId),
+          prefixName: member.prefixId != null ? prefixesById.get(member.prefixId) : undefined,
+        }));
+
+      this.dataSource = new MatTableDataSource(this.items);
+      this.dataSource.filterPredicate = (row, filter) => {
+        const normalized = filter.trim().toLowerCase();
+        return (
+          row.firstName.toLowerCase().includes(normalized) ||
+          row.lastName.toLowerCase().includes(normalized) ||
+          (row.maternalName ?? "").toLowerCase().includes(normalized) ||
+          (row.memberTypeName ?? "").toLowerCase().includes(normalized) ||
+          (row.prefixName ?? "").toLowerCase().includes(normalized) ||
+          row.email.toLowerCase().includes(normalized)
+        );
+      };
+      this.dataSource.paginator = this.paginator();
+      this.dataSource.sort = this.matSort();
     });
   }
 

@@ -137,7 +137,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   return(): void {
-    this.router.navigate(["dashboard/noticias"]);
+    this.router.navigate(["dashboard/news"]);
   }
 
   submitNews(status: number): void {

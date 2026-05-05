@@ -2,7 +2,12 @@ import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 import { assetUrl } from "../lib/upload.js";
-import type { AdminNewsListItem } from "./admin-list.types.js";
+import type {
+  AdminNewsListItem,
+  AdminNewsListQuery,
+  AdminNewsListResponse,
+  AdminNewsSortBy,
+} from "./admin-list.types.js";
 
 export interface NewsUpsertInput {
   translations: Bilingual<{ title: string; summary: string; body: string }>;
@@ -35,11 +40,39 @@ export async function listNews(status?: number) {
   return query.orderBy("publishedAt", "desc").execute();
 }
 
-export async function listAdminNewsItems(): Promise<AdminNewsListItem[]> {
-  const rows = await db
+const NEWS_SORT_COLUMN: Record<AdminNewsSortBy, string> = {
+  publishedAt: "news.publishedAt",
+  title: "news.title",
+  status: "news.status",
+  authorName: "member.firstName",
+  categoryName: "news_type.name",
+};
+
+export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNewsListResponse> {
+  const offset = (query.page - 1) * query.pageSize;
+  let base = db
     .selectFrom("news")
     .innerJoin("news_type", "news_type.id", "news.newsTypeId")
     .innerJoin("member", "member.id", "news.authorId")
+    .$if(query.status !== undefined, (qb) => qb.where("news.status", "=", query.status as number))
+    .$if(query.newsTypeId !== undefined, (qb) => qb.where("news.newsTypeId", "=", query.newsTypeId as number))
+    .$if(query.authorId !== undefined, (qb) => qb.where("news.authorId", "=", query.authorId as number))
+    .$if(Boolean(query.q), (qb) =>
+      qb.where((eb) =>
+        eb.or([
+          eb("news.title", "like", `%${query.q}%`),
+          eb("news.summary", "like", `%${query.q}%`),
+          eb("member.firstName", "like", `%${query.q}%`),
+          eb("member.lastName", "like", `%${query.q}%`),
+          eb("member.maternalName", "like", `%${query.q}%`),
+          eb("news_type.name", "like", `%${query.q}%`),
+        ]),
+      ),
+    );
+
+  const totalRow = await base.select(({ fn }) => fn.count<number>("news.id").as("count")).executeTakeFirstOrThrow();
+
+  const rows = await base
     .select([
       "news.id as id",
       "news.title as title",
@@ -53,10 +86,13 @@ export async function listAdminNewsItems(): Promise<AdminNewsListItem[]> {
       "member.maternalName as maternalName",
       "member.photo as authorPhoto",
     ])
-    .orderBy("news.publishedAt", "desc")
+    .orderBy(NEWS_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
+    .orderBy("news.id", "desc")
+    .limit(query.pageSize)
+    .offset(offset)
     .execute();
 
-  return rows.map((row) => ({
+  const items: AdminNewsListItem[] = rows.map((row) => ({
     id: row.id,
     title: row.title,
     publishedAt: row.publishedAt,
@@ -68,6 +104,13 @@ export async function listAdminNewsItems(): Promise<AdminNewsListItem[]> {
     authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
     authorAsset: assetUrl(row.authorPhoto),
   }));
+
+  return {
+    items,
+    total: Number(totalRow.count),
+    page: query.page,
+    pageSize: query.pageSize,
+  };
 }
 
 export async function getNewsItem(id: number) {

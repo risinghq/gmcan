@@ -84,7 +84,7 @@ export default [
         title: "Proyectos - Editar fuente",
         canDeactivate: [canDeactivateGuard],
       },
-      { path: "noticias", loadComponent: () => import("./news/list/noticias.component"), title: "Noticias" },
+      { path: "news", loadComponent: () => import("./news/list/noticias.component"), title: "Noticias" },
       {
         path: "add-news",
         loadComponent: () => import("./news/add/add-news.component"),

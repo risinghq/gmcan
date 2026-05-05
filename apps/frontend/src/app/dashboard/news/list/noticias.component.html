@@ -1,107 +1,109 @@
 <mat-tab-group class="noticias-div" [(selectedIndex)]="selectedTab" (selectedIndexChange)="changedTab($event)">
   <mat-tab label="Listado de noticias">
-    <div class="flex-news mb-16">
+    <div class="flex-news mb-16" style="gap: 12px; flex-wrap: wrap">
       <div class="search-news">
-        <input
-          class="input-search-text"
-          (keyup)="applyFilter($event)"
-          placeholder="Buscar noticias por título, fecha de publicación, categoría, autor o estado."
-        />
+        <input class="input-search-text" (keyup)="onSearchChange($event)" placeholder="Buscar noticias" />
         <mat-icon class="icon-search-toolbar">search</mat-icon>
       </div>
+      <select class="input-search-text" (change)="onStatusChange($event)">
+        <option value="">Todos los estados</option>
+        <option value="1">Activo</option>
+        <option value="0">Inactivo</option>
+      </select>
+      <select class="input-search-text" (change)="onNewsTypeChange($event)">
+        <option value="">Todas las categorías</option>
+        @for (newsType of newsTypes; track newsType.id) {
+          <option [value]="newsType.id">{{ newsType.name }}</option>
+        }
+      </select>
       <div class="center btn-black" (click)="addNews()">
         <a class="link"> Agregar noticia </a>
       </div>
     </div>
-    <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
-      <!-- ID Column -->
-      <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Titulo</th>
-        <td mat-cell class="titulo-list" *matCellDef="let row" (click)="editNews(row.id)">
-          {{ row.title }}
-        </td>
-      </ng-container>
 
-      <!-- Progress Column -->
-      <ng-container matColumnDef="publishedAtLabel">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Publicacion</th>
-        <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">
-          {{ row.publishedAtLabel }}
-        </td>
-      </ng-container>
+    @if (items.length > 0) {
+      <table mat-table [dataSource]="items" matSort (matSortChange)="onSortChange($event)">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Titulo</th>
+          <td mat-cell class="titulo-list" *matCellDef="let row" (click)="editNews(row.id)">{{ row.title }}</td>
+        </ng-container>
 
-      <!-- Name Column -->
-      <ng-container matColumnDef="categoryName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Categoría</th>
-        <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">
-          {{ row.categoryName }}
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="publishedAtLabel">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Publicacion</th>
+          <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">{{ row.publishedAtLabel }}</td>
+        </ng-container>
 
-      <!-- Color Column -->
-      <ng-container matColumnDef="authorName">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor</th>
-        <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">
-          <div class="flex-news">
-            <div class="member-img-round mr-8">
-              @if (row.authorAsset) {
-                <img class="member-img" src="{{ row.authorAsset }}" alt="User photo" />
-              }
-              @if (!row.authorAsset) {
-                <img class="member-img" src="/img/placeholders/user.png" alt="" />
-              }
+        <ng-container matColumnDef="categoryName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Categoría</th>
+          <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">{{ row.categoryName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="authorName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor</th>
+          <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">
+            <div class="flex-news">
+              <div class="member-img-round mr-8">
+                @if (row.authorAsset) {
+                  <img class="member-img" src="{{ row.authorAsset }}" alt="User photo" />
+                }
+                @if (!row.authorAsset) {
+                  <img class="member-img" src="/img/placeholders/user.png" alt="" />
+                }
+              </div>
+              {{ row.authorName }}
             </div>
-            {{ row.authorName }}
-          </div>
-        </td>
-      </ng-container>
+          </td>
+        </ng-container>
 
-      <!-- Estado Column -->
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
-        <td
-          mat-cell
-          *matCellDef="let row"
-          [class]="{ 'on-status': row.status === 1, 'off-status': row.status === 0 }"
-          (click)="editNews(row.id)"
-        >
-          {{ row.statusLabel }}
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+          <td
+            mat-cell
+            *matCellDef="let row"
+            [class]="{ 'on-status': row.status === 1, 'off-status': row.status === 0 }"
+            (click)="editNews(row.id)"
+          >
+            {{ row.statusLabel }}
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound" />
-    @if (displayedNotFound) {
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+      <mat-paginator
+        [length]="total"
+        [pageIndex]="pageIndex"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="onPageChange($event)"
+      />
+    } @else {
       <span class="plex-sans">No se encontraron resultados</span>
     }
   </mat-tab>
+
   <mat-tab label="Categorías">
     <div class="flex-news mb-16">
       <div class="search-news">
-        <input class="input-search-text" (keyup)="applyFilter2($event)" placeholder="Buscar categoría por nombre" />
+        <input class="input-search-text" (keyup)="onCategorySearch($event)" placeholder="Buscar categoría por nombre" />
         <mat-icon class="icon-search-toolbar">search</mat-icon>
       </div>
       <div class="center btn-black" (click)="addCategory()">
         <a class="link"> Agregar categoría </a>
       </div>
     </div>
-    <table mat-table [dataSource]="dataSource2" [hidden]="displayedNotFound2" matSort>
-      <!-- ID Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de categoría</th>
-        <td mat-cell *matCellDef="let row" (click)="editCategory(row.id)">
-          {{ row.name }}
-        </td>
-      </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
-    </table>
+    @if (filteredNewsTypes.length > 0) {
+      <table mat-table [dataSource]="filteredNewsTypes">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nombre de categoría</th>
+          <td mat-cell *matCellDef="let row" (click)="editCategory(row.id)">{{ row.name }}</td>
+        </ng-container>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound2" />
-    @if (displayedNotFound2) {
+        <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
+      </table>
+    } @else {
       <span class="plex-sans">No se encontraron resultados</span>
     }
   </mat-tab>

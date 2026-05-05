@@ -49,7 +49,9 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
   if (status !== undefined) query = query.where("project.status", "=", status);
   if (q) {
     const like = `%${q}%`;
-    query = query.where((eb) => eb.or([eb("project.title", "like", like), eb("project.titleEN", "like", like), eb("project.code", "like", like)]));
+    query = query.where((eb) =>
+      eb.or([eb("project.title", "like", like), eb("project.titleEN", "like", like), eb("project.code", "like", like)]),
+    );
   }
   const projects = await query.orderBy("project.startDate", "desc").execute();
   if (projects.length === 0) return [];

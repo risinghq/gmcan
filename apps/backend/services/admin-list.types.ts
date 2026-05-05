@@ -11,6 +11,27 @@ export interface AdminNewsListItem {
   authorAsset: string | null;
 }
 
+export type AdminNewsSortBy = "publishedAt" | "title" | "status" | "authorName" | "categoryName";
+export type AdminListSortOrder = "asc" | "desc";
+
+export interface AdminNewsListQuery {
+  q?: string;
+  status?: number;
+  newsTypeId?: number;
+  authorId?: number;
+  sortBy: AdminNewsSortBy;
+  sortOrder: AdminListSortOrder;
+  page: number;
+  pageSize: number;
+}
+
+export interface AdminNewsListResponse {
+  items: AdminNewsListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
 export interface AdminProjectMemberListItem {
   memberId: number;
   name: string;

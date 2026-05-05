@@ -5,6 +5,7 @@ import { z, type ZodType } from "zod";
 import { db } from "../../db/client.js";
 import type { Database } from "../../db/schema.js";
 import { requirePermission } from "../../middleware/authz.js";
+import { getNewsTypeReferenceCount } from "../../services/ref.service.js";
 
 function crudRouter<T extends keyof Database>(table: T, createSchema: ZodType, updateSchema: ZodType): Hono {
   const router = new Hono();
@@ -45,9 +46,15 @@ function crudRouter<T extends keyof Database>(table: T, createSchema: ZodType, u
 }
 
 const router = new Hono();
+const IdParam = z.object({ id: z.coerce.number().int().positive() });
 router.use("*", async (c, next) => {
   if (c.req.method === "GET") return requirePermission("refs.read")(c, next);
   return requirePermission("refs.write")(c, next);
+});
+
+router.get("/news-type/:id/count", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  return c.json(await getNewsTypeReferenceCount(id));
 });
 
 router.route(
