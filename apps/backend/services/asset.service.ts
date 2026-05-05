@@ -82,10 +82,10 @@ export async function uploadAndReplaceCurrent(input: {
   await ensureResourceExists(input.resourceType, input.resourceId);
   const policy = getSlotPolicy(input.resourceType, input.slot);
 
-  const storageKey = await saveUploadedFile(input.file, { kind: policy.kind });
+  const buffer = Buffer.from(await input.file.arrayBuffer());
+  const storageKey = await saveUploadedFile(input.file, { kind: policy.kind, bytes: buffer });
   if (!storageKey) throw new Error("Invalid file type");
 
-  const buffer = Buffer.from(await input.file.arrayBuffer());
   const ext = extensionFromName(input.file.name);
   const mimeDetected = input.file.type || "application/octet-stream";
 

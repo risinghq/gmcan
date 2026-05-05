@@ -84,7 +84,10 @@ async function serveFile(c: Context, filePath: string): Promise<Response> {
   });
 }
 
-export async function saveUploadedFile(file: File, options: { kind: UploadFileKind }): Promise<string | null> {
+export async function saveUploadedFile(
+  file: File,
+  options: { kind: UploadFileKind; bytes?: Buffer },
+): Promise<string | null> {
   const ext = extensionOf(file.name);
   const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind] as readonly string[];
   if (!allowedExtensions.includes(ext)) return null;
@@ -94,7 +97,8 @@ export async function saveUploadedFile(file: File, options: { kind: UploadFileKi
   if (!resolved) throw new Error("Unable to build file path");
 
   await fs.promises.mkdir(path.dirname(resolved.path), { recursive: true });
-  await fs.promises.writeFile(resolved.path, Buffer.from(await file.arrayBuffer()));
+  const bytes = options.bytes ?? Buffer.from(await file.arrayBuffer());
+  await fs.promises.writeFile(resolved.path, bytes);
   return resolved.key;
 }
 

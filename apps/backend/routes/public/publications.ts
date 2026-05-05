@@ -49,25 +49,38 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
   const rows = await listPublications();
   return c.json(
     await Promise.all(
-      rows.map(async (row) => ({
-        id: row.id,
-        title: row.title,
-        abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-        asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
-        journalIssue: row.journalIssue,
-        doi: row.doi,
-        publishedAt: row.publishedAt,
-        typeId: row.typeId,
-        journalId: row.journalId,
-        universityId: row.universityId,
-        eventId: row.eventId,
-        thesisTypeId: row.thesisTypeId,
-        updatedAt: row.updatedAt,
-        createdAt: row.createdAt,
-        authors: (row.authors as any[]).map((author) =>
-          author.kind === "registered" ? Object.assign(author, { asset: null }) : author,
-        ),
-      })),
+      rows.map(async (row) => {
+        const authors = await Promise.all(
+          (row.authors as any[]).map(async (author) =>
+            author.kind === "registered"
+              ? Object.assign({}, author, {
+                  asset: await resolveAssetAccessUrl({
+                    resourceType: "member",
+                    resourceId: author.memberId,
+                    slot: "photo",
+                  }),
+                })
+              : author,
+          ),
+        );
+        return {
+          id: row.id,
+          title: row.title,
+          abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
+          asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
+          journalIssue: row.journalIssue,
+          doi: row.doi,
+          publishedAt: row.publishedAt,
+          typeId: row.typeId,
+          journalId: row.journalId,
+          universityId: row.universityId,
+          eventId: row.eventId,
+          thesisTypeId: row.thesisTypeId,
+          updatedAt: row.updatedAt,
+          createdAt: row.createdAt,
+          authors,
+        };
+      }),
     ),
   );
 });
@@ -92,8 +105,18 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     thesisTypeId: pub.thesisTypeId,
     updatedAt: pub.updatedAt,
     createdAt: pub.createdAt,
-    authors: (pub.authors as any[]).map((author) =>
-      author.kind === "registered" ? Object.assign(author, { asset: null }) : author,
+    authors: await Promise.all(
+      (pub.authors as any[]).map(async (author) =>
+        author.kind === "registered"
+          ? Object.assign({}, author, {
+              asset: await resolveAssetAccessUrl({
+                resourceType: "member",
+                resourceId: author.memberId,
+                slot: "photo",
+              }),
+            })
+          : author,
+      ),
     ),
   });
 });

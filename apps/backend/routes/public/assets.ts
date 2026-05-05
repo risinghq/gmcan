@@ -12,11 +12,10 @@ const Query = z.object({
   expires: z.coerce.number().int().optional(),
 });
 
-router.get("/:assetId", zValidator("param", Params), async (c) => {
+router.get("/:assetId", zValidator("param", Params), zValidator("query", Query), async (c) => {
   const { assetId } = c.req.valid("param");
-  const parsed = Query.safeParse(Object.fromEntries(new URL(c.req.url).searchParams));
-  if (!parsed.success) return c.json({ error: "Invalid query" }, 400);
-  return serveAssetById(c, assetId, parsed.data);
+  const parsed = c.req.valid("query");
+  return serveAssetById(c, assetId, parsed);
 });
 
 export default router;
