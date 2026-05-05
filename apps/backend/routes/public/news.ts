@@ -4,13 +4,13 @@ import { z } from "zod";
 
 import { localizeField, type Locale } from "../../lib/public-locale.js";
 import { assetUrl } from "../../lib/upload.js";
-import { getNewsItem, listNews } from "../../services/news.service.js";
+import { getPublicNewsRow, listPublicNewsRows } from "../../services/news.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const FilterQuery = z.object({ status: z.coerce.number().int().optional() });
 
-function toPublicNews(row: Awaited<ReturnType<typeof getNewsItem>>, locale: Locale) {
+function toPublicNews(row: Awaited<ReturnType<typeof getPublicNewsRow>>, locale: Locale) {
   if (!row) return null;
   return {
     id: row.id,
@@ -25,20 +25,23 @@ function toPublicNews(row: Awaited<ReturnType<typeof getNewsItem>>, locale: Loca
     newsTypeId: row.newsTypeId,
     updatedAt: row.updatedAt,
     createdAt: row.createdAt,
+    authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+    authorAsset: assetUrl(row.authorPhoto),
+    newsTypeName: localizeField(row, locale, { es: "newsTypeName", en: "newsTypeNameEN" }),
   };
 }
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
   const locale = c.get("locale");
   const { status } = c.req.valid("query");
-  const rows = await listNews(status);
+  const rows = await listPublicNewsRows(status);
   return c.json(rows.map((row) => toPublicNews(row, locale)));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
-  const row = await getNewsItem(id);
+  const row = await getPublicNewsRow(id);
   if (!row) return c.json({ error: "Not found" }, 404);
   return c.json(toPublicNews(row, locale));
 });

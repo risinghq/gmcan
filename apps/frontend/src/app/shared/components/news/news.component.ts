@@ -1,17 +1,13 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
-import type { Member } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import { parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
-import { forkJoin } from "rxjs";
 
 type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
 
@@ -23,10 +19,8 @@ type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; 
 })
 export default class NewsComponent implements OnInit {
   newsService = inject(NewsService);
-  memberService = inject(MemberService);
   route = inject(ActivatedRoute);
   router = inject(Router);
-  lookup = inject(LookupService);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
 
@@ -65,13 +59,7 @@ export default class NewsComponent implements OnInit {
   }
 
   loadNoticias(): void {
-    forkJoin({
-      news: this.newsService.listNews(),
-      members: this.memberService.listMembers(),
-    }).subscribe(({ news, members }) => {
-      const membersMap = new Map((members as Member[]).map((m) => [m.id, m]));
-      const newsTypesMap = new Map(this.lookup.newsTypes().map((t) => [t.id, t]));
-
+    this.newsService.listNews().subscribe((news) => {
       const enriched = (news as News[])
         .filter((n) => n.status !== 0 && n.id !== this.idNoticiaE)
         .toSorted((a, b) => {
@@ -87,14 +75,10 @@ export default class NewsComponent implements OnInit {
                 publishedAtDate,
               ) ?? "");
 
-          const newsType = n.newsTypeId ? newsTypesMap.get(n.newsTypeId) : undefined;
-          const member = n.authorId ? membersMap.get(n.authorId) : undefined;
-          const autor = member ? `${member.firstName} ${member.lastName}`.trim() : "";
-
           return Object.assign({} as NewsDisplay, n, {
-            nombreTipoNoticia: newsType?.name ?? "",
+            nombreTipoNoticia: n.newsTypeName ?? "",
             fechaFormateada,
-            autor,
+            autor: n.authorName ?? "",
           });
         });
 

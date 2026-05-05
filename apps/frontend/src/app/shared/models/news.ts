@@ -11,4 +11,7 @@ export interface News {
   newsTypeId: number;
   updatedAt: string | null;
   createdAt: string | null;
+  authorName?: string;
+  authorAsset?: string | null;
+  newsTypeName?: string;
 }

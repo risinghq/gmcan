@@ -40,6 +40,71 @@ export async function listNews(status?: number) {
   return query.orderBy("publishedAt", "desc").execute();
 }
 
+export async function listPublicNewsRows(status?: number) {
+  let query = db
+    .selectFrom("news")
+    .leftJoin("member", "member.id", "news.authorId")
+    .leftJoin("news_type", "news_type.id", "news.newsTypeId")
+    .select([
+      "news.id as id",
+      "news.title as title",
+      "news.titleEN as titleEN",
+      "news.summary as summary",
+      "news.summaryEN as summaryEN",
+      "news.body as body",
+      "news.bodyEN as bodyEN",
+      "news.status as status",
+      "news.publishedAt as publishedAt",
+      "news.photo as photo",
+      "news.priority as priority",
+      "news.authorId as authorId",
+      "news.newsTypeId as newsTypeId",
+      "news.updatedAt as updatedAt",
+      "news.createdAt as createdAt",
+      "member.firstName as firstName",
+      "member.lastName as lastName",
+      "member.maternalName as maternalName",
+      "member.photo as authorPhoto",
+      "news_type.name as newsTypeName",
+      "news_type.nameEN as newsTypeNameEN",
+    ]);
+
+  if (status !== undefined) query = query.where("news.status", "=", status);
+  return query.orderBy("news.publishedAt", "desc").execute();
+}
+
+export async function getPublicNewsRow(id: number) {
+  return db
+    .selectFrom("news")
+    .leftJoin("member", "member.id", "news.authorId")
+    .leftJoin("news_type", "news_type.id", "news.newsTypeId")
+    .select([
+      "news.id as id",
+      "news.title as title",
+      "news.titleEN as titleEN",
+      "news.summary as summary",
+      "news.summaryEN as summaryEN",
+      "news.body as body",
+      "news.bodyEN as bodyEN",
+      "news.status as status",
+      "news.publishedAt as publishedAt",
+      "news.photo as photo",
+      "news.priority as priority",
+      "news.authorId as authorId",
+      "news.newsTypeId as newsTypeId",
+      "news.updatedAt as updatedAt",
+      "news.createdAt as createdAt",
+      "member.firstName as firstName",
+      "member.lastName as lastName",
+      "member.maternalName as maternalName",
+      "member.photo as authorPhoto",
+      "news_type.name as newsTypeName",
+      "news_type.nameEN as newsTypeNameEN",
+    ])
+    .where("news.id", "=", id)
+    .executeTakeFirst();
+}
+
 const NEWS_SORT_COLUMN: Record<AdminNewsSortBy, string> = {
   publishedAt: "news.publishedAt",
   title: "news.title",

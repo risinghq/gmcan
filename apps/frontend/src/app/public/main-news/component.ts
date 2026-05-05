@@ -6,12 +6,9 @@ import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
-import type { Member } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
@@ -20,7 +17,6 @@ import {
   NgbPaginationNumber,
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
-import { forkJoin } from "rxjs";
 
 type NewsDisplay = News & { nombreTipoNoticia: string; fechaFormateada: string; autor: string };
 type NewsTypeFilter = { id: number; name: string };
@@ -46,9 +42,7 @@ type NewsTypeFilter = { id: number; name: string };
 })
 export default class MainNewsComponent implements OnInit {
   newsService = inject(NewsService);
-  memberService = inject(MemberService);
   route = inject(ActivatedRoute);
-  lookup = inject(LookupService);
   router = inject(Router);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
@@ -86,13 +80,7 @@ export default class MainNewsComponent implements OnInit {
 
   loadNews(): void {
     this.allCharged = false;
-    forkJoin({
-      news: this.newsService.listNews(),
-      members: this.memberService.listMembers(),
-    }).subscribe(({ news, members }) => {
-      const membersMap = new Map((members as Member[]).map((m) => [m.id, m]));
-      const newsTypesMap = new Map(this.lookup.newsTypes().map((t) => [t.id, t]));
-
+    this.newsService.listNews().subscribe((news) => {
       const enriched = (news as News[])
         .filter((n) => n.status !== 0)
         .toSorted((a, b) => {
@@ -110,24 +98,22 @@ export default class MainNewsComponent implements OnInit {
               ? ""
               : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
 
-          const newsType = n.newsTypeId ? newsTypesMap.get(n.newsTypeId) : undefined;
-          const member = n.authorId ? membersMap.get(n.authorId) : undefined;
-          const autor = member ? `${member.firstName} ${member.lastName}`.trim() : "";
-
           return Object.assign({} as NewsDisplay, n, {
-            nombreTipoNoticia: newsType?.name ?? "",
+            nombreTipoNoticia: n.newsTypeName ?? "",
             fechaFormateada,
-            autor,
+            autor: n.authorName ?? "",
           });
         });
 
       this.allNoticias = enriched;
 
-      const usedTypeIds = new Set(enriched.map((n) => n.newsTypeId).filter(Boolean));
-      this.tiponoticias = this.lookup
-        .newsTypes()
-        .filter((t) => usedTypeIds.has(t.id))
-        .toSorted((a, b) => (a.name > b.name ? 1 : -1));
+      const categories = new Map<number, NewsTypeFilter>();
+      for (const item of enriched) {
+        if (item.newsTypeId && item.nombreTipoNoticia && !categories.has(item.newsTypeId)) {
+          categories.set(item.newsTypeId, { id: item.newsTypeId, name: item.nombreTipoNoticia });
+        }
+      }
+      this.tiponoticias = [...categories.values()].toSorted((a, b) => (a.name > b.name ? 1 : -1));
 
       this.applyFilter();
       this.allCharged = true;
