@@ -47,7 +47,7 @@ const SEED_BINDINGS: SeedBinding[] = [
     slot: "file",
     source: "seed/publications/N3eSqMJvE1F0HWXspbEfplB6.pdf",
   },
-  { resourceType: "research_group", resourceId: 1, slot: "facilities", source: "seed/group/facilities.jpg" },
+  { resourceType: "research_group", resourceId: 1, slot: "facilities", source: "seed/group/facilities.png" },
   { resourceType: "research_group", resourceId: 1, slot: "header", source: "seed/group/header.png" },
   { resourceType: "research_group", resourceId: 1, slot: "footer", source: "seed/group/footer.png" },
 ];
