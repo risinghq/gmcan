@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { localizeField } from "../../lib/public-locale.js";
-import { assetUrl } from "../../lib/upload.js";
+import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import { getPublication, listPublications, listPublicationsByFilter } from "../../services/publication.service.js";
 
 const router = new Hono();
@@ -26,11 +26,34 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       universityId: university,
     });
     return c.json(
-      rows.map((row) => ({
+      await Promise.all(
+        rows.map(async (row) => ({
+          id: row.id,
+          title: row.title,
+          abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
+          asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
+          journalIssue: row.journalIssue,
+          doi: row.doi,
+          publishedAt: row.publishedAt,
+          typeId: row.typeId,
+          journalId: row.journalId,
+          universityId: row.universityId,
+          eventId: row.eventId,
+          thesisTypeId: row.thesisTypeId,
+          updatedAt: row.updatedAt,
+          createdAt: row.createdAt,
+        })),
+      ),
+    );
+  }
+  const rows = await listPublications();
+  return c.json(
+    await Promise.all(
+      rows.map(async (row) => ({
         id: row.id,
         title: row.title,
         abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-        asset: assetUrl(row.file),
+        asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
         journalIssue: row.journalIssue,
         doi: row.doi,
         publishedAt: row.publishedAt,
@@ -41,30 +64,11 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         thesisTypeId: row.thesisTypeId,
         updatedAt: row.updatedAt,
         createdAt: row.createdAt,
+        authors: (row.authors as any[]).map((author) =>
+          author.kind === "registered" ? Object.assign(author, { asset: null }) : author,
+        ),
       })),
-    );
-  }
-  const rows = await listPublications();
-  return c.json(
-    rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-      asset: assetUrl(row.file),
-      journalIssue: row.journalIssue,
-      doi: row.doi,
-      publishedAt: row.publishedAt,
-      typeId: row.typeId,
-      journalId: row.journalId,
-      universityId: row.universityId,
-      eventId: row.eventId,
-      thesisTypeId: row.thesisTypeId,
-      updatedAt: row.updatedAt,
-      createdAt: row.createdAt,
-      authors: (row.authors as any[]).map((author) =>
-        author.kind === "registered" ? Object.assign(author, { asset: assetUrl(author.photo) }) : author,
-      ),
-    })),
+    ),
   );
 });
 
@@ -77,7 +81,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: pub.id,
     title: pub.title,
     abstract: localizeField(pub, locale, { es: "abstractES", en: "abstractEN", required: false }),
-    asset: assetUrl(pub.file),
+    asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: pub.id, slot: "file" }),
     journalIssue: pub.journalIssue,
     doi: pub.doi,
     publishedAt: pub.publishedAt,
@@ -89,7 +93,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     updatedAt: pub.updatedAt,
     createdAt: pub.createdAt,
     authors: (pub.authors as any[]).map((author) =>
-      author.kind === "registered" ? Object.assign(author, { asset: assetUrl(author.photo) }) : author,
+      author.kind === "registered" ? Object.assign(author, { asset: null }) : author,
     ),
   });
 });

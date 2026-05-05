@@ -2,7 +2,6 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { replaceAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
@@ -10,14 +9,10 @@ import {
   createSoftware,
   deleteEquipment,
   deleteSoftware,
-  getAboutPhoto,
-  getGroupFile,
   listAbout,
   listEquipment,
   listGroups,
   listSoftware,
-  setAboutPhoto,
-  setGroupFile,
   updateAboutDescription,
   updateAboutObjectives,
   updateAboutServices,
@@ -33,13 +28,6 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const SlotParam = z.object({ slot: z.enum(["facilities", "header", "footer"]) });
-
-const SLOT_CONFIG = {
-  facilities: { column: "facilitiesPhoto" as const, kind: "image" as const },
-  header: { column: "logoHeader" as const, kind: "brandImage" as const },
-  footer: { column: "logoFooter" as const, kind: "brandImage" as const },
-};
 
 router.use("*", async (c, next) => {
   if (c.req.method === "GET") return requirePermission("content.read")(c, next);
@@ -126,18 +114,6 @@ router.put(
   },
 );
 
-router.put("/:id/assets/:slot", zValidator("param", IdParam.extend(SlotParam.shape)), async (c) => {
-  const { id, slot } = c.req.valid("param");
-  const config = SLOT_CONFIG[slot];
-  return replaceAssetFile(c, {
-    domain: "group",
-    kind: config.kind,
-    current: await getGroupFile(id, config.column),
-    column: config.column,
-    set: (assetKey) => setGroupFile(id, config.column, assetKey),
-  });
-});
-
 // About
 router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
@@ -180,17 +156,6 @@ router.put(
     return c.json(okStatus());
   },
 );
-
-router.put("/about/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return replaceAssetFile(c, {
-    domain: "about",
-    kind: "image",
-    current: await getAboutPhoto(id),
-    column: "photo",
-    set: (assetKey) => setAboutPhoto(id, assetKey),
-  });
-});
 
 // Software
 router.get(

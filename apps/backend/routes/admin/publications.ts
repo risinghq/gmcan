@@ -3,17 +3,14 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { replaceAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createPublication,
   deletePublication,
   getPublicationEditView,
-  getPublicationFile,
   listAdminPublications,
   replaceAuthors,
-  setPublicationFile,
   updatePublication,
 } from "../../services/publication.service.js";
 
@@ -78,17 +75,6 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deletePublication(id);
   return c.json(okStatus());
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return replaceAssetFile(c, {
-    domain: "publications",
-    kind: "document",
-    current: await getPublicationFile(id),
-    column: "file",
-    set: (assetKey) => setPublicationFile(id, assetKey),
-  });
 });
 
 router.put("/:id/authors", zValidator("param", IdParam), zValidator("json", z.array(AuthorEntry)), async (c) => {

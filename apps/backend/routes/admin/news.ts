@@ -3,19 +3,15 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { replaceAssetFile, removeAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
-  clearNewsPhoto,
   createNews,
   deleteNews,
   getNewsItem,
-  getNewsPhoto,
   listAdminNews,
   type NewsUpsertInput,
   toAdminNewsView,
-  setNewsPhoto,
   updateNews,
 } from "../../services/news.service.js";
 
@@ -79,26 +75,6 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteNews(id);
   return c.json(okStatus());
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return replaceAssetFile(c, {
-    domain: "news",
-    kind: "image",
-    current: await getNewsPhoto(id),
-    column: "photo",
-    set: (assetKey) => setNewsPhoto(id, assetKey),
-  });
-});
-
-router.delete("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return removeAssetFile(c, {
-    current: await getNewsPhoto(id),
-    column: "photo",
-    clear: () => clearNewsPhoto(id),
-  });
 });
 
 export default router;

@@ -2,21 +2,17 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { replaceAssetFile, removeAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToGroup,
-  clearMemberPhoto,
   createMember,
   deleteMember,
   getMemberFull,
-  getMemberPhoto,
   listAdminMembers,
   listMemberGroups,
   removeMemberFromGroup,
   searchAuthorPool,
-  setMemberPhoto,
   updateMember,
   verifyEmailExists,
 } from "../../services/member.service.js";
@@ -108,26 +104,6 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMember(id);
   return c.json(okStatus());
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return replaceAssetFile(c, {
-    domain: "members",
-    kind: "image",
-    current: await getMemberPhoto(id),
-    column: "photo",
-    set: (assetKey) => setMemberPhoto(id, assetKey),
-  });
-});
-
-router.delete("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return removeAssetFile(c, {
-    current: await getMemberPhoto(id),
-    column: "photo",
-    clear: () => clearMemberPhoto(id),
-  });
 });
 
 router.get("/:id/groups", zValidator("param", IdParam), async (c) => {

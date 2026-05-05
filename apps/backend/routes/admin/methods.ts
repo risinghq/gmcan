@@ -3,16 +3,13 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { replaceAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createMethod,
   deleteMethod,
   getMethod,
-  getMethodPhoto,
   listMethods,
-  setMethodPhoto,
   toAdminMethodView,
   updateMethod,
 } from "../../services/group.service.js";
@@ -69,17 +66,6 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMethod(id);
   return c.json(okStatus());
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return replaceAssetFile(c, {
-    domain: "methods",
-    kind: "image",
-    current: await getMethodPhoto(id),
-    column: "photo",
-    set: (assetKey) => setMethodPhoto(id, assetKey),
-  });
 });
 
 export default router;

@@ -3,17 +3,9 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import type { Actor } from "../../authz/types.js";
-import { replaceAssetFile, removeAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { capabilitiesForActor, requirePermission } from "../../middleware/authz.js";
-import {
-  clearMemberPhoto,
-  getMemberFull,
-  getMemberPhoto,
-  getResetPasswordStatus,
-  setMemberPhoto,
-  updatePassword,
-} from "../../services/member.service.js";
+import { getMemberFull, getResetPasswordStatus, updatePassword } from "../../services/member.service.js";
 
 const router = new Hono();
 
@@ -43,25 +35,5 @@ router.put(
     return c.json(okStatus());
   },
 );
-
-router.put("/asset", requirePermission("account.self.write"), async (c) => {
-  const memberId = c.get("memberId") as number;
-  return replaceAssetFile(c, {
-    domain: "members",
-    kind: "image",
-    current: await getMemberPhoto(memberId),
-    column: "photo",
-    set: (assetKey) => setMemberPhoto(memberId, assetKey),
-  });
-});
-
-router.delete("/asset", requirePermission("account.self.write"), async (c) => {
-  const memberId = c.get("memberId") as number;
-  return removeAssetFile(c, {
-    current: await getMemberPhoto(memberId),
-    column: "photo",
-    clear: () => clearMemberPhoto(memberId),
-  });
-});
 
 export default router;

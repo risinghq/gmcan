@@ -282,6 +282,45 @@ export interface MemberGroupTable {
   updatedAt: DateString;
 }
 
+export interface AssetTable {
+  id: Generated<number>;
+  storageKey: string;
+  bucket: string;
+  mimeDetected: string;
+  ext: string;
+  sizeBytes: number;
+  sha256: string;
+  visibility: "public" | "private";
+  status: "active" | "soft_deleted" | "hard_deleted" | "quarantined";
+  createdBy: number | null;
+  createdAt: DateString;
+  deletedAt: DateString | null;
+  deleteAfter: DateString | null;
+}
+
+export interface AssetBindingTable {
+  id: Generated<number>;
+  resourceType: string;
+  resourceId: number;
+  slot: string;
+  assetId: number;
+  isCurrent: number;
+  replacedByBindingId: number | null;
+  replacedAt: DateString | null;
+  createdAt: DateString;
+  deletedAt: DateString | null;
+}
+
+export interface AssetAuditTable {
+  id: Generated<number>;
+  assetId: number | null;
+  bindingId: number | null;
+  action: string;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+
 export interface Database {
   gender: GenderTable;
   prefix: PrefixTable;
@@ -309,6 +348,9 @@ export interface Database {
   project: ProjectTable;
   member_project: MemberProjectTable;
   member_group: MemberGroupTable;
+  asset: AssetTable;
+  asset_binding: AssetBindingTable;
+  asset_audit: AssetAuditTable;
 }
 
 export type ProjectRow = Selectable<ProjectTable>;

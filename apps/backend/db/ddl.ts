@@ -134,6 +134,34 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   ],
   member_project: ["projectId", "memberId", "createdAt", "updatedAt"],
   member_group: ["memberId", "groupId", "createdAt", "updatedAt"],
+  asset: [
+    "id",
+    "storageKey",
+    "bucket",
+    "mimeDetected",
+    "ext",
+    "sizeBytes",
+    "sha256",
+    "visibility",
+    "status",
+    "createdBy",
+    "createdAt",
+    "deletedAt",
+    "deleteAfter",
+  ],
+  asset_binding: [
+    "id",
+    "resourceType",
+    "resourceId",
+    "slot",
+    "assetId",
+    "isCurrent",
+    "replacedByBindingId",
+    "replacedAt",
+    "createdAt",
+    "deletedAt",
+  ],
+  asset_audit: ["id", "assetId", "bindingId", "action", "actorId", "reason", "createdAt"],
 };
 
 export async function createTables(db: Kysely<Database>) {
@@ -468,6 +496,62 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
     .execute();
+
+  await db.schema
+    .createTable("asset")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("storageKey", "text", (c) => c.notNull().unique())
+    .addColumn("bucket", "text", (c) => c.notNull())
+    .addColumn("mimeDetected", "text", (c) => c.notNull())
+    .addColumn("ext", "text", (c) => c.notNull())
+    .addColumn("sizeBytes", "integer", (c) => c.notNull())
+    .addColumn("sha256", "text", (c) => c.notNull())
+    .addColumn("visibility", "text", (c) => c.notNull())
+    .addColumn("status", "text", (c) => c.notNull())
+    .addColumn("createdBy", "integer", (c) => c.references("member.id"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("deletedAt", "text")
+    .addColumn("deleteAfter", "text")
+    .execute();
+
+  await db.schema
+    .createTable("asset_binding")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("resourceType", "text", (c) => c.notNull())
+    .addColumn("resourceId", "integer", (c) => c.notNull())
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id"))
+    .addColumn("isCurrent", "integer", (c) => c.notNull())
+    .addColumn("replacedByBindingId", "integer", (c) => c.references("asset_binding.id"))
+    .addColumn("replacedAt", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("deletedAt", "text")
+    .execute();
+
+  await db.schema
+    .createTable("asset_audit")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("assetId", "integer", (c) => c.references("asset.id"))
+    .addColumn("bindingId", "integer", (c) => c.references("asset_binding.id"))
+    .addColumn("action", "text", (c) => c.notNull())
+    .addColumn("actorId", "integer", (c) => c.references("member.id"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .execute();
+
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_asset_binding_current_unique
+    ON asset_binding(resourceType, resourceId, slot)
+    WHERE isCurrent = 1 AND deletedAt IS NULL
+  `.execute(db);
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_asset_binding_lookup
+    ON asset_binding(resourceType, resourceId, slot, isCurrent)
+  `.execute(db);
 
   await sql`
     CREATE VIRTUAL TABLE IF NOT EXISTS news_search USING fts5(

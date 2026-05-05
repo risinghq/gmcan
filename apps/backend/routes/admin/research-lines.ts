@@ -3,16 +3,13 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { replaceAssetFile } from "../../lib/asset-route.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createResearchLine,
   deleteResearchLine,
   getResearchLine,
-  getResearchLinePhoto,
   listResearchLines,
-  setResearchLinePhoto,
   toAdminResearchLineView,
   updateResearchLine,
 } from "../../services/group.service.js";
@@ -69,17 +66,6 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteResearchLine(id);
   return c.json(okStatus());
-});
-
-router.put("/:id/asset", zValidator("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  return replaceAssetFile(c, {
-    domain: "research-lines",
-    kind: "image",
-    current: await getResearchLinePhoto(id),
-    column: "photo",
-    set: (assetKey) => setResearchLinePhoto(id, assetKey),
-  });
 });
 
 export default router;
