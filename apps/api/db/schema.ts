@@ -177,10 +177,9 @@ export interface AboutTable {
   id: Generated<number>;
   descriptionES: string;
   descriptionEN: string;
-  objectivesES: string | null;
-  objectivesEN: string | null;
-  servicesES: string | null;
-  servicesEN: string | null;
+  objectivesContent: string | null;
+  servicesContent: string | null;
+  homeServicesTeaserContent: string | null;
   createdAt: DateString | null;
   updatedAt: DateString | null;
 

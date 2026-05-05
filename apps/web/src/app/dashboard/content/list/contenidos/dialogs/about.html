@@ -3,15 +3,33 @@
   <div class="about-text-div">
     <div class="about-title">{{ labels.aboutUs }}</div>
     <div class="about-sub-divi"></div>
-    <div id="whoAre" class="about-text"></div>
+    <div class="about-text" [innerHTML]="previewData.about.description"></div>
     <div class="about-title about-top">{{ labels.ourObjectives }}</div>
     <div class="about-subtitle">{{ labels.ourObjectivesQuestion }}</div>
     <div class="about-sub-divi"></div>
-    <div id="objectives" class="about-text"></div>
+    <div class="about-text">
+      @for (paragraph of previewData.about.objectivesContent.introParagraphs; track paragraph) {
+      <p>{{ paragraph }}</p>
+      }
+      <ul>
+        @for (item of previewData.about.objectivesContent.items; track item) {
+        <li>{{ item }}</li>
+        }
+      </ul>
+    </div>
     <div class="about-title about-top">{{ labels.ourServices }}</div>
     <div class="about-subtitle">{{ labels.ourServicesQuestion }}</div>
     <div class="about-sub-divi"></div>
-    <div id="services" class="about-text"></div>
+    <div class="about-text">
+      @for (paragraph of previewData.about.servicesContent.introParagraphs; track paragraph) {
+      <p>{{ paragraph }}</p>
+      }
+      <ul>
+        @for (item of previewData.about.servicesContent.items; track item) {
+        <li>{{ item }}</li>
+        }
+      </ul>
+    </div>
   </div>
 </div>
 <div class="outside" [mat-dialog-close]="false">X</div>

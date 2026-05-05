@@ -44,7 +44,7 @@ export default class HomeComponent implements OnInit {
   lineasInvestigacion: HomeViewModel["lineasInvestigacion"] = [];
   newsItems: HomeNewsItem[] = [];
   featuredNews: HomeNewsItem = {} as HomeNewsItem;
-  aboutUs = "";
+  aboutUs: string[] = [];
   metodos: Method[] = [];
   publicaciones: HomePublicacion[] = [];
   proyectos: HomeProyecto[] = [];

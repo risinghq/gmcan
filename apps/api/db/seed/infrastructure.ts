@@ -306,38 +306,60 @@ export async function seedAbout() {
         "<p>La investigación en el área de nanomateriales es uno de los componentes principales del desarrollo de la nanotecnología que permite el dominio y la modificación de las propiedades de los materiales mediante el cambio en sus estructuras atómicas. El grupo de investigación de métodos computacionales aplicado a nanomateriales (GMCAN), adscrito a la Facultad de Ciencias Físicas de la UNMSM, aplica y desarrolla modernas herramientas computacionales para entender, predecir y controlar los procesos físicos y químicos en el rango de tamaños moleculares hasta la mesoescala. Los integrantes del GMCAN vienen realizando investigaciones sobre nuevos materiales en los últimos 15 años. Hasta la actualidad se han estudiado las propiedades estructurales, energéticas, estructura electrónica de diversas nanopartículas, propiedades mecánicas de nanoestructuras, transiciones de fase y procesos de ordenación química en aleaciones binarias. El GMCAN mantiene estrecha colaboración con varios laboratorios y grupos de modelamiento y simulación. Formamos parte de la Red Iberoamericana de Divulgación y Formación en Nanotecnología (NANODYF).</p>",
       descriptionEN:
         "<p>Research in the area of nanomaterials is one of the main components of the development of nanotechnology, enabling control and modification of material properties by changing their atomic structures. The research group on computational methods applied to nanomaterials (GMCAN), affiliated with the Faculty of Physical Sciences at UNMSM, develops and applies modern computational tools to understand, predict and control physical and chemical processes from molecular scales up to the mesoscale. GMCAN members have been carrying out research on new materials for the past 15 years. To date, we have studied structural and energetic properties, electronic structure of various nanoparticles, mechanical properties of nanostructures, phase transitions and chemical ordering processes in binary alloys. GMCAN maintains close collaboration with several laboratories and modeling and simulation groups. We are part of the Iberoamerican Network for Dissemination and Training in Nanotechnology (NANODYF).</p>",
-      objectivesES:
-        "<p><strong>¿Qué hacemos?</strong></p>\
-        <ul>\
-          <li>Estudiar mediante la simulación con Dinámica Molecular (MD) diferentes propiedades físicas y químicas de las nanopartículas y nanoestructuras.</li>\
-          <li>Estudiar mediante la teoría del funcional de la densidad (DFT) procesos de funcionalización y fenómenos superficiales de nanosistemas.</li>\
-          <li>Estudiar mediante Monte Carlo (MC) y dinámica de espín (SD) los procesos de transformaciones de fase en sistemas magnéticos nanoestructurados.</li>\
-          <li>Contribuir con la formación de recursos humanos altamente calificados en el estudio de diversos sistemas nanoestructurados empleando diversas herramientas computacionales.</li>\
-        </ul>",
-      objectivesEN:
-        "<p><strong>What we do</strong></p>\
-        <ul>\
-          <li>Study, via Molecular Dynamics (MD) simulation, different physical and chemical properties of nanoparticles and nanostructures.</li>\
-          <li>Study functionalization processes and surface phenomena of nanosystems using Density Functional Theory (DFT).</li>\
-          <li>Investigate phase transformation processes in nanostructured magnetic systems using Monte Carlo (MC) and spin dynamics (SD).</li>\
-          <li>Contribute to the training of highly qualified human resources in the study of various nanostructured systems using diverse computational tools.</li>\
-        </ul>",
-      servicesES:
-        "<p><strong>¿Qué ofrecemos?</strong></p>\
-        <ul>\
-          <li>Brindar servicios a los <strong>grupos experimentales</strong> de la Universidad Nacional Mayor de San Marcos y otras instituciones académicas.</li>\
-          <li>Brindar servicios y asesoría a la <strong>comunidad académica y empresarial</strong>.</li>\
-          <li>Brindar el servicio de <strong>diseño e implementación de programas especializados</strong>.</li>\
-          <li>Promover los métodos computacionales de investigación de los nanomateriales en los diferentes <strong>niveles de enseñanza secundaria y universitaria</strong>.</li>\
-        </ul>",
-      servicesEN:
-        "<p><strong>What we offer</strong></p>\
-        <ul>\
-          <li>Provide services to experimental groups at Universidad Nacional Mayor de San Marcos and other academic institutions.</li>\
-          <li>Offer services and consultancy to the academic and business community.</li>\
-          <li>Provide design and implementation of specialized software programs.</li>\
-          <li>Promote computational research methods for nanomaterials at secondary and university education levels.</li>\
-        </ul>",
+      objectivesContent: JSON.stringify({
+        es: {
+          introParagraphs: [],
+          items: [
+            "Estudiar mediante la simulación con Dinámica Molecular (MD) diferentes propiedades físicas y químicas de las nanopartículas y nanoestructuras.",
+            "Estudiar mediante la teoría del funcional de la densidad (DFT) procesos de funcionalización y fenómenos superficiales de nanosistemas.",
+            "Estudiar mediante Monte Carlo (MC) y dinámica de espín (SD) los procesos de transformaciones de fase en sistemas magnéticos nanoestructurados.",
+            "Contribuir con la formación de recursos humanos altamente calificados en el estudio de diversos sistemas nanoestructurados empleando diversas herramientas computacionales.",
+          ],
+        },
+        en: {
+          introParagraphs: [],
+          items: [
+            "Study, via Molecular Dynamics (MD) simulation, different physical and chemical properties of nanoparticles and nanostructures.",
+            "Study functionalization processes and surface phenomena of nanosystems using Density Functional Theory (DFT).",
+            "Investigate phase transformation processes in nanostructured magnetic systems using Monte Carlo (MC) and spin dynamics (SD).",
+            "Contribute to the training of highly qualified human resources in the study of various nanostructured systems using diverse computational tools.",
+          ],
+        },
+      }),
+      servicesContent: JSON.stringify({
+        es: {
+          introParagraphs: [],
+          items: [
+            "Brindar servicios a los grupos experimentales de la Universidad Nacional Mayor de San Marcos y otras instituciones académicas.",
+            "Brindar servicios y asesoría a la comunidad académica y empresarial.",
+            "Brindar el servicio de diseño e implementación de programas especializados.",
+            "Promover los métodos computacionales de investigación de los nanomateriales en los diferentes niveles de enseñanza secundaria y universitaria.",
+          ],
+        },
+        en: {
+          introParagraphs: [],
+          items: [
+            "Provide services to experimental groups at Universidad Nacional Mayor de San Marcos and other academic institutions.",
+            "Offer services and consultancy to the academic and business community.",
+            "Provide design and implementation of specialized software programs.",
+            "Promote computational research methods for nanomaterials at secondary and university education levels.",
+          ],
+        },
+      }),
+      homeServicesTeaserContent: JSON.stringify({
+        es: {
+          paragraphs: [
+            "Brindamos servicios y asesoría computacional para grupos experimentales, academia y sector empresarial.",
+            "También diseñamos e implementamos programas especializados para necesidades de investigación en nanomateriales.",
+          ],
+        },
+        en: {
+          paragraphs: [
+            "We provide computational services and consulting for experimental groups, academia, and industry.",
+            "We also design and implement specialized software for nanomaterials research needs.",
+          ],
+        },
+      }),
       createdAt: today,
       updatedAt: today,
       groupId: 1,

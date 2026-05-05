@@ -47,7 +47,7 @@ export type HomeViewModel = {
   lineasInvestigacion: ResearchLine[];
   metodos: Method[];
   miembros: Member[];
-  aboutUs: string;
+  aboutUs: string[];
   articulos: number;
   tesis: number;
   resumenes: number;

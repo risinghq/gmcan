@@ -14,6 +14,7 @@ import {
   listGroups,
   listSoftware,
   updateAboutDescription,
+  updateAboutHomeServicesTeaser,
   updateAboutObjectives,
   updateAboutServices,
   updateEquipment,
@@ -28,6 +29,27 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const AboutSectionSchema = z.object({
+  introParagraphs: z.array(z.string().trim().min(1)),
+  items: z.array(z.string().trim().min(1)),
+});
+const LocalizedSectionSchema = z.object({
+  es: AboutSectionSchema,
+  en: AboutSectionSchema,
+});
+const LocalizedTeaserSchema = z.object({
+  es: z.object({ paragraphs: z.array(z.string().trim().min(1)).min(1) }),
+  en: z.object({ paragraphs: z.array(z.string().trim().min(1)).min(1) }),
+});
+
+function parseJsonContent<T>(raw: string | null, schema: z.ZodType<T>, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    return schema.parse(JSON.parse(raw));
+  } catch {
+    return fallback;
+  }
+}
 
 router.use("*", async (c, next) => {
   if (c.req.method === "GET") return requirePermission("content.read")(c, next);
@@ -118,7 +140,26 @@ router.put(
 router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const rows = await listAbout(id);
-  return c.json(rows);
+  return c.json(
+    rows.map((row) => ({
+      ...row,
+      objectivesContent: parseJsonContent(
+        row.objectivesContent,
+        LocalizedSectionSchema,
+        { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
+      ),
+      servicesContent: parseJsonContent(
+        row.servicesContent,
+        LocalizedSectionSchema,
+        { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
+      ),
+      homeServicesTeaserContent: parseJsonContent(
+        row.homeServicesTeaserContent,
+        LocalizedTeaserSchema,
+        { es: { paragraphs: [] }, en: { paragraphs: [] } },
+      ),
+    })),
+  );
 });
 
 router.put(
@@ -136,11 +177,11 @@ router.put(
 router.put(
   "/about/:id/objectives",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ objectivesES: z.string().optional(), objectivesEN: z.string().optional() })),
+  zValidator("json", z.object({ objectivesContent: LocalizedSectionSchema })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
-    await updateAboutObjectives(id, data);
+    await updateAboutObjectives(id, { objectivesContent: JSON.stringify(data.objectivesContent) });
     return c.json(okStatus());
   },
 );
@@ -148,11 +189,25 @@ router.put(
 router.put(
   "/about/:id/services",
   zValidator("param", IdParam),
-  zValidator("json", z.object({ servicesES: z.string().optional(), servicesEN: z.string().optional() })),
+  zValidator("json", z.object({ servicesContent: LocalizedSectionSchema })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
-    await updateAboutServices(id, data);
+    await updateAboutServices(id, { servicesContent: JSON.stringify(data.servicesContent) });
+    return c.json(okStatus());
+  },
+);
+
+router.put(
+  "/about/:id/home-services-teaser",
+  zValidator("param", IdParam),
+  zValidator("json", z.object({ homeServicesTeaserContent: LocalizedTeaserSchema })),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const data = c.req.valid("json");
+    await updateAboutHomeServicesTeaser(id, {
+      homeServicesTeaserContent: JSON.stringify(data.homeServicesTeaserContent),
+    });
     return c.json(okStatus());
   },
 );

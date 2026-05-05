@@ -51,7 +51,7 @@ export class HomeDataService {
     const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
     const newsSafe = Array.isArray(newsRaw?.items) ? (newsRaw.items as PublicNewsListItem[]) : [];
 
-    const aboutUs = group?.id ? await this.loadAboutUs(group.id) : "";
+    const aboutUs = group?.id ? await this.loadAboutUs(group.id) : [];
 
     const publicaciones = this.enrichPublicaciones(publicacionesSafe);
     const proyectos = this.enrichProyectos(
@@ -94,12 +94,12 @@ export class HomeDataService {
     };
   }
 
-  private async loadAboutUs(groupId: number): Promise<string> {
+  private async loadAboutUs(groupId: number): Promise<string[]> {
     try {
       const aboutList = await firstValueFrom(this.groupService.listPublicAbout(groupId));
-      return Array.isArray(aboutList) ? (aboutList[0]?.services ?? "") : "";
+      return Array.isArray(aboutList) ? (aboutList[0]?.homeServicesTeaserContent?.paragraphs ?? []) : [];
     } catch {
-      return "";
+      return [];
     }
   }
 

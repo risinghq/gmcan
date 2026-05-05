@@ -68,10 +68,9 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "id",
     "descriptionES",
     "descriptionEN",
-    "objectivesES",
-    "objectivesEN",
-    "servicesES",
-    "servicesEN",
+    "objectivesContent",
+    "servicesContent",
+    "homeServicesTeaserContent",
     "createdAt",
     "updatedAt",
 
@@ -376,10 +375,9 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("descriptionES", "text", (c) => c.notNull())
     .addColumn("descriptionEN", "text", (c) => c.notNull())
-    .addColumn("objectivesES", "text")
-    .addColumn("objectivesEN", "text")
-    .addColumn("servicesES", "text")
-    .addColumn("servicesEN", "text")
+    .addColumn("objectivesContent", "text")
+    .addColumn("servicesContent", "text")
+    .addColumn("homeServicesTeaserContent", "text")
     .addColumn("createdAt", "text")
     .addColumn("updatedAt", "text")
 

@@ -2,6 +2,10 @@ import { db } from "../db/client.js";
 import type { MethodRow, ResearchLineRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 
+export type AboutSectionContent = { introParagraphs: string[]; items: string[] };
+export type LocalizedAboutSectionContent = { es: AboutSectionContent; en: AboutSectionContent };
+export type LocalizedHomeServicesTeaserContent = { es: { paragraphs: string[] }; en: { paragraphs: string[] } };
+
 export async function getGroup(id: number) {
   return db.selectFrom("research_group").selectAll().where("id", "=", id).executeTakeFirst();
 }
@@ -49,11 +53,15 @@ export async function updateAboutDescription(id: number, data: { descriptionES: 
   await db.updateTable("about").set(data).where("id", "=", id).execute();
 }
 
-export async function updateAboutObjectives(id: number, data: { objectivesES?: string; objectivesEN?: string }) {
+export async function updateAboutObjectives(id: number, data: { objectivesContent?: string }) {
   await db.updateTable("about").set(data).where("id", "=", id).execute();
 }
 
-export async function updateAboutServices(id: number, data: { servicesES?: string; servicesEN?: string }) {
+export async function updateAboutServices(id: number, data: { servicesContent?: string }) {
+  await db.updateTable("about").set(data).where("id", "=", id).execute();
+}
+
+export async function updateAboutHomeServicesTeaser(id: number, data: { homeServicesTeaserContent?: string }) {
   await db.updateTable("about").set(data).where("id", "=", id).execute();
 }
 

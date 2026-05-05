@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
-import type { About } from "../models/about";
+import type { About, LocalizedAboutSectionContent, LocalizedHomeServicesTeaserContent } from "../models/about";
 import type { Equipment } from "../models/equipment";
 import type { Group } from "../models/group";
 import type { Software } from "../models/software";
@@ -73,12 +73,25 @@ export class GroupService {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/description`, data);
   }
 
-  updateAboutObjectives(id: number, data: { objectives?: string }): Observable<{ status: number }> {
+  updateAboutObjectives(
+    id: number,
+    data: { objectivesContent: LocalizedAboutSectionContent },
+  ): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/objectives`, data);
   }
 
-  updateAboutServices(id: number, data: { services?: string }): Observable<{ status: number }> {
+  updateAboutServices(
+    id: number,
+    data: { servicesContent: LocalizedAboutSectionContent },
+  ): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/services`, data);
+  }
+
+  updateAboutHomeServicesTeaser(
+    id: number,
+    data: { homeServicesTeaserContent: LocalizedHomeServicesTeaserContent },
+  ): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/home-services-teaser`, data);
   }
 
   uploadAboutAsset(id: number, file: File): Observable<{ status: number }> {

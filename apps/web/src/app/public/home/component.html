@@ -116,7 +116,11 @@
   </div>
   <div class="services-card">
     <img class="services-icon" src="/img/icons/bulb.svg" />
-    <div class="mt-services about-text" [innerHTML]="aboutUs"></div>
+    <div class="mt-services about-text">
+      @for (paragraph of aboutUs; track paragraph) {
+      <p>{{ paragraph }}</p>
+      }
+    </div>
     <div
       class="btn-black align-center"
       [style.display]="screenWidth < 960 ? 'none' : 'block'"

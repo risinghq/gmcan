@@ -8,6 +8,24 @@ import { listAbout, listEquipment, listGroups, listSoftware } from "../../servic
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const AboutSectionSchema = z.object({
+  introParagraphs: z.array(z.string()),
+  items: z.array(z.string()),
+});
+const LocalizedSectionSchema = z.object({ es: AboutSectionSchema, en: AboutSectionSchema });
+const HomeTeaserSchema = z.object({
+  es: z.object({ paragraphs: z.array(z.string()) }),
+  en: z.object({ paragraphs: z.array(z.string()) }),
+});
+
+function parseJsonContent<T>(raw: string | null, schema: z.ZodType<T>, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    return schema.parse(JSON.parse(raw));
+  } catch {
+    return fallback;
+  }
+}
 
 router.get("/", async (c) => {
   const locale = c.get("locale");
@@ -52,8 +70,18 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
     rows.map(async (row) => ({
       id: row.id,
       description: localizeField(row, locale, { es: "descriptionES", en: "descriptionEN" }),
-      objectives: localizeField(row, locale, { es: "objectivesES", en: "objectivesEN", required: false }),
-      services: localizeField(row, locale, { es: "servicesES", en: "servicesEN", required: false }),
+      objectivesContent: parseJsonContent(row.objectivesContent, LocalizedSectionSchema, {
+        es: { introParagraphs: [], items: [] },
+        en: { introParagraphs: [], items: [] },
+      })[locale],
+      servicesContent: parseJsonContent(row.servicesContent, LocalizedSectionSchema, {
+        es: { introParagraphs: [], items: [] },
+        en: { introParagraphs: [], items: [] },
+      })[locale],
+      homeServicesTeaserContent: parseJsonContent(row.homeServicesTeaserContent, HomeTeaserSchema, {
+        es: { paragraphs: [] },
+        en: { paragraphs: [] },
+      })[locale],
       asset: await resolveAssetAccessUrl({ resourceType: "about", resourceId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,
