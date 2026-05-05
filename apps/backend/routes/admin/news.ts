@@ -11,6 +11,7 @@ import {
   deleteNews,
   getNewsItem,
   getNewsPhoto,
+  listAdminNewsItems,
   listNews,
   type NewsUpsertInput,
   toAdminNewsView,
@@ -40,8 +41,7 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", async (c) => {
-  const rows = await listNews();
-  return c.json(rows.map(toAdminNewsView));
+  return c.json(await listAdminNewsItems());
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

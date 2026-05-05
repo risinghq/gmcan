@@ -4,6 +4,7 @@ import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 import { assetUrl } from "../lib/upload.js";
+import type { AdminPublicationListItem } from "./admin-list.types.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -119,6 +120,68 @@ export async function listPublications() {
   }
 
   return publications.map((p) => Object.assign(p, { authors: authorsByPublication.get(p.id) ?? [] }));
+}
+
+export async function listAdminPublications(typeId?: number): Promise<AdminPublicationListItem[]> {
+  let query = db.selectFrom("publication").selectAll();
+  if (typeId !== undefined) query = query.where("publication.typeId", "=", typeId);
+  const publications = await query.orderBy("publication.publishedAt", "desc").execute();
+  if (publications.length === 0) return [];
+
+  const publicationIds = publications.map((publication) => publication.id);
+  const [eventRows, authorRows] = await Promise.all([
+    db.selectFrom("event").select(["id", "name"]).execute(),
+    db
+      .selectFrom("publication_author")
+      .leftJoin("member", "member.id", "publication_author.memberId")
+      .select([
+        "publication_author.publicationId as publicationId",
+        "publication_author.isPrincipal as isPrincipal",
+        "publication_author.externalName as externalName",
+        "publication_author.memberId as memberId",
+        "member.firstName as firstName",
+        "member.lastName as lastName",
+        "member.maternalName as maternalName",
+        "member.photo as photo",
+      ])
+      .where("publication_author.publicationId", "in", publicationIds)
+      .orderBy("publication_author.publicationId", "asc")
+      .orderBy("publication_author.isPrincipal", "asc")
+      .orderBy("publication_author.id", "asc")
+      .execute(),
+  ]);
+
+  const eventsById = new Map(eventRows.map((eventRow) => [eventRow.id, eventRow.name]));
+  const firstAuthorByPublication = new Map<number, { name: string; asset: string | null }>();
+  for (const row of authorRows) {
+    if (firstAuthorByPublication.has(row.publicationId)) continue;
+    if (row.memberId) {
+      firstAuthorByPublication.set(row.publicationId, {
+        name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+        asset: assetUrl(row.photo),
+      });
+      continue;
+    }
+    firstAuthorByPublication.set(row.publicationId, { name: row.externalName ?? "", asset: null });
+  }
+
+  return publications.map((publication) => {
+    const firstAuthor = firstAuthorByPublication.get(publication.id);
+    return {
+      id: publication.id,
+      title: publication.title,
+      publishedAt: publication.publishedAt,
+      typeId: publication.typeId,
+      journalId: publication.journalId,
+      universityId: publication.universityId,
+      thesisTypeId: publication.thesisTypeId,
+      doi: publication.doi,
+      eventId: publication.eventId,
+      eventName: publication.eventId ? (eventsById.get(publication.eventId) ?? "") : "",
+      firstAuthorName: firstAuthor?.name ?? "",
+      firstAuthorAsset: firstAuthor?.asset ?? null,
+    };
+  });
 }
 
 export async function getPublication(id: number) {

@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
+import type { AdminNewsListItem } from "../models/admin-list";
 import type { News } from "../models/news";
 import { GLOBAL } from "./global";
 
@@ -32,8 +33,8 @@ export class NewsService {
   }
 
   // Admin
-  listAdminNews(): Observable<News[]> {
-    return this.http.get<News[]>(`${GLOBAL.url}admin/news`);
+  listAdminNews(): Observable<AdminNewsListItem[]> {
+    return this.http.get<AdminNewsListItem[]>(`${GLOBAL.url}admin/news`);
   }
 
   getAdminNews(id: number): Observable<News> {

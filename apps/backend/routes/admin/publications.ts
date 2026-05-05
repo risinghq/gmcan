@@ -10,7 +10,7 @@ import {
   deletePublication,
   getPublicationEditView,
   getPublicationFile,
-  listPublications,
+  listAdminPublications,
   replaceAuthors,
   setPublicationFile,
   updatePublication,
@@ -18,6 +18,7 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const ListQuery = z.object({ type: z.coerce.number().int().optional() });
 
 const AuthorEntry = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("registered"), memberId: z.number().int(), isPrincipal: z.number().int() }),
@@ -47,9 +48,9 @@ router.use("*", async (c, next) => {
   return requirePermission("publications.write")(c, next);
 });
 
-router.get("/", async (c) => {
-  const rows = await listPublications();
-  return c.json(rows);
+router.get("/", zValidator("query", ListQuery), async (c) => {
+  const { type } = c.req.valid("query");
+  return c.json(await listAdminPublications(type));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

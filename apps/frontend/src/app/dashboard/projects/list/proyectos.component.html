@@ -43,7 +43,7 @@
         <ng-container matColumnDef="fechaInicio">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de Inicio</th>
           <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
-            {{ row.fechaI }}
+            {{ row.startDateLabel }}
           </td>
         </ng-container>
         <ng-container matColumnDef="codigo">
@@ -126,7 +126,7 @@
       </ng-container>
       <ng-container matColumnDef="fechaInicio">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha de Inicio</th>
-        <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">{{ row.fechaI }}</td>
+        <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">{{ row.startDateLabel }}</td>
       </ng-container>
       <ng-container matColumnDef="codigo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Código</th>

@@ -1,6 +1,8 @@
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
+import { assetUrl } from "../lib/upload.js";
+import type { AdminNewsListItem } from "./admin-list.types.js";
 
 export interface NewsUpsertInput {
   translations: Bilingual<{ title: string; summary: string; body: string }>;
@@ -31,6 +33,41 @@ export async function listNews(status?: number) {
   let query = db.selectFrom("news").selectAll();
   if (status !== undefined) query = query.where("status", "=", status);
   return query.orderBy("publishedAt", "desc").execute();
+}
+
+export async function listAdminNewsItems(): Promise<AdminNewsListItem[]> {
+  const rows = await db
+    .selectFrom("news")
+    .innerJoin("news_type", "news_type.id", "news.newsTypeId")
+    .innerJoin("member", "member.id", "news.authorId")
+    .select([
+      "news.id as id",
+      "news.title as title",
+      "news.publishedAt as publishedAt",
+      "news.status as status",
+      "news.authorId as authorId",
+      "news.newsTypeId as newsTypeId",
+      "news_type.name as categoryName",
+      "member.firstName as firstName",
+      "member.lastName as lastName",
+      "member.maternalName as maternalName",
+      "member.photo as authorPhoto",
+    ])
+    .orderBy("news.publishedAt", "desc")
+    .execute();
+
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    publishedAt: row.publishedAt,
+    status: row.status,
+    authorId: row.authorId,
+    newsTypeId: row.newsTypeId,
+    statusLabel: row.status === 1 ? "Activo" : "Inactivo",
+    categoryName: row.categoryName,
+    authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+    authorAsset: assetUrl(row.authorPhoto),
+  }));
 }
 
 export async function getNewsItem(id: number) {

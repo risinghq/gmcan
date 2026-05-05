@@ -3,7 +3,8 @@ import { Injectable, inject } from "@angular/core";
 import { Observable } from "rxjs";
 
 import type { SaveAuthorEntry } from "../models/author";
-import type { Publication, PublicationWithAuthors } from "../models/publication";
+import type { AdminPublicationListItem } from "../models/admin-list";
+import type { PublicationWithAuthors } from "../models/publication";
 import { GLOBAL } from "./global";
 
 export interface PublicationFields {
@@ -24,6 +25,10 @@ export interface PublicationFilters {
   event?: number;
   journal?: number;
   university?: number;
+}
+
+export interface AdminPublicationFilters {
+  type?: number;
 }
 
 @Injectable({ providedIn: "root" })
@@ -50,8 +55,10 @@ export class PublicationService {
   }
 
   // Admin
-  listAdminPublications(): Observable<Publication[]> {
-    return this.http.get<Publication[]>(`${GLOBAL.url}admin/publications`);
+  listAdminPublications(filters?: AdminPublicationFilters): Observable<AdminPublicationListItem[]> {
+    return this.http.get<AdminPublicationListItem[]>(`${GLOBAL.url}admin/publications`, {
+      params: filters as Record<string, string | number> | undefined,
+    });
   }
 
   createPublication(data: PublicationFields, authors: SaveAuthorEntry[]): Observable<{ id: number }> {

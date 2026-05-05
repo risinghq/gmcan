@@ -18,15 +18,12 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { Member } from "@app/shared/models/member";
-import type { News } from "@app/shared/models/news";
-import { MemberService } from "@app/shared/services/member.service";
+import type { AdminNewsListItem } from "@app/shared/models/admin-list";
 import { NewsService } from "@app/shared/services/news.service";
 import type { RefItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { parseLocalDate } from "@app/shared/utils/date";
-import { forkJoin } from "rxjs";
 
 interface NewsListItem {
   id: number;
@@ -64,7 +61,6 @@ interface NewsListItem {
 })
 export default class NoticiasComponent implements OnInit {
   private readonly newsService = inject(NewsService);
-  private readonly memberService = inject(MemberService);
   private readonly refService = inject(RefService);
   private readonly titlecasePipe = inject(TitleCasePipe);
   private readonly datePipe = inject(DatePipe);
@@ -87,24 +83,14 @@ export default class NoticiasComponent implements OnInit {
   constructor() {}
 
   private loadList(): void {
-    forkJoin({
-      news: this.newsService.listAdminNews(),
-      authors: this.memberService.listAdminMembers(),
-      newsTypes: this.refService.listNewsTypes(),
-    }).subscribe(({ news, authors, newsTypes }: { news: News[]; authors: Member[]; newsTypes: RefItem[] }) => {
-      const membersById = new Map<number, Member>(authors.map((member) => [member.id, member]));
-      const newsTypesById = new Map<number, RefItem>(newsTypes.map((newsType) => [newsType.id, newsType]));
+    this.refService.listNewsTypes().subscribe((newsTypes: RefItem[]) => {
       this.newsTypes = newsTypes;
       this.dataSource2 = new MatTableDataSource(this.newsTypes);
       this.dataSource2.sort = this.sort2();
       this.dataSource2.paginator = this.paginator2();
-
-      this.items = news
-        .toSorted((a, b) =>
-          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
-        )
-        .map((item) => this.mapNewsItem(item, membersById, newsTypesById));
-
+    });
+    this.newsService.listAdminNews().subscribe((news) => {
+      this.items = news.map((item) => this.mapNewsItem(item));
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();
@@ -121,9 +107,7 @@ export default class NoticiasComponent implements OnInit {
     });
   }
 
-  private mapNewsItem(news: News, membersById: Map<number, Member>, newsTypesById: Map<number, RefItem>): NewsListItem {
-    const author = membersById.get(news.authorId);
-    const category = newsTypesById.get(news.newsTypeId);
+  private mapNewsItem(news: AdminNewsListItem): NewsListItem {
     const publishedAt = parseLocalDate(news.publishedAt);
     const publishedAtLabel = publishedAt
       ? (this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? "") ?? "")
@@ -132,11 +116,11 @@ export default class NoticiasComponent implements OnInit {
       id: news.id,
       title: news.title,
       publishedAtLabel,
-      categoryName: category?.name ?? "",
-      authorName: author ? [author.firstName, author.lastName, author.maternalName].filter(Boolean).join(" ") : "",
-      authorAsset: author?.asset ?? null,
+      categoryName: news.categoryName,
+      authorName: news.authorName,
+      authorAsset: news.authorAsset,
       status: news.status,
-      statusLabel: news.status === 1 ? "Activo" : "Inactivo",
+      statusLabel: news.statusLabel,
     };
   }
 
