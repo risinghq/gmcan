@@ -36,7 +36,9 @@ export class HomeDataService {
       firstValueFrom(this.groupService.getGroup()),
       firstValueFrom(this.publicationService.listPublications()),
       firstValueFrom(this.projectService.listProjects()),
-      firstValueFrom(this.newsService.listNews({ status: 1, sortBy: "publishedAt", sortOrder: "desc", page: 1, pageSize: 6 })),
+      firstValueFrom(
+        this.newsService.listNews({ status: 1, sortBy: "publishedAt", sortOrder: "desc", page: 1, pageSize: 6 }),
+      ),
       firstValueFrom(this.researchLinesService.list()),
       firstValueFrom(this.methodsService.list()),
       firstValueFrom(this.memberService.listMembers()),

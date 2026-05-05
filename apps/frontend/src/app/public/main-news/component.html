@@ -67,7 +67,12 @@
             </div>
           </div>
           } @if (total > pageSize) {
-          <ngb-pagination [page]="page" [pageSize]="pageSize" [collectionSize]="total" (pageChange)="onPageChange($event)">
+          <ngb-pagination
+            [page]="page"
+            [pageSize]="pageSize"
+            [collectionSize]="total"
+            (pageChange)="onPageChange($event)"
+          >
             <ng-template class="unique-left" ngbPaginationPrevious>
               <div (click)="scroll()" class="h-ih">
                 <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
