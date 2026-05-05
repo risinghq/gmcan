@@ -1,8 +1,9 @@
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod";
 
-export const LocaleSchema = z.enum(["es", "en"]);
-export type Locale = z.infer<typeof LocaleSchema>;
+import { LocaleCodeSchema, type LocaleCode } from "./locales.js";
+
+export const LocaleSchema = LocaleCodeSchema;
+export type Locale = LocaleCode;
 
 export function localizeField<T extends Record<string, unknown>>(
   row: T,

@@ -141,24 +141,25 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const rows = await listAbout(id);
   return c.json(
-    rows.map((row) => ({
-      ...row,
-      objectivesContent: parseJsonContent(
-        row.objectivesContent,
-        LocalizedSectionSchema,
-        { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
-      ),
-      servicesContent: parseJsonContent(
-        row.servicesContent,
-        LocalizedSectionSchema,
-        { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
-      ),
-      homeServicesTeaserContent: parseJsonContent(
-        row.homeServicesTeaserContent,
-        LocalizedTeaserSchema,
-        { es: { paragraphs: [] }, en: { paragraphs: [] } },
-      ),
-    })),
+    rows.map((row) =>
+      Object.assign(row, {
+        objectivesContent: parseJsonContent(
+          row.objectivesContent,
+          LocalizedSectionSchema,
+          { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
+        ),
+        servicesContent: parseJsonContent(
+          row.servicesContent,
+          LocalizedSectionSchema,
+          { es: { introParagraphs: [], items: [] }, en: { introParagraphs: [], items: [] } },
+        ),
+        homeServicesTeaserContent: parseJsonContent(
+          row.homeServicesTeaserContent,
+          LocalizedTeaserSchema,
+          { es: { paragraphs: [] }, en: { paragraphs: [] } },
+        ),
+      }),
+    ),
   );
 });
 

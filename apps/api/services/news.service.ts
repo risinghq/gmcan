@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { Bilingual } from "../lib/admin-translations.js";
+import { type Locale } from "../lib/public-locale.js";
 import type {
   AdminNewsListItem,
   AdminNewsListQuery,
@@ -92,7 +93,7 @@ const PUBLIC_SORT_COLUMN: Record<PublicNewsSortBy, string> = {
   title: "news.title",
 };
 
-export async function listPublicNews(locale: "es" | "en", query: PublicNewsListQuery): Promise<PublicNewsListResponse> {
+export async function listPublicNews(locale: Locale, query: PublicNewsListQuery): Promise<PublicNewsListResponse> {
   const offset = (query.page - 1) * query.pageSize;
   const newsTypeNameField = locale === "en" ? "news_type.nameEN" : "news_type.name";
 
@@ -156,7 +157,7 @@ export async function listPublicNews(locale: "es" | "en", query: PublicNewsListQ
   };
 }
 
-export async function getPublicNewsDetail(id: number, locale: "es" | "en"): Promise<PublicNewsDetail | null> {
+export async function getPublicNewsDetail(id: number, locale: Locale): Promise<PublicNewsDetail | null> {
   const newsTypeNameField = locale === "en" ? "news_type.nameEN" : "news_type.name";
   const row = await db
     .selectFrom("news")
