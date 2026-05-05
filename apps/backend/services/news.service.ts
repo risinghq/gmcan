@@ -120,14 +120,12 @@ export async function listPublicNews(locale: "es" | "en", query: PublicNewsListQ
       "news.title as title",
       "news.summary as summary",
       "news.publishedAt as publishedAt",
-      "news.photo as photo",
       "news.priority as priority",
       "news.authorId as authorId",
       "news.newsTypeId as newsTypeId",
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as authorPhoto",
       sql<string>`coalesce(${sql.ref(newsTypeNameField)}, '')`.as("newsTypeName"),
     ])
     .orderBy(PUBLIC_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
@@ -171,7 +169,6 @@ export async function getPublicNewsDetail(id: number, locale: "es" | "en"): Prom
       "news.body as body",
       "news.status as status",
       "news.publishedAt as publishedAt",
-      "news.photo as photo",
       "news.priority as priority",
       "news.authorId as authorId",
       "news.newsTypeId as newsTypeId",
@@ -180,7 +177,6 @@ export async function getPublicNewsDetail(id: number, locale: "es" | "en"): Prom
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as authorPhoto",
       sql<string>`coalesce(${sql.ref(newsTypeNameField)}, '')`.as("newsTypeName"),
     ])
     .where("news.id", "=", id)
@@ -251,7 +247,6 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as authorPhoto",
     ])
     .orderBy(NEWS_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
     .orderBy("news.id", "desc")
@@ -293,7 +288,6 @@ export function toAdminNewsView(row: NewsRow) {
     publishedAt: row.publishedAt,
     updatedAt: row.updatedAt,
     createdAt: row.createdAt,
-    photo: row.photo,
     priority: row.priority,
     authorId: row.authorId,
     newsTypeId: row.newsTypeId,

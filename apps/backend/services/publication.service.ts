@@ -55,7 +55,6 @@ async function attachAuthors(publicationId: number) {
       sql<string>`member.firstName`.as("memberFirstName"),
       sql<string>`member.lastName`.as("memberLastName"),
       sql<string | null>`member.maternalName`.as("memberMaternalName"),
-      sql<string | null>`member.photo`.as("memberPhoto"),
     ])
     .where("publication_author.publicationId", "=", publicationId)
     .orderBy("publication_author.isPrincipal", "asc")
@@ -65,13 +64,13 @@ async function attachAuthors(publicationId: number) {
     rows.map(async (row) => {
       if (row.memberId) {
         return {
-          kind: "registered" as const,
-          memberId: row.memberId,
-          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-          photo: row.memberPhoto ?? null,
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-          isPrincipal: row.isPrincipal,
-        };
+        kind: "registered" as const,
+        memberId: row.memberId,
+        name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+        photo: null,
+        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+        isPrincipal: row.isPrincipal,
+      };
       }
       return {
         kind: "external" as const,
@@ -98,7 +97,6 @@ export async function listPublications() {
       sql<string>`member.firstName`.as("memberFirstName"),
       sql<string>`member.lastName`.as("memberLastName"),
       sql<string | null>`member.maternalName`.as("memberMaternalName"),
-      sql<string | null>`member.photo`.as("memberPhoto"),
     ])
     .where("publication_author.publicationId", "in", ids)
     .orderBy("publication_author.publicationId", "asc")
@@ -110,13 +108,13 @@ export async function listPublications() {
       publicationId: row.publicationId,
       entry: row.memberId
         ? {
-            kind: "registered" as const,
-            memberId: row.memberId,
-            name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-            photo: row.memberPhoto ?? null,
-            photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-            isPrincipal: row.isPrincipal,
-          }
+          kind: "registered" as const,
+          memberId: row.memberId,
+          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+          photo: null,
+          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+          isPrincipal: row.isPrincipal,
+        }
         : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
     })),
   );
@@ -150,7 +148,6 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
         "member.firstName as firstName",
         "member.lastName as lastName",
         "member.maternalName as maternalName",
-        "member.photo as photo",
       ])
       .where("publication_author.publicationId", "in", publicationIds)
       .orderBy("publication_author.publicationId", "asc")

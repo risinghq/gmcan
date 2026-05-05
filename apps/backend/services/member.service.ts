@@ -33,7 +33,6 @@ export async function listAdminMembers(filter?: {
       "member.roleId",
       "member.memberTypeId",
       "member.prefixId",
-      "member.photo",
       sql<string>`COALESCE(member_type.nameSingular, '')`.as("memberTypeName"),
       sql<string | null>`prefix.nombre`.as("prefixName"),
     ]);
@@ -151,7 +150,7 @@ export async function searchAuthorPool(q: string) {
   const [members, externals] = await Promise.all([
     db
       .selectFrom("member")
-      .select(["id", "firstName", "lastName", "maternalName", "photo"])
+      .select(["id", "firstName", "lastName", "maternalName"])
       .where((eb) =>
         eb.or([eb("firstName", "like", like), eb("lastName", "like", like), eb("maternalName", "like", like)]),
       )
@@ -172,7 +171,7 @@ export async function searchAuthorPool(q: string) {
       kind: "registered" as const,
       memberId: m.id,
       name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
-      photo: m.photo ?? null,
+      photo: null,
       photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: m.id, slot: "photo" }),
     })),
   );

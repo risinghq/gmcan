@@ -67,7 +67,6 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.photo as photo",
     ])
     .where("member_project.projectId", "in", projectIds)
     .orderBy("member_project.projectId", "asc")

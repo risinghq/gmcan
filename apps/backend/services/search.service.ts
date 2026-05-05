@@ -40,7 +40,6 @@ export async function globalSearch(q: string, types: Set<string>) {
             "news.title",
             "news.titleEN",
             "news.publishedAt",
-            "news.photo",
             "news.authorId",
             "news.newsTypeId",
             "news.status",
@@ -109,7 +108,6 @@ export async function globalSearch(q: string, types: Set<string>) {
             sql<string>`member.firstName`.as("memberFirstName"),
             sql<string>`member.lastName`.as("memberLastName"),
             sql<string | null>`member.maternalName`.as("memberMaternalName"),
-            sql<string | null>`member.photo`.as("memberPhoto"),
           ])
           .where("publication_author.publicationId", "in", publicationIds)
           .orderBy("publication_author.publicationId", "asc")
@@ -125,7 +123,7 @@ export async function globalSearch(q: string, types: Set<string>) {
             kind: "registered" as const,
             memberId: row.memberId,
             name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-            photo: row.memberPhoto ?? null,
+            photo: null,
             photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
             isPrincipal: row.isPrincipal,
           }
@@ -148,7 +146,7 @@ export async function globalSearch(q: string, types: Set<string>) {
       ? await db
           .selectFrom("member_project")
           .innerJoin("member", "member.id", "member_project.memberId")
-          .select(["member_project.projectId", "member.id", "member.firstName", "member.lastName", "member.photo"])
+          .select(["member_project.projectId", "member.id", "member.firstName", "member.lastName"])
           .where("member_project.projectId", "in", projectIds)
           .execute()
       : [];
@@ -159,7 +157,7 @@ export async function globalSearch(q: string, types: Set<string>) {
       entry: {
         memberId: row.id,
         name: row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName,
-        photo: row.photo,
+        photo: null,
         photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
       },
     })),
