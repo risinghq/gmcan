@@ -5,7 +5,7 @@
         <div class="text-category mb-16">Logo del grupo</div>
         @if (state.files.previewMap.head) {
         <div class="logo-preview mb-16"><img class="img-logo" src="{{ state.files.previewMap.head }}" /></div>
-        } @if (state.group.logoHeader && !state.files.previewMap.head) {
+        } @if (state.group.assets.header && !state.files.previewMap.head) {
         <div class="logo-preview mb-16">
           <img class="img-logo" src="{{ state.url + 'api/assets/group-header.png' }}" />
         </div>
@@ -25,7 +25,7 @@
         <div class="text-category mb-16">Logo en negativo</div>
         @if (state.files.previewMap.foot) {
         <div class="logo-preview-inverse mb-16"><img class="img-logo" src="{{ state.files.previewMap.foot }}" /></div>
-        } @if (state.group.logoFooter && !state.files.previewMap.foot) {
+        } @if (state.group.assets.footer && !state.files.previewMap.foot) {
         <div class="logo-preview-inverse mb-16">
           <img class="img-logo" src="{{ state.url + 'api/assets/group-footer.png' }}" />
         </div>

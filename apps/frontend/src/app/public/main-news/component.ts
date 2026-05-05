@@ -1,4 +1,4 @@
-import { NgClass, SlicePipe } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
 import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
@@ -42,7 +42,6 @@ type NewsTypeFilter = { id: number; name: string };
     NgbPaginationNumber,
     NgbPaginationNext,
     NgClass,
-    SlicePipe,
   ],
 })
 export default class MainNewsComponent implements OnInit {
