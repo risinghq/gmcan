@@ -1,6 +1,6 @@
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
-export type PublicationDisplay = PublicationWithAuthors & {
+export type PublicationDisplay = PublicPublicationWithAuthors & {
   fecha: string;
   tipoPublicacion?: string;
   tipoTesis?: string;

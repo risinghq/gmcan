@@ -19,8 +19,6 @@ import {
 } from "@app/dashboard/publications/flow/authors";
 import { buildThesisPayload } from "@app/dashboard/publications/flow/publication-payload";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
-import { createPublication } from "@app/shared/models/factories";
-import type { Publication } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
@@ -29,6 +27,13 @@ import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
+
+interface ThesisDraft {
+  title: string;
+  abstract: string;
+  universityId: number | null;
+  thesisKindCode: "phd" | "masters" | null;
+}
 
 @Component({
   selector: "app-add-tesis",
@@ -64,7 +69,7 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
-  publicacion: Publication;
+  publicacion: ThesisDraft;
   publishedAtObj?: Date;
   public publicacionForm: FormGroup;
   button_text = "Guardar tesis";
@@ -80,11 +85,10 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       publishedAt: ["", [Validators.required]],
       universityId: ["", [Validators.required]],
-      thesisTypeId: ["", [Validators.required]],
+      thesisKindCode: ["", [Validators.required]],
       abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.publicacion = createPublication();
-    this.publicacion.typeId = 2;
+    this.publicacion = { title: "", abstract: "", universityId: null, thesisKindCode: null };
     this.url = GLOBAL.url;
   }
 
@@ -129,13 +133,14 @@ export default class AddTesisComponent implements OnInit, HasUnsavedChanges {
 
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.otrosAutores[0]?.name) return;
+    if (!this.publicacion.universityId || !this.publicacion.thesisKindCode) return;
 
     const data = buildThesisPayload({
       title: this.publicacion.title,
       abstract: this.publicacion.abstract ?? undefined,
       publishedAt: this.publishedAtObj,
-      universityId: this.publicacion.universityId ?? undefined,
-      thesisTypeId: this.publicacion.thesisTypeId ?? undefined,
+      universityId: this.publicacion.universityId,
+      thesisKindCode: this.publicacion.thesisKindCode,
     });
 
     this.publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {

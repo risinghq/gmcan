@@ -1,6 +1,6 @@
 import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
@@ -33,7 +33,7 @@ export class PublicationDataService {
 
     const sorted = publications.toSorted((a, b) => ((b.publishedAt ?? "") > (a.publishedAt ?? "") ? 1 : -1));
 
-    const enrich = (pub: PublicationWithAuthors): PublicationDisplay => {
+    const enrich = (pub: PublicPublicationWithAuthors): PublicationDisplay => {
       const publishedAtDate = requireLocalDate(pub.publishedAt, "publication.publishedAt");
       const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
       const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;

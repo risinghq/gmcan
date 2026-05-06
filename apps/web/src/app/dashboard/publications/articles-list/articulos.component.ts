@@ -18,14 +18,14 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import type { JournalItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
-interface PublicationRow extends PublicationWithAuthors {
+interface PublicationRow extends PublicPublicationWithAuthors {
   fecha?: string;
 }
 
@@ -89,7 +89,7 @@ export default class ArticulosComponent implements OnInit {
   }
 
   getArticles(): void {
-    this.publicationService.listPublications({ type: 1 }).subscribe((res) => {
+    this.publicationService.listPublications({ kindCode: "journal_article" }).subscribe((res) => {
       if (res) {
         const sorted = res.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,

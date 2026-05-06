@@ -22,16 +22,17 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { AuthorEntry, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { MemberService } from "@app/shared/services/member.service";
-import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
+import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { requireLocalDate, toIsoDate } from "@app/shared/utils/date";
+import { buildResumenPayload } from "@app/dashboard/publications/flow/publication-payload";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
@@ -48,6 +49,15 @@ interface AuthorFormRow {
   memberId: number | null;
   myControl: FormControl<string>;
   filteredOptions?: Observable<AuthorSearchResult[]>;
+}
+
+interface ResumenDraft {
+  id: number;
+  title: string;
+  abstract: string;
+  doi: string;
+  publishedAtDate: Date;
+  eventId: number | null;
 }
 
 @Component({
@@ -84,7 +94,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
   private eventService = inject(EventService);
 
-  publicacion: PublicationWithAuthors & { publishedAtDate?: Date };
+  publicacion: ResumenDraft;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
   eventos: EventItem[] = [];
@@ -111,19 +121,10 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     this.publicacion = {
       id: 0,
       title: "",
-      asset: null,
-      abstract: null,
-      journalIssue: null,
-      doi: null,
-      publishedAt: "",
-      typeId: 3,
-      journalId: null,
-      universityId: null,
+      abstract: "",
+      doi: "",
+      publishedAtDate: new Date(),
       eventId: null,
-      thesisTypeId: null,
-      updatedAt: null,
-      createdAt: null,
-      authors: [],
     };
   }
 
@@ -132,12 +133,18 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.bindResumen(this.route.snapshot.data["publication"] as PublicationWithAuthors);
+    this.bindResumen(this.route.snapshot.data["publication"] as PublicPublicationWithAuthors);
   }
 
-  private bindResumen(result: PublicationWithAuthors): void {
-    this.publicacion = result;
-    this.publicacion.publishedAtDate = requireLocalDate(result.publishedAt, "publication.publishedAt");
+  private bindResumen(result: PublicPublicationWithAuthors): void {
+    this.publicacion = {
+      id: result.id,
+      title: result.title,
+      abstract: result.abstract ?? "",
+      doi: result.doi ?? "",
+      publishedAtDate: requireLocalDate(result.publishedAt, "publication.publishedAt"),
+      eventId: result.subtype.kindCode === "conference_paper" ? result.subtype.conferencePaper.eventId : null,
+    };
     this.getEventos(result.authors);
   }
 
@@ -158,21 +165,21 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
         map((value) => this.filterAuthors(value ?? "")),
       );
 
-      const principal = existingAuthors.find((a) => a.isPrincipal === 0);
+      const principal = existingAuthors.find((a) => a.authorOrder === 0);
       if (principal) {
         this.selectedUser = principal.name;
-        this.principalMemberId = principal.memberId ?? null;
+        this.principalMemberId = principal.kind === "registered" ? (principal.memberId ?? null) : null;
         this.myControl.setValue(principal.name);
       }
 
       const coAuthors = existingAuthors
-        .filter((a) => a.isPrincipal > 0)
-        .toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+        .filter((a) => a.authorOrder > 0)
+        .toSorted((a, b) => a.authorOrder - b.authorOrder);
       this.otrosAutores = coAuthors.map((a, i) => {
         const row: AuthorFormRow = {
           id: i + 1,
           name: a.name,
-          memberId: a.memberId ?? null,
+          memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
           myControl: new FormControl<string>(a.name, { nonNullable: true }),
         };
         row.filteredOptions = row.myControl.valueChanges.pipe(
@@ -266,14 +273,14 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
 
     const publishedAt = toIsoDate(this.publicacion.publishedAtDate ?? new Date());
 
-    const data: PublicationFields = {
+    if (!this.publicacion.eventId) return;
+    const data = buildResumenPayload({
       title: this.publicacion.title,
-      abstract: this.publicacion.abstract ?? undefined,
-      doi: this.publicacion.doi ?? undefined,
-      publishedAt,
-      typeId: 3,
-      eventId: this.publicacion.eventId ?? undefined,
-    };
+      abstract: this.publicacion.abstract,
+      doi: this.publicacion.doi || undefined,
+      publishedAt: this.publicacion.publishedAtDate,
+      eventId: this.publicacion.eventId,
+    });
 
     this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((result) => {
       if (result.status === 1) {
@@ -288,17 +295,17 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
     const entries: SaveAuthorEntry[] = [];
 
     if (this.principalMemberId) {
-      entries.push({ kind: "registered", memberId: this.principalMemberId, isPrincipal: 0 });
+      entries.push({ kind: "registered", memberId: this.principalMemberId, authorOrder: 0 });
     } else if (this.selectedUser) {
-      entries.push({ kind: "external", externalName: this.selectedUser, isPrincipal: 0 });
+      entries.push({ kind: "external", externalName: this.selectedUser, authorOrder: 0 });
     }
 
     this.otrosAutores.forEach((row, i) => {
       if (!row.name) return;
       if (row.memberId) {
-        entries.push({ kind: "registered", memberId: row.memberId, isPrincipal: i + 1 });
+        entries.push({ kind: "registered", memberId: row.memberId, authorOrder: i + 1 });
       } else {
-        entries.push({ kind: "external", externalName: row.name, isPrincipal: i + 1 });
+        entries.push({ kind: "external", externalName: row.name, authorOrder: i + 1 });
       }
     });
 

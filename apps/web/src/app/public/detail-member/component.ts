@@ -7,7 +7,7 @@ import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
-import type { Publication } from "@app/shared/models/publication";
+import type { PublicPublication } from "@gmcan/contracts/public";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -23,7 +23,7 @@ import {
 
 type MemberDisplay = Member & { active: string; prefix: string; tipoMiembro: string };
 
-type PublicationDisplay = Publication & {
+type PublicationDisplay = PublicPublication & {
   fecha: string;
   tipoPublicacion?: string;
   tipoTesis?: string;

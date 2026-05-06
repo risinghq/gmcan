@@ -18,14 +18,14 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { RefService, type UniversityItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
-interface PublicationRow extends PublicationWithAuthors {
+interface PublicationRow extends PublicPublicationWithAuthors {
   fecha?: string;
   thesisTypeName?: string;
   universityName?: string;
@@ -93,7 +93,7 @@ export default class TesisComponent implements OnInit {
   }
 
   getThesis(): void {
-    this.publicationService.listPublications({ type: 2 }).subscribe((res) => {
+    this.publicationService.listPublications({ kindCode: "thesis" }).subscribe((res) => {
       if (res) {
         const sorted = res.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
@@ -103,9 +103,11 @@ export default class TesisComponent implements OnInit {
           const d = new Date(pub.publishedAt);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
-          const thesisType = this.lookup.thesisTypes().find((t) => t.id === pub.thesisTypeId);
+          const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
+          const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
+          const thesisType = this.lookup.thesisKinds().find((t) => t.code === thesisKindCode);
           row.thesisTypeName = thesisType?.name ?? "";
-          const university = this.lookup.universities().find((u) => u.id === pub.universityId);
+          const university = this.lookup.universities().find((u) => u.id === universityId);
           row.universityName = university?.name ?? "";
           return row;
         });
