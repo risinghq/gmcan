@@ -71,8 +71,6 @@ export default class DetailMemberComponent implements OnInit {
 
   language: (typeof Languages)[number] = Languages[0];
 
-  constructor() {}
-
   ngOnInit(): void {
     this.language = this.session.language();
     const origin = parsePublicOrigin(this.route);

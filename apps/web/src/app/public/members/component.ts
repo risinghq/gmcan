@@ -33,8 +33,6 @@ export default class MembersComponent implements OnInit {
   language: (typeof Languages)[number] = Languages[0];
   allCharged = false;
 
-  constructor() {}
-
   ngOnInit(): void {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.members);

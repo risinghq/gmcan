@@ -31,7 +31,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { requireLocalDate, toIsoDate } from "@app/shared/utils/date";
+import { requireLocalDate } from "@app/shared/utils/date";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
@@ -270,8 +270,6 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
 
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
-
-    const publishedAt = toIsoDate(this.publicacion.publishedAtDate ?? new Date());
 
     if (!this.publicacion.eventId) return;
     const data = buildResumenPayload({
