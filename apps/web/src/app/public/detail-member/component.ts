@@ -10,7 +10,6 @@ import type { Member } from "@app/shared/models/member";
 import type { Publication } from "@app/shared/models/publication";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -67,15 +66,12 @@ export default class DetailMemberComponent implements OnInit {
   public cargado = false;
   public previouspage = "Inicio";
   public previouslink = "/home";
-  public url: string;
   page = 1;
   pageSize = 5;
 
   language: (typeof Languages)[number] = Languages[0];
 
-  constructor() {
-    this.url = GLOBAL.url;
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.language = this.session.language();
@@ -109,14 +105,14 @@ export default class DetailMemberComponent implements OnInit {
     const id = Number(this.route.snapshot.params["id"]);
     if (!id) return;
 
-    const prefijos = this.lookup.prefijos();
-    const prefijosMap = new Map(prefijos.map((p) => [p.idPrefijo, p]));
+    const prefijos = this.lookup.prefixes();
+    const prefijosMap = new Map(prefijos.map((p) => [p.code, p]));
     const memberTypes = this.lookup.memberTypes();
-    const memberTypesMap = new Map(memberTypes.map((t) => [t.id, t]));
-    const pubTypes = this.lookup.publicationTypes();
-    const pubTypesMap = new Map(pubTypes.map((t) => [t.id, t]));
-    const thesisTypes = this.lookup.thesisTypes();
-    const thesisTypesMap = new Map(thesisTypes.map((t) => [t.id, t]));
+    const memberTypesMap = new Map(memberTypes.map((t) => [t.code, t]));
+    const pubTypes = this.lookup.publicationKinds();
+    const pubTypesMap = new Map(pubTypes.map((t) => [t.code, t]));
+    const thesisTypes = this.lookup.thesisKinds();
+    const thesisTypesMap = new Map(thesisTypes.map((t) => [t.code, t]));
     const journals = this.lookup.journals();
     const journalsMap = new Map(journals.map((j) => [j.id, j]));
     const universities = this.lookup.universities();
@@ -128,11 +124,11 @@ export default class DetailMemberComponent implements OnInit {
       if (!res?.member) return;
 
       const m = res.member;
-      const prefijo = m.prefixId ? prefijosMap.get(m.prefixId) : undefined;
-      const prefix = prefijo && prefijo.nombre !== "Ninguno" && prefijo.nombre !== "Bachiller" ? prefijo.nombre : "";
-      const memberType = memberTypesMap.get(m.memberTypeId);
+      const prefijo = m.prefixCode ? prefijosMap.get(m.prefixCode) : undefined;
+      const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
+      const memberType = memberTypesMap.get(m.memberTypeCode);
       const active =
-        m.status === 1
+        m.isActive === 1
           ? (this.language.detailMemberText?.[0]?.activeMember ?? "")
           : (this.language.detailMemberText?.[0]?.oldMember ?? "");
 
@@ -143,14 +139,18 @@ export default class DetailMemberComponent implements OnInit {
         const d = parseLocalDate(pub.publishedAt);
         const fecha = d ? (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "") : "";
 
-        const evento = pub.eventId ? eventsMap.get(pub.eventId) : undefined;
+        const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
+        const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
+        const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
+        const journalId = pub.subtype.kindCode === "journal_article" ? pub.subtype.journalArticle.journalId : null;
+        const evento = eventId ? eventsMap.get(eventId) : undefined;
 
         return Object.assign({} as PublicationDisplay, pub, {
           fecha,
-          tipoPublicacion: pubTypesMap.get(pub.typeId)?.name,
-          tipoTesis: pub.thesisTypeId ? thesisTypesMap.get(pub.thesisTypeId)?.name : undefined,
-          revista: pub.journalId ? journalsMap.get(pub.journalId)?.name : undefined,
-          universidad: pub.universityId ? (universitiesMap.get(pub.universityId)?.name ?? undefined) : undefined,
+          tipoPublicacion: pubTypesMap.get(pub.kindCode)?.name,
+          tipoTesis: thesisKindCode ? thesisTypesMap.get(thesisKindCode)?.name : undefined,
+          revista: journalId ? journalsMap.get(journalId)?.name : undefined,
+          universidad: universityId ? (universitiesMap.get(universityId)?.name ?? undefined) : undefined,
           evento: evento?.name,
           ciudad: evento?.city ?? undefined,
           pais: evento?.country ?? undefined,

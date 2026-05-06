@@ -6,14 +6,13 @@ export interface Publication {
   title: string;
   asset: AssetLinks | null;
   abstract: string | null;
-  journalIssue: number | null;
   doi: string | null;
   publishedAt: string;
-  typeId: number;
-  journalId: number | null;
-  universityId: number | null;
-  eventId: number | null;
-  thesisTypeId: number | null;
+  kindCode: "journal_article" | "conference_paper" | "thesis";
+  subtype:
+    | { kindCode: "journal_article"; journalArticle: { journalId?: number | null; issue?: number | null } }
+    | { kindCode: "conference_paper"; conferencePaper: { eventId: number | null } }
+    | { kindCode: "thesis"; thesis: { universityId: number | null; thesisKindCode: "phd" | "masters" | null } };
   updatedAt: string | null;
   createdAt: string | null;
 }

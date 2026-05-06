@@ -30,8 +30,8 @@ export class ProjectsDataService {
     const lineas = Array.isArray(lineasRaw) ? lineasRaw : [];
 
     const lineasMap = new Map(lineas.map((l) => [l.id, l]));
-    const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.id, f]));
-    const monedasMap = new Map(this.lookup.monedas().map((m) => [m.idMoneda, m]));
+    const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.code, f]));
+    const monedasMap = new Map(this.lookup.currencies().map((m) => [m.code, m]));
 
     const enrich = (p: ProjectWithMembers): ProjectDisplay => {
       const startDate = requireLocalDate(p.startDate, "project.startDate");
@@ -47,8 +47,8 @@ export class ProjectsDataService {
         fechaI: this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? "",
         fechaF,
         lineasInvestigacion: lineasMap.get(p.researchLineId)?.name,
-        fuenteFinanciamiento: fuentesMap.get(p.fundingSourceId)?.name,
-        moneda: monedasMap.get(p.currencyId)?.simbolo,
+        fuenteFinanciamiento: fuentesMap.get(p.fundingSourceCode)?.name,
+        moneda: monedasMap.get(p.currencyCode)?.symbol,
       };
     };
 

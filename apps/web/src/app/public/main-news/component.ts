@@ -24,7 +24,7 @@ type PublicNewsCard = PublicNewsListItem & {
   publishedAtLabel: string;
   authorNameLabel: string;
 };
-type NewsTypeFilter = { id: number; name: string };
+type NewsTypeFilter = { code: "general" | "research" | "event"; name: string };
 
 @Component({
   selector: "app-main-news",
@@ -69,7 +69,7 @@ export default class MainNewsComponent implements OnInit {
     this.screenWidth = this.browser.innerWidth();
   }
 
-  public selectedCategoryId = -1;
+  public selectedCategoryCode: "general" | "research" | "event" | null = null;
   public selectedCategoryName = "";
   public page = 1;
   public pageSize = 10;
@@ -80,7 +80,7 @@ export default class MainNewsComponent implements OnInit {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.selectedCategoryName = this.language.newsText[0].categoryTitle;
-    this.newsTypes = this.lookup.newsTypes().toSorted((a, b) => (a.name > b.name ? 1 : -1));
+    this.newsTypes = this.lookup.newsKinds().toSorted((a, b) => (a.name > b.name ? 1 : -1));
     this.loadNews();
   }
 
@@ -88,8 +88,8 @@ export default class MainNewsComponent implements OnInit {
     this.allCharged = false;
     this.newsService
       .listNews({
-        status: 1,
-        newsTypeId: this.selectedCategoryId === -1 ? undefined : this.selectedCategoryId,
+        statusCode: "published",
+        newsKindCode: this.selectedCategoryCode ?? undefined,
         sortBy: "publishedAt",
         sortOrder: "desc",
         page: this.page,
@@ -107,7 +107,7 @@ export default class MainNewsComponent implements OnInit {
               : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
 
           return Object.assign({} as PublicNewsCard, n, {
-            newsTypeNameLabel: n.newsTypeName,
+            newsTypeNameLabel: n.newsKindName,
             publishedAtLabel: fechaFormateada,
             authorNameLabel: n.authorName,
           });
@@ -117,8 +117,8 @@ export default class MainNewsComponent implements OnInit {
       });
   }
 
-  selectCategory(id: number, name: string): void {
-    this.selectedCategoryId = id;
+  selectCategory(code: "general" | "research" | "event" | null, name: string): void {
+    this.selectedCategoryCode = code;
     this.selectedCategoryName = name;
     this.page = 1;
     this.loadNews();

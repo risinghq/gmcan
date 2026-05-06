@@ -183,17 +183,17 @@
     @for (publicacion of publicaciones | slice: 0 : 5; track publicacion; let i = $index) {
     <div class="publication flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == publicaciones.length }">
       <div class="col-lg-4 col-md-12 nopd" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-        @if (publicacion.typeId !== 2) {
+        @if (publicacion.kindCode !== 'thesis') {
         <div
           class="publication-type"
           [class]="{
-                'publication-type-1': publicacion.typeId === 1,
-                'publication-type-3': publicacion.typeId === 3,
+                'publication-type-1': publicacion.kindCode === 'journal_article',
+                'publication-type-3': publicacion.kindCode === 'conference_paper',
               }"
         >
           {{ publicacion.tipoPublicacion }}
         </div>
-        } @if (publicacion.typeId === 2) {
+        } @if (publicacion.kindCode === 'thesis') {
         <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
         }
         <div class="flex-news flex-flow publication-mt">
@@ -220,11 +220,11 @@
             >{{ publicacion.doi }}</a
           >
         </div>
-        } @if (publicacion.typeId !== 3 && publicacion.asset) {
+        } @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
         <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
           {{ this.language.publicationsText[0].preview }}
         </a>
-        } @if (publicacion.typeId !== 3 && publicacion.asset) {
+        } @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
         <a class="publication-green" href="{{ publicacion.asset.download }}">
           {{ this.language.publicationsText[0].download }}
         </a>
@@ -233,17 +233,17 @@
       <div class="col-lg-8 col-md-12 nopd">
         <div>
           <div class="flex-news" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
-            @if (publicacion.typeId !== 2) {
+            @if (publicacion.kindCode !== 'thesis') {
             <div
               class="publication-type"
               [class]="{
-                    'publication-type-1': publicacion.typeId === 1,
-                    'publication-type-3': publicacion.typeId === 3,
+                    'publication-type-1': publicacion.kindCode === 'journal_article',
+                    'publication-type-3': publicacion.kindCode === 'conference_paper',
                   }"
             >
               {{ publicacion.tipoPublicacion }}
             </div>
-            } @if (publicacion.typeId === 2) {
+            } @if (publicacion.kindCode === 'thesis') {
             <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
             }
             <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
@@ -298,11 +298,11 @@
           </div>
           <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
-            @if (publicacion.typeId !== 3 && publicacion.asset) {
+            @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
             <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
               {{ this.language.publicationsText[0].preview }}
             </a>
-            } @if (publicacion.typeId !== 3 && publicacion.asset) {
+            } @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
             <a class="publication-green" href="{{ publicacion.asset.download }}">
               {{ this.language.publicationsText[0].download }}
             </a>

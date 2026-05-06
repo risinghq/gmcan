@@ -12,15 +12,15 @@ export interface Member {
   birthDate: string | null;
   bio: string | null;
   asset: string | null;
-  status: number;
-  roleId: number;
-  memberTypeId: number;
-  prefixId: number | null;
+  isActive: number;
+  roleCode: "administrator" | "researcher" | "visitor";
+  memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+  prefixCode: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
   capabilities?: Capability[];
 }
 
 export interface MemberFull extends Member {
-  genderId: number | null;
+  genderCode: "male" | "female" | null;
 }
 
 export interface MemberPublishability {

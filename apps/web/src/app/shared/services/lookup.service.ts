@@ -3,7 +3,6 @@ import { Injectable, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { catchError, of, share } from "rxjs";
 
-import { GENEROS, MONEDAS, PREFIJOS } from "../constants/lookups";
 import type { LookupData } from "../models/lookup";
 import { GLOBAL } from "./global";
 
@@ -21,10 +20,14 @@ export class LookupService {
   private getEmptyLookup(): LookupData {
     return {
       memberTypes: [],
-      publicationTypes: [],
-      thesisTypes: [],
-      newsTypes: [],
+      publicationKinds: [],
+      thesisKinds: [],
+      newsKinds: [],
       fundingSources: [],
+      currencies: [],
+      roles: [],
+      genders: [],
+      prefixes: [],
       universities: [],
       journals: [],
       events: [],
@@ -32,36 +35,40 @@ export class LookupService {
     };
   }
 
-  generos() {
-    return GENEROS;
-  }
-
-  prefijos() {
-    return PREFIJOS;
-  }
-
-  monedas() {
-    return MONEDAS;
-  }
-
   memberTypes() {
     return this.data().memberTypes;
   }
 
-  publicationTypes() {
-    return this.data().publicationTypes;
+  publicationKinds() {
+    return this.data().publicationKinds;
   }
 
-  thesisTypes() {
-    return this.data().thesisTypes;
+  thesisKinds() {
+    return this.data().thesisKinds;
   }
 
-  newsTypes() {
-    return this.data().newsTypes;
+  newsKinds() {
+    return this.data().newsKinds;
   }
 
   fundingSources() {
     return this.data().fundingSources;
+  }
+
+  currencies() {
+    return this.data().currencies;
+  }
+
+  roles() {
+    return this.data().roles;
+  }
+
+  genders() {
+    return this.data().genders;
+  }
+
+  prefixes() {
+    return this.data().prefixes;
   }
 
   universities() {

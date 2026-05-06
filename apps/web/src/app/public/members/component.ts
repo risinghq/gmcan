@@ -7,13 +7,12 @@ import { Router } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 type MemberDisplay = Member & { prefix: string };
-type MemberTypeGroup = { id: number; name: string; members: MemberDisplay[] };
+type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
 
 @Component({
   selector: "app-members",
@@ -31,40 +30,36 @@ export default class MembersComponent implements OnInit {
   public cargado = false;
   public tipoMiembros: MemberTypeGroup[] = [];
   public membrosNoActivos: MemberDisplay[] = [];
-  public url: string;
   language: (typeof Languages)[number] = Languages[0];
   allCharged = false;
 
-  constructor() {
-    this.url = GLOBAL.url;
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.members);
     this.cargado = true;
-    this.tipoMiembros = this.lookup.memberTypes().map((t) => ({ id: t.id, name: t.name, members: [] }));
+    this.tipoMiembros = this.lookup.memberTypes().map((t) => ({ code: t.code, name: t.name, members: [] }));
     this.getMembers();
   }
 
   getMembers(): void {
     this.memberService.listMembers().subscribe((res: Member[]) => {
       if (res) {
-        const prefijos = this.lookup.prefijos();
-        const prefijosMap = new Map(prefijos.map((p) => [p.idPrefijo, p]));
+        const prefijos = this.lookup.prefixes();
+        const prefijosMap = new Map(prefijos.map((p) => [p.code, p]));
 
         const processed = res.map((m): MemberDisplay => {
           const asset = m.asset ?? "/img/placeholders/user.png";
-          const prefijo = m.prefixId ? prefijosMap.get(m.prefixId) : undefined;
-          const prefix =
-            prefijo && prefijo.nombre !== "Ninguno" && prefijo.nombre !== "Bachiller" ? prefijo.nombre : "";
+          const prefijo = m.prefixCode ? prefijosMap.get(m.prefixCode) : undefined;
+          const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
           return { ...m, asset, prefix };
         });
 
         for (const tipoMiembro of this.tipoMiembros) {
-          tipoMiembro.members = processed.filter((m) => m.memberTypeId === tipoMiembro.id && m.status === 1);
+          tipoMiembro.members = processed.filter((m) => m.memberTypeCode === tipoMiembro.code && m.isActive === 1);
         }
-        this.membrosNoActivos = processed.filter((m) => m.status !== 1);
+        this.membrosNoActivos = processed.filter((m) => m.isActive !== 1);
         this.allCharged = true;
       }
     });
