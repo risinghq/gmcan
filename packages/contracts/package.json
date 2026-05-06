@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./public": "./src/public/index.ts"
+    "./public": "./src/public/index.ts",
+    "./admin": "./src/admin/index.ts"
   },
   "dependencies": {
     "zod": "^4.4.3"

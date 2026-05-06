@@ -1,3 +1,5 @@
+export type { AdminPublicationListItem } from "@gmcan/contracts/admin";
+
 export interface AdminNewsListItem {
   id: number;
   title: string;
@@ -52,18 +54,6 @@ export interface AdminProjectListItem {
   fundingSourceCode: "vrip" | "none";
   startDateLabel: string;
   members: AdminProjectMemberListItem[];
-}
-
-export interface AdminPublicationListItem {
-  id: number;
-  title: string;
-  publishedAt: string;
-  kindCode: "journal_article" | "conference_paper" | "thesis";
-  subtype: unknown;
-  doi: string | null;
-  publishedAtLabel: string;
-  firstAuthorName: string;
-  firstAuthorAsset: string | null;
 }
 
 export interface AdminMemberListItem {

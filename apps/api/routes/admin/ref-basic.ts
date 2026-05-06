@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { db } from "../../db/client.js";
 import { okStatus } from "../../lib/contracts.js";
+import { getEventPublicationDependencyCount, getJournalPublicationDependencyCount } from "../../services/publication.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -37,6 +38,26 @@ router.delete("/journal/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("journal").where("id", "=", id).execute();
   return c.json(okStatus());
+});
+
+router.get("/journal/:id/dependencies", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const journalArticle = await getJournalPublicationDependencyCount(id);
+  return c.json({
+    total: journalArticle,
+    byKind: { journalArticle, conferencePaper: 0, thesis: 0 },
+    canDelete: journalArticle === 0,
+  });
+});
+
+router.get("/event/:id/dependencies", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const conferencePaper = await getEventPublicationDependencyCount(id);
+  return c.json({
+    total: conferencePaper,
+    byKind: { journalArticle: 0, conferencePaper, thesis: 0 },
+    canDelete: conferencePaper === 0,
+  });
 });
 
 export default router;

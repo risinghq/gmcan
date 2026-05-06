@@ -15,8 +15,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { LookupService } from "@app/shared/services/lookup.service";
-import { PublicationService } from "@app/shared/services/publication.service";
 import type { JournalItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -34,8 +32,6 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private refService = inject(RefService);
-  private lookup = inject(LookupService);
-  private publicationService = inject(PublicationService);
 
   revista: JournalItem = { id: 0, name: "" };
   public revistaForm: FormGroup;
@@ -59,16 +55,17 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
 
   getRevista(): void {
     const id = Number(this.route.snapshot.params["id"] ?? 0);
-    const found = this.lookup.journals().find((r) => r.id === id);
-    if (found) {
+    this.refService.listJournals().subscribe((journals) => {
+      const found = journals.find((r) => r.id === id);
+      if (!found) return;
       this.revista = { id: found.id, name: found.name };
       this.checkCanDelete(id);
-    }
+    });
   }
 
   checkCanDelete(id: number): void {
-    this.publicationService.listAdminPublications().subscribe((pubs) => {
-      this.notCanDo = pubs.filter((p) => p.journalId === id).length === 0;
+    this.refService.getJournalDependencies(id).subscribe((res) => {
+      this.notCanDo = res.canDelete;
     });
   }
 

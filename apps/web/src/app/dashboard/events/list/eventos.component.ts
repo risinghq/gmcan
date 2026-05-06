@@ -74,7 +74,7 @@ export default class EventosComponent implements OnInit {
   }
 
   getResumenes(): void {
-    this.publicationService.listAdminPublications({ type: 3 }).subscribe((rows) => {
+    this.publicationService.listAdminPublications({ kindCode: "conference_paper" }).subscribe((rows) => {
       this.items = rows;
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
@@ -83,7 +83,7 @@ export default class EventosComponent implements OnInit {
           row.title.toLowerCase().includes(normalized) ||
           row.firstAuthorName.toLowerCase().includes(normalized) ||
           row.publishedAtLabel.toLowerCase().includes(normalized) ||
-          row.eventName.toLowerCase().includes(normalized)
+          (row.eventName ?? "").toLowerCase().includes(normalized)
         );
       };
       this.dataSource.sort = this.matSort();

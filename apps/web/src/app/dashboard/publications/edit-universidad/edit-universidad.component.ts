@@ -15,7 +15,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
-import { PublicationService } from "@app/shared/services/publication.service";
 import type { UniversityItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -33,7 +32,6 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private refService = inject(RefService);
-  private publicationService = inject(PublicationService);
 
   universidad: UniversityItem = { id: 0, name: "" };
   public universidadForm: FormGroup;
@@ -66,8 +64,8 @@ export default class EditUniversidadComponent implements OnInit, HasUnsavedChang
   }
 
   checkCanDelete(id: number): void {
-    this.publicationService.listAdminPublications().subscribe((pubs) => {
-      this.notCanDo = pubs.filter((p) => p.universityId === id).length === 0;
+    this.refService.getUniversityDependencies(id).subscribe((res) => {
+      this.notCanDo = res.canDelete;
     });
   }
 

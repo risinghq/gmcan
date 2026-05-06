@@ -5,6 +5,7 @@ import { z } from "zod";
 import { db } from "../../db/client.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { getUniversityPublicationDependencyCount } from "../../services/publication.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -143,6 +144,16 @@ router.delete("/university/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("university").where("id", "=", id).execute();
   return c.json(okStatus());
+});
+
+router.get("/university/:id/dependencies", zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const thesis = await getUniversityPublicationDependencyCount(id);
+  return c.json({
+    total: thesis,
+    byKind: { journalArticle: 0, conferencePaper: 0, thesis },
+    canDelete: thesis === 0,
+  });
 });
 
 export default router;

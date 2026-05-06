@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { AdminPublicationListItem, AdminPublicationListQuery } from "@gmcan/contracts/admin";
 import type { PublicationKindCode, PublicPublicationWithAuthors, ThesisKindCode } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
-import type { AdminPublicationListItem } from "../models/admin-list";
 import type { SaveAuthorEntry } from "../models/author";
 import { GLOBAL } from "./global";
 
@@ -22,10 +22,6 @@ export interface PublicationFilters {
   event?: number;
   journal?: number;
   university?: number;
-}
-
-export interface AdminPublicationFilters {
-  kindCode?: "journal_article" | "conference_paper" | "thesis";
 }
 
 @Injectable({ providedIn: "root" })
@@ -52,7 +48,7 @@ export class PublicationService {
   }
 
   // Admin
-  listAdminPublications(filters?: AdminPublicationFilters): Observable<AdminPublicationListItem[]> {
+  listAdminPublications(filters?: AdminPublicationListQuery): Observable<AdminPublicationListItem[]> {
     return this.http.get<AdminPublicationListItem[]>(GLOBAL.admin("publications"), {
       params: filters as Record<string, string | number> | undefined,
     });

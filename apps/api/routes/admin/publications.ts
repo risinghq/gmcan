@@ -1,3 +1,4 @@
+import { AdminPublicationListQuerySchema } from "@gmcan/contracts/admin";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -18,7 +19,6 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const ListQuery = z.object({ kindCode: z.enum(["journal_article", "conference_paper", "thesis"]).optional() });
 
 const AuthorEntry = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("registered"), memberId: z.number().int(), authorOrder: z.number().int().min(1) }),
@@ -61,9 +61,10 @@ router.use("*", async (c, next) => {
   return requirePermission("publications.write")(c, next);
 });
 
-router.get("/", zValidator("query", ListQuery), async (c) => {
-  const { kindCode } = c.req.valid("query");
-  return c.json(await listAdminPublications(kindCode));
+router.get("/", zValidator("query", AdminPublicationListQuerySchema), async (c) => {
+  const locale = c.get("locale");
+  const filters = c.req.valid("query");
+  return c.json(await listAdminPublications(filters, locale));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
