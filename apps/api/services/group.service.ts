@@ -14,7 +14,7 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
         if (rows.length > 0) {
           await trx
             .insertInto("group_translation")
-            .values(rows.map(({ locale, payload }) => ({ groupId: ownerId, locale, ...payload })))
+            .values(rows.map(({ locale, payload }) => Object.assign({ groupId: ownerId, locale }, payload)))
             .execute();
         }
         break;
@@ -23,7 +23,7 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
         if (rows.length > 0) {
           await trx
             .insertInto("about_translation")
-            .values(rows.map(({ locale, payload }) => ({ aboutId: ownerId, locale, ...payload })))
+            .values(rows.map(({ locale, payload }) => Object.assign({ aboutId: ownerId, locale }, payload)))
             .execute();
         }
         break;
@@ -32,7 +32,7 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
         if (rows.length > 0) {
           await trx
             .insertInto("research_line_translation")
-            .values(rows.map(({ locale, payload }) => ({ researchLineId: ownerId, locale, ...payload })))
+            .values(rows.map(({ locale, payload }) => Object.assign({ researchLineId: ownerId, locale }, payload)))
             .execute();
         }
         break;
@@ -41,7 +41,7 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
         if (rows.length > 0) {
           await trx
             .insertInto("method_translation")
-            .values(rows.map(({ locale, payload }) => ({ methodId: ownerId, locale, ...payload })))
+            .values(rows.map(({ locale, payload }) => Object.assign({ methodId: ownerId, locale }, payload)))
             .execute();
         }
         break;
@@ -50,7 +50,7 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
         if (rows.length > 0) {
           await trx
             .insertInto("software_translation")
-            .values(rows.map(({ locale, payload }) => ({ softwareId: ownerId, locale, ...payload })))
+            .values(rows.map(({ locale, payload }) => Object.assign({ softwareId: ownerId, locale }, payload)))
             .execute();
         }
         break;
