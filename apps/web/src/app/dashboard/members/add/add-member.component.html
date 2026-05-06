@@ -212,7 +212,7 @@
           <div class="text-category">Idioma del resumen</div>
           <mat-form-field class="input-category">
             <mat-label />
-            <mat-select [ngModel]="selectedBioLocale" (ngModelChange)="setBioLocale($event)" name="bioLocale">
+            <mat-select formControlName="bioLocale" name="bioLocale">
               @for (locale of bioLocales; track locale) {
                 <mat-option [value]="locale">{{ locale.toUpperCase() }}</mat-option>
               }
@@ -223,15 +223,7 @@
           <div class="text-category">
             Resumen profesional <span>({{ bioLength() }}/500)</span>
           </div>
-          <textarea
-            [ngModel]="bioByLocale[selectedBioLocale]"
-            (ngModelChange)="setBioForSelectedLocale($event)"
-            formControlName="bio"
-            name="bio"
-            autosize
-            class="input-category"
-            maxlength="500"
-          ></textarea>
+          <textarea formControlName="bio" name="bio" autosize class="input-category" maxlength="500"></textarea>
         </div>
         <div class="full-width mb-16">
           <div class="text-category">

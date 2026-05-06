@@ -15,7 +15,7 @@ import type { MemberFull } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { ADMIN_MEMBER_LOCALES, type AdminMemberLocale, MemberService } from "@app/shared/services/member.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -63,12 +63,14 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   get prefijos() {
     return this.lookup.prefijos();
   }
+  get bioLocales() {
+    return this.lookup.locales().supported;
+  }
   hide = true;
   hide2 = true;
   url: string;
-  readonly bioLocales = ADMIN_MEMBER_LOCALES;
-  selectedBioLocale: AdminMemberLocale = "es";
-  bioByLocale: Record<AdminMemberLocale, string> = { es: "", en: "" };
+  selectedBioLocale = "es";
+  bioByLocale: Record<string, string> = {};
 
   button_text = "Registrar nuevo miembro";
 
@@ -86,6 +88,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
       dni: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       password: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       confirmPassword: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      bioLocale: ["es", [Validators.required]],
       bio: [""],
     });
     this.url = GLOBAL.url;
@@ -96,7 +99,18 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     event.returnValue = false;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.selectedBioLocale = this.lookup.locales().default || this.bioLocales[0] || "es";
+    this.memberForm.controls["bioLocale"].setValue(this.selectedBioLocale);
+    this.memberForm.controls["bio"].setValue(this.bioByLocale[this.selectedBioLocale] ?? "");
+    this.memberForm.controls["bioLocale"].valueChanges.subscribe((locale) => {
+      if (!locale) return;
+      this.setBioLocale(locale);
+    });
+    this.memberForm.controls["bio"].valueChanges.subscribe((bio) => {
+      this.setBioForSelectedLocale(bio ?? "");
+    });
+  }
 
   isDirty(): boolean {
     return this.memberForm.dirty;
@@ -154,17 +168,16 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
                 memberTypeId: this.member.memberTypeId,
                 prefixId: this.member.prefixId ?? undefined,
                 genderId: this.member.genderId ?? undefined,
+                translation: { locale: this.selectedBioLocale, bio },
               })
               .subscribe((res) => {
                 if (res.id) {
-                  this.memberService.updateMemberTranslation(res.id, this.selectedBioLocale, bio).subscribe(() => {
-                    if (this.fileData) {
-                      this.memberService.uploadAsset(res.id, this.fileData).subscribe();
-                    }
-                    this.openSnackBar("Miembro agregado exitosamente");
-                    this.memberForm.markAsPristine();
-                    this.return();
-                  });
+                  if (this.fileData) {
+                    this.memberService.uploadAsset(res.id, this.fileData).subscribe();
+                  }
+                  this.openSnackBar("Miembro agregado exitosamente");
+                  this.memberForm.markAsPristine();
+                  this.return();
                 }
               });
           } else {
@@ -212,8 +225,9 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate(["dashboard/miembros-activos"]);
   }
 
-  setBioLocale(locale: AdminMemberLocale): void {
+  setBioLocale(locale: string): void {
     this.selectedBioLocale = locale;
+    this.memberForm.controls["bio"].setValue(this.bioByLocale[this.selectedBioLocale] ?? "", { emitEvent: false });
   }
 
   setBioForSelectedLocale(value: string): void {

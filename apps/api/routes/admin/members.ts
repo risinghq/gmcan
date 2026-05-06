@@ -4,12 +4,13 @@ import { z } from "zod";
 
 import { okStatus } from "../../lib/contracts.js";
 import { LocaleCodeSchema } from "../../lib/locales.js";
-import { requirePermission } from "../../middleware/authz.js";
+import { requirePermission, requireSelfOrPermission } from "../../middleware/authz.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   addMemberToGroup,
   createMember,
   deleteMember,
+  getMemberPublishability,
   getMemberTranslation,
   getMemberFull,
   listAdminMembers,
@@ -37,6 +38,7 @@ const CreateBody = z.object({
   memberTypeId: z.number().int(),
   prefixId: z.number().int().optional(),
   genderId: z.number().int().optional(),
+  translation: z.object({ locale: LocaleCodeSchema, bio: z.string() }).optional(),
 });
 
 const UpdateBody = z.object({
@@ -50,6 +52,7 @@ const UpdateBody = z.object({
   memberTypeId: z.number().int(),
   prefixId: z.number().int().optional(),
   genderId: z.number().int().optional(),
+  translation: z.object({ locale: LocaleCodeSchema, bio: z.string() }).optional(),
 });
 
 const FilterQuery = z.object({
@@ -58,29 +61,34 @@ const FilterQuery = z.object({
   memberTypeId: z.coerce.number().int().optional(),
 });
 
-router.use("*", async (c, next) => {
-  if (c.req.method === "GET") return requirePermission("members.read")(c, next);
-  return requirePermission("members.write")(c, next);
-});
-
-router.get("/", zValidator("query", FilterQuery), async (c) => {
+router.get("/", requirePermission("members.read"), zValidator("query", FilterQuery), async (c) => {
   const { q, status, memberTypeId } = c.req.valid("query");
   return c.json(await listAdminMembers({ q, status, memberTypeId }));
 });
 
-router.get("/exists/email", zValidator("query", z.object({ email: z.string().min(1) })), async (c) => {
-  const { email } = c.req.valid("query");
-  const found = await verifyEmailExists(email);
-  return c.json({ exists: !!found });
-});
+router.get(
+  "/exists/email",
+  requirePermission("members.read"),
+  zValidator("query", z.object({ email: z.string().min(1) })),
+  async (c) => {
+    const { email } = c.req.valid("query");
+    const found = await verifyEmailExists(email);
+    return c.json({ exists: !!found });
+  },
+);
 
-router.get("/authors/search", zValidator("query", z.object({ q: z.string().default("") })), async (c) => {
-  const { q } = c.req.valid("query");
-  const results = await searchAuthorPool(q);
-  return c.json(results);
-});
+router.get(
+  "/authors/search",
+  requirePermission("members.read"),
+  zValidator("query", z.object({ q: z.string().default("") })),
+  async (c) => {
+    const { q } = c.req.valid("query");
+    const results = await searchAuthorPool(q);
+    return c.json(results);
+  },
+);
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", requirePermission("members.read"), zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const member = await getMemberFull(id);
   if (!member) return c.json({ error: "Not found" }, 404);
@@ -90,21 +98,34 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   });
 });
 
-router.post("/", zValidator("json", CreateBody), async (c) => {
+router.get("/:id/publishability", requirePermission("members.read"), zValidator("param", IdParam), async (c) => {
+  const { id } = c.req.valid("param");
+  const publishability = await getMemberPublishability(id);
+  return c.json(publishability);
+});
+
+router.post("/", requirePermission("members.write"), zValidator("json", CreateBody), async (c) => {
   const data = c.req.valid("json");
   const id = await createMember(data);
   return c.json({ id }, 201);
 });
 
-router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody), async (c) => {
-  const { id } = c.req.valid("param");
-  const data = c.req.valid("json");
-  await updateMember(id, data);
-  return c.json(okStatus());
-});
+router.put(
+  "/:id",
+  requirePermission("members.write"),
+  zValidator("param", IdParam),
+  zValidator("json", UpdateBody),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const data = c.req.valid("json");
+    await updateMember(id, data);
+    return c.json(okStatus());
+  },
+);
 
 router.put(
   "/:id/translations/:locale",
+  requireSelfOrPermission("id", "account.self.write", "members.write"),
   zValidator("param", IdParam.extend({ locale: LocaleCodeSchema })),
   zValidator("json", z.object({ bio: z.string() })),
   async (c) => {
@@ -117,6 +138,7 @@ router.put(
 
 router.get(
   "/:id/translations/:locale",
+  requireSelfOrPermission("id", "account.self.read", "members.read"),
   zValidator("param", IdParam.extend({ locale: LocaleCodeSchema })),
   async (c) => {
     const { id, locale } = c.req.valid("param");
@@ -125,13 +147,13 @@ router.get(
   },
 );
 
-router.delete("/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/:id", requirePermission("members.write"), zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMember(id);
   return c.json(okStatus());
 });
 
-router.get("/:id/groups", zValidator("param", IdParam), async (c) => {
+router.get("/:id/groups", requirePermission("members.read"), zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const rows = await listMemberGroups(id);
   return c.json(rows);
@@ -139,6 +161,7 @@ router.get("/:id/groups", zValidator("param", IdParam), async (c) => {
 
 router.post(
   "/:id/groups",
+  requirePermission("members.write"),
   zValidator("param", IdParam),
   zValidator("json", z.object({ groupId: z.number().int() })),
   async (c) => {
@@ -151,6 +174,7 @@ router.post(
 
 router.delete(
   "/:id/groups/:groupId",
+  requirePermission("members.write"),
   zValidator("param", IdParam.extend({ groupId: z.coerce.number().int().positive() })),
   async (c) => {
     const { id, groupId } = c.req.valid("param");

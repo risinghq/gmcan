@@ -28,6 +28,7 @@ export class LookupService {
       universities: [],
       journals: [],
       events: [],
+      locales: { supported: ["es", "en"], default: "es" },
     };
   }
 
@@ -73,5 +74,9 @@ export class LookupService {
 
   events() {
     return this.data().events;
+  }
+
+  locales() {
+    return this.data().locales;
   }
 }

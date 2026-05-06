@@ -19,12 +19,7 @@ import type { MemberFull } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import {
-  ADMIN_MEMBER_LOCALES,
-  type AdminMemberLocale,
-  MemberService,
-  type MemberUpdateBody,
-} from "@app/shared/services/member.service";
+import { MemberService, type MemberUpdateBody } from "@app/shared/services/member.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -73,9 +68,11 @@ export default class PerfilComponent implements OnInit {
     { value: MEMBER_STATUS.INACTIVE, label: "Inactivo" },
     { value: MEMBER_STATUS.BLOCKED, label: "Bloqueado" },
   ];
-  readonly bioLocales = ADMIN_MEMBER_LOCALES;
-  selectedBioLocale: AdminMemberLocale = "es";
-  bioByLocale: Record<AdminMemberLocale, string> = { es: "", en: "" };
+  get bioLocales() {
+    return this.lookup.locales().supported;
+  }
+  selectedBioLocale = "es";
+  bioByLocale: Record<string, string> = {};
 
   member: MemberFull = { ...createMemberFull() };
   memberId: number | null = null;
@@ -128,6 +125,7 @@ export default class PerfilComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.selectedBioLocale = this.lookup.locales().default || this.bioLocales[0] || "es";
     this.getUser();
   }
 
@@ -177,8 +175,7 @@ export default class PerfilComponent implements OnInit {
         bio: result.bio ?? "",
         status: (result.status as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
       });
-      this.bioByLocale.es = result.bio ?? "";
-      this.bioByLocale.en = "";
+      this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
     });
   }
 
@@ -201,6 +198,7 @@ export default class PerfilComponent implements OnInit {
       memberTypeId: values.memberTypeId ?? this.member.memberTypeId,
       prefixId: values.prefixId ?? undefined,
       genderId: values.genderId ?? undefined,
+      translation: { locale: this.selectedBioLocale, bio },
     };
 
     this.isSavingProfile = true;
@@ -208,21 +206,17 @@ export default class PerfilComponent implements OnInit {
       next: (result) => {
         if (result.status !== 1) return;
 
-        this.memberService.updateMemberTranslation(this.memberId!, this.selectedBioLocale, bio).subscribe({
-          next: () => {
-            if (this.fileData) {
-              this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
-                next: () => {
-                  this.fileData = null;
-                  this.previewUrl = null;
-                },
-              });
-            }
-            this.uiState.setProfileUpdated(true);
-            this.openSnackBar("Información actualizada exitosamente");
-            this.getUser();
-          },
-        });
+        if (this.fileData) {
+          this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
+            next: () => {
+              this.fileData = null;
+              this.previewUrl = null;
+            },
+          });
+        }
+        this.uiState.setProfileUpdated(true);
+        this.openSnackBar("Información actualizada exitosamente");
+        this.getUser();
       },
       error: () => this.openSnackBar("No se pudo actualizar el perfil", "snack-error"),
       complete: () => {
@@ -284,7 +278,7 @@ export default class PerfilComponent implements OnInit {
     });
   }
 
-  setBioLocale(locale: AdminMemberLocale): void {
+  setBioLocale(locale: string): void {
     this.selectedBioLocale = locale;
     if (this.memberId == null) return;
     this.memberService.getMemberTranslation(this.memberId, locale).subscribe((row) => {

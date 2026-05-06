@@ -228,8 +228,9 @@ export async function createMember(data: {
   memberTypeId: number;
   prefixId?: number;
   genderId?: number;
+  translation?: { locale: string; bio: string };
 }) {
-  const { password, ...rest } = data;
+  const { password, translation, ...rest } = data;
   const today = new Date().toISOString().split("T")[0];
   return db.transaction().execute(async (trx) => {
     const result = await trx
@@ -248,6 +249,13 @@ export async function createMember(data: {
       .values(SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: null })))
       .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing())
       .execute();
+    if (translation) {
+      await trx
+        .insertInto("member_translation")
+        .values({ memberId, locale: translation.locale, bio: translation.bio })
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
+        .execute();
+    }
     return memberId;
   });
 }
@@ -265,6 +273,7 @@ export async function updateMember(
     memberTypeId: number;
     prefixId?: number;
     genderId?: number;
+    translation?: { locale: string; bio: string };
   },
 ) {
   const today = new Date().toISOString().split("T")[0];
@@ -286,6 +295,13 @@ export async function updateMember(
       })
       .where("id", "=", id)
       .execute();
+    if (data.translation) {
+      await trx
+        .insertInto("member_translation")
+        .values({ memberId: id, locale: data.translation.locale, bio: data.translation.bio })
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
+        .execute();
+    }
   });
 }
 
@@ -304,6 +320,39 @@ export async function getMemberTranslation(id: number, locale: string) {
     .where("memberId", "=", id)
     .where("locale", "=", locale)
     .executeTakeFirst();
+}
+
+export async function getMemberPublishability(id: number) {
+  const member = await db
+    .selectFrom("member")
+    .select(["id", "dni", "email", "firstName", "lastName", "status"])
+    .where("id", "=", id)
+    .executeTakeFirst();
+  if (!member)
+    return { publishable: false, missing: { base: ["member"], translations: {} as Record<string, string[]> } };
+
+  const missingBase: string[] = [];
+  if (!member.dni) missingBase.push("dni");
+  if (!member.email) missingBase.push("email");
+  if (!member.firstName) missingBase.push("firstName");
+  if (!member.lastName) missingBase.push("lastName");
+  if (member.status !== 1) missingBase.push("status");
+
+  const rows = await db
+    .selectFrom("member_translation")
+    .select(["locale", "bio"])
+    .where("memberId", "=", id)
+    .where("locale", "in", SUPPORTED_LOCALES)
+    .execute();
+  const map = new Map(rows.map((r) => [r.locale, r.bio]));
+  const missingTranslations: Record<string, string[]> = {};
+  for (const locale of SUPPORTED_LOCALES) {
+    const bio = map.get(locale);
+    if (!bio || bio.trim().length === 0) missingTranslations[locale] = ["bio"];
+  }
+
+  const publishable = missingBase.length === 0 && Object.keys(missingTranslations).length === 0;
+  return { publishable, missing: { base: missingBase, translations: missingTranslations } };
 }
 
 export async function deleteMember(id: number) {

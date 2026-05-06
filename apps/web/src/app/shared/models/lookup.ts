@@ -7,4 +7,5 @@ export interface LookupData {
   universities: { id: number; name: string }[];
   journals: { id: number; name: string }[];
   events: { id: number; name: string; city: string | null; country: string | null }[];
+  locales: { supported: string[]; default: string };
 }

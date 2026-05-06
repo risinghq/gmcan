@@ -7,9 +7,6 @@ import type { AuthorSearchResult } from "../models/author";
 import type { Member, MemberFull, MemberProfile } from "../models/member";
 import { GLOBAL } from "./global";
 
-export const ADMIN_MEMBER_LOCALES = ["es", "en"] as const;
-export type AdminMemberLocale = (typeof ADMIN_MEMBER_LOCALES)[number];
-
 export interface MemberCreateBody {
   dni: string;
   email: string;
@@ -23,6 +20,7 @@ export interface MemberCreateBody {
   memberTypeId: number;
   prefixId?: number;
   genderId?: number;
+  translation?: { locale: string; bio: string };
 }
 
 export interface MemberUpdateBody {
@@ -36,6 +34,7 @@ export interface MemberUpdateBody {
   memberTypeId: number;
   prefixId?: number;
   genderId?: number;
+  translation?: { locale: string; bio: string };
 }
 
 @Injectable({ providedIn: "root" })

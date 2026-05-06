@@ -25,7 +25,7 @@ import type { MemberFull } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { ADMIN_MEMBER_LOCALES, type AdminMemberLocale, MemberService } from "@app/shared/services/member.service";
+import { MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
@@ -77,11 +77,13 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   get generos() {
     return this.lookup.generos();
   }
+  get bioLocales() {
+    return this.lookup.locales().supported;
+  }
   button_text = "Actualizar información";
   edit = true;
-  readonly bioLocales = ADMIN_MEMBER_LOCALES;
-  selectedBioLocale: AdminMemberLocale = "es";
-  bioByLocale: Record<AdminMemberLocale, string> = { es: "", en: "" };
+  selectedBioLocale = "es";
+  bioByLocale: Record<string, string> = {};
 
   constructor() {
     this.memberForm = this.formBuilder.group({
@@ -97,6 +99,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       dni: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       password: ["", [SpaceValidator.cannotContainSpace]],
       confirmPassword: ["", [SpaceValidator.cannotContainSpace]],
+      bioLocale: ["es", [Validators.required]],
       bio: [""],
     });
     this.member = createMemberFull();
@@ -112,6 +115,15 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
+    this.selectedBioLocale = this.lookup.locales().default || this.bioLocales[0] || "es";
+    this.memberForm.controls["bioLocale"].setValue(this.selectedBioLocale);
+    this.memberForm.controls["bioLocale"].valueChanges.subscribe((locale) => {
+      if (!locale) return;
+      this.setBioLocale(locale);
+    });
+    this.memberForm.controls["bio"].valueChanges.subscribe((bio) => {
+      this.setBioForSelectedLocale(bio ?? "");
+    });
     this.bindUser(this.route.snapshot.data["member"] as MemberFull);
   }
 
@@ -122,8 +134,8 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   private bindUser(result: MemberFull): void {
     this.memberForm.controls["dni"].disable();
     this.member = result;
-    this.bioByLocale.es = result.bio ?? "";
-    this.bioByLocale.en = "";
+    this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
+    this.memberForm.controls["bio"].setValue(this.bioByLocale[this.selectedBioLocale] ?? "", { emitEvent: false });
     this.oldEmail = result.email ?? "";
 
     if (result.birthDate) {
@@ -194,23 +206,16 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
             memberTypeId: this.member.memberTypeId,
             prefixId: this.member.prefixId ?? undefined,
             genderId: this.member.genderId ?? undefined,
+            translation: { locale: this.selectedBioLocale, bio: this.bioByLocale[this.selectedBioLocale] ?? "" },
           })
           .subscribe((res) => {
             if (res.status === 1) {
-              this.memberService
-                .updateMemberTranslation(
-                  this.member.id,
-                  this.selectedBioLocale,
-                  this.bioByLocale[this.selectedBioLocale] ?? "",
-                )
-                .subscribe(() => {
-                  if (this.fileData) {
-                    this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
-                  }
-                  this.openSnackBar("Miembro actualizado exitosamente");
-                  this.memberForm.markAsPristine();
-                  this.return();
-                });
+              if (this.fileData) {
+                this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
+              }
+              this.openSnackBar("Miembro actualizado exitosamente");
+              this.memberForm.markAsPristine();
+              this.return();
             }
           });
       };
@@ -266,11 +271,12 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate(["dashboard/" + returnTo]);
   }
 
-  setBioLocale(locale: AdminMemberLocale): void {
+  setBioLocale(locale: string): void {
     this.selectedBioLocale = locale;
     if (!this.member.id) return;
     this.memberService.getMemberTranslation(this.member.id, locale).subscribe((row) => {
       this.bioByLocale[locale] = row.bio ?? "";
+      this.memberForm.controls["bio"].setValue(this.bioByLocale[locale] ?? "", { emitEvent: false });
     });
   }
 

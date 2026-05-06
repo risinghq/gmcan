@@ -26,6 +26,11 @@ export function localizedMemberSelectQuery(locale: Locale) {
 
 export function publicLocalizedMemberSelectQuery(locale: Locale) {
   let query = localizedMemberSelectQuery(locale)
+    .where("member.status", "=", 1)
+    .where("member.dni", "!=", "")
+    .where("member.email", "!=", "")
+    .where("member.firstName", "!=", "")
+    .where("member.lastName", "!=", "")
     .where("member_translation.bio", "is not", null)
     .where("member_translation.bio", "!=", "");
 
