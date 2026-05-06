@@ -6,7 +6,8 @@ import { okStatus } from "../../lib/contracts.js";
 import { extractFirstFile } from "../../lib/upload.js";
 import { requirePermission } from "../../middleware/authz.js";
 import { deleteCurrentAsset, putAsset, restoreAsset } from "../../services/assets/service.js";
-import { CanonicalAssetPayloadSchema } from "../../services/assets/validators.js";
+import type { OwnerType } from "../../services/assets/types.js";
+import { CanonicalAssetPayloadSchema, assertSlotForOwner } from "../../services/assets/validators.js";
 
 const router = new Hono();
 const RestoreBody = z.object({ assetId: z.number().int().positive() });
@@ -29,7 +30,8 @@ router.put("/", async (c) => {
   if (!file) return c.json({ error: "No file uploaded" }, 400);
 
   try {
-    await putAsset({ ...parsed.data, file, actorId: c.get("memberId") });
+    assertSlotForOwner(parsed.data.ownerType as OwnerType, parsed.data.slot);
+    await putAsset({ ...parsed.data, slot: parsed.data.slot as never, file, actorId: c.get("memberId") });
   } catch (error) {
     if (error instanceof Error && (error.message.includes("Unsupported slot") || error.message.includes("Invalid"))) {
       return c.json({ error: error.message }, 400);
@@ -43,7 +45,8 @@ router.put("/", async (c) => {
 router.delete("/", zValidator("json", CanonicalAssetPayloadSchema), async (c) => {
   const payload = c.req.valid("json");
   try {
-    await deleteCurrentAsset({ ...payload, actorId: c.get("memberId") });
+    assertSlotForOwner(payload.ownerType as OwnerType, payload.slot);
+    await deleteCurrentAsset({ ...payload, slot: payload.slot as never, actorId: c.get("memberId") });
   } catch (error) {
     if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
     if (error instanceof Error && error.message.includes("Unsupported slot"))

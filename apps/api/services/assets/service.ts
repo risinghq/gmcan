@@ -154,21 +154,18 @@ export async function resolveAssetAccessUrl(input: {
   slot: string;
 }): Promise<string | null> {
   assertSlotForOwner(input.ownerType, input.slot);
-  const cfg = OWNER_CONFIG[input.ownerType];
 
-  const row = await db
-    .selectFrom(cfg.table)
-    .innerJoin("asset", "asset.id", `${cfg.table}.assetId` as never)
-    .select([`${cfg.table}.assetId` as never, "asset.visibility", "asset.lifecycleStatus"])
-    .where(cfg.ownerColumn, "=", input.ownerId as never)
-    .where("slot", "=", input.slot as never)
-    .orderBy("version", "desc")
-    .limit(1)
+  const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
+  if (!assetId) return null;
+
+  const asset = await db
+    .selectFrom("asset")
+    .select(["visibility", "lifecycleStatus"])
+    .where("id", "=", assetId)
     .executeTakeFirst();
 
-  if (!row || row.lifecycleStatus !== "active") return null;
-  const assetId = row.assetId as number;
-  return row.visibility === "private" ? makeSignedAssetUrl(assetId, 300) : `${getBackendUrl()}/api/assets/${assetId}`;
+  if (!asset || asset.lifecycleStatus !== "active") return null;
+  return asset.visibility === "private" ? makeSignedAssetUrl(assetId, 300) : `${getBackendUrl()}/api/assets/${assetId}`;
 }
 
 export async function serveAssetById(

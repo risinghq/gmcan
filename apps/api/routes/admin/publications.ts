@@ -12,6 +12,8 @@ import {
   listAdminPublications,
   replaceAuthors,
   updatePublication,
+  type AuthorInput,
+  type PublicationFields,
 } from "../../services/publication.service.js";
 
 const router = new Hono();
@@ -41,7 +43,7 @@ const Subtype = z.discriminatedUnion("kindCode", [
   }),
 ]);
 
-const PublicationFields = z.object({
+const PublicationFieldsSchema = z.object({
   doi: z.string().optional(),
   publishedAt: z.string(),
   subtype: Subtype,
@@ -51,8 +53,8 @@ const PublicationFields = z.object({
   }),
 });
 
-const CreateBody = z.object({ data: PublicationFields, authors: z.array(AuthorEntry) });
-const UpdateBody = z.object({ data: PublicationFields, authors: z.array(AuthorEntry) });
+const CreateBody = z.object({ data: PublicationFieldsSchema, authors: z.array(AuthorEntry) });
+const UpdateBody = z.object({ data: PublicationFieldsSchema, authors: z.array(AuthorEntry) });
 
 router.use("*", async (c, next) => {
   if (c.req.method === "GET") return requirePermission("publications.read")(c, next);
@@ -73,14 +75,14 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
 router.post("/", zValidator("json", CreateBody), async (c) => {
   const { data, authors } = c.req.valid("json");
-  const id = await createPublication(data, authors);
+  const id = await createPublication(data as PublicationFields, authors as AuthorInput[]);
   return c.json({ id }, 201);
 });
 
 router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody), async (c) => {
   const { id } = c.req.valid("param");
   const { data, authors } = c.req.valid("json");
-  await updatePublication(id, data, authors);
+  await updatePublication(id, data as PublicationFields, authors as AuthorInput[]);
   return c.json(okStatus());
 });
 
@@ -93,7 +95,7 @@ router.delete("/:id", zValidator("param", IdParam), async (c) => {
 router.put("/:id/authors", zValidator("param", IdParam), zValidator("json", z.array(AuthorEntry)), async (c) => {
   const { id } = c.req.valid("param");
   const authors = c.req.valid("json");
-  await replaceAuthors(id, authors);
+  await replaceAuthors(id, authors as AuthorInput[]);
   return c.json(okStatus());
 });
 

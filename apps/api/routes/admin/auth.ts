@@ -24,7 +24,7 @@ router.post("/login", zValidator("json", z.object({ email: z.email(), password: 
   const capabilities = role
     ? capabilitiesForActor({ id: member.id, roleCode: member.roleCode, role, isActive: member.isActive })
     : [];
-  await createSession(c, member.id, email);
+  await createSession(c, member.id);
   return c.json({ user: { ...user, capabilities } });
 });
 

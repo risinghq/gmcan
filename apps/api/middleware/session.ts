@@ -1,4 +1,11 @@
+import { randomUUID } from "node:crypto";
+
 import type { Context, Next } from "hono";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+
+import { env } from "../config/env.js";
+import { db } from "../db/client.js";
+import { AUTH_EXEMPT_PATHS } from "./auth-exempt.js";
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -7,23 +14,17 @@ declare module "hono" {
   }
 }
 
-import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-
-import { env } from "../config/env.js";
-import { db } from "../db/client.js";
-import { AUTH_EXEMPT_PATHS } from "./auth-exempt.js";
-
 const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 const IDLE_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 
-export async function createSession(c: Context, memberId: number, email: string): Promise<void> {
-  const id = crypto.randomUUID();
+export async function createSession(c: Context, memberId: number): Promise<void> {
+  const id = randomUUID();
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_MAX_AGE_MS);
 
   await db
     .insertInto("session")
-    .values({ id, memberId, email, expiresAt: expiresAt.toISOString(), lastActive: now.toISOString() })
+    .values({ id, memberId, expiresAt: expiresAt.toISOString(), lastActiveAt: now.toISOString() })
     .execute();
 
   setCookie(c, "sid", id, {
@@ -59,14 +60,17 @@ export const requireSession = async (c: Context, next: Next) => {
     return c.json({ error: "Session expired" }, 401);
   }
 
-  if (new Date(session.lastActive).getTime() + IDLE_TIMEOUT_MS < now.getTime()) {
+  if (new Date(session.lastActiveAt).getTime() + IDLE_TIMEOUT_MS < now.getTime()) {
     await db.deleteFrom("session").where("id", "=", id).execute();
     return c.json({ error: "Session expired" }, 401);
   }
 
-  await db.updateTable("session").set({ lastActive: now.toISOString() }).where("id", "=", id).execute();
+  await db.updateTable("session").set({ lastActiveAt: now.toISOString() }).where("id", "=", id).execute();
+
+  const member = await db.selectFrom("member").select(["email"]).where("id", "=", session.memberId).executeTakeFirst();
+  if (!member) return c.json({ error: "Unauthorized" }, 401);
 
   c.set("memberId", session.memberId);
-  c.set("email", session.email);
+  c.set("email", member.email);
   await next();
 };

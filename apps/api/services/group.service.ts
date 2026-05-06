@@ -8,7 +8,7 @@ export type AboutSectionContent = { introParagraphs: string[]; items: string[] }
 async function replaceTranslations(table: TTable, ownerId: number, values: Record<string, Record<string, unknown>>) {
   const rows = Object.entries(values).map(([locale, payload]) => ({ locale, payload }));
   const ownerColumnByTable = {
-    group_translation: "groupId",
+    research_group_translation: "groupId",
     about_translation: "aboutId",
     research_line_translation: "researchLineId",
     method_translation: "methodId",
@@ -28,7 +28,7 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
 }
 
 type TTable =
-  | "group_translation"
+  | "research_group_translation"
   | "about_translation"
   | "research_line_translation"
   | "method_translation"
@@ -45,23 +45,23 @@ export async function listGroups() {
 export async function listGroupsLocalized(locale: Locale) {
   return db
     .selectFrom("research_group")
-    .innerJoin("group_translation", "group_translation.groupId", "research_group.id")
+    .innerJoin("research_group_translation", "research_group_translation.groupId", "research_group.id")
     .select([
       "research_group.id as id",
       "research_group.address as address",
       "research_group.email as email",
       "research_group.phone as phone",
-      "research_group.name as name",
+      "research_group.shortName as name",
       "research_group.fullName as fullName",
       "research_group.createdAt as createdAt",
       "research_group.updatedAt as updatedAt",
-      "group_translation.summary as summary",
-      "group_translation.facilities as facilities",
-      "group_translation.futureWork as futureWork",
-      "group_translation.publicationsSection as publicationsSection",
-      "group_translation.projectsSection as projectsSection",
+      "research_group_translation.summary as summary",
+      "research_group_translation.facilities as facilities",
+      "research_group_translation.futureWork as futureWork",
+      "research_group_translation.publicationsSection as publicationsSection",
+      "research_group_translation.projectsSection as projectsSection",
     ])
-    .where("group_translation.locale", "=", locale)
+    .where("research_group_translation.locale", "=", locale)
     .execute();
 }
 
@@ -74,7 +74,7 @@ export async function updateGroupSummary(
   data: { translations: LocalizedTranslations<{ summary: string }> },
 ) {
   await replaceTranslations(
-    "group_translation",
+    "research_group_translation",
     id,
     Object.fromEntries(Object.entries(data.translations).map(([locale, row]) => [locale, { summary: row.summary }])),
   );
@@ -87,7 +87,7 @@ export async function updateGroupFacilities(
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { facilities: row.facilities ?? null }]),
   );
-  await replaceTranslations("group_translation", id, rows);
+  await replaceTranslations("research_group_translation", id, rows);
 }
 
 export async function updateGroupFutureWork(
@@ -97,7 +97,7 @@ export async function updateGroupFutureWork(
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { futureWork: row.futureWork ?? null }]),
   );
-  await replaceTranslations("group_translation", id, rows);
+  await replaceTranslations("research_group_translation", id, rows);
 }
 
 export async function updateGroupPublicationsSection(
@@ -110,7 +110,7 @@ export async function updateGroupPublicationsSection(
       { publicationsSection: row.publicationsSection ?? null },
     ]),
   );
-  await replaceTranslations("group_translation", id, rows);
+  await replaceTranslations("research_group_translation", id, rows);
 }
 
 export async function updateGroupProjectsSection(
@@ -123,7 +123,7 @@ export async function updateGroupProjectsSection(
       { projectsSection: row.projectsSection ?? null },
     ]),
   );
-  await replaceTranslations("group_translation", id, rows);
+  await replaceTranslations("research_group_translation", id, rows);
 }
 
 export async function listAbout(groupId: number) {
