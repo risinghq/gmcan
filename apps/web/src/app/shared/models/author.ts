@@ -9,9 +9,9 @@ export interface AuthorEntry {
   memberId?: number;
   name: string;
   asset?: string | null;
-  isPrincipal: number;
+  authorOrder: number;
 }
 
 export type SaveAuthorEntry =
-  | { kind: "registered"; memberId: number; isPrincipal: number }
-  | { kind: "external"; externalName: string; isPrincipal: number };
+  | { kind: "registered"; memberId: number; authorOrder: number }
+  | { kind: "external"; externalName: string; authorOrder: number };
