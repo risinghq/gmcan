@@ -13,6 +13,7 @@
       "name": "api",
       "version": "1.0.0",
       "dependencies": {
+        "@gmcan/contracts": "workspace:*",
         "@hono/node-server": "^2.0.1",
         "@hono/zod-validator": "^0.7.6",
         "@libsql/client": "^0.17.2",
@@ -49,6 +50,7 @@
         "@fontsource/ibm-plex-sans": "^5.2.5",
         "@fontsource/ibm-plex-serif": "^5.2.5",
         "@fontsource/roboto": "^5.2.5",
+        "@gmcan/contracts": "workspace:*",
         "@ng-bootstrap/ng-bootstrap": "^20.0.0",
         "@popperjs/core": "^2.11.8",
         "animate.css": "^4.1.1",
@@ -72,6 +74,13 @@
         "jsdom": "^29.1.1",
         "typescript": "~5.9.0",
         "vitest": "^4.1.5",
+      },
+    },
+    "packages/contracts": {
+      "name": "@gmcan/contracts",
+      "version": "0.0.0",
+      "dependencies": {
+        "zod": "^4.4.3",
       },
     },
   },
@@ -399,6 +408,8 @@
     "@fontsource/roboto": ["@fontsource/roboto@5.2.10", "", {}, "sha512-8HlA5FtSfz//oFSr2eL7GFXAiE7eIkcGOtx7tjsLKq+as702x9+GU7K95iDeWFapHC4M2hv9RrpXKRTGGBI8Zg=="],
 
     "@gar/promise-retry": ["@gar/promise-retry@1.0.3", "", {}, "sha512-GmzA9ckNokPypTg10pgpeHNQe7ph+iIKKmhKu3Ob9ANkswreCx7R3cKmY781K8QK3AqVL3xVh9A42JvIAbkkSA=="],
+
+    "@gmcan/contracts": ["@gmcan/contracts@workspace:packages/contracts"],
 
     "@harperfast/extended-iterable": ["@harperfast/extended-iterable@1.0.3", "", {}, "sha512-sSAYhQca3rDWtQUHSAPeO7axFIUJOI6hn1gjRC5APVE1a90tuyT8f5WIgRsFhhWA7htNkju2veB9eWL6YHi/Lw=="],
 

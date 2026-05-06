@@ -1,0 +1,12 @@
+{
+  "name": "@gmcan/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./public": "./src/public/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}

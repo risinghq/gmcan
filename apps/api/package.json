@@ -29,6 +29,7 @@
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
+    "@gmcan/contracts": "workspace:*",
     "@hono/node-server": "^2.0.1",
     "@hono/zod-validator": "^0.7.6",
     "@libsql/client": "^0.17.2",
