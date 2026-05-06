@@ -73,6 +73,11 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
               .onRef("project_translation.projectId", "=", "project.id")
               .on("project_translation.locale", "=", locale),
           )
+          .innerJoin("research_line_translation", (join) =>
+            join
+              .onRef("research_line_translation.researchLineId", "=", "project.researchLineId")
+              .on("research_line_translation.locale", "=", locale),
+          )
           .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
           .select([
             "project.id",
@@ -86,6 +91,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
             "project.researchLineId",
             "project.currencyCode",
             "project.fundingSourceCode",
+            "research_line_translation.name as researchLine",
             "funding_source.name as fundingSource",
           ])
           .where("project.statusCode", "=", "active")
@@ -94,6 +100,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
               eb("project_translation.title", "like", like),
               eb("project.code", "like", like),
               eb("project_translation.description", "like", like),
+              eb("research_line_translation.name", "like", like),
               eb("funding_source.name", "like", like),
             ]),
           )
@@ -194,6 +201,6 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
         }),
       ),
     ),
-    projects: projects.map((project) => Object.assign({ researchLine: "" }, project)),
+    projects,
   };
 }
