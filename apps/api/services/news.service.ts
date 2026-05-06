@@ -2,9 +2,9 @@ import { sql } from "kysely";
 
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
-import type { Bilingual } from "../lib/admin-translations.js";
-import { SUPPORTED_LOCALES, type LocaleCode } from "../lib/locales.js";
-import { throwMissingTranslation, type Locale } from "../lib/public-locale.js";
+import type { LocalizedTranslations } from "../lib/admin-translations.js";
+import { DEFAULT_LOCALE, type LocaleCode } from "../lib/locales.js";
+import { type Locale } from "../lib/public-locale.js";
 import type {
   AdminNewsListItem,
   AdminNewsListQuery,
@@ -14,7 +14,7 @@ import type {
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export interface NewsUpsertInput {
-  translations: Bilingual<{ title: string; summary: string; body: string }>;
+  translations: LocalizedTranslations<{ title: string; summary: string; body: string }>;
   status: number;
   publishedAt?: string;
   authorId: number;
@@ -150,7 +150,7 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      sql<string>`coalesce(news_type_translation.name, news_type.name, '')`.as("newsTypeName"),
+      sql<string>`coalesce(news_type_translation.name, '')`.as("newsTypeName"),
     ])
     .orderBy(PUBLIC_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
     .orderBy("news.id", "desc")
@@ -208,7 +208,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      sql<string>`coalesce(news_type_translation.name, news_type.name, '')`.as("newsTypeName"),
+      sql<string>`coalesce(news_type_translation.name, '')`.as("newsTypeName"),
     ])
     .where("news.id", "=", id)
     .executeTakeFirst();
@@ -239,7 +239,7 @@ const NEWS_SORT_COLUMN: Record<AdminNewsSortBy, string> = {
   title: "news_translation.title",
   status: "news.status",
   authorName: "member.firstName",
-  categoryName: "news_type.name",
+  categoryName: "news_type_translation.name",
 };
 
 export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNewsListResponse> {
@@ -247,9 +247,14 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
   const base = db
     .selectFrom("news")
     .innerJoin("news_translation", (join) =>
-      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", "es"),
+      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", DEFAULT_LOCALE),
     )
     .innerJoin("news_type", "news_type.id", "news.newsTypeId")
+    .leftJoin("news_type_translation", (join) =>
+      join
+        .onRef("news_type_translation.newsTypeId", "=", "news.newsTypeId")
+        .on("news_type_translation.locale", "=", DEFAULT_LOCALE),
+    )
     .innerJoin("member", "member.id", "news.authorId")
     .$if(query.status !== undefined, (qb) => qb.where("news.status", "=", query.status as number))
     .$if(query.newsTypeId !== undefined, (qb) => qb.where("news.newsTypeId", "=", query.newsTypeId as number))
@@ -262,7 +267,7 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
           eb("member.firstName", "like", `%${query.q}%`),
           eb("member.lastName", "like", `%${query.q}%`),
           eb("member.maternalName", "like", `%${query.q}%`),
-          eb("news_type.name", "like", `%${query.q}%`),
+          eb("news_type_translation.name", "like", `%${query.q}%`),
         ]),
       ),
     );
@@ -277,7 +282,7 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
       "news.status as status",
       "news.authorId as authorId",
       "news.newsTypeId as newsTypeId",
-      "news_type.name as categoryName",
+      "news_type_translation.name as categoryName",
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
@@ -321,12 +326,6 @@ export async function toAdminNewsView(row: NewsRow) {
     .select(["locale", "title", "summary", "body"])
     .where("newsId", "=", row.id)
     .execute();
-
-  for (const locale of SUPPORTED_LOCALES) {
-    if (!translations.find((tr) => tr.locale === locale)) {
-      throwMissingTranslation(`news:${row.id}:${locale}`);
-    }
-  }
 
   return {
     id: row.id,

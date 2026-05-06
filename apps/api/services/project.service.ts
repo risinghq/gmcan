@@ -3,10 +3,10 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
-import type { Bilingual } from "../lib/admin-translations.js";
+import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { SUPPORTED_LOCALES, type LocaleCode } from "../lib/locales.js";
-import { throwMissingTranslation, type Locale } from "../lib/public-locale.js";
+import { DEFAULT_LOCALE, type LocaleCode } from "../lib/locales.js";
+import { type Locale } from "../lib/public-locale.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
@@ -19,7 +19,7 @@ export interface ProjectAdminInput {
   researchLineId: number;
   currencyId: number;
   fundingSourceId: number;
-  translations: Bilingual<{ title: string; description: string }>;
+  translations: LocalizedTranslations<{ title: string; description: string }>;
 }
 
 function toProjectRow(data: ProjectAdminInput) {
@@ -90,7 +90,9 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
-      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", "es"),
+      join
+        .onRef("project_translation.projectId", "=", "project.id")
+        .on("project_translation.locale", "=", DEFAULT_LOCALE),
     )
     .select([
       "project.id as id",
@@ -171,12 +173,6 @@ export async function toAdminProjectView(project: ProjectRow) {
     .where("projectId", "=", project.id)
     .execute();
 
-  for (const locale of SUPPORTED_LOCALES) {
-    if (!translations.find((tr) => tr.locale === locale)) {
-      throwMissingTranslation(`project:${project.id}:${locale}`);
-    }
-  }
-
   return {
     id: project.id,
     code: project.code,
@@ -229,7 +225,9 @@ export async function searchProjects(q: string, status?: number) {
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
-      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", "es"),
+      join
+        .onRef("project_translation.projectId", "=", "project.id")
+        .on("project_translation.locale", "=", DEFAULT_LOCALE),
     )
     .selectAll("project")
     .where((eb) => eb.or([eb("project_translation.title", "like", like), eb("project.code", "like", like)]));

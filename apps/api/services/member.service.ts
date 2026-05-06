@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
+import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
@@ -15,7 +16,7 @@ export async function listMembers() {
 export async function listMembersLocalized(locale: Locale) {
   return db
     .selectFrom("member")
-    .leftJoin("member_translation", (join) =>
+    .innerJoin("member_translation", (join) =>
       join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
     )
     .select([...MEMBER_PUBLIC, "member_translation.bio as localizedBio"])
@@ -30,6 +31,11 @@ export async function listAdminMembers(filter?: {
   let query = db
     .selectFrom("member")
     .leftJoin("member_type", "member_type.id", "member.memberTypeId")
+    .leftJoin("member_type_translation", (join) =>
+      join
+        .onRef("member_type_translation.memberTypeId", "=", "member_type.id")
+        .on("member_type_translation.locale", "=", DEFAULT_LOCALE),
+    )
     .leftJoin("prefix", "prefix.id", "member.prefixId")
     .select([
       "member.id",
@@ -44,8 +50,8 @@ export async function listAdminMembers(filter?: {
       "member.roleId",
       "member.memberTypeId",
       "member.prefixId",
-      sql<string>`COALESCE(member_type.nameSingular, '')`.as("memberTypeName"),
-      sql<string | null>`prefix.nombre`.as("prefixName"),
+      sql<string>`COALESCE(member_type_translation.nameSingular, '')`.as("memberTypeName"),
+      sql<string | null>`prefix.name`.as("prefixName"),
     ]);
 
   if (filter?.status !== undefined) query = query.where("member.status", "=", filter.status);
@@ -146,10 +152,10 @@ export async function getMemberProfileLocalized(id: number, locale: Locale) {
     .select("bio")
     .where("memberId", "=", id)
     .where("locale", "=", locale)
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
   return {
     ...profile,
-    member: Object.assign({}, profile.member, { localizedBio: tr?.bio ?? null }),
+    member: Object.assign({}, profile.member, { localizedBio: tr.bio }),
   };
 }
 

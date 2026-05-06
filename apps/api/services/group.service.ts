@@ -1,26 +1,63 @@
 import { db } from "../db/client.js";
 import type { MethodRow, ResearchLineRow } from "../db/schema.js";
-import type { Bilingual } from "../lib/admin-translations.js";
-import { SUPPORTED_LOCALES } from "../lib/locales.js";
-import { throwMissingTranslation, type Locale } from "../lib/public-locale.js";
+import type { LocalizedTranslations } from "../lib/admin-translations.js";
+import { type Locale } from "../lib/public-locale.js";
 
 export type AboutSectionContent = { introParagraphs: string[]; items: string[] };
-export type LocalizedAboutSectionContent = { es: AboutSectionContent; en: AboutSectionContent };
-export type LocalizedHomeServicesTeaserContent = { es: { paragraphs: string[] }; en: { paragraphs: string[] } };
 
 async function replaceTranslations(
   table: TTable,
-  whereColumn: string,
   ownerId: number,
   values: Record<string, Record<string, unknown>>,
 ) {
+  const rows = Object.entries(values).map(([locale, payload]) => ({ locale, payload }));
   await db.transaction().execute(async (trx) => {
-    await (trx as any).deleteFrom(table).where(whereColumn, "=", ownerId).execute();
-    const rows = Object.entries(values).map(([locale, payload]) =>
-      Object.assign({ [whereColumn]: ownerId, locale }, payload),
-    );
-    if (rows.length > 0) {
-      await (trx as any).insertInto(table).values(rows).execute();
+    switch (table) {
+      case "group_translation":
+        await trx.deleteFrom("group_translation").where("groupId", "=", ownerId).execute();
+        if (rows.length > 0) {
+          await trx
+            .insertInto("group_translation")
+            .values(rows.map(({ locale, payload }) => ({ groupId: ownerId, locale, ...payload })))
+            .execute();
+        }
+        break;
+      case "about_translation":
+        await trx.deleteFrom("about_translation").where("aboutId", "=", ownerId).execute();
+        if (rows.length > 0) {
+          await trx
+            .insertInto("about_translation")
+            .values(rows.map(({ locale, payload }) => ({ aboutId: ownerId, locale, ...payload })))
+            .execute();
+        }
+        break;
+      case "research_line_translation":
+        await trx.deleteFrom("research_line_translation").where("researchLineId", "=", ownerId).execute();
+        if (rows.length > 0) {
+          await trx
+            .insertInto("research_line_translation")
+            .values(rows.map(({ locale, payload }) => ({ researchLineId: ownerId, locale, ...payload })))
+            .execute();
+        }
+        break;
+      case "method_translation":
+        await trx.deleteFrom("method_translation").where("methodId", "=", ownerId).execute();
+        if (rows.length > 0) {
+          await trx
+            .insertInto("method_translation")
+            .values(rows.map(({ locale, payload }) => ({ methodId: ownerId, locale, ...payload })))
+            .execute();
+        }
+        break;
+      case "software_translation":
+        await trx.deleteFrom("software_translation").where("softwareId", "=", ownerId).execute();
+        if (rows.length > 0) {
+          await trx
+            .insertInto("software_translation")
+            .values(rows.map(({ locale, payload }) => ({ softwareId: ownerId, locale, ...payload })))
+            .execute();
+        }
+        break;
     }
   });
 }
@@ -67,32 +104,31 @@ export async function updateGroupInfo(id: number, data: { email?: string; phone?
   await db.updateTable("research_group").set(data).where("id", "=", id).execute();
 }
 
-export async function updateGroupSummary(id: number, data: { translations: Bilingual<{ summary: string }> }) {
+export async function updateGroupSummary(id: number, data: { translations: LocalizedTranslations<{ summary: string }> }) {
   await replaceTranslations(
     "group_translation",
-    "groupId",
     id,
     Object.fromEntries(Object.entries(data.translations).map(([locale, row]) => [locale, { summary: row.summary }])),
   );
 }
 
-export async function updateGroupFacilities(id: number, data: { translations: Bilingual<{ facilities?: string }> }) {
+export async function updateGroupFacilities(id: number, data: { translations: LocalizedTranslations<{ facilities?: string }> }) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { facilities: row.facilities ?? null }]),
   );
-  await replaceTranslations("group_translation", "groupId", id, rows);
+  await replaceTranslations("group_translation", id, rows);
 }
 
-export async function updateGroupFutureWork(id: number, data: { translations: Bilingual<{ futureWork?: string }> }) {
+export async function updateGroupFutureWork(id: number, data: { translations: LocalizedTranslations<{ futureWork?: string }> }) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { futureWork: row.futureWork ?? null }]),
   );
-  await replaceTranslations("group_translation", "groupId", id, rows);
+  await replaceTranslations("group_translation", id, rows);
 }
 
 export async function updateGroupPublicationsSection(
   id: number,
-  data: { translations: Bilingual<{ publicationsSection?: string }> },
+  data: { translations: LocalizedTranslations<{ publicationsSection?: string }> },
 ) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [
@@ -100,12 +136,12 @@ export async function updateGroupPublicationsSection(
       { publicationsSection: row.publicationsSection ?? null },
     ]),
   );
-  await replaceTranslations("group_translation", "groupId", id, rows);
+  await replaceTranslations("group_translation", id, rows);
 }
 
 export async function updateGroupProjectsSection(
   id: number,
-  data: { translations: Bilingual<{ projectsSection?: string }> },
+  data: { translations: LocalizedTranslations<{ projectsSection?: string }> },
 ) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [
@@ -113,7 +149,7 @@ export async function updateGroupProjectsSection(
       { projectsSection: row.projectsSection ?? null },
     ]),
   );
-  await replaceTranslations("group_translation", "groupId", id, rows);
+  await replaceTranslations("group_translation", id, rows);
 }
 
 export async function listAbout(groupId: number) {
@@ -146,16 +182,16 @@ export async function listAboutLocalized(groupId: number, locale: Locale) {
     .execute();
 }
 
-export async function updateAboutDescription(id: number, data: { translations: Bilingual<{ description: string }> }) {
+export async function updateAboutDescription(id: number, data: { translations: LocalizedTranslations<{ description: string }> }) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { description: row.description }]),
   );
-  await replaceTranslations("about_translation", "aboutId", id, rows);
+  await replaceTranslations("about_translation", id, rows);
 }
 
 export async function updateAboutObjectives(
   id: number,
-  data: { translations: Bilingual<{ objectivesContent?: string }> },
+  data: { translations: LocalizedTranslations<{ objectivesContent?: string }> },
 ) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [
@@ -163,22 +199,22 @@ export async function updateAboutObjectives(
       { objectivesContent: row.objectivesContent ?? null },
     ]),
   );
-  await replaceTranslations("about_translation", "aboutId", id, rows);
+  await replaceTranslations("about_translation", id, rows);
 }
 
-export async function updateAboutServices(id: number, data: { translations: Bilingual<{ servicesContent?: string }> }) {
+export async function updateAboutServices(id: number, data: { translations: LocalizedTranslations<{ servicesContent?: string }> }) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [
       locale,
       { servicesContent: row.servicesContent ?? null },
     ]),
   );
-  await replaceTranslations("about_translation", "aboutId", id, rows);
+  await replaceTranslations("about_translation", id, rows);
 }
 
 export async function updateAboutHomeServicesTeaser(
   id: number,
-  data: { translations: Bilingual<{ homeServicesTeaserContent?: string }> },
+  data: { translations: LocalizedTranslations<{ homeServicesTeaserContent?: string }> },
 ) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [
@@ -186,7 +222,7 @@ export async function updateAboutHomeServicesTeaser(
       { homeServicesTeaserContent: row.homeServicesTeaserContent ?? null },
     ]),
   );
-  await replaceTranslations("about_translation", "aboutId", id, rows);
+  await replaceTranslations("about_translation", id, rows);
 }
 
 export async function listResearchLines(groupId?: number) {
@@ -239,9 +275,6 @@ export async function toAdminResearchLineView(row: ResearchLineRow) {
     .select(["locale", "name", "description"])
     .where("researchLineId", "=", row.id)
     .execute();
-  for (const locale of SUPPORTED_LOCALES) {
-    if (!translations.find((tr) => tr.locale === locale)) throwMissingTranslation(`research_line:${row.id}:${locale}`);
-  }
   return {
     id: row.id,
     groupId: row.groupId,
@@ -255,7 +288,7 @@ export async function toAdminResearchLineView(row: ResearchLineRow) {
 
 export async function createResearchLine(data: {
   groupId: number;
-  translations: Bilingual<{ name: string; description?: string }>;
+  translations: LocalizedTranslations<{ name: string; description?: string }>;
 }) {
   return db.transaction().execute(async (trx) => {
     const result = await trx.insertInto("research_line").values({ groupId: data.groupId }).executeTakeFirstOrThrow();
@@ -277,7 +310,7 @@ export async function createResearchLine(data: {
 
 export async function updateResearchLine(
   id: number,
-  data: { translations: Bilingual<{ name: string; description?: string }> },
+  data: { translations: LocalizedTranslations<{ name: string; description?: string }> },
 ) {
   await replaceTranslations(
     "research_line_translation",
@@ -346,9 +379,6 @@ export async function toAdminMethodView(row: MethodRow) {
     .select(["locale", "name", "description"])
     .where("methodId", "=", row.id)
     .execute();
-  for (const locale of SUPPORTED_LOCALES) {
-    if (!translations.find((tr) => tr.locale === locale)) throwMissingTranslation(`method:${row.id}:${locale}`);
-  }
   return {
     id: row.id,
     groupId: row.groupId,
@@ -362,7 +392,7 @@ export async function toAdminMethodView(row: MethodRow) {
 
 export async function createMethod(data: {
   groupId: number;
-  translations: Bilingual<{ name: string; description: string }>;
+  translations: LocalizedTranslations<{ name: string; description: string }>;
 }) {
   return db.transaction().execute(async (trx) => {
     const result = await trx.insertInto("method").values({ groupId: data.groupId }).executeTakeFirstOrThrow();
@@ -384,7 +414,7 @@ export async function createMethod(data: {
 
 export async function updateMethod(
   id: number,
-  data: { translations: Bilingual<{ name: string; description: string }> },
+  data: { translations: LocalizedTranslations<{ name: string; description: string }> },
 ) {
   await replaceTranslations(
     "method_translation",
@@ -428,7 +458,7 @@ export async function listSoftwareLocalized(locale: Locale, groupId?: number) {
 }
 
 export async function createSoftware(data: {
-  translations: Bilingual<{ name?: string; description?: string }>;
+  translations: LocalizedTranslations<{ name?: string; description?: string }>;
   moreInfo?: string;
   groupId: number;
 }) {
@@ -455,7 +485,7 @@ export async function createSoftware(data: {
 
 export async function updateSoftware(
   id: number,
-  data: { translations: Bilingual<{ name?: string; description?: string }>; moreInfo?: string },
+  data: { translations: LocalizedTranslations<{ name?: string; description?: string }>; moreInfo?: string },
 ) {
   await db.transaction().execute(async (trx) => {
     await trx.updateTable("software").set({ moreInfo: data.moreInfo }).where("id", "=", id).execute();

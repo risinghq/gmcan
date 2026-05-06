@@ -2,10 +2,10 @@ import { sql } from "kysely";
 
 import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
-import type { Bilingual } from "../lib/admin-translations.js";
+import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { SUPPORTED_LOCALES, type LocaleCode } from "../lib/locales.js";
-import { throwMissingTranslation, type Locale } from "../lib/public-locale.js";
+import { DEFAULT_LOCALE, type LocaleCode } from "../lib/locales.js";
+import { type Locale } from "../lib/public-locale.js";
 import type { AdminPublicationListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
@@ -17,7 +17,7 @@ export interface AuthorInput {
 }
 
 export interface PublicationFields {
-  translations: Bilingual<{ title: string; abstract?: string }>;
+  translations: LocalizedTranslations<{ title: string; abstract?: string }>;
   doi?: string;
   publishedAt: string;
   journalIssue?: number;
@@ -153,7 +153,7 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
     .innerJoin("publication_translation", (join) =>
       join
         .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", "es"),
+        .on("publication_translation.locale", "=", DEFAULT_LOCALE),
     )
     .select([
       "publication.id as id",
@@ -172,7 +172,13 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
 
   const publicationIds = publications.map((publication) => publication.id);
   const [eventRows, authorRows] = await Promise.all([
-    db.selectFrom("event").select(["id", "name"]).execute(),
+    db
+      .selectFrom("event")
+      .innerJoin("event_translation", (join) =>
+        join.onRef("event_translation.eventId", "=", "event.id").on("event_translation.locale", "=", DEFAULT_LOCALE),
+      )
+      .select(["event.id as id", "event_translation.name as name"])
+      .execute(),
     db
       .selectFrom("publication_author")
       .leftJoin("member", "member.id", "publication_author.memberId")
@@ -270,12 +276,6 @@ export async function getPublicationEditView(id: number) {
     .where("publicationId", "=", id)
     .execute();
 
-  for (const locale of SUPPORTED_LOCALES) {
-    if (!translations.find((tr) => tr.locale === locale)) {
-      throwMissingTranslation(`publication:${id}:${locale}`);
-    }
-  }
-
   return {
     publication: Object.assign({}, result.publication, {
       translations: Object.fromEntries(
@@ -331,7 +331,7 @@ export async function searchPublications(q: string) {
     .innerJoin("publication_translation", (join) =>
       join
         .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", "es"),
+        .on("publication_translation.locale", "=", DEFAULT_LOCALE),
     )
     .selectAll("publication")
     .where((eb) =>

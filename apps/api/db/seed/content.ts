@@ -118,11 +118,8 @@ export async function seedUniversities() {
   await db
     .insertInto("university")
     .values([
-      {
-        id: 1,
-        name: "Universidad Nacional Mayor San Marcos",
-      },
-      { id: 2, name: "Universidad de Piura" },
+      { id: 1 },
+      { id: 2 },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -141,12 +138,7 @@ export async function seedUniversities() {
 export async function seedEvents() {
   await db
     .insertInto("event")
-    .values({
-      id: 1,
-      name: "Simposio Peruano de Física",
-      city: "Trujillo",
-      country: "Perú",
-    })
+    .values({ id: 1 })
     .onConflict((oc) => oc.doNothing())
     .execute();
   await db

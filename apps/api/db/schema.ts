@@ -2,6 +2,10 @@ import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 type DateString = string;
 
+export interface LocaleTable {
+  code: string;
+}
+
 export interface GenderTable {
   id: Generated<number>;
   name: string;
@@ -19,8 +23,6 @@ export interface RoleTable {
 
 export interface MemberTypeTable {
   id: Generated<number>;
-  name: string;
-  nameSingular: string;
 }
 export interface MemberTypeTranslationTable {
   id: Generated<number>;
@@ -32,7 +34,6 @@ export interface MemberTypeTranslationTable {
 
 export interface PublicationTypeTable {
   id: Generated<number>;
-  name: string;
 }
 export interface PublicationTypeTranslationTable {
   id: Generated<number>;
@@ -43,7 +44,6 @@ export interface PublicationTypeTranslationTable {
 
 export interface ThesisTypeTable {
   id: Generated<number>;
-  name: string;
 }
 export interface ThesisTypeTranslationTable {
   id: Generated<number>;
@@ -54,7 +54,6 @@ export interface ThesisTypeTranslationTable {
 
 export interface NewsTypeTable {
   id: Generated<number>;
-  name: string;
 }
 export interface NewsTypeTranslationTable {
   id: Generated<number>;
@@ -70,7 +69,6 @@ export interface JournalTable {
 
 export interface UniversityTable {
   id: Generated<number>;
-  name: string;
 }
 export interface UniversityTranslationTable {
   id: Generated<number>;
@@ -81,9 +79,6 @@ export interface UniversityTranslationTable {
 
 export interface EventTable {
   id: Generated<number>;
-  name: string;
-  city: string | null;
-  country: string | null;
 }
 export interface EventTranslationTable {
   id: Generated<number>;
@@ -367,6 +362,7 @@ export interface AssetAuditTable {
 }
 
 export interface Database {
+  locale: LocaleTable;
   gender: GenderTable;
   prefix: PrefixTable;
   role: RoleTable;

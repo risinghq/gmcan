@@ -50,7 +50,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
     await Promise.all(
       rows.map(async (row) => {
         const authors = await Promise.all(
-          (row.authors as any[]).map(async (author) =>
+          row.authors.map(async (author) =>
             author.kind === "registered"
               ? Object.assign({}, author, {
                   asset: await resolveAssetAccessUrl({
@@ -105,7 +105,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     updatedAt: pub.updatedAt,
     createdAt: pub.createdAt,
     authors: await Promise.all(
-      (pub.authors as any[]).map(async (author) =>
+      pub.authors.map(async (author) =>
         author.kind === "registered"
           ? Object.assign({}, author, {
               asset: await resolveAssetAccessUrl({

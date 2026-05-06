@@ -30,7 +30,7 @@ export const LocaleCodeSchema = z
   });
 
 export type LocaleCode = string;
-export type LocalizedMap<T> = Record<string, T>;
+export type LocalizedMap<T> = Record<LocaleCode, T>;
 
 export function isSupportedLocale(locale: string): boolean {
   return SUPPORTED_LOCALES.includes(locale.toLowerCase());

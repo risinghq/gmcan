@@ -30,7 +30,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
   const member = {
     ...profile.member,
-    bio: (profile.member as any).localizedBio,
+    bio: profile.member.localizedBio,
     asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: profile.member.id, slot: "photo" }),
   };
 
