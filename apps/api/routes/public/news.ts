@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { PublicNewsDetailSchema, PublicNewsListQuerySchema, PublicNewsListResponseSchema } from "@gmcan/contracts/public";
+import { PublicNewsListQuerySchema } from "@gmcan/contracts/public";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -12,15 +12,15 @@ router.get("/", zValidator("query", PublicNewsListQuerySchema), async (c) => {
   const locale = c.get("locale");
   const query = c.req.valid("query");
   const response = await listPublicNews(locale, {
-      q: query.q,
-      statusCode: query.statusCode,
-      newsKindCode: query.newsKindCode,
-      sortBy: query.sortBy,
-      sortOrder: query.sortOrder,
-      page: query.page,
-      pageSize: query.pageSize,
-    });
-  return c.json(PublicNewsListResponseSchema.parse(response));
+    q: query.q,
+    statusCode: query.statusCode,
+    newsKindCode: query.newsKindCode,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+    page: query.page,
+    pageSize: query.pageSize,
+  });
+  return c.json(response);
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
@@ -28,7 +28,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getPublicNewsDetail(id, locale);
   if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json(PublicNewsDetailSchema.parse(row));
+  return c.json(row);
 });
 
 export default router;

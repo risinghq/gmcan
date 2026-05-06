@@ -38,10 +38,10 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
           kindCode: row.kindCode,
           subtype:
             row.kindCode === "journal_article"
-              ? { journalArticle: { journalId: row.journalId, issue: row.issue } }
+              ? { kindCode: "journal_article", journalArticle: { journalId: row.journalId, issue: row.issue } }
               : row.kindCode === "conference_paper"
-                ? { conferencePaper: { eventId: row.eventId } }
-                : { thesis: { universityId: row.universityId, thesisKindCode: row.thesisKindCode } },
+                ? { kindCode: "conference_paper", conferencePaper: { eventId: row.eventId } }
+                : { kindCode: "thesis", thesis: { universityId: row.universityId, thesisKindCode: row.thesisKindCode } },
           updatedAt: row.updatedAt,
           createdAt: row.createdAt,
         })),
