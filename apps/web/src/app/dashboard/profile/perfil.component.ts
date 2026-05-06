@@ -15,6 +15,8 @@ import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field"
 import { MatInput } from "@angular/material/input";
 import { MatOption, MatSelect } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
+import { countMissingRequirements, publishabilityTooltip } from "@app/shared/member-publishability/utils";
 import { createMemberFull } from "@app/shared/models/factories";
 import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -23,8 +25,6 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService, type MemberUpdateBody } from "@app/shared/services/member.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
-
-import { PublishabilityDialogComponent } from "../members/publishability-dialog.component";
 
 type MemberStatus = 0 | 1 | 3;
 
@@ -300,16 +300,11 @@ export default class PerfilComponent implements OnInit {
 
   missingRequirementsCount(): number {
     if (!this.publishability) return 0;
-    return (
-      this.publishability.missing.base.length +
-      Object.values(this.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
-    );
+    return countMissingRequirements(this.publishability);
   }
 
   publishabilityTooltip(): string {
-    if (!this.publishability) return "Estado de publicación no disponible";
-    if (this.publishability.publishable) return "Ready para mostrarse en público";
-    return `Borrador: ${this.missingRequirementsCount()} requisito(s) pendiente(s)`;
+    return publishabilityTooltip(this.publishability);
   }
 
   private loadPublishability(): void {

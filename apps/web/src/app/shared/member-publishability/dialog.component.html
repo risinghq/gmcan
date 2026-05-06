@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Estado de publicación</h2>
+<div mat-dialog-content>
+  <p><strong>Miembro:</strong> {{ data.memberName }}</p>
+  @if (data.publishability.publishable) {
+    <p>Ready para mostrarse en público.</p>
+  } @else {
+    <p>Draft. Requisitos pendientes:</p>
+    <ul>
+      @for (item of missingItems(); track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  }
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+</div>

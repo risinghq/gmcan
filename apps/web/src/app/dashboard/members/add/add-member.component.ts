@@ -10,6 +10,8 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
+import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
+import { countMissingRequirements, publishabilityTooltip } from "@app/shared/member-publishability/utils";
 import { createMemberFull } from "@app/shared/models/factories";
 import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -18,8 +20,6 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
-
-import { PublishabilityDialogComponent } from "../publishability-dialog.component";
 
 @Component({
   selector: "app-add-member",
@@ -239,16 +239,11 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   missingRequirementsCount(): number {
     if (!this.publishability) return 0;
-    return (
-      this.publishability.missing.base.length +
-      Object.values(this.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
-    );
+    return countMissingRequirements(this.publishability);
   }
 
   publishabilityTooltip(): string {
-    if (!this.publishability) return "Estado de publicación no disponible";
-    if (this.publishability.publishable) return "Ready para mostrarse en público";
-    return `Borrador: ${this.missingRequirementsCount()} requisito(s) pendiente(s)`;
+    return publishabilityTooltip(this.publishability);
   }
 
   openPublishabilityDetails(): void {

@@ -17,10 +17,10 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
+import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
+import { countMissingRequirements } from "@app/shared/member-publishability/utils";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { MemberService } from "@app/shared/services/member.service";
-
-import { PublishabilityDialogComponent } from "../publishability-dialog.component";
 
 @Component({
   selector: "app-miembros",
@@ -119,10 +119,7 @@ export default class MiembrosComponent implements OnInit {
 
   missingCount(row: AdminMemberListItem): number {
     if (!row.publishability) return 0;
-    return (
-      row.publishability.missing.base.length +
-      Object.values(row.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
-    );
+    return countMissingRequirements(row.publishability);
   }
 
   openPublishability(row: AdminMemberListItem, event: Event): void {
