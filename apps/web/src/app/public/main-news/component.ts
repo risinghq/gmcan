@@ -80,7 +80,10 @@ export default class MainNewsComponent implements OnInit {
     this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.news);
     this.selectedCategoryName = this.language.newsText[0].categoryTitle;
-    this.newsTypes = this.lookup.newsKinds().toSorted((a, b) => (a.name > b.name ? 1 : -1));
+    this.newsTypes = this.lookup
+      .newsKinds()
+      .filter((item): item is NewsTypeFilter => item.code === "general" || item.code === "research" || item.code === "event")
+      .toSorted((a, b) => (a.name > b.name ? 1 : -1));
     this.loadNews();
   }
 

@@ -31,7 +31,7 @@ interface NewsListItem {
   categoryName: string;
   authorName: string;
   authorAsset: string | null;
-  status: number;
+  statusCode: "draft" | "published" | "archived";
   statusLabel: string;
 }
 
@@ -75,7 +75,7 @@ export default class NewsListComponent implements OnInit {
   pageSize = 10;
   pageIndex = 0;
   search = "";
-  statusFilter = "";
+  statusFilter: "" | "draft" | "published" | "archived" = "";
   newsTypeFilter = "";
   sortBy: AdminNewsSortBy = "publishedAt";
   sortOrder: "asc" | "desc" = "desc";
@@ -95,8 +95,8 @@ export default class NewsListComponent implements OnInit {
     this.newsService
       .listAdminNews({
         q: this.search || undefined,
-        status: this.statusFilter === "" ? undefined : Number(this.statusFilter),
-        newsTypeId: this.newsTypeFilter === "" ? undefined : Number(this.newsTypeFilter),
+        statusCode: this.statusFilter === "" ? undefined : this.statusFilter,
+        newsKindCode: this.newsTypeFilter === "" ? undefined : (this.newsTypeFilter as "general" | "research" | "event"),
         sortBy: this.sortBy,
         sortOrder: this.sortOrder,
         page: this.pageIndex + 1,
@@ -120,7 +120,7 @@ export default class NewsListComponent implements OnInit {
       categoryName: news.categoryName,
       authorName: news.authorName,
       authorAsset: news.authorAsset,
-      status: news.status,
+      statusCode: news.statusCode,
       statusLabel: news.statusLabel,
     };
   }
@@ -150,7 +150,7 @@ export default class NewsListComponent implements OnInit {
       publishedAtLabel: "publishedAt",
       categoryName: "categoryName",
       authorName: "authorName",
-      status: "status",
+      status: "statusCode",
     };
     this.sortBy = map[event.active] ?? "publishedAt";
     this.sortOrder = order;

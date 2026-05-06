@@ -21,13 +21,13 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createNews } from "@app/shared/models/factories";
-import type { Member } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
+import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
@@ -84,9 +84,9 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   url: string;
   public newsForm: FormGroup;
   get categorias() {
-    return this.lookup.newsTypes();
+    return this.lookup.newsKinds();
   }
-  autores: Member[] = [];
+  autores: AdminMemberListItem[] = [];
   button_text = "";
   button_text2 = "";
 
@@ -97,7 +97,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       body: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       publishedAt: ["", [Validators.required]],
       authorId: [null, [Validators.required]],
-      newsTypeId: ["", [Validators.required]],
+      newsKindCode: ["", [Validators.required]],
     });
     this.noticia = createNews();
     this.url = GLOBAL.url;
@@ -119,7 +119,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     if (found.publishedAt) {
       this.publishedAtObj = parseLocalDate(found.publishedAt);
     }
-    if (found.status === 0) {
+    if (found.statusCode === "draft") {
       this.button_text = "Publicar noticia";
       this.button_text2 = "Guardar sin publicar";
       return;
@@ -129,7 +129,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getAuthors(): void {
-    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
       if (result) {
         this.autores = result;
       }
@@ -140,29 +140,29 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate(["dashboard/news"]);
   }
 
-  submitNews(status: number): void {
-    if (status === 1 && this.newsForm.valid && (this.noticia.asset || this.fileData)) {
-      this.publishDialog(status);
-    } else if (status === 0) {
-      if (this.noticia.status === 0) {
-        this.publishMethod(status);
+  submitNews(mode: "published" | "draft"): void {
+    if (mode === "published" && this.newsForm.valid && (this.noticia.asset || this.fileData)) {
+      this.publishDialog(mode);
+    } else if (mode === "draft") {
+      if (this.noticia.statusCode === "draft") {
+        this.publishMethod(mode);
       } else {
-        this.notPublishDialog(status);
+        this.notPublishDialog(mode);
       }
     }
   }
 
-  publish(status: number): void {
-    if (status === 1 && this.newsForm.valid && (this.noticia.asset || this.fileData)) {
-      this.publishMethod(status);
-    } else if (status === 0) {
-      this.publishMethod(status);
+  publish(mode: "published" | "draft"): void {
+    if (mode === "published" && this.newsForm.valid && (this.noticia.asset || this.fileData)) {
+      this.publishMethod(mode);
+    } else if (mode === "draft") {
+      this.publishMethod(mode);
     }
   }
 
-  publishMethod(status: number): void {
+  publishMethod(mode: "published" | "draft"): void {
     const publishedAt = this.publishedAtObj ? toIsoDate(this.publishedAtObj) : undefined;
-    const body = toNewsUpsertBody(this.noticia, status, publishedAt);
+    const body = toNewsUpsertBody(this.noticia, mode, publishedAt);
     if (!body) return;
     this.newsService.updateNews(this.noticia.id, body).subscribe((result) => {
       if (result.status === 1) {
@@ -171,7 +171,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
         }
         this.newsForm.markAsPristine();
         this.return();
-        this.openSnackBar(status === 1 ? "Noticia publicada exitosamente" : "Noticia guardada exitosamente");
+        this.openSnackBar(mode === "published" ? "Noticia publicada exitosamente" : "Noticia guardada exitosamente");
       }
     });
   }
@@ -179,7 +179,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   private previewDialog?: MatDialogRef<DialogPreview2>;
 
   previewNews(): void {
-    const cat = this.categorias.find((x) => x.id === this.noticia.newsTypeId);
+    const cat = this.categorias.find((x) => x.code === this.noticia.newsKindCode);
     const aut = this.autores.find((x) => x.id === this.noticia.authorId) ?? null;
     const publishedAt = this.publishedAtObj ? toIsoDate(this.publishedAtObj) : null;
     const data: NewsPreviewData = {
@@ -203,13 +203,13 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 
   private dialogRef2?: MatDialogRef<DialogPublish2>;
 
-  publishDialog(value: number): void {
+  publishDialog(value: "published" | "draft"): void {
     this.dialogRef2 = this.dialog.open(DialogPublish2, {
       width: "530px",
       id: "idleTimer",
       data: {
         title:
-          this.noticia.status === 1
+          this.noticia.statusCode === "published"
             ? "¿Estás seguro que deseas actualizar la noticia?"
             : "¿Estás seguro que deseas publicar la noticia?",
         text: "La información será publica para todo el mundo",
@@ -226,7 +226,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 
   private dialogRef3?: MatDialogRef<DialogPublish3>;
 
-  notPublishDialog(value: number): void {
+  notPublishDialog(value: "published" | "draft"): void {
     this.dialogRef3 = this.dialog.open(DialogPublish3, {
       width: "530px",
       id: "idleTimer",

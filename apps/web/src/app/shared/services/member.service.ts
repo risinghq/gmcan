@@ -15,11 +15,11 @@ export interface MemberCreateBody {
   lastName: string;
   maternalName?: string;
   birthDate?: string;
-  status: number;
-  roleId: number;
-  memberTypeId: number;
-  prefixId?: number;
-  genderId?: number;
+  isActive: number;
+  roleCode: "administrator" | "researcher" | "visitor";
+  memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+  prefixCode?: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
+  genderCode?: "male" | "female" | null;
   translation?: { locale: string; bio: string };
 }
 
@@ -29,11 +29,11 @@ export interface MemberUpdateBody {
   lastName?: string;
   maternalName?: string;
   birthDate?: string;
-  status?: number;
-  roleId?: number;
-  memberTypeId?: number;
-  prefixId?: number;
-  genderId?: number;
+  isActive?: number;
+  roleCode?: "administrator" | "researcher" | "visitor";
+  memberTypeCode?: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+  prefixCode?: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
+  genderCode?: "male" | "female" | null;
   translation?: { locale: string; bio: string };
 }
 
@@ -51,7 +51,10 @@ export class MemberService {
   }
 
   // Admin
-  listAdminMembers(params?: { status?: number; memberTypeId?: number }): Observable<AdminMemberListItem[]> {
+  listAdminMembers(params?: {
+    isActive?: number;
+    memberTypeCode?: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+  }): Observable<AdminMemberListItem[]> {
     return this.http.get<AdminMemberListItem[]>(GLOBAL.admin("members"), {
       params: params as Record<string, string | number>,
     });

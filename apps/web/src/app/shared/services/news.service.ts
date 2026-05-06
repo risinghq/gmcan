@@ -7,14 +7,12 @@ import type { News, PublicNewsDetail, PublicNewsListQuery, PublicNewsListRespons
 import { GLOBAL } from "./global";
 
 export interface NewsUpsertBody {
-  title: string;
-  summary: string;
-  body: string;
-  status: number;
+  statusCode: "draft" | "published" | "archived";
   publishedAt?: string;
   authorId: number;
-  newsTypeId: number;
+  newsKindCode: "general" | "research" | "event";
   priority?: number;
+  translations: Record<string, { title: string; summary: string; body: string }>;
 }
 
 @Injectable({ providedIn: "root" })

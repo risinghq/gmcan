@@ -28,7 +28,7 @@ export class DetailNewsDataService {
     const month = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "MMMM", "es") ?? "") : "";
     const year = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "y") ?? "") : "";
 
-    const newsTypeNameLabel = newsItem.newsTypeName ?? "";
+    const newsTypeNameLabel = newsItem.newsKindName ?? "";
     const authorNameLabel = newsItem.authorName ?? "";
     const authorPhoto = newsItem.authorAsset ?? null;
     const authorId = newsItem.authorId ?? null;

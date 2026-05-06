@@ -81,7 +81,7 @@ export default class PerfilComponent implements OnInit {
 
   member: MemberFull = { ...createMemberFull() };
   memberId: number | null = null;
-  roleId: number | null = null;
+  roleCode: MemberFull["roleCode"] | null = null;
 
   profileForm = this.formBuilder.group({
     firstName: ["", Validators.required],
@@ -90,9 +90,9 @@ export default class PerfilComponent implements OnInit {
     maternalName: [""],
     birthDate: [null as Date | null],
     email: ["", [Validators.required, Validators.email]],
-    genderId: [null as number | null],
-    prefixId: [null as number | null],
-    memberTypeId: [null as number | null, Validators.required],
+    genderCode: [null as MemberFull["genderCode"]],
+    prefixCode: [null as MemberFull["prefixCode"]],
+    memberTypeCode: [null as MemberFull["memberTypeCode"] | null, Validators.required],
     dni: [{ value: "", disabled: true }, Validators.required],
     bio: ["", Validators.maxLength(500)],
     status: [MEMBER_STATUS.ACTIVE as MemberStatus, Validators.required],
@@ -117,11 +117,11 @@ export default class PerfilComponent implements OnInit {
   }
 
   get prefijos() {
-    return this.lookup.prefijos();
+    return this.lookup.prefixes();
   }
 
   get generos() {
-    return this.lookup.generos();
+    return this.lookup.genders();
   }
 
   get photoUrl(): string | null {
@@ -160,7 +160,7 @@ export default class PerfilComponent implements OnInit {
 
       this.member = { ...result };
       this.memberId = result.id;
-      this.roleId = result.roleId;
+      this.roleCode = result.roleCode;
       const splitNames = this.splitFirstAndMiddleName(result.firstName);
 
       const birthDate = result.birthDate ? new Date(result.birthDate) : null;
@@ -173,12 +173,12 @@ export default class PerfilComponent implements OnInit {
         maternalName: result.maternalName ?? "",
         birthDate,
         email: result.email,
-        genderId: result.genderId ?? null,
-        prefixId: result.prefixId ?? null,
-        memberTypeId: result.memberTypeId,
+        genderCode: result.genderCode ?? null,
+        prefixCode: result.prefixCode ?? null,
+        memberTypeCode: result.memberTypeCode,
         dni: result.dni,
         bio: result.bio ?? "",
-        status: (result.status as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
+        status: (result.isActive as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
       });
       this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
       this.loadPublishability();
@@ -186,7 +186,7 @@ export default class PerfilComponent implements OnInit {
   }
 
   actualizarUsuario(): void {
-    if (this.profileForm.invalid || this.memberId === null || this.roleId === null) {
+    if (this.profileForm.invalid || this.memberId === null || this.roleCode === null) {
       this.profileForm.markAllAsTouched();
       return;
     }
@@ -199,11 +199,11 @@ export default class PerfilComponent implements OnInit {
       lastName: values.lastName?.trim() ?? "",
       maternalName: values.maternalName?.trim() || undefined,
       birthDate: values.birthDate ? new Date(values.birthDate).toLocaleDateString("sv") : undefined,
-      status: (values.status ?? MEMBER_STATUS.ACTIVE) as MemberStatus,
-      roleId: this.roleId,
-      memberTypeId: values.memberTypeId ?? this.member.memberTypeId,
-      prefixId: values.prefixId ?? undefined,
-      genderId: values.genderId ?? undefined,
+      isActive: (values.status ?? MEMBER_STATUS.ACTIVE) as MemberStatus,
+      roleCode: this.roleCode,
+      memberTypeCode: values.memberTypeCode ?? this.member.memberTypeCode,
+      prefixCode: values.prefixCode ?? undefined,
+      genderCode: values.genderCode ?? undefined,
       translation: { locale: this.selectedBioLocale, bio },
     };
 

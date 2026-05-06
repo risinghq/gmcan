@@ -107,9 +107,9 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Género</div>
                 <mat-form-field class="input-category">
-                  <mat-select formControlName="genderId" name="genderId">
+                  <mat-select formControlName="genderCode" name="genderCode">
                     @for (genero of generos; track genero) {
-                      <mat-option [value]="genero.idGenero">{{ genero.nombre }}</mat-option>
+                      <mat-option [value]="genero.code">{{ genero.name }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -117,9 +117,9 @@
               <div class="full-width">
                 <div class="text-category">Máximo nivel académico alcanzado</div>
                 <mat-form-field class="input-category">
-                  <mat-select formControlName="prefixId" name="prefixId">
+                  <mat-select formControlName="prefixCode" name="prefixCode">
                     @for (prefijo of prefijos; track prefijo) {
-                      <mat-option [value]="prefijo.idPrefijo">{{ prefijo.nombre }}</mat-option>
+                      <mat-option [value]="prefijo.code">{{ prefijo.label }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -129,9 +129,9 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Cargo <span class="red-text">*</span></div>
                 <mat-form-field class="input-category">
-                  <mat-select formControlName="memberTypeId" name="memberTypeId">
+                  <mat-select formControlName="memberTypeCode" name="memberTypeCode">
                     @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
-                      <mat-option [value]="tipoMiembro.id">{{ tipoMiembro.nameSingular }}</mat-option>
+                      <mat-option [value]="tipoMiembro.code">{{ tipoMiembro.nameSingular }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -239,9 +239,21 @@
             analíticas
           </div>
           <div class="boxed">
-            <input type="radio" id="coordYes" name="coord" [checked]="member.roleId == 2" (click)="setCoord(2)" />
+            <input
+              type="radio"
+              id="coordYes"
+              name="coord"
+              [checked]="member.roleCode !== 'administrator'"
+              (click)="setCoord(2)"
+            />
             <label class="mr-16" for="coordYes">No</label>
-            <input type="radio" id="coordNo" name="coord" [checked]="member.roleId == 1" (click)="setCoord(1)" />
+            <input
+              type="radio"
+              id="coordNo"
+              name="coord"
+              [checked]="member.roleCode === 'administrator'"
+              (click)="setCoord(1)"
+            />
             <label for="coordNo">Sí</label>
           </div>
         </div>
@@ -252,7 +264,7 @@
               type="radio"
               id="fallecidoYes"
               name="fallecido"
-              [checked]="member.status == 0 || member.status == 1"
+              [checked]="member.isActive == 0 || member.isActive == 1"
               (click)="adHonorem(1)"
             />
             <label class="mr-16" for="fallecidoYes">No</label>
@@ -260,7 +272,7 @@
               type="radio"
               id="fallecidoNo"
               name="fallecido"
-              [checked]="member.status == 3"
+              [checked]="member.isActive == 3"
               (click)="adHonorem(3)"
             />
             <label for="fallecidoNo">Sí</label>
@@ -273,11 +285,11 @@
               type="radio"
               id="exMemberYes"
               name="ex"
-              [checked]="member.status == 3 || member.status == 1"
+              [checked]="member.isActive == 3 || member.isActive == 1"
               (click)="oldMember(1)"
             />
             <label class="mr-16" for="exMemberYes">No</label>
-            <input type="radio" id="exMemberNo" name="ex" [checked]="member.status == 0" (click)="oldMember(0)" />
+            <input type="radio" id="exMemberNo" name="ex" [checked]="member.isActive == 0" (click)="oldMember(0)" />
             <label for="exMemberNo">Sí</label>
           </div>
         </div>

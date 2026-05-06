@@ -54,13 +54,13 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   member: MemberFull;
   segundoNombre = "";
   get generos() {
-    return this.lookup.generos();
+    return this.lookup.genders();
   }
   get tipoMiembros() {
     return this.lookup.memberTypes();
   }
   get prefijos() {
-    return this.lookup.prefijos();
+    return this.lookup.prefixes();
   }
   get bioLocales() {
     return this.lookup.locales().supported;
@@ -82,9 +82,9 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
       maternalName: [""],
       birthDate: [""],
       email: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      genderId: [""],
-      prefixId: [""],
-      memberTypeId: ["", [Validators.required]],
+      genderCode: [""],
+      prefixCode: [""],
+      memberTypeCode: ["", [Validators.required]],
       dni: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       password: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       confirmPassword: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
@@ -119,7 +119,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   adHono = 0;
 
   setCoord(value: number): void {
-    this.member.roleId = value;
+    this.member.roleCode = value === 1 ? "administrator" : "researcher";
   }
 
   adHonorem(value: number): void {
@@ -162,11 +162,11 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
                 lastName: values.lastName,
                 maternalName: values.maternalName ?? undefined,
                 birthDate,
-                status,
-                roleId: this.member.roleId,
-                memberTypeId: values.memberTypeId,
-                prefixId: values.prefixId || undefined,
-                genderId: values.genderId || undefined,
+                isActive: status,
+                roleCode: this.member.roleCode,
+                memberTypeCode: values.memberTypeCode,
+                prefixCode: values.prefixCode || undefined,
+                genderCode: values.genderCode || undefined,
                 translation: { locale: this.selectedBioLocale, bio },
               })
               .subscribe((res) => {

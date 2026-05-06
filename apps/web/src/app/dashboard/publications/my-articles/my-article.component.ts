@@ -17,12 +17,12 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { PublicationService } from "@app/shared/services/publication.service";
 
-interface PublicationRow extends PublicationWithAuthors {
+interface PublicationRow extends PublicPublicationWithAuthors {
   fecha?: string;
 }
 
@@ -74,9 +74,9 @@ export default class MyArticleComponent implements OnInit {
   getUserArticles(): void {
     const user = this.auth.getUser();
     if (!user) return;
-    this.publicationService.listPublications({ type: 1 }).subscribe((res) => {
+    this.publicationService.listPublications({ kindCode: "journal_article" }).subscribe((res) => {
       if (res) {
-        const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
+        const mine = res.filter((pub) => pub.authors.some((a) => a.kind === "registered" && a.memberId === user.id));
         const sorted = mine.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
         );
