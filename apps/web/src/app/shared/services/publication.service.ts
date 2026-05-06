@@ -31,11 +31,6 @@ export interface AdminPublicationFilters {
   type?: number;
 }
 
-export interface CountTypeItem {
-  name?: string;
-  total?: string | number;
-}
-
 @Injectable({ providedIn: "root" })
 export class PublicationService {
   private http = inject(HttpClient);
@@ -51,16 +46,12 @@ export class PublicationService {
     return this.http.get<PublicationWithAuthors>(GLOBAL.api(`publications/${id}`));
   }
 
-  countByType(): Observable<CountTypeItem[]> {
-    return this.http.get<CountTypeItem[]>(GLOBAL.api("publications/count-by-type"));
-  }
-
   getAsset(assetId: number): Observable<Blob> {
     return this.http.get(GLOBAL.api(`assets/${assetId}`), { responseType: "blob" });
   }
 
   downloadAsset(assetId: number): Observable<Blob> {
-    return this.http.get(GLOBAL.api(`assets/${assetId}?download=true`), { responseType: "blob" });
+    return this.http.get(GLOBAL.api(`assets/${assetId}/download`), { responseType: "blob" });
   }
 
   // Admin

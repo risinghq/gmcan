@@ -37,11 +37,6 @@ export interface MemberUpdateBody {
   translation?: { locale: string; bio: string };
 }
 
-export interface CountTypeItem {
-  name?: string;
-  total?: string | number;
-}
-
 @Injectable({ providedIn: "root" })
 export class MemberService {
   private http = inject(HttpClient);
@@ -53,10 +48,6 @@ export class MemberService {
 
   getMemberProfile(id: number): Observable<MemberProfile> {
     return this.http.get<MemberProfile>(GLOBAL.api(`members/${id}`));
-  }
-
-  countByType(): Observable<CountTypeItem[]> {
-    return this.http.get<CountTypeItem[]>(GLOBAL.api("members/count-by-type"));
   }
 
   // Admin

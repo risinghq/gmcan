@@ -220,12 +220,12 @@
             >{{ publicacion.doi }}</a
           >
         </div>
-        } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
-        <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
+        } @if (publicacion.typeId !== 3 && publicacion.asset) {
+        <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
           {{ this.language.publicationsText[0].preview }}
         </a>
-        } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
-        <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
+        } @if (publicacion.typeId !== 3 && publicacion.asset) {
+        <a class="publication-green" href="{{ publicacion.asset.download }}">
           {{ this.language.publicationsText[0].download }}
         </a>
         }
@@ -298,12 +298,12 @@
           </div>
           <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
-            @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
-            <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
+            @if (publicacion.typeId !== 3 && publicacion.asset) {
+            <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
               {{ this.language.publicationsText[0].preview }}
             </a>
-            } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
-            <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
+            } @if (publicacion.typeId !== 3 && publicacion.asset) {
+            <a class="publication-green" href="{{ publicacion.asset.download }}">
               {{ this.language.publicationsText[0].download }}
             </a>
             }

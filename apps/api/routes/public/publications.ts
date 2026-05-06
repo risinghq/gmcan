@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import { resolveAssetAccessLinks } from "../../services/assets/service.js";
 import { getPublication, listPublications, listPublicationsByFilter } from "../../services/publication.service.js";
 
 const router = new Hono();
@@ -32,7 +32,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
           id: row.id,
           title: row.title,
           abstract: row.abstract,
-          asset: await resolveAssetAccessUrl({ ownerType: "publication", ownerId: row.id, slot: "file" }),
+          asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
           doi: row.doi,
           publishedAt: row.publishedAt,
           kindCode: row.kindCode,
@@ -56,7 +56,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         id: row.id,
         title: row.title,
         abstract: row.abstract,
-        asset: await resolveAssetAccessUrl({ ownerType: "publication", ownerId: row.id, slot: "file" }),
+        asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
         doi: row.doi,
         publishedAt: row.publishedAt,
         kindCode: row.kindCode,
@@ -79,7 +79,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: pub.id,
     title: pub.title,
     abstract: pub.abstract,
-    asset: await resolveAssetAccessUrl({ ownerType: "publication", ownerId: pub.id, slot: "file" }),
+    asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: pub.id, slot: "file" }),
     doi: pub.doi,
     publishedAt: pub.publishedAt,
     kindCode: pub.kindCode,

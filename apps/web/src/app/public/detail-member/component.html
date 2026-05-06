@@ -102,12 +102,12 @@
             </div>
             }
             <div class="flex-news mt-16">
-              @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
-              <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
+              @if (publicacion.typeId !== 3 && publicacion.asset) {
+              <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
                 {{ this.language.publicationsText[0].preview }}
               </a>
-              } @if (publicacion.typeId !== 3 && publicacion.asset && publicacion.asset !== "") {
-              <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
+              } @if (publicacion.typeId !== 3 && publicacion.asset) {
+              <a class="publication-green" href="{{ publicacion.asset.download }}">
                 {{ this.language.publicationsText[0].download }}
               </a>
               }

@@ -2,9 +2,8 @@ import { Component, OnInit, inject } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
 import { AuthzService } from "@app/shared/services/authz.service";
+import { DashboardService } from "@app/shared/services/dashboard.service";
 import { GroupService } from "@app/shared/services/group.service";
-import { MemberService } from "@app/shared/services/member.service";
-import { PublicationService } from "@app/shared/services/publication.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { BaseChartDirective } from "ng2-charts";
 
@@ -17,8 +16,7 @@ import { BaseChartDirective } from "ng2-charts";
 export default class DashboardComponent implements OnInit {
   authz = inject(AuthzService);
   groupService = inject(GroupService);
-  private memberService = inject(MemberService);
-  private publicationService = inject(PublicationService);
+  private dashboardService = inject(DashboardService);
   private uiState = inject(UiStateService);
 
   screenWidth = window.innerWidth;
@@ -30,7 +28,7 @@ export default class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.getGrupoInfo();
-    this.getCountTypeMember();
+    this.loadDashboardSummary();
   }
 
   getGrupoInfo(): void {
@@ -40,37 +38,15 @@ export default class DashboardComponent implements OnInit {
   total = 0;
   total2 = 0;
 
-  getCountTypeMember(): void {
-    this.memberService.countByType().subscribe((res) => {
-      if (res && res.length > 0) {
-        const labels: string[] = [];
-        const data: string[] = [];
-        for (const item of res) {
-          labels.push(String(item.name ?? ""));
-          data.push(String(item.total ?? "0"));
-          this.total += Number(item.total ?? 0);
-        }
-        this.chartLabels = labels;
-        this.chartDatasets = [{ data, label: "Miembros" }];
-      }
-      this.getCountTypePublication();
-    });
-  }
+  loadDashboardSummary(): void {
+    this.dashboardService.getSummary().subscribe((summary) => {
+      this.total = summary.membersByType.reduce((sum, item) => sum + item.count, 0);
+      this.chartLabels = summary.membersByType.map((item) => item.label);
+      this.chartDatasets = [{ data: summary.membersByType.map((item) => item.count), label: "Miembros" }];
 
-  getCountTypePublication(): void {
-    this.publicationService.countByType().subscribe((res) => {
-      if (res && res.length > 0) {
-        const labels: string[] = [];
-        const data: string[] = [];
-        for (const item of res) {
-          labels.push(String(item.name ?? ""));
-          data.push(String(item.total ?? "0"));
-          this.total2 += Number(item.total ?? 0);
-        }
-        data.push("0");
-        this.chartLabels2 = labels;
-        this.chartDatasets2 = [{ data, label: "Cantidad" }];
-      }
+      this.total2 = summary.publicationsByKind.reduce((sum, item) => sum + item.count, 0);
+      this.chartLabels2 = summary.publicationsByKind.map((item) => item.label);
+      this.chartDatasets2 = [{ data: summary.publicationsByKind.map((item) => item.count), label: "Cantidad" }];
     });
   }
 

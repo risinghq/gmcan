@@ -8,7 +8,7 @@ import { db } from "../../db/client.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../../lib/upload.js";
 import { OWNER_CONFIG } from "./policy.js";
 import { ensureOwnerExists, getCurrentAssetId, getNextVersion } from "./repo.js";
-import type { AssetDeleteRequest, AssetWriteRequest, OwnerType } from "./types.js";
+import type { AssetDeleteRequest, AssetLinks, AssetWriteRequest, OwnerType } from "./types.js";
 import { assertSlotForOwner } from "./validators.js";
 
 const RETENTION_DAYS = 90;
@@ -142,10 +142,18 @@ function signAccess(assetId: number, expiresAt: number): string {
   return createHmac("sha256", SIGN_SECRET).update(`${assetId}:${expiresAt}`).digest("hex");
 }
 
-function makeSignedAssetUrl(assetId: number, expiresInSeconds: number): string {
+function makeAssetPath(assetId: number, asAttachment: boolean): string {
+  return asAttachment ? `/api/assets/${assetId}/download` : `/api/assets/${assetId}`;
+}
+
+function makeSignedAssetUrl(assetId: number, expiresInSeconds: number, asAttachment: boolean): string {
   const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
   const token = signAccess(assetId, expiresAt);
-  return `${getBackendUrl()}/api/assets/${assetId}?expires=${expiresAt}&token=${token}`;
+  return `${getBackendUrl()}${makeAssetPath(assetId, asAttachment)}?expires=${expiresAt}&token=${token}`;
+}
+
+function makePublicAssetUrl(assetId: number, asAttachment: boolean): string {
+  return `${getBackendUrl()}${makeAssetPath(assetId, asAttachment)}`;
 }
 
 export async function resolveAssetAccessUrl(input: {
@@ -165,13 +173,37 @@ export async function resolveAssetAccessUrl(input: {
     .executeTakeFirst();
 
   if (!asset || asset.lifecycleStatus !== "active") return null;
-  return asset.visibility === "private" ? makeSignedAssetUrl(assetId, 300) : `${getBackendUrl()}/api/assets/${assetId}`;
+  return asset.visibility === "private" ? makeSignedAssetUrl(assetId, 300, false) : makePublicAssetUrl(assetId, false);
+}
+
+export async function resolveAssetAccessLinks(input: {
+  ownerType: OwnerType;
+  ownerId: number;
+  slot: string;
+}): Promise<AssetLinks | null> {
+  assertSlotForOwner(input.ownerType, input.slot);
+
+  const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
+  if (!assetId) return null;
+
+  const asset = await db
+    .selectFrom("asset")
+    .select(["visibility", "lifecycleStatus"])
+    .where("id", "=", assetId)
+    .executeTakeFirst();
+
+  if (!asset || asset.lifecycleStatus !== "active") return null;
+  const isPrivate = asset.visibility === "private";
+  return {
+    inline: isPrivate ? makeSignedAssetUrl(assetId, 300, false) : makePublicAssetUrl(assetId, false),
+    download: isPrivate ? makeSignedAssetUrl(assetId, 300, true) : makePublicAssetUrl(assetId, true),
+  };
 }
 
 export async function serveAssetById(
   c: Context,
   assetId: number,
-  options: { download?: boolean; token?: string; expires?: number },
+  options: { asAttachment: boolean; token?: string; expires?: number },
 ): Promise<Response> {
   const row = await db
     .selectFrom("asset")
@@ -189,5 +221,5 @@ export async function serveAssetById(
 
   const key = normalizeAssetKey(row.storageKey);
   if (!key) return c.json({ error: "Invalid asset key" }, 400);
-  return serveAsset(c, { assetKey: key, asAttachment: options.download });
+  return serveAsset(c, { assetKey: key, asAttachment: options.asAttachment });
 }

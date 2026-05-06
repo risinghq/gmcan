@@ -20,6 +20,11 @@ export type AssetWriteRequest<T extends OwnerType = OwnerType> = {
   actorId: number | null;
 };
 
+export type AssetLinks = {
+  inline: string;
+  download: string;
+};
+
 export type AssetDeleteRequest<T extends OwnerType = OwnerType> = {
   ownerType: T;
   ownerId: number;

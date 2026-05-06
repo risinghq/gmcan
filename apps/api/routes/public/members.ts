@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../services/assets/service.js";
 import { getMemberProfileLocalized, listMembersLocalized } from "../../services/member.service.js";
 
 const router = new Hono();
@@ -35,7 +35,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const publications = await Promise.all(
     profile.publications.map(async (publication) => ({
       ...publication,
-      asset: await resolveAssetAccessUrl({ ownerType: "publication", ownerId: publication.id, slot: "file" }),
+      asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: publication.id, slot: "file" }),
     })),
   );
 

@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../services/assets/service.js";
 import { globalSearch } from "../../services/search.service.js";
 
 const router = new Hono();
@@ -29,7 +29,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       id: row.id,
       title: row.title,
       abstract: row.abstract,
-      asset: await resolveAssetAccessUrl({ ownerType: "publication", ownerId: row.id, slot: "file" }),
+      asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
       doi: row.doi,
       publishedAt: row.publishedAt,
       kindCode: row.kindCode,

@@ -1,9 +1,10 @@
 import type { AuthorEntry } from "./author";
+import type { AssetLinks } from "./asset";
 
 export interface Publication {
   id: number;
   title: string;
-  asset: string | null;
+  asset: AssetLinks | null;
   abstract: string | null;
   journalIssue: number | null;
   doi: string | null;
