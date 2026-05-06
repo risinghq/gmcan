@@ -354,6 +354,21 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
     const input = fileInput.target as HTMLInputElement;
     this.fileData = input.files?.[0] ?? null;
   }
+
+  get hasExistingAsset(): boolean {
+    return this.publicacion.asset != null;
+  }
+
+  get existingAssetLabel(): string | null {
+    const download = this.publicacion.asset?.download;
+    if (!download) return null;
+    try {
+      const fileName = new URL(download).pathname.split("/").pop();
+      return fileName || "PDF";
+    } catch {
+      return "PDF";
+    }
+  }
 }
 
 @Component({

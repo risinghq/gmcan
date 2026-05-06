@@ -65,9 +65,9 @@
                     <div class="member-name">
                       {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                     </div>
-                    @if (miembro.status === 3) {
+                    @if (miembro.isActive === 3) {
                     <div class="member-email cursive">In memoriam</div>
-                    } @if (miembro.status !== 3) {
+                    } @if (miembro.isActive !== 3) {
                     <div class="member-email">
                       <mat-icon class="email-icon"> email </mat-icon>
                       {{ miembro.email }}

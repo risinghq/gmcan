@@ -12,7 +12,7 @@
         <div class="full-width">
           <div class="text-category">Título <span class="red-text">*</span></div>
           <input
-            [(ngModel)]="publicacion.title"
+            [(ngModel)]="draft.title"
             formControlName="título"
             name="título"
             class="input-category"
@@ -42,7 +42,7 @@
             <div class="text-category">Revista <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar revista</mat-label>
-              <mat-select [(ngModel)]="publicacion.journalId" formControlName="journalId" name="journalId">
+              <mat-select [(ngModel)]="draft.journalId" formControlName="journalId" name="journalId">
                 @for (r of lookup.journals(); track r) {
                   <mat-option [value]="r.id">{{ r.name }}</mat-option>
                 }
@@ -52,7 +52,7 @@
           <div class="mr-32 full-width">
             <div class="text-category">Volumen <span class="red-text">*</span></div>
             <input
-              [(ngModel)]="publicacion.journalIssue"
+              [(ngModel)]="draft.journalIssue"
               formControlName="journalIssue"
               name="journalIssue"
               class="input-category"
@@ -63,7 +63,7 @@
           <div class="full-width">
             <div class="text-category">DOI <span class="red-text">*</span></div>
             <input
-              [(ngModel)]="publicacion.doi"
+              [(ngModel)]="draft.doi"
               formControlName="doi"
               name="doi"
               class="input-category"
@@ -189,7 +189,7 @@
         <div class="full-width mt-16 mb-16">
           <div class="text-category">Resumen <span class="red-text">*</span></div>
           <textarea
-            [(ngModel)]="publicacion.abstract"
+            [(ngModel)]="draft.abstract"
             placeholder="Insertar resumen"
             formControlName="abstract"
             name="abstract"
@@ -202,21 +202,21 @@
           <div class="flex-news">
             <div class="gray-box flex-news mr-16">
               <img class="upload-icon mr-16" src="/img/icons/upload.svg" />
-              @if (!fileData && !publicacion.asset) {
+              @if (!fileData && !hasExistingAsset) {
                 <span class="gray-pdf plex-sans">PDF</span>
               }
               @if (fileData) {
                 <span class="gray-pdf plex-sans">{{ fileData.name }}</span>
               }
-              @if (!fileData && publicacion.asset) {
-                <span class="gray-pdf plex-sans">{{ publicacion.asset }}</span>
+              @if (!fileData && hasExistingAsset && existingAssetLabel) {
+                <span class="gray-pdf plex-sans">{{ existingAssetLabel }}</span>
               }
             </div>
             <div class="green-text">
-              @if (!fileData && !publicacion.asset) {
+              @if (!fileData && !hasExistingAsset) {
                 <span class="plex-sans">Seleccionar PDF</span>
               }
-              @if (fileData || publicacion.asset) {
+              @if (fileData || hasExistingAsset) {
                 <span class="plex-sans">Cambiar</span>
               }
               <input

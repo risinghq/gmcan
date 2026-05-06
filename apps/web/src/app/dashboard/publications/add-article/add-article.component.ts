@@ -74,6 +74,7 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
 
   publicacion: ArticleDraft;
+  draft: ArticleDraft;
   publishedAtObj?: Date;
   public publicacionForm: FormGroup;
   button_text = "Guardar artículo";
@@ -105,6 +106,7 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
       journalId: null,
       journalIssue: null,
     };
+    this.draft = this.publicacion;
     this.url = GLOBAL.url;
   }
 
@@ -215,5 +217,13 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   fileProgress(fileInput: Event): void {
     const input = fileInput.target as HTMLInputElement;
     this.fileData = input.files?.[0] ?? null;
+  }
+
+  get hasExistingAsset(): boolean {
+    return false;
+  }
+
+  get existingAssetLabel(): string | null {
+    return null;
   }
 }

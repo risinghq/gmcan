@@ -84,7 +84,8 @@
                 <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
                 @if (publicacion.revista != null && publicacion.revista != "") {
                 <div class="publication-rev">
-                  {{ publicacion.revista }} Vol. {{ publicacion.journalIssue }} {{ publicacion.universidad }}
+                  {{ publicacion.revista }} Vol. {{ publicacion.subtype.kindCode === 'journal_article' ?
+                  publicacion.subtype.journalArticle.issue : '' }} {{ publicacion.universidad }}
                 </div>
                 } @if (publicacion.universidad != null && publicacion.universidad != "") {
                 <div class="publication-rev">{{ publicacion.universidad }}</div>
@@ -261,7 +262,7 @@
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
-                  {{ proyecto.moneda }}{{ proyecto.fundedAmount }}
+                  {{ proyecto.moneda }}{{ proyecto.fundedAmountMinor }}
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
