@@ -4,7 +4,10 @@ import { z } from "zod";
 
 import { db } from "../../db/client.js";
 import { okStatus } from "../../lib/contracts.js";
-import { getEventPublicationDependencyCount, getJournalPublicationDependencyCount } from "../../services/publication.service.js";
+import {
+  getEventPublicationDependencyCount,
+  getJournalPublicationDependencyCount,
+} from "../../services/publication.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });

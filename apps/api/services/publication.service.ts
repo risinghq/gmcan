@@ -1,5 +1,5 @@
-import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { AdminPublicationListItem, AdminPublicationSubtype } from "@gmcan/contracts/admin";
+import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
 import { db } from "../db/client.js";
 import type { PublicationKindCode, ThesisKindCode } from "../db/schema.js";
