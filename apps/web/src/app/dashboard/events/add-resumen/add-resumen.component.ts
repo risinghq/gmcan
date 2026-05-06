@@ -32,6 +32,14 @@ import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
 
+interface ResumenDraft {
+  title: string;
+  abstract?: string;
+  doi?: string;
+  eventId?: number;
+  publishedAtDate?: Date;
+}
+
 @Component({
   selector: "app-add-resumen",
   templateUrl: "./add-resumen.component.html",
@@ -66,7 +74,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
   private eventService = inject(EventService);
 
-  publicacion: PublicationFields & { publishedAtDate?: Date };
+  publicacion: ResumenDraft;
   public publicacionForm: FormGroup;
   button_text = "Guardar resumen";
   eventos: EventItem[] = [];
@@ -92,8 +100,6 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     });
     this.publicacion = {
       title: "",
-      publishedAt: "",
-      typeId: 3,
     };
   }
 
@@ -169,6 +175,7 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
 
   submitArticle(): void {
     if (!this.publicacionForm.valid || !this.selectedUser) return;
+    if (!this.publicacion.eventId) return;
 
     const data: PublicationFields = buildResumenPayload({
       title: this.publicacion.title,
@@ -191,9 +198,9 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
     const entries: SaveAuthorEntry[] = [];
 
     if (this.principalMemberId) {
-      entries.push({ kind: "registered", memberId: this.principalMemberId, isPrincipal: 0 });
+      entries.push({ kind: "registered", memberId: this.principalMemberId, authorOrder: 0 });
     } else if (this.selectedUser) {
-      entries.push({ kind: "external", externalName: this.selectedUser, isPrincipal: 0 });
+      entries.push({ kind: "external", externalName: this.selectedUser, authorOrder: 0 });
     }
     entries.push(...buildCoAuthorSaveList(this.otrosAutores, this.options, 1));
 

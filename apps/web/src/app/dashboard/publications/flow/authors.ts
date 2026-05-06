@@ -43,10 +43,10 @@ export function buildCoAuthorSaveList(
     const matchedAuthor = options.find((option) => option.name === row.name) ?? null;
     const memberId = row.memberId ?? matchedAuthor?.id ?? null;
     if (memberId) {
-      entries.push({ kind: "registered", memberId, isPrincipal: startPrincipalIndex + index });
+      entries.push({ kind: "registered", memberId, authorOrder: startPrincipalIndex + index });
       return;
     }
-    entries.push({ kind: "external", externalName: row.name, isPrincipal: startPrincipalIndex + index });
+    entries.push({ kind: "external", externalName: row.name, authorOrder: startPrincipalIndex + index });
   });
   return entries;
 }

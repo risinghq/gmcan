@@ -20,8 +20,6 @@ import {
 } from "@app/dashboard/publications/flow/authors";
 import { buildArticlePayload } from "@app/dashboard/publications/flow/publication-payload";
 import type { AuthorSearchResult } from "@app/shared/models/author";
-import { createPublication } from "@app/shared/models/factories";
-import type { Publication } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
@@ -32,6 +30,14 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
+
+interface ArticleDraft {
+  title: string;
+  abstract: string;
+  doi: string;
+  journalId: number | null;
+  journalIssue: number | null;
+}
 
 @Component({
   selector: "app-add-article",
@@ -67,7 +73,7 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
-  publicacion: Publication;
+  publicacion: ArticleDraft;
   publishedAtObj?: Date;
   public publicacionForm: FormGroup;
   button_text = "Guardar artículo";
@@ -92,8 +98,13 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
       abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
-    this.publicacion = createPublication();
-    this.publicacion.typeId = 1;
+    this.publicacion = {
+      title: "",
+      abstract: "",
+      doi: "",
+      journalId: null,
+      journalIssue: null,
+    };
     this.url = GLOBAL.url;
   }
 
@@ -182,9 +193,9 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
 
     const resolvedPrincipal = this.principalAuthor?.name === this.selectedUser ? this.principalAuthor : null;
     if (resolvedPrincipal?.id) {
-      return [{ kind: "registered" as const, memberId: resolvedPrincipal.id, isPrincipal: 0 }, ...entries];
+      return [{ kind: "registered" as const, memberId: resolvedPrincipal.id, authorOrder: 0 }, ...entries];
     } else {
-      return [{ kind: "external" as const, externalName: this.selectedUser, isPrincipal: 0 }, ...entries];
+      return [{ kind: "external" as const, externalName: this.selectedUser, authorOrder: 0 }, ...entries];
     }
   }
 

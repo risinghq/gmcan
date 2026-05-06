@@ -1,34 +1,30 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type {
+  PublicPublicationListQuery,
+  PublicPublicationWithAuthors,
+  ThesisKindCode,
+} from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminPublicationListItem } from "../models/admin-list";
 import type { SaveAuthorEntry } from "../models/author";
-import type { PublicationWithAuthors } from "../models/publication";
 import { GLOBAL } from "./global";
 
 export interface PublicationFields {
-  title: string;
-  abstract?: string;
   doi?: string;
   publishedAt: string;
-  journalIssue?: number;
-  typeId: number;
-  journalId?: number;
-  universityId?: number;
-  thesisTypeId?: number;
-  eventId?: number;
+  subtype:
+    | { kindCode: "journal_article"; journalArticle: { journalId?: number; issue?: number } }
+    | { kindCode: "conference_paper"; conferencePaper: { eventId: number } }
+    | { kindCode: "thesis"; thesis: { universityId: number; thesisKindCode: ThesisKindCode } };
+  translations: Record<string, { title: string; abstract?: string }>;
 }
 
-export interface PublicationFilters {
-  type?: number;
-  event?: number;
-  journal?: number;
-  university?: number;
-}
+export type PublicationFilters = PublicPublicationListQuery;
 
 export interface AdminPublicationFilters {
-  type?: number;
+  kindCode?: "journal_article" | "conference_paper" | "thesis";
 }
 
 @Injectable({ providedIn: "root" })
@@ -36,14 +32,14 @@ export class PublicationService {
   private http = inject(HttpClient);
 
   // Public
-  listPublications(filters?: PublicationFilters): Observable<PublicationWithAuthors[]> {
-    return this.http.get<PublicationWithAuthors[]>(GLOBAL.api("publications"), {
+  listPublications(filters?: PublicationFilters): Observable<PublicPublicationWithAuthors[]> {
+    return this.http.get<PublicPublicationWithAuthors[]>(GLOBAL.api("publications"), {
       params: filters as Record<string, string | number> | undefined,
     });
   }
 
-  getPublication(id: number): Observable<PublicationWithAuthors> {
-    return this.http.get<PublicationWithAuthors>(GLOBAL.api(`publications/${id}`));
+  getPublication(id: number): Observable<PublicPublicationWithAuthors> {
+    return this.http.get<PublicPublicationWithAuthors>(GLOBAL.api(`publications/${id}`));
   }
 
   getAsset(assetId: number): Observable<Blob> {
