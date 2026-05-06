@@ -14,48 +14,48 @@ export class GroupService {
 
   // Public
   getGroup(): Observable<Group> {
-    return this.http.get<Group>(`${GLOBAL.url}api/group`);
+    return this.http.get<Group>(GLOBAL.api("group"));
   }
 
   listPublicAbout(groupId: number): Observable<About[]> {
-    return this.http.get<About[]>(`${GLOBAL.url}api/group/${groupId}/about`);
+    return this.http.get<About[]>(GLOBAL.api(`group/${groupId}/about`));
   }
 
   listPublicSoftware(groupId: number): Observable<Software[]> {
-    return this.http.get<Software[]>(`${GLOBAL.url}api/group/${groupId}/software`);
+    return this.http.get<Software[]>(GLOBAL.api(`group/${groupId}/software`));
   }
 
   listPublicEquipment(groupId: number): Observable<Equipment[]> {
-    return this.http.get<Equipment[]>(`${GLOBAL.url}api/group/${groupId}/equipment`);
+    return this.http.get<Equipment[]>(GLOBAL.api(`group/${groupId}/equipment`));
   }
 
   // Admin
   listGroups(): Observable<Group[]> {
-    return this.http.get<Group[]>(`${GLOBAL.url}admin/group`);
+    return this.http.get<Group[]>(GLOBAL.admin("group"));
   }
 
   updateInfo(id: number, data: { email?: string; phone?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/info`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/info`), data);
   }
 
   updateSummary(id: number, data: { summary: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/summary`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/summary`), data);
   }
 
   updateFacilities(id: number, data: { facilities?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/facilities`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/facilities`), data);
   }
 
   updateFutureWork(id: number, data: { futureWork?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/future-work`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/future-work`), data);
   }
 
   updatePublicationsSection(id: number, data: { publicationsSection?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/publications-section`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/publications-section`), data);
   }
 
   updateProjectsSection(id: number, data: { projectsSection?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/${id}/projects-section`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/projects-section`), data);
   }
 
   uploadAsset(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
@@ -66,32 +66,32 @@ export class GroupService {
 
   // About (admin)
   listAdminAbout(groupId: number): Observable<About[]> {
-    return this.http.get<About[]>(`${GLOBAL.url}admin/group/${groupId}/about`);
+    return this.http.get<About[]>(GLOBAL.admin(`group/${groupId}/about`));
   }
 
   updateAboutDescription(id: number, data: { description: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/description`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/description`), data);
   }
 
   updateAboutObjectives(
     id: number,
     data: { objectivesContent: LocalizedAboutSectionContent },
   ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/objectives`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/objectives`), data);
   }
 
   updateAboutServices(
     id: number,
     data: { servicesContent: LocalizedAboutSectionContent },
   ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/services`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/services`), data);
   }
 
   updateAboutHomeServicesTeaser(
     id: number,
     data: { homeServicesTeaserContent: LocalizedHomeServicesTeaserContent },
   ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/about/${id}/home-services-teaser`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/home-services-teaser`), data);
   }
 
   uploadAboutAsset(id: number, file: File): Observable<{ status: number }> {
@@ -102,11 +102,11 @@ export class GroupService {
 
   // Software (under group routes)
   listSoftware(groupId: number): Observable<Software[]> {
-    return this.http.get<Software[]>(`${GLOBAL.url}admin/group/${groupId}/software`);
+    return this.http.get<Software[]>(GLOBAL.admin(`group/${groupId}/software`));
   }
 
   getSoftwareItem(id: number): Observable<Software> {
-    return this.http.get<Software>(`${GLOBAL.url}admin/group/software/${id}`);
+    return this.http.get<Software>(GLOBAL.admin(`group/software/${id}`));
   }
 
   createSoftware(data: {
@@ -115,27 +115,27 @@ export class GroupService {
     moreInfo?: string;
     groupId: number;
   }): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/group/software`, data);
+    return this.http.post<{ id: number }>(GLOBAL.admin("group/software"), data);
   }
 
   updateSoftware(
     id: number,
     data: { name?: string; description?: string; moreInfo?: string },
   ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/software/${id}`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/software/${id}`), data);
   }
 
   deleteSoftware(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/group/software/${id}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`group/software/${id}`));
   }
 
   // Equipment (under group routes)
   listEquipment(groupId: number): Observable<Equipment[]> {
-    return this.http.get<Equipment[]>(`${GLOBAL.url}admin/group/${groupId}/equipment`);
+    return this.http.get<Equipment[]>(GLOBAL.admin(`group/${groupId}/equipment`));
   }
 
   getEquipment(id: number): Observable<Equipment> {
-    return this.http.get<Equipment>(`${GLOBAL.url}admin/group/equipment/${id}`);
+    return this.http.get<Equipment>(GLOBAL.admin(`group/equipment/${id}`));
   }
 
   createEquipment(data: {
@@ -146,17 +146,17 @@ export class GroupService {
     storage?: string;
     groupId: number;
   }): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/group/equipment`, data);
+    return this.http.post<{ id: number }>(GLOBAL.admin("group/equipment"), data);
   }
 
   updateEquipment(
     id: number,
     data: { name?: string; cpu?: string; gpu?: string; ram?: string; storage?: string },
   ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/group/equipment/${id}`, data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/equipment/${id}`), data);
   }
 
   deleteEquipment(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/group/equipment/${id}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`group/equipment/${id}`));
   }
 }
