@@ -44,45 +44,6 @@ function nameOf(first?: string | null, last?: string | null, maternal?: string |
   return [first, last, maternal].filter(Boolean).join(" ").trim();
 }
 
-async function writeSubtypeRows(publicationId: number, subtype: PublicationSubtypeInput) {
-  if (subtype.kindCode === "journal_article") {
-    await db
-      .insertInto("journal_article")
-      .values({
-        publicationId,
-        journalId: subtype.journalArticle.journalId ?? null,
-        issue: subtype.journalArticle.issue ?? null,
-      })
-      .execute();
-    return;
-  }
-
-  if (subtype.kindCode === "conference_paper") {
-    await db
-      .insertInto("conference_paper")
-      .values({ publicationId, eventId: subtype.conferencePaper.eventId })
-      .execute();
-    return;
-  }
-
-  await db
-    .insertInto("thesis")
-    .values({
-      publicationId,
-      universityId: subtype.thesis.universityId,
-      thesisKindCode: subtype.thesis.thesisKindCode,
-    })
-    .execute();
-}
-
-async function clearSubtypeRows(publicationId: number) {
-  await Promise.all([
-    db.deleteFrom("journal_article").where("publicationId", "=", publicationId).execute(),
-    db.deleteFrom("conference_paper").where("publicationId", "=", publicationId).execute(),
-    db.deleteFrom("thesis").where("publicationId", "=", publicationId).execute(),
-  ]);
-}
-
 async function attachAuthors(publicationId: number): Promise<PublicationAuthor[]> {
   const rows = await db
     .selectFrom("publication_author")
@@ -177,7 +138,14 @@ export async function listPublications(locale: Locale) {
   const authorsById = new Map(authorRows);
 
   return publications.map((row) => ({
-    ...row,
+    id: row.id,
+    kindCode: row.kindCode,
+    title: row.title,
+    abstract: row.abstract,
+    doi: row.doi,
+    publishedAt: row.publishedAt,
+    updatedAt: row.updatedAt,
+    createdAt: row.createdAt,
     subtype: subtypes.get(row.id),
     authors: authorsById.get(row.id) ?? [],
   }));
@@ -223,18 +191,33 @@ export async function listAdminPublications(kindCode?: PublicationKindCode): Pro
       .execute(),
   ]);
 
-  const firstAuthorByPublication = new Map<number, { name: string; asset: string | null }>();
-  for (const row of authorRows) {
-    if (firstAuthorByPublication.has(row.publicationId)) continue;
-    if (row.memberId) {
-      firstAuthorByPublication.set(row.publicationId, {
-        name: nameOf(row.firstName, row.lastName, row.maternalName),
-        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
-      });
-      continue;
+  const firstAuthorRowsByPublication = new Map<
+    number,
+    {
+      externalName: string | null;
+      memberId: number | null;
+      firstName: string | null;
+      lastName: string | null;
+      maternalName: string | null;
     }
-    firstAuthorByPublication.set(row.publicationId, { name: row.externalName ?? "", asset: null });
+  >();
+  for (const row of authorRows) {
+    if (firstAuthorRowsByPublication.has(row.publicationId)) continue;
+    firstAuthorRowsByPublication.set(row.publicationId, row);
   }
+  const firstAuthorEntries = await Promise.all(
+    Array.from(firstAuthorRowsByPublication.entries()).map(async ([publicationId, row]) => {
+      if (!row.memberId) return [publicationId, { name: row.externalName ?? "", asset: null }] as const;
+      return [
+        publicationId,
+        {
+          name: nameOf(row.firstName, row.lastName, row.maternalName),
+          asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
+        },
+      ] as const;
+    }),
+  );
+  const firstAuthorByPublication = new Map(firstAuthorEntries);
 
   return publications.map((publication) => ({
     id: publication.id,
