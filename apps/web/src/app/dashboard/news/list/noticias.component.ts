@@ -96,7 +96,8 @@ export default class NewsListComponent implements OnInit {
       .listAdminNews({
         q: this.search || undefined,
         statusCode: this.statusFilter === "" ? undefined : this.statusFilter,
-        newsKindCode: this.newsTypeFilter === "" ? undefined : (this.newsTypeFilter as "general" | "research" | "event"),
+        newsKindCode:
+          this.newsTypeFilter === "" ? undefined : (this.newsTypeFilter as "general" | "research" | "event"),
         sortBy: this.sortBy,
         sortOrder: this.sortOrder,
         page: this.pageIndex + 1,

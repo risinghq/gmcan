@@ -1,7 +1,4 @@
-import type {
-  PublicationAuthor,
-  PublicPublicationWithAuthors,
-} from "@gmcan/contracts/public";
+import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
 import { db } from "../db/client.js";
 import type { PublicationKindCode, ThesisKindCode } from "../db/schema.js";
@@ -280,7 +277,6 @@ export async function getPublicationEditView(id: number) {
     authors,
   };
 }
-
 
 export async function searchPublications(q: string) {
   const like = `%${q}%`;

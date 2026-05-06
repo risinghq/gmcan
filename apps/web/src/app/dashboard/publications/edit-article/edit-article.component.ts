@@ -20,7 +20,6 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -31,6 +30,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate } from "@app/shared/utils/date";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
@@ -148,15 +148,14 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       const principal = pub.authors.find((a) => a.authorOrder === 0);
       if (principal) {
         this.selectedUser = principal.name;
-        this.principalAuthor = principal.kind === "registered" && principal.memberId
-          ? { id: principal.memberId, name: principal.name, asset: principal.asset ?? null }
-          : null;
+        this.principalAuthor =
+          principal.kind === "registered" && principal.memberId
+            ? { id: principal.memberId, name: principal.name, asset: principal.asset ?? null }
+            : null;
         this.myControl.setValue(principal.name);
       }
 
-      const coAuthors = pub.authors
-        .filter((a) => a.authorOrder > 0)
-        .toSorted((a, b) => a.authorOrder - b.authorOrder);
+      const coAuthors = pub.authors.filter((a) => a.authorOrder > 0).toSorted((a, b) => a.authorOrder - b.authorOrder);
       this.otrosAutores = coAuthors.map((a, i) => {
         const row: AuthorFormRow = {
           id: i + 1,

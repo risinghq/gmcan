@@ -7,13 +7,13 @@ import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
-import type { PublicPublication } from "@gmcan/contracts/public";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
+import type { PublicPublication } from "@gmcan/contracts/public";
 import {
   NgbPagination,
   NgbPaginationPrevious,

@@ -1,10 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import type {
-  PublicationKindCode,
-  PublicPublicationWithAuthors,
-  ThesisKindCode,
-} from "@gmcan/contracts/public";
+import type { PublicationKindCode, PublicPublicationWithAuthors, ThesisKindCode } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminPublicationListItem } from "../models/admin-list";

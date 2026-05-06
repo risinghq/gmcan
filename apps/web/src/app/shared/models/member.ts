@@ -1,6 +1,7 @@
+import type { PublicPublication } from "@gmcan/contracts/public";
+
 import type { Capability } from "./capabilities";
 import type { Project } from "./project";
-import type { PublicPublication } from "@gmcan/contracts/public";
 
 export interface Member {
   id: number;

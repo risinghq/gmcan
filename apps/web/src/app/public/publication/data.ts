@@ -1,10 +1,10 @@
 import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { requireLocalDate } from "@app/shared/utils/date";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
 import type { PublicationDisplay, PublicationViewModel } from "./types";

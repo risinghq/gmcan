@@ -17,11 +17,11 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
 interface PublicationRow extends PublicPublicationWithAuthors {
   fecha?: string;

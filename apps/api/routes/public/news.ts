@@ -1,5 +1,5 @@
-import { zValidator } from "@hono/zod-validator";
 import { PublicNewsListQuerySchema } from "@gmcan/contracts/public";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 

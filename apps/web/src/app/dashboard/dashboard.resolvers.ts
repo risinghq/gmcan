@@ -3,11 +3,11 @@ import { ResolveFn } from "@angular/router";
 import type { MemberFull } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { map, of } from "rxjs";
 
 export type ToolbarBadge = {

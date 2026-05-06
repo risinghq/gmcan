@@ -18,12 +18,12 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { RefService, type UniversityItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
 interface PublicationRow extends PublicPublicationWithAuthors {
   fecha?: string;

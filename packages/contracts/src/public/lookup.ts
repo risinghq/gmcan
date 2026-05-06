@@ -12,7 +12,9 @@ export const LookupDataSchema = z.object({
   prefixes: z.array(z.object({ code: z.string(), label: z.string() })),
   universities: z.array(z.object({ id: z.number(), name: z.string() })),
   journals: z.array(z.object({ id: z.number(), name: z.string() })),
-  events: z.array(z.object({ id: z.number(), name: z.string(), city: z.string().nullable(), country: z.string().nullable() })),
+  events: z.array(
+    z.object({ id: z.number(), name: z.string(), city: z.string().nullable(), country: z.string().nullable() }),
+  ),
   locales: z.object({ supported: z.array(z.string()), default: z.string() }),
 });
 

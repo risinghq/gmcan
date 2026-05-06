@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-import { CurrencyCodeSchema, FundingSourceCodeSchema, NewsKindCodeSchema, NewsStatusCodeSchema, ProjectStatusCodeSchema } from "./common.js";
+import {
+  CurrencyCodeSchema,
+  FundingSourceCodeSchema,
+  NewsKindCodeSchema,
+  NewsStatusCodeSchema,
+  ProjectStatusCodeSchema,
+} from "./common.js";
 import { PublicMemberSchema } from "./member.js";
 import { PublicProjectMemberSchema } from "./project.js";
 import { PublicPublicationWithAuthorsSchema } from "./publication.js";

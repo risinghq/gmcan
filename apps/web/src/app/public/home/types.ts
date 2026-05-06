@@ -3,8 +3,8 @@ import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { ResearchLine } from "@app/shared/models/research-line";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
 export type HomePublicacion = PublicPublicationWithAuthors & {
   fecha: string;

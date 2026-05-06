@@ -82,7 +82,9 @@ export default class MainNewsComponent implements OnInit {
     this.selectedCategoryName = this.language.newsText[0].categoryTitle;
     this.newsTypes = this.lookup
       .newsKinds()
-      .filter((item): item is NewsTypeFilter => item.code === "general" || item.code === "research" || item.code === "event")
+      .filter(
+        (item): item is NewsTypeFilter => item.code === "general" || item.code === "research" || item.code === "event",
+      )
       .toSorted((a, b) => (a.name > b.name ? 1 : -1));
     this.loadNews();
   }

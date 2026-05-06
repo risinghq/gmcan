@@ -29,7 +29,6 @@
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
-    "@gmcan/contracts": "workspace:*",
     "@angular/animations": "^21.2.6",
     "@angular/cdk": "^21.2.4",
     "@angular/common": "^21.2.6",
@@ -46,6 +45,7 @@
     "@fontsource/ibm-plex-sans": "^5.2.5",
     "@fontsource/ibm-plex-serif": "^5.2.5",
     "@fontsource/roboto": "^5.2.5",
+    "@gmcan/contracts": "workspace:*",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "@popperjs/core": "^2.11.8",
     "animate.css": "^4.1.1",

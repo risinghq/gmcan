@@ -4,7 +4,6 @@ import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import type { ProjectWithMembers } from "@app/shared/models/project";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -14,6 +13,7 @@ import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
 import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
@@ -53,7 +53,9 @@ export class HomeDataService {
     const lineasInvestigacion = Array.isArray(lineasRaw) ? (lineasRaw as ResearchLine[]) : [];
     const metodos = Array.isArray(metodosRaw) ? (metodosRaw as Method[]) : [];
     const miembros = Array.isArray(miembrosRaw) ? (miembrosRaw as Member[]) : [];
-    const publicacionesSafe = Array.isArray(publicacionesRaw) ? (publicacionesRaw as PublicPublicationWithAuthors[]) : [];
+    const publicacionesSafe = Array.isArray(publicacionesRaw)
+      ? (publicacionesRaw as PublicPublicationWithAuthors[])
+      : [];
     const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
     const newsSafe = Array.isArray(newsRaw?.items) ? (newsRaw.items as PublicNewsListItem[]) : [];
 
