@@ -1,6 +1,5 @@
 import { db } from "../db/client.js";
 import { type Locale } from "../lib/public-locale.js";
-import { resolveAssetAccessUrl } from "./assets/service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
@@ -130,7 +129,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       : [];
 
   const resolvedPublicationAuthors = await Promise.all(
-    publicationAuthors.map(async (row) => ({
+    publicationAuthors.map((row) => ({
       publicationId: row.publicationId,
       entry: row.memberId
         ? {
@@ -138,7 +137,6 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
             memberId: row.memberId,
             authorOrder: row.authorOrder,
             name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-            photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
           }
         : { kind: "external" as const, name: row.externalName ?? "", authorOrder: row.authorOrder },
     })),
@@ -165,12 +163,11 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       : [];
 
   const resolvedProjectMembers = await Promise.all(
-    projectMembers.map(async (row) => ({
+    projectMembers.map((row) => ({
       projectId: row.projectId,
       entry: {
         memberId: row.id,
         name: row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName,
-        photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
       },
     })),
   );
@@ -186,20 +183,11 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
 
   return {
     publications,
-    members: await Promise.all(
-      members.map(async (row) =>
-        Object.assign({}, row, {
-          photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
-        }),
-      ),
-    ),
-    news: await Promise.all(
-      newsRows.map(async (row) =>
-        Object.assign({}, row, {
-          authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" ").trim(),
-          photoUrl: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
-        }),
-      ),
+    members,
+    news: newsRows.map((row) =>
+      Object.assign({}, row, {
+        authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" ").trim(),
+      }),
     ),
     projects,
   };
