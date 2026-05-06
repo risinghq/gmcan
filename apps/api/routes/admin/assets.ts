@@ -5,81 +5,63 @@ import { z } from "zod";
 import { okStatus } from "../../lib/contracts.js";
 import { extractFirstFile } from "../../lib/upload.js";
 import { requirePermission } from "../../middleware/authz.js";
-import {
-  type ResourceType,
-  restoreBinding,
-  softDeleteCurrentBinding,
-  uploadAndReplaceCurrent,
-} from "../../services/asset.service.js";
+import { deleteCurrentAsset, putAsset, restoreAsset } from "../../services/assets/service.js";
+import { CanonicalAssetPayloadSchema } from "../../services/assets/validators.js";
 
 const router = new Hono();
-
-const ResourceParam = z.object({
-  resourceType: z.enum(["member", "news", "method", "research_line", "publication", "research_group", "about"]),
-  resourceId: z.coerce.number().int().positive(),
-  slot: z.string().min(1),
-});
+const RestoreBody = z.object({ assetId: z.number().int().positive() });
 
 router.use("*", async (c, next) => {
   if (c.req.method === "GET") return requirePermission("content.read")(c, next);
   return requirePermission("content.write")(c, next);
 });
 
-router.put("/:resourceType/:resourceId/:slot", zValidator("param", ResourceParam), async (c) => {
-  const { resourceType, resourceId, slot } = c.req.valid("param");
+router.put("/", async (c) => {
   const body = await c.req.parseBody({ all: true });
+  const parsed = CanonicalAssetPayloadSchema.safeParse({
+    ownerType: body.ownerType,
+    ownerId: body.ownerId,
+    slot: body.slot,
+  });
+  if (!parsed.success) return c.json({ error: "Invalid payload" }, 400);
+
   const file = extractFirstFile(body);
   if (!file) return c.json({ error: "No file uploaded" }, 400);
 
   try {
-    const typedResourceType: ResourceType = resourceType;
-    await uploadAndReplaceCurrent({
-      resourceType: typedResourceType,
-      resourceId,
-      slot,
-      file,
-      actorId: c.get("memberId"),
-    });
+    await putAsset({ ...parsed.data, file, actorId: c.get("memberId") });
   } catch (error) {
     if (error instanceof Error && (error.message.includes("Unsupported slot") || error.message.includes("Invalid"))) {
       return c.json({ error: error.message }, 400);
     }
-    if (error instanceof Error && error.message === "Resource not found") return c.json({ error: error.message }, 404);
+    if (error instanceof Error && error.message === "Owner not found") return c.json({ error: error.message }, 404);
     throw error;
   }
   return c.json(okStatus());
 });
 
-router.delete("/:resourceType/:resourceId/:slot", zValidator("param", ResourceParam), async (c) => {
-  const { resourceType, resourceId, slot } = c.req.valid("param");
+router.delete("/", zValidator("json", CanonicalAssetPayloadSchema), async (c) => {
+  const payload = c.req.valid("json");
   try {
-    const typedResourceType: ResourceType = resourceType;
-    await softDeleteCurrentBinding({
-      resourceType: typedResourceType,
-      resourceId,
-      slot,
-      actorId: c.get("memberId"),
-    });
+    await deleteCurrentAsset({ ...payload, actorId: c.get("memberId") });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
+    if (error instanceof Error && error.message.includes("Unsupported slot"))
+      return c.json({ error: error.message }, 400);
+    throw error;
+  }
+  return c.json(okStatus());
+});
+
+router.post("/restore", zValidator("json", RestoreBody), async (c) => {
+  const { assetId } = c.req.valid("json");
+  try {
+    await restoreAsset(assetId, c.get("memberId"));
   } catch (error) {
     if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
     throw error;
   }
   return c.json(okStatus());
 });
-
-router.post(
-  "/restore/:bindingId",
-  zValidator("param", z.object({ bindingId: z.coerce.number().int().positive() })),
-  async (c) => {
-    const { bindingId } = c.req.valid("param");
-    try {
-      await restoreBinding(bindingId, c.get("memberId"));
-    } catch (error) {
-      if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
-      throw error;
-    }
-    return c.json(okStatus());
-  },
-);
 
 export default router;

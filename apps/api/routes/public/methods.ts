@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import { getMethodLocalized, listMethodsLocalized } from "../../services/group.service.js";
 
 const router = new Hono();
@@ -16,7 +16,7 @@ router.get("/", async (c) => {
       id: row.id,
       name: row.name,
       description: row.description,
-      asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: row.id, slot: "photo" }),
+      asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -34,7 +34,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: row.id,
     name: row.name,
     description: row.description,
-    asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: row.id, slot: "photo" }),
+    asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: row.id, slot: "photo" }),
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

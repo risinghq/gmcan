@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
+import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToProject,
@@ -18,16 +19,19 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const StatusCode = z.enum(["planned", "active", "completed", "archived"]);
+const CurrencyCode = z.enum(["pen", "usd"]);
+const FundingSourceCode = z.enum(["vrip", "none"]);
 
 const ProjectBody = z.object({
   code: z.string().min(1),
-  fundedAmount: z.string(),
-  status: z.number().int().optional(),
+  fundedAmountMinor: z.number().int(),
+  statusCode: StatusCode.optional(),
   startDate: z.string(),
   endDate: z.string().optional(),
   researchLineId: z.number().int(),
-  currencyId: z.number().int(),
-  fundingSourceId: z.number().int(),
+  currencyCode: CurrencyCode,
+  fundingSourceCode: FundingSourceCode,
   translations: translationsSchema({
     title: z.string().min(1),
     description: z.string().min(1),
@@ -35,7 +39,7 @@ const ProjectBody = z.object({
 });
 
 const FilterQuery = z.object({
-  status: z.coerce.number().int().optional(),
+  statusCode: StatusCode.optional(),
   q: z.string().optional(),
 });
 
@@ -45,8 +49,8 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
-  const { status, q } = c.req.valid("query");
-  return c.json(await listAdminProjects(status, q));
+  const { statusCode, q } = c.req.valid("query");
+  return c.json(await listAdminProjects(statusCode, q));
 });
 
 router.post("/", zValidator("json", ProjectBody), async (c) => {
@@ -59,25 +63,25 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", ProjectBody)
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateProject(id, data);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteProject(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.put("/:id/end", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await endProject(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.put("/:id/restart", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await restartProject(id);
-  return c.json({ status: 1 });
+  return c.json(okStatus());
 });
 
 router.get("/:id/members", zValidator("param", IdParam), async (c) => {
@@ -94,7 +98,7 @@ router.post(
     const { id } = c.req.valid("param");
     const { memberId } = c.req.valid("json");
     await addMemberToProject(id, memberId);
-    return c.json({ status: 1 }, 201);
+    return c.json(okStatus(), 201);
   },
 );
 
@@ -104,7 +108,7 @@ router.delete(
   async (c) => {
     const { id, memberId } = c.req.valid("param");
     await removeMemberFromProject(id, memberId);
-    return c.json({ status: 1 });
+    return c.json(okStatus());
   },
 );
 

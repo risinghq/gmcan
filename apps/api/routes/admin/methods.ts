@@ -5,7 +5,7 @@ import { z } from "zod";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import {
   createMethod,
   deleteMethod,
@@ -45,7 +45,7 @@ router.get("/", async (c) => {
       rows.map(async (row) => {
         const view = await toAdminMethodView(row);
         return Object.assign({}, view, {
-          asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: view.id, slot: "photo" }),
+          asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: view.id, slot: "photo" }),
         });
       }),
     ),
@@ -59,7 +59,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const view = await toAdminMethodView(row);
   return c.json(
     Object.assign({}, view, {
-      asset: await resolveAssetAccessUrl({ resourceType: "method", resourceId: view.id, slot: "photo" }),
+      asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: view.id, slot: "photo" }),
     }),
   );
 });

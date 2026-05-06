@@ -16,22 +16,35 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const ListQuery = z.object({ type: z.coerce.number().int().optional() });
+const ListQuery = z.object({ kindCode: z.enum(["journal_article", "conference_paper", "thesis"]).optional() });
 
 const AuthorEntry = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("registered"), memberId: z.number().int(), isPrincipal: z.number().int() }),
-  z.object({ kind: z.literal("external"), externalName: z.string().min(1), isPrincipal: z.number().int() }),
+  z.object({ kind: z.literal("registered"), memberId: z.number().int(), authorOrder: z.number().int().min(1) }),
+  z.object({ kind: z.literal("external"), externalName: z.string().min(1), authorOrder: z.number().int().min(1) }),
+]);
+
+const Subtype = z.discriminatedUnion("kindCode", [
+  z.object({
+    kindCode: z.literal("journal_article"),
+    journalArticle: z.object({
+      journalId: z.number().int().positive().optional(),
+      issue: z.number().int().positive().optional(),
+    }),
+  }),
+  z.object({
+    kindCode: z.literal("conference_paper"),
+    conferencePaper: z.object({ eventId: z.number().int().positive() }),
+  }),
+  z.object({
+    kindCode: z.literal("thesis"),
+    thesis: z.object({ universityId: z.number().int().positive(), thesisKindCode: z.enum(["phd", "masters"]) }),
+  }),
 ]);
 
 const PublicationFields = z.object({
   doi: z.string().optional(),
   publishedAt: z.string(),
-  journalIssue: z.number().optional(),
-  typeId: z.number().int(),
-  journalId: z.number().int().optional(),
-  universityId: z.number().int().optional(),
-  thesisTypeId: z.number().int().optional(),
-  eventId: z.number().int().optional(),
+  subtype: Subtype,
   translations: translationsSchema({
     title: z.string().min(1),
     abstract: z.string().optional(),
@@ -47,8 +60,8 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", zValidator("query", ListQuery), async (c) => {
-  const { type } = c.req.valid("query");
-  return c.json(await listAdminPublications(type));
+  const { kindCode } = c.req.valid("query");
+  return c.json(await listAdminPublications(kindCode));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

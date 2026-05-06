@@ -6,7 +6,8 @@ import { getProjectLocalized, listProjectsLocalized } from "../../services/proje
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const FilterQuery = z.object({ status: z.coerce.number().int().optional() });
+const StatusCode = z.enum(["planned", "active", "completed", "archived"]);
+const FilterQuery = z.object({ statusCode: StatusCode.optional() });
 
 function toPublicProject(row: Awaited<ReturnType<typeof getProjectLocalized>>) {
   if (!row) return null;
@@ -14,14 +15,14 @@ function toPublicProject(row: Awaited<ReturnType<typeof getProjectLocalized>>) {
     id: row.id,
     title: row.title,
     code: row.code,
-    fundedAmount: row.fundedAmount,
+    fundedAmountMinor: row.fundedAmountMinor,
     description: row.description,
-    status: row.status,
+    statusCode: row.statusCode,
     startDate: row.startDate,
     endDate: row.endDate,
     researchLineId: row.researchLineId,
-    currencyId: row.currencyId,
-    fundingSourceId: row.fundingSourceId,
+    currencyCode: row.currencyCode,
+    fundingSourceCode: row.fundingSourceCode,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -29,25 +30,9 @@ function toPublicProject(row: Awaited<ReturnType<typeof getProjectLocalized>>) {
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
   const locale = c.get("locale");
-  const { status } = c.req.valid("query");
-  const rows = await listProjectsLocalized(locale, status);
-  return c.json(
-    rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      code: row.code,
-      fundedAmount: row.fundedAmount,
-      description: row.description,
-      status: row.status,
-      startDate: row.startDate,
-      endDate: row.endDate,
-      researchLineId: row.researchLineId,
-      currencyId: row.currencyId,
-      fundingSourceId: row.fundingSourceId,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    })),
-  );
+  const { statusCode } = c.req.valid("query");
+  const rows = await listProjectsLocalized(locale, statusCode);
+  return c.json(rows.map((row) => toPublicProject(row)));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import { getMemberProfileLocalized, listMembersLocalized } from "../../services/member.service.js";
 
 const router = new Hono();
@@ -14,7 +14,7 @@ router.get("/", async (c) => {
   const shaped = await Promise.all(
     rows.map(async (row) =>
       Object.assign({}, row, {
-        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
       }),
     ),
   );
@@ -29,13 +29,13 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
   const member = {
     ...profile.member,
-    asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: profile.member.id, slot: "photo" }),
+    asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: profile.member.id, slot: "photo" }),
   };
 
   const publications = await Promise.all(
     profile.publications.map(async (publication) => ({
       ...publication,
-      asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: publication.id, slot: "file" }),
+      asset: await resolveAssetAccessUrl({ ownerType: "publication", ownerId: publication.id, slot: "file" }),
     })),
   );
 

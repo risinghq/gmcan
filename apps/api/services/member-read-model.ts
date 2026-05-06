@@ -19,16 +19,17 @@ export function localizedMemberSelectQuery(locale: Locale) {
       "member.maternalName as maternalName",
       "member.birthDate as birthDate",
       "member_translation.bio as bio",
-      "member.status as status",
-      "member.roleId as roleId",
-      "member.memberTypeId as memberTypeId",
-      "member.prefixId as prefixId",
+      "member.isActive as isActive",
+      "member.roleCode as roleCode",
+      "member.memberTypeCode as memberTypeCode",
+      "member.prefixCode as prefixCode",
+      "member.genderCode as genderCode",
     ]);
 }
 
 export function publicLocalizedMemberSelectQuery(locale: Locale) {
   let query = localizedMemberSelectQuery(locale)
-    .where("member.status", "=", 1)
+    .where("member.isActive", "=", 1)
     .where("member.dni", "!=", "")
     .where("member.email", "!=", "")
     .where("member.firstName", "!=", "")

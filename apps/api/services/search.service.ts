@@ -1,7 +1,7 @@
 import { db } from "../db/client.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
-import { resolveAssetAccessUrl } from "./asset.service.js";
+import { resolveAssetAccessUrl } from "./assets/service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
@@ -16,7 +16,14 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
               .onRef("publication_translation.publicationId", "=", "publication.id")
               .on("publication_translation.locale", "=", DEFAULT_LOCALE),
           )
-          .selectAll()
+          .select([
+            "publication.id",
+            "publication.kindCode",
+            "publication.doi",
+            "publication.publishedAt",
+            "publication_translation.title as title",
+            "publication_translation.abstract as abstract",
+          ])
           .where((eb) =>
             eb.or([
               eb("publication_translation.title", "like", like),
@@ -49,8 +56,8 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
             "news_translation.title as title",
             "news.publishedAt",
             "news.authorId",
-            "news.newsTypeId",
-            "news.status",
+            "news.newsKindCode",
+            "news.statusCode",
             "member.firstName as authorFirstName",
             "member.lastName as authorLastName",
           ])
@@ -67,23 +74,22 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
               .onRef("project_translation.projectId", "=", "project.id")
               .on("project_translation.locale", "=", DEFAULT_LOCALE),
           )
-          .innerJoin("research_line", "research_line.id", "project.researchLineId")
-          .innerJoin("funding_source", "funding_source.id", "project.fundingSourceId")
+          .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
           .select([
             "project.id",
             "project_translation.title as title",
             "project.code",
-            "project.fundedAmount",
+            "project.fundedAmountMinor",
             "project_translation.description as description",
-            "project.status",
+            "project.statusCode",
             "project.startDate",
             "project.endDate",
             "project.researchLineId",
-            "project.currencyId",
-            "project.fundingSourceId",
+            "project.currencyCode",
+            "project.fundingSourceCode",
             "funding_source.name as fundingSource",
           ])
-          .where("project.status", "=", 1)
+          .where("project.statusCode", "=", "active")
           .where((eb) =>
             eb.or([
               eb("project_translation.title", "like", like),
@@ -96,7 +102,6 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       : Promise.resolve([]),
   ]);
 
-  // Attach authors to publications
   const publicationIds = publicationRows.map((r) => r.id);
   const publicationAuthors =
     publicationIds.length > 0
@@ -105,7 +110,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           .leftJoin("member", "member.id", "publication_author.memberId")
           .select([
             "publication_author.publicationId",
-            "publication_author.isPrincipal",
+            "publication_author.authorOrder",
             "publication_author.externalName",
             "publication_author.memberId",
             "member.firstName as memberFirstName",
@@ -114,7 +119,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           ])
           .where("publication_author.publicationId", "in", publicationIds)
           .orderBy("publication_author.publicationId", "asc")
-          .orderBy("publication_author.isPrincipal", "asc")
+          .orderBy("publication_author.authorOrder", "asc")
           .execute()
       : [];
 
@@ -125,14 +130,14 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
         ? {
             kind: "registered" as const,
             memberId: row.memberId,
+            authorOrder: row.authorOrder,
             name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-            photo: null,
-            photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-            isPrincipal: row.isPrincipal,
+            photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
           }
-        : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
+        : { kind: "external" as const, name: row.externalName ?? "", authorOrder: row.authorOrder },
     })),
   );
+
   const authorsByPublication = new Map<number, unknown[]>();
   for (const row of resolvedPublicationAuthors) {
     const current = authorsByPublication.get(row.publicationId) ?? [];
@@ -142,15 +147,14 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
 
   const publications = publicationRows.map((p) => Object.assign(p, { authors: authorsByPublication.get(p.id) ?? [] }));
 
-  // Attach members to projects
   const projectIds = projectRows.map((r) => r.id);
   const projectMembers =
     projectIds.length > 0
       ? await db
-          .selectFrom("member_project")
-          .innerJoin("member", "member.id", "member_project.memberId")
-          .select(["member_project.projectId", "member.id", "member.firstName", "member.lastName"])
-          .where("member_project.projectId", "in", projectIds)
+          .selectFrom("project_member")
+          .innerJoin("member", "member.id", "project_member.memberId")
+          .select(["project_member.projectId", "member.id", "member.firstName", "member.lastName"])
+          .where("project_member.projectId", "in", projectIds)
           .execute()
       : [];
 
@@ -160,11 +164,11 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       entry: {
         memberId: row.id,
         name: row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName,
-        photo: null,
-        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
       },
     })),
   );
+
   const membersByProject = new Map<number, unknown[]>();
   for (const row of resolvedProjectMembers) {
     const current = membersByProject.get(row.projectId) ?? [];
@@ -179,7 +183,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     members: await Promise.all(
       members.map(async (row) =>
         Object.assign({}, row, {
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+          photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
         }),
       ),
     ),
@@ -187,7 +191,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       newsRows.map(async (row) =>
         Object.assign({}, row, {
           authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" ").trim(),
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
+          photoUrl: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
         }),
       ),
     ),

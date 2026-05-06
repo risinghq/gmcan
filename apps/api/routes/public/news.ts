@@ -6,10 +6,13 @@ import { getPublicNewsDetail, listPublicNews } from "../../services/news.service
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const StatusCode = z.enum(["draft", "published", "archived"]);
+const NewsKindCode = z.enum(["general", "research", "event"]);
+
 const FilterQuery = z.object({
   q: z.string().trim().optional(),
-  status: z.coerce.number().int().default(1),
-  newsTypeId: z.coerce.number().int().optional(),
+  statusCode: StatusCode.default("published"),
+  newsKindCode: NewsKindCode.optional(),
   sortBy: z.enum(["publishedAt", "title"]).default("publishedAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
   page: z.coerce.number().int().positive().default(1),
@@ -22,8 +25,8 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
   return c.json(
     await listPublicNews(locale, {
       q: query.q,
-      status: query.status,
-      newsTypeId: query.newsTypeId,
+      statusCode: query.statusCode,
+      newsKindCode: query.newsKindCode,
       sortBy: query.sortBy,
       sortOrder: query.sortOrder,
       page: query.page,

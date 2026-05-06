@@ -1,36 +1,83 @@
 import { createHmac } from "node:crypto";
-import path from "node:path";
 
 import type { Context } from "hono";
-import type { Kysely, Transaction } from "kysely";
 
 import { getBackendUrl } from "../config.js";
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
-import type { Database } from "../db/schema.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../lib/upload.js";
 
 export type AssetVisibility = "public" | "private";
 export type ResourceType = "member" | "news" | "method" | "research_line" | "publication" | "research_group" | "about";
 
-type SlotPolicy = {
-  kind: "image" | "brandImage" | "document";
-  visibility: AssetVisibility;
-};
-
 const RETENTION_DAYS = 90;
 const SIGN_SECRET = env.ASSET_SIGNING_SECRET;
 
-const SLOT_POLICIES: Record<string, SlotPolicy> = {
-  "member.photo": { kind: "image", visibility: "public" },
-  "news.photo": { kind: "image", visibility: "public" },
-  "method.photo": { kind: "image", visibility: "public" },
-  "research_line.photo": { kind: "image", visibility: "public" },
-  "publication.file": { kind: "document", visibility: "public" },
-  "research_group.facilities": { kind: "image", visibility: "public" },
-  "research_group.header": { kind: "brandImage", visibility: "public" },
-  "research_group.footer": { kind: "brandImage", visibility: "public" },
-  "about.photo": { kind: "image", visibility: "public" },
+type OwnerConfig = {
+  table:
+    | "member_asset"
+    | "news_asset"
+    | "method_asset"
+    | "research_line_asset"
+    | "publication_asset"
+    | "research_group_asset"
+    | "about_asset";
+  ownerColumn: "memberId" | "newsId" | "methodId" | "researchLineId" | "publicationId" | "groupId" | "aboutId";
+  resourceTable: ResourceType;
+  slots: readonly string[];
+  kindBySlot: Record<string, "image" | "brandImage" | "document">;
+};
+
+const OWNER_CONFIG: Record<ResourceType, OwnerConfig> = {
+  member: {
+    table: "member_asset",
+    ownerColumn: "memberId",
+    resourceTable: "member",
+    slots: ["photo"],
+    kindBySlot: { photo: "image" },
+  },
+  news: {
+    table: "news_asset",
+    ownerColumn: "newsId",
+    resourceTable: "news",
+    slots: ["photo"],
+    kindBySlot: { photo: "image" },
+  },
+  method: {
+    table: "method_asset",
+    ownerColumn: "methodId",
+    resourceTable: "method",
+    slots: ["photo"],
+    kindBySlot: { photo: "image" },
+  },
+  research_line: {
+    table: "research_line_asset",
+    ownerColumn: "researchLineId",
+    resourceTable: "research_line",
+    slots: ["photo"],
+    kindBySlot: { photo: "image" },
+  },
+  publication: {
+    table: "publication_asset",
+    ownerColumn: "publicationId",
+    resourceTable: "publication",
+    slots: ["file"],
+    kindBySlot: { file: "document" },
+  },
+  research_group: {
+    table: "research_group_asset",
+    ownerColumn: "groupId",
+    resourceTable: "research_group",
+    slots: ["facilities", "header", "footer"],
+    kindBySlot: { facilities: "image", header: "brandImage", footer: "brandImage" },
+  },
+  about: {
+    table: "about_asset",
+    ownerColumn: "aboutId",
+    resourceTable: "about",
+    slots: ["photo"],
+    kindBySlot: { photo: "image" },
+  },
 };
 
 function nowIso(): string {
@@ -43,96 +90,73 @@ function plusDays(days: number): string {
   return date.toISOString();
 }
 
-function slotKey(resourceType: ResourceType, slot: string): string {
-  return `${resourceType}.${slot}`;
+function assertSlot(ownerType: ResourceType, slot: string) {
+  const config = OWNER_CONFIG[resourceType];
+  if (!config.slots.includes(slot)) throw new Error(`Unsupported slot '${slot}' for resource '${resourceType}'`);
+  return config;
 }
 
-function getSlotPolicy(resourceType: ResourceType, slot: string): SlotPolicy {
-  const policy = SLOT_POLICIES[slotKey(resourceType, slot)];
-  if (!policy) throw new Error(`Unsupported slot '${slot}' for resource '${resourceType}'`);
-  return policy;
-}
-
-async function ensureResourceExists(resourceType: ResourceType, resourceId: number): Promise<void> {
+async function ensureResourceExists(ownerType: ResourceType, ownerId: number): Promise<void> {
   const row = await db.selectFrom(resourceType).select("id").where("id", "=", resourceId).executeTakeFirst();
   if (!row) throw new Error("Resource not found");
 }
 
-async function writeAudit(
-  executor: Kysely<Database> | Transaction<Database>,
-  action: string,
-  assetId: number | null,
-  bindingId: number | null,
-  actorId: number | null,
-): Promise<void> {
-  await executor
-    .insertInto("asset_audit")
-    .values({ action, assetId, bindingId, actorId, createdAt: nowIso(), reason: null })
-    .execute();
-}
-
-async function getCurrentBinding(
-  executor: Kysely<Database> | Transaction<Database>,
-  input: { resourceType: ResourceType; resourceId: number; slot: string },
-) {
-  return executor
-    .selectFrom("asset_binding_current as c")
-    .innerJoin("asset_binding_history as h", "h.id", "c.bindingId")
-    .select(["h.id", "h.assetId", "h.version"])
-    .where("c.resourceType", "=", input.resourceType)
-    .where("c.resourceId", "=", input.resourceId)
-    .where("c.slot", "=", input.slot)
-    .executeTakeFirst();
-}
-
-async function insertBindingHistory(
-  executor: Kysely<Database> | Transaction<Database>,
-  input: {
-    resourceType: ResourceType;
-    resourceId: number;
-    slot: string;
-    assetId: number;
-    actorId: number | null;
-    reason: string | null;
-    version: number;
-  },
-) {
-  const inserted = await executor
-    .insertInto("asset_binding_history")
-    .values({
-      resourceType: input.resourceType,
-      resourceId: input.resourceId,
-      slot: input.slot,
-      assetId: input.assetId,
-      version: input.version,
-      actorId: input.actorId,
-      reason: input.reason,
-      createdAt: nowIso(),
-    })
-    .executeTakeFirstOrThrow();
-  return Number(inserted.insertId);
+async function writeAudit(action: string, assetId: number | null, actorId: number | null, reason: string | null) {
+  await db.insertInto("asset_audit").values({ action, assetId, actorId, reason, createdAt: nowIso() }).execute();
 }
 
 function extensionFromName(fileName: string): string {
-  return path.extname(fileName).replace(".", "").toLowerCase();
+  const idx = fileName.lastIndexOf(".");
+  return idx === -1 ? "" : fileName.slice(idx + 1).toLowerCase();
+}
+
+async function latestVersion(ownerType: ResourceType, ownerId: number, slot: string): Promise<number> {
+  const config = OWNER_CONFIG[resourceType];
+  const row = await db
+    .selectFrom(config.table)
+    .select(({ fn }) => fn.max<number>("version").as("maxVersion"))
+    .where(config.ownerColumn, "=", resourceId as never)
+    .where("slot", "=", slot as never)
+    .executeTakeFirst();
+
+  return row?.maxVersion ?? 0;
+}
+
+async function currentAssetId(ownerType: ResourceType, ownerId: number, slot: string): Promise<number | null> {
+  const config = OWNER_CONFIG[resourceType];
+  const row = await db
+    .selectFrom(config.table)
+    .select("assetId")
+    .where(config.ownerColumn, "=", resourceId as never)
+    .where("slot", "=", slot as never)
+    .orderBy("version", "desc")
+    .limit(1)
+    .executeTakeFirst();
+  return row?.assetId ?? null;
 }
 
 export async function uploadAndReplaceCurrent(input: {
-  resourceType: ResourceType;
-  resourceId: number;
+  ownerType: ResourceType;
+  ownerId: number;
   slot: string;
   file: File;
   actorId: number | null;
 }): Promise<void> {
+  const config = assertSlot(input.resourceType, input.slot);
   await ensureResourceExists(input.resourceType, input.resourceId);
-  const policy = getSlotPolicy(input.resourceType, input.slot);
 
   const buffer = Buffer.from(await input.file.arrayBuffer());
-  const storageKey = await saveUploadedFile(input.file, { kind: policy.kind, bytes: buffer });
+  const storageKey = await saveUploadedFile(input.file, {
+    kind: config.kindBySlot[input.slot],
+    bytes: buffer,
+  });
   if (!storageKey) throw new Error("Invalid file type");
 
   const ext = extensionFromName(input.file.name);
   const mimeDetected = input.file.type || "application/octet-stream";
+
+  const previousAssetId = await currentAssetId(input.resourceType, input.resourceId, input.slot);
+  const version = (await latestVersion(input.resourceType, input.resourceId, input.slot)) + 1;
 
   await db.transaction().execute(async (trx) => {
     const assetInsert = await trx
@@ -144,107 +168,84 @@ export async function uploadAndReplaceCurrent(input: {
         ext,
         sizeBytes: buffer.byteLength,
         sha256: sha256Buffer(buffer),
-        visibility: policy.visibility,
-        status: "active",
+        visibility: "public",
+        lifecycleStatus: "active",
         createdBy: input.actorId,
         createdAt: nowIso(),
         deletedAt: null,
         deleteAfter: null,
       })
-      .executeTakeFirst();
+      .executeTakeFirstOrThrow();
 
     const assetId = Number(assetInsert.insertId);
-    const current = await getCurrentBinding(trx, input);
-    const bindingId = await insertBindingHistory(trx, {
-      ...input,
-      assetId,
-      actorId: input.actorId,
-      reason: "upload",
-      version: (current?.version ?? 0) + 1,
-    });
 
     await trx
-      .insertInto("asset_binding_current")
+      .insertInto(config.table)
       .values({
-        resourceType: input.resourceType,
-        resourceId: input.resourceId,
+        [config.ownerColumn]: input.resourceId,
         slot: input.slot,
-        bindingId,
-        updatedAt: nowIso(),
-      })
-      .onConflict((oc) =>
-        oc.columns(["resourceType", "resourceId", "slot"]).doUpdateSet({ bindingId, updatedAt: nowIso() }),
-      )
+        version,
+        assetId,
+        actorId: input.actorId,
+        reason: "upload",
+        createdAt: nowIso(),
+      } as never)
       .execute();
 
-    if (current) {
+    if (previousAssetId) {
       await trx
         .updateTable("asset")
-        .set({ status: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
-        .where("id", "=", current.assetId)
+        .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
+        .where("id", "=", previousAssetId)
+        .execute();
+      await trx
+        .insertInto("asset_audit")
+        .values({
+          action: "replace",
+          assetId: previousAssetId,
+          actorId: input.actorId,
+          reason: null,
+          createdAt: nowIso(),
+        })
         .execute();
     }
 
-    await writeAudit(trx, "upload", assetId, bindingId, input.actorId);
-    if (current) await writeAudit(trx, "replace", current.assetId, current.id, input.actorId);
+    await trx
+      .insertInto("asset_audit")
+      .values({ action: "upload", assetId, actorId: input.actorId, reason: null, createdAt: nowIso() })
+      .execute();
   });
 }
 
 export async function softDeleteCurrentBinding(input: {
-  resourceType: ResourceType;
-  resourceId: number;
+  ownerType: ResourceType;
+  ownerId: number;
   slot: string;
   actorId: number | null;
 }): Promise<void> {
-  const current = await getCurrentBinding(db, input);
-  if (!current) throw new Error("Current asset binding not found");
+  assertSlot(input.resourceType, input.slot);
+  const assetId = await currentAssetId(input.resourceType, input.resourceId, input.slot);
+  if (!assetId) throw new Error("Current asset binding not found");
 
-  await db.transaction().execute(async (trx) => {
-    await trx
-      .deleteFrom("asset_binding_current")
-      .where("resourceType", "=", input.resourceType)
-      .where("resourceId", "=", input.resourceId)
-      .where("slot", "=", input.slot)
-      .execute();
-    await trx
-      .updateTable("asset")
-      .set({ status: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
-      .where("id", "=", current.assetId)
-      .execute();
-    await writeAudit(trx, "soft_delete", current.assetId, current.id, input.actorId);
-  });
+  await db
+    .updateTable("asset")
+    .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
+    .where("id", "=", assetId)
+    .execute();
+
+  await writeAudit("soft_delete", assetId, input.actorId, null);
 }
 
-export async function restoreBinding(bindingId: number, actorId: number | null): Promise<void> {
-  const binding = await db
-    .selectFrom("asset_binding_history")
-    .selectAll()
-    .where("id", "=", bindingId)
-    .executeTakeFirst();
-  if (!binding) throw new Error("Binding not found");
+export async function restoreBinding(assetId: number, actorId: number | null): Promise<void> {
+  const row = await db.selectFrom("asset").select(["id"]).where("id", "=", assetId).executeTakeFirst();
+  if (!row) throw new Error("Binding not found");
 
-  await db.transaction().execute(async (trx) => {
-    await trx
-      .insertInto("asset_binding_current")
-      .values({
-        resourceType: binding.resourceType as ResourceType,
-        resourceId: binding.resourceId,
-        slot: binding.slot,
-        bindingId: binding.id,
-        updatedAt: nowIso(),
-      })
-      .onConflict((oc) =>
-        oc.columns(["resourceType", "resourceId", "slot"]).doUpdateSet({ bindingId: binding.id, updatedAt: nowIso() }),
-      )
-      .execute();
-
-    await trx
-      .updateTable("asset")
-      .set({ status: "active", deletedAt: null, deleteAfter: null })
-      .where("id", "=", binding.assetId)
-      .execute();
-    await writeAudit(trx, "restore", binding.assetId, binding.id, actorId);
-  });
+  await db
+    .updateTable("asset")
+    .set({ lifecycleStatus: "active", deletedAt: null, deleteAfter: null })
+    .where("id", "=", assetId)
+    .execute();
+  await writeAudit("restore", assetId, actorId, null);
 }
 
 function signAccess(assetId: number, expiresAt: number): string {
@@ -257,24 +258,48 @@ export function makeSignedAssetUrl(assetId: number, expiresInSeconds: number): s
   return `${getBackendUrl()}/api/assets/${assetId}?expires=${expiresAt}&token=${token}`;
 }
 
+async function resolveAssetIdByOwner(ownerType: ResourceType, ownerId: number, slot: string): Promise<number | null> {
+  assertSlot(resourceType, slot);
+  const config = OWNER_CONFIG[resourceType];
+  const row = await db
+    .selectFrom(config.table)
+    .innerJoin("asset", "asset.id", `${config.table}.assetId` as never)
+    .select([`${config.table}.assetId` as never, "asset.visibility", "asset.lifecycleStatus"])
+    .where(config.ownerColumn, "=", resourceId as never)
+    .where("slot", "=", slot as never)
+    .orderBy("version", "desc")
+    .limit(1)
+    .executeTakeFirst();
+
+  if (!row || row.lifecycleStatus !== "active") return null;
+  return row.assetId as number;
+}
+
 export async function resolveAssetAccessUrl(input: {
-  resourceType: ResourceType;
-  resourceId: number;
+  ownerType: ResourceType;
+  ownerId: number;
   slot: string;
 }): Promise<string | null> {
-  const row = await db
-    .selectFrom("asset_binding_current as c")
-    .innerJoin("asset_binding_history as h", "h.id", "c.bindingId")
-    .innerJoin("asset as a", "a.id", "h.assetId")
-    .select(["a.id", "a.visibility"])
-    .where("c.resourceType", "=", input.resourceType)
-    .where("c.resourceId", "=", input.resourceId)
-    .where("c.slot", "=", input.slot)
-    .where("a.status", "=", "active")
-    .executeTakeFirst();
-  if (!row) return null;
-  return row.visibility === "private" ? makeSignedAssetUrl(row.id, 300) : `${getBackendUrl()}/api/assets/${row.id}`;
+  const assetId = await resolveAssetIdByOwner(input.resourceType, input.resourceId, input.slot);
+  if (!assetId) return null;
+
+  const asset = await db.selectFrom("asset").select(["visibility"]).where("id", "=", assetId).executeTakeFirst();
+  if (!asset) return null;
+  return asset.visibility === "private" ? makeSignedAssetUrl(assetId, 300) : `${getBackendUrl()}/api/assets/${assetId}`;
 }
+
+export const resolveAssetAccessUrlByOwner = {
+  member: (memberId: number, slot: "photo") => resolveAssetAccessUrl({ ownerType: "member", ownerId: memberId, slot }),
+  news: (newsId: number, slot: "photo") => resolveAssetAccessUrl({ ownerType: "news", ownerId: newsId, slot }),
+  method: (methodId: number, slot: "photo") => resolveAssetAccessUrl({ ownerType: "method", ownerId: methodId, slot }),
+  researchLine: (researchLineId: number, slot: "photo") =>
+    resolveAssetAccessUrl({ ownerType: "research_line", ownerId: researchLineId, slot }),
+  publication: (publicationId: number, slot: "file") =>
+    resolveAssetAccessUrl({ ownerType: "publication", ownerId: publicationId, slot }),
+  researchGroup: (groupId: number, slot: "facilities" | "header" | "footer") =>
+    resolveAssetAccessUrl({ ownerType: "research_group", ownerId: groupId, slot }),
+  about: (aboutId: number, slot: "photo") => resolveAssetAccessUrl({ ownerType: "about", ownerId: aboutId, slot }),
+};
 
 export async function serveAssetById(
   c: Context,
@@ -285,7 +310,7 @@ export async function serveAssetById(
     .selectFrom("asset")
     .selectAll()
     .where("id", "=", assetId)
-    .where("status", "=", "active")
+    .where("lifecycleStatus", "=", "active")
     .executeTakeFirst();
   if (!row) return c.json({ error: "File not found" }, 404);
 

@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import {
   listAboutLocalized,
   listEquipment,
@@ -33,12 +33,12 @@ router.get("/", async (c) => {
     fullName: row.fullName,
     assets: {
       facilities: await resolveAssetAccessUrl({
-        resourceType: "research_group",
-        resourceId: row.id,
+        ownerType: "research_group",
+        ownerId: row.id,
         slot: "facilities",
       }),
-      header: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "header" }),
-      footer: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "footer" }),
+      header: await resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot: "header" }),
+      footer: await resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot: "footer" }),
     },
     facilities: row.facilities,
     futureWork: row.futureWork,
@@ -60,7 +60,7 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
       objectivesContent: AboutSectionSchema.parse(JSON.parse(row.objectivesContent)),
       servicesContent: AboutSectionSchema.parse(JSON.parse(row.servicesContent)),
       homeServicesTeaserContent: HomeTeaserSchema.parse(JSON.parse(row.homeServicesTeaserContent)),
-      asset: await resolveAssetAccessUrl({ resourceType: "about", resourceId: row.id, slot: "photo" }),
+      asset: await resolveAssetAccessUrl({ ownerType: "about", ownerId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

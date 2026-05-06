@@ -1,14 +1,15 @@
 import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
+import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
 import { memberProjects, memberPublications, publicProfile } from "../db/views.js";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
-import { resolveAssetAccessUrl } from "./asset.service.js";
+import { resolveAssetAccessUrl } from "./assets/service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
-const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "status"] as const;
+const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "isActive"] as const;
 const REQUIRED_MEMBER_TRANSLATED_FIELDS = ["bio"] as const;
 
 export interface MemberPublishability {
@@ -28,22 +29,22 @@ export async function listMembersLocalized(locale: Locale) {
 }
 
 export async function listAdminMembers(filter?: {
-  status?: number;
-  memberTypeId?: number;
+  isActive?: number;
+  memberTypeCode?: MemberTypeCode;
   q?: string;
 }): Promise<AdminMemberListItem[]> {
   let query = db
     .selectFrom("member")
-    .leftJoin("member_type", "member_type.id", "member.memberTypeId")
+    .leftJoin("member_type", "member_type.code", "member.memberTypeCode")
     .leftJoin("member_type_translation", (join) =>
       join
-        .onRef("member_type_translation.memberTypeId", "=", "member_type.id")
+        .onRef("member_type_translation.memberTypeCode", "=", "member_type.code")
         .on("member_type_translation.locale", "=", DEFAULT_LOCALE),
     )
     .leftJoin("member_translation", (join) =>
       join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", DEFAULT_LOCALE),
     )
-    .leftJoin("prefix", "prefix.id", "member.prefixId")
+    .leftJoin("prefix", "prefix.code", "member.prefixCode")
     .select([
       "member.id",
       "member.dni",
@@ -53,16 +54,16 @@ export async function listAdminMembers(filter?: {
       "member.maternalName",
       "member.birthDate",
       "member_translation.bio as bio",
-      "member.status",
-      "member.roleId",
-      "member.memberTypeId",
-      "member.prefixId",
+      "member.isActive",
+      "member.roleCode",
+      "member.memberTypeCode",
+      "member.prefixCode",
       "member_type_translation.nameSingular as memberTypeName",
-      "prefix.name as prefixName",
+      "prefix.label as prefixName",
     ]);
 
-  if (filter?.status !== undefined) query = query.where("member.status", "=", filter.status);
-  if (filter?.memberTypeId !== undefined) query = query.where("member.memberTypeId", "=", filter.memberTypeId);
+  if (filter?.isActive !== undefined) query = query.where("member.isActive", "=", filter.isActive);
+  if (filter?.memberTypeCode !== undefined) query = query.where("member.memberTypeCode", "=", filter.memberTypeCode);
   if (filter?.q) {
     const like = `%${filter.q}%`;
     query = query.where((eb) =>
@@ -100,7 +101,7 @@ export async function listAdminMembers(filter?: {
       if (!row.email) missingBase.push("email");
       if (!row.firstName) missingBase.push("firstName");
       if (!row.lastName) missingBase.push("lastName");
-      if (row.status !== 1) missingBase.push("status");
+      if (row.isActive !== 1) missingBase.push("isActive");
 
       const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
       const missingTranslations: Record<string, string[]> = {};
@@ -120,13 +121,13 @@ export async function listAdminMembers(filter?: {
         maternalName: row.maternalName,
         birthDate: row.birthDate,
         bio: row.bio,
-        status: row.status,
-        roleId: row.roleId,
-        memberTypeId: row.memberTypeId,
+        isActive: row.isActive,
+        roleCode: row.roleCode,
+        memberTypeCode: row.memberTypeCode,
         memberTypeName: row.memberTypeName ?? "",
-        prefixId: row.prefixId,
+        prefixCode: row.prefixCode,
         prefixName: row.prefixName,
-        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
         publishability: {
           publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
           missing: { base: missingBase, translations: missingTranslations },
@@ -140,12 +141,12 @@ export async function listMemberNames() {
   return db.selectFrom("member").select(MEMBER_NAME).execute();
 }
 
-export async function listActiveMembers(status: number) {
-  return db.selectFrom("member").select(MEMBER_ACTIVE).where("status", "=", status).execute();
+export async function listActiveMembers(isActive: number) {
+  return db.selectFrom("member").select(MEMBER_ACTIVE).where("isActive", "=", isActive).execute();
 }
 
-export async function listMembersByType(memberTypeId: number) {
-  return db.selectFrom("member").select(MEMBER_ACTIVE).where("memberTypeId", "=", memberTypeId).execute();
+export async function listMembersByType(memberTypeCode: MemberTypeCode) {
+  return db.selectFrom("member").select(MEMBER_ACTIVE).where("memberTypeCode", "=", memberTypeCode).execute();
 }
 
 export async function getMember(id: number) {
@@ -167,11 +168,14 @@ export async function getMemberFull(id: number) {
       "member.maternalName as maternalName",
       "member.birthDate as birthDate",
       "member_translation.bio as bio",
-      "member.status as status",
-      "member.roleId as roleId",
-      "member.memberTypeId as memberTypeId",
-      "member.prefixId as prefixId",
-      "member.genderId as genderId",
+      "member.isActive as isActive",
+      "member.roleCode as roleCode",
+      "member.memberTypeCode as memberTypeCode",
+      "member.prefixCode as prefixCode",
+      "member.genderCode as genderCode",
+      "member.passwordResetRequired as passwordResetRequired",
+      "member.resetToken as resetToken",
+      "member.resetExpiresAt as resetExpiresAt",
     ])
     .where("member.id", "=", id)
     .executeTakeFirst();
@@ -180,7 +184,7 @@ export async function getMemberFull(id: number) {
 export async function getMemberByEmail(email: string) {
   return db
     .selectFrom("member")
-    .select([...MEMBER_PUBLIC, "password"])
+    .select([...MEMBER_PUBLIC, "passwordHash", "passwordResetRequired", "resetToken", "resetExpiresAt"])
     .where("email", "=", email)
     .executeTakeFirst();
 }
@@ -245,7 +249,7 @@ export async function searchAuthorPool(q: string) {
       memberId: m.id,
       name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
       photo: null,
-      photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: m.id, slot: "photo" }),
+      photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: m.id, slot: "photo" }),
     })),
   );
 
@@ -273,32 +277,36 @@ export async function createMember(data: {
   lastName: string;
   maternalName?: string;
   birthDate?: string;
-  status: number;
-  roleId: number;
-  memberTypeId: number;
-  prefixId?: number;
-  genderId?: number;
+  isActive: number;
+  roleCode: RoleCode;
+  memberTypeCode: MemberTypeCode;
+  prefixCode?: PrefixCode | null;
+  genderCode?: GenderCode | null;
   translation?: { locale: string; bio: string };
 }) {
   const { password, translation, ...rest } = data;
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date().toISOString();
   return db.transaction().execute(async (trx) => {
     const result = await trx
       .insertInto("member")
       .values({
         ...rest,
-        password: hashPassword(password),
-        resetPassword: 0,
-        createdAt: today,
-        updatedAt: today,
+        passwordHash: hashPassword(password),
+        passwordResetRequired: 0,
+        resetToken: null,
+        resetExpiresAt: null,
+        createdAt: now,
+        updatedAt: now,
       })
       .executeTakeFirstOrThrow();
+
     const memberId = Number(result.insertId);
     await trx
       .insertInto("member_translation")
       .values(SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: null })))
       .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing())
       .execute();
+
     if (translation) {
       await trx
         .insertInto("member_translation")
@@ -306,6 +314,7 @@ export async function createMember(data: {
         .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
         .execute();
     }
+
     return memberId;
   });
 }
@@ -318,15 +327,15 @@ export async function updateMember(
     lastName: string;
     maternalName?: string;
     birthDate?: string;
-    status: number;
-    roleId: number;
-    memberTypeId: number;
-    prefixId?: number;
-    genderId?: number;
+    isActive: number;
+    roleCode: RoleCode;
+    memberTypeCode: MemberTypeCode;
+    prefixCode?: PrefixCode | null;
+    genderCode?: GenderCode | null;
     translation?: { locale: string; bio: string };
   },
 ) {
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date().toISOString();
   await db.transaction().execute(async (trx) => {
     await trx
       .updateTable("member")
@@ -336,15 +345,16 @@ export async function updateMember(
         lastName: data.lastName,
         maternalName: data.maternalName,
         birthDate: data.birthDate,
-        status: data.status,
-        roleId: data.roleId,
-        memberTypeId: data.memberTypeId,
-        prefixId: data.prefixId,
-        genderId: data.genderId,
-        updatedAt: today,
+        isActive: data.isActive,
+        roleCode: data.roleCode,
+        memberTypeCode: data.memberTypeCode,
+        prefixCode: data.prefixCode,
+        genderCode: data.genderCode,
+        updatedAt: now,
       })
       .where("id", "=", id)
       .execute();
+
     if (data.translation) {
       await trx
         .insertInto("member_translation")
@@ -375,18 +385,20 @@ export async function getMemberTranslation(id: number, locale: string) {
 export async function evaluateMemberPublishability(id: number): Promise<MemberPublishability> {
   const member = await db
     .selectFrom("member")
-    .select(["id", "dni", "email", "firstName", "lastName", "status"])
+    .select(["id", "dni", "email", "firstName", "lastName", "isActive"])
     .where("id", "=", id)
     .executeTakeFirst();
-  if (!member)
+
+  if (!member) {
     return { publishable: false, missing: { base: ["member"], translations: {} as Record<string, string[]> } };
+  }
 
   const missingBase: string[] = [];
   if (!member.dni) missingBase.push("dni");
   if (!member.email) missingBase.push("email");
   if (!member.firstName) missingBase.push("firstName");
   if (!member.lastName) missingBase.push("lastName");
-  if (member.status !== 1) missingBase.push("status");
+  if (member.isActive !== 1) missingBase.push("isActive");
 
   const rows = await db
     .selectFrom("member_translation")
@@ -423,19 +435,19 @@ export async function deleteMember(id: number) {
 export async function updatePassword(email: string, newPassword: string) {
   await db
     .updateTable("member")
-    .set({ password: hashPassword(newPassword), resetPassword: 0 })
+    .set({ passwordHash: hashPassword(newPassword), passwordResetRequired: 0, resetToken: null, resetExpiresAt: null })
     .where("email", "=", email)
     .execute();
 }
 
 export async function getResetPasswordStatus(email: string) {
-  return db.selectFrom("member").select("resetPassword").where("email", "=", email).executeTakeFirst();
+  return db.selectFrom("member").select("passwordResetRequired").where("email", "=", email).executeTakeFirst();
 }
 
-export async function setResetToken(memberId: number, token: string, expires: string) {
+export async function setResetToken(memberId: number, token: string, expiresAt: string) {
   await db
     .updateTable("member")
-    .set({ resetToken: token, resetExpires: expires, resetPassword: 1 })
+    .set({ resetToken: token, resetExpiresAt: expiresAt, passwordResetRequired: 1 })
     .where("id", "=", memberId)
     .execute();
 }
@@ -446,15 +458,15 @@ export async function getMemberByResetToken(token: string) {
     .selectFrom("member")
     .select(["id", "firstName", "email"])
     .where("resetToken", "=", token)
-    .where("resetExpires", ">", now)
-    .where("resetPassword", "=", 1)
+    .where("resetExpiresAt", ">", now)
+    .where("passwordResetRequired", "=", 1)
     .executeTakeFirst();
 }
 
 export async function consumeResetToken(memberId: number, newPassword: string) {
   await db
     .updateTable("member")
-    .set({ password: hashPassword(newPassword), resetToken: null, resetExpires: null, resetPassword: 0 })
+    .set({ passwordHash: hashPassword(newPassword), resetToken: null, resetExpiresAt: null, passwordResetRequired: 0 })
     .where("id", "=", memberId)
     .execute();
 }
@@ -468,8 +480,8 @@ export async function listGroupMembers(groupId: number) {
 }
 
 export async function addMemberToGroup(memberId: number, groupId: number) {
-  const today = new Date().toISOString().split("T")[0];
-  await db.insertInto("member_group").values({ memberId, groupId, createdAt: today, updatedAt: today }).execute();
+  const now = new Date().toISOString();
+  await db.insertInto("member_group").values({ memberId, groupId, createdAt: now, updatedAt: now }).execute();
 }
 
 export async function removeMemberFromGroup(memberId: number, groupId: number) {

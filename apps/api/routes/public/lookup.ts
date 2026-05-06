@@ -9,35 +9,18 @@ router.get("/", async (c) => {
   const locale = c.get("locale");
   const data = await getLookupData(locale);
   return c.json({
-    memberTypes: data.memberTypes.map((item) => ({
-      id: item.id,
-      name: item.name,
-      nameSingular: item.nameSingular,
-    })),
-    publicationTypes: data.publicationTypes.map((item) => ({
-      id: item.id,
-      name: item.name,
-    })),
-    thesisTypes: data.thesisTypes.map((item) => ({
-      id: item.id,
-      name: item.name,
-    })),
-    newsTypes: data.newsTypes.map((item) => ({
-      id: item.id,
-      name: item.name,
-    })),
+    memberTypes: data.memberTypes,
+    publicationKinds: data.publicationKinds,
+    thesisKinds: data.thesisKinds,
+    newsKinds: data.newsKinds,
     fundingSources: data.fundingSources,
-    universities: data.universities.map((item) => ({
-      id: item.id,
-      name: item.name,
-    })),
+    currencies: data.currencies,
+    roles: data.roles,
+    genders: data.genders,
+    prefixes: data.prefixes,
+    universities: data.universities,
     journals: data.journals,
-    events: data.events.map((item) => ({
-      id: item.id,
-      name: item.name,
-      city: item.city,
-      country: item.country,
-    })),
+    events: data.events,
     locales: {
       supported: SUPPORTED_LOCALES,
       default: DEFAULT_LOCALE,

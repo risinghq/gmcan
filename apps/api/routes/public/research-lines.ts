@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import { getResearchLineLocalized, listResearchLinesLocalized } from "../../services/group.service.js";
 
 const router = new Hono();
@@ -16,7 +16,7 @@ router.get("/", async (c) => {
       id: row.id,
       name: row.name,
       description: row.description,
-      asset: await resolveAssetAccessUrl({ resourceType: "research_line", resourceId: row.id, slot: "photo" }),
+      asset: await resolveAssetAccessUrl({ ownerType: "research_line", ownerId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -34,7 +34,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     id: row.id,
     name: row.name,
     description: row.description,
-    asset: await resolveAssetAccessUrl({ resourceType: "research_line", resourceId: row.id, slot: "photo" }),
+    asset: await resolveAssetAccessUrl({ ownerType: "research_line", ownerId: row.id, slot: "photo" }),
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,

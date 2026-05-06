@@ -5,7 +5,7 @@ import { z } from "zod";
 import { okStatus } from "../../lib/contracts.js";
 import { LocaleCodeSchema } from "../../lib/locales.js";
 import { requirePermission, requireSelfOrPermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import {
   addMemberToGroup,
   createMember,
@@ -24,6 +24,10 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const RoleCode = z.enum(["administrator", "researcher", "visitor"]);
+const MemberTypeCode = z.enum(["researcher", "phd_student", "master_student", "undergraduate_student", "collaborator"]);
+const PrefixCode = z.enum(["dr", "dra", "mg", "lic", "bach", "ing", "none"]);
+const GenderCode = z.enum(["male", "female"]);
 
 const CreateBody = z.object({
   dni: z.string().min(1),
@@ -33,11 +37,11 @@ const CreateBody = z.object({
   lastName: z.string().min(1),
   maternalName: z.string().optional(),
   birthDate: z.string().optional(),
-  status: z.number().int(),
-  roleId: z.number().int(),
-  memberTypeId: z.number().int(),
-  prefixId: z.number().int().optional(),
-  genderId: z.number().int().optional(),
+  isActive: z.number().int(),
+  roleCode: RoleCode,
+  memberTypeCode: MemberTypeCode,
+  prefixCode: PrefixCode.nullish(),
+  genderCode: GenderCode.nullish(),
   translation: z.object({ locale: LocaleCodeSchema, bio: z.string() }).optional(),
 });
 
@@ -47,23 +51,23 @@ const UpdateBody = z.object({
   lastName: z.string().min(1),
   maternalName: z.string().optional(),
   birthDate: z.string().optional(),
-  status: z.number().int(),
-  roleId: z.number().int(),
-  memberTypeId: z.number().int(),
-  prefixId: z.number().int().optional(),
-  genderId: z.number().int().optional(),
+  isActive: z.number().int(),
+  roleCode: RoleCode,
+  memberTypeCode: MemberTypeCode,
+  prefixCode: PrefixCode.nullish(),
+  genderCode: GenderCode.nullish(),
   translation: z.object({ locale: LocaleCodeSchema, bio: z.string() }).optional(),
 });
 
 const FilterQuery = z.object({
   q: z.string().optional(),
-  status: z.coerce.number().int().optional(),
-  memberTypeId: z.coerce.number().int().optional(),
+  isActive: z.coerce.number().int().optional(),
+  memberTypeCode: MemberTypeCode.optional(),
 });
 
 router.get("/", requirePermission("members.read"), zValidator("query", FilterQuery), async (c) => {
-  const { q, status, memberTypeId } = c.req.valid("query");
-  return c.json(await listAdminMembers({ q, status, memberTypeId }));
+  const { q, isActive, memberTypeCode } = c.req.valid("query");
+  return c.json(await listAdminMembers({ q, isActive, memberTypeCode }));
 });
 
 router.get(
@@ -94,7 +98,7 @@ router.get("/:id", requirePermission("members.read"), zValidator("param", IdPara
   if (!member) return c.json({ error: "Not found" }, 404);
   return c.json({
     ...member,
-    asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: member.id, slot: "photo" }),
+    asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: member.id, slot: "photo" }),
   });
 });
 
@@ -126,11 +130,11 @@ router.patch(
       lastName: patch.lastName ?? current.lastName,
       maternalName: patch.maternalName !== undefined ? patch.maternalName : (current.maternalName ?? undefined),
       birthDate: patch.birthDate !== undefined ? patch.birthDate : (current.birthDate ?? undefined),
-      status: patch.status ?? current.status,
-      roleId: patch.roleId ?? current.roleId,
-      memberTypeId: patch.memberTypeId ?? current.memberTypeId,
-      prefixId: patch.prefixId !== undefined ? patch.prefixId : (current.prefixId ?? undefined),
-      genderId: patch.genderId !== undefined ? patch.genderId : (current.genderId ?? undefined),
+      isActive: patch.isActive ?? current.isActive,
+      roleCode: patch.roleCode ?? current.roleCode,
+      memberTypeCode: patch.memberTypeCode ?? current.memberTypeCode,
+      prefixCode: patch.prefixCode !== undefined ? patch.prefixCode : (current.prefixCode ?? undefined),
+      genderCode: patch.genderCode !== undefined ? patch.genderCode : (current.genderCode ?? undefined),
       translation: patch.translation,
     });
     return c.json(okStatus());

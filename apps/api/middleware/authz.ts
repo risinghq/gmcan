@@ -1,6 +1,6 @@
 import type { Context, MiddlewareHandler, Next } from "hono";
 
-import { permissionsForRole, roleById } from "../authz/permissions.js";
+import { permissionsForRole, roleByCode } from "../authz/permissions.js";
 import { can } from "../authz/policy.js";
 import type { Actor, Permission } from "../authz/types.js";
 import { getMemberFull } from "../services/member.service.js";
@@ -36,14 +36,14 @@ export const loadActor: MiddlewareHandler = async (c: Context, next: Next) => {
   const member = await getMemberFull(memberId);
   if (!member) return c.json({ error: "Unauthorized" }, 401);
 
-  const role = roleById[member.roleId];
+  const role = roleByCode[member.roleCode];
   if (!role) return c.json({ error: "Forbidden" }, 403);
 
   c.set("actor", {
     id: member.id,
-    roleId: member.roleId,
+    roleCode: member.roleCode,
     role,
-    status: member.status,
+    isActive: member.isActive,
   });
 
   await next();

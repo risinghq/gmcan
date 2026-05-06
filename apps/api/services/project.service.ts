@@ -1,35 +1,35 @@
 import { db } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
-import type { ProjectRow } from "../db/schema.js";
+import type { ProjectRow, ProjectStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
-import { resolveAssetAccessUrl } from "./asset.service.js";
+import { resolveAssetAccessUrl } from "./assets/service.js";
 
 export interface ProjectAdminInput {
   code: string;
-  fundedAmount: string;
-  status?: number;
+  fundedAmountMinor: number;
+  statusCode?: ProjectStatusCode;
   startDate: string;
   endDate?: string;
   researchLineId: number;
-  currencyId: number;
-  fundingSourceId: number;
+  currencyCode: "pen" | "usd";
+  fundingSourceCode: "vrip" | "none";
   translations: LocalizedTranslations<{ title: string; description: string }>;
 }
 
 function toProjectRow(data: ProjectAdminInput) {
   return {
     code: data.code,
-    fundedAmount: data.fundedAmount,
-    status: data.status,
+    fundedAmountMinor: data.fundedAmountMinor,
+    statusCode: data.statusCode ?? "planned",
     startDate: data.startDate,
     endDate: data.endDate,
     researchLineId: data.researchLineId,
-    currencyId: data.currencyId,
-    fundingSourceId: data.fundingSourceId,
+    currencyCode: data.currencyCode,
+    fundingSourceCode: data.fundingSourceCode,
   };
 }
 
@@ -53,13 +53,13 @@ async function replaceProjectTranslations(
   });
 }
 
-export async function listProjects(status?: number) {
+export async function listProjects(statusCode?: ProjectStatusCode) {
   let query = db.selectFrom("project").selectAll();
-  if (status !== undefined) query = query.where("status", "=", status);
+  if (statusCode !== undefined) query = query.where("statusCode", "=", statusCode);
   return query.execute();
 }
 
-export async function listProjectsLocalized(locale: Locale, status?: number) {
+export async function listProjectsLocalized(locale: Locale, statusCode?: ProjectStatusCode) {
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
@@ -69,22 +69,22 @@ export async function listProjectsLocalized(locale: Locale, status?: number) {
       "project.id as id",
       "project_translation.title as title",
       "project.code as code",
-      "project.fundedAmount as fundedAmount",
+      "project.fundedAmountMinor as fundedAmountMinor",
       "project_translation.description as description",
-      "project.status as status",
+      "project.statusCode as statusCode",
       "project.startDate as startDate",
       "project.endDate as endDate",
       "project.researchLineId as researchLineId",
-      "project.currencyId as currencyId",
-      "project.fundingSourceId as fundingSourceId",
+      "project.currencyCode as currencyCode",
+      "project.fundingSourceCode as fundingSourceCode",
       "project.createdAt as createdAt",
       "project.updatedAt as updatedAt",
     ]);
-  if (status !== undefined) query = query.where("project.status", "=", status);
+  if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
   return query.execute();
 }
 
-export async function listAdminProjects(status?: number, q?: string): Promise<AdminProjectListItem[]> {
+export async function listAdminProjects(statusCode?: ProjectStatusCode, q?: string): Promise<AdminProjectListItem[]> {
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
@@ -96,38 +96,40 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
       "project.id as id",
       "project_translation.title as title",
       "project.code as code",
-      "project.fundedAmount as fundedAmount",
+      "project.fundedAmountMinor as fundedAmountMinor",
       "project_translation.description as description",
-      "project.status as status",
+      "project.statusCode as statusCode",
       "project.startDate as startDate",
       "project.endDate as endDate",
       "project.researchLineId as researchLineId",
-      "project.currencyId as currencyId",
-      "project.fundingSourceId as fundingSourceId",
+      "project.currencyCode as currencyCode",
+      "project.fundingSourceCode as fundingSourceCode",
     ]);
-  if (status !== undefined) query = query.where("project.status", "=", status);
+
+  if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
   if (q) {
     const like = `%${q}%`;
     query = query.where((eb) =>
       eb.or([eb("project_translation.title", "like", like), eb("project.code", "like", like)]),
     );
   }
+
   const projects = await query.orderBy("project.startDate", "desc").execute();
   if (projects.length === 0) return [];
 
   const projectIds = projects.map((project) => project.id);
   const memberRows = await db
-    .selectFrom("member_project")
-    .innerJoin("member", "member.id", "member_project.memberId")
+    .selectFrom("project_member")
+    .innerJoin("member", "member.id", "project_member.memberId")
     .select([
-      "member_project.projectId as projectId",
+      "project_member.projectId as projectId",
       "member.id as memberId",
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
     ])
-    .where("member_project.projectId", "in", projectIds)
-    .orderBy("member_project.projectId", "asc")
+    .where("project_member.projectId", "in", projectIds)
+    .orderBy("project_member.projectId", "asc")
     .execute();
 
   const memberEntries = await Promise.all(
@@ -136,10 +138,11 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
       entry: {
         memberId: row.memberId,
         name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
+        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
       } satisfies AdminProjectMemberListItem,
     })),
   );
+
   const membersByProject = new Map<number, AdminProjectMemberListItem[]>();
   for (const row of memberEntries) {
     const current = membersByProject.get(row.projectId) ?? [];
@@ -151,14 +154,14 @@ export async function listAdminProjects(status?: number, q?: string): Promise<Ad
     id: project.id,
     title: project.title,
     code: project.code,
-    fundedAmount: project.fundedAmount,
+    fundedAmountMinor: project.fundedAmountMinor,
     description: project.description,
-    status: project.status,
+    statusCode: project.statusCode,
     startDate: project.startDate,
     endDate: project.endDate,
     researchLineId: project.researchLineId,
-    currencyId: project.currencyId,
-    fundingSourceId: project.fundingSourceId,
+    currencyCode: project.currencyCode,
+    fundingSourceCode: project.fundingSourceCode,
     startDateLabel: monthYearEs(project.startDate),
     members: membersByProject.get(project.id) ?? [],
   }));
@@ -174,13 +177,13 @@ export async function toAdminProjectView(project: ProjectRow) {
   return {
     id: project.id,
     code: project.code,
-    fundedAmount: project.fundedAmount,
-    status: project.status,
+    fundedAmountMinor: project.fundedAmountMinor,
+    statusCode: project.statusCode,
     startDate: project.startDate,
     endDate: project.endDate,
     researchLineId: project.researchLineId,
-    currencyId: project.currencyId,
-    fundingSourceId: project.fundingSourceId,
+    currencyCode: project.currencyCode,
+    fundingSourceCode: project.fundingSourceCode,
     createdAt: project.createdAt,
     updatedAt: project.updatedAt,
     translations: Object.fromEntries(
@@ -203,14 +206,14 @@ export async function getProjectLocalized(id: number, locale: Locale) {
       "project.id as id",
       "project_translation.title as title",
       "project.code as code",
-      "project.fundedAmount as fundedAmount",
+      "project.fundedAmountMinor as fundedAmountMinor",
       "project_translation.description as description",
-      "project.status as status",
+      "project.statusCode as statusCode",
       "project.startDate as startDate",
       "project.endDate as endDate",
       "project.researchLineId as researchLineId",
-      "project.currencyId as currencyId",
-      "project.fundingSourceId as fundingSourceId",
+      "project.currencyCode as currencyCode",
+      "project.fundingSourceCode as fundingSourceCode",
       "project.createdAt as createdAt",
       "project.updatedAt as updatedAt",
     ])
@@ -218,7 +221,7 @@ export async function getProjectLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function searchProjects(q: string, status?: number) {
+export async function searchProjects(q: string, statusCode?: ProjectStatusCode) {
   const like = `%${q}%`;
   let query = db
     .selectFrom("project")
@@ -229,7 +232,7 @@ export async function searchProjects(q: string, status?: number) {
     )
     .selectAll("project")
     .where((eb) => eb.or([eb("project_translation.title", "like", like), eb("project.code", "like", like)]));
-  if (status !== undefined) query = query.where("project.status", "=", status);
+  if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
   return query.execute();
 }
 
@@ -251,31 +254,31 @@ export async function deleteProject(id: number) {
 
 export async function endProject(id: number) {
   const endDate = new Date().toISOString().slice(0, 10);
-  await db.updateTable("project").set({ endDate, status: 0 }).where("id", "=", id).execute();
+  await db.updateTable("project").set({ endDate, statusCode: "completed" }).where("id", "=", id).execute();
 }
 
 export async function restartProject(id: number) {
-  await db.updateTable("project").set({ endDate: null, status: 1 }).where("id", "=", id).execute();
+  await db.updateTable("project").set({ endDate: null, statusCode: "active" }).where("id", "=", id).execute();
 }
 
 export async function listProjectMembers(projectId: number) {
   return db
     .selectFrom("member")
-    .innerJoin("member_project", "member_project.memberId", "member.id")
+    .innerJoin("project_member", "project_member.memberId", "member.id")
     .select([...MEMBER_NAME, "member.email as email"])
-    .where("member_project.projectId", "=", projectId)
+    .where("project_member.projectId", "=", projectId)
     .execute();
 }
 
 export async function listMemberProjects(memberId: number) {
-  return db.selectFrom("member_project").selectAll().where("memberId", "=", memberId).execute();
+  return db.selectFrom("project_member").selectAll().where("memberId", "=", memberId).execute();
 }
 
 export async function addMemberToProject(projectId: number, memberId: number) {
-  const today = new Date().toISOString().split("T")[0];
-  await db.insertInto("member_project").values({ projectId, memberId, createdAt: today, updatedAt: today }).execute();
+  const now = new Date().toISOString();
+  await db.insertInto("project_member").values({ projectId, memberId, createdAt: now, updatedAt: now }).execute();
 }
 
 export async function removeMemberFromProject(projectId: number, memberId: number) {
-  await db.deleteFrom("member_project").where("projectId", "=", projectId).where("memberId", "=", memberId).execute();
+  await db.deleteFrom("project_member").where("projectId", "=", projectId).where("memberId", "=", memberId).execute();
 }
