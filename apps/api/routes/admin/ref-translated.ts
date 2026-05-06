@@ -8,9 +8,6 @@ import { okStatus } from "../../lib/contracts.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const MemberTypeTranslationBody = z.object({
-  translations: translationsSchema({ name: z.string().min(1), nameSingular: z.string().min(1) }),
-});
 const NamedTranslationBody = z.object({
   translations: translationsSchema({ name: z.string().min(1) }),
 });
