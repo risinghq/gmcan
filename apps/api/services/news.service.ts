@@ -5,11 +5,7 @@ import type { NewsRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
-import type {
-  AdminNewsListItem,
-  AdminNewsListQuery,
-  AdminNewsListResponse,
-} from "./admin-list.types.js";
+import type { AdminNewsListItem, AdminNewsListQuery, AdminNewsListResponse } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export interface NewsUpsertInput {
