@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "../../db/client.js";
-import type { CurrencyTable, FundingSourceTable, GenderTable, JournalTable, PrefixTable, RoleTable } from "../../db/schema.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -19,7 +18,7 @@ router.get("/gender/:id", zValidator("param", IdParam), async (c) => {
 });
 router.post("/gender", zValidator("json", PlainNameBody), async (c) => {
   const body = c.req.valid("json");
-  const result = await db.insertInto("gender").values(body as Omit<GenderTable, "id">).executeTakeFirstOrThrow();
+  const result = await db.insertInto("gender").values(body).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
 router.put("/gender/:id", zValidator("param", IdParam), zValidator("json", PlainNameBody), async (c) => {
@@ -41,7 +40,7 @@ router.get("/prefix/:id", zValidator("param", IdParam), async (c) => {
   return c.json(row);
 });
 router.post("/prefix", zValidator("json", PlainNameBody), async (c) => {
-  const result = await db.insertInto("prefix").values(c.req.valid("json") as Omit<PrefixTable, "id">).executeTakeFirstOrThrow();
+  const result = await db.insertInto("prefix").values(c.req.valid("json")).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
 router.put("/prefix/:id", zValidator("param", IdParam), zValidator("json", PlainNameBody), async (c) => {
@@ -63,7 +62,7 @@ router.get("/role/:id", zValidator("param", IdParam), async (c) => {
   return c.json(row);
 });
 router.post("/role", zValidator("json", PlainNameBody), async (c) => {
-  const result = await db.insertInto("role").values(c.req.valid("json") as Omit<RoleTable, "id">).executeTakeFirstOrThrow();
+  const result = await db.insertInto("role").values(c.req.valid("json")).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
 router.put("/role/:id", zValidator("param", IdParam), zValidator("json", PlainNameBody), async (c) => {
@@ -85,7 +84,7 @@ router.get("/journal/:id", zValidator("param", IdParam), async (c) => {
   return c.json(row);
 });
 router.post("/journal", zValidator("json", PlainNameBody), async (c) => {
-  const result = await db.insertInto("journal").values(c.req.valid("json") as Omit<JournalTable, "id">).executeTakeFirstOrThrow();
+  const result = await db.insertInto("journal").values(c.req.valid("json")).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
 router.put("/journal/:id", zValidator("param", IdParam), zValidator("json", PlainNameBody), async (c) => {
@@ -107,10 +106,7 @@ router.get("/funding-source/:id", zValidator("param", IdParam), async (c) => {
   return c.json(row);
 });
 router.post("/funding-source", zValidator("json", PlainNameBody), async (c) => {
-  const result = await db
-    .insertInto("funding_source")
-    .values(c.req.valid("json") as Omit<FundingSourceTable, "id">)
-    .executeTakeFirstOrThrow();
+  const result = await db.insertInto("funding_source").values(c.req.valid("json")).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
 router.put("/funding-source/:id", zValidator("param", IdParam), zValidator("json", PlainNameBody), async (c) => {
@@ -132,10 +128,7 @@ router.get("/currency/:id", zValidator("param", IdParam), async (c) => {
   return c.json(row);
 });
 router.post("/currency", zValidator("json", CurrencyBody), async (c) => {
-  const result = await db
-    .insertInto("currency")
-    .values(c.req.valid("json") as Omit<CurrencyTable, "id">)
-    .executeTakeFirstOrThrow();
+  const result = await db.insertInto("currency").values(c.req.valid("json")).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
 router.put("/currency/:id", zValidator("param", IdParam), zValidator("json", CurrencyBody), async (c) => {

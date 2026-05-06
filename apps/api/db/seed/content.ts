@@ -37,7 +37,7 @@ export async function seedNews() {
         authorId: 1,
         newsTypeId: NewsType.GENERAL,
       },
-    ] as any)
+    ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
@@ -117,10 +117,7 @@ export async function seedJournals() {
 export async function seedUniversities() {
   await db
     .insertInto("university")
-    .values([
-      { id: 1 },
-      { id: 2 },
-    ])
+    .values([{ id: 1 }, { id: 2 }])
     .onConflict((oc) => oc.doNothing())
     .execute();
   await db
@@ -166,7 +163,7 @@ export async function seedProject() {
       researchLineId: ResearchLine.HEXAGONAL,
       currencyId: Currency.SOL,
       fundingSourceId: FundingSource.VRIP,
-    } as any)
+    })
     .onConflict((oc) => oc.doNothing())
     .execute();
   await db
@@ -246,7 +243,7 @@ export async function seedPublications() {
         eventId: null,
         thesisTypeId: null,
       },
-    ] as any)
+    ])
     .onConflict((oc) => oc.doNothing())
     .execute();
 

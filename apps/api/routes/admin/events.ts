@@ -57,7 +57,10 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   return c.json({
     id,
     translations: Object.fromEntries(
-      translations.map((tr) => [tr.locale, { name: tr.name, city: tr.city ?? undefined, country: tr.country ?? undefined }]),
+      translations.map((tr) => [
+        tr.locale,
+        { name: tr.name, city: tr.city ?? undefined, country: tr.country ?? undefined },
+      ]),
     ),
   });
 });

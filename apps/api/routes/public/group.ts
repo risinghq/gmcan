@@ -2,7 +2,6 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { throwMissingTranslation } from "../../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   listAboutLocalized,
@@ -18,15 +17,6 @@ const AboutSectionSchema = z.object({
   items: z.array(z.string()),
 });
 const HomeTeaserSchema = z.object({ paragraphs: z.array(z.string()) });
-
-function parseJsonContentStrict<T>(raw: string | null, schema: z.ZodType<T>, field: string): T {
-  if (!raw) throwMissingTranslation(field);
-  try {
-    return schema.parse(JSON.parse(raw));
-  } catch {
-    throwMissingTranslation(field);
-  }
-}
 
 router.get("/", async (c) => {
   const locale = c.get("locale");
@@ -67,21 +57,9 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
     rows.map(async (row) => ({
       id: row.id,
       description: row.description,
-      objectivesContent: parseJsonContentStrict(
-        row.objectivesContent,
-        AboutSectionSchema,
-        `about:${row.id}:objectivesContent`,
-      ),
-      servicesContent: parseJsonContentStrict(
-        row.servicesContent,
-        AboutSectionSchema,
-        `about:${row.id}:servicesContent`,
-      ),
-      homeServicesTeaserContent: parseJsonContentStrict(
-        row.homeServicesTeaserContent,
-        HomeTeaserSchema,
-        `about:${row.id}:homeServicesTeaserContent`,
-      ),
+      objectivesContent: AboutSectionSchema.parse(JSON.parse(row.objectivesContent)),
+      servicesContent: AboutSectionSchema.parse(JSON.parse(row.servicesContent)),
+      homeServicesTeaserContent: HomeTeaserSchema.parse(JSON.parse(row.homeServicesTeaserContent)),
       asset: await resolveAssetAccessUrl({ resourceType: "about", resourceId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,

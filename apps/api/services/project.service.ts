@@ -5,7 +5,7 @@ import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { DEFAULT_LOCALE, type LocaleCode } from "../lib/locales.js";
+import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
@@ -187,7 +187,7 @@ export async function toAdminProjectView(project: ProjectRow) {
     updatedAt: project.updatedAt,
     translations: Object.fromEntries(
       translations.map((tr) => [tr.locale, { title: tr.title, description: tr.description }]),
-    ) as Record<LocaleCode, { title: string; description: string }>,
+    ),
   };
 }
 

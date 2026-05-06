@@ -4,7 +4,7 @@ import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
-import { DEFAULT_LOCALE, type LocaleCode } from "../lib/locales.js";
+import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminPublicationListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
@@ -280,7 +280,7 @@ export async function getPublicationEditView(id: number) {
     publication: Object.assign({}, result.publication, {
       translations: Object.fromEntries(
         translations.map((tr) => [tr.locale, { title: tr.title, abstract: tr.abstract ?? undefined }]),
-      ) as Record<LocaleCode, { title: string; abstract?: string }>,
+      ),
     }),
     authors: result.authors,
   };

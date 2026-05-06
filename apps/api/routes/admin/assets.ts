@@ -6,9 +6,9 @@ import { okStatus } from "../../lib/contracts.js";
 import { extractFirstFile } from "../../lib/upload.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
+  type ResourceType,
   restoreBinding,
   softDeleteCurrentBinding,
-  type ResourceType,
   uploadAndReplaceCurrent,
 } from "../../services/asset.service.js";
 
@@ -32,12 +32,13 @@ router.put("/:resourceType/:resourceId/:slot", zValidator("param", ResourceParam
   if (!file) return c.json({ error: "No file uploaded" }, 400);
 
   try {
+    const typedResourceType: ResourceType = resourceType;
     await uploadAndReplaceCurrent({
-      resourceType: resourceType as ResourceType,
+      resourceType: typedResourceType,
       resourceId,
       slot,
       file,
-      actorId: c.get("memberId") as number,
+      actorId: c.get("memberId"),
     });
   } catch (error) {
     if (error instanceof Error && (error.message.includes("Unsupported slot") || error.message.includes("Invalid"))) {
@@ -52,11 +53,12 @@ router.put("/:resourceType/:resourceId/:slot", zValidator("param", ResourceParam
 router.delete("/:resourceType/:resourceId/:slot", zValidator("param", ResourceParam), async (c) => {
   const { resourceType, resourceId, slot } = c.req.valid("param");
   try {
+    const typedResourceType: ResourceType = resourceType;
     await softDeleteCurrentBinding({
-      resourceType: resourceType as ResourceType,
+      resourceType: typedResourceType,
       resourceId,
       slot,
-      actorId: c.get("memberId") as number,
+      actorId: c.get("memberId"),
     });
   } catch (error) {
     if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
@@ -71,7 +73,7 @@ router.post(
   async (c) => {
     const { bindingId } = c.req.valid("param");
     try {
-      await restoreBinding(bindingId, c.get("memberId") as number);
+      await restoreBinding(bindingId, c.get("memberId"));
     } catch (error) {
       if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
       throw error;

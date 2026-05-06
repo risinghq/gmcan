@@ -13,7 +13,7 @@ declare module "hono" {
 }
 
 function logDenial(c: Context, permission: Permission, reason: string): void {
-  const actor = c.get("actor") as Actor | undefined;
+  const actor = c.get("actor");
   console.warn(
     JSON.stringify({
       type: "authz_denied",
@@ -30,7 +30,7 @@ function logDenial(c: Context, permission: Permission, reason: string): void {
 export const loadActor: MiddlewareHandler = async (c: Context, next: Next) => {
   if (AUTH_EXEMPT_PATHS.has(c.req.path)) return next();
 
-  const memberId = c.get("memberId") as number | undefined;
+  const memberId = c.get("memberId");
   if (!memberId) return c.json({ error: "Unauthorized" }, 401);
 
   const member = await getMemberFull(memberId);
@@ -51,7 +51,7 @@ export const loadActor: MiddlewareHandler = async (c: Context, next: Next) => {
 
 export function requirePermission(permission: Permission): MiddlewareHandler {
   return async (c, next) => {
-    const actor = c.get("actor") as Actor | undefined;
+    const actor = c.get("actor");
     if (!can(actor, permission)) {
       logDenial(c, permission, "missing_permission");
       return c.json({ error: "Forbidden" }, 403);

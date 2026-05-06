@@ -1,10 +1,11 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 
+import type { LocalizedTranslations } from "../../lib/admin-translations.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
-import { throwMissingTranslation } from "../../lib/public-locale.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createEquipment,
@@ -37,11 +38,23 @@ const AboutSectionSchema = z.object({
 });
 
 function parseJsonContentStrict<T>(raw: string | null, schema: z.ZodType<T>, field: string): T {
-  if (!raw) throwMissingTranslation(field);
+  if (!raw) {
+    throw new HTTPException(500, {
+      res: new Response(JSON.stringify({ error: "Missing translation", code: "MISSING_TRANSLATION", field }), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      }),
+    });
+  }
   try {
     return schema.parse(JSON.parse(raw));
   } catch {
-    throwMissingTranslation(field);
+    throw new HTTPException(500, {
+      res: new Response(JSON.stringify({ error: "Missing translation", code: "MISSING_TRANSLATION", field }), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      }),
+    });
   }
 }
 
@@ -181,13 +194,12 @@ router.put(
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
+    const translations: LocalizedTranslations<{ objectivesContent?: string }> = {};
+    for (const [locale, tr] of Object.entries(data.translations)) {
+      translations[locale] = { objectivesContent: JSON.stringify(tr.objectivesContent) };
+    }
     await updateAboutObjectives(id, {
-      translations: Object.fromEntries(
-        Object.entries(data.translations).map(([locale, tr]) => [
-          locale,
-          { objectivesContent: JSON.stringify(tr.objectivesContent) },
-        ]),
-      ) as any,
+      translations,
     });
     return c.json(okStatus());
   },
@@ -200,13 +212,12 @@ router.put(
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
+    const translations: LocalizedTranslations<{ servicesContent?: string }> = {};
+    for (const [locale, tr] of Object.entries(data.translations)) {
+      translations[locale] = { servicesContent: JSON.stringify(tr.servicesContent) };
+    }
     await updateAboutServices(id, {
-      translations: Object.fromEntries(
-        Object.entries(data.translations).map(([locale, tr]) => [
-          locale,
-          { servicesContent: JSON.stringify(tr.servicesContent) },
-        ]),
-      ) as any,
+      translations,
     });
     return c.json(okStatus());
   },
@@ -226,13 +237,12 @@ router.put(
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
+    const translations: LocalizedTranslations<{ homeServicesTeaserContent?: string }> = {};
+    for (const [locale, tr] of Object.entries(data.translations)) {
+      translations[locale] = { homeServicesTeaserContent: JSON.stringify(tr.homeServicesTeaserContent) };
+    }
     await updateAboutHomeServicesTeaser(id, {
-      translations: Object.fromEntries(
-        Object.entries(data.translations).map(([locale, tr]) => [
-          locale,
-          { homeServicesTeaserContent: JSON.stringify(tr.homeServicesTeaserContent) },
-        ]),
-      ) as any,
+      translations,
     });
     return c.json(okStatus());
   },

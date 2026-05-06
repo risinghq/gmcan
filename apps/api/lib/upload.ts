@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
+import { randomUUIDv7 } from "bun";
 import type { Context } from "hono";
 
 export const MIME_TYPES: Record<string, string> = {
@@ -24,15 +25,6 @@ export type UploadFileKind = keyof typeof UPLOAD_FILE_KIND_EXTENSIONS;
 export const STORAGE_ROOT = path.resolve(process.cwd(), ".storage");
 const QUARANTINE_ROOT = path.join(STORAGE_ROOT, ".quarantine");
 const SAFE_ASSET_SEGMENT = /^[A-Za-z0-9._-]+$/;
-
-function randomUuidV7(): string {
-  const maybeBun = (globalThis as { Bun?: { randomUUIDv7?: () => string } }).Bun;
-  if (maybeBun?.randomUUIDv7) return maybeBun.randomUUIDv7();
-  const nowHex = Date.now().toString(16).padStart(12, "0");
-  const rest = crypto.getRandomValues(new Uint8Array(10));
-  const hex = [...rest].map((b) => b.toString(16).padStart(2, "0")).join("");
-  return `${nowHex.slice(0, 8)}-${nowHex.slice(8, 12)}-7${hex.slice(0, 3)}-a${hex.slice(3, 6)}-${hex.slice(6, 18)}`;
-}
 
 export function normalizeAssetKey(assetKey: string): string | null {
   const normalized = assetKey.replaceAll("\\", "/").replace(/^\/+/, "");
@@ -57,7 +49,7 @@ function extensionOf(fileName: string): string {
 }
 
 export function buildAssetKey(ext: string): string {
-  return `${randomUuidV7()}.${ext}`;
+  return `${randomUUIDv7()}.${ext}`;
 }
 
 export function extractFirstFile(body: Record<string, string | File | (string | File)[]>): File | undefined {
@@ -89,7 +81,7 @@ export async function saveUploadedFile(
   options: { kind: UploadFileKind; bytes?: Buffer },
 ): Promise<string | null> {
   const ext = extensionOf(file.name);
-  const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind] as readonly string[];
+  const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind];
   if (!allowedExtensions.includes(ext)) return null;
 
   const assetKey = buildAssetKey(ext);

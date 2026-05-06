@@ -5,11 +5,7 @@ import { type Locale } from "../lib/public-locale.js";
 
 export type AboutSectionContent = { introParagraphs: string[]; items: string[] };
 
-async function replaceTranslations(
-  table: TTable,
-  ownerId: number,
-  values: Record<string, Record<string, unknown>>,
-) {
+async function replaceTranslations(table: TTable, ownerId: number, values: Record<string, Record<string, unknown>>) {
   const rows = Object.entries(values).map(([locale, payload]) => ({ locale, payload }));
   await db.transaction().execute(async (trx) => {
     switch (table) {
@@ -104,7 +100,10 @@ export async function updateGroupInfo(id: number, data: { email?: string; phone?
   await db.updateTable("research_group").set(data).where("id", "=", id).execute();
 }
 
-export async function updateGroupSummary(id: number, data: { translations: LocalizedTranslations<{ summary: string }> }) {
+export async function updateGroupSummary(
+  id: number,
+  data: { translations: LocalizedTranslations<{ summary: string }> },
+) {
   await replaceTranslations(
     "group_translation",
     id,
@@ -112,14 +111,20 @@ export async function updateGroupSummary(id: number, data: { translations: Local
   );
 }
 
-export async function updateGroupFacilities(id: number, data: { translations: LocalizedTranslations<{ facilities?: string }> }) {
+export async function updateGroupFacilities(
+  id: number,
+  data: { translations: LocalizedTranslations<{ facilities?: string }> },
+) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { facilities: row.facilities ?? null }]),
   );
   await replaceTranslations("group_translation", id, rows);
 }
 
-export async function updateGroupFutureWork(id: number, data: { translations: LocalizedTranslations<{ futureWork?: string }> }) {
+export async function updateGroupFutureWork(
+  id: number,
+  data: { translations: LocalizedTranslations<{ futureWork?: string }> },
+) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { futureWork: row.futureWork ?? null }]),
   );
@@ -182,7 +187,10 @@ export async function listAboutLocalized(groupId: number, locale: Locale) {
     .execute();
 }
 
-export async function updateAboutDescription(id: number, data: { translations: LocalizedTranslations<{ description: string }> }) {
+export async function updateAboutDescription(
+  id: number,
+  data: { translations: LocalizedTranslations<{ description: string }> },
+) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [locale, { description: row.description }]),
   );
@@ -202,7 +210,10 @@ export async function updateAboutObjectives(
   await replaceTranslations("about_translation", id, rows);
 }
 
-export async function updateAboutServices(id: number, data: { translations: LocalizedTranslations<{ servicesContent?: string }> }) {
+export async function updateAboutServices(
+  id: number,
+  data: { translations: LocalizedTranslations<{ servicesContent?: string }> },
+) {
   const rows = Object.fromEntries(
     Object.entries(data.translations).map(([locale, row]) => [
       locale,

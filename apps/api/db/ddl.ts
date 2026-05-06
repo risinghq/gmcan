@@ -441,9 +441,12 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("aboutId", "integer", (c) => c.notNull().references("about.id").onDelete("cascade"))
     .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
     .addColumn("description", "text", (c) => c.notNull())
-    .addColumn("objectivesContent", "text")
-    .addColumn("servicesContent", "text")
-    .addColumn("homeServicesTeaserContent", "text")
+    .addColumn("objectivesContent", "text", (c) => c.notNull())
+    .addColumn("servicesContent", "text", (c) => c.notNull())
+    .addColumn("homeServicesTeaserContent", "text", (c) => c.notNull())
+    .addCheckConstraint("about_translation_objectives_json_valid", sql`json_valid("objectivesContent")`)
+    .addCheckConstraint("about_translation_services_json_valid", sql`json_valid("servicesContent")`)
+    .addCheckConstraint("about_translation_teaser_json_valid", sql`json_valid("homeServicesTeaserContent")`)
     .addUniqueConstraint("about_translation_owner_locale_unique", ["aboutId", "locale"])
     .execute();
 

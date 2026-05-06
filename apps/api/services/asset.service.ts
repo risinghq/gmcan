@@ -2,10 +2,12 @@ import { createHmac } from "node:crypto";
 import path from "node:path";
 
 import type { Context } from "hono";
+import type { Kysely, Transaction } from "kysely";
 
 import { getBackendUrl } from "../config.js";
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
+import type { Database } from "../db/schema.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../lib/upload.js";
 
 export type AssetVisibility = "public" | "private";
@@ -57,7 +59,7 @@ async function ensureResourceExists(resourceType: ResourceType, resourceId: numb
 }
 
 async function writeAudit(
-  executor: typeof db,
+  executor: Kysely<Database> | Transaction<Database>,
   action: string,
   assetId: number | null,
   bindingId: number | null,
@@ -150,8 +152,8 @@ export async function uploadAndReplaceCurrent(input: {
         .execute();
     }
 
-    await writeAudit(trx as typeof db, "upload", assetId, bindingId, input.actorId);
-    if (current) await writeAudit(trx as typeof db, "replace", current.assetId, current.id, input.actorId);
+    await writeAudit(trx, "upload", assetId, bindingId, input.actorId);
+    if (current) await writeAudit(trx, "replace", current.assetId, current.id, input.actorId);
   });
 }
 
@@ -183,7 +185,7 @@ export async function softDeleteCurrentBinding(input: {
       .set({ status: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
       .where("id", "=", current.assetId)
       .execute();
-    await writeAudit(trx as typeof db, "soft_delete", current.assetId, current.id, input.actorId);
+    await writeAudit(trx, "soft_delete", current.assetId, current.id, input.actorId);
   });
 }
 
@@ -213,7 +215,7 @@ export async function restoreBinding(bindingId: number, actorId: number | null):
       .set({ status: "active", deletedAt: null, deleteAfter: null })
       .where("id", "=", binding.assetId)
       .execute();
-    await writeAudit(trx as typeof db, "restore", binding.assetId, binding.id, actorId);
+    await writeAudit(trx, "restore", binding.assetId, binding.id, actorId);
   });
 }
 

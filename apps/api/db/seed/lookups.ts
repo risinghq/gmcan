@@ -1,4 +1,13 @@
+import { SUPPORTED_LOCALES } from "../../lib/locales.js";
 import { db } from "../client.js";
+
+export async function seedLocales() {
+  await db
+    .insertInto("locale")
+    .values(SUPPORTED_LOCALES.map((code) => ({ code })))
+    .onConflict((oc) => oc.doNothing())
+    .execute();
+}
 
 export async function seedLookups() {
   await seedGender();
@@ -54,13 +63,7 @@ async function seedRole() {
 async function seedMemberType() {
   await db
     .insertInto("member_type")
-    .values([
-      { id: 1, name: "Investigadores", nameSingular: "Investigador" },
-      { id: 2, name: "Estudiantes de Doctorado", nameSingular: "Estudiante de Doctorado" },
-      { id: 3, name: "Estudiantes de Maestría", nameSingular: "Estudiante de Maestría" },
-      { id: 4, name: "Estudiantes de Pregrado", nameSingular: "Estudiante de Pregrado" },
-      { id: 5, name: "Colaboradores", nameSingular: "Colaborador" },
-    ])
+    .values([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
@@ -85,11 +88,7 @@ async function seedMemberType() {
 async function seedPublicationType() {
   await db
     .insertInto("publication_type")
-    .values([
-      { id: 1, name: "Journal Article" },
-      { id: 2, name: "Conference Paper" },
-      { id: 3, name: "Thesis" },
-    ])
+    .values([{ id: 1 }, { id: 2 }, { id: 3 }])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
@@ -110,10 +109,7 @@ async function seedPublicationType() {
 async function seedThesisType() {
   await db
     .insertInto("thesis_type")
-    .values([
-      { id: 1, name: "PhD" },
-      { id: 2, name: "Master's" },
-    ])
+    .values([{ id: 1 }, { id: 2 }])
     .onConflict((oc) => oc.doNothing())
     .execute();
 
@@ -132,11 +128,7 @@ async function seedThesisType() {
 async function seedNewsType() {
   await db
     .insertInto("news_type")
-    .values([
-      { id: 1, name: "General" },
-      { id: 2, name: "Research" },
-      { id: 3, name: "Event" },
-    ])
+    .values([{ id: 1 }, { id: 2 }, { id: 3 }])
     .onConflict((oc) => oc.doNothing())
     .execute();
 

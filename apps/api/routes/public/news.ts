@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { getPublicNewsDetail, listPublicNews, type PublicNewsSortBy } from "../../services/news.service.js";
+import { getPublicNewsDetail, listPublicNews } from "../../services/news.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -24,7 +24,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       q: query.q,
       status: query.status,
       newsTypeId: query.newsTypeId,
-      sortBy: query.sortBy as PublicNewsSortBy,
+      sortBy: query.sortBy,
       sortOrder: query.sortOrder,
       page: query.page,
       pageSize: query.pageSize,

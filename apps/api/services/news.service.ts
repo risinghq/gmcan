@@ -3,13 +3,12 @@ import { sql } from "kysely";
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
-import { DEFAULT_LOCALE, type LocaleCode } from "../lib/locales.js";
+import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import type {
   AdminNewsListItem,
   AdminNewsListQuery,
   AdminNewsListResponse,
-  AdminNewsSortBy,
 } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
@@ -83,11 +82,6 @@ function toNewsRow(data: NewsUpsertInput) {
   };
 }
 
-const PUBLIC_SORT_COLUMN: Record<PublicNewsSortBy, string> = {
-  publishedAt: "news.publishedAt",
-  title: "news_translation.title",
-};
-
 async function replaceNewsTranslations(
   newsId: number,
   translations: Record<string, { title: string; summary: string; body: string }>,
@@ -152,7 +146,8 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
       "member.maternalName as maternalName",
       sql<string>`coalesce(news_type_translation.name, '')`.as("newsTypeName"),
     ])
-    .orderBy(PUBLIC_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
+    .$if(query.sortBy === "publishedAt", (qb) => qb.orderBy("news.publishedAt", query.sortOrder))
+    .$if(query.sortBy === "title", (qb) => qb.orderBy("news_translation.title", query.sortOrder))
     .orderBy("news.id", "desc")
     .limit(query.pageSize)
     .offset(offset)
@@ -234,17 +229,9 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
   };
 }
 
-const NEWS_SORT_COLUMN: Record<AdminNewsSortBy, string> = {
-  publishedAt: "news.publishedAt",
-  title: "news_translation.title",
-  status: "news.status",
-  authorName: "member.firstName",
-  categoryName: "news_type_translation.name",
-};
-
 export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNewsListResponse> {
   const offset = (query.page - 1) * query.pageSize;
-  const base = db
+  let base = db
     .selectFrom("news")
     .innerJoin("news_translation", (join) =>
       join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", DEFAULT_LOCALE),
@@ -255,22 +242,22 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
         .onRef("news_type_translation.newsTypeId", "=", "news.newsTypeId")
         .on("news_type_translation.locale", "=", DEFAULT_LOCALE),
     )
-    .innerJoin("member", "member.id", "news.authorId")
-    .$if(query.status !== undefined, (qb) => qb.where("news.status", "=", query.status as number))
-    .$if(query.newsTypeId !== undefined, (qb) => qb.where("news.newsTypeId", "=", query.newsTypeId as number))
-    .$if(query.authorId !== undefined, (qb) => qb.where("news.authorId", "=", query.authorId as number))
-    .$if(Boolean(query.q), (qb) =>
-      qb.where((eb) =>
-        eb.or([
-          eb("news_translation.title", "like", `%${query.q}%`),
-          eb("news_translation.summary", "like", `%${query.q}%`),
-          eb("member.firstName", "like", `%${query.q}%`),
-          eb("member.lastName", "like", `%${query.q}%`),
-          eb("member.maternalName", "like", `%${query.q}%`),
-          eb("news_type_translation.name", "like", `%${query.q}%`),
-        ]),
-      ),
+    .innerJoin("member", "member.id", "news.authorId");
+  if (query.status !== undefined) base = base.where("news.status", "=", query.status);
+  if (query.newsTypeId !== undefined) base = base.where("news.newsTypeId", "=", query.newsTypeId);
+  if (query.authorId !== undefined) base = base.where("news.authorId", "=", query.authorId);
+  if (query.q) {
+    base = base.where((eb) =>
+      eb.or([
+        eb("news_translation.title", "like", `%${query.q}%`),
+        eb("news_translation.summary", "like", `%${query.q}%`),
+        eb("member.firstName", "like", `%${query.q}%`),
+        eb("member.lastName", "like", `%${query.q}%`),
+        eb("member.maternalName", "like", `%${query.q}%`),
+        eb("news_type_translation.name", "like", `%${query.q}%`),
+      ]),
     );
+  }
 
   const totalRow = await base.select(({ fn }) => fn.count<number>("news.id").as("count")).executeTakeFirstOrThrow();
 
@@ -287,7 +274,11 @@ export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNew
       "member.lastName as lastName",
       "member.maternalName as maternalName",
     ])
-    .orderBy(NEWS_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
+    .$if(query.sortBy === "publishedAt", (qb) => qb.orderBy("news.publishedAt", query.sortOrder))
+    .$if(query.sortBy === "title", (qb) => qb.orderBy("news_translation.title", query.sortOrder))
+    .$if(query.sortBy === "status", (qb) => qb.orderBy("news.status", query.sortOrder))
+    .$if(query.sortBy === "authorName", (qb) => qb.orderBy("member.firstName", query.sortOrder))
+    .$if(query.sortBy === "categoryName", (qb) => qb.orderBy("news_type_translation.name", query.sortOrder))
     .orderBy("news.id", "desc")
     .limit(query.pageSize)
     .offset(offset)
@@ -338,7 +329,7 @@ export async function toAdminNewsView(row: NewsRow) {
     newsTypeId: row.newsTypeId,
     translations: Object.fromEntries(
       translations.map((tr) => [tr.locale, { title: tr.title, summary: tr.summary, body: tr.body }]),
-    ) as Record<LocaleCode, { title: string; summary: string; body: string }>,
+    ),
   };
 }
 

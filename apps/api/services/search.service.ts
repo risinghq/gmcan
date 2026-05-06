@@ -69,7 +69,9 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       ? db
           .selectFrom("project")
           .innerJoin("project_translation", (join) =>
-            join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", DEFAULT_LOCALE),
+            join
+              .onRef("project_translation.projectId", "=", "project.id")
+              .on("project_translation.locale", "=", DEFAULT_LOCALE),
           )
           .innerJoin("research_line", "research_line.id", "project.researchLineId")
           .innerJoin("funding_source", "funding_source.id", "project.fundingSourceId")

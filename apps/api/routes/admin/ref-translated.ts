@@ -3,14 +3,6 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "../../db/client.js";
-import type {
-  MemberTypeTable,
-  MemberTypeTranslationTable,
-  NewsTypeTable,
-  PublicationTypeTable,
-  ThesisTypeTable,
-  UniversityTable,
-} from "../../db/schema.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { getNewsTypeReferenceCount } from "../../services/ref.service.js";
 
@@ -68,13 +60,15 @@ router.get("/member-type/:id", zValidator("param", IdParam), async (c) => {
 
   return c.json({
     id,
-    translations: Object.fromEntries(translations.map((tr) => [tr.locale, { name: tr.name, nameSingular: tr.nameSingular }])),
+    translations: Object.fromEntries(
+      translations.map((tr) => [tr.locale, { name: tr.name, nameSingular: tr.nameSingular }]),
+    ),
   });
 });
 
 router.post("/member-type", zValidator("json", MemberTypeTranslationBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const created = await db.insertInto("member_type").values({} as Omit<MemberTypeTable, "id">).executeTakeFirstOrThrow();
+  const created = await db.insertInto("member_type").defaultValues().executeTakeFirstOrThrow();
   const id = Number(created.insertId);
 
   await db
@@ -85,35 +79,40 @@ router.post("/member-type", zValidator("json", MemberTypeTranslationBody), async
         locale,
         name: payload.name,
         nameSingular: payload.nameSingular,
-      })) as Omit<MemberTypeTranslationTable, "id">[],
+      })),
     )
     .execute();
 
   return c.json({ id }, 201);
 });
 
-router.put("/member-type/:id", zValidator("param", IdParam), zValidator("json", MemberTypeTranslationBody), async (c) => {
-  const { id } = c.req.valid("param");
-  const { translations } = c.req.valid("json");
+router.put(
+  "/member-type/:id",
+  zValidator("param", IdParam),
+  zValidator("json", MemberTypeTranslationBody),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const { translations } = c.req.valid("json");
 
-  await db.transaction().execute(async (trx) => {
-    await trx.selectFrom("member_type").select("id").where("id", "=", id).executeTakeFirstOrThrow();
-    await trx.deleteFrom("member_type_translation").where("memberTypeId", "=", id).execute();
-    await trx
-      .insertInto("member_type_translation")
-      .values(
-        Object.entries(translations).map(([locale, payload]) => ({
-          memberTypeId: id,
-          locale,
-          name: payload.name,
-          nameSingular: payload.nameSingular,
-        })),
-      )
-      .execute();
-  });
+    await db.transaction().execute(async (trx) => {
+      await trx.selectFrom("member_type").select("id").where("id", "=", id).executeTakeFirstOrThrow();
+      await trx.deleteFrom("member_type_translation").where("memberTypeId", "=", id).execute();
+      await trx
+        .insertInto("member_type_translation")
+        .values(
+          Object.entries(translations).map(([locale, payload]) => ({
+            memberTypeId: id,
+            locale,
+            name: payload.name,
+            nameSingular: payload.nameSingular,
+          })),
+        )
+        .execute();
+    });
 
-  return c.json({ status: 1 });
-});
+    return c.json({ status: 1 });
+  },
+);
 
 router.delete("/member-type/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
@@ -123,7 +122,11 @@ router.delete("/member-type/:id", zValidator("param", IdParam), async (c) => {
 
 async function listNamedTranslated(
   table: "publication_type" | "thesis_type" | "news_type" | "university",
-  trTable: "publication_type_translation" | "thesis_type_translation" | "news_type_translation" | "university_translation",
+  trTable:
+    | "publication_type_translation"
+    | "thesis_type_translation"
+    | "news_type_translation"
+    | "university_translation",
   ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
 ) {
   const rows = await db
@@ -133,7 +136,7 @@ async function listNamedTranslated(
     .execute();
 
   const byId = new Map<number, Record<string, { name: string }>>();
-  for (const row of rows as Array<{ id: number; locale: string; name: string }>) {
+  for (const row of rows) {
     byId.set(row.id, { ...(byId.get(row.id) ?? {}), [row.locale]: { name: row.name } });
   }
   return Array.from(byId.entries()).map(([id, translations]) => ({ id, translations }));
@@ -142,17 +145,17 @@ async function listNamedTranslated(
 async function getNamedTranslated(
   id: number,
   table: "publication_type" | "thesis_type" | "news_type" | "university",
-  trTable: "publication_type_translation" | "thesis_type_translation" | "news_type_translation" | "university_translation",
+  trTable:
+    | "publication_type_translation"
+    | "thesis_type_translation"
+    | "news_type_translation"
+    | "university_translation",
   ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
 ) {
   const row = await db.selectFrom(table).select(["id"]).where("id", "=", id).executeTakeFirst();
   if (!row) return null;
 
-  const translations = await db
-    .selectFrom(trTable)
-    .select(["locale", "name"])
-    .where(ownerCol, "=", id)
-    .execute();
+  const translations = await db.selectFrom(trTable).select(["locale", "name"]).where(ownerCol, "=", id).execute();
 
   return { id, translations: Object.fromEntries(translations.map((tr) => [tr.locale, { name: tr.name }])) };
 }
@@ -160,13 +163,14 @@ async function getNamedTranslated(
 async function createNamedTranslated(
   translations: Record<string, { name: string }>,
   table: "publication_type" | "thesis_type" | "news_type" | "university",
-  trTable: "publication_type_translation" | "thesis_type_translation" | "news_type_translation" | "university_translation",
+  trTable:
+    | "publication_type_translation"
+    | "thesis_type_translation"
+    | "news_type_translation"
+    | "university_translation",
   ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
 ) {
-  const created = await db
-    .insertInto(table)
-    .values({} as Omit<PublicationTypeTable | ThesisTypeTable | NewsTypeTable | UniversityTable, "id">)
-    .executeTakeFirstOrThrow();
+  const created = await db.insertInto(table).defaultValues().executeTakeFirstOrThrow();
   const id = Number(created.insertId);
 
   await db
@@ -181,7 +185,11 @@ async function updateNamedTranslated(
   id: number,
   translations: Record<string, { name: string }>,
   table: "publication_type" | "thesis_type" | "news_type" | "university",
-  trTable: "publication_type_translation" | "thesis_type_translation" | "news_type_translation" | "university_translation",
+  trTable:
+    | "publication_type_translation"
+    | "thesis_type_translation"
+    | "news_type_translation"
+    | "university_translation",
   ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
 ) {
   await db.transaction().execute(async (trx) => {
@@ -205,14 +213,30 @@ router.get("/publication-type/:id", zValidator("param", IdParam), async (c) => {
 });
 router.post("/publication-type", zValidator("json", NamedTranslationBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const id = await createNamedTranslated(translations, "publication_type", "publication_type_translation", "publicationTypeId");
+  const id = await createNamedTranslated(
+    translations,
+    "publication_type",
+    "publication_type_translation",
+    "publicationTypeId",
+  );
   return c.json({ id }, 201);
 });
-router.put("/publication-type/:id", zValidator("param", IdParam), zValidator("json", NamedTranslationBody), async (c) => {
-  const { id } = c.req.valid("param");
-  await updateNamedTranslated(id, c.req.valid("json").translations, "publication_type", "publication_type_translation", "publicationTypeId");
-  return c.json({ status: 1 });
-});
+router.put(
+  "/publication-type/:id",
+  zValidator("param", IdParam),
+  zValidator("json", NamedTranslationBody),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    await updateNamedTranslated(
+      id,
+      c.req.valid("json").translations,
+      "publication_type",
+      "publication_type_translation",
+      "publicationTypeId",
+    );
+    return c.json({ status: 1 });
+  },
+);
 router.delete("/publication-type/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("publication_type").where("id", "=", id).execute();
@@ -235,7 +259,13 @@ router.post("/thesis-type", zValidator("json", NamedTranslationBody), async (c) 
 });
 router.put("/thesis-type/:id", zValidator("param", IdParam), zValidator("json", NamedTranslationBody), async (c) => {
   const { id } = c.req.valid("param");
-  await updateNamedTranslated(id, c.req.valid("json").translations, "thesis_type", "thesis_type_translation", "thesisTypeId");
+  await updateNamedTranslated(
+    id,
+    c.req.valid("json").translations,
+    "thesis_type",
+    "thesis_type_translation",
+    "thesisTypeId",
+  );
   return c.json({ status: 1 });
 });
 router.delete("/thesis-type/:id", zValidator("param", IdParam), async (c) => {
@@ -285,7 +315,13 @@ router.post("/university", zValidator("json", NamedTranslationBody), async (c) =
 });
 router.put("/university/:id", zValidator("param", IdParam), zValidator("json", NamedTranslationBody), async (c) => {
   const { id } = c.req.valid("param");
-  await updateNamedTranslated(id, c.req.valid("json").translations, "university", "university_translation", "universityId");
+  await updateNamedTranslated(
+    id,
+    c.req.valid("json").translations,
+    "university",
+    "university_translation",
+    "universityId",
+  );
   return c.json({ status: 1 });
 });
 router.delete("/university/:id", zValidator("param", IdParam), async (c) => {

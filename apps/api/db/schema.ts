@@ -219,9 +219,9 @@ export interface AboutTranslationTable {
   aboutId: number;
   locale: string;
   description: string;
-  objectivesContent: string | null;
-  servicesContent: string | null;
-  homeServicesTeaserContent: string | null;
+  objectivesContent: string;
+  servicesContent: string;
+  homeServicesTeaserContent: string;
 }
 
 export interface GroupTranslationTable {
