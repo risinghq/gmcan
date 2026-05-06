@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import type {
-  PublicPublicationListQuery,
+  PublicationKindCode,
   PublicPublicationWithAuthors,
   ThesisKindCode,
 } from "@gmcan/contracts/public";
@@ -21,7 +21,12 @@ export interface PublicationFields {
   translations: Record<string, { title: string; abstract?: string }>;
 }
 
-export type PublicationFilters = PublicPublicationListQuery;
+export interface PublicationFilters {
+  kindCode?: PublicationKindCode;
+  event?: number;
+  journal?: number;
+  university?: number;
+}
 
 export interface AdminPublicationFilters {
   kindCode?: "journal_article" | "conference_paper" | "thesis";
