@@ -25,39 +25,39 @@ export class ProjectService {
 
   // Public
   listProjects(): Observable<ProjectWithMembers[]> {
-    return this.http.get<ProjectWithMembers[]>(`${GLOBAL.url}api/projects`);
+    return this.http.get<ProjectWithMembers[]>(GLOBAL.api("projects"));
   }
 
   // Admin
   listAdminProjects(): Observable<AdminProjectListItem[]> {
-    return this.http.get<AdminProjectListItem[]>(`${GLOBAL.url}admin/projects`);
+    return this.http.get<AdminProjectListItem[]>(GLOBAL.admin("projects"));
   }
 
   getProject(id: number): Observable<Project> {
-    return this.http.get<Project>(`${GLOBAL.url}admin/projects/${id}`);
+    return this.http.get<Project>(GLOBAL.admin(`projects/${id}`));
   }
 
   createProject(body: ProjectBody): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/projects`, body);
+    return this.http.post<{ id: number }>(GLOBAL.admin("projects"), body);
   }
 
   updateProject(id: number, body: ProjectBody): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/projects/${id}`, body);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`projects/${id}`), body);
   }
 
   deleteProject(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/projects/${id}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`projects/${id}`));
   }
 
   getProjectMembers(id: number): Observable<AdminProjectListItem["members"]> {
-    return this.http.get<AdminProjectListItem["members"]>(`${GLOBAL.url}admin/projects/${id}/members`);
+    return this.http.get<AdminProjectListItem["members"]>(GLOBAL.admin(`projects/${id}/members`));
   }
 
   addProjectMember(id: number, memberId: number): Observable<{ status: number }> {
-    return this.http.post<{ status: number }>(`${GLOBAL.url}admin/projects/${id}/members`, { memberId });
+    return this.http.post<{ status: number }>(GLOBAL.admin(`projects/${id}/members`), { memberId });
   }
 
   removeProjectMember(id: number, memberId: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/projects/${id}/members/${memberId}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`projects/${id}/members/${memberId}`));
   }
 }

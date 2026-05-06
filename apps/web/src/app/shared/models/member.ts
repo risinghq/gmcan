@@ -36,3 +36,9 @@ export interface MemberProfile {
   projects: Project[];
   publications: Publication[];
 }
+
+export interface MemberGroup {
+  id: number;
+  name: string;
+  fullName: string | null;
+}

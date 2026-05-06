@@ -22,33 +22,33 @@ export class MethodsService {
 
   // Public
   list(): Observable<Method[]> {
-    return this.http.get<Method[]>(`${GLOBAL.url}api/methods`);
+    return this.http.get<Method[]>(GLOBAL.api("methods"));
   }
 
   // Admin
   listAdmin(): Observable<Method[]> {
-    return this.http.get<Method[]>(`${GLOBAL.url}admin/methods`);
+    return this.http.get<Method[]>(GLOBAL.admin("methods"));
   }
 
   get(id: number): Observable<Method> {
-    return this.http.get<Method>(`${GLOBAL.url}admin/methods/${id}`);
+    return this.http.get<Method>(GLOBAL.admin(`methods/${id}`));
   }
 
   create(body: MethodBody): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/methods`, body);
+    return this.http.post<{ id: number }>(GLOBAL.admin("methods"), body);
   }
 
   update(id: number, body: MethodUpdateBody): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/methods/${id}`, body);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`methods/${id}`), body);
   }
 
   delete(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/methods/${id}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`methods/${id}`));
   }
 
   uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/method/${id}/photo`, formData);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`assets/method/${id}/photo`), formData);
   }
 }

@@ -1,17 +1,12 @@
-import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, inject } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
 import { AuthzService } from "@app/shared/services/authz.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
+import { MemberService } from "@app/shared/services/member.service";
+import { PublicationService } from "@app/shared/services/publication.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { BaseChartDirective } from "ng2-charts";
-
-interface CountTypeItem {
-  name?: string;
-  total?: string | number;
-}
 
 @Component({
   selector: "app-dashboard",
@@ -22,15 +17,14 @@ interface CountTypeItem {
 export default class DashboardComponent implements OnInit {
   authz = inject(AuthzService);
   groupService = inject(GroupService);
-  private http = inject(HttpClient);
+  private memberService = inject(MemberService);
+  private publicationService = inject(PublicationService);
   private uiState = inject(UiStateService);
 
   screenWidth = window.innerWidth;
-  public url: string;
   public grupoinfo: Group;
 
   constructor() {
-    this.url = GLOBAL.url;
     this.grupoinfo = this.uiState.groupInfo();
   }
 
@@ -47,7 +41,7 @@ export default class DashboardComponent implements OnInit {
   total2 = 0;
 
   getCountTypeMember(): void {
-    this.http.get<CountTypeItem[]>(`${GLOBAL.url}api/members/count-by-type`).subscribe((res) => {
+    this.memberService.countByType().subscribe((res) => {
       if (res && res.length > 0) {
         const labels: string[] = [];
         const data: string[] = [];
@@ -64,7 +58,7 @@ export default class DashboardComponent implements OnInit {
   }
 
   getCountTypePublication(): void {
-    this.http.get<CountTypeItem[]>(`${GLOBAL.url}api/publications/count-by-type`).subscribe((res) => {
+    this.publicationService.countByType().subscribe((res) => {
       if (res && res.length > 0) {
         const labels: string[] = [];
         const data: string[] = [];

@@ -11,7 +11,7 @@ import { GLOBAL } from "./global";
 export class LookupService {
   private http = inject(HttpClient);
 
-  private readonly lookup$ = this.http.get<LookupData>(`${GLOBAL.url}api/lookup`).pipe(
+  private readonly lookup$ = this.http.get<LookupData>(GLOBAL.api("lookup")).pipe(
     share(),
     catchError(() => of(this.getEmptyLookup())),
   );

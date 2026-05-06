@@ -36,7 +36,7 @@ export default class DetailNewsComponent implements OnInit {
   day = "";
   month = "";
   year = "";
-  url = GLOBAL.url;
+  shareUrl = "";
   language: (typeof Languages)[number] = Languages[0];
 
   ngOnInit(): void {
@@ -55,6 +55,7 @@ export default class DetailNewsComponent implements OnInit {
     this.meta.updateTag({ name: "title", content: String(this.newsItem.title) });
     this.meta.updateTag({ property: "og:title", content: String(this.newsItem.title) });
     this.titleService.setTitle(String(this.newsItem.title));
+    this.shareUrl = GLOBAL.app(`detail-news/${this.newsItem.id}`);
     const origin = parsePublicOrigin(this.route);
     const originInfo = getPublicOriginInfo(origin);
     this.previouslink = originInfo.route;

@@ -22,33 +22,33 @@ export class ResearchLinesService {
 
   // Public
   list(): Observable<ResearchLine[]> {
-    return this.http.get<ResearchLine[]>(`${GLOBAL.url}api/research-lines`);
+    return this.http.get<ResearchLine[]>(GLOBAL.api("research-lines"));
   }
 
   // Admin
   listAdmin(): Observable<ResearchLine[]> {
-    return this.http.get<ResearchLine[]>(`${GLOBAL.url}admin/research-lines`);
+    return this.http.get<ResearchLine[]>(GLOBAL.admin("research-lines"));
   }
 
   get(id: number): Observable<ResearchLine> {
-    return this.http.get<ResearchLine>(`${GLOBAL.url}admin/research-lines/${id}`);
+    return this.http.get<ResearchLine>(GLOBAL.admin(`research-lines/${id}`));
   }
 
   create(body: ResearchLineBody): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/research-lines`, body);
+    return this.http.post<{ id: number }>(GLOBAL.admin("research-lines"), body);
   }
 
   update(id: number, body: ResearchLineUpdateBody): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/research-lines/${id}`, body);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`research-lines/${id}`), body);
   }
 
   delete(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/research-lines/${id}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`research-lines/${id}`));
   }
 
   uploadAsset(id: number, file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/assets/research_line/${id}/photo`, formData);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`assets/research_line/${id}/photo`), formData);
   }
 }

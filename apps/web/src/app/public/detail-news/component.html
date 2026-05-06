@@ -40,7 +40,7 @@
               </div>
             </div>
           </div>
-          <app-shared-share-buttons [url]="url + 'api/news/' + newsItem.id" [title]="newsItem.title" />
+          <app-shared-share-buttons [url]="shareUrl" [title]="newsItem.title" />
 
           <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="newsItem.body"></div>
         </div>
