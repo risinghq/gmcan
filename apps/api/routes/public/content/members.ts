@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../services/assets/service.js";
-import { getMemberProfileLocalized, listMembersLocalized } from "../../services/member.service.js";
+import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../../services/assets/service.js";
+import { getMemberProfileLocalized, listMembersLocalized } from "../../../services/member.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });

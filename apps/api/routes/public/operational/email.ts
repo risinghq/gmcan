@@ -5,14 +5,14 @@ import { Hono } from "hono";
 import { Resend } from "resend";
 import { z } from "zod";
 
-import { getFrontendUrl } from "../../config.js";
-import { env } from "../../config/env.js";
+import { getFrontendUrl } from "../../../config.js";
+import { env } from "../../../config/env.js";
 import {
   consumeResetToken,
   getMemberByEmail,
   getMemberByResetToken,
   setResetToken,
-} from "../../services/member.service.js";
+} from "../../../services/member.service.js";
 
 const router = new Hono();
 const resend = new Resend(env.RESEND_API_KEY);

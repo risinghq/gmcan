@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../services/assets/service.js";
-import { globalSearch } from "../../services/search.service.js";
+import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../../services/assets/service.js";
+import { globalSearch } from "../../../services/search.service.js";
 
 const router = new Hono();
 

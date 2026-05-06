@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { getProjectLocalized, listProjectsLocalized } from "../../services/project.service.js";
+import { getProjectLocalized, listProjectsLocalized } from "../../../services/project.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });

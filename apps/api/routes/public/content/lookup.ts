@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../../lib/locales.js";
-import { getLookupData } from "../../services/ref.service.js";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../../../lib/locales.js";
+import { getLookupData } from "../../../services/ref.service.js";
 
 const router = new Hono();
 

@@ -22,24 +22,26 @@ import AdminProjectsRoutes from "./routes/admin/projects.js";
 import AdminPublicationsRoutes from "./routes/admin/publications.js";
 import AdminRefRoutes from "./routes/admin/ref.js";
 import AdminResearchLinesRoutes from "./routes/admin/research-lines.js";
-import PublicAssetsRoutes from "./routes/public/assets.js";
-import PublicEmailRoutes from "./routes/public/email.js";
-import PublicEquipmentRoutes from "./routes/public/equipment.js";
-import PublicEventsRoutes from "./routes/public/events.js";
-import PublicGroupRoutes from "./routes/public/group.js";
-import PublicLookupRoutes from "./routes/public/lookup.js";
-import PublicMembersRoutes from "./routes/public/members.js";
-import PublicMethodsRoutes from "./routes/public/methods.js";
-import PublicNewsRoutes from "./routes/public/news.js";
-import PublicProjectsRoutes from "./routes/public/projects.js";
-import PublicPublicationsRoutes from "./routes/public/publications.js";
-import PublicResearchLinesRoutes from "./routes/public/research-lines.js";
-import PublicSearchRoutes from "./routes/public/search.js";
-import PublicSoftwareRoutes from "./routes/public/software.js";
+import PublicAssetsRoutes from "./routes/public/content/assets.js";
+import PublicEquipmentRoutes from "./routes/public/content/equipment.js";
+import PublicEventsRoutes from "./routes/public/content/events.js";
+import PublicGroupRoutes from "./routes/public/content/group.js";
+import PublicLookupRoutes from "./routes/public/content/lookup.js";
+import PublicMembersRoutes from "./routes/public/content/members.js";
+import PublicMethodsRoutes from "./routes/public/content/methods.js";
+import PublicNewsRoutes from "./routes/public/content/news.js";
+import PublicProjectsRoutes from "./routes/public/content/projects.js";
+import PublicPublicationsRoutes from "./routes/public/content/publications.js";
+import PublicResearchLinesRoutes from "./routes/public/content/research-lines.js";
+import PublicSearchRoutes from "./routes/public/content/search.js";
+import PublicSoftwareRoutes from "./routes/public/content/software.js";
+import PublicEmailRoutes from "./routes/public/operational/email.js";
 
 await bootstrap();
 
 const app = new Hono({ strict: false });
+const publicContentApi = new Hono({ strict: false });
+const adminApi = new Hono({ strict: false });
 
 app.onError(onError);
 
@@ -53,41 +55,45 @@ app.use(
   }),
 );
 
-// Public API
-app.route("/api/email", PublicEmailRoutes);
-app.use("/api/*", requireRequestLocale);
-app.route("/api/publications", PublicPublicationsRoutes);
-app.route("/api/members", PublicMembersRoutes);
-app.route("/api/projects", PublicProjectsRoutes);
-app.route("/api/news", PublicNewsRoutes);
-app.route("/api/events", PublicEventsRoutes);
-app.route("/api/research-lines", PublicResearchLinesRoutes);
-app.route("/api/methods", PublicMethodsRoutes);
-app.route("/api/software", PublicSoftwareRoutes);
-app.route("/api/equipment", PublicEquipmentRoutes);
-app.route("/api/group", PublicGroupRoutes);
-app.route("/api/lookup", PublicLookupRoutes);
-app.route("/api/search", PublicSearchRoutes);
-app.route("/api/assets", PublicAssetsRoutes);
+// Public content API (locale-aware)
+publicContentApi.use("*", requireRequestLocale);
+publicContentApi.route("/publications", PublicPublicationsRoutes);
+publicContentApi.route("/members", PublicMembersRoutes);
+publicContentApi.route("/projects", PublicProjectsRoutes);
+publicContentApi.route("/news", PublicNewsRoutes);
+publicContentApi.route("/events", PublicEventsRoutes);
+publicContentApi.route("/research-lines", PublicResearchLinesRoutes);
+publicContentApi.route("/methods", PublicMethodsRoutes);
+publicContentApi.route("/software", PublicSoftwareRoutes);
+publicContentApi.route("/equipment", PublicEquipmentRoutes);
+publicContentApi.route("/group", PublicGroupRoutes);
+publicContentApi.route("/lookup", PublicLookupRoutes);
+publicContentApi.route("/search", PublicSearchRoutes);
+publicContentApi.route("/assets", PublicAssetsRoutes);
 
 // Admin API
 // All routes under /admin/* require session (login/logout exempted in middleware)
-app.use("/admin/*", requireRequestLocale);
-app.use("/admin/*", requireSession);
-app.use("/admin/*", loadActor);
-app.route("/admin/auth", AdminAuthRoutes);
-app.route("/admin/account", AdminAccountRoutes);
-app.route("/admin/assets", AdminAssetsRoutes);
-app.route("/admin/dashboard", AdminDashboardRoutes);
-app.route("/admin/email", AdminEmailRoutes);
-app.route("/admin/members", AdminMembersRoutes);
-app.route("/admin/publications", AdminPublicationsRoutes);
-app.route("/admin/projects", AdminProjectsRoutes);
-app.route("/admin/news", AdminNewsRoutes);
-app.route("/admin/events", AdminEventsRoutes);
-app.route("/admin/research-lines", AdminResearchLinesRoutes);
-app.route("/admin/methods", AdminMethodsRoutes);
-app.route("/admin/group", AdminGroupRoutes);
-app.route("/admin/ref", AdminRefRoutes);
+adminApi.use("*", requireRequestLocale);
+adminApi.use("*", requireSession);
+adminApi.use("*", loadActor);
+adminApi.route("/auth", AdminAuthRoutes);
+adminApi.route("/account", AdminAccountRoutes);
+adminApi.route("/assets", AdminAssetsRoutes);
+adminApi.route("/dashboard", AdminDashboardRoutes);
+adminApi.route("/email", AdminEmailRoutes);
+adminApi.route("/members", AdminMembersRoutes);
+adminApi.route("/publications", AdminPublicationsRoutes);
+adminApi.route("/projects", AdminProjectsRoutes);
+adminApi.route("/news", AdminNewsRoutes);
+adminApi.route("/events", AdminEventsRoutes);
+adminApi.route("/research-lines", AdminResearchLinesRoutes);
+adminApi.route("/methods", AdminMethodsRoutes);
+adminApi.route("/group", AdminGroupRoutes);
+adminApi.route("/ref", AdminRefRoutes);
+
+// Public operational endpoint (explicitly locale-agnostic)
+app.route("/api/email", PublicEmailRoutes);
+app.route("/api", publicContentApi);
+app.route("/admin", adminApi);
 
 serve({ fetch: app.fetch, port: 3000 });

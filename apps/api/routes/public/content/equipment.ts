@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { listEquipment } from "../../services/group.service.js";
+import { listEquipment } from "../../../services/group.service.js";
 
 const router = new Hono();
 
