@@ -1,5 +1,4 @@
 import { db } from "../db/client.js";
-import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "./assets/service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
@@ -14,7 +13,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           .innerJoin("publication_translation", (join) =>
             join
               .onRef("publication_translation.publicationId", "=", "publication.id")
-              .on("publication_translation.locale", "=", DEFAULT_LOCALE),
+              .on("publication_translation.locale", "=", locale),
           )
           .select([
             "publication.id",
@@ -48,7 +47,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
       ? db
           .selectFrom("news")
           .leftJoin("news_translation", (join) =>
-            join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", DEFAULT_LOCALE),
+            join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", locale),
           )
           .leftJoin("member", "member.id", "news.authorId")
           .select([
@@ -72,7 +71,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           .innerJoin("project_translation", (join) =>
             join
               .onRef("project_translation.projectId", "=", "project.id")
-              .on("project_translation.locale", "=", DEFAULT_LOCALE),
+              .on("project_translation.locale", "=", locale),
           )
           .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
           .select([
