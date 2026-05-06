@@ -19,6 +19,8 @@ import { MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
+import { PublishabilityDialogComponent } from "../publishability-dialog.component";
+
 @Component({
   selector: "app-add-member",
   templateUrl: "./add-member.component.html",
@@ -247,6 +249,17 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     if (!this.publishability) return "Estado de publicación no disponible";
     if (this.publishability.publishable) return "Ready para mostrarse en público";
     return `Borrador: ${this.missingRequirementsCount()} requisito(s) pendiente(s)`;
+  }
+
+  openPublishabilityDetails(): void {
+    if (!this.publishability) return;
+    this.dialog.open(PublishabilityDialogComponent, {
+      width: "560px",
+      data: {
+        memberName: `${this.member.firstName} ${this.member.lastName}`.trim(),
+        publishability: this.publishability,
+      },
+    });
   }
 
   openEraser() {}

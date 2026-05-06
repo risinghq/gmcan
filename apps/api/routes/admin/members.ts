@@ -110,19 +110,6 @@ router.post("/", requirePermission("members.write"), zValidator("json", CreateBo
   return c.json({ id }, 201);
 });
 
-router.put(
-  "/:id",
-  requirePermission("members.write"),
-  zValidator("param", IdParam),
-  zValidator("json", UpdateBody),
-  async (c) => {
-    const { id } = c.req.valid("param");
-    const data = c.req.valid("json");
-    await updateMember(id, data);
-    return c.json(okStatus());
-  },
-);
-
 router.patch(
   "/:id",
   requirePermission("members.write"),

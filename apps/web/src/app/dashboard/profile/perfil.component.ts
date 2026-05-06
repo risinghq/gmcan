@@ -10,6 +10,7 @@ import {
 import { MatButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from "@angular/material/datepicker";
+import { MatDialog } from "@angular/material/dialog";
 import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatOption, MatSelect } from "@angular/material/select";
@@ -22,6 +23,8 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService, type MemberUpdateBody } from "@app/shared/services/member.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
+
+import { PublishabilityDialogComponent } from "../members/publishability-dialog.component";
 
 type MemberStatus = 0 | 1 | 3;
 
@@ -60,6 +63,7 @@ export default class PerfilComponent implements OnInit {
   lookup = inject(LookupService);
   private snackBar = inject(MatSnackBar);
   private uiState = inject(UiStateService);
+  private dialog = inject(MatDialog);
 
   readonly url = GLOBAL.url;
   readonly minPasswordLength = MIN_PASSWORD_LENGTH;
@@ -312,6 +316,17 @@ export default class PerfilComponent implements OnInit {
     if (this.memberId == null) return;
     this.memberService.getMemberPublishability(this.memberId).subscribe((data) => {
       this.publishability = data;
+    });
+  }
+
+  openPublishabilityDetails(): void {
+    if (!this.publishability) return;
+    this.dialog.open(PublishabilityDialogComponent, {
+      width: "560px",
+      data: {
+        memberName: `${this.member.firstName} ${this.member.lastName}`.trim(),
+        publishability: this.publishability,
+      },
     });
   }
 }

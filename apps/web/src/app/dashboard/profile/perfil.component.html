@@ -6,9 +6,19 @@
         @if (publishability) {
           <div class="mb-16">
             @if (publishability.publishable) {
-              <span class="status-chip status-ready" [title]="publishabilityTooltip()">Ready</span>
+              <span
+                class="status-chip status-ready"
+                [title]="publishabilityTooltip()"
+                (click)="openPublishabilityDetails()"
+              >
+                Ready
+              </span>
             } @else {
-              <span class="status-chip status-draft" [title]="publishabilityTooltip()">
+              <span
+                class="status-chip status-draft"
+                [title]="publishabilityTooltip()"
+                (click)="openPublishabilityDetails()"
+              >
                 Draft · {{ missingRequirementsCount() }}
               </span>
             }

@@ -73,9 +73,11 @@
       <th mat-header-cell *matHeaderCellDef>Estado</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">
         @if (row.publishability?.publishable) {
-          <span class="status-chip status-ready">Ready</span>
+          <span class="status-chip status-ready" (click)="openPublishability(row, $event)">Ready</span>
         } @else {
-          <span class="status-chip status-draft">Draft · {{ missingCount(row) }}</span>
+          <span class="status-chip status-draft" (click)="openPublishability(row, $event)">
+            Draft · {{ missingCount(row) }}
+          </span>
         }
       </td>
     </ng-container>

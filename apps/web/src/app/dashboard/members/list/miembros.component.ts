@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, viewChild } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -18,6 +19,8 @@ import {
 import { ActivatedRoute, Router } from "@angular/router";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { MemberService } from "@app/shared/services/member.service";
+
+import { PublishabilityDialogComponent } from "../publishability-dialog.component";
 
 @Component({
   selector: "app-miembros",
@@ -44,6 +47,7 @@ export default class MiembrosComponent implements OnInit {
   private memberService = inject(MemberService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
 
   displayedColumns: string[] = [
     "firstName",
@@ -119,5 +123,17 @@ export default class MiembrosComponent implements OnInit {
       row.publishability.missing.base.length +
       Object.values(row.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
     );
+  }
+
+  openPublishability(row: AdminMemberListItem, event: Event): void {
+    event.stopPropagation();
+    if (!row.publishability) return;
+    this.dialog.open(PublishabilityDialogComponent, {
+      width: "560px",
+      data: {
+        memberName: `${row.firstName} ${row.lastName}`.trim(),
+        publishability: row.publishability,
+      },
+    });
   }
 }
