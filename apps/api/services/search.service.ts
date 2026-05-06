@@ -2,25 +2,37 @@ import { sql } from "kysely";
 
 import { db } from "../db/client.js";
 import { MEMBER_PUBLIC } from "../db/projections.js";
+import { type Locale } from "../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
-export async function globalSearch(q: string, types: Set<string>) {
+export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
   const like = `%${q}%`;
 
   const [publicationRows, members, newsRows, projectRows] = await Promise.all([
     types.has("publications")
       ? db
           .selectFrom("publication")
+          .innerJoin("publication_translation", (join) =>
+            join
+              .onRef("publication_translation.publicationId", "=", "publication.id")
+              .on("publication_translation.locale", "=", "es"),
+          )
           .selectAll()
           .where((eb) =>
-            eb.or([eb("title", "like", like), eb("abstractES", "like", like), eb("abstractEN", "like", like)]),
+            eb.or([
+              eb("publication_translation.title", "like", like),
+              eb("publication_translation.abstract", "like", like),
+            ]),
           )
           .execute()
       : Promise.resolve([]),
     types.has("members")
       ? db
           .selectFrom("member")
-          .select(MEMBER_PUBLIC)
+          .leftJoin("member_translation", (join) =>
+            join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
+          )
+          .select([...MEMBER_PUBLIC, "member_translation.bio as localizedBio"])
           .where((eb) =>
             eb.or([
               eb("firstName", "like", like),
@@ -55,16 +67,17 @@ export async function globalSearch(q: string, types: Set<string>) {
     types.has("projects")
       ? db
           .selectFrom("project")
+          .innerJoin("project_translation", (join) =>
+            join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", "es"),
+          )
           .innerJoin("research_line", "research_line.id", "project.researchLineId")
           .innerJoin("funding_source", "funding_source.id", "project.fundingSourceId")
           .select([
             "project.id",
-            "project.title",
-            "project.titleEN",
+            "project_translation.title as title",
             "project.code",
             "project.fundedAmount",
-            "project.description",
-            "project.descriptionEN",
+            "project_translation.description as description",
             "project.status",
             "project.startDate",
             "project.endDate",
@@ -77,11 +90,9 @@ export async function globalSearch(q: string, types: Set<string>) {
           .where("project.status", "=", 1)
           .where((eb) =>
             eb.or([
-              eb("project.title", "like", like),
-              eb("project.titleEN", "like", like),
+              eb("project_translation.title", "like", like),
               eb("project.code", "like", like),
-              eb("project.description", "like", like),
-              eb("project.descriptionEN", "like", like),
+              eb("project_translation.description", "like", like),
               eb("funding_source.name", "like", like),
             ]),
           )

@@ -4,6 +4,8 @@ import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { Bilingual } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
+import { SUPPORTED_LOCALES, type LocaleCode } from "../lib/locales.js";
+import { throwMissingTranslation, type Locale } from "../lib/public-locale.js";
 import type { AdminPublicationListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
@@ -27,12 +29,7 @@ export interface PublicationFields {
 }
 
 function toPublicationRow(data: PublicationFields) {
-  const es = data.translations.es;
-  const en = data.translations.en;
   return {
-    title: es.title,
-    abstractES: es.abstract ?? null,
-    abstractEN: en.abstract ?? null,
     doi: data.doi,
     publishedAt: data.publishedAt,
     journalIssue: data.journalIssue,
@@ -81,8 +78,30 @@ async function attachAuthors(publicationId: number) {
   );
 }
 
-export async function listPublications() {
-  const publications = await db.selectFrom("publication").selectAll().execute();
+export async function listPublications(locale: Locale) {
+  const publications = await db
+    .selectFrom("publication")
+    .innerJoin("publication_translation", (join) =>
+      join
+        .onRef("publication_translation.publicationId", "=", "publication.id")
+        .on("publication_translation.locale", "=", locale),
+    )
+    .select([
+      "publication.id as id",
+      "publication_translation.title as title",
+      "publication_translation.abstract as abstract",
+      "publication.journalIssue as journalIssue",
+      "publication.doi as doi",
+      "publication.publishedAt as publishedAt",
+      "publication.updatedAt as updatedAt",
+      "publication.createdAt as createdAt",
+      "publication.typeId as typeId",
+      "publication.journalId as journalId",
+      "publication.universityId as universityId",
+      "publication.eventId as eventId",
+      "publication.thesisTypeId as thesisTypeId",
+    ])
+    .execute();
   if (publications.length === 0) return [];
 
   const ids = publications.map((p) => p.id);
@@ -129,7 +148,24 @@ export async function listPublications() {
 }
 
 export async function listAdminPublications(typeId?: number): Promise<AdminPublicationListItem[]> {
-  let query = db.selectFrom("publication").selectAll();
+  let query = db
+    .selectFrom("publication")
+    .innerJoin("publication_translation", (join) =>
+      join
+        .onRef("publication_translation.publicationId", "=", "publication.id")
+        .on("publication_translation.locale", "=", "es"),
+    )
+    .select([
+      "publication.id as id",
+      "publication_translation.title as title",
+      "publication.publishedAt as publishedAt",
+      "publication.typeId as typeId",
+      "publication.journalId as journalId",
+      "publication.universityId as universityId",
+      "publication.thesisTypeId as thesisTypeId",
+      "publication.doi as doi",
+      "publication.eventId as eventId",
+    ]);
   if (typeId !== undefined) query = query.where("publication.typeId", "=", typeId);
   const publications = await query.orderBy("publication.publishedAt", "desc").execute();
   if (publications.length === 0) return [];
@@ -194,28 +230,97 @@ export async function listAdminPublications(typeId?: number): Promise<AdminPubli
   });
 }
 
-export async function getPublication(id: number) {
-  const publication = await db.selectFrom("publication").selectAll().where("id", "=", id).executeTakeFirst();
+export async function getPublication(id: number, locale: Locale) {
+  const publication = await db
+    .selectFrom("publication")
+    .innerJoin("publication_translation", (join) =>
+      join
+        .onRef("publication_translation.publicationId", "=", "publication.id")
+        .on("publication_translation.locale", "=", locale),
+    )
+    .select([
+      "publication.id as id",
+      "publication_translation.title as title",
+      "publication_translation.abstract as abstract",
+      "publication.journalIssue as journalIssue",
+      "publication.doi as doi",
+      "publication.publishedAt as publishedAt",
+      "publication.updatedAt as updatedAt",
+      "publication.createdAt as createdAt",
+      "publication.typeId as typeId",
+      "publication.journalId as journalId",
+      "publication.universityId as universityId",
+      "publication.eventId as eventId",
+      "publication.thesisTypeId as thesisTypeId",
+    ])
+    .where("publication.id", "=", id)
+    .executeTakeFirst();
   if (!publication) return null;
   const authors = await attachAuthors(id);
   return { ...publication, authors };
 }
 
 export async function getPublicationEditView(id: number) {
-  return publicationWithAuthors(id);
+  const result = await publicationWithAuthors(id);
+  if (!result.publication) return result;
+
+  const translations = await db
+    .selectFrom("publication_translation")
+    .select(["locale", "title", "abstract"])
+    .where("publicationId", "=", id)
+    .execute();
+
+  for (const locale of SUPPORTED_LOCALES) {
+    if (!translations.find((tr) => tr.locale === locale)) {
+      throwMissingTranslation(`publication:${id}:${locale}`);
+    }
+  }
+
+  return {
+    publication: Object.assign({}, result.publication, {
+      translations: Object.fromEntries(
+        translations.map((tr) => [tr.locale, { title: tr.title, abstract: tr.abstract ?? undefined }]),
+      ) as Record<LocaleCode, { title: string; abstract?: string }>,
+    }),
+    authors: result.authors,
+  };
 }
 
-export async function listPublicationsByFilter(filter: {
-  typeId?: number;
-  eventId?: number;
-  journalId?: number;
-  universityId?: number;
-}) {
-  let query = db.selectFrom("publication").selectAll();
-  if (filter.typeId) query = query.where("typeId", "=", filter.typeId);
-  if (filter.eventId) query = query.where("eventId", "=", filter.eventId);
-  if (filter.journalId) query = query.where("journalId", "=", filter.journalId);
-  if (filter.universityId) query = query.where("universityId", "=", filter.universityId);
+export async function listPublicationsByFilter(
+  locale: Locale,
+  filter: {
+    typeId?: number;
+    eventId?: number;
+    journalId?: number;
+    universityId?: number;
+  },
+) {
+  let query = db
+    .selectFrom("publication")
+    .innerJoin("publication_translation", (join) =>
+      join
+        .onRef("publication_translation.publicationId", "=", "publication.id")
+        .on("publication_translation.locale", "=", locale),
+    )
+    .select([
+      "publication.id as id",
+      "publication_translation.title as title",
+      "publication_translation.abstract as abstract",
+      "publication.journalIssue as journalIssue",
+      "publication.doi as doi",
+      "publication.publishedAt as publishedAt",
+      "publication.updatedAt as updatedAt",
+      "publication.createdAt as createdAt",
+      "publication.typeId as typeId",
+      "publication.journalId as journalId",
+      "publication.universityId as universityId",
+      "publication.eventId as eventId",
+      "publication.thesisTypeId as thesisTypeId",
+    ]);
+  if (filter.typeId) query = query.where("publication.typeId", "=", filter.typeId);
+  if (filter.eventId) query = query.where("publication.eventId", "=", filter.eventId);
+  if (filter.journalId) query = query.where("publication.journalId", "=", filter.journalId);
+  if (filter.universityId) query = query.where("publication.universityId", "=", filter.universityId);
   return query.execute();
 }
 
@@ -223,8 +328,15 @@ export async function searchPublications(q: string) {
   const like = `%${q}%`;
   return db
     .selectFrom("publication")
-    .selectAll()
-    .where((eb) => eb.or([eb("title", "like", like), eb("abstractES", "like", like), eb("abstractEN", "like", like)]))
+    .innerJoin("publication_translation", (join) =>
+      join
+        .onRef("publication_translation.publicationId", "=", "publication.id")
+        .on("publication_translation.locale", "=", "es"),
+    )
+    .selectAll("publication")
+    .where((eb) =>
+      eb.or([eb("publication_translation.title", "like", like), eb("publication_translation.abstract", "like", like)]),
+    )
     .execute();
 }
 
@@ -232,6 +344,19 @@ export async function createPublication(data: PublicationFields, authors: Author
   return db.transaction().execute(async (trx) => {
     const result = await trx.insertInto("publication").values(toPublicationRow(data)).executeTakeFirstOrThrow();
     const id = Number(result.insertId);
+
+    await trx
+      .insertInto("publication_translation")
+      .values(
+        Object.entries(data.translations).map(([locale, tr]) => ({
+          publicationId: id,
+          locale,
+          title: tr.title,
+          abstract: tr.abstract ?? null,
+        })),
+      )
+      .execute();
+
     if (authors.length > 0) {
       await trx
         .insertInto("publication_author")
@@ -252,6 +377,19 @@ export async function createPublication(data: PublicationFields, authors: Author
 export async function updatePublication(id: number, data: PublicationFields, authors: AuthorInput[]) {
   await db.transaction().execute(async (trx) => {
     await trx.updateTable("publication").set(toPublicationRow(data)).where("id", "=", id).execute();
+    await trx.deleteFrom("publication_translation").where("publicationId", "=", id).execute();
+    await trx
+      .insertInto("publication_translation")
+      .values(
+        Object.entries(data.translations).map(([locale, tr]) => ({
+          publicationId: id,
+          locale,
+          title: tr.title,
+          abstract: tr.abstract ?? null,
+        })),
+      )
+      .execute();
+
     await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
     if (authors.length > 0) {
       await trx

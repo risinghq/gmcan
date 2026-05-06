@@ -4,11 +4,22 @@ import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
 import { hashPassword } from "../lib/password.js";
+import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
+}
+
+export async function listMembersLocalized(locale: Locale) {
+  return db
+    .selectFrom("member")
+    .leftJoin("member_translation", (join) =>
+      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
+    )
+    .select([...MEMBER_PUBLIC, "member_translation.bio as localizedBio"])
+    .execute();
 }
 
 export async function listAdminMembers(filter?: {
@@ -101,7 +112,6 @@ export async function getMemberFull(id: number) {
       "maternalName",
       "birthDate",
       "bio",
-      "bioEN",
       "status",
       "roleId",
       "memberTypeId",
@@ -126,6 +136,21 @@ export async function getMemberByDni(dni: string) {
 
 export async function getMemberProfile(id: number) {
   return publicProfile(id);
+}
+
+export async function getMemberProfileLocalized(id: number, locale: Locale) {
+  const profile = await publicProfile(id);
+  if (!profile.member) return profile;
+  const tr = await db
+    .selectFrom("member_translation")
+    .select("bio")
+    .where("memberId", "=", id)
+    .where("locale", "=", locale)
+    .executeTakeFirst();
+  return {
+    ...profile,
+    member: Object.assign({}, profile.member, { localizedBio: tr?.bio ?? null }),
+  };
 }
 
 export async function searchMembers(q: string) {
@@ -200,7 +225,6 @@ export async function createMember(data: {
   maternalName?: string;
   birthDate?: string;
   bio?: string;
-  bioEN?: string;
   status: number;
   roleId: number;
   memberTypeId: number;
@@ -231,7 +255,6 @@ export async function updateMember(
     maternalName?: string;
     birthDate?: string;
     bio?: string;
-    bioEN?: string;
     status: number;
     roleId: number;
     memberTypeId: number;

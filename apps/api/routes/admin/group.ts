@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { throwMissingTranslation } from "../../lib/public-locale.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createEquipment,
@@ -35,12 +36,12 @@ const AboutSectionSchema = z.object({
   items: z.array(z.string().trim().min(1)),
 });
 
-function parseJsonContent<T>(raw: string | null, schema: z.ZodType<T>, fallback: T): T {
-  if (!raw) return fallback;
+function parseJsonContentStrict<T>(raw: string | null, schema: z.ZodType<T>, field: string): T {
+  if (!raw) throwMissingTranslation(field);
   try {
     return schema.parse(JSON.parse(raw));
   } catch {
-    return fallback;
+    throwMissingTranslation(field);
   }
 }
 
@@ -138,18 +139,20 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
             tr.locale,
             {
               description: tr.description,
-              objectivesContent: parseJsonContent(tr.objectivesContent, AboutSectionSchema, {
-                introParagraphs: [],
-                items: [],
-              }),
-              servicesContent: parseJsonContent(tr.servicesContent, AboutSectionSchema, {
-                introParagraphs: [],
-                items: [],
-              }),
-              homeServicesTeaserContent: parseJsonContent(
+              objectivesContent: parseJsonContentStrict(
+                tr.objectivesContent,
+                AboutSectionSchema,
+                `about:${row.id}:${tr.locale}:objectivesContent`,
+              ),
+              servicesContent: parseJsonContentStrict(
+                tr.servicesContent,
+                AboutSectionSchema,
+                `about:${row.id}:${tr.locale}:servicesContent`,
+              ),
+              homeServicesTeaserContent: parseJsonContentStrict(
                 tr.homeServicesTeaserContent,
                 z.object({ paragraphs: z.array(z.string().trim().min(1)) }),
-                { paragraphs: [] },
+                `about:${row.id}:${tr.locale}:homeServicesTeaserContent`,
               ),
             },
           ]),

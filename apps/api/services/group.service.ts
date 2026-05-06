@@ -8,11 +8,6 @@ export type AboutSectionContent = { introParagraphs: string[]; items: string[] }
 export type LocalizedAboutSectionContent = { es: AboutSectionContent; en: AboutSectionContent };
 export type LocalizedHomeServicesTeaserContent = { es: { paragraphs: string[] }; en: { paragraphs: string[] } };
 
-function requireTranslation<T extends Record<string, unknown>>(row: T | undefined, owner: string): T {
-  if (!row) throwMissingTranslation(owner);
-  return row;
-}
-
 async function replaceTranslations(
   table: TTable,
   whereColumn: string,
@@ -37,18 +32,8 @@ type TTable =
   | "method_translation"
   | "software_translation";
 
-export async function getGroup(id: number, locale?: Locale) {
-  const group = await db.selectFrom("research_group").selectAll().where("id", "=", id).executeTakeFirst();
-  if (!group) return undefined;
-  if (!locale) return group;
-
-  const tr = await db
-    .selectFrom("group_translation")
-    .selectAll()
-    .where("groupId", "=", id)
-    .where("locale", "=", locale)
-    .executeTakeFirst();
-  return { ...group, translation: requireTranslation(tr, `group_translation:${id}:${locale}`) };
+export async function getGroup(id: number) {
+  return db.selectFrom("research_group").selectAll().where("id", "=", id).executeTakeFirst();
 }
 
 export async function listGroups() {

@@ -2,7 +2,6 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { localizeField } from "../../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import { globalSearch } from "../../services/search.service.js";
 
@@ -23,12 +22,12 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   }
 
   const requested = new Set(types.split(",").map((t) => t.trim()));
-  const result = await globalSearch(term, requested);
+  const result = await globalSearch(term, requested, locale);
   const publications = await Promise.all(
     result.publications.map(async (row) => ({
       id: row.id,
       title: row.title,
-      abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
+      abstract: row.abstract,
       asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
       journalIssue: row.journalIssue,
       doi: row.doi,
@@ -57,7 +56,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const members = await Promise.all(
     result.members.map(async (row) =>
       Object.assign({}, row, {
-        bio: localizeField(row, locale, { es: "bio", en: "bioEN", required: false }),
+        bio: row.localizedBio,
         asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
       }),
     ),
@@ -78,18 +77,18 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const projects = await Promise.all(
     result.projects.map(async (row) => ({
       id: row.id,
-      title: localizeField(row, locale, { es: "title", en: "titleEN" }),
+      title: row.title,
       code: row.code,
       fundedAmount: row.fundedAmount,
-      description: localizeField(row, locale, { es: "description", en: "descriptionEN" }),
+      description: row.description,
       status: row.status,
       startDate: row.startDate,
       endDate: row.endDate,
       researchLineId: row.researchLineId,
       fundingSourceId: row.fundingSourceId,
       currencyId: row.currencyId,
-      researchLine: localizeField(row, locale, { es: "researchLine", en: "researchLine" }),
-      fundingSource: localizeField(row, locale, { es: "fundingSource", en: "fundingSource" }),
+      researchLine: row.researchLine,
+      fundingSource: row.fundingSource,
       members: await Promise.all(
         row.members.map(async (member) =>
           Object.assign({}, member, {

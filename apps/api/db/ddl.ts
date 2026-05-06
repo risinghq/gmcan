@@ -7,35 +7,22 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   gender: ["id", "name"],
   prefix: ["id", "name"],
   role: ["id", "name"],
-  member_type: ["id", "name", "nameEN", "nameSingular", "nameSingularEN"],
-  publication_type: ["id", "name", "nameEN"],
-  thesis_type: ["id", "name", "nameEN"],
-  news_type: ["id", "name", "nameEN"],
+  member_type: ["id", "name", "nameSingular"],
+  member_type_translation: ["id", "memberTypeId", "locale", "name", "nameSingular"],
+  publication_type: ["id", "name"],
+  publication_type_translation: ["id", "publicationTypeId", "locale", "name"],
+  thesis_type: ["id", "name"],
+  thesis_type_translation: ["id", "thesisTypeId", "locale", "name"],
+  news_type: ["id", "name"],
+  news_type_translation: ["id", "newsTypeId", "locale", "name"],
   journal: ["id", "name"],
-  university: ["id", "name", "nameEN"],
-  event: ["id", "name", "city", "country", "cityEN", "countryEN"],
+  university: ["id", "name"],
+  university_translation: ["id", "universityId", "locale", "name"],
+  event: ["id", "name", "city", "country"],
+  event_translation: ["id", "eventId", "locale", "name", "city", "country"],
   funding_source: ["id", "name"],
   currency: ["id", "symbol"],
-  research_group: [
-    "id",
-    "summaryES",
-    "summaryEN",
-    "address",
-    "email",
-    "phone",
-    "name",
-    "fullName",
-    "facilitiesES",
-    "facilitiesEN",
-    "futureWorkES",
-    "futureWorkEN",
-    "publicationsSectionES",
-    "publicationsSectionEN",
-    "projectsSectionES",
-    "projectsSectionEN",
-    "createdAt",
-    "updatedAt",
-  ],
+  research_group: ["id", "address", "email", "phone", "name", "fullName", "createdAt", "updatedAt"],
   member: [
     "id",
     "dni",
@@ -46,7 +33,6 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "maternalName",
     "birthDate",
     "bio",
-    "bioEN",
 
     "status",
     "resetPassword",
@@ -59,6 +45,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "resetToken",
     "resetExpires",
   ],
+  member_translation: ["id", "memberId", "locale", "bio"],
   session: ["id", "memberId", "email", "expiresAt", "lastActive"],
   research_line: ["id", "groupId", "createdAt", "updatedAt"],
   research_line_translation: ["id", "researchLineId", "locale", "name", "description"],
@@ -101,9 +88,6 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   news_translation: ["id", "newsId", "locale", "title", "summary", "body"],
   publication: [
     "id",
-    "title",
-    "abstractES",
-    "abstractEN",
     "journalIssue",
     "doi",
     "publishedAt",
@@ -115,15 +99,12 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "eventId",
     "thesisTypeId",
   ],
+  publication_translation: ["id", "publicationId", "locale", "title", "abstract"],
   publication_author: ["id", "publicationId", "isPrincipal", "externalName", "memberId"],
   project: [
     "id",
-    "title",
-    "titleEN",
     "code",
     "fundedAmount",
-    "description",
-    "descriptionEN",
     "status",
     "startDate",
     "endDate",
@@ -133,6 +114,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "currencyId",
     "fundingSourceId",
   ],
+  project_translation: ["id", "projectId", "locale", "title", "description"],
   member_project: ["projectId", "memberId", "createdAt", "updatedAt"],
   member_group: ["memberId", "groupId", "createdAt", "updatedAt"],
   asset: [
@@ -192,9 +174,17 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("nameEN", "text", (c) => c.notNull())
     .addColumn("nameSingular", "text", (c) => c.notNull())
-    .addColumn("nameSingularEN", "text", (c) => c.notNull())
+    .execute();
+  await db.schema
+    .createTable("member_type_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("memberTypeId", "integer", (c) => c.notNull().references("member_type.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull())
+    .addColumn("nameSingular", "text", (c) => c.notNull())
+    .addUniqueConstraint("member_type_translation_owner_locale_unique", ["memberTypeId", "locale"])
     .execute();
 
   await db.schema
@@ -202,7 +192,15 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("nameEN", "text", (c) => c.notNull())
+    .execute();
+  await db.schema
+    .createTable("news_type_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("newsTypeId", "integer", (c) => c.notNull().references("news_type.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull())
+    .addUniqueConstraint("news_type_translation_owner_locale_unique", ["newsTypeId", "locale"])
     .execute();
 
   await db.schema
@@ -210,7 +208,15 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("nameEN", "text", (c) => c.notNull())
+    .execute();
+  await db.schema
+    .createTable("publication_type_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("publicationTypeId", "integer", (c) => c.notNull().references("publication_type.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull())
+    .addUniqueConstraint("publication_type_translation_owner_locale_unique", ["publicationTypeId", "locale"])
     .execute();
 
   await db.schema
@@ -218,7 +224,15 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("nameEN", "text", (c) => c.notNull())
+    .execute();
+  await db.schema
+    .createTable("thesis_type_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("thesisTypeId", "integer", (c) => c.notNull().references("thesis_type.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull())
+    .addUniqueConstraint("thesis_type_translation_owner_locale_unique", ["thesisTypeId", "locale"])
     .execute();
 
   await db.schema
@@ -228,8 +242,17 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("city", "text")
     .addColumn("country", "text")
-    .addColumn("cityEN", "text")
-    .addColumn("countryEN", "text")
+    .execute();
+  await db.schema
+    .createTable("event_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("eventId", "integer", (c) => c.notNull().references("event.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull())
+    .addColumn("city", "text")
+    .addColumn("country", "text")
+    .addUniqueConstraint("event_translation_owner_locale_unique", ["eventId", "locale"])
     .execute();
 
   await db.schema
@@ -258,7 +281,15 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("nameEN", "text", (c) => c.notNull())
+    .execute();
+  await db.schema
+    .createTable("university_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("universityId", "integer", (c) => c.notNull().references("university.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull())
+    .addUniqueConstraint("university_translation_owner_locale_unique", ["universityId", "locale"])
     .execute();
 
   await db.schema
@@ -286,7 +317,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("maternalName", "text")
     .addColumn("birthDate", "text")
     .addColumn("bio", "text")
-    .addColumn("bioEN", "text")
 
     .addColumn("status", "integer", (c) => c.notNull())
     .addColumn("resetPassword", "integer", (c) => c.notNull())
@@ -298,6 +328,16 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("genderId", "integer", (c) => c.references("gender.id"))
     .addColumn("resetToken", "text")
     .addColumn("resetExpires", "text")
+    .execute();
+
+  await db.schema
+    .createTable("member_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("bio", "text")
+    .addUniqueConstraint("member_translation_owner_locale_unique", ["memberId", "locale"])
     .execute();
 
   await db.schema
@@ -452,9 +492,6 @@ export async function createTables(db: Kysely<Database>) {
     .createTable("publication")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("abstractES", "text")
-    .addColumn("abstractEN", "text")
     .addColumn("journalIssue", "integer")
     .addColumn("doi", "text")
     .addColumn("publishedAt", "text", (c) => c.notNull())
@@ -468,15 +505,22 @@ export async function createTables(db: Kysely<Database>) {
     .execute();
 
   await db.schema
+    .createTable("publication_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("publicationId", "integer", (c) => c.notNull().references("publication.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("title", "text", (c) => c.notNull())
+    .addColumn("abstract", "text")
+    .addUniqueConstraint("publication_translation_owner_locale_unique", ["publicationId", "locale"])
+    .execute();
+
+  await db.schema
     .createTable("project")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("titleEN", "text")
     .addColumn("code", "text", (c) => c.notNull())
     .addColumn("fundedAmount", "text", (c) => c.notNull())
-    .addColumn("description", "text", (c) => c.notNull())
-    .addColumn("descriptionEN", "text")
     .addColumn("status", "integer")
     .addColumn("startDate", "text", (c) => c.notNull())
     .addColumn("endDate", "text")
@@ -485,6 +529,17 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("researchLineId", "integer", (c) => c.notNull().references("research_line.id"))
     .addColumn("currencyId", "integer", (c) => c.notNull().references("currency.id"))
     .addColumn("fundingSourceId", "integer", (c) => c.notNull().references("funding_source.id"))
+    .execute();
+
+  await db.schema
+    .createTable("project_translation")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("projectId", "integer", (c) => c.notNull().references("project.id").onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull())
+    .addColumn("title", "text", (c) => c.notNull())
+    .addColumn("description", "text", (c) => c.notNull())
+    .addUniqueConstraint("project_translation_owner_locale_unique", ["projectId", "locale"])
     .execute();
 
   await db.schema

@@ -55,41 +55,28 @@ async function seedMemberType() {
   await db
     .insertInto("member_type")
     .values([
-      {
-        id: 1,
-        name: "Investigadores",
-        nameEN: "Researchers",
-        nameSingular: "Investigador",
-        nameSingularEN: "Researcher",
-      },
-      {
-        id: 2,
-        name: "Estudiantes de Doctorado",
-        nameEN: "PhD Students",
-        nameSingular: "Estudiante de Doctorado",
-        nameSingularEN: "PhD Student",
-      },
-      {
-        id: 3,
-        name: "Estudiantes de Maestría",
-        nameEN: "Master Students",
-        nameSingular: "Estudiante de Maestría",
-        nameSingularEN: "Master Student",
-      },
-      {
-        id: 4,
-        name: "Estudiantes de Pregrado",
-        nameEN: "Undergraduate Students",
-        nameSingular: "Estudiante de Pregrado",
-        nameSingularEN: "Undergraduate Student",
-      },
-      {
-        id: 5,
-        name: "Colaboradores",
-        nameEN: "Collaborators",
-        nameSingular: "Colaborador",
-        nameSingularEN: "Collaborator",
-      },
+      { id: 1, name: "Investigadores", nameSingular: "Investigador" },
+      { id: 2, name: "Estudiantes de Doctorado", nameSingular: "Estudiante de Doctorado" },
+      { id: 3, name: "Estudiantes de Maestría", nameSingular: "Estudiante de Maestría" },
+      { id: 4, name: "Estudiantes de Pregrado", nameSingular: "Estudiante de Pregrado" },
+      { id: 5, name: "Colaboradores", nameSingular: "Colaborador" },
+    ])
+    .onConflict((oc) => oc.doNothing())
+    .execute();
+
+  await db
+    .insertInto("member_type_translation")
+    .values([
+      { memberTypeId: 1, locale: "es", name: "Investigadores", nameSingular: "Investigador" },
+      { memberTypeId: 1, locale: "en", name: "Researchers", nameSingular: "Researcher" },
+      { memberTypeId: 2, locale: "es", name: "Estudiantes de Doctorado", nameSingular: "Estudiante de Doctorado" },
+      { memberTypeId: 2, locale: "en", name: "PhD Students", nameSingular: "PhD Student" },
+      { memberTypeId: 3, locale: "es", name: "Estudiantes de Maestría", nameSingular: "Estudiante de Maestría" },
+      { memberTypeId: 3, locale: "en", name: "Master Students", nameSingular: "Master Student" },
+      { memberTypeId: 4, locale: "es", name: "Estudiantes de Pregrado", nameSingular: "Estudiante de Pregrado" },
+      { memberTypeId: 4, locale: "en", name: "Undergraduate Students", nameSingular: "Undergraduate Student" },
+      { memberTypeId: 5, locale: "es", name: "Colaboradores", nameSingular: "Colaborador" },
+      { memberTypeId: 5, locale: "en", name: "Collaborators", nameSingular: "Collaborator" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -99,9 +86,22 @@ async function seedPublicationType() {
   await db
     .insertInto("publication_type")
     .values([
-      { id: 1, name: "Journal Article", nameEN: "Journal Article" },
-      { id: 2, name: "Conference Paper", nameEN: "Conference Paper" },
-      { id: 3, name: "Thesis", nameEN: "Thesis" },
+      { id: 1, name: "Journal Article" },
+      { id: 2, name: "Conference Paper" },
+      { id: 3, name: "Thesis" },
+    ])
+    .onConflict((oc) => oc.doNothing())
+    .execute();
+
+  await db
+    .insertInto("publication_type_translation")
+    .values([
+      { publicationTypeId: 1, locale: "es", name: "Journal Article" },
+      { publicationTypeId: 1, locale: "en", name: "Journal Article" },
+      { publicationTypeId: 2, locale: "es", name: "Conference Paper" },
+      { publicationTypeId: 2, locale: "en", name: "Conference Paper" },
+      { publicationTypeId: 3, locale: "es", name: "Thesis" },
+      { publicationTypeId: 3, locale: "en", name: "Thesis" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -111,8 +111,19 @@ async function seedThesisType() {
   await db
     .insertInto("thesis_type")
     .values([
-      { id: 1, name: "PhD", nameEN: "PhD" },
-      { id: 2, name: "Master's", nameEN: "Master's" },
+      { id: 1, name: "PhD" },
+      { id: 2, name: "Master's" },
+    ])
+    .onConflict((oc) => oc.doNothing())
+    .execute();
+
+  await db
+    .insertInto("thesis_type_translation")
+    .values([
+      { thesisTypeId: 1, locale: "es", name: "PhD" },
+      { thesisTypeId: 1, locale: "en", name: "PhD" },
+      { thesisTypeId: 2, locale: "es", name: "Master's" },
+      { thesisTypeId: 2, locale: "en", name: "Master's" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();
@@ -122,9 +133,22 @@ async function seedNewsType() {
   await db
     .insertInto("news_type")
     .values([
-      { id: 1, name: "General", nameEN: "General" },
-      { id: 2, name: "Research", nameEN: "Research" },
-      { id: 3, name: "Event", nameEN: "Event" },
+      { id: 1, name: "General" },
+      { id: 2, name: "Research" },
+      { id: 3, name: "Event" },
+    ])
+    .onConflict((oc) => oc.doNothing())
+    .execute();
+
+  await db
+    .insertInto("news_type_translation")
+    .values([
+      { newsTypeId: 1, locale: "es", name: "General" },
+      { newsTypeId: 1, locale: "en", name: "General" },
+      { newsTypeId: 2, locale: "es", name: "Research" },
+      { newsTypeId: 2, locale: "en", name: "Research" },
+      { newsTypeId: 3, locale: "es", name: "Event" },
+      { newsTypeId: 3, locale: "en", name: "Event" },
     ])
     .onConflict((oc) => oc.doNothing())
     .execute();

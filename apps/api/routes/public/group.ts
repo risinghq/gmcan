@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { throwMissingTranslation } from "../../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   listAboutLocalized,
@@ -18,12 +19,12 @@ const AboutSectionSchema = z.object({
 });
 const HomeTeaserSchema = z.object({ paragraphs: z.array(z.string()) });
 
-function parseJsonContent<T>(raw: string | null, schema: z.ZodType<T>, fallback: T): T {
-  if (!raw) return fallback;
+function parseJsonContentStrict<T>(raw: string | null, schema: z.ZodType<T>, field: string): T {
+  if (!raw) throwMissingTranslation(field);
   try {
     return schema.parse(JSON.parse(raw));
   } catch {
-    return fallback;
+    throwMissingTranslation(field);
   }
 }
 
@@ -66,15 +67,21 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
     rows.map(async (row) => ({
       id: row.id,
       description: row.description,
-      objectivesContent: parseJsonContent(row.objectivesContent, AboutSectionSchema, {
-        introParagraphs: [],
-        items: [],
-      }),
-      servicesContent: parseJsonContent(row.servicesContent, AboutSectionSchema, {
-        introParagraphs: [],
-        items: [],
-      }),
-      homeServicesTeaserContent: parseJsonContent(row.homeServicesTeaserContent, HomeTeaserSchema, { paragraphs: [] }),
+      objectivesContent: parseJsonContentStrict(
+        row.objectivesContent,
+        AboutSectionSchema,
+        `about:${row.id}:objectivesContent`,
+      ),
+      servicesContent: parseJsonContentStrict(
+        row.servicesContent,
+        AboutSectionSchema,
+        `about:${row.id}:servicesContent`,
+      ),
+      homeServicesTeaserContent: parseJsonContentStrict(
+        row.homeServicesTeaserContent,
+        HomeTeaserSchema,
+        `about:${row.id}:homeServicesTeaserContent`,
+      ),
       asset: await resolveAssetAccessUrl({ resourceType: "about", resourceId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,

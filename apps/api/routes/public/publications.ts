@@ -2,7 +2,6 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { localizeField } from "../../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import { getPublication, listPublications, listPublicationsByFilter } from "../../services/publication.service.js";
 
@@ -19,7 +18,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
   const locale = c.get("locale");
   const { type, event, journal, university } = c.req.valid("query");
   if (type || event || journal || university) {
-    const rows = await listPublicationsByFilter({
+    const rows = await listPublicationsByFilter(locale, {
       typeId: type,
       eventId: event,
       journalId: journal,
@@ -30,7 +29,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         rows.map(async (row) => ({
           id: row.id,
           title: row.title,
-          abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
+          abstract: row.abstract,
           asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
           journalIssue: row.journalIssue,
           doi: row.doi,
@@ -46,7 +45,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
       ),
     );
   }
-  const rows = await listPublications();
+  const rows = await listPublications(locale);
   return c.json(
     await Promise.all(
       rows.map(async (row) => {
@@ -66,7 +65,7 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
         return {
           id: row.id,
           title: row.title,
-          abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
+          abstract: row.abstract,
           asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
           journalIssue: row.journalIssue,
           doi: row.doi,
@@ -88,12 +87,12 @@ router.get("/", zValidator("query", FilterQuery), async (c) => {
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
-  const pub = await getPublication(id);
+  const pub = await getPublication(id, locale);
   if (!pub) return c.json({ error: "Not found" }, 404);
   return c.json({
     id: pub.id,
     title: pub.title,
-    abstract: localizeField(pub, locale, { es: "abstractES", en: "abstractEN", required: false }),
+    abstract: pub.abstract,
     asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: pub.id, slot: "file" }),
     journalIssue: pub.journalIssue,
     doi: pub.doi,

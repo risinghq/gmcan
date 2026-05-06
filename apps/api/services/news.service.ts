@@ -111,7 +111,6 @@ async function replaceNewsTranslations(
 
 export async function listPublicNews(locale: Locale, query: PublicNewsListQuery): Promise<PublicNewsListResponse> {
   const offset = (query.page - 1) * query.pageSize;
-  const newsTypeNameField = locale === "en" ? "news_type.nameEN" : "news_type.name";
 
   let base = db
     .selectFrom("news")
@@ -120,6 +119,11 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
     )
     .leftJoin("member", "member.id", "news.authorId")
     .leftJoin("news_type", "news_type.id", "news.newsTypeId")
+    .leftJoin("news_type_translation", (join) =>
+      join
+        .onRef("news_type_translation.newsTypeId", "=", "news.newsTypeId")
+        .on("news_type_translation.locale", "=", locale),
+    )
     .where("news.status", "=", query.status);
   if (query.newsTypeId !== undefined) {
     base = base.where("news.newsTypeId", "=", query.newsTypeId);
@@ -146,7 +150,7 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      sql<string>`coalesce(${sql.ref(newsTypeNameField)}, '')`.as("newsTypeName"),
+      sql<string>`coalesce(news_type_translation.name, news_type.name, '')`.as("newsTypeName"),
     ])
     .orderBy(PUBLIC_SORT_COLUMN[query.sortBy] as any, query.sortOrder)
     .orderBy("news.id", "desc")
@@ -177,7 +181,6 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
 }
 
 export async function getPublicNewsDetail(id: number, locale: Locale): Promise<PublicNewsDetail | null> {
-  const newsTypeNameField = locale === "en" ? "news_type.nameEN" : "news_type.name";
   const row = await db
     .selectFrom("news")
     .innerJoin("news_translation", (join) =>
@@ -185,6 +188,11 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
     )
     .leftJoin("member", "member.id", "news.authorId")
     .leftJoin("news_type", "news_type.id", "news.newsTypeId")
+    .leftJoin("news_type_translation", (join) =>
+      join
+        .onRef("news_type_translation.newsTypeId", "=", "news.newsTypeId")
+        .on("news_type_translation.locale", "=", locale),
+    )
     .select([
       "news.id as id",
       "news_translation.title as title",
@@ -200,7 +208,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      sql<string>`coalesce(${sql.ref(newsTypeNameField)}, '')`.as("newsTypeName"),
+      sql<string>`coalesce(news_type_translation.name, news_type.name, '')`.as("newsTypeName"),
     ])
     .where("news.id", "=", id)
     .executeTakeFirst();

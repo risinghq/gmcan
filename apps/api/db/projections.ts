@@ -11,7 +11,6 @@ export const MEMBER_PUBLIC = [
   "maternalName",
   "birthDate",
   "bio",
-  "bioEN",
   "status",
   "roleId",
   "memberTypeId",
