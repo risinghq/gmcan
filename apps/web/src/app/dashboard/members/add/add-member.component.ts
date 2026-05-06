@@ -15,7 +15,7 @@ import type { MemberFull } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
+import { ADMIN_MEMBER_LOCALES, type AdminMemberLocale, MemberService } from "@app/shared/services/member.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -66,6 +66,9 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   hide = true;
   hide2 = true;
   url: string;
+  readonly bioLocales = ADMIN_MEMBER_LOCALES;
+  selectedBioLocale: AdminMemberLocale = "es";
+  bioByLocale: Record<AdminMemberLocale, string> = { es: "", en: "" };
 
   button_text = "Registrar nuevo miembro";
 
@@ -136,6 +139,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
       this.memberService.verifyEmail(this.member.email).subscribe((result) => {
         if (!result.exists) {
           if (this.password === this.memberForm.controls["confirmPassword"].value) {
+            const bio = this.bioByLocale[this.selectedBioLocale] ?? "";
             this.memberService
               .createMember({
                 dni: this.member.dni,
@@ -145,7 +149,6 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
                 lastName: this.member.lastName,
                 maternalName: this.member.maternalName ?? undefined,
                 birthDate,
-                bio: this.member.bio ?? undefined,
                 status,
                 roleId: this.member.roleId,
                 memberTypeId: this.member.memberTypeId,
@@ -154,12 +157,14 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
               })
               .subscribe((res) => {
                 if (res.id) {
-                  if (this.fileData) {
-                    this.memberService.uploadAsset(res.id, this.fileData).subscribe();
-                  }
-                  this.openSnackBar("Miembro agregado exitosamente");
-                  this.memberForm.markAsPristine();
-                  this.return();
+                  this.memberService.updateMemberTranslation(res.id, this.selectedBioLocale, bio).subscribe(() => {
+                    if (this.fileData) {
+                      this.memberService.uploadAsset(res.id, this.fileData).subscribe();
+                    }
+                    this.openSnackBar("Miembro agregado exitosamente");
+                    this.memberForm.markAsPristine();
+                    this.return();
+                  });
                 }
               });
           } else {
@@ -205,6 +210,18 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   return() {
     this.router.navigate(["dashboard/miembros-activos"]);
+  }
+
+  setBioLocale(locale: AdminMemberLocale): void {
+    this.selectedBioLocale = locale;
+  }
+
+  setBioForSelectedLocale(value: string): void {
+    this.bioByLocale[this.selectedBioLocale] = value;
+  }
+
+  bioLength(): number {
+    return (this.bioByLocale[this.selectedBioLocale] ?? "").length;
   }
 
   openEraser() {}

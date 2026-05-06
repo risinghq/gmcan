@@ -3,18 +3,21 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { okStatus } from "../../lib/contracts.js";
+import { LocaleCodeSchema } from "../../lib/locales.js";
 import { requirePermission } from "../../middleware/authz.js";
 import { resolveAssetAccessUrl } from "../../services/asset.service.js";
 import {
   addMemberToGroup,
   createMember,
   deleteMember,
+  getMemberTranslation,
   getMemberFull,
   listAdminMembers,
   listMemberGroups,
   removeMemberFromGroup,
   searchAuthorPool,
   updateMember,
+  updateMemberTranslation,
   verifyEmailExists,
 } from "../../services/member.service.js";
 
@@ -29,7 +32,6 @@ const CreateBody = z.object({
   lastName: z.string().min(1),
   maternalName: z.string().optional(),
   birthDate: z.string().optional(),
-  bio: z.string().optional(),
   status: z.number().int(),
   roleId: z.number().int(),
   memberTypeId: z.number().int(),
@@ -43,7 +45,6 @@ const UpdateBody = z.object({
   lastName: z.string().min(1),
   maternalName: z.string().optional(),
   birthDate: z.string().optional(),
-  bio: z.string().optional(),
   status: z.number().int(),
   roleId: z.number().int(),
   memberTypeId: z.number().int(),
@@ -101,6 +102,28 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody),
   await updateMember(id, data);
   return c.json(okStatus());
 });
+
+router.put(
+  "/:id/translations/:locale",
+  zValidator("param", IdParam.extend({ locale: LocaleCodeSchema })),
+  zValidator("json", z.object({ bio: z.string() })),
+  async (c) => {
+    const { id, locale } = c.req.valid("param");
+    const { bio } = c.req.valid("json");
+    await updateMemberTranslation(id, locale, bio);
+    return c.json(okStatus());
+  },
+);
+
+router.get(
+  "/:id/translations/:locale",
+  zValidator("param", IdParam.extend({ locale: LocaleCodeSchema })),
+  async (c) => {
+    const { id, locale } = c.req.valid("param");
+    const row = await getMemberTranslation(id, locale);
+    return c.json({ bio: row?.bio ?? "" });
+  },
+);
 
 router.delete("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");

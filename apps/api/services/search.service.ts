@@ -2,7 +2,7 @@ import { db } from "../db/client.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
-import { localizedMemberSelectQuery } from "./member-read-model.js";
+import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
   const like = `%${q}%`;
@@ -26,7 +26,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           .execute()
       : Promise.resolve([]),
     types.has("members")
-      ? localizedMemberSelectQuery(locale)
+      ? publicLocalizedMemberSelectQuery(locale)
           .where((eb) =>
             eb.or([
               eb("firstName", "like", like),

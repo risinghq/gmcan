@@ -6,14 +6,14 @@ import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
-import { localizedMemberSelectQuery } from "./member-read-model.js";
+import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
 }
 
 export async function listMembersLocalized(locale: Locale) {
-  return localizedMemberSelectQuery(locale).execute();
+  return publicLocalizedMemberSelectQuery(locale).execute();
 }
 
 export async function listAdminMembers(filter?: {
@@ -145,7 +145,7 @@ export async function getMemberProfile(id: number) {
 
 export async function getMemberProfileLocalized(id: number, locale: Locale) {
   const [member, projects, publications] = await Promise.all([
-    localizedMemberSelectQuery(locale).where("member.id", "=", id).executeTakeFirst(),
+    publicLocalizedMemberSelectQuery(locale).where("member.id", "=", id).executeTakeFirst(),
     memberProjects(id),
     memberPublications(id),
   ]);
@@ -215,15 +215,6 @@ export async function verifyDniExists(dni: string) {
   return db.selectFrom("member").select("id").where("dni", "=", dni).executeTakeFirst();
 }
 
-async function replaceMemberBioTranslations(memberId: number, bio?: string) {
-  const rows = SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: bio ?? null }));
-  await db
-    .insertInto("member_translation")
-    .values(rows)
-    .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet({ bio: bio ?? null }))
-    .execute();
-}
-
 export async function createMember(data: {
   dni: string;
   email: string;
@@ -232,7 +223,6 @@ export async function createMember(data: {
   lastName: string;
   maternalName?: string;
   birthDate?: string;
-  bio?: string;
   status: number;
   roleId: number;
   memberTypeId: number;
@@ -241,19 +231,25 @@ export async function createMember(data: {
 }) {
   const { password, ...rest } = data;
   const today = new Date().toISOString().split("T")[0];
-  const result = await db
-    .insertInto("member")
-    .values({
-      ...rest,
-      password: hashPassword(password),
-      resetPassword: 0,
-      createdAt: today,
-      updatedAt: today,
-    })
-    .executeTakeFirstOrThrow();
-  const memberId = Number(result.insertId);
-  await replaceMemberBioTranslations(memberId, data.bio);
-  return memberId;
+  return db.transaction().execute(async (trx) => {
+    const result = await trx
+      .insertInto("member")
+      .values({
+        ...rest,
+        password: hashPassword(password),
+        resetPassword: 0,
+        createdAt: today,
+        updatedAt: today,
+      })
+      .executeTakeFirstOrThrow();
+    const memberId = Number(result.insertId);
+    await trx
+      .insertInto("member_translation")
+      .values(SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: null })))
+      .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing())
+      .execute();
+    return memberId;
+  });
 }
 
 export async function updateMember(
@@ -264,7 +260,6 @@ export async function updateMember(
     lastName: string;
     maternalName?: string;
     birthDate?: string;
-    bio?: string;
     status: number;
     roleId: number;
     memberTypeId: number;
@@ -273,24 +268,42 @@ export async function updateMember(
   },
 ) {
   const today = new Date().toISOString().split("T")[0];
+  await db.transaction().execute(async (trx) => {
+    await trx
+      .updateTable("member")
+      .set({
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        maternalName: data.maternalName,
+        birthDate: data.birthDate,
+        status: data.status,
+        roleId: data.roleId,
+        memberTypeId: data.memberTypeId,
+        prefixId: data.prefixId,
+        genderId: data.genderId,
+        updatedAt: today,
+      })
+      .where("id", "=", id)
+      .execute();
+  });
+}
+
+export async function updateMemberTranslation(id: number, locale: string, bio: string) {
   await db
-    .updateTable("member")
-    .set({
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      maternalName: data.maternalName,
-      birthDate: data.birthDate,
-      status: data.status,
-      roleId: data.roleId,
-      memberTypeId: data.memberTypeId,
-      prefixId: data.prefixId,
-      genderId: data.genderId,
-      updatedAt: today,
-    })
-    .where("id", "=", id)
+    .insertInto("member_translation")
+    .values({ memberId: id, locale, bio })
+    .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
     .execute();
-  await replaceMemberBioTranslations(id, data.bio);
+}
+
+export async function getMemberTranslation(id: number, locale: string) {
+  return db
+    .selectFrom("member_translation")
+    .select(["memberId", "locale", "bio"])
+    .where("memberId", "=", id)
+    .where("locale", "=", locale)
+    .executeTakeFirst();
 }
 
 export async function deleteMember(id: number) {

@@ -1,4 +1,5 @@
 import { db } from "../db/client.js";
+import { SUPPORTED_LOCALES } from "../lib/locales.js";
 import type { Locale } from "../lib/public-locale.js";
 
 export function localizedMemberSelectQuery(locale: Locale) {
@@ -21,4 +22,26 @@ export function localizedMemberSelectQuery(locale: Locale) {
       "member.memberTypeId as memberTypeId",
       "member.prefixId as prefixId",
     ]);
+}
+
+export function publicLocalizedMemberSelectQuery(locale: Locale) {
+  let query = localizedMemberSelectQuery(locale)
+    .where("member_translation.bio", "is not", null)
+    .where("member_translation.bio", "!=", "");
+
+  for (const requiredLocale of SUPPORTED_LOCALES) {
+    query = query.where((eb) =>
+      eb.exists(
+        eb
+          .selectFrom("member_translation as required_translation")
+          .select("required_translation.memberId")
+          .whereRef("required_translation.memberId", "=", "member.id")
+          .where("required_translation.locale", "=", requiredLocale)
+          .where("required_translation.bio", "is not", null)
+          .where("required_translation.bio", "!=", ""),
+      ),
+    );
+  }
+
+  return query;
 }

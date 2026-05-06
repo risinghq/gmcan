@@ -19,7 +19,12 @@ import type { MemberFull } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService, type MemberUpdateBody } from "@app/shared/services/member.service";
+import {
+  ADMIN_MEMBER_LOCALES,
+  type AdminMemberLocale,
+  MemberService,
+  type MemberUpdateBody,
+} from "@app/shared/services/member.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
 
@@ -68,6 +73,9 @@ export default class PerfilComponent implements OnInit {
     { value: MEMBER_STATUS.INACTIVE, label: "Inactivo" },
     { value: MEMBER_STATUS.BLOCKED, label: "Bloqueado" },
   ];
+  readonly bioLocales = ADMIN_MEMBER_LOCALES;
+  selectedBioLocale: AdminMemberLocale = "es";
+  bioByLocale: Record<AdminMemberLocale, string> = { es: "", en: "" };
 
   member: MemberFull = { ...createMemberFull() };
   memberId: number | null = null;
@@ -169,6 +177,8 @@ export default class PerfilComponent implements OnInit {
         bio: result.bio ?? "",
         status: (result.status as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
       });
+      this.bioByLocale.es = result.bio ?? "";
+      this.bioByLocale.en = "";
     });
   }
 
@@ -179,13 +189,13 @@ export default class PerfilComponent implements OnInit {
     }
 
     const values = this.profileForm.getRawValue();
+    const bio = (this.bioByLocale[this.selectedBioLocale] ?? "").trim();
     const body: MemberUpdateBody = {
       email: values.email?.trim() ?? "",
       firstName: this.buildCanonicalFirstName(values.firstName ?? "", values.middleName ?? ""),
       lastName: values.lastName?.trim() ?? "",
       maternalName: values.maternalName?.trim() || undefined,
       birthDate: values.birthDate ? new Date(values.birthDate).toLocaleDateString("sv") : undefined,
-      bio: values.bio?.trim() || undefined,
       status: (values.status ?? MEMBER_STATUS.ACTIVE) as MemberStatus,
       roleId: this.roleId,
       memberTypeId: values.memberTypeId ?? this.member.memberTypeId,
@@ -198,17 +208,21 @@ export default class PerfilComponent implements OnInit {
       next: (result) => {
         if (result.status !== 1) return;
 
-        if (this.fileData) {
-          this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
-            next: () => {
-              this.fileData = null;
-              this.previewUrl = null;
-            },
-          });
-        }
-        this.uiState.setProfileUpdated(true);
-        this.openSnackBar("Información actualizada exitosamente");
-        this.getUser();
+        this.memberService.updateMemberTranslation(this.memberId!, this.selectedBioLocale, bio).subscribe({
+          next: () => {
+            if (this.fileData) {
+              this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
+                next: () => {
+                  this.fileData = null;
+                  this.previewUrl = null;
+                },
+              });
+            }
+            this.uiState.setProfileUpdated(true);
+            this.openSnackBar("Información actualizada exitosamente");
+            this.getUser();
+          },
+        });
       },
       error: () => this.openSnackBar("No se pudo actualizar el perfil", "snack-error"),
       complete: () => {
@@ -268,5 +282,18 @@ export default class PerfilComponent implements OnInit {
       horizontalPosition: "right",
       verticalPosition: "top",
     });
+  }
+
+  setBioLocale(locale: AdminMemberLocale): void {
+    this.selectedBioLocale = locale;
+    if (this.memberId == null) return;
+    this.memberService.getMemberTranslation(this.memberId, locale).subscribe((row) => {
+      this.bioByLocale[locale] = row.bio ?? "";
+      this.profileForm.controls.bio.setValue(this.bioByLocale[locale]);
+    });
+  }
+
+  onBioChange(value: string): void {
+    this.bioByLocale[this.selectedBioLocale] = value;
   }
 }

@@ -7,6 +7,9 @@ import type { AuthorSearchResult } from "../models/author";
 import type { Member, MemberFull, MemberProfile } from "../models/member";
 import { GLOBAL } from "./global";
 
+export const ADMIN_MEMBER_LOCALES = ["es", "en"] as const;
+export type AdminMemberLocale = (typeof ADMIN_MEMBER_LOCALES)[number];
+
 export interface MemberCreateBody {
   dni: string;
   email: string;
@@ -15,7 +18,6 @@ export interface MemberCreateBody {
   lastName: string;
   maternalName?: string;
   birthDate?: string;
-  bio?: string;
   status: number;
   roleId: number;
   memberTypeId: number;
@@ -29,7 +31,6 @@ export interface MemberUpdateBody {
   lastName: string;
   maternalName?: string;
   birthDate?: string;
-  bio?: string;
   status: number;
   roleId: number;
   memberTypeId: number;
@@ -67,6 +68,14 @@ export class MemberService {
 
   updateMember(id: number, body: MemberUpdateBody): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(`${GLOBAL.url}admin/members/${id}`, body);
+  }
+
+  updateMemberTranslation(id: number, locale: string, bio: string): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/members/${id}/translations/${locale}`, { bio });
+  }
+
+  getMemberTranslation(id: number, locale: string): Observable<{ bio: string }> {
+    return this.http.get<{ bio: string }>(`${GLOBAL.url}admin/members/${id}/translations/${locale}`);
   }
 
   deleteMember(id: number): Observable<{ status: number }> {

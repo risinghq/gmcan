@@ -143,10 +143,28 @@
         </div>
 
         <div class="full-width mb-16">
+          <div class="text-category">Idioma del resumen</div>
+          <mat-form-field class="input-category">
+            <mat-label />
+            <mat-select [value]="selectedBioLocale" (selectionChange)="setBioLocale($event.value)">
+              @for (locale of bioLocales; track locale) {
+                <mat-option [value]="locale">{{ locale.toUpperCase() }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional <span>({{ profileForm.controls.bio.value?.length ?? 0 }}/500)</span>
+            Resumen profesional <span>({{ bioByLocale[selectedBioLocale]?.length ?? 0 }}/500)</span>
           </div>
-          <textarea formControlName="bio" autosize class="input-category" maxlength="500"></textarea>
+          <textarea
+            formControlName="bio"
+            (input)="onBioChange($any($event.target).value)"
+            autosize
+            class="input-category"
+            maxlength="500"
+          ></textarea>
         </div>
       </form>
 
