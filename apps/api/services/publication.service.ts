@@ -1,3 +1,8 @@
+import type {
+  PublicationAuthor,
+  PublicPublicationWithAuthors,
+} from "@gmcan/contracts/public";
+
 import { db } from "../db/client.js";
 import type { PublicationKindCode, ThesisKindCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
@@ -5,7 +10,7 @@ import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminPublicationListItem } from "./admin-list.types.js";
-import { resolveAssetAccessUrl } from "./assets/service.js";
+import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "./assets/service.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -26,19 +31,13 @@ export interface PublicationFields {
   subtype: PublicationSubtypeInput;
 }
 
-export type PublicationAuthor =
-  | {
-      kind: "registered";
-      authorOrder: number;
-      memberId: number;
-      name: string;
-      photoUrl: string | null;
-    }
-  | {
-      kind: "external";
-      authorOrder: number;
-      name: string;
-    };
+export interface PublicPublicationFilter {
+  id?: number;
+  kindCode?: PublicationKindCode;
+  eventId?: number;
+  journalId?: number;
+  universityId?: number;
+}
 
 function nameOf(first?: string | null, last?: string | null, maternal?: string | null): string {
   return [first, last, maternal].filter(Boolean).join(" ").trim();
@@ -64,19 +63,19 @@ async function attachAuthors(publicationId: number): Promise<PublicationAuthor[]
     rows.map(async (row) => {
       if (row.memberId) {
         return {
-          kind: "registered" as const,
+          kind: "registered",
           authorOrder: row.authorOrder,
           memberId: row.memberId,
           name: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
-          photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
-        };
+          asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
+        } satisfies PublicationAuthor;
       }
 
       return {
-        kind: "external" as const,
+        kind: "external",
         authorOrder: row.authorOrder,
         name: row.externalName ?? "",
-      };
+      } satisfies PublicationAuthor;
     }),
   );
 }
@@ -108,14 +107,20 @@ async function subtypeByPublicationIds(publicationIds: number[]) {
   return subtypes;
 }
 
-export async function listPublications(locale: Locale) {
-  const publications = await db
+export async function listPublications(
+  locale: Locale,
+  filter: PublicPublicationFilter = {},
+): Promise<PublicPublicationWithAuthors[]> {
+  let query = db
     .selectFrom("publication")
     .innerJoin("publication_translation", (join) =>
       join
         .onRef("publication_translation.publicationId", "=", "publication.id")
         .on("publication_translation.locale", "=", locale),
     )
+    .leftJoin("conference_paper", "conference_paper.publicationId", "publication.id")
+    .leftJoin("journal_article", "journal_article.publicationId", "publication.id")
+    .leftJoin("thesis", "thesis.publicationId", "publication.id")
     .select([
       "publication.id as id",
       "publication.kindCode as kindCode",
@@ -125,9 +130,15 @@ export async function listPublications(locale: Locale) {
       "publication.publishedAt as publishedAt",
       "publication.updatedAt as updatedAt",
       "publication.createdAt as createdAt",
-    ])
-    .orderBy("publication.publishedAt", "desc")
-    .execute();
+    ]);
+
+  if (filter.id) query = query.where("publication.id", "=", filter.id);
+  if (filter.kindCode) query = query.where("publication.kindCode", "=", filter.kindCode);
+  if (filter.eventId) query = query.where("conference_paper.eventId", "=", filter.eventId);
+  if (filter.journalId) query = query.where("journal_article.journalId", "=", filter.journalId);
+  if (filter.universityId) query = query.where("thesis.universityId", "=", filter.universityId);
+
+  const publications = await query.orderBy("publication.publishedAt", "desc").execute();
 
   if (publications.length === 0) return [];
   const ids = publications.map((p) => p.id);
@@ -137,18 +148,26 @@ export async function listPublications(locale: Locale) {
   ]);
   const authorsById = new Map(authorRows);
 
-  return publications.map((row) => ({
-    id: row.id,
-    kindCode: row.kindCode,
-    title: row.title,
-    abstract: row.abstract,
-    doi: row.doi,
-    publishedAt: row.publishedAt,
-    updatedAt: row.updatedAt,
-    createdAt: row.createdAt,
-    subtype: subtypes.get(row.id),
-    authors: authorsById.get(row.id) ?? [],
-  }));
+  return Promise.all(
+    publications.map(async (row) => {
+      const subtype = subtypes.get(row.id);
+      if (!subtype) throw new Error(`Publication ${row.id} is missing subtype data`);
+
+      return {
+        id: row.id,
+        kindCode: row.kindCode,
+        title: row.title,
+        asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
+        abstract: row.abstract,
+        doi: row.doi,
+        publishedAt: row.publishedAt,
+        updatedAt: row.updatedAt,
+        createdAt: row.createdAt,
+        subtype,
+        authors: authorsById.get(row.id) ?? [],
+      } satisfies PublicPublicationWithAuthors;
+    }),
+  );
 }
 
 export async function listAdminPublications(kindCode?: PublicationKindCode): Promise<AdminPublicationListItem[]> {
@@ -233,29 +252,7 @@ export async function listAdminPublications(kindCode?: PublicationKindCode): Pro
 }
 
 export async function getPublication(id: number, locale: Locale) {
-  const publication = await db
-    .selectFrom("publication")
-    .innerJoin("publication_translation", (join) =>
-      join
-        .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", locale),
-    )
-    .select([
-      "publication.id as id",
-      "publication.kindCode as kindCode",
-      "publication_translation.title as title",
-      "publication_translation.abstract as abstract",
-      "publication.doi as doi",
-      "publication.publishedAt as publishedAt",
-      "publication.updatedAt as updatedAt",
-      "publication.createdAt as createdAt",
-    ])
-    .where("publication.id", "=", id)
-    .executeTakeFirst();
-  if (!publication) return null;
-
-  const [subtypes, authors] = await Promise.all([subtypeByPublicationIds([id]), attachAuthors(id)]);
-  return { ...publication, subtype: subtypes.get(id), authors };
+  return (await listPublications(locale, { id }))[0] ?? null;
 }
 
 export async function getPublicationEditView(id: number) {
@@ -284,43 +281,6 @@ export async function getPublicationEditView(id: number) {
   };
 }
 
-export async function listPublicationsByFilter(
-  locale: Locale,
-  filter: { kindCode?: PublicationKindCode; eventId?: number; journalId?: number; universityId?: number },
-) {
-  let query = db
-    .selectFrom("publication")
-    .innerJoin("publication_translation", (join) =>
-      join
-        .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", locale),
-    )
-    .leftJoin("conference_paper", "conference_paper.publicationId", "publication.id")
-    .leftJoin("journal_article", "journal_article.publicationId", "publication.id")
-    .leftJoin("thesis", "thesis.publicationId", "publication.id")
-    .select([
-      "publication.id as id",
-      "publication.kindCode as kindCode",
-      "publication_translation.title as title",
-      "publication_translation.abstract as abstract",
-      "publication.doi as doi",
-      "publication.publishedAt as publishedAt",
-      "publication.updatedAt as updatedAt",
-      "publication.createdAt as createdAt",
-      "conference_paper.eventId as eventId",
-      "journal_article.journalId as journalId",
-      "journal_article.issue as issue",
-      "thesis.universityId as universityId",
-      "thesis.thesisKindCode as thesisKindCode",
-    ]);
-
-  if (filter.kindCode) query = query.where("publication.kindCode", "=", filter.kindCode);
-  if (filter.eventId) query = query.where("conference_paper.eventId", "=", filter.eventId);
-  if (filter.journalId) query = query.where("journal_article.journalId", "=", filter.journalId);
-  if (filter.universityId) query = query.where("thesis.universityId", "=", filter.universityId);
-
-  return query.execute();
-}
 
 export async function searchPublications(q: string) {
   const like = `%${q}%`;
