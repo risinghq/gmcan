@@ -1,5 +1,3 @@
-import { sql } from "kysely";
-
 import { db } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectRow } from "../db/schema.js";
@@ -264,7 +262,7 @@ export async function listProjectMembers(projectId: number) {
   return db
     .selectFrom("member")
     .innerJoin("member_project", "member_project.memberId", "member.id")
-    .select([...MEMBER_NAME, sql<string>`member.email`.as("email")])
+    .select([...MEMBER_NAME, "member.email as email"])
     .where("member_project.projectId", "=", projectId)
     .execute();
 }

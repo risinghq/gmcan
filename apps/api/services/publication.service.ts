@@ -1,5 +1,3 @@
-import { sql } from "kysely";
-
 import { db } from "../db/client.js";
 import { publicationWithAuthors } from "../db/views.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
@@ -49,9 +47,9 @@ async function attachAuthors(publicationId: number) {
       "publication_author.isPrincipal",
       "publication_author.externalName",
       "publication_author.memberId",
-      sql<string>`member.firstName`.as("memberFirstName"),
-      sql<string>`member.lastName`.as("memberLastName"),
-      sql<string | null>`member.maternalName`.as("memberMaternalName"),
+      "member.firstName as memberFirstName",
+      "member.lastName as memberLastName",
+      "member.maternalName as memberMaternalName",
     ])
     .where("publication_author.publicationId", "=", publicationId)
     .orderBy("publication_author.isPrincipal", "asc")
@@ -113,9 +111,9 @@ export async function listPublications(locale: Locale) {
       "publication_author.isPrincipal",
       "publication_author.externalName",
       "publication_author.memberId",
-      sql<string>`member.firstName`.as("memberFirstName"),
-      sql<string>`member.lastName`.as("memberLastName"),
-      sql<string | null>`member.maternalName`.as("memberMaternalName"),
+      "member.firstName as memberFirstName",
+      "member.lastName as memberLastName",
+      "member.maternalName as memberMaternalName",
     ])
     .where("publication_author.publicationId", "in", ids)
     .orderBy("publication_author.publicationId", "asc")

@@ -1,5 +1,3 @@
-import { sql } from "kysely";
-
 import { db } from "./client.js";
 import { MEMBER_PUBLIC } from "./projections.js";
 
@@ -23,9 +21,9 @@ export async function publicationWithAuthors(id: number): Promise<{
         "publication_author.isPrincipal",
         "publication_author.externalName",
         "publication_author.memberId",
-        sql<string>`member.firstName`.as("memberFirstName"),
-        sql<string>`member.lastName`.as("memberLastName"),
-        sql<string | null>`member.maternalName`.as("memberMaternalName"),
+        "member.firstName as memberFirstName",
+        "member.lastName as memberLastName",
+        "member.maternalName as memberMaternalName",
       ])
       .where("publication_author.publicationId", "=", id)
       .orderBy("publication_author.isPrincipal", "asc")

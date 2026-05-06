@@ -1,5 +1,3 @@
-import { sql } from "kysely";
-
 import { db } from "../db/client.js";
 import { MEMBER_PUBLIC } from "../db/projections.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
@@ -58,7 +56,8 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
             "news.authorId",
             "news.newsTypeId",
             "news.status",
-            sql<string>`TRIM(COALESCE(member.firstName, '') || ' ' || COALESCE(member.lastName, ''))`.as("authorName"),
+            "member.firstName as authorFirstName",
+            "member.lastName as authorLastName",
           ])
           .where((eb) =>
             eb.or([eb("news_translation.title", "like", like), eb("news_translation.summary", "like", like)]),
@@ -87,8 +86,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
             "project.researchLineId",
             "project.currencyId",
             "project.fundingSourceId",
-            sql<string>`''`.as("researchLine"),
-            sql<string>`funding_source.name`.as("fundingSource"),
+            "funding_source.name as fundingSource",
           ])
           .where("project.status", "=", 1)
           .where((eb) =>
@@ -115,9 +113,9 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
             "publication_author.isPrincipal",
             "publication_author.externalName",
             "publication_author.memberId",
-            sql<string>`member.firstName`.as("memberFirstName"),
-            sql<string>`member.lastName`.as("memberLastName"),
-            sql<string | null>`member.maternalName`.as("memberMaternalName"),
+            "member.firstName as memberFirstName",
+            "member.lastName as memberLastName",
+            "member.maternalName as memberMaternalName",
           ])
           .where("publication_author.publicationId", "in", publicationIds)
           .orderBy("publication_author.publicationId", "asc")
@@ -193,10 +191,11 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     news: await Promise.all(
       newsRows.map(async (row) =>
         Object.assign({}, row, {
+          authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" ").trim(),
           photoUrl: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
         }),
       ),
     ),
-    projects,
+    projects: projects.map((project) => Object.assign({ researchLine: "" }, project)),
   };
 }

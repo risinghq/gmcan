@@ -1,5 +1,3 @@
-import { sql } from "kysely";
-
 import { db } from "../db/client.js";
 import type { NewsRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
@@ -119,11 +117,17 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
     base = base.where("news.newsTypeId", "=", query.newsTypeId);
   }
   if (query.q) {
-    base = base.where(sql<boolean>`news.id in (
-      select rowid
-      from news_search
-      where news_search match ${query.q}
-    )`);
+    const like = `%${query.q}%`;
+    base = base.where((eb) =>
+      eb.or([
+        eb("news_translation.title", "like", like),
+        eb("news_translation.summary", "like", like),
+        eb("member.firstName", "like", like),
+        eb("member.lastName", "like", like),
+        eb("member.maternalName", "like", like),
+        eb("news_type_translation.name", "like", like),
+      ]),
+    );
   }
 
   const totalRow = await base.select(({ fn }) => fn.count<number>("news.id").as("count")).executeTakeFirstOrThrow();
@@ -140,7 +144,7 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      sql<string>`coalesce(news_type_translation.name, '')`.as("newsTypeName"),
+      "news_type_translation.name as newsTypeName",
     ])
     .$if(query.sortBy === "publishedAt", (qb) => qb.orderBy("news.publishedAt", query.sortOrder))
     .$if(query.sortBy === "title", (qb) => qb.orderBy("news_translation.title", query.sortOrder))
@@ -162,7 +166,7 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
         newsTypeId: row.newsTypeId,
         authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
         authorAsset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.authorId, slot: "photo" }),
-        newsTypeName: row.newsTypeName,
+        newsTypeName: row.newsTypeName ?? "",
       })),
     ),
     total: Number(totalRow.count),
@@ -199,7 +203,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      sql<string>`coalesce(news_type_translation.name, '')`.as("newsTypeName"),
+      "news_type_translation.name as newsTypeName",
     ])
     .where("news.id", "=", id)
     .executeTakeFirst();
@@ -221,7 +225,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale): Promise<P
     createdAt: row.createdAt,
     authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
     authorAsset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.authorId, slot: "photo" }),
-    newsTypeName: row.newsTypeName,
+    newsTypeName: row.newsTypeName ?? "",
   };
 }
 

@@ -1,7 +1,6 @@
 import type { Kysely } from "kysely";
 import { sql } from "kysely";
 
-import { DEFAULT_LOCALE } from "../lib/locales.js";
 import type { Database } from "./schema.js";
 
 export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
@@ -149,6 +148,32 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   asset_audit: ["id", "assetId", "bindingId", "action", "actorId", "reason", "createdAt"],
 };
 
+async function createIdTable(db: Kysely<Database>, table: string) {
+  await db.schema
+    .createTable(table)
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .execute();
+}
+
+async function createNameTranslationTable(
+  db: Kysely<Database>,
+  table: string,
+  ownerTable: string,
+  ownerColumn: string,
+  uniqueConstraintName: string,
+) {
+  await db.schema
+    .createTable(table)
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn(ownerColumn, "integer", (c) => c.notNull().references(`${ownerTable}.id`).onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
+    .addColumn("name", "text", (c) => c.notNull())
+    .addUniqueConstraint(uniqueConstraintName, [ownerColumn, "locale"])
+    .execute();
+}
+
 export async function createTables(db: Kysely<Database>) {
   await db.schema
     .createTable("locale")
@@ -177,11 +202,7 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("name", "text", (c) => c.notNull())
     .execute();
 
-  await db.schema
-    .createTable("member_type")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
+  await createIdTable(db, "member_type");
   await db.schema
     .createTable("member_type_translation")
     .ifNotExists()
@@ -193,56 +214,34 @@ export async function createTables(db: Kysely<Database>) {
     .addUniqueConstraint("member_type_translation_owner_locale_unique", ["memberTypeId", "locale"])
     .execute();
 
-  await db.schema
-    .createTable("news_type")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
-  await db.schema
-    .createTable("news_type_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("newsTypeId", "integer", (c) => c.notNull().references("news_type.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addUniqueConstraint("news_type_translation_owner_locale_unique", ["newsTypeId", "locale"])
-    .execute();
+  await createIdTable(db, "news_type");
+  await createNameTranslationTable(
+    db,
+    "news_type_translation",
+    "news_type",
+    "newsTypeId",
+    "news_type_translation_owner_locale_unique",
+  );
 
-  await db.schema
-    .createTable("publication_type")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
-  await db.schema
-    .createTable("publication_type_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("publicationTypeId", "integer", (c) => c.notNull().references("publication_type.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addUniqueConstraint("publication_type_translation_owner_locale_unique", ["publicationTypeId", "locale"])
-    .execute();
+  await createIdTable(db, "publication_type");
+  await createNameTranslationTable(
+    db,
+    "publication_type_translation",
+    "publication_type",
+    "publicationTypeId",
+    "publication_type_translation_owner_locale_unique",
+  );
 
-  await db.schema
-    .createTable("thesis_type")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
-  await db.schema
-    .createTable("thesis_type_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("thesisTypeId", "integer", (c) => c.notNull().references("thesis_type.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addUniqueConstraint("thesis_type_translation_owner_locale_unique", ["thesisTypeId", "locale"])
-    .execute();
+  await createIdTable(db, "thesis_type");
+  await createNameTranslationTable(
+    db,
+    "thesis_type_translation",
+    "thesis_type",
+    "thesisTypeId",
+    "thesis_type_translation_owner_locale_unique",
+  );
 
-  await db.schema
-    .createTable("event")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
+  await createIdTable(db, "event");
   await db.schema
     .createTable("event_translation")
     .ifNotExists()
@@ -276,20 +275,14 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("name", "text", (c) => c.notNull())
     .execute();
 
-  await db.schema
-    .createTable("university")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
-  await db.schema
-    .createTable("university_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("universityId", "integer", (c) => c.notNull().references("university.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addUniqueConstraint("university_translation_owner_locale_unique", ["universityId", "locale"])
-    .execute();
+  await createIdTable(db, "university");
+  await createNameTranslationTable(
+    db,
+    "university_translation",
+    "university",
+    "universityId",
+    "university_translation_owner_locale_unique",
+  );
 
   await db.schema
     .createTable("research_group")
@@ -617,113 +610,36 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("createdAt", "text", (c) => c.notNull())
     .execute();
 
-  await sql`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_asset_binding_current_unique
-    ON asset_binding(resourceType, resourceId, slot)
-    WHERE isCurrent = 1 AND deletedAt IS NULL
-  `.execute(db);
+  await db.schema
+    .createIndex("idx_asset_binding_current_unique")
+    .ifNotExists()
+    .unique()
+    .on("asset_binding")
+    .columns(["resourceType", "resourceId", "slot"])
+    .where("isCurrent", "=", 1)
+    .where("deletedAt", "is", null)
+    .execute();
 
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_asset_binding_lookup
-    ON asset_binding(resourceType, resourceId, slot, isCurrent)
-  `.execute(db);
+  await db.schema
+    .createIndex("idx_asset_binding_lookup")
+    .ifNotExists()
+    .on("asset_binding")
+    .columns(["resourceType", "resourceId", "slot", "isCurrent"])
+    .execute();
 
-  await sql`
-    CREATE VIRTUAL TABLE IF NOT EXISTS news_search USING fts5(
-      title,
-      summary,
-      authorName,
-      categoryName
-    )
-  `.execute(db);
+  await db.schema
+    .createIndex("idx_news_status_published_at")
+    .ifNotExists()
+    .on("news")
+    .columns(["status", "publishedAt"])
+    .execute();
 
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_news_status_published_at
-    ON news(status, publishedAt DESC)
-  `.execute(db);
+  await db.schema
+    .createIndex("idx_news_type_published_at")
+    .ifNotExists()
+    .on("news")
+    .columns(["newsTypeId", "publishedAt"])
+    .execute();
 
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_news_type_published_at
-    ON news(newsTypeId, publishedAt DESC)
-  `.execute(db);
-
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_news_author
-    ON news(authorId)
-  `.execute(db);
-
-  await sql`
-    CREATE TRIGGER IF NOT EXISTS news_ai AFTER INSERT ON news BEGIN
-      INSERT INTO news_search(rowid, title, summary, authorName, categoryName)
-      VALUES (
-        NEW.id,
-        COALESCE((SELECT title FROM news_translation WHERE newsId = NEW.id AND locale = ${DEFAULT_LOCALE}), ''),
-        COALESCE((SELECT summary FROM news_translation WHERE newsId = NEW.id AND locale = ${DEFAULT_LOCALE}), ''),
-        COALESCE((SELECT TRIM(COALESCE(firstName, '') || ' ' || COALESCE(lastName, '') || ' ' || COALESCE(maternalName, '')) FROM member WHERE id = NEW.authorId), ''),
-        COALESCE((SELECT name FROM news_type_translation WHERE newsTypeId = NEW.newsTypeId AND locale = ${DEFAULT_LOCALE}), '')
-      );
-    END
-  `.execute(db);
-
-  await sql`
-    CREATE TRIGGER IF NOT EXISTS news_au AFTER UPDATE ON news BEGIN
-      INSERT OR REPLACE INTO news_search(rowid, title, summary, authorName, categoryName)
-      VALUES (
-        NEW.id,
-        COALESCE((SELECT title FROM news_translation WHERE newsId = NEW.id AND locale = ${DEFAULT_LOCALE}), ''),
-        COALESCE((SELECT summary FROM news_translation WHERE newsId = NEW.id AND locale = ${DEFAULT_LOCALE}), ''),
-        COALESCE((SELECT TRIM(COALESCE(firstName, '') || ' ' || COALESCE(lastName, '') || ' ' || COALESCE(maternalName, '')) FROM member WHERE id = NEW.authorId), ''),
-        COALESCE((SELECT name FROM news_type_translation WHERE newsTypeId = NEW.newsTypeId AND locale = ${DEFAULT_LOCALE}), '')
-      );
-    END
-  `.execute(db);
-
-  await sql`
-    CREATE TRIGGER IF NOT EXISTS news_ad AFTER DELETE ON news BEGIN
-      DELETE FROM news_search WHERE rowid = OLD.id;
-    END
-  `.execute(db);
-
-  await sql`
-    CREATE TRIGGER IF NOT EXISTS member_au_news_search AFTER UPDATE ON member BEGIN
-      UPDATE news_search
-      SET authorName = COALESCE(TRIM(COALESCE(NEW.firstName, '') || ' ' || COALESCE(NEW.lastName, '') || ' ' || COALESCE(NEW.maternalName, '')), '')
-      WHERE rowid IN (SELECT id FROM news WHERE authorId = NEW.id);
-    END
-  `.execute(db);
-
-  await sql`
-    CREATE TRIGGER IF NOT EXISTS news_type_au_news_search AFTER UPDATE ON news_type BEGIN
-      UPDATE news_search
-      SET categoryName = COALESCE((SELECT name FROM news_type_translation WHERE newsTypeId = NEW.id AND locale = ${DEFAULT_LOCALE}), '')
-      WHERE rowid IN (SELECT id FROM news WHERE newsTypeId = NEW.id);
-    END
-  `.execute(db);
-
-  await sql`
-    CREATE TRIGGER IF NOT EXISTS news_translation_ai AFTER INSERT ON news_translation BEGIN
-      INSERT OR REPLACE INTO news_search(rowid, title, summary, authorName, categoryName)
-      VALUES (
-        NEW.newsId,
-        COALESCE((SELECT title FROM news_translation WHERE newsId = NEW.newsId AND locale = ${DEFAULT_LOCALE}), ''),
-        COALESCE((SELECT summary FROM news_translation WHERE newsId = NEW.newsId AND locale = ${DEFAULT_LOCALE}), ''),
-        COALESCE((SELECT TRIM(COALESCE(member.firstName, '') || ' ' || COALESCE(member.lastName, '') || ' ' || COALESCE(member.maternalName, '')) FROM news LEFT JOIN member ON member.id = news.authorId WHERE news.id = NEW.newsId), ''),
-        COALESCE((SELECT news_type_translation.name FROM news LEFT JOIN news_type_translation ON news_type_translation.newsTypeId = news.newsTypeId AND news_type_translation.locale = ${DEFAULT_LOCALE} WHERE news.id = NEW.newsId), '')
-      );
-    END
-  `.execute(db);
-
-  await sql`
-    INSERT OR REPLACE INTO news_search(rowid, title, summary, authorName, categoryName)
-    SELECT
-      news.id,
-      COALESCE(news_translation.title, ''),
-      COALESCE(news_translation.summary, ''),
-      COALESCE(TRIM(COALESCE(member.firstName, '') || ' ' || COALESCE(member.lastName, '') || ' ' || COALESCE(member.maternalName, '')), ''),
-      COALESCE(news_type_translation.name, '')
-    FROM news
-    LEFT JOIN news_translation ON news_translation.newsId = news.id AND news_translation.locale = ${DEFAULT_LOCALE}
-    LEFT JOIN member ON member.id = news.authorId
-    LEFT JOIN news_type_translation ON news_type_translation.newsTypeId = news.newsTypeId AND news_type_translation.locale = ${DEFAULT_LOCALE}
-  `.execute(db);
+  await db.schema.createIndex("idx_news_author").ifNotExists().on("news").column("authorId").execute();
 }

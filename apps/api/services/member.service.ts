@@ -1,5 +1,3 @@
-import { sql } from "kysely";
-
 import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
 import { publicProfile } from "../db/views.js";
@@ -50,8 +48,8 @@ export async function listAdminMembers(filter?: {
       "member.roleId",
       "member.memberTypeId",
       "member.prefixId",
-      sql<string>`COALESCE(member_type_translation.nameSingular, '')`.as("memberTypeName"),
-      sql<string | null>`prefix.name`.as("prefixName"),
+      "member_type_translation.nameSingular as memberTypeName",
+      "prefix.name as prefixName",
     ]);
 
   if (filter?.status !== undefined) query = query.where("member.status", "=", filter.status);
@@ -82,7 +80,7 @@ export async function listAdminMembers(filter?: {
       status: row.status,
       roleId: row.roleId,
       memberTypeId: row.memberTypeId,
-      memberTypeName: row.memberTypeName,
+      memberTypeName: row.memberTypeName ?? "",
       prefixId: row.prefixId,
       prefixName: row.prefixName,
       asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
@@ -301,11 +299,12 @@ export async function setResetToken(memberId: number, token: string, expires: st
 }
 
 export async function getMemberByResetToken(token: string) {
+  const now = new Date().toISOString();
   return db
     .selectFrom("member")
     .select(["id", "firstName", "email"])
     .where("resetToken", "=", token)
-    .where("resetExpires", ">", sql<string>`datetime('now')`)
+    .where("resetExpires", ">", now)
     .where("resetPassword", "=", 1)
     .executeTakeFirst();
 }
