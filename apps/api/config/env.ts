@@ -9,7 +9,8 @@ const EnvSchema = z.object({
   ASSET_SIGNING_SECRET: z.string().min(1),
   RESEND_API_KEY: z.string().min(1).optional(),
   INSTITUTIONAL_EMAIL: z.email().optional(),
-  ADMIN_LOCALES: z.string().optional(),
+  SUPPORTED_LOCALES: z.string().optional(),
+  DEFAULT_LOCALE: z.string().optional(),
 });
 
 const parsed = EnvSchema.safeParse(process.env);

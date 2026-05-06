@@ -20,9 +20,9 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { buildThesisPayload } from "@app/dashboard/publications/flow/publication-payload";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
@@ -31,6 +31,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate } from "@app/shared/utils/date";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { startWith, map } from "rxjs/operators";
@@ -41,6 +42,16 @@ interface AuthorFormRow {
   memberId: number | null;
   myControl: FormControl<string>;
   filteredOptions?: Observable<AuthorSearchResult[]>;
+}
+
+interface ThesisDraft {
+  id: number;
+  title: string;
+  abstract: string;
+  publishedAt: string;
+  universityId: number | null;
+  thesisKindCode: "phd" | "masters" | null;
+  asset: string | null;
 }
 
 @Component({
@@ -77,12 +88,13 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
-  publicacion: PublicationWithAuthors;
+  publicacion: ThesisDraft;
   publishedAtObj?: Date;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
   url: string;
   edit = true;
+  private loadedPublication: PublicPublicationWithAuthors;
 
   options: AuthorSearchResult[] = [];
   otrosAutores: AuthorFormRow[] = [];
@@ -93,10 +105,20 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
       título: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       publishedAt: ["", [Validators.required]],
       universityId: ["", [Validators.required]],
-      thesisTypeId: ["", [Validators.required]],
+      thesisKindCode: ["", [Validators.required]],
       abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
-    this.publicacion = this.route.snapshot.data["publication"] as PublicationWithAuthors;
+    const loaded = this.route.snapshot.data["publication"] as PublicPublicationWithAuthors;
+    this.loadedPublication = loaded;
+    this.publicacion = {
+      id: loaded.id,
+      title: loaded.title,
+      abstract: loaded.abstract ?? "",
+      publishedAt: loaded.publishedAt,
+      universityId: loaded.subtype.kindCode === "thesis" ? loaded.subtype.thesis.universityId : null,
+      thesisKindCode: loaded.subtype.kindCode === "thesis" ? loaded.subtype.thesis.thesisKindCode : null,
+      asset: loaded.asset?.inline ?? null,
+    };
     this.url = GLOBAL.url;
   }
 
@@ -105,11 +127,10 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.bindPublication(this.publicacion);
+    this.bindPublication(this.loadedPublication);
   }
 
-  private bindPublication(pub: PublicationWithAuthors): void {
-    this.publicacion = pub;
+  private bindPublication(pub: PublicPublicationWithAuthors): void {
     const publishedAt = parseLocalDate(pub.publishedAt);
     if (publishedAt) {
       this.publishedAtObj = publishedAt;
@@ -117,12 +138,12 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
 
     this.memberService.searchAuthors("").subscribe((allAuthors) => {
       this.options = allAuthors;
-      const sorted = pub.authors.toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+      const sorted = pub.authors.toSorted((a, b) => a.authorOrder - b.authorOrder);
       this.otrosAutores = sorted.map((a, i) => {
         const row: AuthorFormRow = {
           id: i + 1,
           name: a.name,
-          memberId: a.memberId ?? null,
+          memberId: a.kind === "registered" ? a.memberId : null,
           myControl: new FormControl<string>(a.name, { nonNullable: true }),
         };
         row.filteredOptions = row.myControl.valueChanges.pipe(
@@ -200,16 +221,14 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   submitArticle(): void {
     if (!this.publicacionForm.valid) return;
 
-    const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : "";
-
-    const data = {
+    if (!this.publicacion.universityId || !this.publicacion.thesisKindCode) return;
+    const data = buildThesisPayload({
       title: this.publicacion.title,
       abstract: this.publicacion.abstract ?? undefined,
-      publishedAt,
-      typeId: 2,
-      universityId: this.publicacion.universityId ?? undefined,
-      thesisTypeId: this.publicacion.thesisTypeId ?? undefined,
-    };
+      publishedAt: this.publishedAtObj,
+      universityId: this.publicacion.universityId,
+      thesisKindCode: this.publicacion.thesisKindCode,
+    });
 
     this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((response) => {
       if (response.status === 1) {
@@ -230,9 +249,9 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
         const matchedAuthor = this.options.find((o) => o.name === row.name);
         const memberId = row.memberId ?? matchedAuthor?.id ?? null;
         if (memberId) {
-          return { kind: "registered" as const, memberId, isPrincipal: i };
+          return { kind: "registered" as const, memberId, authorOrder: i };
         }
-        return { kind: "external" as const, externalName: row.name, isPrincipal: i };
+        return { kind: "external" as const, externalName: row.name, authorOrder: i };
       });
   }
 

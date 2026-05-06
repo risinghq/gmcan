@@ -14,7 +14,7 @@ export class AuthService {
   private currentUser: Member | null = null;
 
   login(credentials: { email: string; password: string }): Observable<{ user: Member }> {
-    return this.http.post<{ user: Member }>(`${GLOBAL.url}admin/auth/login`, credentials).pipe(
+    return this.http.post<{ user: Member }>(GLOBAL.admin("auth/login"), credentials).pipe(
       tap((res) => {
         if (res?.user) {
           this.currentUser = res.user;
@@ -25,7 +25,7 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${GLOBAL.url}admin/auth/logout`, {}).pipe(tap(() => this.clearSessionState()));
+    return this.http.post<void>(GLOBAL.admin("auth/logout"), {}).pipe(tap(() => this.clearSessionState()));
   }
 
   getUser(): Member | null {
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   fetchCurrentUser(): Observable<MemberFull> {
-    return this.http.get<MemberFull>(`${GLOBAL.url}admin/account/me`).pipe(
+    return this.http.get<MemberFull>(GLOBAL.admin("account/me")).pipe(
       tap((user) => {
         this.currentUser = user;
         this.authz.setCapabilities(user.capabilities);
@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   updateMyPassword(params: { newPassword: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/account/password`, {
+    return this.http.put<{ status: number }>(GLOBAL.admin("account/password"), {
       password: params.newPassword,
     });
   }

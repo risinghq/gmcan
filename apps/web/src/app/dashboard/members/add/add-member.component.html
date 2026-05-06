@@ -8,6 +8,27 @@
         </div>
         <div class="right obligatory-text"><span class="red-text">(*) </span>Campos obligatorios</div>
       </div>
+      @if (edit && publishability) {
+        <div class="mb-16">
+          @if (publishability.publishable) {
+            <span
+              class="status-chip status-ready"
+              [title]="publishabilityTooltip()"
+              (click)="openPublishabilityDetails()"
+            >
+              Ready
+            </span>
+          } @else {
+            <span
+              class="status-chip status-draft"
+              [title]="publishabilityTooltip()"
+              (click)="openPublishabilityDetails()"
+            >
+              Draft · {{ missingRequirementsCount() }}
+            </span>
+          }
+        </div>
+      }
       <form [formGroup]="memberForm">
         <div class="flex-news mt-24">
           <div class="full-width">
@@ -15,7 +36,6 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Primer nombre <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.firstName"
                   formControlName="firstName"
                   name="firstName"
                   class="input-category"
@@ -26,7 +46,6 @@
               <div class="full-width">
                 <div class="text-category">Segundo nombre</div>
                 <input
-                  [(ngModel)]="segundoNombre"
                   formControlName="middleName"
                   name="middleName"
                   placeholder="Insertar segundo nombre"
@@ -38,7 +57,6 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Apellido paterno <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.lastName"
                   formControlName="lastName"
                   name="lastName"
                   class="input-category"
@@ -49,7 +67,6 @@
               <div class="full-width">
                 <div class="text-category">Apellido materno</div>
                 <input
-                  [(ngModel)]="member.maternalName"
                   formControlName="maternalName"
                   name="maternalName"
                   placeholder="Insertar apellido materno"
@@ -64,7 +81,6 @@
                   <mat-label />
                   <input
                     matInput
-                    [(ngModel)]="birthDateObj"
                     [matDatepicker]="dp"
                     formControlName="birthDate"
                     name="birthDate"
@@ -77,7 +93,6 @@
               <div class="full-width">
                 <div class="text-category">Correo electrónico <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.email"
                   type="email"
                   formControlName="email"
                   name="email"
@@ -92,9 +107,9 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Género</div>
                 <mat-form-field class="input-category">
-                  <mat-select [(ngModel)]="member.genderId" formControlName="genderId" name="genderId">
+                  <mat-select formControlName="genderCode" name="genderCode">
                     @for (genero of generos; track genero) {
-                      <mat-option [value]="genero.idGenero">{{ genero.nombre }}</mat-option>
+                      <mat-option [value]="genero.code">{{ genero.name }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -102,9 +117,9 @@
               <div class="full-width">
                 <div class="text-category">Máximo nivel académico alcanzado</div>
                 <mat-form-field class="input-category">
-                  <mat-select [(ngModel)]="member.prefixId" formControlName="prefixId" name="prefixId">
+                  <mat-select formControlName="prefixCode" name="prefixCode">
                     @for (prefijo of prefijos; track prefijo) {
-                      <mat-option [value]="prefijo.idPrefijo">{{ prefijo.nombre }}</mat-option>
+                      <mat-option [value]="prefijo.code">{{ prefijo.label }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -114,9 +129,9 @@
               <div class="mr-32 full-width">
                 <div class="text-category">Cargo <span class="red-text">*</span></div>
                 <mat-form-field class="input-category">
-                  <mat-select [(ngModel)]="member.memberTypeId" formControlName="memberTypeId" name="memberTypeId">
+                  <mat-select formControlName="memberTypeCode" name="memberTypeCode">
                     @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
-                      <mat-option [value]="tipoMiembro.id">{{ tipoMiembro.nameSingular }}</mat-option>
+                      <mat-option [value]="tipoMiembro.code">{{ tipoMiembro.nameSingular }}</mat-option>
                     }
                   </mat-select>
                 </mat-form-field>
@@ -124,7 +139,6 @@
               <div class="full-width">
                 <div class="text-category">N° DNI / Pasaporte <span class="red-text">*</span></div>
                 <input
-                  [(ngModel)]="member.dni"
                   formControlName="dni"
                   name="dni"
                   [disabled]="edit"
@@ -139,13 +153,7 @@
                 <div class="text-category">Contraseña (mínimo 8 caracteres) <span class="red-text">*</span></div>
                 <mat-form-field class="input-category" [class.invalid-error]="errPass">
                   <mat-label />
-                  <input
-                    matInput
-                    [type]="hide ? 'password' : 'text'"
-                    [(ngModel)]="password"
-                    formControlName="password"
-                    name="password"
-                  />
+                  <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" name="password" />
                   <button
                     mat-icon-button
                     matSuffix
@@ -209,17 +217,21 @@
           </div>
         </div>
         <div class="full-width mb-16">
+          <div class="text-category">Idioma del resumen</div>
+          <mat-form-field class="input-category">
+            <mat-label />
+            <mat-select formControlName="bioLocale" name="bioLocale">
+              @for (locale of bioLocales; track locale) {
+                <mat-option [value]="locale">{{ locale.toUpperCase() }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="full-width mb-16">
           <div class="text-category">
-            Resumen profesional <span>({{ member.bio?.length ?? 0 }}/500)</span>
+            Resumen profesional <span>({{ bioLength() }}/500)</span>
           </div>
-          <textarea
-            [(ngModel)]="member.bio"
-            formControlName="bio"
-            name="bio"
-            autosize
-            class="input-category"
-            maxlength="500"
-          ></textarea>
+          <textarea formControlName="bio" name="bio" autosize class="input-category" maxlength="500"></textarea>
         </div>
         <div class="full-width mb-16">
           <div class="text-category">
@@ -227,9 +239,21 @@
             analíticas
           </div>
           <div class="boxed">
-            <input type="radio" id="coordYes" name="coord" [checked]="member.roleId == 2" (click)="setCoord(2)" />
+            <input
+              type="radio"
+              id="coordYes"
+              name="coord"
+              [checked]="member.roleCode !== 'administrator'"
+              (click)="setCoord(2)"
+            />
             <label class="mr-16" for="coordYes">No</label>
-            <input type="radio" id="coordNo" name="coord" [checked]="member.roleId == 1" (click)="setCoord(1)" />
+            <input
+              type="radio"
+              id="coordNo"
+              name="coord"
+              [checked]="member.roleCode === 'administrator'"
+              (click)="setCoord(1)"
+            />
             <label for="coordNo">Sí</label>
           </div>
         </div>
@@ -240,7 +264,7 @@
               type="radio"
               id="fallecidoYes"
               name="fallecido"
-              [checked]="member.status == 0 || member.status == 1"
+              [checked]="member.isActive == 0 || member.isActive == 1"
               (click)="adHonorem(1)"
             />
             <label class="mr-16" for="fallecidoYes">No</label>
@@ -248,7 +272,7 @@
               type="radio"
               id="fallecidoNo"
               name="fallecido"
-              [checked]="member.status == 3"
+              [checked]="member.isActive == 3"
               (click)="adHonorem(3)"
             />
             <label for="fallecidoNo">Sí</label>
@@ -261,11 +285,11 @@
               type="radio"
               id="exMemberYes"
               name="ex"
-              [checked]="member.status == 3 || member.status == 1"
+              [checked]="member.isActive == 3 || member.isActive == 1"
               (click)="oldMember(1)"
             />
             <label class="mr-16" for="exMemberYes">No</label>
-            <input type="radio" id="exMemberNo" name="ex" [checked]="member.status == 0" (click)="oldMember(0)" />
+            <input type="radio" id="exMemberNo" name="ex" [checked]="member.isActive == 0" (click)="oldMember(0)" />
             <label for="exMemberNo">Sí</label>
           </div>
         </div>

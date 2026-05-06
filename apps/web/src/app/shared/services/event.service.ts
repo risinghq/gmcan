@@ -23,27 +23,27 @@ export class EventService {
 
   // Public
   list(): Observable<EventItem[]> {
-    return this.http.get<EventItem[]>(`${GLOBAL.url}api/events`);
+    return this.http.get<EventItem[]>(GLOBAL.api("events"));
   }
 
   // Admin
   listAdmin(): Observable<EventItem[]> {
-    return this.http.get<EventItem[]>(`${GLOBAL.url}admin/events`);
+    return this.http.get<EventItem[]>(GLOBAL.admin("events"));
   }
 
   get(id: number): Observable<EventItem> {
-    return this.http.get<EventItem>(`${GLOBAL.url}admin/events/${id}`);
+    return this.http.get<EventItem>(GLOBAL.admin(`events/${id}`));
   }
 
   create(body: EventBody): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/events`, body);
+    return this.http.post<{ id: number }>(GLOBAL.admin("events"), body);
   }
 
   update(id: number, body: EventBody): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/events/${id}`, body);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`events/${id}`), body);
   }
 
   delete(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/events/${id}`);
+    return this.http.delete<{ status: number }>(GLOBAL.admin(`events/${id}`));
   }
 }

@@ -13,13 +13,16 @@ export function buildArticlePayload(input: {
   journalId?: number;
 }): PublicationFields {
   return {
-    title: input.title,
-    abstract: input.abstract ?? undefined,
     doi: input.doi ?? undefined,
     publishedAt: toIsoDateString(input.publishedAt),
-    journalIssue: input.journalIssue ?? undefined,
-    typeId: 1,
-    journalId: input.journalId ?? undefined,
+    subtype: {
+      kindCode: "journal_article",
+      journalArticle: {
+        journalId: input.journalId ?? undefined,
+        issue: input.journalIssue ?? undefined,
+      },
+    },
+    translations: { es: { title: input.title, abstract: input.abstract ?? undefined } },
   };
 }
 
@@ -27,16 +30,19 @@ export function buildThesisPayload(input: {
   title: string;
   abstract?: string;
   publishedAt?: Date;
-  universityId?: number;
-  thesisTypeId?: number;
+  universityId: number;
+  thesisKindCode: "phd" | "masters";
 }): PublicationFields {
   return {
-    title: input.title,
-    abstract: input.abstract ?? undefined,
     publishedAt: toIsoDateString(input.publishedAt),
-    typeId: 2,
-    universityId: input.universityId ?? undefined,
-    thesisTypeId: input.thesisTypeId ?? undefined,
+    subtype: {
+      kindCode: "thesis",
+      thesis: {
+        universityId: input.universityId,
+        thesisKindCode: input.thesisKindCode,
+      },
+    },
+    translations: { es: { title: input.title, abstract: input.abstract ?? undefined } },
   };
 }
 
@@ -45,14 +51,12 @@ export function buildResumenPayload(input: {
   abstract?: string;
   doi?: string;
   publishedAt?: Date;
-  eventId?: number;
+  eventId: number;
 }): PublicationFields {
   return {
-    title: input.title,
-    abstract: input.abstract,
     doi: input.doi,
     publishedAt: toIsoDateString(input.publishedAt),
-    typeId: 3,
-    eventId: input.eventId,
+    subtype: { kindCode: "conference_paper", conferencePaper: { eventId: input.eventId } },
+    translations: { es: { title: input.title, abstract: input.abstract } },
   };
 }

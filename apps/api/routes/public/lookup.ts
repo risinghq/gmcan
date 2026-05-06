@@ -1,43 +1,30 @@
 import { Hono } from "hono";
 
-import { localizeField } from "../../lib/public-locale.js";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../../lib/locales.js";
 import { getLookupData } from "../../services/ref.service.js";
 
 const router = new Hono();
 
 router.get("/", async (c) => {
   const locale = c.get("locale");
-  const data = await getLookupData();
+  const data = await getLookupData(locale);
   return c.json({
-    memberTypes: data.memberTypes.map((item) => ({
-      id: item.id,
-      name: localizeField(item, locale, { es: "name", en: "nameEN" }),
-      nameSingular: localizeField(item, locale, { es: "nameSingular", en: "nameSingularEN" }),
-    })),
-    publicationTypes: data.publicationTypes.map((item) => ({
-      id: item.id,
-      name: localizeField(item, locale, { es: "name", en: "nameEN" }),
-    })),
-    thesisTypes: data.thesisTypes.map((item) => ({
-      id: item.id,
-      name: localizeField(item, locale, { es: "name", en: "nameEN" }),
-    })),
-    newsTypes: data.newsTypes.map((item) => ({
-      id: item.id,
-      name: localizeField(item, locale, { es: "name", en: "nameEN" }),
-    })),
+    memberTypes: data.memberTypes,
+    publicationKinds: data.publicationKinds,
+    thesisKinds: data.thesisKinds,
+    newsKinds: data.newsKinds,
     fundingSources: data.fundingSources,
-    universities: data.universities.map((item) => ({
-      id: item.id,
-      name: localizeField(item, locale, { es: "name", en: "nameEN" }),
-    })),
+    currencies: data.currencies,
+    roles: data.roles,
+    genders: data.genders,
+    prefixes: data.prefixes,
+    universities: data.universities,
     journals: data.journals,
-    events: data.events.map((item) => ({
-      id: item.id,
-      name: localizeField(item, locale, { es: "name", en: "name" }),
-      city: localizeField(item, locale, { es: "city", en: "cityEN", required: false }),
-      country: localizeField(item, locale, { es: "country", en: "countryEN", required: false }),
-    })),
+    events: data.events,
+    locales: {
+      supported: SUPPORTED_LOCALES,
+      default: DEFAULT_LOCALE,
+    },
   });
 });
 

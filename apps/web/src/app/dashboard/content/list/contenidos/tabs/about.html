@@ -53,12 +53,31 @@
         <div class="text-category">Objetivos <span class="red-text">*</span></div>
         <div class="green-text right plex-sans" (click)="state.previewAbout()">Vista Previa</div>
       </div>
-      <ckeditor
-        [editor]="state.Editor"
-        [(ngModel)]="state.aboutUs.objectives"
-        formControlName="objectives"
-        name="objectives"
-      />
+      <div class="mb-12">Párrafos introductorios</div>
+      @for (paragraph of state.aboutUs.objectivesContent.introParagraphs; track $index; let i = $index) {
+      <div class="flex-news mb-12">
+        <textarea
+          class="full-width"
+          rows="3"
+          [(ngModel)]="state.aboutUs.objectivesContent.introParagraphs[i]"
+          [ngModelOptions]="{ standalone: true }"
+        ></textarea>
+        <div class="green-text ml-16" (click)="state.removeSectionParagraph('objectives', i)">Quitar</div>
+      </div>
+      }
+      <div class="green-text mb-16" (click)="state.addSectionParagraph('objectives')">+ Agregar párrafo</div>
+      <div class="mb-12">Lista de objetivos</div>
+      @for (item of state.aboutUs.objectivesContent.items; track $index; let i = $index) {
+      <div class="flex-news mb-12">
+        <input
+          class="full-width"
+          [(ngModel)]="state.aboutUs.objectivesContent.items[i]"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <div class="green-text ml-16" (click)="state.removeSectionItem('objectives', i)">Quitar</div>
+      </div>
+      }
+      <div class="green-text" (click)="state.addSectionItem('objectives')">+ Agregar ítem</div>
     </div>
     <div class="right black-btn mb-12">
       <div class="link link-set" (click)="state.submitObjetivos()">Actualizar información</div>
@@ -72,15 +91,54 @@
         <div class="text-category">Servicios <span class="red-text">*</span></div>
         <div class="green-text right plex-sans" (click)="state.previewAbout()">Vista Previa</div>
       </div>
-      <ckeditor
-        [editor]="state.Editor"
-        [(ngModel)]="state.aboutUs.services"
-        formControlName="services"
-        name="services"
-      />
+      <div class="mb-12">Párrafos introductorios</div>
+      @for (paragraph of state.aboutUs.servicesContent.introParagraphs; track $index; let i = $index) {
+      <div class="flex-news mb-12">
+        <textarea
+          class="full-width"
+          rows="3"
+          [(ngModel)]="state.aboutUs.servicesContent.introParagraphs[i]"
+          [ngModelOptions]="{ standalone: true }"
+        ></textarea>
+        <div class="green-text ml-16" (click)="state.removeSectionParagraph('services', i)">Quitar</div>
+      </div>
+      }
+      <div class="green-text mb-16" (click)="state.addSectionParagraph('services')">+ Agregar párrafo</div>
+      <div class="mb-12">Lista de servicios</div>
+      @for (item of state.aboutUs.servicesContent.items; track $index; let i = $index) {
+      <div class="flex-news mb-12">
+        <input
+          class="full-width"
+          [(ngModel)]="state.aboutUs.servicesContent.items[i]"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <div class="green-text ml-16" (click)="state.removeSectionItem('services', i)">Quitar</div>
+      </div>
+      }
+      <div class="green-text" (click)="state.addSectionItem('services')">+ Agregar ítem</div>
     </div>
     <div class="right black-btn mb-12">
       <div class="link link-set" (click)="state.submitServicios()">Actualizar información</div>
     </div>
   </form>
+
+  <div class="title mb-16">Teaser de servicios (Home)</div>
+  <div class="full-width mb-24">
+    <div class="text-category">Párrafos teaser <span class="red-text">*</span></div>
+    @for (paragraph of state.aboutUs.homeServicesTeaserContent.paragraphs; track $index; let i = $index) {
+    <div class="flex-news mb-12">
+      <textarea
+        class="full-width"
+        rows="3"
+        [(ngModel)]="state.aboutUs.homeServicesTeaserContent.paragraphs[i]"
+        [ngModelOptions]="{ standalone: true }"
+      ></textarea>
+      <div class="green-text ml-16" (click)="state.removeTeaserParagraph(i)">Quitar</div>
+    </div>
+    }
+    <div class="green-text mb-16" (click)="state.addTeaserParagraph()">+ Agregar párrafo</div>
+    <div class="right black-btn mb-12">
+      <div class="link link-set" (click)="state.submitHomeServicesTeaser()">Actualizar información</div>
+    </div>
+  </div>
 </div>

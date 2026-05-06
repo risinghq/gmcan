@@ -79,13 +79,13 @@ export default class GlobalSearchComponent implements OnInit {
   memberExpanded = true;
   newsExpanded = true;
 
-  private publicationTypeById = new Map<number, string>();
-  private thesisTypeById = new Map<number, string>();
+  private publicationTypeByCode = new Map<string, string>();
+  private thesisTypeByCode = new Map<string, string>();
   private journalById = new Map<number, string>();
   private universityById = new Map<number, string>();
   private eventById = new Map<number, { name: string; city: string | null; country: string | null }>();
-  private currencyById = new Map<number, string>();
-  private newsTypeById = new Map<number, string>();
+  private currencyByCode = new Map<string, string>();
+  private newsTypeByCode = new Map<string, string>();
 
   constructor() {
     this.searchGlobalForm = this.formBuilder.group({
@@ -124,7 +124,7 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   fillProyecto(proyecto: ProjectDisplay): void {
-    proyecto.moneda = this.currencyById.get(proyecto.currencyId ?? -1);
+    proyecto.moneda = this.currencyByCode.get(proyecto.currencyCode ?? "");
 
     const start = this.normalizedDate(proyecto.startDate);
     if (start) {
@@ -138,11 +138,15 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   fillPublicacion(pub: PublicationDisplay): void {
-    pub.tipoPublicacion = this.publicationTypeById.get(pub.typeId ?? -1);
-    pub.revista = this.journalById.get(pub.journalId ?? -1);
-    pub.universidad = this.universityById.get(pub.universityId ?? -1) ?? undefined;
-    pub.tipoTesis = this.thesisTypeById.get(pub.thesisTypeId ?? -1);
-    const evento = this.eventById.get(pub.eventId ?? -1);
+    pub.tipoPublicacion = this.publicationTypeByCode.get(pub.kindCode ?? "");
+    const journalId = pub.subtype.kindCode === "journal_article" ? (pub.subtype.journalArticle.journalId ?? -1) : -1;
+    const universityId = pub.subtype.kindCode === "thesis" ? (pub.subtype.thesis.universityId ?? -1) : -1;
+    const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
+    const eventId = pub.subtype.kindCode === "conference_paper" ? (pub.subtype.conferencePaper.eventId ?? -1) : -1;
+    pub.revista = this.journalById.get(journalId);
+    pub.universidad = this.universityById.get(universityId) ?? undefined;
+    pub.tipoTesis = thesisKindCode ? this.thesisTypeByCode.get(thesisKindCode) : undefined;
+    const evento = this.eventById.get(eventId);
     pub.evento = evento?.name;
     pub.ciudad = evento?.city ?? null;
     pub.pais = evento?.country ?? null;
@@ -153,7 +157,7 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   fillNoticia(noticia: NewsDisplay): void {
-    noticia.nombreTipoNoticia = this.newsTypeById.get(noticia.newsTypeId ?? -1);
+    noticia.nombreTipoNoticia = this.newsTypeByCode.get(noticia.newsKindCode ?? "");
     const publishedAt = this.normalizedDate(noticia.publishedAt);
     if (publishedAt) noticia.fechaFormateada = this.datePipe.transform(publishedAt, "MM/dd/y", "es") ?? undefined;
   }
@@ -209,8 +213,8 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   private buildLookupMaps(): void {
-    this.publicationTypeById = new Map(this.lookup.publicationTypes().map((item) => [item.id, item.name]));
-    this.thesisTypeById = new Map(this.lookup.thesisTypes().map((item) => [item.id, item.name]));
+    this.publicationTypeByCode = new Map(this.lookup.publicationKinds().map((item) => [item.code, item.name]));
+    this.thesisTypeByCode = new Map(this.lookup.thesisKinds().map((item) => [item.code, item.name]));
     this.journalById = new Map(this.lookup.journals().map((item) => [item.id, item.name]));
     this.universityById = new Map(this.lookup.universities().map((item) => [item.id, item.name]));
     this.eventById = new Map(
@@ -218,8 +222,8 @@ export default class GlobalSearchComponent implements OnInit {
         .events()
         .map((item) => [item.id, { name: item.name, city: item.city ?? null, country: item.country ?? null }]),
     );
-    this.currencyById = new Map(this.lookup.monedas().map((item) => [item.idMoneda, item.simbolo]));
-    this.newsTypeById = new Map(this.lookup.newsTypes().map((item) => [item.id, item.name]));
+    this.currencyByCode = new Map(this.lookup.currencies().map((item) => [item.code, item.symbol]));
+    this.newsTypeByCode = new Map(this.lookup.newsKinds().map((item) => [item.code, item.name]));
   }
 
   private normalizedDate(value: string | null | undefined): Date | null {

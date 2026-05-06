@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, viewChild } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -16,6 +17,8 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
+import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
+import { countMissingRequirements } from "@app/shared/member-publishability/utils";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { MemberService } from "@app/shared/services/member.service";
 
@@ -44,8 +47,17 @@ export default class MiembrosComponent implements OnInit {
   private memberService = inject(MemberService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
 
-  displayedColumns: string[] = ["firstName", "lastName", "maternalName", "memberTypeName", "prefixName", "email"];
+  displayedColumns: string[] = [
+    "firstName",
+    "lastName",
+    "maternalName",
+    "memberTypeName",
+    "prefixName",
+    "email",
+    "publishability",
+  ];
   items: AdminMemberListItem[] = [];
   dataSource = new MatTableDataSource<AdminMemberListItem>([]);
 
@@ -65,9 +77,8 @@ export default class MiembrosComponent implements OnInit {
   loadList(isActiveMode: boolean): void {
     this.memberService.listAdminMembers().subscribe((rows) => {
       this.items = isActiveMode
-        ? rows.filter((member) => member.status === 1)
-        : rows.filter((member) => member.status === 0 || member.status === 3);
-
+        ? rows.filter((member) => member.isActive === 1)
+        : rows.filter((member) => member.isActive === 0 || member.isActive === 3);
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();
@@ -104,5 +115,22 @@ export default class MiembrosComponent implements OnInit {
       ? "miembros-activos"
       : "miembros-antiguos";
     this.router.navigate(["dashboard/edit-member/" + id], { queryParams: { returnTo } });
+  }
+
+  missingCount(row: AdminMemberListItem): number {
+    if (!row.publishability) return 0;
+    return countMissingRequirements(row.publishability);
+  }
+
+  openPublishability(row: AdminMemberListItem, event: Event): void {
+    event.stopPropagation();
+    if (!row.publishability) return;
+    this.dialog.open(PublishabilityDialogComponent, {
+      width: "560px",
+      data: {
+        memberName: `${row.firstName} ${row.lastName}`.trim(),
+        publishability: row.publishability,
+      },
+    });
   }
 }

@@ -3,10 +3,10 @@ import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import type { ResearchLine } from "@app/shared/models/research-line";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
-export type HomePublicacion = PublicationWithAuthors & {
+export type HomePublicacion = PublicPublicationWithAuthors & {
   fecha: string;
   tipoPublicacion?: string;
   tipoTesis?: string;
@@ -47,7 +47,7 @@ export type HomeViewModel = {
   lineasInvestigacion: ResearchLine[];
   metodos: Method[];
   miembros: Member[];
-  aboutUs: string;
+  aboutUs: string[];
   articulos: number;
   tesis: number;
   resumenes: number;

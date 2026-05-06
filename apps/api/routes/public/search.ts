@@ -2,8 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { localizeField } from "../../lib/public-locale.js";
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../services/assets/service.js";
 import { globalSearch } from "../../services/search.service.js";
 
 const router = new Hono();
@@ -23,30 +22,22 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   }
 
   const requested = new Set(types.split(",").map((t) => t.trim()));
-  const result = await globalSearch(term, requested);
+  const result = await globalSearch(term, requested, locale);
+
   const publications = await Promise.all(
     result.publications.map(async (row) => ({
       id: row.id,
       title: row.title,
-      abstract: localizeField(row, locale, { es: "abstractES", en: "abstractEN", required: false }),
-      asset: await resolveAssetAccessUrl({ resourceType: "publication", resourceId: row.id, slot: "file" }),
-      journalIssue: row.journalIssue,
+      abstract: row.abstract,
+      asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
       doi: row.doi,
       publishedAt: row.publishedAt,
-      typeId: row.typeId,
-      journalId: row.journalId,
-      universityId: row.universityId,
-      eventId: row.eventId,
-      thesisTypeId: row.thesisTypeId,
+      kindCode: row.kindCode,
       authors: await Promise.all(
         row.authors.map(async (author) =>
           author.kind === "registered"
             ? Object.assign({}, author, {
-                asset: await resolveAssetAccessUrl({
-                  resourceType: "member",
-                  resourceId: author.memberId,
-                  slot: "photo",
-                }),
+                asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: author.memberId, slot: "photo" }),
               })
             : author,
         ),
@@ -57,8 +48,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const members = await Promise.all(
     result.members.map(async (row) =>
       Object.assign({}, row, {
-        bio: localizeField(row, locale, { es: "bio", en: "bioEN", required: false }),
-        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
       }),
     ),
   );
@@ -66,11 +56,11 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const news = await Promise.all(
     result.news.map(async (row) => ({
       id: row.id,
-      title: localizeField(row, locale, { es: "title", en: "titleEN" }),
+      title: row.title,
       publishedAt: row.publishedAt,
-      asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
-      newsTypeId: row.newsTypeId,
-      status: row.status,
+      asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
+      newsKindCode: row.newsKindCode,
+      statusCode: row.statusCode,
       authorName: row.authorName,
     })),
   );
@@ -78,34 +68,29 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const projects = await Promise.all(
     result.projects.map(async (row) => ({
       id: row.id,
-      title: localizeField(row, locale, { es: "title", en: "titleEN" }),
+      title: row.title,
       code: row.code,
-      fundedAmount: row.fundedAmount,
-      description: localizeField(row, locale, { es: "description", en: "descriptionEN" }),
-      status: row.status,
+      fundedAmountMinor: row.fundedAmountMinor,
+      description: row.description,
+      statusCode: row.statusCode,
       startDate: row.startDate,
       endDate: row.endDate,
       researchLineId: row.researchLineId,
-      fundingSourceId: row.fundingSourceId,
-      currencyId: row.currencyId,
-      researchLine: localizeField(row, locale, { es: "researchLine", en: "researchLine" }),
-      fundingSource: localizeField(row, locale, { es: "fundingSource", en: "fundingSource" }),
+      fundingSourceCode: row.fundingSourceCode,
+      currencyCode: row.currencyCode,
+      researchLine: row.researchLine,
+      fundingSource: row.fundingSource,
       members: await Promise.all(
         row.members.map(async (member) =>
           Object.assign({}, member, {
-            asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: member.memberId, slot: "photo" }),
+            asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: member.memberId, slot: "photo" }),
           }),
         ),
       ),
     })),
   );
 
-  return c.json({
-    publications,
-    members,
-    news,
-    projects,
-  });
+  return c.json({ publications, members, news, projects });
 });
 
 export default router;

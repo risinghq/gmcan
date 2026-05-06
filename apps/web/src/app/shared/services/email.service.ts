@@ -27,18 +27,18 @@ export class EmailService {
   private http = inject(HttpClient);
 
   sendMembershipApplication(application: MembershipApplication): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(`${GLOBAL.url}api/email`, application);
+    return this.http.post<EmailResponse>(GLOBAL.api("email"), application);
   }
 
   sendPasswordReset(request: PasswordResetRequest): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(`${GLOBAL.url}admin/auth/password-reset`, request);
+    return this.http.post<EmailResponse>(GLOBAL.admin("auth/password-reset"), request);
   }
 
   verifyResetToken(token: string): Observable<{ valid: boolean }> {
-    return this.http.post<{ valid: boolean }>(`${GLOBAL.url}admin/auth/verify-reset-token`, { token });
+    return this.http.post<{ valid: boolean }>(GLOBAL.admin("auth/verify-reset-token"), { token });
   }
 
   resetPassword(token: string, newPassword: string): Observable<{ status: number }> {
-    return this.http.post<{ status: number }>(`${GLOBAL.url}admin/auth/reset-password`, { token, newPassword });
+    return this.http.post<{ status: number }>(GLOBAL.admin("auth/reset-password"), { token, newPassword });
   }
 }

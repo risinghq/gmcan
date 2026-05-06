@@ -25,9 +25,13 @@
             <div class="text-category">Tipo <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar tipo</mat-label>
-              <mat-select [(ngModel)]="publicacion.thesisTypeId" formControlName="thesisTypeId" name="thesisTypeId">
-                @for (t of lookup.thesisTypes(); track t) {
-                  <mat-option [value]="t.id">{{ t.name }}</mat-option>
+              <mat-select
+                [(ngModel)]="publicacion.thesisKindCode"
+                formControlName="thesisKindCode"
+                name="thesisKindCode"
+              >
+                @for (t of lookup.thesisKinds(); track t) {
+                  <mat-option [value]="t.code">{{ t.name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -138,21 +142,18 @@
           <div class="flex-news">
             <div class="gray-box flex-news mr-16">
               <img class="upload-icon mr-16" src="/img/icons/upload.svg" />
-              @if (!fileData && !publicacion.asset) {
+              @if (!fileData) {
                 <span class="gray-pdf plex-sans">PDF</span>
               }
               @if (fileData) {
                 <span class="gray-pdf plex-sans">{{ fileData.name }}</span>
               }
-              @if (!fileData && publicacion.asset) {
-                <span class="gray-pdf plex-sans">{{ publicacion.asset }}</span>
-              }
             </div>
             <div class="green-text">
-              @if (!fileData && !publicacion.asset) {
+              @if (!fileData) {
                 <span class="plex-sans">Seleccionar PDF</span>
               }
-              @if (fileData || publicacion.asset) {
+              @if (fileData) {
                 <span class="plex-sans">Cambiar</span>
               }
               <input

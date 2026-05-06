@@ -2,21 +2,30 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { localizeField } from "../../lib/public-locale.js";
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
-import { listAbout, listEquipment, listGroups, listSoftware } from "../../services/group.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import {
+  listAboutLocalized,
+  listEquipment,
+  listGroupsLocalized,
+  listSoftwareLocalized,
+} from "../../services/group.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const AboutSectionSchema = z.object({
+  introParagraphs: z.array(z.string()),
+  items: z.array(z.string()),
+});
+const HomeTeaserSchema = z.object({ paragraphs: z.array(z.string()) });
 
 router.get("/", async (c) => {
   const locale = c.get("locale");
-  const groups = await listGroups();
+  const groups = await listGroupsLocalized(locale);
   const row = groups[0];
   if (!row) return c.json({ error: "Not found" }, 404);
   return c.json({
     id: row.id,
-    summary: localizeField(row, locale, { es: "summaryES", en: "summaryEN" }),
+    summary: row.summary,
     address: row.address,
     email: row.email,
     phone: row.phone,
@@ -24,21 +33,17 @@ router.get("/", async (c) => {
     fullName: row.fullName,
     assets: {
       facilities: await resolveAssetAccessUrl({
-        resourceType: "research_group",
-        resourceId: row.id,
+        ownerType: "research_group",
+        ownerId: row.id,
         slot: "facilities",
       }),
-      header: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "header" }),
-      footer: await resolveAssetAccessUrl({ resourceType: "research_group", resourceId: row.id, slot: "footer" }),
+      header: await resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot: "header" }),
+      footer: await resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot: "footer" }),
     },
-    facilities: localizeField(row, locale, { es: "facilitiesES", en: "facilitiesEN", required: false }),
-    futureWork: localizeField(row, locale, { es: "futureWorkES", en: "futureWorkEN", required: false }),
-    publicationsSection: localizeField(row, locale, {
-      es: "publicationsSectionES",
-      en: "publicationsSectionEN",
-      required: false,
-    }),
-    projectsSection: localizeField(row, locale, { es: "projectsSectionES", en: "projectsSectionEN", required: false }),
+    facilities: row.facilities,
+    futureWork: row.futureWork,
+    publicationsSection: row.publicationsSection,
+    projectsSection: row.projectsSection,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   });
@@ -47,14 +52,15 @@ router.get("/", async (c) => {
 router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
-  const rows = await listAbout(id);
+  const rows = await listAboutLocalized(id, locale);
   const shaped = await Promise.all(
     rows.map(async (row) => ({
       id: row.id,
-      description: localizeField(row, locale, { es: "descriptionES", en: "descriptionEN" }),
-      objectives: localizeField(row, locale, { es: "objectivesES", en: "objectivesEN", required: false }),
-      services: localizeField(row, locale, { es: "servicesES", en: "servicesEN", required: false }),
-      asset: await resolveAssetAccessUrl({ resourceType: "about", resourceId: row.id, slot: "photo" }),
+      description: row.description,
+      objectivesContent: AboutSectionSchema.parse(JSON.parse(row.objectivesContent)),
+      servicesContent: AboutSectionSchema.parse(JSON.parse(row.servicesContent)),
+      homeServicesTeaserContent: HomeTeaserSchema.parse(JSON.parse(row.homeServicesTeaserContent)),
+      asset: await resolveAssetAccessUrl({ ownerType: "about", ownerId: row.id, slot: "photo" }),
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -69,12 +75,12 @@ router.get(
   async (c) => {
     const locale = c.get("locale");
     const { groupId } = c.req.valid("param");
-    const rows = await listSoftware(groupId);
+    const rows = await listSoftwareLocalized(locale, groupId);
     return c.json(
       rows.map((row) => ({
         id: row.id,
         name: row.name,
-        description: localizeField(row, locale, { es: "description", en: "descriptionEN", required: false }),
+        description: row.description,
         moreInfo: row.moreInfo,
         groupId: row.groupId,
         createdAt: row.createdAt,

@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { RefDependenciesResponse } from "@gmcan/contracts/admin";
 import { Observable } from "rxjs";
 
 import { GLOBAL } from "./global";
@@ -73,6 +74,10 @@ export class RefService {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/journal/${id}`);
   }
 
+  getJournalDependencies(id: number): Observable<RefDependenciesResponse> {
+    return this.http.get<RefDependenciesResponse>(`${GLOBAL.url}admin/ref/journal/${id}/dependencies`);
+  }
+
   // Universities
   listUniversities(): Observable<UniversityItem[]> {
     return this.http.get<UniversityItem[]>(`${GLOBAL.url}admin/ref/university`);
@@ -88,6 +93,14 @@ export class RefService {
 
   deleteUniversity(id: number): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/university/${id}`);
+  }
+
+  getUniversityDependencies(id: number): Observable<RefDependenciesResponse> {
+    return this.http.get<RefDependenciesResponse>(`${GLOBAL.url}admin/ref/university/${id}/dependencies`);
+  }
+
+  getEventDependencies(id: number): Observable<RefDependenciesResponse> {
+    return this.http.get<RefDependenciesResponse>(`${GLOBAL.url}admin/ref/event/${id}/dependencies`);
   }
 
   // Funding sources

@@ -10,6 +10,6 @@ export class SoftwareService {
   private http = inject(HttpClient);
 
   list(): Observable<Software[]> {
-    return this.http.get<Software[]>(`${GLOBAL.url}api/software`);
+    return this.http.get<Software[]>(GLOBAL.api("software"));
   }
 }

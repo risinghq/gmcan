@@ -1,19 +1,19 @@
+import type { AssetLinks } from "./asset";
 import type { AuthorEntry } from "./author";
 
 export interface SearchResults {
   publications: {
     id: number;
     title: string;
-    asset: string | null;
+    asset: AssetLinks | null;
     abstract: string | null;
-    journalIssue: number | null;
     doi: string | null;
     publishedAt: string;
-    typeId: number;
-    journalId: number | null;
-    universityId: number | null;
-    eventId: number | null;
-    thesisTypeId: number | null;
+    kindCode: "journal_article" | "conference_paper" | "thesis";
+    subtype:
+      | { kindCode: "journal_article"; journalArticle: { journalId?: number | null; issue?: number | null } }
+      | { kindCode: "conference_paper"; conferencePaper: { eventId: number | null } }
+      | { kindCode: "thesis"; thesis: { universityId: number | null; thesisKindCode: "phd" | "masters" | null } };
     authors: AuthorEntry[];
   }[];
   members: {
@@ -26,32 +26,32 @@ export interface SearchResults {
     birthDate: string | null;
     bio: string | null;
     asset: string | null;
-    status: number;
-    roleId: number;
-    memberTypeId: number;
-    prefixId: number | null;
+    isActive: number;
+    roleCode: "administrator" | "researcher" | "visitor";
+    memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+    prefixCode: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
   }[];
   news: {
     id: number;
     title: string;
     publishedAt: string;
     asset: string | null;
-    newsTypeId: number;
-    status: number;
+    newsKindCode: "general" | "research" | "event";
+    statusCode: "draft" | "published" | "archived";
     authorName: string;
   }[];
   projects: {
     id: number;
     title: string;
     code: string;
-    fundedAmount: string;
+    fundedAmountMinor: number;
     description: string;
-    status: number | null;
+    statusCode: "planned" | "active" | "completed" | "archived";
     startDate: string;
     endDate: string | null;
     researchLineId: number;
-    fundingSourceId: number;
-    currencyId: number;
+    fundingSourceCode: "vrip" | "none";
+    currencyCode: "pen" | "usd";
     researchLine: string;
     fundingSource: string;
     members: { memberId: number; name: string; asset: string | null }[];

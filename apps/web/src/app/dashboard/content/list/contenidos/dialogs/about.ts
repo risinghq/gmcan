@@ -25,12 +25,4 @@ export class DialogAboutPreview {
   };
 
   url = GLOBAL.url;
-  ngOnInit(): void {
-    const services = document.getElementById("services");
-    const whoAre = document.getElementById("whoAre");
-    const objectives = document.getElementById("objectives");
-    if (services) services.innerHTML = this.previewData.about.services ?? "";
-    if (whoAre) whoAre.innerHTML = this.previewData.about.description ?? "";
-    if (objectives) objectives.innerHTML = this.previewData.about.objectives ?? "";
-  }
 }

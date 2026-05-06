@@ -1,260 +1,288 @@
 import type { Generated, Insertable, Selectable, Updateable } from "kysely";
 
-type DateString = string;
+export type DateString = string;
+export type LocaleCode = string;
 
-export interface GenderTable {
-  id: Generated<number>;
-  name: string;
+export type RoleCode = "administrator" | "researcher" | "visitor";
+export type MemberTypeCode = "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+export type GenderCode = "male" | "female";
+export type PrefixCode = "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none";
+export type PublicationKindCode = "journal_article" | "conference_paper" | "thesis";
+export type ThesisKindCode = "phd" | "masters";
+export type NewsKindCode = "general" | "research" | "event";
+export type CurrencyCode = "pen" | "usd";
+export type FundingSourceCode = "vrip" | "none";
+export type NewsStatusCode = "draft" | "published" | "archived";
+export type ProjectStatusCode = "planned" | "active" | "completed" | "archived";
+export type AssetVisibility = "public" | "private";
+export type AssetLifecycleStatus = "active" | "soft_deleted" | "hard_deleted" | "quarantined";
+
+export interface LocaleTable {
+  code: LocaleCode;
 }
 
-export interface PrefixTable {
-  id: Generated<number>;
-  name: string;
+export interface CodeTable<TCode extends string = string> {
+  code: TCode;
 }
 
-export interface RoleTable {
-  id: Generated<number>;
+export interface GenderTable extends CodeTable<GenderCode> {
   name: string;
 }
-
-export interface MemberTypeTable {
-  id: Generated<number>;
+export interface PrefixTable extends CodeTable<PrefixCode> {
+  label: string;
+}
+export interface RoleTable extends CodeTable<RoleCode> {
   name: string;
-  nameEN: string;
+}
+export interface MemberTypeTable extends CodeTable<MemberTypeCode> {}
+export interface MemberTypeTranslationTable {
+  memberTypeCode: MemberTypeCode;
+  locale: LocaleCode;
+  name: string;
   nameSingular: string;
-  nameSingularEN: string;
 }
-
-export interface PublicationTypeTable {
-  id: Generated<number>;
+export interface PublicationKindTable extends CodeTable<PublicationKindCode> {}
+export interface PublicationKindTranslationTable {
+  publicationKindCode: PublicationKindCode;
+  locale: LocaleCode;
   name: string;
-  nameEN: string;
 }
-
-export interface ThesisTypeTable {
-  id: Generated<number>;
+export interface ThesisKindTable extends CodeTable<ThesisKindCode> {}
+export interface ThesisKindTranslationTable {
+  thesisKindCode: ThesisKindCode;
+  locale: LocaleCode;
   name: string;
-  nameEN: string;
 }
-
-export interface NewsTypeTable {
-  id: Generated<number>;
+export interface NewsKindTable extends CodeTable<NewsKindCode> {}
+export interface NewsKindTranslationTable {
+  newsKindCode: NewsKindCode;
+  locale: LocaleCode;
   name: string;
-  nameEN: string;
+}
+export interface CurrencyTable extends CodeTable<CurrencyCode> {
+  symbol: string;
+}
+export interface FundingSourceTable extends CodeTable<FundingSourceCode> {
+  name: string;
 }
 
 export interface JournalTable {
   id: Generated<number>;
   name: string;
 }
-
 export interface UniversityTable {
   id: Generated<number>;
-  name: string;
-  nameEN: string;
 }
-
+export interface UniversityTranslationTable {
+  universityId: number;
+  locale: LocaleCode;
+  name: string;
+}
 export interface EventTable {
   id: Generated<number>;
+}
+export interface EventTranslationTable {
+  eventId: number;
+  locale: LocaleCode;
   name: string;
   city: string | null;
   country: string | null;
-  cityEN: string | null;
-  countryEN: string | null;
-}
-
-export interface FundingSourceTable {
-  id: Generated<number>;
-  name: string;
-}
-
-export interface CurrencyTable {
-  id: Generated<number>;
-  symbol: string;
 }
 
 export interface ResearchGroupTable {
   id: Generated<number>;
-  summaryES: string;
-  summaryEN: string;
+  slug: string;
+  shortName: string;
+  fullName: string;
   address: string | null;
   email: string | null;
   phone: string | null;
-  name: string | null;
-  fullName: string | null;
-  facilitiesES: string | null;
-  facilitiesEN: string | null;
-  futureWorkES: string | null;
-  futureWorkEN: string | null;
-  publicationsSectionES: string | null;
-  publicationsSectionEN: string | null;
-  projectsSectionES: string | null;
-  projectsSectionEN: string | null;
   createdAt: DateString;
   updatedAt: DateString;
+}
+export interface ResearchGroupTranslationTable {
+  groupId: number;
+  locale: LocaleCode;
+  summary: string;
+  facilities: string | null;
+  futureWork: string | null;
+  publicationsSection: string | null;
+  projectsSection: string | null;
 }
 
 export interface MemberTable {
   id: Generated<number>;
   dni: string;
   email: string;
-  password: string;
+  passwordHash: string;
   firstName: string;
   lastName: string;
   maternalName: string | null;
   birthDate: DateString | null;
-  bio: string | null;
-  bioEN: string | null;
-
-  status: number;
-  resetPassword: number;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
-  roleId: number;
-  memberTypeId: number;
-  prefixId: number | null;
-  genderId: number | null;
+  isActive: number;
+  passwordResetRequired: number;
+  roleCode: RoleCode;
+  memberTypeCode: MemberTypeCode;
+  prefixCode: PrefixCode | null;
+  genderCode: GenderCode | null;
   resetToken: string | null;
-  resetExpires: DateString | null;
+  resetExpiresAt: DateString | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
+export interface MemberTranslationTable {
+  memberId: number;
+  locale: LocaleCode;
+  bio: string | null;
+}
 export interface SessionTable {
   id: string;
   memberId: number;
-  email: string;
   expiresAt: DateString;
-  lastActive: DateString;
+  lastActiveAt: DateString;
 }
 
 export interface ResearchLineTable {
   id: Generated<number>;
-  name: string;
-  nameEN: string;
-  description: string | null;
-  descriptionEN: string | null;
-
   groupId: number;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
+export interface ResearchLineTranslationTable {
+  researchLineId: number;
+  locale: LocaleCode;
+  name: string;
+  description: string | null;
+}
 export interface MethodTable {
   id: Generated<number>;
-  name: string;
-  nameEN: string;
-  description: string;
-  descriptionEN: string | null;
-
   groupId: number;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
+export interface MethodTranslationTable {
+  methodId: number;
+  locale: LocaleCode;
+  name: string;
+  description: string | null;
+}
 export interface EquipmentTable {
   id: Generated<number>;
+  groupId: number;
   name: string;
   cpu: string | null;
   gpu: string | null;
   ram: string | null;
   storage: string | null;
-  groupId: number;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
 export interface SoftwareTable {
   id: Generated<number>;
-  name: string | null;
-  description: string | null;
-  descriptionEN: string | null;
-  moreInfo: string | null;
   groupId: number;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
+  moreInfo: string | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
+export interface SoftwareTranslationTable {
+  softwareId: number;
+  locale: LocaleCode;
+  name: string;
+  description: string | null;
+}
 export interface AboutTable {
   id: Generated<number>;
-  descriptionES: string;
-  descriptionEN: string;
-  objectivesES: string | null;
-  objectivesEN: string | null;
-  servicesES: string | null;
-  servicesEN: string | null;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
-
   groupId: number;
+  createdAt: DateString;
+  updatedAt: DateString;
+}
+export interface AboutTranslationTable {
+  aboutId: number;
+  locale: LocaleCode;
+  description: string;
+  objectivesContent: string;
+  servicesContent: string;
+  homeServicesTeaserContent: string;
 }
 
 export interface NewsTable {
   id: Generated<number>;
-  title: string;
-  titleEN: string;
-  summary: string;
-  summaryEN: string;
-  body: string;
-  bodyEN: string;
-  status: number;
+  statusCode: NewsStatusCode;
   publishedAt: DateString;
-  updatedAt: DateString | null;
-  createdAt: DateString | null;
-
   priority: number | null;
   authorId: number;
-  newsTypeId: number;
+  newsKindCode: NewsKindCode;
+  createdAt: DateString;
+  updatedAt: DateString;
+}
+export interface NewsTranslationTable {
+  newsId: number;
+  locale: LocaleCode;
+  title: string;
+  summary: string;
+  body: string;
 }
 
 export interface PublicationTable {
   id: Generated<number>;
-  title: string;
-  abstractES: string | null;
-  abstractEN: string | null;
-  journalIssue: number | null;
+  kindCode: PublicationKindCode;
   doi: string | null;
   publishedAt: DateString;
-  updatedAt: DateString | null;
-  createdAt: DateString | null;
-  typeId: number;
-  journalId: number | null;
-  universityId: number | null;
-  eventId: number | null;
-  thesisTypeId: number | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
-export interface PublicationAuthorTable {
-  id: Generated<number>;
+export interface PublicationTranslationTable {
   publicationId: number;
-  isPrincipal: number;
-  externalName: string | null;
+  locale: LocaleCode;
+  title: string;
+  abstract: string | null;
+}
+export interface JournalArticleTable {
+  publicationId: number;
+  journalId: number | null;
+  issue: number | null;
+}
+export interface ConferencePaperTable {
+  publicationId: number;
+  eventId: number;
+}
+export interface ThesisTable {
+  publicationId: number;
+  universityId: number;
+  thesisKindCode: ThesisKindCode;
+}
+export interface PublicationAuthorTable {
+  publicationId: number;
+  authorOrder: number;
   memberId: number | null;
+  externalName: string | null;
 }
 
 export interface ProjectTable {
   id: Generated<number>;
-  title: string;
-  titleEN: string | null;
   code: string;
-  fundedAmount: string;
-  description: string;
-  descriptionEN: string | null;
-  status: number | null;
+  fundedAmountMinor: number;
+  statusCode: ProjectStatusCode;
   startDate: DateString;
   endDate: DateString | null;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
   researchLineId: number;
-  currencyId: number;
-  fundingSourceId: number;
+  currencyCode: CurrencyCode;
+  fundingSourceCode: FundingSourceCode;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
-export interface MemberProjectTable {
+export interface ProjectTranslationTable {
+  projectId: number;
+  locale: LocaleCode;
+  title: string;
+  description: string;
+}
+export interface ProjectMemberTable {
   projectId: number;
   memberId: number;
-  createdAt: DateString | null;
-  updatedAt: DateString | null;
+  createdAt: DateString;
+  updatedAt: DateString;
 }
-
 export interface MemberGroupTable {
   memberId: number;
   groupId: number;
@@ -270,81 +298,152 @@ export interface AssetTable {
   ext: string;
   sizeBytes: number;
   sha256: string;
-  visibility: "public" | "private";
-  status: "active" | "soft_deleted" | "hard_deleted" | "quarantined";
+  visibility: AssetVisibility;
+  lifecycleStatus: AssetLifecycleStatus;
   createdBy: number | null;
   createdAt: DateString;
   deletedAt: DateString | null;
   deleteAfter: DateString | null;
 }
-
-export interface AssetBindingTable {
-  id: Generated<number>;
-  resourceType: string;
-  resourceId: number;
-  slot: string;
-  assetId: number;
-  isCurrent: number;
-  replacedByBindingId: number | null;
-  replacedAt: DateString | null;
-  createdAt: DateString;
-  deletedAt: DateString | null;
-}
-
 export interface AssetAuditTable {
   id: Generated<number>;
   assetId: number | null;
-  bindingId: number | null;
   action: string;
   actorId: number | null;
   reason: string | null;
   createdAt: DateString;
 }
 
+export interface MemberAssetTable {
+  memberId: number;
+  slot: "photo";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+export interface NewsAssetTable {
+  newsId: number;
+  slot: "photo";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+export interface MethodAssetTable {
+  methodId: number;
+  slot: "photo";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+export interface ResearchLineAssetTable {
+  researchLineId: number;
+  slot: "photo";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+export interface PublicationAssetTable {
+  publicationId: number;
+  slot: "file";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+export interface ResearchGroupAssetTable {
+  groupId: number;
+  slot: "facilities" | "header" | "footer";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+export interface AboutAssetTable {
+  aboutId: number;
+  slot: "photo";
+  version: number;
+  assetId: number;
+  actorId: number | null;
+  reason: string | null;
+  createdAt: DateString;
+}
+
 export interface Database {
+  locale: LocaleTable;
   gender: GenderTable;
   prefix: PrefixTable;
   role: RoleTable;
   member_type: MemberTypeTable;
-  publication_type: PublicationTypeTable;
-  thesis_type: ThesisTypeTable;
-  news_type: NewsTypeTable;
+  member_type_translation: MemberTypeTranslationTable;
+  publication_kind: PublicationKindTable;
+  publication_kind_translation: PublicationKindTranslationTable;
+  thesis_kind: ThesisKindTable;
+  thesis_kind_translation: ThesisKindTranslationTable;
+  news_kind: NewsKindTable;
+  news_kind_translation: NewsKindTranslationTable;
+  currency: CurrencyTable;
+  funding_source: FundingSourceTable;
   journal: JournalTable;
   university: UniversityTable;
+  university_translation: UniversityTranslationTable;
   event: EventTable;
-  funding_source: FundingSourceTable;
-  currency: CurrencyTable;
+  event_translation: EventTranslationTable;
   research_group: ResearchGroupTable;
+  research_group_translation: ResearchGroupTranslationTable;
   member: MemberTable;
+  member_translation: MemberTranslationTable;
   session: SessionTable;
   research_line: ResearchLineTable;
+  research_line_translation: ResearchLineTranslationTable;
   method: MethodTable;
+  method_translation: MethodTranslationTable;
   equipment: EquipmentTable;
   software: SoftwareTable;
+  software_translation: SoftwareTranslationTable;
   about: AboutTable;
+  about_translation: AboutTranslationTable;
   news: NewsTable;
+  news_translation: NewsTranslationTable;
   publication: PublicationTable;
+  publication_translation: PublicationTranslationTable;
+  journal_article: JournalArticleTable;
+  conference_paper: ConferencePaperTable;
+  thesis: ThesisTable;
   publication_author: PublicationAuthorTable;
   project: ProjectTable;
-  member_project: MemberProjectTable;
+  project_translation: ProjectTranslationTable;
+  project_member: ProjectMemberTable;
   member_group: MemberGroupTable;
   asset: AssetTable;
-  asset_binding: AssetBindingTable;
   asset_audit: AssetAuditTable;
+  member_asset: MemberAssetTable;
+  news_asset: NewsAssetTable;
+  method_asset: MethodAssetTable;
+  research_line_asset: ResearchLineAssetTable;
+  publication_asset: PublicationAssetTable;
+  research_group_asset: ResearchGroupAssetTable;
+  about_asset: AboutAssetTable;
 }
 
 export type ProjectRow = Selectable<ProjectTable>;
 export type ProjectInsert = Insertable<ProjectTable>;
 export type ProjectUpdate = Updateable<ProjectTable>;
-
 export type NewsRow = Selectable<NewsTable>;
 export type NewsInsert = Insertable<NewsTable>;
 export type NewsUpdate = Updateable<NewsTable>;
-
 export type ResearchLineRow = Selectable<ResearchLineTable>;
 export type ResearchLineInsert = Insertable<ResearchLineTable>;
 export type ResearchLineUpdate = Updateable<ResearchLineTable>;
-
 export type MethodRow = Selectable<MethodTable>;
 export type MethodInsert = Insertable<MethodTable>;
 export type MethodUpdate = Updateable<MethodTable>;

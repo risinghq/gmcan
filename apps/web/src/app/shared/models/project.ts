@@ -2,14 +2,14 @@ export interface Project {
   id: number;
   title: string;
   code: string;
-  fundedAmount: string;
+  fundedAmountMinor: number;
   description: string;
-  status: number | null;
+  statusCode: "planned" | "active" | "completed" | "archived";
   startDate: string;
   endDate: string | null;
   researchLineId: number;
-  currencyId: number;
-  fundingSourceId: number;
+  currencyCode: "pen" | "usd";
+  fundingSourceCode: "vrip" | "none";
   createdAt: string | null;
   updatedAt: string | null;
 }

@@ -1,17 +1,15 @@
-import { sql } from "kysely";
-
 import { db } from "./client.js";
 import { MEMBER_PUBLIC } from "./projections.js";
 
 export interface AuthorEntry {
   kind: "registered" | "external";
+  authorOrder: number;
   memberId?: number;
   name: string;
-  isPrincipal: number;
 }
 
 export async function publicationWithAuthors(id: number): Promise<{
-  publication: Record<string, unknown>;
+  publication: Record<string, unknown> | null;
   authors: AuthorEntry[];
 }> {
   const [publication, rows] = await Promise.all([
@@ -20,15 +18,15 @@ export async function publicationWithAuthors(id: number): Promise<{
       .selectFrom("publication_author")
       .leftJoin("member", "member.id", "publication_author.memberId")
       .select([
-        "publication_author.isPrincipal",
+        "publication_author.authorOrder",
         "publication_author.externalName",
         "publication_author.memberId",
-        sql<string>`member.firstName`.as("memberFirstName"),
-        sql<string>`member.lastName`.as("memberLastName"),
-        sql<string | null>`member.maternalName`.as("memberMaternalName"),
+        "member.firstName as memberFirstName",
+        "member.lastName as memberLastName",
+        "member.maternalName as memberMaternalName",
       ])
       .where("publication_author.publicationId", "=", id)
-      .orderBy("publication_author.isPrincipal", "asc")
+      .orderBy("publication_author.authorOrder", "asc")
       .execute(),
   ]);
 
@@ -37,26 +35,26 @@ export async function publicationWithAuthors(id: number): Promise<{
       return {
         kind: "registered" as const,
         memberId: row.memberId,
-        name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-        isPrincipal: row.isPrincipal,
+        authorOrder: row.authorOrder,
+        name: [row.memberFirstName, row.memberLastName, row.memberMaternalName].filter(Boolean).join(" "),
       };
     }
     return {
       kind: "external" as const,
       name: row.externalName ?? "",
-      isPrincipal: row.isPrincipal,
+      authorOrder: row.authorOrder,
     };
   });
 
-  return { publication: publication as Record<string, unknown>, authors };
+  return { publication: publication ? (publication as Record<string, unknown>) : null, authors };
 }
 
 export async function memberProjects(memberId: number) {
   return db
     .selectFrom("project")
-    .innerJoin("member_project", "member_project.projectId", "project.id")
+    .innerJoin("project_member", "project_member.projectId", "project.id")
     .selectAll("project")
-    .where("member_project.memberId", "=", memberId)
+    .where("project_member.memberId", "=", memberId)
     .execute();
 }
 

@@ -15,6 +15,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import type { FundingSourceItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
@@ -34,6 +35,7 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
   private refService = inject(RefService);
   private projectService = inject(ProjectService);
+  private lookup = inject(LookupService);
 
   fuente: FundingSourceItem = { id: 0, name: "" };
   public fuenteForm: FormGroup;
@@ -67,8 +69,11 @@ export default class EditFuenteComponent implements OnInit, HasUnsavedChanges {
   notCanDo = false;
 
   checkCanDelete(fundingSourceId: number): void {
+    void fundingSourceId;
     this.projectService.listAdminProjects().subscribe((projects) => {
-      const inUse = projects.some((p) => p.fundingSourceId === fundingSourceId);
+      const sourceName = this.fuente.name.trim().toLowerCase();
+      const matched = this.lookup.fundingSources().find((item) => item.name.trim().toLowerCase() === sourceName);
+      const inUse = matched ? projects.some((p) => p.fundingSourceCode === matched.code) : false;
       this.notCanDo = !inUse;
     });
   }

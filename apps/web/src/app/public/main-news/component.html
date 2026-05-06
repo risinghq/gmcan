@@ -25,11 +25,11 @@
             <mat-icon> keyboard_arrow_down </mat-icon>
           </button>
           <mat-menu #menu="matMenu" xPosition="before">
-            <button mat-menu-item (click)="selectCategory(-1, language.newsText[0].allNews)">
+            <button mat-menu-item (click)="selectCategory(null, language.newsText[0].allNews)">
               {{ language.newsText[0].allNews }}
             </button>
             @for (newsType of newsTypes; track newsType) {
-            <button mat-menu-item (click)="selectCategory(newsType.id, newsType.name)">{{ newsType.name }}</button>
+            <button mat-menu-item (click)="selectCategory(newsType.code, newsType.name)">{{ newsType.name }}</button>
             }
           </mat-menu>
         </div>
@@ -94,16 +94,16 @@
       <div class="category-title">{{ language.newsText[0].categoryTitle }}</div>
       <div
         class="category"
-        [ngClass]="selectedCategoryId == -1 ? 'active' : 'category'"
-        (click)="selectCategory(-1, language.newsText[0].allNews)"
+        [ngClass]="selectedCategoryCode === null ? 'active' : 'category'"
+        (click)="selectCategory(null, language.newsText[0].allNews)"
       >
         {{ language.newsText[0].allNews }}
       </div>
       @for (newsType of newsTypes; track newsType) {
       <div
         class="category"
-        [ngClass]="selectedCategoryId == newsType.id ? 'active' : 'category'"
-        (click)="selectCategory(newsType.id, newsType.name)"
+        [ngClass]="selectedCategoryCode === newsType.code ? 'active' : 'category'"
+        (click)="selectCategory(newsType.code, newsType.name)"
       >
         {{ newsType.name }}
       </div>

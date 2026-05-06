@@ -45,6 +45,7 @@
     "@fontsource/ibm-plex-sans": "^5.2.5",
     "@fontsource/ibm-plex-serif": "^5.2.5",
     "@fontsource/roboto": "^5.2.5",
+    "@gmcan/contracts": "workspace:*",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
     "@popperjs/core": "^2.11.8",
     "animate.css": "^4.1.1",

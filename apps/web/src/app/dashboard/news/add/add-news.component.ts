@@ -19,9 +19,9 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createNews } from "@app/shared/models/factories";
-import type { Member } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
@@ -82,9 +82,9 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   publishedAtObj?: Date;
   public newsForm: FormGroup;
   get categorias() {
-    return this.lookup.newsTypes();
+    return this.lookup.newsKinds();
   }
-  autores: Member[] = [];
+  autores: AdminMemberListItem[] = [];
   button_text = "Publicar noticia";
   button_text2 = "Guardar sin publicar";
 
@@ -95,7 +95,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
       body: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       publishedAt: ["", Validators.required],
       authorId: [null, Validators.required],
-      newsTypeId: ["", Validators.required],
+      newsKindCode: ["", Validators.required],
     });
     this.noticia = createNews();
     this.url = GLOBAL.url;
@@ -110,7 +110,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   getAuthors(): void {
-    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
       if (result) {
         this.autores = result;
       }
@@ -124,17 +124,17 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate(["dashboard/news"]);
   }
 
-  submitNews(status: number): void {
-    if (status === 1 && this.newsForm.valid && this.fileData) {
-      this.publishDialog(status);
-    } else if (status === 0) {
-      this.publish(status);
+  submitNews(mode: "published" | "draft"): void {
+    if (mode === "published" && this.newsForm.valid && this.fileData) {
+      this.publishDialog(mode);
+    } else if (mode === "draft") {
+      this.publish(mode);
     }
   }
 
-  publish(status: number): void {
+  publish(mode: "published" | "draft"): void {
     const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : undefined;
-    const body = toNewsUpsertBody(this.noticia, status, publishedAt);
+    const body = toNewsUpsertBody(this.noticia, mode, publishedAt);
     if (!body) return;
     this.newsService.createNews(body).subscribe((result) => {
       if (result.id) {
@@ -151,7 +151,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   private previewDialog?: MatDialogRef<DialogPreview>;
 
   previewNews(): void {
-    const cat = this.categorias.find((x) => x.id === this.noticia.newsTypeId);
+    const cat = this.categorias.find((x) => x.code === this.noticia.newsKindCode);
     const aut = this.autores.find((x) => x.id === this.noticia.authorId) ?? null;
     const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : null;
     const data: NewsPreviewData = {
@@ -175,7 +175,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
 
   private dialogRef?: MatDialogRef<DialogPublish>;
 
-  publishDialog(value: number): void {
+  publishDialog(value: "published" | "draft"): void {
     this.dialogRef = this.dialog.open(DialogPublish, {
       width: "530px",
       id: "idleTimer",

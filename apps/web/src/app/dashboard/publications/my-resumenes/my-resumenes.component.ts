@@ -17,13 +17,13 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
-interface PublicationRow extends PublicationWithAuthors {
+interface PublicationRow extends PublicPublicationWithAuthors {
   fecha?: string;
   eventName?: string;
 }
@@ -77,9 +77,9 @@ export default class MyResumenesComponent implements OnInit {
   getUserResumenes(): void {
     const user = this.auth.getUser();
     if (!user) return;
-    this.publicationService.listPublications({ type: 3 }).subscribe((res) => {
+    this.publicationService.listPublications({ kindCode: "conference_paper" }).subscribe((res) => {
       if (res) {
-        const mine = res.filter((pub) => pub.authors.some((a) => a.memberId === user.id));
+        const mine = res.filter((pub) => pub.authors.some((a) => a.kind === "registered" && a.memberId === user.id));
         const sorted = mine.toSorted((a, b) =>
           (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
         );
@@ -88,7 +88,8 @@ export default class MyResumenesComponent implements OnInit {
           const d = new Date(pub.publishedAt);
           d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
           row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
-          const event = this.lookup.events().find((e) => e.id === pub.eventId);
+          const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
+          const event = this.lookup.events().find((e) => e.id === eventId);
           row.eventName = event?.name ?? "";
           return row;
         });

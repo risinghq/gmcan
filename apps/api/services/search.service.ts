@@ -1,26 +1,39 @@
-import { sql } from "kysely";
-
 import { db } from "../db/client.js";
-import { MEMBER_PUBLIC } from "../db/projections.js";
-import { resolveAssetAccessUrl } from "./asset.service.js";
+import { DEFAULT_LOCALE } from "../lib/locales.js";
+import { type Locale } from "../lib/public-locale.js";
+import { resolveAssetAccessUrl } from "./assets/service.js";
+import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
-export async function globalSearch(q: string, types: Set<string>) {
+export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
   const like = `%${q}%`;
 
   const [publicationRows, members, newsRows, projectRows] = await Promise.all([
     types.has("publications")
       ? db
           .selectFrom("publication")
-          .selectAll()
+          .innerJoin("publication_translation", (join) =>
+            join
+              .onRef("publication_translation.publicationId", "=", "publication.id")
+              .on("publication_translation.locale", "=", DEFAULT_LOCALE),
+          )
+          .select([
+            "publication.id",
+            "publication.kindCode",
+            "publication.doi",
+            "publication.publishedAt",
+            "publication_translation.title as title",
+            "publication_translation.abstract as abstract",
+          ])
           .where((eb) =>
-            eb.or([eb("title", "like", like), eb("abstractES", "like", like), eb("abstractEN", "like", like)]),
+            eb.or([
+              eb("publication_translation.title", "like", like),
+              eb("publication_translation.abstract", "like", like),
+            ]),
           )
           .execute()
       : Promise.resolve([]),
     types.has("members")
-      ? db
-          .selectFrom("member")
-          .select(MEMBER_PUBLIC)
+      ? publicLocalizedMemberSelectQuery(locale)
           .where((eb) =>
             eb.or([
               eb("firstName", "like", like),
@@ -34,58 +47,54 @@ export async function globalSearch(q: string, types: Set<string>) {
     types.has("news")
       ? db
           .selectFrom("news")
+          .leftJoin("news_translation", (join) =>
+            join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", DEFAULT_LOCALE),
+          )
           .leftJoin("member", "member.id", "news.authorId")
           .select([
             "news.id",
-            "news.title",
-            "news.titleEN",
+            "news_translation.title as title",
             "news.publishedAt",
             "news.authorId",
-            "news.newsTypeId",
-            "news.status",
-            sql<string>`TRIM(COALESCE(member.firstName, '') || ' ' || COALESCE(member.lastName, ''))`.as("authorName"),
+            "news.newsKindCode",
+            "news.statusCode",
+            "member.firstName as authorFirstName",
+            "member.lastName as authorLastName",
           ])
           .where((eb) =>
-            eb.or([
-              eb("news.title", "like", like),
-              eb("news.summary", "like", like),
-              eb("news.summaryEN", "like", like),
-            ]),
+            eb.or([eb("news_translation.title", "like", like), eb("news_translation.summary", "like", like)]),
           )
           .execute()
       : Promise.resolve([]),
     types.has("projects")
       ? db
           .selectFrom("project")
-          .innerJoin("research_line", "research_line.id", "project.researchLineId")
-          .innerJoin("funding_source", "funding_source.id", "project.fundingSourceId")
+          .innerJoin("project_translation", (join) =>
+            join
+              .onRef("project_translation.projectId", "=", "project.id")
+              .on("project_translation.locale", "=", DEFAULT_LOCALE),
+          )
+          .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
           .select([
             "project.id",
-            "project.title",
-            "project.titleEN",
+            "project_translation.title as title",
             "project.code",
-            "project.fundedAmount",
-            "project.description",
-            "project.descriptionEN",
-            "project.status",
+            "project.fundedAmountMinor",
+            "project_translation.description as description",
+            "project.statusCode",
             "project.startDate",
             "project.endDate",
             "project.researchLineId",
-            "project.currencyId",
-            "project.fundingSourceId",
-            sql<string>`research_line.name`.as("researchLine"),
-            sql<string>`funding_source.name`.as("fundingSource"),
+            "project.currencyCode",
+            "project.fundingSourceCode",
+            "funding_source.name as fundingSource",
           ])
-          .where("project.status", "=", 1)
+          .where("project.statusCode", "=", "active")
           .where((eb) =>
             eb.or([
-              eb("project.title", "like", like),
-              eb("project.titleEN", "like", like),
+              eb("project_translation.title", "like", like),
               eb("project.code", "like", like),
-              eb("project.description", "like", like),
-              eb("project.descriptionEN", "like", like),
-              eb("research_line.name", "like", like),
-              eb("research_line.nameEN", "like", like),
+              eb("project_translation.description", "like", like),
               eb("funding_source.name", "like", like),
             ]),
           )
@@ -93,7 +102,6 @@ export async function globalSearch(q: string, types: Set<string>) {
       : Promise.resolve([]),
   ]);
 
-  // Attach authors to publications
   const publicationIds = publicationRows.map((r) => r.id);
   const publicationAuthors =
     publicationIds.length > 0
@@ -102,16 +110,16 @@ export async function globalSearch(q: string, types: Set<string>) {
           .leftJoin("member", "member.id", "publication_author.memberId")
           .select([
             "publication_author.publicationId",
-            "publication_author.isPrincipal",
+            "publication_author.authorOrder",
             "publication_author.externalName",
             "publication_author.memberId",
-            sql<string>`member.firstName`.as("memberFirstName"),
-            sql<string>`member.lastName`.as("memberLastName"),
-            sql<string | null>`member.maternalName`.as("memberMaternalName"),
+            "member.firstName as memberFirstName",
+            "member.lastName as memberLastName",
+            "member.maternalName as memberMaternalName",
           ])
           .where("publication_author.publicationId", "in", publicationIds)
           .orderBy("publication_author.publicationId", "asc")
-          .orderBy("publication_author.isPrincipal", "asc")
+          .orderBy("publication_author.authorOrder", "asc")
           .execute()
       : [];
 
@@ -122,14 +130,14 @@ export async function globalSearch(q: string, types: Set<string>) {
         ? {
             kind: "registered" as const,
             memberId: row.memberId,
+            authorOrder: row.authorOrder,
             name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
-            photo: null,
-            photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.memberId, slot: "photo" }),
-            isPrincipal: row.isPrincipal,
+            photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
           }
-        : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
+        : { kind: "external" as const, name: row.externalName ?? "", authorOrder: row.authorOrder },
     })),
   );
+
   const authorsByPublication = new Map<number, unknown[]>();
   for (const row of resolvedPublicationAuthors) {
     const current = authorsByPublication.get(row.publicationId) ?? [];
@@ -139,15 +147,14 @@ export async function globalSearch(q: string, types: Set<string>) {
 
   const publications = publicationRows.map((p) => Object.assign(p, { authors: authorsByPublication.get(p.id) ?? [] }));
 
-  // Attach members to projects
   const projectIds = projectRows.map((r) => r.id);
   const projectMembers =
     projectIds.length > 0
       ? await db
-          .selectFrom("member_project")
-          .innerJoin("member", "member.id", "member_project.memberId")
-          .select(["member_project.projectId", "member.id", "member.firstName", "member.lastName"])
-          .where("member_project.projectId", "in", projectIds)
+          .selectFrom("project_member")
+          .innerJoin("member", "member.id", "project_member.memberId")
+          .select(["project_member.projectId", "member.id", "member.firstName", "member.lastName"])
+          .where("project_member.projectId", "in", projectIds)
           .execute()
       : [];
 
@@ -157,11 +164,11 @@ export async function globalSearch(q: string, types: Set<string>) {
       entry: {
         memberId: row.id,
         name: row.firstName.length > 0 ? `${row.firstName[0]}. ${row.lastName}` : row.lastName,
-        photo: null,
-        photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
       },
     })),
   );
+
   const membersByProject = new Map<number, unknown[]>();
   for (const row of resolvedProjectMembers) {
     const current = membersByProject.get(row.projectId) ?? [];
@@ -176,17 +183,18 @@ export async function globalSearch(q: string, types: Set<string>) {
     members: await Promise.all(
       members.map(async (row) =>
         Object.assign({}, row, {
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+          photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
         }),
       ),
     ),
     news: await Promise.all(
       newsRows.map(async (row) =>
         Object.assign({}, row, {
-          photoUrl: await resolveAssetAccessUrl({ resourceType: "news", resourceId: row.id, slot: "photo" }),
+          authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" ").trim(),
+          photoUrl: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
         }),
       ),
     ),
-    projects,
+    projects: projects.map((project) => Object.assign({ researchLine: "" }, project)),
   };
 }

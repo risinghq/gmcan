@@ -59,17 +59,17 @@
             track publicacion; let i = $index ) {
             <div class="publication">
               <div class="flex-news">
-                @if (publicacion.typeId != 2) {
+                @if (publicacion.kindCode != 'thesis') {
                 <div
                   class="publication-type"
                   [class]="{
-                          'publication-type-1': publicacion.typeId == 1,
-                          'publication-type-3': publicacion.typeId == 3,
+                          'publication-type-1': publicacion.kindCode == 'journal_article',
+                          'publication-type-3': publicacion.kindCode == 'conference_paper',
                         }"
                 >
                   {{ publicacion.tipoPublicacion }}
                 </div>
-                } @if (publicacion.typeId == 2) {
+                } @if (publicacion.kindCode == 'thesis') {
                 <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
                 }
                 <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
@@ -84,7 +84,8 @@
                 <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
                 @if (publicacion.revista != null && publicacion.revista != "") {
                 <div class="publication-rev">
-                  {{ publicacion.revista }} Vol. {{ publicacion.journalIssue }} {{ publicacion.universidad }}
+                  {{ publicacion.revista }} Vol. {{ publicacion.subtype.kindCode === 'journal_article' ?
+                  publicacion.subtype.journalArticle.issue : '' }} {{ publicacion.universidad }}
                 </div>
                 } @if (publicacion.universidad != null && publicacion.universidad != "") {
                 <div class="publication-rev">{{ publicacion.universidad }}</div>
@@ -121,12 +122,12 @@
                 } }
               </div>
               <div class="flex-news mt-16">
-                @if (publicacion.typeId != 3 && publicacion.asset && publicacion.asset != "") {
-                <a class="publication-green" href="{{ publicacion.asset }}" target="_blank">
+                @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
+                <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
                   {{ this.language.publicationsText[0].preview }}
                 </a>
-                } @if (publicacion.typeId != 3 && publicacion.asset && publicacion.asset != "") {
-                <a class="publication-green" href="{{ publicacion.asset + '?download=true' }}">
+                } @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
+                <a class="publication-green" href="{{ publicacion.asset.download }}">
                   {{ this.language.publicationsText[0].download }}
                 </a>
                 }
@@ -261,7 +262,7 @@
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
-                  {{ proyecto.moneda }}{{ proyecto.fundedAmount }}
+                  {{ proyecto.moneda }}{{ proyecto.fundedAmountMinor }}
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>

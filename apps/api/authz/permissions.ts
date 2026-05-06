@@ -1,10 +1,9 @@
-import { Role as RoleId } from "../lib/enums.js";
 import type { Permission, Role } from "./types.js";
 
-export const roleById: Record<number, Role> = {
-  [RoleId.ADMINISTRATOR]: "administrator",
-  [RoleId.RESEARCHER]: "researcher",
-  [RoleId.VISITOR]: "visitor",
+export const roleByCode: Record<Role, Role> = {
+  administrator: "administrator",
+  researcher: "researcher",
+  visitor: "visitor",
 };
 
 const permissionsByRole: Record<Role, ReadonlySet<Permission>> = {

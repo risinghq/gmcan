@@ -65,7 +65,7 @@ export default class NewsComponent implements OnInit {
   loadNoticias(): void {
     this.newsService
       .listNews({
-        status: 1,
+        statusCode: "published",
         sortBy: "publishedAt",
         sortOrder: "desc",
         page: 1,
@@ -88,7 +88,7 @@ export default class NewsComponent implements OnInit {
                 ) ?? "");
 
             return Object.assign({} as NewsDisplay, n, {
-              newsTypeNameLabel: n.newsTypeName,
+              newsTypeNameLabel: n.newsKindName,
               publishedAtLabel: fechaFormateada,
               authorNameLabel: n.authorName,
             });

@@ -3,12 +3,12 @@ export interface News {
   title: string;
   summary: string;
   body: string;
-  status: number;
+  statusCode: "draft" | "published" | "archived";
   publishedAt: string;
   asset: string | null;
   priority: number | null;
   authorId: number;
-  newsTypeId: number;
+  newsKindCode: "general" | "research" | "event";
   updatedAt: string | null;
   createdAt: string | null;
 }
@@ -21,16 +21,16 @@ export interface PublicNewsListItem {
   asset: string | null;
   priority: number | null;
   authorId: number;
-  newsTypeId: number;
+  newsKindCode: "general" | "research" | "event";
   authorName: string;
   authorAsset: string | null;
-  newsTypeName: string;
+  newsKindName: string;
 }
 
 export interface PublicNewsListQuery {
   q?: string;
-  status?: number;
-  newsTypeId?: number;
+  statusCode?: "draft" | "published" | "archived";
+  newsKindCode?: "general" | "research" | "event";
   sortBy?: "publishedAt" | "title";
   sortOrder?: "asc" | "desc";
   page?: number;
@@ -46,7 +46,7 @@ export interface PublicNewsListResponse {
 
 export interface PublicNewsDetail extends PublicNewsListItem {
   body: string;
-  status: number;
+  statusCode: "draft" | "published" | "archived";
   updatedAt: string | null;
   createdAt: string | null;
 }

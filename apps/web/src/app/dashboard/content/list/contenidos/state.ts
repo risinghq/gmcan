@@ -6,7 +6,13 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
-import type { About } from "@app/shared/models/about";
+import type {
+  About,
+  AboutSectionContent,
+  HomeServicesTeaserContent,
+  LocalizedAboutSectionContent,
+  LocalizedHomeServicesTeaserContent,
+} from "@app/shared/models/about";
 import type { Equipment } from "@app/shared/models/equipment";
 import { createGroup, type Group } from "@app/shared/models/factories";
 import type { Method } from "@app/shared/models/method";
@@ -16,6 +22,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { ClassicEditor } from "ckeditor5";
 
@@ -38,6 +45,7 @@ export class ContenidosState {
   private readonly methodsService = inject(MethodsService);
   private readonly groupService = inject(GroupService);
   private readonly tabState = inject(TabStateService);
+  private readonly session = inject(SessionService);
 
   readonly files = new ContenidosFiles();
   readonly Editor = ClassicEditor;
@@ -50,13 +58,15 @@ export class ContenidosState {
   aboutUs: About = {
     id: 0,
     description: "",
-    objectives: null,
-    services: null,
+    objectivesContent: { introParagraphs: [], items: [] },
+    servicesContent: { introParagraphs: [], items: [] },
+    homeServicesTeaserContent: { paragraphs: [] },
     asset: null,
     groupId: 0,
     createdAt: null,
     updatedAt: null,
   };
+  locale: "es" | "en" = "es";
   group: Group = createGroup();
 
   descripcionForm: FormGroup = this.formBuilder.group({
@@ -100,6 +110,7 @@ export class ContenidosState {
   displayedNotFound4 = false;
 
   init(): void {
+    this.locale = this.session.language().locale === "en" ? "en" : "es";
     this.selectedTab = this.tabState.contenidosTab();
     this.groupService.listGroups().subscribe((res) => {
       if (res.length > 0) {
@@ -168,7 +179,7 @@ export class ContenidosState {
   getContenidos(): void {
     this.groupService.listAdminAbout(this.group.id).subscribe((res) => {
       if (res.length > 0) {
-        this.aboutUs = res[0];
+        this.aboutUs = this.normalizeAbout(res[0]);
       }
     });
   }
@@ -188,9 +199,10 @@ export class ContenidosState {
   }
 
   submitObjetivos(): void {
+    const objectivesContent = this.buildLocalizedSectionContent(this.aboutUs.objectivesContent);
     this.groupService
       .updateAboutObjectives(this.aboutUs.id, {
-        objectives: this.aboutUs.objectives ?? undefined,
+        objectivesContent,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
@@ -198,9 +210,21 @@ export class ContenidosState {
   }
 
   submitServicios(): void {
+    const servicesContent = this.buildLocalizedSectionContent(this.aboutUs.servicesContent);
     this.groupService
       .updateAboutServices(this.aboutUs.id, {
-        services: this.aboutUs.services ?? undefined,
+        servicesContent,
+      })
+      .subscribe((res) => {
+        if (res.status === 1) this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
+      });
+  }
+
+  submitHomeServicesTeaser(): void {
+    const homeServicesTeaserContent = this.buildLocalizedHomeTeaserContent(this.aboutUs.homeServicesTeaserContent);
+    this.groupService
+      .updateAboutHomeServicesTeaser(this.aboutUs.id, {
+        homeServicesTeaserContent,
       })
       .subscribe((res) => {
         if (res.status === 1) this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
@@ -330,5 +354,79 @@ export class ContenidosState {
 
   private openSnackBar(value: string): void {
     this.snackBar.open(value, undefined, { duration: 2000, horizontalPosition: "right", verticalPosition: "top" });
+  }
+
+  private normalizeAbout(raw: About): About {
+    const objectivesAny = raw.objectivesContent as unknown as
+      | AboutSectionContent
+      | LocalizedAboutSectionContent
+      | undefined;
+    const servicesAny = raw.servicesContent as unknown as
+      | AboutSectionContent
+      | LocalizedAboutSectionContent
+      | undefined;
+    const teaserAny = raw.homeServicesTeaserContent as unknown as
+      | HomeServicesTeaserContent
+      | LocalizedHomeServicesTeaserContent
+      | undefined;
+    const objectivesContent =
+      objectivesAny && "es" in objectivesAny
+        ? objectivesAny[this.locale]
+        : (objectivesAny ?? { introParagraphs: [], items: [] });
+    const servicesContent =
+      servicesAny && "es" in servicesAny
+        ? servicesAny[this.locale]
+        : (servicesAny ?? { introParagraphs: [], items: [] });
+    const homeServicesTeaserContent =
+      teaserAny && "es" in teaserAny ? teaserAny[this.locale] : (teaserAny ?? { paragraphs: [] });
+    return {
+      ...raw,
+      objectivesContent,
+      servicesContent,
+      homeServicesTeaserContent,
+    };
+  }
+
+  addSectionParagraph(section: "objectives" | "services"): void {
+    const content = section === "objectives" ? this.aboutUs.objectivesContent : this.aboutUs.servicesContent;
+    content.introParagraphs.push("");
+  }
+
+  removeSectionParagraph(section: "objectives" | "services", index: number): void {
+    const content = section === "objectives" ? this.aboutUs.objectivesContent : this.aboutUs.servicesContent;
+    content.introParagraphs.splice(index, 1);
+  }
+
+  addSectionItem(section: "objectives" | "services"): void {
+    const content = section === "objectives" ? this.aboutUs.objectivesContent : this.aboutUs.servicesContent;
+    content.items.push("");
+  }
+
+  removeSectionItem(section: "objectives" | "services", index: number): void {
+    const content = section === "objectives" ? this.aboutUs.objectivesContent : this.aboutUs.servicesContent;
+    content.items.splice(index, 1);
+  }
+
+  addTeaserParagraph(): void {
+    this.aboutUs.homeServicesTeaserContent.paragraphs.push("");
+  }
+
+  removeTeaserParagraph(index: number): void {
+    this.aboutUs.homeServicesTeaserContent.paragraphs.splice(index, 1);
+  }
+
+  private buildLocalizedSectionContent(value: AboutSectionContent): LocalizedAboutSectionContent {
+    const normalized = {
+      introParagraphs: value.introParagraphs.map((item) => item.trim()).filter((item) => item.length > 0),
+      items: value.items.map((item) => item.trim()).filter((item) => item.length > 0),
+    };
+    return { es: normalized, en: normalized };
+  }
+
+  private buildLocalizedHomeTeaserContent(value: HomeServicesTeaserContent): LocalizedHomeServicesTeaserContent {
+    const normalized = {
+      paragraphs: value.paragraphs.map((item) => item.trim()).filter((item) => item.length > 0),
+    };
+    return { es: normalized, en: normalized };
   }
 }

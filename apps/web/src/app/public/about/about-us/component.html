@@ -12,11 +12,29 @@
     <div class="about-title about-top">{{ language.aboutText[0].ourObjectives }}</div>
     <div class="about-subtitle">{{ language.aboutText[0].ourObjectivesQuestion }}</div>
     <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus.objectives"></div>
+    <div class="about-text">
+      @for (paragraph of aboutus.objectivesContent.introParagraphs; track paragraph) {
+      <p>{{ paragraph }}</p>
+      }
+      <ul>
+        @for (item of aboutus.objectivesContent.items; track item) {
+        <li>{{ item }}</li>
+        }
+      </ul>
+    </div>
     <div class="about-title about-top">{{ language.aboutText[0].ourServices }}</div>
     <div class="about-subtitle">{{ language.aboutText[0].ourServicesQuestion }}</div>
     <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus.services"></div>
+    <div class="about-text">
+      @for (paragraph of aboutus.servicesContent.introParagraphs; track paragraph) {
+      <p>{{ paragraph }}</p>
+      }
+      <ul>
+        @for (item of aboutus.servicesContent.items; track item) {
+        <li>{{ item }}</li>
+        }
+      </ul>
+    </div>
   </div>
 </div>
 }

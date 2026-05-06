@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -19,9 +19,11 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router, ActivatedRoute } from "@angular/router";
+import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
+import { countMissingRequirements, publishabilityTooltip } from "@app/shared/member-publishability/utils";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createMemberFull } from "@app/shared/models/factories";
-import type { MemberFull } from "@app/shared/models/member";
+import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -37,7 +39,6 @@ import { AutosizeModule } from "ngx-autosize";
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,
-    FormsModule,
     ReactiveFormsModule,
     MatFormField,
     MatLabel,
@@ -65,20 +66,24 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   public memberForm: FormGroup;
   member: MemberFull;
   segundoNombre = "";
-  birthDateObj?: Date;
-  password = "";
   private oldEmail = "";
   get tipoMiembros() {
     return this.lookup.memberTypes();
   }
   get prefijos() {
-    return this.lookup.prefijos();
+    return this.lookup.prefixes();
   }
   get generos() {
-    return this.lookup.generos();
+    return this.lookup.genders();
+  }
+  get bioLocales() {
+    return this.lookup.locales().supported;
   }
   button_text = "Actualizar información";
   edit = true;
+  selectedBioLocale = "es";
+  bioByLocale: Record<string, string> = {};
+  publishability: MemberPublishability | null = null;
 
   constructor() {
     this.memberForm = this.formBuilder.group({
@@ -88,12 +93,13 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       maternalName: [""],
       birthDate: [""],
       email: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      genderId: [""],
-      prefixId: [""],
-      memberTypeId: ["", [Validators.required]],
+      genderCode: [""],
+      prefixCode: [""],
+      memberTypeCode: ["", [Validators.required]],
       dni: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       password: ["", [SpaceValidator.cannotContainSpace]],
       confirmPassword: ["", [SpaceValidator.cannotContainSpace]],
+      bioLocale: ["es", [Validators.required]],
       bio: [""],
     });
     this.member = createMemberFull();
@@ -109,7 +115,17 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
+    this.selectedBioLocale = this.lookup.locales().default || this.bioLocales[0] || "es";
+    this.memberForm.controls["bioLocale"].setValue(this.selectedBioLocale);
+    this.memberForm.controls["bioLocale"].valueChanges.subscribe((locale) => {
+      if (!locale) return;
+      this.setBioLocale(locale);
+    });
+    this.memberForm.controls["bio"].valueChanges.subscribe((bio) => {
+      this.setBioForSelectedLocale(bio ?? "");
+    });
     this.bindUser(this.route.snapshot.data["member"] as MemberFull);
+    this.loadPublishability();
   }
 
   isDirty(): boolean {
@@ -119,25 +135,40 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   private bindUser(result: MemberFull): void {
     this.memberForm.controls["dni"].disable();
     this.member = result;
+    this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
     this.oldEmail = result.email ?? "";
 
-    if (result.birthDate) {
-      this.birthDateObj = parseLocalDate(result.birthDate);
-    }
-
+    const birthDate = result.birthDate ? parseLocalDate(result.birthDate) : null;
     if (result.firstName.includes(" ")) {
       const parts = result.firstName.split(" ");
       this.member.firstName = parts[0] ?? "";
       this.segundoNombre = parts.slice(1).join(" ");
     }
 
+    this.memberForm.patchValue(
+      {
+        firstName: this.member.firstName,
+        middleName: this.segundoNombre,
+        lastName: result.lastName,
+        maternalName: result.maternalName ?? "",
+        birthDate,
+        email: result.email,
+        genderCode: result.genderCode ?? "",
+        prefixCode: result.prefixCode ?? "",
+        memberTypeCode: result.memberTypeCode,
+        dni: result.dni,
+        bioLocale: this.selectedBioLocale,
+        bio: this.bioByLocale[this.selectedBioLocale] ?? "",
+      },
+      { emitEvent: false },
+    );
     this.memberForm.controls["confirmPassword"].setValue("");
   }
 
   adHono = 0;
 
   setCoord(value: number): void {
-    this.member.roleId = value;
+    this.member.roleCode = value === 1 ? "administrator" : "researcher";
   }
 
   adHonorem(value: number): void {
@@ -154,42 +185,42 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
 
   addMember(): void {
     if (this.memberForm.valid) {
-      const firstName = this.segundoNombre
-        ? `${this.member.firstName} ${this.segundoNombre}`.trim()
-        : this.member.firstName;
-      const birthDate = this.birthDateObj ? toIsoDate(this.birthDateObj) : undefined;
+      const values = this.memberForm.getRawValue();
+      const firstName = values.middleName ? `${values.firstName} ${values.middleName}`.trim() : values.firstName;
+      const birthDate = values.birthDate ? toIsoDate(values.birthDate) : undefined;
 
       let status: number;
       if (this.adHono === 3) {
         status = 3;
       } else if (this.oldMem === 0) {
         status = 0;
-      } else if (!this.member.status) {
+      } else if (!values.status) {
         status = 1;
       } else {
-        status = this.member.status;
+        status = values.status;
       }
 
       const doUpdate = () => {
+        const password = values.password;
         const confirmPass = this.memberForm.controls["confirmPassword"].value;
-        if (this.password && this.password !== confirmPass) {
+        if (password && password !== confirmPass) {
           this.openSnackBar("Las contraseñas no coinciden", "err-snackbar");
           this.errPass = true;
           return;
         }
         this.memberService
           .updateMember(this.member.id, {
-            email: this.member.email,
+            email: values.email,
             firstName,
-            lastName: this.member.lastName,
-            maternalName: this.member.maternalName ?? undefined,
+            lastName: values.lastName,
+            maternalName: values.maternalName ?? undefined,
             birthDate,
-            bio: this.member.bio ?? undefined,
-            status,
-            roleId: this.member.roleId,
-            memberTypeId: this.member.memberTypeId,
-            prefixId: this.member.prefixId ?? undefined,
-            genderId: this.member.genderId ?? undefined,
+            isActive: status,
+            roleCode: this.member.roleCode,
+            memberTypeCode: values.memberTypeCode,
+            prefixCode: values.prefixCode || undefined,
+            genderCode: values.genderCode || undefined,
+            translation: { locale: this.selectedBioLocale, bio: this.bioByLocale[this.selectedBioLocale] ?? "" },
           })
           .subscribe((res) => {
             if (res.status === 1) {
@@ -197,14 +228,15 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
                 this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
               }
               this.openSnackBar("Miembro actualizado exitosamente");
+              this.loadPublishability();
               this.memberForm.markAsPristine();
               this.return();
             }
           });
       };
 
-      if (this.oldEmail !== this.member.email) {
-        this.memberService.verifyEmail(this.member.email).subscribe((result) => {
+      if (this.oldEmail !== values.email) {
+        this.memberService.verifyEmail(values.email).subscribe((result) => {
           if (!result.exists) {
             doUpdate();
           } else {
@@ -252,6 +284,51 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
         ? "miembros-antiguos"
         : "miembros-activos";
     this.router.navigate(["dashboard/" + returnTo]);
+  }
+
+  setBioLocale(locale: string): void {
+    this.selectedBioLocale = locale;
+    if (!this.member.id) return;
+    this.memberService.getMemberTranslation(this.member.id, locale).subscribe((row) => {
+      this.bioByLocale[locale] = row.bio ?? "";
+      this.memberForm.controls["bio"].setValue(this.bioByLocale[locale] ?? "", { emitEvent: false });
+      this.loadPublishability();
+    });
+  }
+
+  setBioForSelectedLocale(value: string): void {
+    this.bioByLocale[this.selectedBioLocale] = value;
+  }
+
+  bioLength(): number {
+    return (this.bioByLocale[this.selectedBioLocale] ?? "").length;
+  }
+
+  missingRequirementsCount(): number {
+    if (!this.publishability) return 0;
+    return countMissingRequirements(this.publishability);
+  }
+
+  publishabilityTooltip(): string {
+    return publishabilityTooltip(this.publishability);
+  }
+
+  private loadPublishability(): void {
+    if (!this.member.id) return;
+    this.memberService.getMemberPublishability(this.member.id).subscribe((data) => {
+      this.publishability = data;
+    });
+  }
+
+  openPublishabilityDetails(): void {
+    if (!this.publishability) return;
+    this.dialog.open(PublishabilityDialogComponent, {
+      width: "560px",
+      data: {
+        memberName: `${this.member.firstName} ${this.member.lastName}`.trim(),
+        publishability: this.publishability,
+      },
+    });
   }
 
   private dialogRef2?: MatDialogRef<DialogCancel5>;

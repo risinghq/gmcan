@@ -72,9 +72,9 @@
             <div class="full-width ml-26">
               <div class="text-category">Categoría <span class="red-text">*</span></div>
               <mat-form-field class="input-category">
-                <mat-select [(ngModel)]="noticia.newsTypeId" formControlName="newsTypeId" name="newsTypeId">
+                <mat-select [(ngModel)]="noticia.newsKindCode" formControlName="newsKindCode" name="newsKindCode">
                   @for (categoria of categorias; track categoria) {
-                    <mat-option [value]="categoria.id">{{ categoria.name }}</mat-option>
+                    <mat-option [value]="categoria.code">{{ categoria.name }}</mat-option>
                   }
                 </mat-select>
               </mat-form-field>
@@ -132,7 +132,7 @@
           </div>
         }
         <div class="right pd-8 mr-16">
-          <div class="link link-set" (click)="submitNews(0)">
+          <div class="link link-set" (click)="submitNews('draft')">
             {{ button_text2 }}
           </div>
         </div>
@@ -142,7 +142,7 @@
             'btn-grey': !(newsForm.valid && (noticia.asset || fileData != null || previewUrl)),
           }"
         >
-          <div class="link link-set" (click)="submitNews(1)">
+          <div class="link link-set" (click)="submitNews('published')">
             {{ button_text }}
           </div>
         </div>

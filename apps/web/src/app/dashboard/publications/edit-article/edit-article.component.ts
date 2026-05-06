@@ -22,7 +22,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/author";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
@@ -31,6 +30,7 @@ import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate } from "@app/shared/utils/date";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { AutosizeModule } from "ngx-autosize";
 import { Observable } from "rxjs";
 import { map, startWith } from "rxjs/operators";
@@ -41,6 +41,14 @@ interface AuthorFormRow {
   memberId: number | null;
   myControl: FormControl<string>;
   filteredOptions?: Observable<AuthorSearchResult[]>;
+}
+
+interface ArticleDraft {
+  title: string;
+  abstract: string;
+  doi: string;
+  journalId: number | null;
+  journalIssue: number | null;
 }
 
 @Component({
@@ -77,7 +85,8 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
-  publicacion: PublicationWithAuthors;
+  publicacion: PublicPublicationWithAuthors;
+  draft: ArticleDraft;
   publishedAtObj?: Date;
   public publicacionForm: FormGroup;
   button_text = "Actualizar información";
@@ -102,7 +111,8 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       abstract: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       userSelector: [""],
     });
-    this.publicacion = this.route.snapshot.data["publication"] as PublicationWithAuthors;
+    this.publicacion = this.route.snapshot.data["publication"] as PublicPublicationWithAuthors;
+    this.draft = { title: "", abstract: "", doi: "", journalId: null, journalIssue: null };
     this.url = GLOBAL.url;
   }
 
@@ -114,8 +124,15 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
     this.bindPublication(this.publicacion);
   }
 
-  private bindPublication(pub: PublicationWithAuthors): void {
+  private bindPublication(pub: PublicPublicationWithAuthors): void {
     this.publicacion = pub;
+    this.draft = {
+      title: pub.title,
+      abstract: pub.abstract ?? "",
+      doi: pub.doi ?? "",
+      journalId: pub.subtype.kindCode === "journal_article" ? (pub.subtype.journalArticle.journalId ?? null) : null,
+      journalIssue: pub.subtype.kindCode === "journal_article" ? (pub.subtype.journalArticle.issue ?? null) : null,
+    };
     const publishedAt = parseLocalDate(pub.publishedAt);
     if (publishedAt) {
       this.publishedAtObj = publishedAt;
@@ -128,21 +145,22 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
         map((value) => this.filterAuthors(value)),
       );
 
-      const principal = pub.authors.find((a) => a.isPrincipal === 0);
+      const principal = pub.authors.find((a) => a.authorOrder === 0);
       if (principal) {
         this.selectedUser = principal.name;
-        this.principalAuthor = principal.memberId
-          ? { id: principal.memberId, name: principal.name, asset: principal.asset ?? null }
-          : null;
+        this.principalAuthor =
+          principal.kind === "registered" && principal.memberId
+            ? { id: principal.memberId, name: principal.name, asset: principal.asset ?? null }
+            : null;
         this.myControl.setValue(principal.name);
       }
 
-      const coAuthors = pub.authors.filter((a) => a.isPrincipal > 0).toSorted((a, b) => a.isPrincipal - b.isPrincipal);
+      const coAuthors = pub.authors.filter((a) => a.authorOrder > 0).toSorted((a, b) => a.authorOrder - b.authorOrder);
       this.otrosAutores = coAuthors.map((a, i) => {
         const row: AuthorFormRow = {
           id: i + 1,
           name: a.name,
-          memberId: a.memberId ?? null,
+          memberId: a.kind === "registered" ? a.memberId : null,
           myControl: new FormControl<string>(a.name, { nonNullable: true }),
         };
         row.filteredOptions = row.myControl.valueChanges.pipe(
@@ -236,13 +254,21 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
     const publishedAt = this.publishedAtObj ? new Date(this.publishedAtObj).toLocaleDateString("sv") : "";
 
     const data = {
-      title: this.publicacion.title,
-      abstract: this.publicacion.abstract ?? undefined,
-      doi: this.publicacion.doi ?? undefined,
-      publishedAt,
-      journalIssue: this.publicacion.journalIssue ?? undefined,
-      typeId: 1,
-      journalId: this.publicacion.journalId ?? undefined,
+      doi: this.draft.doi ?? undefined,
+      publishedAt: publishedAt,
+      subtype: {
+        kindCode: "journal_article" as const,
+        journalArticle: {
+          journalId: this.draft.journalId ?? undefined,
+          issue: this.draft.journalIssue ?? undefined,
+        },
+      },
+      translations: {
+        es: {
+          title: this.draft.title,
+          abstract: this.draft.abstract ?? undefined,
+        },
+      },
     };
 
     this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((response) => {
@@ -262,9 +288,9 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
 
     const resolvedPrincipal = this.principalAuthor?.name === this.selectedUser ? this.principalAuthor : null;
     if (resolvedPrincipal?.id) {
-      entries.push({ kind: "registered", memberId: resolvedPrincipal.id, isPrincipal: 0 });
+      entries.push({ kind: "registered", memberId: resolvedPrincipal.id, authorOrder: 0 });
     } else {
-      entries.push({ kind: "external", externalName: this.selectedUser, isPrincipal: 0 });
+      entries.push({ kind: "external", externalName: this.selectedUser, authorOrder: 0 });
     }
 
     this.otrosAutores.forEach((row, i) => {
@@ -272,9 +298,9 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       const matchedAuthor = this.options.find((o) => o.name === row.name);
       const memberId = row.memberId ?? matchedAuthor?.id ?? null;
       if (memberId) {
-        entries.push({ kind: "registered", memberId, isPrincipal: i + 1 });
+        entries.push({ kind: "registered", memberId, authorOrder: i + 1 });
       } else {
-        entries.push({ kind: "external", externalName: row.name, isPrincipal: i + 1 });
+        entries.push({ kind: "external", externalName: row.name, authorOrder: i + 1 });
       }
     });
 
@@ -327,6 +353,21 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   fileProgress(fileInput: Event): void {
     const input = fileInput.target as HTMLInputElement;
     this.fileData = input.files?.[0] ?? null;
+  }
+
+  get hasExistingAsset(): boolean {
+    return this.publicacion.asset != null;
+  }
+
+  get existingAssetLabel(): string | null {
+    const download = this.publicacion.asset?.download;
+    if (!download) return null;
+    try {
+      const fileName = new URL(download).pathname.split("/").pop();
+      return fileName || "PDF";
+    } catch {
+      return "PDF";
+    }
   }
 }
 

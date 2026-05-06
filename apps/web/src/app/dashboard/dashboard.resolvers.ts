@@ -3,11 +3,11 @@ import { ResolveFn } from "@angular/router";
 import type { MemberFull } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
 import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { map, of } from "rxjs";
 
 export type ToolbarBadge = {
@@ -25,7 +25,7 @@ export const projectResolver: ResolveFn<Project> = (route) => {
   return inject(ProjectService).getProject(id);
 };
 
-export const publicationResolver: ResolveFn<PublicationWithAuthors> = (route) => {
+export const publicationResolver: ResolveFn<PublicPublicationWithAuthors> = (route) => {
   const id = Number(route.paramMap.get("id") ?? 0);
   return inject(PublicationService).getPublication(id);
 };
@@ -38,7 +38,7 @@ export const newsResolver: ResolveFn<News> = (route) => {
 export const newsToolbarBadgeResolver: ResolveFn<ToolbarBadge | null> = (route) =>
   of(route.data["news"] as News).pipe(
     map((news) =>
-      (news.status ?? 0) === 1
+      news.statusCode === "published"
         ? ({ label: "Noticia Publicada", tone: "published" } as ToolbarBadge)
         : ({ label: "Borrador", tone: "draft" } as ToolbarBadge),
     ),
@@ -58,7 +58,7 @@ export const projectEditTitleResolver: ResolveFn<string> = (route) =>
   of(route.data["project"] as Project).pipe(map((project) => `Proyectos - ${project.title}`));
 
 export const publicationEditTitleResolver: ResolveFn<string> = (route) =>
-  of(route.data["publication"] as PublicationWithAuthors).pipe(
+  of(route.data["publication"] as PublicPublicationWithAuthors).pipe(
     map((publication) => {
       const path = route.routeConfig?.path ?? "";
       const entity = path.startsWith("edit-thesis")

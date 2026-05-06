@@ -19,7 +19,7 @@ export type Permission =
 
 export interface Actor {
   id: number;
-  roleId: number;
+  roleCode: Role;
   role: Role;
-  status: number;
+  isActive: number;
 }

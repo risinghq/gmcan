@@ -5,7 +5,7 @@ import { z } from "zod";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import {
   createNews,
   deleteNews,
@@ -18,22 +18,25 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
+const StatusCode = z.enum(["draft", "published", "archived"]);
+const NewsKindCode = z.enum(["general", "research", "event"]);
+
 const ListQuery = z.object({
   q: z.string().trim().optional(),
-  status: z.coerce.number().int().optional(),
-  newsTypeId: z.coerce.number().int().optional(),
+  statusCode: StatusCode.optional(),
+  newsKindCode: NewsKindCode.optional(),
   authorId: z.coerce.number().int().optional(),
-  sortBy: z.enum(["publishedAt", "title", "status", "authorName", "categoryName"]).default("publishedAt"),
+  sortBy: z.enum(["publishedAt", "title", "statusCode", "authorName", "categoryName"]).default("publishedAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
   page: z.coerce.number().int().positive().default(1),
   pageSize: z.coerce.number().int().positive().default(10),
 });
 
 const NewsBody = z.object({
-  status: z.number().int(),
+  statusCode: StatusCode,
   publishedAt: z.string().optional(),
   authorId: z.number().int(),
-  newsTypeId: z.number().int(),
+  newsKindCode: NewsKindCode,
   priority: z.number().int().optional(),
   translations: translationsSchema({
     title: z.string().trim().min(1),
@@ -56,10 +59,10 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getNewsItem(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  const view = toAdminNewsView(row);
+  const view = await toAdminNewsView(row);
   return c.json({
     ...view,
-    asset: await resolveAssetAccessUrl({ resourceType: "news", resourceId: view.id, slot: "photo" }),
+    asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: view.id, slot: "photo" }),
   });
 });
 

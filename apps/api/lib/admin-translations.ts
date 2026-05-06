@@ -1,37 +1,29 @@
 import { z } from "zod";
 
-import { env } from "../config/env.js";
+import { SUPPORTED_LOCALES, type LocaleCode, type LocalizedMap } from "./locales.js";
 
-function parseLocales(raw: string | undefined): Array<"es" | "en"> {
-  const values = raw
-    ?.split(",")
-    .map((v) => v.trim())
-    .filter((v): v is "es" | "en" => v === "es" || v === "en");
-  if (!values || values.length === 0) return ["es", "en"];
-  if (!values.includes("es") || !values.includes("en")) return ["es", "en"];
-  return values;
-}
-
-export const ADMIN_LOCALES = parseLocales(env.ADMIN_LOCALES);
-export const LocaleSchema = z.enum(["es", "en"]);
-export type AdminLocale = z.infer<typeof LocaleSchema>;
+export const ADMIN_LOCALES = SUPPORTED_LOCALES;
+export const LocaleSchema = z.string().refine((value) => ADMIN_LOCALES.includes(value), {
+  message: "Unsupported locale",
+});
+export type AdminLocale = LocaleCode;
 
 export function translationsSchema<TShape extends z.ZodRawShape>(shape: TShape) {
-  const payload = z.object({
-    es: z.object(shape),
-    en: z.object(shape),
-  });
-  return payload.superRefine((value, ctx) => {
-    const keys = Object.keys(value);
-    for (const locale of ADMIN_LOCALES) {
-      if (!keys.includes(locale)) {
-        ctx.addIssue({
-          code: "custom",
-          message: `Missing translations.${locale}`,
-        });
+  const itemSchema = z.object(shape);
+  return z.record(z.string(), itemSchema).superRefine((value, ctx) => {
+    const keys = new Set(Object.keys(value));
+    for (const locale of SUPPORTED_LOCALES) {
+      if (!keys.has(locale)) {
+        ctx.addIssue({ code: "custom", message: `Missing translations.${locale}` });
+      }
+    }
+
+    for (const key of keys) {
+      if (!SUPPORTED_LOCALES.includes(key)) {
+        ctx.addIssue({ code: "custom", message: `Unsupported locale key: ${key}` });
       }
     }
   });
 }
 
-export type Bilingual<T> = { es: T; en: T };
+export type LocalizedTranslations<T> = LocalizedMap<T>;

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/asset.service.js";
+import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import {
   createResearchLine,
   deleteResearchLine,
@@ -43,9 +43,9 @@ router.get("/", async (c) => {
   return c.json(
     await Promise.all(
       rows.map(async (row) => {
-        const view = toAdminResearchLineView(row);
+        const view = await toAdminResearchLineView(row);
         return Object.assign({}, view, {
-          asset: await resolveAssetAccessUrl({ resourceType: "research_line", resourceId: view.id, slot: "photo" }),
+          asset: await resolveAssetAccessUrl({ ownerType: "research_line", ownerId: view.id, slot: "photo" }),
         });
       }),
     ),
@@ -56,10 +56,10 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getResearchLine(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  const view = toAdminResearchLineView(row);
+  const view = await toAdminResearchLineView(row);
   return c.json(
     Object.assign({}, view, {
-      asset: await resolveAssetAccessUrl({ resourceType: "research_line", resourceId: view.id, slot: "photo" }),
+      asset: await resolveAssetAccessUrl({ ownerType: "research_line", ownerId: view.id, slot: "photo" }),
     }),
   );
 });

@@ -1,17 +1,12 @@
-import { HttpClient } from "@angular/common/http";
 import { Component, OnInit, inject } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
 import { AuthzService } from "@app/shared/services/authz.service";
+import { DashboardService } from "@app/shared/services/dashboard.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { BaseChartDirective } from "ng2-charts";
-
-interface CountTypeItem {
-  name?: string;
-  total?: string | number;
-}
 
 @Component({
   selector: "app-dashboard",
@@ -22,21 +17,20 @@ interface CountTypeItem {
 export default class DashboardComponent implements OnInit {
   authz = inject(AuthzService);
   groupService = inject(GroupService);
-  private http = inject(HttpClient);
+  private dashboardService = inject(DashboardService);
   private uiState = inject(UiStateService);
 
   screenWidth = window.innerWidth;
-  public url: string;
+  readonly manualUrl = GLOBAL.app("grupo/get-manual");
   public grupoinfo: Group;
 
   constructor() {
-    this.url = GLOBAL.url;
     this.grupoinfo = this.uiState.groupInfo();
   }
 
   ngOnInit(): void {
     this.getGrupoInfo();
-    this.getCountTypeMember();
+    this.loadDashboardSummary();
   }
 
   getGrupoInfo(): void {
@@ -46,37 +40,15 @@ export default class DashboardComponent implements OnInit {
   total = 0;
   total2 = 0;
 
-  getCountTypeMember(): void {
-    this.http.get<CountTypeItem[]>(`${GLOBAL.url}api/members/count-by-type`).subscribe((res) => {
-      if (res && res.length > 0) {
-        const labels: string[] = [];
-        const data: string[] = [];
-        for (const item of res) {
-          labels.push(String(item.name ?? ""));
-          data.push(String(item.total ?? "0"));
-          this.total += Number(item.total ?? 0);
-        }
-        this.chartLabels = labels;
-        this.chartDatasets = [{ data, label: "Miembros" }];
-      }
-      this.getCountTypePublication();
-    });
-  }
+  loadDashboardSummary(): void {
+    this.dashboardService.getSummary().subscribe((summary) => {
+      this.total = summary.membersByType.reduce((sum, item) => sum + item.count, 0);
+      this.chartLabels = summary.membersByType.map((item) => item.label);
+      this.chartDatasets = [{ data: summary.membersByType.map((item) => item.count), label: "Miembros" }];
 
-  getCountTypePublication(): void {
-    this.http.get<CountTypeItem[]>(`${GLOBAL.url}api/publications/count-by-type`).subscribe((res) => {
-      if (res && res.length > 0) {
-        const labels: string[] = [];
-        const data: string[] = [];
-        for (const item of res) {
-          labels.push(String(item.name ?? ""));
-          data.push(String(item.total ?? "0"));
-          this.total2 += Number(item.total ?? 0);
-        }
-        data.push("0");
-        this.chartLabels2 = labels;
-        this.chartDatasets2 = [{ data, label: "Cantidad" }];
-      }
+      this.total2 = summary.publicationsByKind.reduce((sum, item) => sum + item.count, 0);
+      this.chartLabels2 = summary.publicationsByKind.map((item) => item.label);
+      this.chartDatasets2 = [{ data: summary.publicationsByKind.map((item) => item.count), label: "Cantidad" }];
     });
   }
 

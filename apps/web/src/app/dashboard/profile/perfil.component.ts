@@ -10,12 +10,15 @@ import {
 import { MatButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from "@angular/material/datepicker";
+import { MatDialog } from "@angular/material/dialog";
 import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatOption, MatSelect } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
+import { countMissingRequirements, publishabilityTooltip } from "@app/shared/member-publishability/utils";
 import { createMemberFull } from "@app/shared/models/factories";
-import type { MemberFull } from "@app/shared/models/member";
+import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -60,6 +63,7 @@ export default class PerfilComponent implements OnInit {
   lookup = inject(LookupService);
   private snackBar = inject(MatSnackBar);
   private uiState = inject(UiStateService);
+  private dialog = inject(MatDialog);
 
   readonly url = GLOBAL.url;
   readonly minPasswordLength = MIN_PASSWORD_LENGTH;
@@ -68,10 +72,16 @@ export default class PerfilComponent implements OnInit {
     { value: MEMBER_STATUS.INACTIVE, label: "Inactivo" },
     { value: MEMBER_STATUS.BLOCKED, label: "Bloqueado" },
   ];
+  get bioLocales() {
+    return this.lookup.locales().supported;
+  }
+  selectedBioLocale = "es";
+  bioByLocale: Record<string, string> = {};
+  publishability: MemberPublishability | null = null;
 
   member: MemberFull = { ...createMemberFull() };
   memberId: number | null = null;
-  roleId: number | null = null;
+  roleCode: MemberFull["roleCode"] | null = null;
 
   profileForm = this.formBuilder.group({
     firstName: ["", Validators.required],
@@ -80,9 +90,9 @@ export default class PerfilComponent implements OnInit {
     maternalName: [""],
     birthDate: [null as Date | null],
     email: ["", [Validators.required, Validators.email]],
-    genderId: [null as number | null],
-    prefixId: [null as number | null],
-    memberTypeId: [null as number | null, Validators.required],
+    genderCode: [null as MemberFull["genderCode"]],
+    prefixCode: [null as MemberFull["prefixCode"]],
+    memberTypeCode: [null as MemberFull["memberTypeCode"] | null, Validators.required],
     dni: [{ value: "", disabled: true }, Validators.required],
     bio: ["", Validators.maxLength(500)],
     status: [MEMBER_STATUS.ACTIVE as MemberStatus, Validators.required],
@@ -107,11 +117,11 @@ export default class PerfilComponent implements OnInit {
   }
 
   get prefijos() {
-    return this.lookup.prefijos();
+    return this.lookup.prefixes();
   }
 
   get generos() {
-    return this.lookup.generos();
+    return this.lookup.genders();
   }
 
   get photoUrl(): string | null {
@@ -120,6 +130,7 @@ export default class PerfilComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.selectedBioLocale = this.lookup.locales().default || this.bioLocales[0] || "es";
     this.getUser();
   }
 
@@ -149,7 +160,7 @@ export default class PerfilComponent implements OnInit {
 
       this.member = { ...result };
       this.memberId = result.id;
-      this.roleId = result.roleId;
+      this.roleCode = result.roleCode;
       const splitNames = this.splitFirstAndMiddleName(result.firstName);
 
       const birthDate = result.birthDate ? new Date(result.birthDate) : null;
@@ -162,35 +173,38 @@ export default class PerfilComponent implements OnInit {
         maternalName: result.maternalName ?? "",
         birthDate,
         email: result.email,
-        genderId: result.genderId ?? null,
-        prefixId: result.prefixId ?? null,
-        memberTypeId: result.memberTypeId,
+        genderCode: result.genderCode ?? null,
+        prefixCode: result.prefixCode ?? null,
+        memberTypeCode: result.memberTypeCode,
         dni: result.dni,
         bio: result.bio ?? "",
-        status: (result.status as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
+        status: (result.isActive as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
       });
+      this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
+      this.loadPublishability();
     });
   }
 
   actualizarUsuario(): void {
-    if (this.profileForm.invalid || this.memberId === null || this.roleId === null) {
+    if (this.profileForm.invalid || this.memberId === null || this.roleCode === null) {
       this.profileForm.markAllAsTouched();
       return;
     }
 
     const values = this.profileForm.getRawValue();
+    const bio = (this.bioByLocale[this.selectedBioLocale] ?? "").trim();
     const body: MemberUpdateBody = {
       email: values.email?.trim() ?? "",
       firstName: this.buildCanonicalFirstName(values.firstName ?? "", values.middleName ?? ""),
       lastName: values.lastName?.trim() ?? "",
       maternalName: values.maternalName?.trim() || undefined,
       birthDate: values.birthDate ? new Date(values.birthDate).toLocaleDateString("sv") : undefined,
-      bio: values.bio?.trim() || undefined,
-      status: (values.status ?? MEMBER_STATUS.ACTIVE) as MemberStatus,
-      roleId: this.roleId,
-      memberTypeId: values.memberTypeId ?? this.member.memberTypeId,
-      prefixId: values.prefixId ?? undefined,
-      genderId: values.genderId ?? undefined,
+      isActive: (values.status ?? MEMBER_STATUS.ACTIVE) as MemberStatus,
+      roleCode: this.roleCode,
+      memberTypeCode: values.memberTypeCode ?? this.member.memberTypeCode,
+      prefixCode: values.prefixCode ?? undefined,
+      genderCode: values.genderCode ?? undefined,
+      translation: { locale: this.selectedBioLocale, bio },
     };
 
     this.isSavingProfile = true;
@@ -267,6 +281,47 @@ export default class PerfilComponent implements OnInit {
       duration: 2000,
       horizontalPosition: "right",
       verticalPosition: "top",
+    });
+  }
+
+  setBioLocale(locale: string): void {
+    this.selectedBioLocale = locale;
+    if (this.memberId == null) return;
+    this.memberService.getMemberTranslation(this.memberId, locale).subscribe((row) => {
+      this.bioByLocale[locale] = row.bio ?? "";
+      this.profileForm.controls.bio.setValue(this.bioByLocale[locale]);
+      this.loadPublishability();
+    });
+  }
+
+  onBioChange(value: string): void {
+    this.bioByLocale[this.selectedBioLocale] = value;
+  }
+
+  missingRequirementsCount(): number {
+    if (!this.publishability) return 0;
+    return countMissingRequirements(this.publishability);
+  }
+
+  publishabilityTooltip(): string {
+    return publishabilityTooltip(this.publishability);
+  }
+
+  private loadPublishability(): void {
+    if (this.memberId == null) return;
+    this.memberService.getMemberPublishability(this.memberId).subscribe((data) => {
+      this.publishability = data;
+    });
+  }
+
+  openPublishabilityDetails(): void {
+    if (!this.publishability) return;
+    this.dialog.open(PublishabilityDialogComponent, {
+      width: "560px",
+      data: {
+        memberName: `${this.member.firstName} ${this.member.lastName}`.trim(),
+        publishability: this.publishability,
+      },
     });
   }
 }

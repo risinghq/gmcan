@@ -1,6 +1,7 @@
+import type { PublicPublication } from "@gmcan/contracts/public";
+
 import type { Capability } from "./capabilities";
 import type { Project } from "./project";
-import type { Publication } from "./publication";
 
 export interface Member {
   id: number;
@@ -12,19 +13,33 @@ export interface Member {
   birthDate: string | null;
   bio: string | null;
   asset: string | null;
-  status: number;
-  roleId: number;
-  memberTypeId: number;
-  prefixId: number | null;
+  isActive: number;
+  roleCode: "administrator" | "researcher" | "visitor";
+  memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
+  prefixCode: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
   capabilities?: Capability[];
 }
 
 export interface MemberFull extends Member {
-  genderId: number | null;
+  genderCode: "male" | "female" | null;
+}
+
+export interface MemberPublishability {
+  publishable: boolean;
+  missing: {
+    base: string[];
+    translations: Record<string, string[]>;
+  };
 }
 
 export interface MemberProfile {
   member: Member | undefined;
   projects: Project[];
-  publications: Publication[];
+  publications: PublicPublication[];
+}
+
+export interface MemberGroup {
+  id: number;
+  name: string;
+  fullName: string | null;
 }

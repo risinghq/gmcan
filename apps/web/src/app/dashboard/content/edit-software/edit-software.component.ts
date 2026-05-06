@@ -59,11 +59,8 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
 
   getSoftware(): void {
     const idSoftware = Number(this.route.snapshot.params["id"]);
-    this.groupService.getSoftwareItem(idSoftware).subscribe((result: unknown) => {
-      const sw = result as Software;
-      if (sw) {
-        this.software = sw;
-      }
+    this.groupService.getSoftwareItem(idSoftware).subscribe((sw: Software) => {
+      if (sw) this.software = sw;
     });
   }
 
