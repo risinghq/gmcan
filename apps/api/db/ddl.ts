@@ -708,46 +708,4 @@ export async function createTables(db: Kysely<Database>) {
     .on("publication_author")
     .column("memberId")
     .execute();
-  await db.schema
-    .createIndex("idx_member_asset_current")
-    .ifNotExists()
-    .on("member_asset")
-    .columns(["memberId", "slot", "version"])
-    .execute();
-  await db.schema
-    .createIndex("idx_news_asset_current")
-    .ifNotExists()
-    .on("news_asset")
-    .columns(["newsId", "slot", "version"])
-    .execute();
-  await db.schema
-    .createIndex("idx_method_asset_current")
-    .ifNotExists()
-    .on("method_asset")
-    .columns(["methodId", "slot", "version"])
-    .execute();
-  await db.schema
-    .createIndex("idx_research_line_asset_current")
-    .ifNotExists()
-    .on("research_line_asset")
-    .columns(["researchLineId", "slot", "version"])
-    .execute();
-  await db.schema
-    .createIndex("idx_publication_asset_current")
-    .ifNotExists()
-    .on("publication_asset")
-    .columns(["publicationId", "slot", "version"])
-    .execute();
-  await db.schema
-    .createIndex("idx_research_group_asset_current")
-    .ifNotExists()
-    .on("research_group_asset")
-    .columns(["groupId", "slot", "version"])
-    .execute();
-  await db.schema
-    .createIndex("idx_about_asset_current")
-    .ifNotExists()
-    .on("about_asset")
-    .columns(["aboutId", "slot", "version"])
-    .execute();
 }
