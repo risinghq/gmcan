@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
 import { AuthzService } from "@app/shared/services/authz.service";
 import { DashboardService } from "@app/shared/services/dashboard.service";
+import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { BaseChartDirective } from "ng2-charts";
@@ -20,6 +21,7 @@ export default class DashboardComponent implements OnInit {
   private uiState = inject(UiStateService);
 
   screenWidth = window.innerWidth;
+  readonly manualUrl = GLOBAL.app("grupo/get-manual");
   public grupoinfo: Group;
 
   constructor() {

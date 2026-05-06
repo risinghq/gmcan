@@ -46,7 +46,15 @@ export async function getDashboardSummary() {
   ]);
 
   return {
-    membersByType: membersByTypeRows.map((row) => ({ ...row, count: numericCount(row.count) })),
-    publicationsByKind: publicationsByKindRows.map((row) => ({ ...row, count: numericCount(row.count) })),
+    membersByType: membersByTypeRows.map((row) => ({
+      code: row.code,
+      label: row.label,
+      count: numericCount(row.count),
+    })),
+    publicationsByKind: publicationsByKindRows.map((row) => ({
+      code: row.code,
+      label: row.label,
+      count: numericCount(row.count),
+    })),
   };
 }
