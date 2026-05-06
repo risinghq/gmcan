@@ -94,8 +94,9 @@ router.get(
 );
 
 router.get("/:id", requirePermission("members.read"), zValidator("param", IdParam), async (c) => {
+  const locale = c.get("locale");
   const { id } = c.req.valid("param");
-  const member = await getMemberFull(id);
+  const member = await getMemberFull(id, locale);
   if (!member) return c.json({ error: "Not found" }, 404);
   return c.json({
     ...member,
@@ -121,9 +122,10 @@ router.patch(
   zValidator("param", IdParam),
   zValidator("json", UpdateBody.partial()),
   async (c) => {
+    const locale = c.get("locale");
     const { id } = c.req.valid("param");
     const patch = c.req.valid("json");
-    const current = await getMemberFull(id);
+    const current = await getMemberFull(id, locale);
     if (!current) return c.json({ error: "Not found" }, 404);
     await updateMember(id, {
       email: patch.email ?? current.email,

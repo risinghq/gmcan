@@ -223,14 +223,12 @@ export async function getProjectLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function searchProjects(q: string, statusCode?: ProjectStatusCode) {
+export async function searchProjects(q: string, locale: Locale = DEFAULT_LOCALE, statusCode?: ProjectStatusCode) {
   const like = `%${q}%`;
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
-      join
-        .onRef("project_translation.projectId", "=", "project.id")
-        .on("project_translation.locale", "=", DEFAULT_LOCALE),
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
     )
     .selectAll("project")
     .where((eb) => eb.or([eb("project_translation.title", "like", like), eb("project.code", "like", like)]));

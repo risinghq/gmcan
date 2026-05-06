@@ -156,11 +156,11 @@ export async function getMember(id: number) {
   return db.selectFrom("member").select(MEMBER_PUBLIC).where("id", "=", id).executeTakeFirst();
 }
 
-export async function getMemberFull(id: number) {
+export async function getMemberFull(id: number, locale: Locale = DEFAULT_LOCALE) {
   return db
     .selectFrom("member")
     .leftJoin("member_translation", (join) =>
-      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", DEFAULT_LOCALE),
+      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
     )
     .select([
       "member.id as id",

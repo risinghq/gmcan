@@ -51,8 +51,9 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", zValidator("query", ListQuery), async (c) => {
+  const locale = c.get("locale");
   const query = c.req.valid("query");
-  return c.json(await listAdminNews(query));
+  return c.json(await listAdminNews(locale, query));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

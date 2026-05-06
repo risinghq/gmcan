@@ -33,7 +33,8 @@ export const loadActor: MiddlewareHandler = async (c: Context, next: Next) => {
   const memberId = c.get("memberId");
   if (!memberId) return c.json({ error: "Unauthorized" }, 401);
 
-  const member = await getMemberFull(memberId);
+  const locale = c.get("locale");
+  const member = await getMemberFull(memberId, locale);
   if (!member) return c.json({ error: "Unauthorized" }, 401);
 
   const role = roleByCode[member.roleCode];

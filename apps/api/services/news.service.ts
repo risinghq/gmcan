@@ -1,7 +1,6 @@
 import { db } from "../db/client.js";
 import type { NewsRow, NewsStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
-import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminNewsListItem, AdminNewsListQuery, AdminNewsListResponse } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./assets/service.js";
@@ -186,18 +185,18 @@ export async function getPublicNewsDetail(id: number, locale: Locale) {
   };
 }
 
-export async function listAdminNews(query: AdminNewsListQuery): Promise<AdminNewsListResponse> {
+export async function listAdminNews(locale: Locale, query: AdminNewsListQuery): Promise<AdminNewsListResponse> {
   const offset = (query.page - 1) * query.pageSize;
   let base = db
     .selectFrom("news")
     .innerJoin("news_translation", (join) =>
-      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", DEFAULT_LOCALE),
+      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", locale),
     )
     .innerJoin("news_kind", "news_kind.code", "news.newsKindCode")
     .leftJoin("news_kind_translation", (join) =>
       join
         .onRef("news_kind_translation.newsKindCode", "=", "news.newsKindCode")
-        .on("news_kind_translation.locale", "=", DEFAULT_LOCALE),
+        .on("news_kind_translation.locale", "=", locale),
     )
     .innerJoin("member", "member.id", "news.authorId");
 

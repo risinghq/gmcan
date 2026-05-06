@@ -400,14 +400,14 @@ export async function getPublicationEditView(id: number) {
   };
 }
 
-export async function searchPublications(q: string) {
+export async function searchPublications(q: string, locale: Locale = DEFAULT_LOCALE) {
   const like = `%${q}%`;
   return db
     .selectFrom("publication")
     .innerJoin("publication_translation", (join) =>
       join
         .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", DEFAULT_LOCALE),
+        .on("publication_translation.locale", "=", locale),
     )
     .select(["publication.id", "publication.kindCode", "publication.doi", "publication.publishedAt"])
     .where((eb) =>

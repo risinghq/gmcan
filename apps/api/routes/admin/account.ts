@@ -11,7 +11,8 @@ const router = new Hono();
 
 router.get("/me", requirePermission("account.self.read"), async (c) => {
   const memberId = c.get("memberId");
-  const member = await getMemberFull(memberId);
+  const locale = c.get("locale");
+  const member = await getMemberFull(memberId, locale);
   if (!member) return c.json({ error: "Not found" }, 404);
   const actor = c.get("actor");
   return c.json({
