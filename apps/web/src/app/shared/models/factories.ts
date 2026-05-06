@@ -4,7 +4,6 @@ import { createGroup, type Group } from "./group";
 import type { MemberFull } from "./member";
 import type { News } from "./news";
 import type { Project } from "./project";
-import type { Publication } from "./publication";
 import type { ResearchLine } from "./research-line";
 import type { Software } from "./software";
 
@@ -22,11 +21,11 @@ export function createMemberFull(): MemberFull {
     birthDate: null,
     bio: null,
     asset: null,
-    status: 1,
-    roleId: 2,
-    memberTypeId: 0,
-    prefixId: null,
-    genderId: null,
+    isActive: 1,
+    roleCode: "researcher",
+    memberTypeCode: "researcher",
+    prefixCode: null,
+    genderCode: null,
   };
 }
 
@@ -36,31 +35,12 @@ export function createNews(): News {
     title: "",
     summary: "",
     body: "",
-    status: 0,
+    statusCode: "draft",
     publishedAt: "",
     asset: null,
     priority: 0,
     authorId: 0,
-    newsTypeId: 0,
-    updatedAt: null,
-    createdAt: null,
-  };
-}
-
-export function createPublication(): Publication {
-  return {
-    id: 0,
-    title: "",
-    asset: null,
-    abstract: "",
-    journalIssue: null,
-    doi: "",
-    publishedAt: "",
-    typeId: 0,
-    journalId: null,
-    universityId: null,
-    eventId: null,
-    thesisTypeId: null,
+    newsKindCode: "general",
     updatedAt: null,
     createdAt: null,
   };
@@ -71,14 +51,14 @@ export function createProject(): Project {
     id: 0,
     title: "",
     code: "",
-    fundedAmount: "",
+    fundedAmountMinor: 0,
     description: "",
-    status: 1,
+    statusCode: "planned",
     startDate: "",
     endDate: null,
     researchLineId: 0,
-    currencyId: 0,
-    fundingSourceId: 0,
+    currencyCode: "pen",
+    fundingSourceCode: "none",
     createdAt: null,
     updatedAt: null,
   };

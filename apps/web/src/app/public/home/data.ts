@@ -4,7 +4,7 @@ import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import type { ProjectWithMembers } from "@app/shared/models/project";
-import type { PublicationWithAuthors } from "@app/shared/models/publication";
+import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -37,7 +37,13 @@ export class HomeDataService {
       firstValueFrom(this.publicationService.listPublications()),
       firstValueFrom(this.projectService.listProjects()),
       firstValueFrom(
-        this.newsService.listNews({ status: 1, sortBy: "publishedAt", sortOrder: "desc", page: 1, pageSize: 6 }),
+        this.newsService.listNews({
+          statusCode: "published",
+          sortBy: "publishedAt",
+          sortOrder: "desc",
+          page: 1,
+          pageSize: 6,
+        }),
       ),
       firstValueFrom(this.researchLinesService.list()),
       firstValueFrom(this.methodsService.list()),
@@ -47,7 +53,7 @@ export class HomeDataService {
     const lineasInvestigacion = Array.isArray(lineasRaw) ? (lineasRaw as ResearchLine[]) : [];
     const metodos = Array.isArray(metodosRaw) ? (metodosRaw as Method[]) : [];
     const miembros = Array.isArray(miembrosRaw) ? (miembrosRaw as Member[]) : [];
-    const publicacionesSafe = Array.isArray(publicacionesRaw) ? (publicacionesRaw as PublicationWithAuthors[]) : [];
+    const publicacionesSafe = Array.isArray(publicacionesRaw) ? (publicacionesRaw as PublicPublicationWithAuthors[]) : [];
     const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
     const newsSafe = Array.isArray(newsRaw?.items) ? (newsRaw.items as PublicNewsListItem[]) : [];
 
@@ -103,7 +109,7 @@ export class HomeDataService {
     }
   }
 
-  private enrichPublicaciones(publicaciones: PublicationWithAuthors[]): HomePublicacion[] {
+  private enrichPublicaciones(publicaciones: PublicPublicationWithAuthors[]): HomePublicacion[] {
     const publicationKinds = this.lookup.publicationKinds();
     const thesisKinds = this.lookup.thesisKinds();
     const journals = this.lookup.journals();
@@ -142,7 +148,7 @@ export class HomeDataService {
 
   private enrichProyectos(proyectos: ProjectWithMembers[], lineas: ResearchLine[]): HomeProyecto[] {
     const fundingSources = this.lookup.fundingSources();
-    const monedas = this.lookup.monedas();
+    const monedas = this.lookup.currencies();
 
     const lineasMap = new Map(lineas.map((l) => [l.id, l]));
     const fuentesMap = new Map(fundingSources.map((f) => [f.code, f]));
