@@ -5,7 +5,6 @@ import { z } from "zod";
 import { db } from "../../db/client.js";
 import type { EventTranslationTable } from "../../db/schema.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
-import { DEFAULT_LOCALE } from "../../lib/locales.js";
 import { requirePermission } from "../../middleware/authz.js";
 
 const router = new Hono();
@@ -27,10 +26,11 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", async (c) => {
+  const locale = c.get("locale");
   const rows = await db
     .selectFrom("event")
     .innerJoin("event_translation", (join) =>
-      join.onRef("event_translation.eventId", "=", "event.id").on("event_translation.locale", "=", DEFAULT_LOCALE),
+      join.onRef("event_translation.eventId", "=", "event.id").on("event_translation.locale", "=", locale),
     )
     .select([
       "event.id as id",

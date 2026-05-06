@@ -1,19 +1,15 @@
 import type { Context, Next } from "hono";
 
 import { DEFAULT_LOCALE, normalizeLocale } from "../lib/locales.js";
+import type { Locale } from "../lib/public-locale.js";
 
 declare module "hono" {
   interface ContextVariableMap {
-    locale: string;
+    locale: Locale;
   }
 }
 
-const PUBLIC_LOCALE_EXEMPT = new Set<string>(["/api/email"]);
-
-export async function requirePublicLocale(c: Context, next: Next) {
-  if (!c.req.path.startsWith("/api/")) return next();
-  if (PUBLIC_LOCALE_EXEMPT.has(c.req.path)) return next();
-
+function resolveRequestLocale(c: Context): Locale {
   const acceptLanguage = (c.req.header("Accept-Language") ?? "").toLowerCase();
   const preferred = acceptLanguage
     .split(",")
@@ -21,7 +17,11 @@ export async function requirePublicLocale(c: Context, next: Next) {
     .filter(Boolean)
     .map((token) => token?.split("-")[0] ?? "");
   const matched = preferred.find((locale) => normalizeLocale(locale) === locale);
-  const locale = matched ? normalizeLocale(matched) : DEFAULT_LOCALE;
+  return matched ? normalizeLocale(matched) : DEFAULT_LOCALE;
+}
+
+export async function requireRequestLocale(c: Context, next: Next) {
+  const locale = resolveRequestLocale(c);
   c.set("locale", locale);
   c.header("Content-Language", locale);
   c.header("Vary", "Accept-Language");

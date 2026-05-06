@@ -84,13 +84,15 @@ export async function listProjectsLocalized(locale: Locale, statusCode?: Project
   return query.execute();
 }
 
-export async function listAdminProjects(statusCode?: ProjectStatusCode, q?: string): Promise<AdminProjectListItem[]> {
+export async function listAdminProjects(
+  locale: Locale,
+  statusCode?: ProjectStatusCode,
+  q?: string,
+): Promise<AdminProjectListItem[]> {
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
-      join
-        .onRef("project_translation.projectId", "=", "project.id")
-        .on("project_translation.locale", "=", DEFAULT_LOCALE),
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
     )
     .select([
       "project.id as id",

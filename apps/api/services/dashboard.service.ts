@@ -1,5 +1,6 @@
 import { db } from "../db/client.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
+import { type Locale } from "../lib/public-locale.js";
 
 export interface DashboardCountItem<TCode extends string = string> {
   code: TCode;
@@ -11,14 +12,14 @@ function numericCount(value: string | number | bigint | null | undefined): numbe
   return Number(value ?? 0);
 }
 
-export async function getDashboardSummary() {
+export async function getDashboardSummary(locale: Locale = DEFAULT_LOCALE) {
   const [membersByTypeRows, publicationsByKindRows] = await Promise.all([
     db
       .selectFrom("member")
       .innerJoin("member_type_translation", (join) =>
         join
           .onRef("member_type_translation.memberTypeCode", "=", "member.memberTypeCode")
-          .on("member_type_translation.locale", "=", DEFAULT_LOCALE),
+          .on("member_type_translation.locale", "=", locale),
       )
       .select((eb) => [
         "member.memberTypeCode as code",
@@ -33,7 +34,7 @@ export async function getDashboardSummary() {
       .innerJoin("publication_kind_translation", (join) =>
         join
           .onRef("publication_kind_translation.publicationKindCode", "=", "publication.kindCode")
-          .on("publication_kind_translation.locale", "=", DEFAULT_LOCALE),
+          .on("publication_kind_translation.locale", "=", locale),
       )
       .select((eb) => [
         "publication.kindCode as code",

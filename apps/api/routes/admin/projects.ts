@@ -49,8 +49,9 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", zValidator("query", FilterQuery), async (c) => {
+  const locale = c.get("locale");
   const { statusCode, q } = c.req.valid("query");
-  return c.json(await listAdminProjects(statusCode, q));
+  return c.json(await listAdminProjects(locale, statusCode, q));
 });
 
 router.post("/", zValidator("json", ProjectBody), async (c) => {

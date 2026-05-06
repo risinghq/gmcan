@@ -66,8 +66,9 @@ const FilterQuery = z.object({
 });
 
 router.get("/", requirePermission("members.read"), zValidator("query", FilterQuery), async (c) => {
+  const locale = c.get("locale");
   const { q, isActive, memberTypeCode } = c.req.valid("query");
-  return c.json(await listAdminMembers({ q, isActive, memberTypeCode }));
+  return c.json(await listAdminMembers(locale, { q, isActive, memberTypeCode }));
 });
 
 router.get(

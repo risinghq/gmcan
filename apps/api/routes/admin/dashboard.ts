@@ -6,7 +6,8 @@ import { getDashboardSummary } from "../../services/dashboard.service.js";
 const router = new Hono();
 
 router.get("/summary", requirePermission("analytics.read"), async (c) => {
-  return c.json(await getDashboardSummary());
+  const locale = c.get("locale");
+  return c.json(await getDashboardSummary(locale));
 });
 
 export default router;

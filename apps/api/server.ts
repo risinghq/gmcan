@@ -6,7 +6,7 @@ import { getFrontendUrl } from "./config.js";
 import { bootstrap } from "./db/bootstrap.js";
 import { loadActor } from "./middleware/authz.js";
 import { onError } from "./middleware/error.js";
-import { requirePublicLocale } from "./middleware/public-locale.js";
+import { requireRequestLocale } from "./middleware/public-locale.js";
 import { requireSession } from "./middleware/session.js";
 import AdminAccountRoutes from "./routes/admin/account.js";
 import AdminAssetsRoutes from "./routes/admin/assets.js";
@@ -54,7 +54,8 @@ app.use(
 );
 
 // Public API
-app.use("/api/*", requirePublicLocale);
+app.route("/api/email", PublicEmailRoutes);
+app.use("/api/*", requireRequestLocale);
 app.route("/api/publications", PublicPublicationsRoutes);
 app.route("/api/members", PublicMembersRoutes);
 app.route("/api/projects", PublicProjectsRoutes);
@@ -67,11 +68,11 @@ app.route("/api/equipment", PublicEquipmentRoutes);
 app.route("/api/group", PublicGroupRoutes);
 app.route("/api/lookup", PublicLookupRoutes);
 app.route("/api/search", PublicSearchRoutes);
-app.route("/api/email", PublicEmailRoutes);
 app.route("/api/assets", PublicAssetsRoutes);
 
 // Admin API
 // All routes under /admin/* require session (login/logout exempted in middleware)
+app.use("/admin/*", requireRequestLocale);
 app.use("/admin/*", requireSession);
 app.use("/admin/*", loadActor);
 app.route("/admin/auth", AdminAuthRoutes);

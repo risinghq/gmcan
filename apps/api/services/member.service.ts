@@ -28,21 +28,24 @@ export async function listMembersLocalized(locale: Locale) {
   return publicLocalizedMemberSelectQuery(locale).execute();
 }
 
-export async function listAdminMembers(filter?: {
-  isActive?: number;
-  memberTypeCode?: MemberTypeCode;
-  q?: string;
-}): Promise<AdminMemberListItem[]> {
+export async function listAdminMembers(
+  locale: Locale,
+  filter?: {
+    isActive?: number;
+    memberTypeCode?: MemberTypeCode;
+    q?: string;
+  },
+): Promise<AdminMemberListItem[]> {
   let query = db
     .selectFrom("member")
     .leftJoin("member_type", "member_type.code", "member.memberTypeCode")
     .leftJoin("member_type_translation", (join) =>
       join
         .onRef("member_type_translation.memberTypeCode", "=", "member_type.code")
-        .on("member_type_translation.locale", "=", DEFAULT_LOCALE),
+        .on("member_type_translation.locale", "=", locale),
     )
     .leftJoin("member_translation", (join) =>
-      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", DEFAULT_LOCALE),
+      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
     )
     .leftJoin("prefix", "prefix.code", "member.prefixCode")
     .select([
@@ -105,11 +108,11 @@ export async function listAdminMembers(filter?: {
 
       const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
       const missingTranslations: Record<string, string[]> = {};
-      for (const locale of SUPPORTED_LOCALES) {
+      for (const supportedLocale of SUPPORTED_LOCALES) {
         const missing: string[] = [];
-        const bio = memberTranslations.get(locale);
+        const bio = memberTranslations.get(supportedLocale);
         if (!bio || bio.trim().length === 0) missing.push("bio");
-        if (missing.length > 0) missingTranslations[locale] = missing;
+        if (missing.length > 0) missingTranslations[supportedLocale] = missing;
       }
 
       return {
