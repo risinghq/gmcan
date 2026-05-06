@@ -21,6 +21,7 @@ import type { AdminProjectListItem } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import type { FundingSourceItem } from "@app/shared/services/ref.service";
+import { RefService } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
 @Component({
@@ -50,6 +51,7 @@ export default class ProyectosComponent implements OnInit {
   router = inject(Router);
   projectService = inject(ProjectService);
   lookup = inject(LookupService);
+  private refService = inject(RefService);
   private tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
@@ -73,23 +75,26 @@ export default class ProyectosComponent implements OnInit {
     if (window.location.href.includes("ejecucion")) {
       this.ejecucion = true;
       this.loadFundingSources();
-      this.loadList(1);
+      this.loadList(true);
     } else {
-      this.loadList(0);
+      this.loadList(false);
     }
   }
 
   loadFundingSources(): void {
-    const sources = this.lookup.fundingSources();
-    this.fundingSources = sources;
-    this.dataSource2 = new MatTableDataSource(this.fundingSources);
-    this.dataSource2.sort = this.sort2();
-    this.dataSource2.paginator = this.paginator2();
+    this.refService.listFundingSources().subscribe((sources) => {
+      this.fundingSources = sources;
+      this.dataSource2 = new MatTableDataSource(this.fundingSources);
+      this.dataSource2.sort = this.sort2();
+      this.dataSource2.paginator = this.paginator2();
+    });
   }
 
-  loadList(status: number): void {
+  loadList(activeMode: boolean): void {
     this.projectService.listAdminProjects().subscribe((rows) => {
-      this.items = status === 1 ? rows.filter((item) => item.status === 1) : rows.filter((item) => item.status !== 1);
+      this.items = activeMode
+        ? rows.filter((item) => item.statusCode === "active")
+        : rows.filter((item) => item.statusCode !== "active");
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();

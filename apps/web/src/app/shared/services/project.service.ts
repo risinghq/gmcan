@@ -7,16 +7,15 @@ import type { Project, ProjectWithMembers } from "../models/project";
 import { GLOBAL } from "./global";
 
 export interface ProjectBody {
-  title: string;
   code: string;
-  fundedAmount: string;
-  description: string;
-  status?: number;
+  fundedAmountMinor: number;
+  statusCode?: "planned" | "active" | "completed" | "archived";
   startDate: string;
   endDate?: string;
   researchLineId: number;
-  currencyId: number;
-  fundingSourceId: number;
+  currencyCode: "pen" | "usd";
+  fundingSourceCode: "vrip" | "none";
+  translations: Record<string, { title: string; description: string }>;
 }
 
 @Injectable({ providedIn: "root" })

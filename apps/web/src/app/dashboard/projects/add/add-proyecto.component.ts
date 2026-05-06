@@ -10,7 +10,7 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
-import type { Member } from "@app/shared/models/member";
+import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -76,7 +76,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   researchLines: ResearchLine[] = [];
   proyectoForm: FormGroup;
   get monedas() {
-    return this.lookup.monedas();
+    return this.lookup.currencies();
   }
   get fundingSources() {
     return this.lookup.fundingSources();
@@ -94,10 +94,10 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
       code: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       startDate: [null, [Validators.required]],
       researchLineId: ["", [Validators.required]],
-      fundingSourceId: ["", [Validators.required]],
-      currencyId: ["", [Validators.required]],
+      fundingSourceCode: ["", [Validators.required]],
+      currencyCode: ["", [Validators.required]],
       description: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fundedAmount: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fundedAmountMinor: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       endDate: [null],
     });
   }
@@ -120,7 +120,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   }
 
   loadMembers(): void {
-    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
       if (result) {
         const sortedMembers = result.toSorted((a, b) => a.firstName.localeCompare(b.firstName));
         this.memberOptions = sortedMembers.map((m) => ({
@@ -252,23 +252,22 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
       code: string;
       startDate: Date | null;
       researchLineId: number;
-      fundingSourceId: number;
-      currencyId: number;
+      fundingSourceCode: "vrip" | "none";
+      currencyCode: "pen" | "usd";
       description: string;
-      fundedAmount: string;
+      fundedAmountMinor: string;
       endDate: Date | null;
     };
 
     return {
-      title: form.title,
       code: form.code,
-      fundedAmount: form.fundedAmount,
-      description: form.description,
+      fundedAmountMinor: Number(form.fundedAmountMinor),
       startDate: toIsoDate(form.startDate ?? new Date()),
       endDate: form.endDate ? toIsoDate(form.endDate) : undefined,
       researchLineId: form.researchLineId,
-      currencyId: form.currencyId,
-      fundingSourceId: form.fundingSourceId,
+      currencyCode: form.currencyCode,
+      fundingSourceCode: form.fundingSourceCode,
+      translations: { es: { title: form.title, description: form.description } },
     };
   }
 

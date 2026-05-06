@@ -78,8 +78,8 @@ export default class LinesInvestigationComponent implements OnInit {
       lineas: this.researchLinesService.list(),
       projects: this.projectService.listProjects(),
     }).subscribe(({ lineas, projects }) => {
-      const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.id, f]));
-      const monedasMap = new Map(this.lookup.monedas().map((m) => [m.idMoneda, m]));
+      const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.code, f]));
+      const monedasMap = new Map(this.lookup.currencies().map((m) => [m.code, m]));
 
       const enrichedProjects = projects.map(
         (project): ProjectDisplay => this.enrichProject(project, lineas, fuentesMap, monedasMap),
@@ -119,16 +119,16 @@ export default class LinesInvestigationComponent implements OnInit {
   private enrichProject(
     project: ProjectWithMembers,
     lineas: ResearchLine[],
-    fuentesMap: Map<number, { name?: string }>,
-    monedasMap: Map<number, { simbolo?: string }>,
+    fuentesMap: Map<string, { name?: string }>,
+    monedasMap: Map<string, { symbol?: string }>,
   ): ProjectDisplay {
     return {
       ...project,
       fechaI: this.formatMonth(project.startDate),
       fechaF: project.endDate ? this.formatMonth(project.endDate) : undefined,
       lineasInvestigacion: lineas.find((line) => line.id === project.researchLineId)?.name,
-      fuenteFinanciamiento: fuentesMap.get(project.fundingSourceId)?.name,
-      moneda: monedasMap.get(project.currencyId)?.simbolo,
+      fuenteFinanciamiento: fuentesMap.get(project.fundingSourceCode)?.name,
+      moneda: monedasMap.get(project.currencyCode)?.symbol,
     };
   }
 

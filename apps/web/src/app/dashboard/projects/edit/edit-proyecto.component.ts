@@ -21,7 +21,7 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
-import type { Member } from "@app/shared/models/member";
+import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import type { Project } from "@app/shared/models/project";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
@@ -92,7 +92,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   researchLines: ResearchLine[] = [];
   proyectoForm: FormGroup;
   get monedas() {
-    return this.lookup.monedas();
+    return this.lookup.currencies();
   }
   get fundingSources() {
     return this.lookup.fundingSources();
@@ -100,7 +100,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
 
   disableSelect = false;
   private projectId = 0;
-  private projectStatus: number | null = null;
+  private projectStatus: Project["statusCode"] | null = null;
 
   miembrosProyecto: ProjectMemberRow[] = [];
   private originalMemberIds: number[] = [];
@@ -111,10 +111,10 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
       code: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       startDate: [null, [Validators.required]],
       researchLineId: ["", [Validators.required]],
-      fundingSourceId: ["", [Validators.required]],
-      currencyId: ["", [Validators.required]],
+      fundingSourceCode: ["", [Validators.required]],
+      currencyCode: ["", [Validators.required]],
       description: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      fundedAmount: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      fundedAmountMinor: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
       endDate: [null],
     });
   }
@@ -132,19 +132,19 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
 
   private bindProject(result: Project): void {
     this.projectId = result.id;
-    this.projectStatus = result.status;
+    this.projectStatus = result.statusCode;
     this.proyectoForm.patchValue({
       title: result.title,
       code: result.code,
       startDate: requireLocalDate(result.startDate, "project.startDate"),
       researchLineId: result.researchLineId,
-      fundingSourceId: result.fundingSourceId,
-      currencyId: result.currencyId,
+      fundingSourceCode: result.fundingSourceCode,
+      currencyCode: result.currencyCode,
       description: result.description,
-      fundedAmount: result.fundedAmount,
+      fundedAmountMinor: result.fundedAmountMinor,
       endDate: parseLocalDate(result.endDate ?? undefined) ?? null,
     });
-    if (result.status === 0) {
+    if (result.statusCode === "completed") {
       this.terminado = true;
       this.disableSelect = true;
       this.button_text2 = "Reactivar proyecto";
@@ -163,7 +163,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   loadMembers(): void {
-    this.memberService.listAdminMembers().subscribe((result: Member[]) => {
+    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
       if (result) {
         result.sort((a, b) => a.firstName.localeCompare(b.firstName));
         this.memberOptions = result.map((m) => ({
@@ -282,14 +282,16 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   }
 
   projectEnd(): void {
-    const newStatus = this.projectStatus === 1 ? 0 : 1;
+    const newStatus = this.projectStatus === "active" ? "completed" : "active";
     this.projectService
-      .updateProject(this.projectId, this.buildProjectBody({ status: newStatus }))
+      .updateProject(this.projectId, this.buildProjectBody({ statusCode: newStatus }))
       .subscribe((result) => {
         if (result.status === 1) {
           this.proyectoForm.markAsPristine();
           this.return();
-          this.openSnackBar(newStatus === 0 ? "Proyecto concluido exitosamente" : "Proyecto reactivado exitosamente");
+          this.openSnackBar(
+            newStatus === "completed" ? "Proyecto concluido exitosamente" : "Proyecto reactivado exitosamente",
+          );
         }
       });
   }
@@ -332,23 +334,22 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
       code: string;
       startDate: Date | null;
       researchLineId: number;
-      fundingSourceId: number;
-      currencyId: number;
+      fundingSourceCode: "vrip" | "none";
+      currencyCode: "pen" | "usd";
       description: string;
-      fundedAmount: string;
+      fundedAmountMinor: number | string;
       endDate: Date | null;
     };
 
     return {
-      title: form.title,
       code: form.code,
-      fundedAmount: form.fundedAmount,
-      description: form.description,
+      fundedAmountMinor: Number(form.fundedAmountMinor),
       startDate: toIsoDate(form.startDate ?? new Date()),
       endDate: form.endDate ? toIsoDate(form.endDate) : undefined,
       researchLineId: form.researchLineId,
-      currencyId: form.currencyId,
-      fundingSourceId: form.fundingSourceId,
+      currencyCode: form.currencyCode,
+      fundingSourceCode: form.fundingSourceCode,
+      translations: { es: { title: form.title, description: form.description } },
       ...extra,
     };
   }

@@ -132,7 +132,7 @@ export default class NewsListComponent implements OnInit {
   }
 
   onStatusChange(event: Event): void {
-    this.statusFilter = (event.target as HTMLSelectElement).value;
+    this.statusFilter = (event.target as HTMLSelectElement).value as "" | "draft" | "published" | "archived";
     this.pageIndex = 0;
     this.loadNews();
   }

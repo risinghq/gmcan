@@ -85,9 +85,9 @@
             <div class="text-category">Fuente de financiamiento <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Seleccionar fuente de financiamiento</mat-label>
-              <mat-select formControlName="fundingSourceId" name="fundingSourceId">
+              <mat-select formControlName="fundingSourceCode" name="fundingSourceCode">
                 @for (fundingSource of fundingSources; track fundingSource) {
-                  <mat-option [value]="fundingSource.id">{{ fundingSource.name }}</mat-option>
+                  <mat-option [value]="fundingSource.code">{{ fundingSource.name }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -96,9 +96,9 @@
             <div class="text-category">Moneda <span class="red-text">*</span></div>
             <mat-form-field class="input-category" floatLabel="auto">
               <mat-label>Tipo</mat-label>
-              <mat-select formControlName="currencyId" name="currencyId">
+              <mat-select formControlName="currencyCode" name="currencyCode">
                 @for (moneda of monedas; track moneda) {
-                  <mat-option [value]="moneda.idMoneda">{{ moneda.simbolo }}</mat-option>
+                  <mat-option [value]="moneda.code">{{ moneda.symbol }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -106,7 +106,7 @@
           <div class="full-width">
             <div class="full-width">
               <div class="text-category">Monto financiado <span class="red-text">*</span></div>
-              <input formControlName="fundedAmount" name="fundedAmount" class="input-category" required />
+              <input formControlName="fundedAmountMinor" name="fundedAmountMinor" class="input-category" required />
             </div>
           </div>
         </div>
