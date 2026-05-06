@@ -1,5 +1,5 @@
-import type { AuthorEntry } from "./author";
 import type { AssetLinks } from "./asset";
+import type { AuthorEntry } from "./author";
 
 export interface SearchResults {
   publications: {
