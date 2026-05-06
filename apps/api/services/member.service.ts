@@ -1,29 +1,19 @@
 import { db } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
-import { publicProfile } from "../db/views.js";
-import { DEFAULT_LOCALE } from "../lib/locales.js";
+import { memberProjects, memberPublications, publicProfile } from "../db/views.js";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
-
-type MemberProfile = Awaited<ReturnType<typeof publicProfile>>;
-type PublicProfileMember = NonNullable<MemberProfile["member"]>;
-type LocalizedMember = PublicProfileMember & { localizedBio: string | null };
-type MemberProfileLocalized = Omit<MemberProfile, "member"> & { member: LocalizedMember | undefined };
+import { localizedMemberSelectQuery } from "./member-read-model.js";
 
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
 }
 
 export async function listMembersLocalized(locale: Locale) {
-  return db
-    .selectFrom("member")
-    .innerJoin("member_translation", (join) =>
-      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
-    )
-    .select([...MEMBER_PUBLIC, "member_translation.bio as localizedBio"])
-    .execute();
+  return localizedMemberSelectQuery(locale).execute();
 }
 
 export async function listAdminMembers(filter?: {
@@ -39,6 +29,9 @@ export async function listAdminMembers(filter?: {
         .onRef("member_type_translation.memberTypeId", "=", "member_type.id")
         .on("member_type_translation.locale", "=", DEFAULT_LOCALE),
     )
+    .leftJoin("member_translation", (join) =>
+      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", DEFAULT_LOCALE),
+    )
     .leftJoin("prefix", "prefix.id", "member.prefixId")
     .select([
       "member.id",
@@ -48,7 +41,7 @@ export async function listAdminMembers(filter?: {
       "member.lastName",
       "member.maternalName",
       "member.birthDate",
-      "member.bio",
+      "member_translation.bio as bio",
       "member.status",
       "member.roleId",
       "member.memberTypeId",
@@ -112,22 +105,25 @@ export async function getMember(id: number) {
 export async function getMemberFull(id: number) {
   return db
     .selectFrom("member")
+    .leftJoin("member_translation", (join) =>
+      join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", DEFAULT_LOCALE),
+    )
     .select([
-      "id",
-      "dni",
-      "email",
-      "firstName",
-      "lastName",
-      "maternalName",
-      "birthDate",
-      "bio",
-      "status",
-      "roleId",
-      "memberTypeId",
-      "prefixId",
-      "genderId",
+      "member.id as id",
+      "member.dni as dni",
+      "member.email as email",
+      "member.firstName as firstName",
+      "member.lastName as lastName",
+      "member.maternalName as maternalName",
+      "member.birthDate as birthDate",
+      "member_translation.bio as bio",
+      "member.status as status",
+      "member.roleId as roleId",
+      "member.memberTypeId as memberTypeId",
+      "member.prefixId as prefixId",
+      "member.genderId as genderId",
     ])
-    .where("id", "=", id)
+    .where("member.id", "=", id)
     .executeTakeFirst();
 }
 
@@ -147,19 +143,13 @@ export async function getMemberProfile(id: number) {
   return publicProfile(id);
 }
 
-export async function getMemberProfileLocalized(id: number, locale: Locale): Promise<MemberProfileLocalized> {
-  const profile = await publicProfile(id);
-  if (!profile.member) return { ...profile, member: undefined };
-  const tr = await db
-    .selectFrom("member_translation")
-    .select("bio")
-    .where("memberId", "=", id)
-    .where("locale", "=", locale)
-    .executeTakeFirstOrThrow();
-  return {
-    ...profile,
-    member: { ...profile.member, localizedBio: tr.bio },
-  };
+export async function getMemberProfileLocalized(id: number, locale: Locale) {
+  const [member, projects, publications] = await Promise.all([
+    localizedMemberSelectQuery(locale).where("member.id", "=", id).executeTakeFirst(),
+    memberProjects(id),
+    memberPublications(id),
+  ]);
+  return { member, projects, publications };
 }
 
 export async function searchMembers(q: string) {
@@ -225,6 +215,15 @@ export async function verifyDniExists(dni: string) {
   return db.selectFrom("member").select("id").where("dni", "=", dni).executeTakeFirst();
 }
 
+async function replaceMemberBioTranslations(memberId: number, bio?: string) {
+  const rows = SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: bio ?? null }));
+  await db
+    .insertInto("member_translation")
+    .values(rows)
+    .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet({ bio: bio ?? null }))
+    .execute();
+}
+
 export async function createMember(data: {
   dni: string;
   email: string;
@@ -251,8 +250,10 @@ export async function createMember(data: {
       createdAt: today,
       updatedAt: today,
     })
-    .executeTakeFirst();
-  return Number(result.insertId);
+    .executeTakeFirstOrThrow();
+  const memberId = Number(result.insertId);
+  await replaceMemberBioTranslations(memberId, data.bio);
+  return memberId;
 }
 
 export async function updateMember(
@@ -274,9 +275,22 @@ export async function updateMember(
   const today = new Date().toISOString().split("T")[0];
   await db
     .updateTable("member")
-    .set({ ...data, updatedAt: today })
+    .set({
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      maternalName: data.maternalName,
+      birthDate: data.birthDate,
+      status: data.status,
+      roleId: data.roleId,
+      memberTypeId: data.memberTypeId,
+      prefixId: data.prefixId,
+      genderId: data.genderId,
+      updatedAt: today,
+    })
     .where("id", "=", id)
     .execute();
+  await replaceMemberBioTranslations(id, data.bio);
 }
 
 export async function deleteMember(id: number) {
