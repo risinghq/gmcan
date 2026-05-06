@@ -2,6 +2,12 @@ import { db } from "../db/client.js";
 import { type Locale } from "../lib/public-locale.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
+type PublicationAuthorEntry =
+  | { kind: "registered"; memberId: number; authorOrder: number; name: string }
+  | { kind: "external"; name: string; authorOrder: number };
+
+type ProjectMemberEntry = { memberId: number; name: string };
+
 export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
   const like = `%${q}%`;
 
@@ -142,7 +148,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     })),
   );
 
-  const authorsByPublication = new Map<number, unknown[]>();
+  const authorsByPublication = new Map<number, PublicationAuthorEntry[]>();
   for (const row of resolvedPublicationAuthors) {
     const current = authorsByPublication.get(row.publicationId) ?? [];
     current.push(row.entry);
@@ -172,7 +178,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     })),
   );
 
-  const membersByProject = new Map<number, unknown[]>();
+  const membersByProject = new Map<number, ProjectMemberEntry[]>();
   for (const row of resolvedProjectMembers) {
     const current = membersByProject.get(row.projectId) ?? [];
     current.push(row.entry);
