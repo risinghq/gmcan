@@ -2,6 +2,8 @@ import { db } from "../db/client.js";
 import { SUPPORTED_LOCALES } from "../lib/locales.js";
 import type { Locale } from "../lib/public-locale.js";
 
+const REQUIRED_TRANSLATED_FIELDS = ["bio"] as const;
+
 export function localizedMemberSelectQuery(locale: Locale) {
   return db
     .selectFrom("member")
@@ -30,20 +32,28 @@ export function publicLocalizedMemberSelectQuery(locale: Locale) {
     .where("member.dni", "!=", "")
     .where("member.email", "!=", "")
     .where("member.firstName", "!=", "")
-    .where("member.lastName", "!=", "")
-    .where("member_translation.bio", "is not", null)
-    .where("member_translation.bio", "!=", "");
+    .where("member.lastName", "!=", "");
+
+  for (const field of REQUIRED_TRANSLATED_FIELDS) {
+    query = query
+      .where(`member_translation.${field}` as "member_translation.bio", "is not", null)
+      .where(`member_translation.${field}` as "member_translation.bio", "!=", "");
+  }
 
   for (const requiredLocale of SUPPORTED_LOCALES) {
     query = query.where((eb) =>
       eb.exists(
-        eb
-          .selectFrom("member_translation as required_translation")
-          .select("required_translation.memberId")
-          .whereRef("required_translation.memberId", "=", "member.id")
-          .where("required_translation.locale", "=", requiredLocale)
-          .where("required_translation.bio", "is not", null)
-          .where("required_translation.bio", "!=", ""),
+        REQUIRED_TRANSLATED_FIELDS.reduce(
+          (inner, field) =>
+            inner
+              .where(`required_translation.${field}` as "required_translation.bio", "is not", null)
+              .where(`required_translation.${field}` as "required_translation.bio", "!=", ""),
+          eb
+            .selectFrom("member_translation as required_translation")
+            .select("required_translation.memberId")
+            .whereRef("required_translation.memberId", "=", "member.id")
+            .where("required_translation.locale", "=", requiredLocale),
+        ),
       ),
     );
   }

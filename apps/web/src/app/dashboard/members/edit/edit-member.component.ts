@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { Component, OnInit, HostListener, inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -21,7 +21,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router, ActivatedRoute } from "@angular/router";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createMemberFull } from "@app/shared/models/factories";
-import type { MemberFull } from "@app/shared/models/member";
+import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -37,7 +37,6 @@ import { AutosizeModule } from "ngx-autosize";
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,
-    FormsModule,
     ReactiveFormsModule,
     MatFormField,
     MatLabel,
@@ -65,8 +64,6 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   public memberForm: FormGroup;
   member: MemberFull;
   segundoNombre = "";
-  birthDateObj?: Date;
-  password = "";
   private oldEmail = "";
   get tipoMiembros() {
     return this.lookup.memberTypes();
@@ -84,6 +81,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   edit = true;
   selectedBioLocale = "es";
   bioByLocale: Record<string, string> = {};
+  publishability: MemberPublishability | null = null;
 
   constructor() {
     this.memberForm = this.formBuilder.group({
@@ -125,6 +123,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       this.setBioForSelectedLocale(bio ?? "");
     });
     this.bindUser(this.route.snapshot.data["member"] as MemberFull);
+    this.loadPublishability();
   }
 
   isDirty(): boolean {
@@ -135,19 +134,32 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     this.memberForm.controls["dni"].disable();
     this.member = result;
     this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
-    this.memberForm.controls["bio"].setValue(this.bioByLocale[this.selectedBioLocale] ?? "", { emitEvent: false });
     this.oldEmail = result.email ?? "";
 
-    if (result.birthDate) {
-      this.birthDateObj = parseLocalDate(result.birthDate);
-    }
-
+    const birthDate = result.birthDate ? parseLocalDate(result.birthDate) : null;
     if (result.firstName.includes(" ")) {
       const parts = result.firstName.split(" ");
       this.member.firstName = parts[0] ?? "";
       this.segundoNombre = parts.slice(1).join(" ");
     }
 
+    this.memberForm.patchValue(
+      {
+        firstName: this.member.firstName,
+        middleName: this.segundoNombre,
+        lastName: result.lastName,
+        maternalName: result.maternalName ?? "",
+        birthDate,
+        email: result.email,
+        genderId: result.genderId ?? "",
+        prefixId: result.prefixId ?? "",
+        memberTypeId: result.memberTypeId,
+        dni: result.dni,
+        bioLocale: this.selectedBioLocale,
+        bio: this.bioByLocale[this.selectedBioLocale] ?? "",
+      },
+      { emitEvent: false },
+    );
     this.memberForm.controls["confirmPassword"].setValue("");
   }
 
@@ -171,41 +183,41 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
 
   addMember(): void {
     if (this.memberForm.valid) {
-      const firstName = this.segundoNombre
-        ? `${this.member.firstName} ${this.segundoNombre}`.trim()
-        : this.member.firstName;
-      const birthDate = this.birthDateObj ? toIsoDate(this.birthDateObj) : undefined;
+      const values = this.memberForm.getRawValue();
+      const firstName = values.middleName ? `${values.firstName} ${values.middleName}`.trim() : values.firstName;
+      const birthDate = values.birthDate ? toIsoDate(values.birthDate) : undefined;
 
       let status: number;
       if (this.adHono === 3) {
         status = 3;
       } else if (this.oldMem === 0) {
         status = 0;
-      } else if (!this.member.status) {
+      } else if (!values.status) {
         status = 1;
       } else {
-        status = this.member.status;
+        status = values.status;
       }
 
       const doUpdate = () => {
+        const password = values.password;
         const confirmPass = this.memberForm.controls["confirmPassword"].value;
-        if (this.password && this.password !== confirmPass) {
+        if (password && password !== confirmPass) {
           this.openSnackBar("Las contraseñas no coinciden", "err-snackbar");
           this.errPass = true;
           return;
         }
         this.memberService
           .updateMember(this.member.id, {
-            email: this.member.email,
+            email: values.email,
             firstName,
-            lastName: this.member.lastName,
-            maternalName: this.member.maternalName ?? undefined,
+            lastName: values.lastName,
+            maternalName: values.maternalName ?? undefined,
             birthDate,
             status,
             roleId: this.member.roleId,
-            memberTypeId: this.member.memberTypeId,
-            prefixId: this.member.prefixId ?? undefined,
-            genderId: this.member.genderId ?? undefined,
+            memberTypeId: values.memberTypeId,
+            prefixId: values.prefixId || undefined,
+            genderId: values.genderId || undefined,
             translation: { locale: this.selectedBioLocale, bio: this.bioByLocale[this.selectedBioLocale] ?? "" },
           })
           .subscribe((res) => {
@@ -214,14 +226,15 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
                 this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
               }
               this.openSnackBar("Miembro actualizado exitosamente");
+              this.loadPublishability();
               this.memberForm.markAsPristine();
               this.return();
             }
           });
       };
 
-      if (this.oldEmail !== this.member.email) {
-        this.memberService.verifyEmail(this.member.email).subscribe((result) => {
+      if (this.oldEmail !== values.email) {
+        this.memberService.verifyEmail(values.email).subscribe((result) => {
           if (!result.exists) {
             doUpdate();
           } else {
@@ -277,6 +290,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     this.memberService.getMemberTranslation(this.member.id, locale).subscribe((row) => {
       this.bioByLocale[locale] = row.bio ?? "";
       this.memberForm.controls["bio"].setValue(this.bioByLocale[locale] ?? "", { emitEvent: false });
+      this.loadPublishability();
     });
   }
 
@@ -286,6 +300,27 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
 
   bioLength(): number {
     return (this.bioByLocale[this.selectedBioLocale] ?? "").length;
+  }
+
+  missingRequirementsCount(): number {
+    if (!this.publishability) return 0;
+    return (
+      this.publishability.missing.base.length +
+      Object.values(this.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
+    );
+  }
+
+  publishabilityTooltip(): string {
+    if (!this.publishability) return "Estado de publicación no disponible";
+    if (this.publishability.publishable) return "Ready para mostrarse en público";
+    return `Borrador: ${this.missingRequirementsCount()} requisito(s) pendiente(s)`;
+  }
+
+  private loadPublishability(): void {
+    if (!this.member.id) return;
+    this.memberService.getMemberPublishability(this.member.id).subscribe((data) => {
+      this.publishability = data;
+    });
   }
 
   private dialogRef2?: MatDialogRef<DialogCancel5>;

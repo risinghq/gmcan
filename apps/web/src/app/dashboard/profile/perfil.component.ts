@@ -15,7 +15,7 @@ import { MatInput } from "@angular/material/input";
 import { MatOption, MatSelect } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { createMemberFull } from "@app/shared/models/factories";
-import type { MemberFull } from "@app/shared/models/member";
+import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -73,6 +73,7 @@ export default class PerfilComponent implements OnInit {
   }
   selectedBioLocale = "es";
   bioByLocale: Record<string, string> = {};
+  publishability: MemberPublishability | null = null;
 
   member: MemberFull = { ...createMemberFull() };
   memberId: number | null = null;
@@ -176,6 +177,7 @@ export default class PerfilComponent implements OnInit {
         status: (result.status as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
       });
       this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
+      this.loadPublishability();
     });
   }
 
@@ -284,10 +286,32 @@ export default class PerfilComponent implements OnInit {
     this.memberService.getMemberTranslation(this.memberId, locale).subscribe((row) => {
       this.bioByLocale[locale] = row.bio ?? "";
       this.profileForm.controls.bio.setValue(this.bioByLocale[locale]);
+      this.loadPublishability();
     });
   }
 
   onBioChange(value: string): void {
     this.bioByLocale[this.selectedBioLocale] = value;
+  }
+
+  missingRequirementsCount(): number {
+    if (!this.publishability) return 0;
+    return (
+      this.publishability.missing.base.length +
+      Object.values(this.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
+    );
+  }
+
+  publishabilityTooltip(): string {
+    if (!this.publishability) return "Estado de publicación no disponible";
+    if (this.publishability.publishable) return "Ready para mostrarse en público";
+    return `Borrador: ${this.missingRequirementsCount()} requisito(s) pendiente(s)`;
+  }
+
+  private loadPublishability(): void {
+    if (this.memberId == null) return;
+    this.memberService.getMemberPublishability(this.memberId).subscribe((data) => {
+      this.publishability = data;
+    });
   }
 }

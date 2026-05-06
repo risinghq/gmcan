@@ -60,11 +60,15 @@ export function requirePermission(permission: Permission): MiddlewareHandler {
   };
 }
 
-export function requireSelfOrPermission(
-  resourceParam: string,
-  selfPermission: Permission,
-  elevatedPermission: Permission,
-): MiddlewareHandler {
+interface SelfOrPermissionGuardOptions {
+  resourceParam: string;
+  selfPermission: Permission;
+  elevatedPermission: Permission;
+}
+
+export function requireSelfOrPermission(options: SelfOrPermissionGuardOptions): MiddlewareHandler {
+  const { resourceParam, selfPermission, elevatedPermission } = options;
+
   return async (c, next) => {
     const actor = c.get("actor");
     const resourceRaw = c.req.param(resourceParam);

@@ -123,9 +123,40 @@ router.put(
   },
 );
 
+router.patch(
+  "/:id",
+  requirePermission("members.write"),
+  zValidator("param", IdParam),
+  zValidator("json", UpdateBody.partial()),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const patch = c.req.valid("json");
+    const current = await getMemberFull(id);
+    if (!current) return c.json({ error: "Not found" }, 404);
+    await updateMember(id, {
+      email: patch.email ?? current.email,
+      firstName: patch.firstName ?? current.firstName,
+      lastName: patch.lastName ?? current.lastName,
+      maternalName: patch.maternalName !== undefined ? patch.maternalName : (current.maternalName ?? undefined),
+      birthDate: patch.birthDate !== undefined ? patch.birthDate : (current.birthDate ?? undefined),
+      status: patch.status ?? current.status,
+      roleId: patch.roleId ?? current.roleId,
+      memberTypeId: patch.memberTypeId ?? current.memberTypeId,
+      prefixId: patch.prefixId !== undefined ? patch.prefixId : (current.prefixId ?? undefined),
+      genderId: patch.genderId !== undefined ? patch.genderId : (current.genderId ?? undefined),
+      translation: patch.translation,
+    });
+    return c.json(okStatus());
+  },
+);
+
 router.put(
   "/:id/translations/:locale",
-  requireSelfOrPermission("id", "account.self.write", "members.write"),
+  requireSelfOrPermission({
+    resourceParam: "id",
+    selfPermission: "account.self.write",
+    elevatedPermission: "members.write",
+  }),
   zValidator("param", IdParam.extend({ locale: LocaleCodeSchema })),
   zValidator("json", z.object({ bio: z.string() })),
   async (c) => {
@@ -138,7 +169,11 @@ router.put(
 
 router.get(
   "/:id/translations/:locale",
-  requireSelfOrPermission("id", "account.self.read", "members.read"),
+  requireSelfOrPermission({
+    resourceParam: "id",
+    selfPermission: "account.self.read",
+    elevatedPermission: "members.read",
+  }),
   zValidator("param", IdParam.extend({ locale: LocaleCodeSchema })),
   async (c) => {
     const { id, locale } = c.req.valid("param");

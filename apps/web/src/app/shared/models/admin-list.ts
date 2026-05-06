@@ -86,4 +86,11 @@ export interface AdminMemberListItem {
   prefixId: number | null;
   prefixName: string | null;
   asset: string | null;
+  publishability?: {
+    publishable: boolean;
+    missing: {
+      base: string[];
+      translations: Record<string, string[]>;
+    };
+  };
 }

@@ -69,6 +69,17 @@
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">{{ row.email }}</td>
     </ng-container>
 
+    <ng-container matColumnDef="publishability">
+      <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">
+        @if (row.publishability?.publishable) {
+          <span class="status-chip status-ready">Ready</span>
+        } @else {
+          <span class="status-chip status-draft">Draft · {{ missingCount(row) }}</span>
+        }
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>

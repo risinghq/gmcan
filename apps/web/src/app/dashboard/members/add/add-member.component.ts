@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener, inject } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -11,7 +11,7 @@ import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { createMemberFull } from "@app/shared/models/factories";
-import type { MemberFull } from "@app/shared/models/member";
+import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -26,7 +26,6 @@ import { AutosizeModule } from "ngx-autosize";
   providers: [provideNativeDateAdapter()],
   imports: [
     MatIcon,
-    FormsModule,
     ReactiveFormsModule,
     MatFormField,
     MatLabel,
@@ -52,8 +51,6 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   public memberForm: FormGroup;
   member: MemberFull;
   segundoNombre = "";
-  birthDateObj?: Date;
-  password = "";
   get generos() {
     return this.lookup.generos();
   }
@@ -71,6 +68,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   url: string;
   selectedBioLocale = "es";
   bioByLocale: Record<string, string> = {};
+  publishability: MemberPublishability | null = null;
 
   button_text = "Registrar nuevo miembro";
 
@@ -136,10 +134,9 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   addMember(): void {
     if (this.memberForm.valid) {
-      const firstName = this.segundoNombre
-        ? `${this.member.firstName} ${this.segundoNombre}`.trim()
-        : this.member.firstName;
-      const birthDate = this.birthDateObj ? new Date(this.birthDateObj).toLocaleDateString("sv") : undefined;
+      const values = this.memberForm.getRawValue();
+      const firstName = values.middleName ? `${values.firstName} ${values.middleName}`.trim() : values.firstName;
+      const birthDate = values.birthDate ? new Date(values.birthDate).toLocaleDateString("sv") : undefined;
 
       let status: number;
       if (this.adHono === 3) {
@@ -150,24 +147,24 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
         status = 1;
       }
 
-      this.memberService.verifyEmail(this.member.email).subscribe((result) => {
+      this.memberService.verifyEmail(values.email).subscribe((result) => {
         if (!result.exists) {
-          if (this.password === this.memberForm.controls["confirmPassword"].value) {
+          if (values.password === this.memberForm.controls["confirmPassword"].value) {
             const bio = this.bioByLocale[this.selectedBioLocale] ?? "";
             this.memberService
               .createMember({
-                dni: this.member.dni,
-                email: this.member.email,
-                password: this.password,
+                dni: values.dni,
+                email: values.email,
+                password: values.password,
                 firstName,
-                lastName: this.member.lastName,
-                maternalName: this.member.maternalName ?? undefined,
+                lastName: values.lastName,
+                maternalName: values.maternalName ?? undefined,
                 birthDate,
                 status,
                 roleId: this.member.roleId,
-                memberTypeId: this.member.memberTypeId,
-                prefixId: this.member.prefixId ?? undefined,
-                genderId: this.member.genderId ?? undefined,
+                memberTypeId: values.memberTypeId,
+                prefixId: values.prefixId || undefined,
+                genderId: values.genderId || undefined,
                 translation: { locale: this.selectedBioLocale, bio },
               })
               .subscribe((res) => {
@@ -236,6 +233,20 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
 
   bioLength(): number {
     return (this.bioByLocale[this.selectedBioLocale] ?? "").length;
+  }
+
+  missingRequirementsCount(): number {
+    if (!this.publishability) return 0;
+    return (
+      this.publishability.missing.base.length +
+      Object.values(this.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
+    );
+  }
+
+  publishabilityTooltip(): string {
+    if (!this.publishability) return "Estado de publicación no disponible";
+    if (this.publishability.publishable) return "Ready para mostrarse en público";
+    return `Borrador: ${this.missingRequirementsCount()} requisito(s) pendiente(s)`;
   }
 
   openEraser() {}

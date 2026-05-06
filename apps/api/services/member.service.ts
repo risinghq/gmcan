@@ -8,6 +8,17 @@ import type { AdminMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
+const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "status"] as const;
+const REQUIRED_MEMBER_TRANSLATED_FIELDS = ["bio"] as const;
+
+export interface MemberPublishability {
+  publishable: boolean;
+  missing: {
+    base: string[];
+    translations: Record<string, string[]>;
+  };
+}
+
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
 }
@@ -65,24 +76,63 @@ export async function listAdminMembers(filter?: {
   }
 
   const rows = await query.orderBy("member.lastName", "asc").execute();
+  const memberIds = rows.map((row) => row.id);
+  const translationRows =
+    memberIds.length === 0
+      ? []
+      : await db
+          .selectFrom("member_translation")
+          .select(["memberId", "locale", "bio"])
+          .where("memberId", "in", memberIds)
+          .where("locale", "in", SUPPORTED_LOCALES)
+          .execute();
+
+  const translationsByMember = new Map<number, Map<string, string | null>>();
+  for (const tr of translationRows) {
+    if (!translationsByMember.has(tr.memberId)) translationsByMember.set(tr.memberId, new Map());
+    translationsByMember.get(tr.memberId)!.set(tr.locale, tr.bio);
+  }
+
   return Promise.all(
-    rows.map(async (row) => ({
-      id: row.id,
-      dni: row.dni,
-      email: row.email,
-      firstName: row.firstName,
-      lastName: row.lastName,
-      maternalName: row.maternalName,
-      birthDate: row.birthDate,
-      bio: row.bio,
-      status: row.status,
-      roleId: row.roleId,
-      memberTypeId: row.memberTypeId,
-      memberTypeName: row.memberTypeName ?? "",
-      prefixId: row.prefixId,
-      prefixName: row.prefixName,
-      asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
-    })),
+    rows.map(async (row) => {
+      const missingBase: string[] = [];
+      if (!row.dni) missingBase.push("dni");
+      if (!row.email) missingBase.push("email");
+      if (!row.firstName) missingBase.push("firstName");
+      if (!row.lastName) missingBase.push("lastName");
+      if (row.status !== 1) missingBase.push("status");
+
+      const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
+      const missingTranslations: Record<string, string[]> = {};
+      for (const locale of SUPPORTED_LOCALES) {
+        const missing: string[] = [];
+        const bio = memberTranslations.get(locale);
+        if (!bio || bio.trim().length === 0) missing.push("bio");
+        if (missing.length > 0) missingTranslations[locale] = missing;
+      }
+
+      return {
+        id: row.id,
+        dni: row.dni,
+        email: row.email,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        maternalName: row.maternalName,
+        birthDate: row.birthDate,
+        bio: row.bio,
+        status: row.status,
+        roleId: row.roleId,
+        memberTypeId: row.memberTypeId,
+        memberTypeName: row.memberTypeName ?? "",
+        prefixId: row.prefixId,
+        prefixName: row.prefixName,
+        asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
+        publishability: {
+          publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
+          missing: { base: missingBase, translations: missingTranslations },
+        },
+      };
+    }),
   );
 }
 
@@ -322,7 +372,7 @@ export async function getMemberTranslation(id: number, locale: string) {
     .executeTakeFirst();
 }
 
-export async function getMemberPublishability(id: number) {
+export async function evaluateMemberPublishability(id: number): Promise<MemberPublishability> {
   const member = await db
     .selectFrom("member")
     .select(["id", "dni", "email", "firstName", "lastName", "status"])
@@ -348,12 +398,23 @@ export async function getMemberPublishability(id: number) {
   const missingTranslations: Record<string, string[]> = {};
   for (const locale of SUPPORTED_LOCALES) {
     const bio = map.get(locale);
-    if (!bio || bio.trim().length === 0) missingTranslations[locale] = ["bio"];
+    const missing: string[] = [];
+    if (!bio || bio.trim().length === 0) missing.push("bio");
+    if (missing.length > 0) missingTranslations[locale] = missing;
   }
 
   const publishable = missingBase.length === 0 && Object.keys(missingTranslations).length === 0;
   return { publishable, missing: { base: missingBase, translations: missingTranslations } };
 }
+
+export async function getMemberPublishability(id: number): Promise<MemberPublishability> {
+  return evaluateMemberPublishability(id);
+}
+
+export const MEMBER_PUBLISHABILITY_REQUIREMENTS = {
+  base: REQUIRED_MEMBER_BASE_FIELDS,
+  translated: REQUIRED_MEMBER_TRANSLATED_FIELDS,
+} as const;
 
 export async function deleteMember(id: number) {
   await db.deleteFrom("member").where("id", "=", id).execute();

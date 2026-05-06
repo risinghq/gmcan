@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 
 import type { AdminMemberListItem } from "../models/admin-list";
 import type { AuthorSearchResult } from "../models/author";
-import type { Member, MemberFull, MemberProfile } from "../models/member";
+import type { Member, MemberFull, MemberProfile, MemberPublishability } from "../models/member";
 import { GLOBAL } from "./global";
 
 export interface MemberCreateBody {
@@ -24,14 +24,14 @@ export interface MemberCreateBody {
 }
 
 export interface MemberUpdateBody {
-  email: string;
-  firstName: string;
-  lastName: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
   maternalName?: string;
   birthDate?: string;
-  status: number;
-  roleId: number;
-  memberTypeId: number;
+  status?: number;
+  roleId?: number;
+  memberTypeId?: number;
   prefixId?: number;
   genderId?: number;
   translation?: { locale: string; bio: string };
@@ -66,7 +66,7 @@ export class MemberService {
   }
 
   updateMember(id: number, body: MemberUpdateBody): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/members/${id}`, body);
+    return this.http.patch<{ status: number }>(`${GLOBAL.url}admin/members/${id}`, body);
   }
 
   updateMemberTranslation(id: number, locale: string, bio: string): Observable<{ status: number }> {
@@ -109,5 +109,9 @@ export class MemberService {
 
   verifyEmail(email: string): Observable<{ exists: boolean }> {
     return this.http.get<{ exists: boolean }>(`${GLOBAL.url}admin/members/exists/email`, { params: { email } });
+  }
+
+  getMemberPublishability(id: number): Observable<MemberPublishability> {
+    return this.http.get<MemberPublishability>(`${GLOBAL.url}admin/members/${id}/publishability`);
   }
 }

@@ -45,7 +45,15 @@ export default class MiembrosComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  displayedColumns: string[] = ["firstName", "lastName", "maternalName", "memberTypeName", "prefixName", "email"];
+  displayedColumns: string[] = [
+    "firstName",
+    "lastName",
+    "maternalName",
+    "memberTypeName",
+    "prefixName",
+    "email",
+    "publishability",
+  ];
   items: AdminMemberListItem[] = [];
   dataSource = new MatTableDataSource<AdminMemberListItem>([]);
 
@@ -67,7 +75,6 @@ export default class MiembrosComponent implements OnInit {
       this.items = isActiveMode
         ? rows.filter((member) => member.status === 1)
         : rows.filter((member) => member.status === 0 || member.status === 3);
-
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();
@@ -104,5 +111,13 @@ export default class MiembrosComponent implements OnInit {
       ? "miembros-activos"
       : "miembros-antiguos";
     this.router.navigate(["dashboard/edit-member/" + id], { queryParams: { returnTo } });
+  }
+
+  missingCount(row: AdminMemberListItem): number {
+    if (!row.publishability) return 0;
+    return (
+      row.publishability.missing.base.length +
+      Object.values(row.publishability.missing.translations).reduce((sum, fields) => sum + fields.length, 0)
+    );
   }
 }

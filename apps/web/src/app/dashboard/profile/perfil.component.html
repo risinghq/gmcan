@@ -3,6 +3,17 @@
     <div class="member-detail-links">
       <form [formGroup]="profileForm">
         <div class="right obligatory-text"><span class="red-text">(*) </span>Campos obligatorios</div>
+        @if (publishability) {
+          <div class="mb-16">
+            @if (publishability.publishable) {
+              <span class="status-chip status-ready" [title]="publishabilityTooltip()">Ready</span>
+            } @else {
+              <span class="status-chip status-draft" [title]="publishabilityTooltip()">
+                Draft · {{ missingRequirementsCount() }}
+              </span>
+            }
+          </div>
+        }
         <div class="flex-news mt-16">
           <div class="full-width">
             <div class="flex-news mb-8">
