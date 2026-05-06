@@ -10,7 +10,8 @@ export async function seedResearchGroup() {
       address: "Germán Amézaga N° 375 - Edificio Jorge Basadre. Ciudad Universitaria, Lima, Perú",
       email: "gmcan@unmsm.edu.pe",
       phone: "+51 989994607",
-      name: "GMCAN",
+      slug: "gmcan",
+      shortName: "GMCAN",
       fullName: "Grupo de Investigación de Métodos Computacionales Aplicado a Nanomateriales",
       createdAt: today,
       updatedAt: today,
@@ -19,7 +20,7 @@ export async function seedResearchGroup() {
     .execute();
 
   await db
-    .insertInto("group_translation")
+    .insertInto("research_group_translation")
     .values([
       {
         groupId: 1,

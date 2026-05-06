@@ -5,67 +5,26 @@ import type { Database } from "./schema.js";
 
 export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   locale: ["code"],
-  gender: ["id", "name"],
-  prefix: ["id", "name"],
-  role: ["id", "name"],
-  member_type: ["id"],
-  member_type_translation: ["id", "memberTypeId", "locale", "name", "nameSingular"],
-  publication_type: ["id"],
-  publication_type_translation: ["id", "publicationTypeId", "locale", "name"],
-  thesis_type: ["id"],
-  thesis_type_translation: ["id", "thesisTypeId", "locale", "name"],
-  news_type: ["id"],
-  news_type_translation: ["id", "newsTypeId", "locale", "name"],
+  gender: ["code", "name"],
+  prefix: ["code", "label"],
+  role: ["code", "name"],
+  member_type: ["code"],
+  member_type_translation: ["memberTypeCode", "locale", "name", "nameSingular"],
+  publication_kind: ["code"],
+  publication_kind_translation: ["publicationKindCode", "locale", "name"],
+  thesis_kind: ["code"],
+  thesis_kind_translation: ["thesisKindCode", "locale", "name"],
+  news_kind: ["code"],
+  news_kind_translation: ["newsKindCode", "locale", "name"],
+  currency: ["code", "symbol"],
+  funding_source: ["code", "name"],
   journal: ["id", "name"],
   university: ["id"],
-  university_translation: ["id", "universityId", "locale", "name"],
+  university_translation: ["universityId", "locale", "name"],
   event: ["id"],
-  event_translation: ["id", "eventId", "locale", "name", "city", "country"],
-  funding_source: ["id", "name"],
-  currency: ["id", "symbol"],
-  research_group: ["id", "address", "email", "phone", "name", "fullName", "createdAt", "updatedAt"],
-  member: [
-    "id",
-    "dni",
-    "email",
-    "password",
-    "firstName",
-    "lastName",
-    "maternalName",
-    "birthDate",
-
-    "status",
-    "resetPassword",
-    "createdAt",
-    "updatedAt",
-    "roleId",
-    "memberTypeId",
-    "prefixId",
-    "genderId",
-    "resetToken",
-    "resetExpires",
-  ],
-  member_translation: ["id", "memberId", "locale", "bio"],
-  session: ["id", "memberId", "email", "expiresAt", "lastActive"],
-  research_line: ["id", "groupId", "createdAt", "updatedAt"],
-  research_line_translation: ["id", "researchLineId", "locale", "name", "description"],
-  method: ["id", "groupId", "createdAt", "updatedAt"],
-  method_translation: ["id", "methodId", "locale", "name", "description"],
-  equipment: ["id", "name", "cpu", "gpu", "ram", "storage", "groupId", "createdAt", "updatedAt"],
-  software: ["id", "moreInfo", "groupId", "createdAt", "updatedAt"],
-  software_translation: ["id", "softwareId", "locale", "name", "description"],
-  about: ["id", "createdAt", "updatedAt", "groupId"],
-  about_translation: [
-    "id",
-    "aboutId",
-    "locale",
-    "description",
-    "objectivesContent",
-    "servicesContent",
-    "homeServicesTeaserContent",
-  ],
-  group_translation: [
-    "id",
+  event_translation: ["eventId", "locale", "name", "city", "country"],
+  research_group: ["id", "slug", "shortName", "fullName", "address", "email", "phone", "createdAt", "updatedAt"],
+  research_group_translation: [
     "groupId",
     "locale",
     "summary",
@@ -74,48 +33,67 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "publicationsSection",
     "projectsSection",
   ],
-  news: [
+  member: [
     "id",
-    "status",
-    "publishedAt",
-    "updatedAt",
+    "dni",
+    "email",
+    "passwordHash",
+    "firstName",
+    "lastName",
+    "maternalName",
+    "birthDate",
+    "isActive",
+    "passwordResetRequired",
+    "roleCode",
+    "memberTypeCode",
+    "prefixCode",
+    "genderCode",
+    "resetToken",
+    "resetExpiresAt",
     "createdAt",
-
-    "priority",
-    "authorId",
-    "newsTypeId",
-  ],
-  news_translation: ["id", "newsId", "locale", "title", "summary", "body"],
-  publication: [
-    "id",
-    "journalIssue",
-    "doi",
-    "publishedAt",
     "updatedAt",
-    "createdAt",
-    "typeId",
-    "journalId",
-    "universityId",
-    "eventId",
-    "thesisTypeId",
   ],
-  publication_translation: ["id", "publicationId", "locale", "title", "abstract"],
-  publication_author: ["id", "publicationId", "isPrincipal", "externalName", "memberId"],
+  member_translation: ["memberId", "locale", "bio"],
+  session: ["id", "memberId", "expiresAt", "lastActiveAt"],
+  research_line: ["id", "groupId", "createdAt", "updatedAt"],
+  research_line_translation: ["researchLineId", "locale", "name", "description"],
+  method: ["id", "groupId", "createdAt", "updatedAt"],
+  method_translation: ["methodId", "locale", "name", "description"],
+  equipment: ["id", "groupId", "name", "cpu", "gpu", "ram", "storage", "createdAt", "updatedAt"],
+  software: ["id", "groupId", "moreInfo", "createdAt", "updatedAt"],
+  software_translation: ["softwareId", "locale", "name", "description"],
+  about: ["id", "groupId", "createdAt", "updatedAt"],
+  about_translation: [
+    "aboutId",
+    "locale",
+    "description",
+    "objectivesContent",
+    "servicesContent",
+    "homeServicesTeaserContent",
+  ],
+  news: ["id", "statusCode", "publishedAt", "priority", "authorId", "newsKindCode", "createdAt", "updatedAt"],
+  news_translation: ["newsId", "locale", "title", "summary", "body"],
+  publication: ["id", "kindCode", "doi", "publishedAt", "createdAt", "updatedAt"],
+  publication_translation: ["publicationId", "locale", "title", "abstract"],
+  journal_article: ["publicationId", "journalId", "issue"],
+  conference_paper: ["publicationId", "eventId"],
+  thesis: ["publicationId", "universityId", "thesisKindCode"],
+  publication_author: ["publicationId", "authorOrder", "memberId", "externalName"],
   project: [
     "id",
     "code",
-    "fundedAmount",
-    "status",
+    "fundedAmountMinor",
+    "statusCode",
     "startDate",
     "endDate",
+    "researchLineId",
+    "currencyCode",
+    "fundingSourceCode",
     "createdAt",
     "updatedAt",
-    "researchLineId",
-    "currencyId",
-    "fundingSourceId",
   ],
-  project_translation: ["id", "projectId", "locale", "title", "description"],
-  member_project: ["projectId", "memberId", "createdAt", "updatedAt"],
+  project_translation: ["projectId", "locale", "title", "description"],
+  project_member: ["projectId", "memberId", "createdAt", "updatedAt"],
   member_group: ["memberId", "groupId", "createdAt", "updatedAt"],
   asset: [
     "id",
@@ -126,51 +104,61 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "sizeBytes",
     "sha256",
     "visibility",
-    "status",
+    "lifecycleStatus",
     "createdBy",
     "createdAt",
     "deletedAt",
     "deleteAfter",
   ],
-  asset_binding_history: [
-    "id",
-    "resourceType",
-    "resourceId",
-    "slot",
-    "assetId",
-    "version",
-    "actorId",
-    "reason",
-    "createdAt",
-  ],
-  asset_binding_current: ["resourceType", "resourceId", "slot", "bindingId", "updatedAt"],
-  asset_audit: ["id", "assetId", "bindingId", "action", "actorId", "reason", "createdAt"],
+  asset_audit: ["id", "assetId", "action", "actorId", "reason", "createdAt"],
+  member_asset: ["memberId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
+  news_asset: ["newsId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
+  method_asset: ["methodId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
+  research_line_asset: ["researchLineId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
+  publication_asset: ["publicationId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
+  research_group_asset: ["groupId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
+  about_asset: ["aboutId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
 };
 
-async function createIdTable(db: Kysely<Database>, table: string) {
-  await db.schema
-    .createTable(table)
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .execute();
-}
-
-async function createNameTranslationTable(
+function addCodeLocaleTranslation(
   db: Kysely<Database>,
   table: string,
   ownerTable: string,
   ownerColumn: string,
-  uniqueConstraintName: string,
+  extraColumns: Array<{ name: string; type: "text"; notNull?: boolean }> = [],
 ) {
-  await db.schema
+  let builder = db.schema
     .createTable(table)
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn(ownerColumn, "integer", (c) => c.notNull().references(`${ownerTable}.id`).onDelete("cascade"))
+    .addColumn(ownerColumn, "text", (c) => c.notNull().references(`${ownerTable}.code`).onDelete("cascade"))
     .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addUniqueConstraint(uniqueConstraintName, [ownerColumn, "locale"])
-    .execute();
+    .addColumn("name", "text", (c) => c.notNull());
+
+  for (const col of extraColumns) {
+    builder = builder.addColumn(col.name, col.type, (c) => (col.notNull ? c.notNull() : c));
+  }
+
+  return builder.addPrimaryKeyConstraint(`${table}_pk`, [ownerColumn, "locale"]).execute();
+}
+
+function addEntityLocaleTranslation(
+  db: Kysely<Database>,
+  table: string,
+  ownerTable: string,
+  ownerColumn: string,
+  columns: Array<{ name: string; type: "text" | "integer"; notNull?: boolean }>,
+) {
+  let builder = db.schema
+    .createTable(table)
+    .ifNotExists()
+    .addColumn(ownerColumn, "integer", (c) => c.notNull().references(`${ownerTable}.id`).onDelete("cascade"))
+    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"));
+
+  for (const col of columns) {
+    builder = builder.addColumn(col.name, col.type, (c) => (col.notNull ? c.notNull() : c));
+  }
+
+  return builder.addPrimaryKeyConstraint(`${table}_pk`, [ownerColumn, "locale"]).execute();
 }
 
 export async function createTables(db: Kysely<Database>) {
@@ -183,118 +171,129 @@ export async function createTables(db: Kysely<Database>) {
   await db.schema
     .createTable("gender")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
     .addColumn("name", "text", (c) => c.notNull())
+    .addCheckConstraint("gender_code_check", sql`code in ('male','female')`)
     .execute();
 
   await db.schema
     .createTable("prefix")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("name", "text", (c) => c.notNull())
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
+    .addColumn("label", "text", (c) => c.notNull())
+    .addCheckConstraint("prefix_code_check", sql`code in ('dr','dra','mg','lic','bach','ing','none')`)
     .execute();
 
   await db.schema
     .createTable("role")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
     .addColumn("name", "text", (c) => c.notNull())
+    .addCheckConstraint("role_code_check", sql`code in ('administrator','researcher','visitor')`)
     .execute();
 
-  await createIdTable(db, "member_type");
   await db.schema
-    .createTable("member_type_translation")
+    .createTable("member_type")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("memberTypeId", "integer", (c) => c.notNull().references("member_type.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("nameSingular", "text", (c) => c.notNull())
-    .addUniqueConstraint("member_type_translation_owner_locale_unique", ["memberTypeId", "locale"])
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
+    .addCheckConstraint(
+      "member_type_code_check",
+      sql`code in ('researcher','phd_student','master_student','undergraduate_student','collaborator')`,
+    )
     .execute();
 
-  await createIdTable(db, "news_type");
-  await createNameTranslationTable(
-    db,
-    "news_type_translation",
-    "news_type",
-    "newsTypeId",
-    "news_type_translation_owner_locale_unique",
-  );
+  await addCodeLocaleTranslation(db, "member_type_translation", "member_type", "memberTypeCode", [
+    { name: "nameSingular", type: "text", notNull: true },
+  ]);
 
-  await createIdTable(db, "publication_type");
-  await createNameTranslationTable(
-    db,
-    "publication_type_translation",
-    "publication_type",
-    "publicationTypeId",
-    "publication_type_translation_owner_locale_unique",
-  );
-
-  await createIdTable(db, "thesis_type");
-  await createNameTranslationTable(
-    db,
-    "thesis_type_translation",
-    "thesis_type",
-    "thesisTypeId",
-    "thesis_type_translation_owner_locale_unique",
-  );
-
-  await createIdTable(db, "event");
   await db.schema
-    .createTable("event_translation")
+    .createTable("publication_kind")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("eventId", "integer", (c) => c.notNull().references("event.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("city", "text")
-    .addColumn("country", "text")
-    .addUniqueConstraint("event_translation_owner_locale_unique", ["eventId", "locale"])
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
+    .addCheckConstraint("publication_kind_code_check", sql`code in ('journal_article','conference_paper','thesis')`)
+    .execute();
+  await addCodeLocaleTranslation(db, "publication_kind_translation", "publication_kind", "publicationKindCode");
+
+  await db.schema
+    .createTable("thesis_kind")
+    .ifNotExists()
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
+    .addCheckConstraint("thesis_kind_code_check", sql`code in ('phd','masters')`)
+    .execute();
+  await addCodeLocaleTranslation(db, "thesis_kind_translation", "thesis_kind", "thesisKindCode");
+
+  await db.schema
+    .createTable("news_kind")
+    .ifNotExists()
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
+    .addCheckConstraint("news_kind_code_check", sql`code in ('general','research','event')`)
+    .execute();
+  await addCodeLocaleTranslation(db, "news_kind_translation", "news_kind", "newsKindCode");
+
+  await db.schema
+    .createTable("currency")
+    .ifNotExists()
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
+    .addColumn("symbol", "text", (c) => c.notNull())
+    .addCheckConstraint("currency_code_check", sql`code in ('pen','usd')`)
     .execute();
 
   await db.schema
     .createTable("funding_source")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("code", "text", (c) => c.primaryKey().notNull())
     .addColumn("name", "text", (c) => c.notNull())
-    .execute();
-
-  await db.schema
-    .createTable("currency")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("symbol", "text", (c) => c.notNull())
+    .addCheckConstraint("funding_source_code_check", sql`code in ('vrip','none')`)
     .execute();
 
   await db.schema
     .createTable("journal")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("name", "text", (c) => c.notNull())
+    .addColumn("name", "text", (c) => c.notNull().unique())
     .execute();
 
-  await createIdTable(db, "university");
-  await createNameTranslationTable(
-    db,
-    "university_translation",
-    "university",
-    "universityId",
-    "university_translation_owner_locale_unique",
-  );
+  await db.schema
+    .createTable("university")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .execute();
+  await addEntityLocaleTranslation(db, "university_translation", "university", "universityId", [
+    { name: "name", type: "text", notNull: true },
+  ]);
+
+  await db.schema
+    .createTable("event")
+    .ifNotExists()
+    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .execute();
+  await addEntityLocaleTranslation(db, "event_translation", "event", "eventId", [
+    { name: "name", type: "text", notNull: true },
+    { name: "city", type: "text" },
+    { name: "country", type: "text" },
+  ]);
 
   await db.schema
     .createTable("research_group")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("slug", "text", (c) => c.notNull().unique())
+    .addColumn("shortName", "text", (c) => c.notNull())
+    .addColumn("fullName", "text", (c) => c.notNull())
     .addColumn("address", "text")
     .addColumn("email", "text")
     .addColumn("phone", "text")
-    .addColumn("name", "text")
-    .addColumn("fullName", "text")
     .addColumn("createdAt", "text", (c) => c.notNull())
     .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
+
+  await addEntityLocaleTranslation(db, "research_group_translation", "research_group", "groupId", [
+    { name: "summary", type: "text", notNull: true },
+    { name: "facilities", type: "text" },
+    { name: "futureWork", type: "text" },
+    { name: "publicationsSection", type: "text" },
+    { name: "projectsSection", type: "text" },
+  ]);
 
   await db.schema
     .createTable("member")
@@ -302,265 +301,235 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("dni", "text", (c) => c.notNull().unique())
     .addColumn("email", "text", (c) => c.notNull().unique())
-    .addColumn("password", "text", (c) => c.notNull())
+    .addColumn("passwordHash", "text", (c) => c.notNull())
     .addColumn("firstName", "text", (c) => c.notNull())
     .addColumn("lastName", "text", (c) => c.notNull())
     .addColumn("maternalName", "text")
     .addColumn("birthDate", "text")
-
-    .addColumn("status", "integer", (c) => c.notNull())
-    .addColumn("resetPassword", "integer", (c) => c.notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
-    .addColumn("roleId", "integer", (c) => c.notNull().references("role.id"))
-    .addColumn("memberTypeId", "integer", (c) => c.notNull().references("member_type.id"))
-    .addColumn("prefixId", "integer", (c) => c.references("prefix.id"))
-    .addColumn("genderId", "integer", (c) => c.references("gender.id"))
+    .addColumn("isActive", "integer", (c) => c.notNull())
+    .addColumn("passwordResetRequired", "integer", (c) => c.notNull())
+    .addColumn("roleCode", "text", (c) => c.notNull().references("role.code"))
+    .addColumn("memberTypeCode", "text", (c) => c.notNull().references("member_type.code"))
+    .addColumn("prefixCode", "text", (c) => c.references("prefix.code"))
+    .addColumn("genderCode", "text", (c) => c.references("gender.code"))
     .addColumn("resetToken", "text")
-    .addColumn("resetExpires", "text")
+    .addColumn("resetExpiresAt", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .addCheckConstraint("member_is_active_check", sql`isActive in (0,1)`)
+    .addCheckConstraint("member_password_reset_required_check", sql`passwordResetRequired in (0,1)`)
     .execute();
 
-  await db.schema
-    .createTable("member_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("bio", "text")
-    .addUniqueConstraint("member_translation_owner_locale_unique", ["memberId", "locale"])
-    .execute();
+  await addEntityLocaleTranslation(db, "member_translation", "member", "memberId", [{ name: "bio", type: "text" }]);
 
   await db.schema
     .createTable("session")
     .ifNotExists()
     .addColumn("id", "text", (c) => c.primaryKey().notNull())
-    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id"))
-    .addColumn("email", "text", (c) => c.notNull())
+    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id").onDelete("cascade"))
     .addColumn("expiresAt", "text", (c) => c.notNull())
-    .addColumn("lastActive", "text", (c) => c.notNull())
+    .addColumn("lastActiveAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
     .createTable("research_line")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
-
-  await db.schema
-    .createTable("research_line_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("researchLineId", "integer", (c) => c.notNull().references("research_line.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("description", "text")
-    .addUniqueConstraint("research_line_translation_owner_locale_unique", ["researchLineId", "locale"])
-    .execute();
+  await addEntityLocaleTranslation(db, "research_line_translation", "research_line", "researchLineId", [
+    { name: "name", type: "text", notNull: true },
+    { name: "description", type: "text" },
+  ]);
 
   await db.schema
     .createTable("method")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
-
-  await db.schema
-    .createTable("method_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("methodId", "integer", (c) => c.notNull().references("method.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text", (c) => c.notNull())
-    .addColumn("description", "text")
-    .addUniqueConstraint("method_translation_owner_locale_unique", ["methodId", "locale"])
-    .execute();
+  await addEntityLocaleTranslation(db, "method_translation", "method", "methodId", [
+    { name: "name", type: "text", notNull: true },
+    { name: "description", type: "text" },
+  ]);
 
   await db.schema
     .createTable("equipment")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
     .addColumn("name", "text", (c) => c.notNull())
     .addColumn("cpu", "text")
     .addColumn("gpu", "text")
     .addColumn("ram", "text")
     .addColumn("storage", "text")
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
     .createTable("software")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
     .addColumn("moreInfo", "text")
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
-
-  await db.schema
-    .createTable("software_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("softwareId", "integer", (c) => c.notNull().references("software.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("name", "text")
-    .addColumn("description", "text")
-    .addUniqueConstraint("software_translation_owner_locale_unique", ["softwareId", "locale"])
-    .execute();
+  await addEntityLocaleTranslation(db, "software_translation", "software", "softwareId", [
+    { name: "name", type: "text", notNull: true },
+    { name: "description", type: "text" },
+  ]);
 
   await db.schema
     .createTable("about")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
-
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
     .createTable("about_translation")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("aboutId", "integer", (c) => c.notNull().references("about.id").onDelete("cascade"))
     .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
     .addColumn("description", "text", (c) => c.notNull())
     .addColumn("objectivesContent", "text", (c) => c.notNull())
     .addColumn("servicesContent", "text", (c) => c.notNull())
     .addColumn("homeServicesTeaserContent", "text", (c) => c.notNull())
-    .addCheckConstraint("about_translation_objectives_json_valid", sql`json_valid("objectivesContent")`)
-    .addCheckConstraint("about_translation_services_json_valid", sql`json_valid("servicesContent")`)
-    .addCheckConstraint("about_translation_teaser_json_valid", sql`json_valid("homeServicesTeaserContent")`)
-    .addUniqueConstraint("about_translation_owner_locale_unique", ["aboutId", "locale"])
-    .execute();
-
-  await db.schema
-    .createTable("group_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("summary", "text", (c) => c.notNull())
-    .addColumn("facilities", "text")
-    .addColumn("futureWork", "text")
-    .addColumn("publicationsSection", "text")
-    .addColumn("projectsSection", "text")
-    .addUniqueConstraint("group_translation_owner_locale_unique", ["groupId", "locale"])
+    .addCheckConstraint("about_translation_objectives_json_valid", sql`json_valid(objectivesContent)`)
+    .addCheckConstraint("about_translation_services_json_valid", sql`json_valid(servicesContent)`)
+    .addCheckConstraint("about_translation_teaser_json_valid", sql`json_valid(homeServicesTeaserContent)`)
+    .addPrimaryKeyConstraint("about_translation_pk", ["aboutId", "locale"])
     .execute();
 
   await db.schema
     .createTable("news")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("status", "integer", (c) => c.notNull())
+    .addColumn("statusCode", "text", (c) => c.notNull())
     .addColumn("publishedAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text")
-    .addColumn("createdAt", "text")
-
     .addColumn("priority", "integer")
-    .addColumn("authorId", "integer", (c) => c.notNull().references("member.id"))
-    .addColumn("newsTypeId", "integer", (c) => c.notNull().references("news_type.id"))
+    .addColumn("authorId", "integer", (c) => c.notNull().references("member.id").onDelete("restrict"))
+    .addColumn("newsKindCode", "text", (c) => c.notNull().references("news_kind.code"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .addCheckConstraint("news_status_code_check", sql`statusCode in ('draft','published','archived')`)
     .execute();
 
-  await db.schema
-    .createTable("news_translation")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("newsId", "integer", (c) => c.notNull().references("news.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("summary", "text", (c) => c.notNull())
-    .addColumn("body", "text", (c) => c.notNull())
-    .addUniqueConstraint("news_translation_owner_locale_unique", ["newsId", "locale"])
-    .execute();
+  await addEntityLocaleTranslation(db, "news_translation", "news", "newsId", [
+    { name: "title", type: "text", notNull: true },
+    { name: "summary", type: "text", notNull: true },
+    { name: "body", type: "text", notNull: true },
+  ]);
 
   await db.schema
     .createTable("publication")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("journalIssue", "integer")
+    .addColumn("kindCode", "text", (c) => c.notNull().references("publication_kind.code"))
     .addColumn("doi", "text")
     .addColumn("publishedAt", "text", (c) => c.notNull())
-    .addColumn("updatedAt", "text")
-    .addColumn("createdAt", "text")
-    .addColumn("typeId", "integer", (c) => c.notNull().references("publication_type.id"))
-    .addColumn("journalId", "integer", (c) => c.references("journal.id"))
-    .addColumn("universityId", "integer", (c) => c.references("university.id"))
-    .addColumn("eventId", "integer", (c) => c.references("event.id"))
-    .addColumn("thesisTypeId", "integer", (c) => c.references("thesis_type.id"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .execute();
+
+  await addEntityLocaleTranslation(db, "publication_translation", "publication", "publicationId", [
+    { name: "title", type: "text", notNull: true },
+    { name: "abstract", type: "text" },
+  ]);
+
+  await db.schema
+    .createTable("journal_article")
+    .ifNotExists()
+    .addColumn("publicationId", "integer", (c) =>
+      c.notNull().primaryKey().references("publication.id").onDelete("cascade"),
+    )
+    .addColumn("journalId", "integer", (c) => c.references("journal.id").onDelete("restrict"))
+    .addColumn("issue", "integer")
     .execute();
 
   await db.schema
-    .createTable("publication_translation")
+    .createTable("conference_paper")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
+    .addColumn("publicationId", "integer", (c) =>
+      c.notNull().primaryKey().references("publication.id").onDelete("cascade"),
+    )
+    .addColumn("eventId", "integer", (c) => c.notNull().references("event.id").onDelete("restrict"))
+    .execute();
+
+  await db.schema
+    .createTable("thesis")
+    .ifNotExists()
+    .addColumn("publicationId", "integer", (c) =>
+      c.notNull().primaryKey().references("publication.id").onDelete("cascade"),
+    )
+    .addColumn("universityId", "integer", (c) => c.notNull().references("university.id").onDelete("restrict"))
+    .addColumn("thesisKindCode", "text", (c) => c.notNull().references("thesis_kind.code"))
+    .execute();
+
+  await db.schema
+    .createTable("publication_author")
+    .ifNotExists()
     .addColumn("publicationId", "integer", (c) => c.notNull().references("publication.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("abstract", "text")
-    .addUniqueConstraint("publication_translation_owner_locale_unique", ["publicationId", "locale"])
+    .addColumn("authorOrder", "integer", (c) => c.notNull())
+    .addColumn("memberId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("externalName", "text")
+    .addPrimaryKeyConstraint("publication_author_pk", ["publicationId", "authorOrder"])
+    .addCheckConstraint("publication_author_order_check", sql`authorOrder > 0`)
+    .addCheckConstraint(
+      "publication_author_identity_check",
+      sql`((memberId is not null and externalName is null) or (memberId is null and externalName is not null and length(trim(externalName)) > 0))`,
+    )
     .execute();
 
   await db.schema
     .createTable("project")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("code", "text", (c) => c.notNull())
-    .addColumn("fundedAmount", "text", (c) => c.notNull())
-    .addColumn("status", "integer")
+    .addColumn("code", "text", (c) => c.notNull().unique())
+    .addColumn("fundedAmountMinor", "integer", (c) => c.notNull().defaultTo(0))
+    .addColumn("statusCode", "text", (c) => c.notNull())
     .addColumn("startDate", "text", (c) => c.notNull())
     .addColumn("endDate", "text")
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
-    .addColumn("researchLineId", "integer", (c) => c.notNull().references("research_line.id"))
-    .addColumn("currencyId", "integer", (c) => c.notNull().references("currency.id"))
-    .addColumn("fundingSourceId", "integer", (c) => c.notNull().references("funding_source.id"))
+    .addColumn("researchLineId", "integer", (c) => c.notNull().references("research_line.id").onDelete("restrict"))
+    .addColumn("currencyCode", "text", (c) => c.notNull().references("currency.code"))
+    .addColumn("fundingSourceCode", "text", (c) => c.notNull().references("funding_source.code"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .addCheckConstraint("project_funded_amount_minor_check", sql`fundedAmountMinor >= 0`)
+    .addCheckConstraint("project_status_code_check", sql`statusCode in ('planned','active','completed','archived')`)
     .execute();
 
+  await addEntityLocaleTranslation(db, "project_translation", "project", "projectId", [
+    { name: "title", type: "text", notNull: true },
+    { name: "description", type: "text", notNull: true },
+  ]);
+
   await db.schema
-    .createTable("project_translation")
+    .createTable("project_member")
     .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("projectId", "integer", (c) => c.notNull().references("project.id").onDelete("cascade"))
-    .addColumn("locale", "text", (c) => c.notNull().references("locale.code").onDelete("restrict"))
-    .addColumn("title", "text", (c) => c.notNull())
-    .addColumn("description", "text", (c) => c.notNull())
-    .addUniqueConstraint("project_translation_owner_locale_unique", ["projectId", "locale"])
-    .execute();
-
-  await db.schema
-    .createTable("publication_author")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("publicationId", "integer", (c) => c.notNull().references("publication.id"))
-    .addColumn("isPrincipal", "integer", (c) => c.notNull())
-    .addColumn("externalName", "text")
-    .addColumn("memberId", "integer", (c) => c.references("member.id"))
+    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id").onDelete("cascade"))
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("project_member_pk", ["projectId", "memberId"])
     .execute();
 
   await db.schema
     .createTable("member_group")
     .ifNotExists()
-    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id"))
-    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id"))
+    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id").onDelete("cascade"))
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
     .addColumn("createdAt", "text", (c) => c.notNull())
     .addColumn("updatedAt", "text", (c) => c.notNull())
-    .execute();
-
-  await db.schema
-    .createTable("member_project")
-    .ifNotExists()
-    .addColumn("projectId", "integer", (c) => c.notNull().references("project.id"))
-    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id"))
-    .addColumn("createdAt", "text")
-    .addColumn("updatedAt", "text")
+    .addPrimaryKeyConstraint("member_group_pk", ["memberId", "groupId"])
     .execute();
 
   await db.schema
@@ -574,90 +543,211 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("sizeBytes", "integer", (c) => c.notNull())
     .addColumn("sha256", "text", (c) => c.notNull())
     .addColumn("visibility", "text", (c) => c.notNull())
-    .addColumn("status", "text", (c) => c.notNull())
-    .addColumn("createdBy", "integer", (c) => c.references("member.id"))
+    .addColumn("lifecycleStatus", "text", (c) => c.notNull())
+    .addColumn("createdBy", "integer", (c) => c.references("member.id").onDelete("set null"))
     .addColumn("createdAt", "text", (c) => c.notNull())
     .addColumn("deletedAt", "text")
     .addColumn("deleteAfter", "text")
-    .execute();
-
-  await db.schema
-    .createTable("asset_binding_history")
-    .ifNotExists()
-    .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("resourceType", "text", (c) => c.notNull())
-    .addColumn("resourceId", "integer", (c) => c.notNull())
-    .addColumn("slot", "text", (c) => c.notNull())
-    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id"))
-    .addColumn("version", "integer", (c) => c.notNull())
-    .addColumn("actorId", "integer", (c) => c.references("member.id"))
-    .addColumn("reason", "text")
-    .addColumn("createdAt", "text", (c) => c.notNull())
-    .addUniqueConstraint("asset_binding_history_owner_version_unique", [
-      "resourceType",
-      "resourceId",
-      "slot",
-      "version",
-    ])
-    .execute();
-
-  await db.schema
-    .createTable("asset_binding_current")
-    .ifNotExists()
-    .addColumn("resourceType", "text", (c) => c.notNull())
-    .addColumn("resourceId", "integer", (c) => c.notNull())
-    .addColumn("slot", "text", (c) => c.notNull())
-    .addColumn("bindingId", "integer", (c) => c.notNull().references("asset_binding_history.id").onDelete("cascade"))
-    .addColumn("updatedAt", "text", (c) => c.notNull())
-    .addPrimaryKeyConstraint("asset_binding_current_pk", ["resourceType", "resourceId", "slot"])
+    .addCheckConstraint("asset_size_bytes_check", sql`sizeBytes >= 0`)
+    .addCheckConstraint("asset_visibility_check", sql`visibility in ('public','private')`)
+    .addCheckConstraint(
+      "asset_lifecycle_status_check",
+      sql`lifecycleStatus in ('active','soft_deleted','hard_deleted','quarantined')`,
+    )
     .execute();
 
   await db.schema
     .createTable("asset_audit")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
-    .addColumn("assetId", "integer", (c) => c.references("asset.id"))
-    .addColumn("bindingId", "integer", (c) => c.references("asset_binding_history.id"))
+    .addColumn("assetId", "integer", (c) => c.references("asset.id").onDelete("set null"))
     .addColumn("action", "text", (c) => c.notNull())
-    .addColumn("actorId", "integer", (c) => c.references("member.id"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
     .addColumn("reason", "text")
     .addColumn("createdAt", "text", (c) => c.notNull())
     .execute();
 
   await db.schema
-    .createIndex("idx_asset_binding_current_unique")
+    .createTable("member_asset")
     .ifNotExists()
-    .on("asset_binding_current")
-    .columns(["resourceType", "resourceId", "slot"])
+    .addColumn("memberId", "integer", (c) => c.notNull().references("member.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("member_asset_pk", ["memberId", "slot", "version"])
+    .addCheckConstraint("member_asset_slot_check", sql`slot = 'photo'`)
+    .addCheckConstraint("member_asset_version_check", sql`version > 0`)
     .execute();
 
   await db.schema
-    .createIndex("idx_asset_binding_lookup")
+    .createTable("news_asset")
     .ifNotExists()
-    .on("asset_binding_current")
-    .columns(["resourceType", "resourceId", "slot"])
+    .addColumn("newsId", "integer", (c) => c.notNull().references("news.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("news_asset_pk", ["newsId", "slot", "version"])
+    .addCheckConstraint("news_asset_slot_check", sql`slot = 'photo'`)
+    .addCheckConstraint("news_asset_version_check", sql`version > 0`)
     .execute();
 
   await db.schema
-    .createIndex("idx_asset_binding_history_lookup")
+    .createTable("method_asset")
     .ifNotExists()
-    .on("asset_binding_history")
-    .columns(["resourceType", "resourceId", "slot", "version"])
+    .addColumn("methodId", "integer", (c) => c.notNull().references("method.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("method_asset_pk", ["methodId", "slot", "version"])
+    .addCheckConstraint("method_asset_slot_check", sql`slot = 'photo'`)
+    .addCheckConstraint("method_asset_version_check", sql`version > 0`)
     .execute();
 
   await db.schema
-    .createIndex("idx_news_status_published_at")
+    .createTable("research_line_asset")
+    .ifNotExists()
+    .addColumn("researchLineId", "integer", (c) => c.notNull().references("research_line.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("research_line_asset_pk", ["researchLineId", "slot", "version"])
+    .addCheckConstraint("research_line_asset_slot_check", sql`slot = 'photo'`)
+    .addCheckConstraint("research_line_asset_version_check", sql`version > 0`)
+    .execute();
+
+  await db.schema
+    .createTable("publication_asset")
+    .ifNotExists()
+    .addColumn("publicationId", "integer", (c) => c.notNull().references("publication.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("publication_asset_pk", ["publicationId", "slot", "version"])
+    .addCheckConstraint("publication_asset_slot_check", sql`slot = 'file'`)
+    .addCheckConstraint("publication_asset_version_check", sql`version > 0`)
+    .execute();
+
+  await db.schema
+    .createTable("research_group_asset")
+    .ifNotExists()
+    .addColumn("groupId", "integer", (c) => c.notNull().references("research_group.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("research_group_asset_pk", ["groupId", "slot", "version"])
+    .addCheckConstraint("research_group_asset_slot_check", sql`slot in ('facilities','header','footer')`)
+    .addCheckConstraint("research_group_asset_version_check", sql`version > 0`)
+    .execute();
+
+  await db.schema
+    .createTable("about_asset")
+    .ifNotExists()
+    .addColumn("aboutId", "integer", (c) => c.notNull().references("about.id").onDelete("cascade"))
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id").onDelete("restrict"))
+    .addColumn("actorId", "integer", (c) => c.references("member.id").onDelete("set null"))
+    .addColumn("reason", "text")
+    .addColumn("createdAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("about_asset_pk", ["aboutId", "slot", "version"])
+    .addCheckConstraint("about_asset_slot_check", sql`slot = 'photo'`)
+    .addCheckConstraint("about_asset_version_check", sql`version > 0`)
+    .execute();
+
+  await db.schema
+    .createIndex("idx_member_active_type")
+    .ifNotExists()
+    .on("member")
+    .columns(["isActive", "memberTypeCode"])
+    .execute();
+  await db.schema
+    .createIndex("idx_news_status_published")
     .ifNotExists()
     .on("news")
-    .columns(["status", "publishedAt"])
+    .columns(["statusCode", "publishedAt"])
     .execute();
-
   await db.schema
-    .createIndex("idx_news_type_published_at")
+    .createIndex("idx_news_kind_published")
     .ifNotExists()
     .on("news")
-    .columns(["newsTypeId", "publishedAt"])
+    .columns(["newsKindCode", "publishedAt"])
     .execute();
-
-  await db.schema.createIndex("idx_news_author").ifNotExists().on("news").column("authorId").execute();
+  await db.schema
+    .createIndex("idx_project_status_start")
+    .ifNotExists()
+    .on("project")
+    .columns(["statusCode", "startDate"])
+    .execute();
+  await db.schema
+    .createIndex("idx_publication_kind_published")
+    .ifNotExists()
+    .on("publication")
+    .columns(["kindCode", "publishedAt"])
+    .execute();
+  await db.schema
+    .createIndex("idx_publication_author_member")
+    .ifNotExists()
+    .on("publication_author")
+    .column("memberId")
+    .execute();
+  await db.schema
+    .createIndex("idx_member_asset_current")
+    .ifNotExists()
+    .on("member_asset")
+    .columns(["memberId", "slot", "version"])
+    .execute();
+  await db.schema
+    .createIndex("idx_news_asset_current")
+    .ifNotExists()
+    .on("news_asset")
+    .columns(["newsId", "slot", "version"])
+    .execute();
+  await db.schema
+    .createIndex("idx_method_asset_current")
+    .ifNotExists()
+    .on("method_asset")
+    .columns(["methodId", "slot", "version"])
+    .execute();
+  await db.schema
+    .createIndex("idx_research_line_asset_current")
+    .ifNotExists()
+    .on("research_line_asset")
+    .columns(["researchLineId", "slot", "version"])
+    .execute();
+  await db.schema
+    .createIndex("idx_publication_asset_current")
+    .ifNotExists()
+    .on("publication_asset")
+    .columns(["publicationId", "slot", "version"])
+    .execute();
+  await db.schema
+    .createIndex("idx_research_group_asset_current")
+    .ifNotExists()
+    .on("research_group_asset")
+    .columns(["groupId", "slot", "version"])
+    .execute();
+  await db.schema
+    .createIndex("idx_about_asset_current")
+    .ifNotExists()
+    .on("about_asset")
+    .columns(["aboutId", "slot", "version"])
+    .execute();
 }
