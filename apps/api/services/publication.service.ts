@@ -171,7 +171,7 @@ async function adminSubtypeByPublicationIds(
       kindCode: "journal_article",
       journalArticle: {
         journalId: row.journalId,
-        journalName: row.journalName ?? null,
+        journalName: row.journalName ?? "",
         issue: row.issue,
       },
     });
@@ -181,7 +181,7 @@ async function adminSubtypeByPublicationIds(
       kindCode: "conference_paper",
       conferencePaper: {
         eventId: row.eventId,
-        eventName: row.eventName ?? null,
+        eventName: row.eventName ?? "",
       },
     });
   }
@@ -190,9 +190,9 @@ async function adminSubtypeByPublicationIds(
       kindCode: "thesis",
       thesis: {
         universityId: row.universityId,
-        universityName: row.universityName ?? null,
+        universityName: row.universityName ?? "",
         thesisKindCode: row.thesisKindCode,
-        thesisKindName: row.thesisKindName ?? null,
+        thesisKindName: row.thesisKindName ?? "",
       },
     });
   }
@@ -344,20 +344,30 @@ export async function listAdminPublications(
   );
   const firstAuthorByPublication = new Map(firstAuthorEntries);
 
-  return publications.map((publication) => ({
-    id: publication.id,
-    title: publication.title,
-    kindCode: publication.kindCode,
-    subtype: subtypes.get(publication.id) ?? {
-      kindCode: "journal_article",
-      journalArticle: { journalId: null, journalName: null, issue: null },
-    },
-    doi: publication.doi,
-    publishedAt: publication.publishedAt,
-    publishedAtLabel: monthYearEs(publication.publishedAt),
-    firstAuthorName: firstAuthorByPublication.get(publication.id)?.name ?? "",
-    firstAuthorAsset: firstAuthorByPublication.get(publication.id)?.asset ?? null,
-  }));
+  return publications.map((publication) => {
+    const subtype = subtypes.get(publication.id);
+    if (!subtype) throw new Error(`Publication ${publication.id} is missing admin subtype data`);
+    const eventName = subtype.kindCode === "conference_paper" ? subtype.conferencePaper.eventName : "";
+    const journalName = subtype.kindCode === "journal_article" ? subtype.journalArticle.journalName : "";
+    const universityName = subtype.kindCode === "thesis" ? subtype.thesis.universityName : "";
+    const thesisKindName = subtype.kindCode === "thesis" ? subtype.thesis.thesisKindName : "";
+
+    return {
+      id: publication.id,
+      title: publication.title,
+      kindCode: publication.kindCode,
+      subtype,
+      eventName,
+      journalName,
+      universityName,
+      thesisKindName,
+      doi: publication.doi,
+      publishedAt: publication.publishedAt,
+      publishedAtLabel: monthYearEs(publication.publishedAt),
+      firstAuthorName: firstAuthorByPublication.get(publication.id)?.name ?? "",
+      firstAuthorAsset: firstAuthorByPublication.get(publication.id)?.asset ?? null,
+    };
+  });
 }
 
 export async function getPublication(id: number, locale: Locale) {
