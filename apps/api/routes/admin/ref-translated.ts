@@ -115,12 +115,21 @@ router.get("/university/:id", zValidator("param", IdParam), async (c) => {
 
 router.post("/university", zValidator("json", NamedTranslationBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const created = await db.insertInto("university").defaultValues().executeTakeFirstOrThrow();
-  const id = Number(created.insertId);
-  await db
-    .insertInto("university_translation")
-    .values(Object.entries(translations).map(([locale, payload]) => ({ universityId: id, locale, name: payload.name })))
-    .execute();
+  const id = await db.transaction().execute(async (trx) => {
+    const created = await trx.insertInto("university").defaultValues().executeTakeFirstOrThrow();
+    const universityId = Number(created.insertId);
+    await trx
+      .insertInto("university_translation")
+      .values(
+        Object.entries(translations).map(([locale, payload]) => ({
+          universityId,
+          locale,
+          name: payload.name,
+        })),
+      )
+      .execute();
+    return universityId;
+  });
   return c.json({ id }, 201);
 });
 

@@ -287,10 +287,23 @@ export async function toAdminNewsView(row: NewsRow) {
 }
 
 export async function createNews(data: NewsUpsertInput) {
-  const result = await db.insertInto("news").values(toNewsRow(data)).executeTakeFirstOrThrow();
-  const id = Number(result.insertId);
-  await replaceNewsTranslations(id, data.translations);
-  return id;
+  return db.transaction().execute(async (trx) => {
+    const result = await trx.insertInto("news").values(toNewsRow(data)).executeTakeFirstOrThrow();
+    const id = Number(result.insertId);
+    await trx
+      .insertInto("news_translation")
+      .values(
+        Object.entries(data.translations).map(([locale, tr]) => ({
+          newsId: id,
+          locale,
+          title: tr.title,
+          summary: tr.summary,
+          body: tr.body,
+        })),
+      )
+      .execute();
+    return id;
+  });
 }
 
 export async function updateNews(id: number, data: NewsUpsertInput) {

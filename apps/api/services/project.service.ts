@@ -237,10 +237,22 @@ export async function searchProjects(q: string, statusCode?: ProjectStatusCode) 
 }
 
 export async function createProject(data: ProjectAdminInput) {
-  const result = await db.insertInto("project").values(toProjectRow(data)).executeTakeFirstOrThrow();
-  const id = Number(result.insertId);
-  await replaceProjectTranslations(id, data.translations);
-  return id;
+  return db.transaction().execute(async (trx) => {
+    const result = await trx.insertInto("project").values(toProjectRow(data)).executeTakeFirstOrThrow();
+    const id = Number(result.insertId);
+    await trx
+      .insertInto("project_translation")
+      .values(
+        Object.entries(data.translations).map(([locale, tr]) => ({
+          projectId: id,
+          locale,
+          title: tr.title,
+          description: tr.description,
+        })),
+      )
+      .execute();
+    return id;
+  });
 }
 
 export async function updateProject(id: number, data: ProjectAdminInput) {

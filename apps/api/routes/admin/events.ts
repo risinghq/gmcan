@@ -67,23 +67,25 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
 router.post("/", zValidator("json", EventBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const result = await db.insertInto("event").values({}).executeTakeFirstOrThrow();
-  const id = Number(result.insertId);
-
-  await db
-    .insertInto("event_translation")
-    .values(
-      Object.entries(translations).map(
-        ([locale, tr]): Omit<EventTranslationTable, "id"> => ({
-          eventId: id,
-          locale,
-          name: tr.name,
-          city: tr.city,
-          country: tr.country,
-        }),
-      ),
-    )
-    .execute();
+  const id = await db.transaction().execute(async (trx) => {
+    const result = await trx.insertInto("event").values({}).executeTakeFirstOrThrow();
+    const eventId = Number(result.insertId);
+    await trx
+      .insertInto("event_translation")
+      .values(
+        Object.entries(translations).map(
+          ([locale, tr]): Omit<EventTranslationTable, "id"> => ({
+            eventId,
+            locale,
+            name: tr.name,
+            city: tr.city,
+            country: tr.country,
+          }),
+        ),
+      )
+      .execute();
+    return eventId;
+  });
 
   return c.json({ id }, 201);
 });
