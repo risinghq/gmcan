@@ -14,7 +14,6 @@ router.get("/", async (c) => {
   const shaped = await Promise.all(
     rows.map(async (row) =>
       Object.assign({}, row, {
-        bio: row.localizedBio,
         asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
       }),
     ),
@@ -30,7 +29,6 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
   const member = {
     ...profile.member,
-    bio: profile.member.localizedBio,
     asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: profile.member.id, slot: "photo" }),
   };
 

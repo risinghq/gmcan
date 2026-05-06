@@ -7,53 +7,22 @@ export type AboutSectionContent = { introParagraphs: string[]; items: string[] }
 
 async function replaceTranslations(table: TTable, ownerId: number, values: Record<string, Record<string, unknown>>) {
   const rows = Object.entries(values).map(([locale, payload]) => ({ locale, payload }));
+  const ownerColumnByTable = {
+    group_translation: "groupId",
+    about_translation: "aboutId",
+    research_line_translation: "researchLineId",
+    method_translation: "methodId",
+    software_translation: "softwareId",
+  } as const;
+  const ownerColumn = ownerColumnByTable[table];
+
   await db.transaction().execute(async (trx) => {
-    switch (table) {
-      case "group_translation":
-        await trx.deleteFrom("group_translation").where("groupId", "=", ownerId).execute();
-        if (rows.length > 0) {
-          await trx
-            .insertInto("group_translation")
-            .values(rows.map(({ locale, payload }) => Object.assign({ groupId: ownerId, locale }, payload)))
-            .execute();
-        }
-        break;
-      case "about_translation":
-        await trx.deleteFrom("about_translation").where("aboutId", "=", ownerId).execute();
-        if (rows.length > 0) {
-          await trx
-            .insertInto("about_translation")
-            .values(rows.map(({ locale, payload }) => Object.assign({ aboutId: ownerId, locale }, payload)))
-            .execute();
-        }
-        break;
-      case "research_line_translation":
-        await trx.deleteFrom("research_line_translation").where("researchLineId", "=", ownerId).execute();
-        if (rows.length > 0) {
-          await trx
-            .insertInto("research_line_translation")
-            .values(rows.map(({ locale, payload }) => Object.assign({ researchLineId: ownerId, locale }, payload)))
-            .execute();
-        }
-        break;
-      case "method_translation":
-        await trx.deleteFrom("method_translation").where("methodId", "=", ownerId).execute();
-        if (rows.length > 0) {
-          await trx
-            .insertInto("method_translation")
-            .values(rows.map(({ locale, payload }) => Object.assign({ methodId: ownerId, locale }, payload)))
-            .execute();
-        }
-        break;
-      case "software_translation":
-        await trx.deleteFrom("software_translation").where("softwareId", "=", ownerId).execute();
-        if (rows.length > 0) {
-          await trx
-            .insertInto("software_translation")
-            .values(rows.map(({ locale, payload }) => Object.assign({ softwareId: ownerId, locale }, payload)))
-            .execute();
-        }
-        break;
+    await trx.deleteFrom(table).where(ownerColumn, "=", ownerId).execute();
+    if (rows.length > 0) {
+      await trx
+        .insertInto(table)
+        .values(rows.map(({ locale, payload }) => Object.assign({ [ownerColumn]: ownerId, locale }, payload)))
+        .execute();
     }
   });
 }
@@ -325,7 +294,6 @@ export async function updateResearchLine(
 ) {
   await replaceTranslations(
     "research_line_translation",
-    "researchLineId",
     id,
     Object.fromEntries(
       Object.entries(data.translations).map(([locale, row]) => [
@@ -429,7 +397,6 @@ export async function updateMethod(
 ) {
   await replaceTranslations(
     "method_translation",
-    "methodId",
     id,
     Object.fromEntries(
       Object.entries(data.translations).map(([locale, row]) => [

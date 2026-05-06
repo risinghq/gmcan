@@ -81,7 +81,7 @@ export async function saveUploadedFile(
   options: { kind: UploadFileKind; bytes?: Buffer },
 ): Promise<string | null> {
   const ext = extensionOf(file.name);
-  const allowedExtensions = UPLOAD_FILE_KIND_EXTENSIONS[options.kind];
+  const allowedExtensions: readonly string[] = UPLOAD_FILE_KIND_EXTENSIONS[options.kind];
   if (!allowedExtensions.includes(ext)) return null;
 
   const assetKey = buildAssetKey(ext);

@@ -119,8 +119,6 @@ export interface MemberTable {
   lastName: string;
   maternalName: string | null;
   birthDate: DateString | null;
-  bio: string | null;
-
   status: number;
   resetPassword: number;
   createdAt: DateString | null;
@@ -338,17 +336,24 @@ export interface AssetTable {
   deleteAfter: DateString | null;
 }
 
-export interface AssetBindingTable {
+export interface AssetBindingHistoryTable {
   id: Generated<number>;
   resourceType: string;
   resourceId: number;
   slot: string;
   assetId: number;
-  isCurrent: number;
-  replacedByBindingId: number | null;
-  replacedAt: DateString | null;
+  version: number;
+  actorId: number | null;
+  reason: string | null;
   createdAt: DateString;
-  deletedAt: DateString | null;
+}
+
+export interface AssetBindingCurrentTable {
+  resourceType: string;
+  resourceId: number;
+  slot: string;
+  bindingId: number;
+  updatedAt: DateString;
 }
 
 export interface AssetAuditTable {
@@ -405,7 +410,8 @@ export interface Database {
   member_project: MemberProjectTable;
   member_group: MemberGroupTable;
   asset: AssetTable;
-  asset_binding: AssetBindingTable;
+  asset_binding_history: AssetBindingHistoryTable;
+  asset_binding_current: AssetBindingCurrentTable;
   asset_audit: AssetAuditTable;
 }
 

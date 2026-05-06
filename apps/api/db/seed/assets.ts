@@ -163,53 +163,70 @@ export async function seedAssetsAndBindings() {
     if (!asset) throw new Error(`Asset row not found for storageKey=${storageKey}`);
 
     await db.transaction().execute(async (trx) => {
-      await trx
-        .updateTable("asset_binding")
-        .set({ isCurrent: 0, replacedAt: now })
-        .where("resourceType", "=", binding.resourceType)
-        .where("resourceId", "=", resourceId)
-        .where("slot", "=", binding.slot)
-        .where("isCurrent", "=", 1)
-        .where("deletedAt", "is", null)
-        .execute();
-
-      const reactivateResult = await trx
-        .updateTable("asset_binding")
-        .set({ isCurrent: 1, replacedAt: null, deletedAt: null })
-        .where("resourceType", "=", binding.resourceType)
-        .where("resourceId", "=", resourceId)
-        .where("slot", "=", binding.slot)
-        .where("assetId", "=", asset.id)
+      const current = await trx
+        .selectFrom("asset_binding_current as c")
+        .innerJoin("asset_binding_history as h", "h.id", "c.bindingId")
+        .select(["h.version", "h.assetId"])
+        .where("c.resourceType", "=", binding.resourceType)
+        .where("c.resourceId", "=", resourceId)
+        .where("c.slot", "=", binding.slot)
         .executeTakeFirst();
 
-      const updated = Number(reactivateResult.numUpdatedRows ?? 0);
-      if (updated === 0) {
+      const historyInsert = await trx
+        .insertInto("asset_binding_history")
+        .values({
+          resourceType: binding.resourceType,
+          resourceId,
+          slot: binding.slot,
+          assetId: asset.id,
+          version: (current?.version ?? 0) + 1,
+          actorId: null,
+          reason: "seed",
+          createdAt: now,
+        })
+        .executeTakeFirstOrThrow();
+      const bindingId = Number(historyInsert.insertId);
+
+      await trx
+        .insertInto("asset_binding_current")
+        .values({
+          resourceType: binding.resourceType,
+          resourceId,
+          slot: binding.slot,
+          bindingId,
+          updatedAt: now,
+        })
+        .onConflict((oc) =>
+          oc.columns(["resourceType", "resourceId", "slot"]).doUpdateSet({
+            bindingId,
+            updatedAt: now,
+          }),
+        )
+        .execute();
+
+      if (current && current.assetId !== asset.id) {
         await trx
-          .insertInto("asset_binding")
-          .values({
-            resourceType: binding.resourceType,
-            resourceId,
-            slot: binding.slot,
-            assetId: asset.id,
-            isCurrent: 1,
-            replacedByBindingId: null,
-            replacedAt: null,
-            createdAt: now,
-            deletedAt: null,
-          })
+          .updateTable("asset")
+          .set({ status: "soft_deleted", deletedAt: now, deleteAfter: now })
+          .where("id", "=", current.assetId)
           .execute();
       }
+
+      await trx
+        .updateTable("asset")
+        .set({ status: "active", deletedAt: null, deleteAfter: null })
+        .where("id", "=", asset.id)
+        .execute();
     });
   }
 }
 
 export async function auditAndQuarantineOrphans() {
   const rows = await db
-    .selectFrom("asset_binding as b")
-    .innerJoin("asset as a", "a.id", "b.assetId")
+    .selectFrom("asset_binding_current as c")
+    .innerJoin("asset_binding_history as h", "h.id", "c.bindingId")
+    .innerJoin("asset as a", "a.id", "h.assetId")
     .select("a.storageKey")
-    .where("b.isCurrent", "=", 1)
-    .where("b.deletedAt", "is", null)
     .where("a.status", "=", "active")
     .execute();
 

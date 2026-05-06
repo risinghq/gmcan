@@ -56,7 +56,6 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const members = await Promise.all(
     result.members.map(async (row) =>
       Object.assign({}, row, {
-        bio: row.localizedBio,
         asset: await resolveAssetAccessUrl({ resourceType: "member", resourceId: row.id, slot: "photo" }),
       }),
     ),

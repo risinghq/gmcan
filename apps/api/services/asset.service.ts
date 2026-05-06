@@ -71,6 +71,48 @@ async function writeAudit(
     .execute();
 }
 
+async function getCurrentBinding(
+  executor: Kysely<Database> | Transaction<Database>,
+  input: { resourceType: ResourceType; resourceId: number; slot: string },
+) {
+  return executor
+    .selectFrom("asset_binding_current as c")
+    .innerJoin("asset_binding_history as h", "h.id", "c.bindingId")
+    .select(["h.id", "h.assetId", "h.version"])
+    .where("c.resourceType", "=", input.resourceType)
+    .where("c.resourceId", "=", input.resourceId)
+    .where("c.slot", "=", input.slot)
+    .executeTakeFirst();
+}
+
+async function insertBindingHistory(
+  executor: Kysely<Database> | Transaction<Database>,
+  input: {
+    resourceType: ResourceType;
+    resourceId: number;
+    slot: string;
+    assetId: number;
+    actorId: number | null;
+    reason: string | null;
+    version: number;
+  },
+) {
+  const inserted = await executor
+    .insertInto("asset_binding_history")
+    .values({
+      resourceType: input.resourceType,
+      resourceId: input.resourceId,
+      slot: input.slot,
+      assetId: input.assetId,
+      version: input.version,
+      actorId: input.actorId,
+      reason: input.reason,
+      createdAt: nowIso(),
+    })
+    .executeTakeFirstOrThrow();
+  return Number(inserted.insertId);
+}
+
 function extensionFromName(fileName: string): string {
   return path.extname(fileName).replace(".", "").toLowerCase();
 }
@@ -112,39 +154,30 @@ export async function uploadAndReplaceCurrent(input: {
       .executeTakeFirst();
 
     const assetId = Number(assetInsert.insertId);
-    const current = await trx
-      .selectFrom("asset_binding")
-      .select(["id", "assetId"])
-      .where("resourceType", "=", input.resourceType)
-      .where("resourceId", "=", input.resourceId)
-      .where("slot", "=", input.slot)
-      .where("isCurrent", "=", 1)
-      .where("deletedAt", "is", null)
-      .executeTakeFirst();
+    const current = await getCurrentBinding(trx, input);
+    const bindingId = await insertBindingHistory(trx, {
+      ...input,
+      assetId,
+      actorId: input.actorId,
+      reason: "upload",
+      version: (current?.version ?? 0) + 1,
+    });
 
-    const bindingInsert = await trx
-      .insertInto("asset_binding")
+    await trx
+      .insertInto("asset_binding_current")
       .values({
         resourceType: input.resourceType,
         resourceId: input.resourceId,
         slot: input.slot,
-        assetId,
-        isCurrent: 1,
-        replacedByBindingId: null,
-        replacedAt: null,
-        createdAt: nowIso(),
-        deletedAt: null,
+        bindingId,
+        updatedAt: nowIso(),
       })
-      .executeTakeFirst();
-    const bindingId = Number(bindingInsert.insertId);
+      .onConflict((oc) =>
+        oc.columns(["resourceType", "resourceId", "slot"]).doUpdateSet({ bindingId, updatedAt: nowIso() }),
+      )
+      .execute();
 
     if (current) {
-      await trx
-        .updateTable("asset_binding")
-        .set({ isCurrent: 0, replacedByBindingId: bindingId, replacedAt: nowIso() })
-        .where("id", "=", current.id)
-        .execute();
-
       await trx
         .updateTable("asset")
         .set({ status: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
@@ -163,22 +196,15 @@ export async function softDeleteCurrentBinding(input: {
   slot: string;
   actorId: number | null;
 }): Promise<void> {
-  const current = await db
-    .selectFrom("asset_binding")
-    .select(["id", "assetId"])
-    .where("resourceType", "=", input.resourceType)
-    .where("resourceId", "=", input.resourceId)
-    .where("slot", "=", input.slot)
-    .where("isCurrent", "=", 1)
-    .where("deletedAt", "is", null)
-    .executeTakeFirst();
+  const current = await getCurrentBinding(db, input);
   if (!current) throw new Error("Current asset binding not found");
 
   await db.transaction().execute(async (trx) => {
     await trx
-      .updateTable("asset_binding")
-      .set({ isCurrent: 0, deletedAt: nowIso(), replacedAt: nowIso() })
-      .where("id", "=", current.id)
+      .deleteFrom("asset_binding_current")
+      .where("resourceType", "=", input.resourceType)
+      .where("resourceId", "=", input.resourceId)
+      .where("slot", "=", input.slot)
       .execute();
     await trx
       .updateTable("asset")
@@ -190,24 +216,26 @@ export async function softDeleteCurrentBinding(input: {
 }
 
 export async function restoreBinding(bindingId: number, actorId: number | null): Promise<void> {
-  const binding = await db.selectFrom("asset_binding").selectAll().where("id", "=", bindingId).executeTakeFirst();
+  const binding = await db
+    .selectFrom("asset_binding_history")
+    .selectAll()
+    .where("id", "=", bindingId)
+    .executeTakeFirst();
   if (!binding) throw new Error("Binding not found");
 
   await db.transaction().execute(async (trx) => {
     await trx
-      .updateTable("asset_binding")
-      .set({ isCurrent: 0, replacedAt: nowIso() })
-      .where("resourceType", "=", binding.resourceType)
-      .where("resourceId", "=", binding.resourceId)
-      .where("slot", "=", binding.slot)
-      .where("isCurrent", "=", 1)
-      .where("deletedAt", "is", null)
-      .execute();
-
-    await trx
-      .updateTable("asset_binding")
-      .set({ isCurrent: 1, deletedAt: null })
-      .where("id", "=", binding.id)
+      .insertInto("asset_binding_current")
+      .values({
+        resourceType: binding.resourceType as ResourceType,
+        resourceId: binding.resourceId,
+        slot: binding.slot,
+        bindingId: binding.id,
+        updatedAt: nowIso(),
+      })
+      .onConflict((oc) =>
+        oc.columns(["resourceType", "resourceId", "slot"]).doUpdateSet({ bindingId: binding.id, updatedAt: nowIso() }),
+      )
       .execute();
 
     await trx
@@ -235,14 +263,13 @@ export async function resolveAssetAccessUrl(input: {
   slot: string;
 }): Promise<string | null> {
   const row = await db
-    .selectFrom("asset_binding as b")
-    .innerJoin("asset as a", "a.id", "b.assetId")
+    .selectFrom("asset_binding_current as c")
+    .innerJoin("asset_binding_history as h", "h.id", "c.bindingId")
+    .innerJoin("asset as a", "a.id", "h.assetId")
     .select(["a.id", "a.visibility"])
-    .where("b.resourceType", "=", input.resourceType)
-    .where("b.resourceId", "=", input.resourceId)
-    .where("b.slot", "=", input.slot)
-    .where("b.isCurrent", "=", 1)
-    .where("b.deletedAt", "is", null)
+    .where("c.resourceType", "=", input.resourceType)
+    .where("c.resourceId", "=", input.resourceId)
+    .where("c.slot", "=", input.slot)
     .where("a.status", "=", "active")
     .executeTakeFirst();
   if (!row) return null;

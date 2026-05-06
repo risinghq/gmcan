@@ -22,6 +22,15 @@ const NamedTranslationBody = z.object({
   }),
 });
 
+function setTranslation<T>(byId: Map<number, Record<string, T>>, id: number, locale: string, value: T) {
+  const translations = byId.get(id);
+  if (translations) {
+    translations[locale] = value;
+    return;
+  }
+  byId.set(id, { [locale]: value } as Record<string, T>);
+}
+
 router.get("/news-type/:id/count", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   return c.json(await getNewsTypeReferenceCount(id));
@@ -41,7 +50,7 @@ router.get("/member-type", async (c) => {
 
   const byId = new Map<number, Record<string, { name: string; nameSingular: string }>>();
   for (const row of rows) {
-    byId.set(row.id, { ...(byId.get(row.id) ?? {}), [row.locale]: { name: row.name, nameSingular: row.nameSingular } });
+    setTranslation(byId, row.id, row.locale, { name: row.name, nameSingular: row.nameSingular });
   }
 
   return c.json(Array.from(byId.entries()).map(([id, translations]) => ({ id, translations })));
@@ -122,22 +131,61 @@ router.delete("/member-type/:id", zValidator("param", IdParam), async (c) => {
 
 async function listNamedTranslated(
   table: "publication_type" | "thesis_type" | "news_type" | "university",
-  trTable:
+  _trTable:
     | "publication_type_translation"
     | "thesis_type_translation"
     | "news_type_translation"
     | "university_translation",
-  ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
+  _ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
 ) {
-  const rows = await db
-    .selectFrom(table)
-    .innerJoin(trTable, `${trTable}.${ownerCol}`, `${table}.id`)
-    .select([`${table}.id as id`, `${trTable}.locale as locale`, `${trTable}.name as name`])
-    .execute();
+  const rows =
+    table === "publication_type"
+      ? await db
+          .selectFrom("publication_type")
+          .innerJoin(
+            "publication_type_translation",
+            "publication_type_translation.publicationTypeId",
+            "publication_type.id",
+          )
+          .select([
+            "publication_type.id as id",
+            "publication_type_translation.locale as locale",
+            "publication_type_translation.name as name",
+          ])
+          .execute()
+      : table === "thesis_type"
+        ? await db
+            .selectFrom("thesis_type")
+            .innerJoin("thesis_type_translation", "thesis_type_translation.thesisTypeId", "thesis_type.id")
+            .select([
+              "thesis_type.id as id",
+              "thesis_type_translation.locale as locale",
+              "thesis_type_translation.name as name",
+            ])
+            .execute()
+        : table === "news_type"
+          ? await db
+              .selectFrom("news_type")
+              .innerJoin("news_type_translation", "news_type_translation.newsTypeId", "news_type.id")
+              .select([
+                "news_type.id as id",
+                "news_type_translation.locale as locale",
+                "news_type_translation.name as name",
+              ])
+              .execute()
+          : await db
+              .selectFrom("university")
+              .innerJoin("university_translation", "university_translation.universityId", "university.id")
+              .select([
+                "university.id as id",
+                "university_translation.locale as locale",
+                "university_translation.name as name",
+              ])
+              .execute();
 
   const byId = new Map<number, Record<string, { name: string }>>();
   for (const row of rows) {
-    byId.set(row.id, { ...(byId.get(row.id) ?? {}), [row.locale]: { name: row.name } });
+    setTranslation(byId, row.id, row.locale, { name: row.name });
   }
   return Array.from(byId.entries()).map(([id, translations]) => ({ id, translations }));
 }
@@ -145,17 +193,46 @@ async function listNamedTranslated(
 async function getNamedTranslated(
   id: number,
   table: "publication_type" | "thesis_type" | "news_type" | "university",
-  trTable:
+  _trTable:
     | "publication_type_translation"
     | "thesis_type_translation"
     | "news_type_translation"
     | "university_translation",
-  ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
+  _ownerCol: "publicationTypeId" | "thesisTypeId" | "newsTypeId" | "universityId",
 ) {
-  const row = await db.selectFrom(table).select(["id"]).where("id", "=", id).executeTakeFirst();
+  const [row, translations] =
+    table === "publication_type"
+      ? await Promise.all([
+          db.selectFrom("publication_type").select("id").where("id", "=", id).executeTakeFirst(),
+          db
+            .selectFrom("publication_type_translation")
+            .select(["locale", "name"])
+            .where("publicationTypeId", "=", id)
+            .execute(),
+        ])
+      : table === "thesis_type"
+        ? await Promise.all([
+            db.selectFrom("thesis_type").select("id").where("id", "=", id).executeTakeFirst(),
+            db
+              .selectFrom("thesis_type_translation")
+              .select(["locale", "name"])
+              .where("thesisTypeId", "=", id)
+              .execute(),
+          ])
+        : table === "news_type"
+          ? await Promise.all([
+              db.selectFrom("news_type").select("id").where("id", "=", id).executeTakeFirst(),
+              db.selectFrom("news_type_translation").select(["locale", "name"]).where("newsTypeId", "=", id).execute(),
+            ])
+          : await Promise.all([
+              db.selectFrom("university").select("id").where("id", "=", id).executeTakeFirst(),
+              db
+                .selectFrom("university_translation")
+                .select(["locale", "name"])
+                .where("universityId", "=", id)
+                .execute(),
+            ]);
   if (!row) return null;
-
-  const translations = await db.selectFrom(trTable).select(["locale", "name"]).where(ownerCol, "=", id).execute();
 
   return { id, translations: Object.fromEntries(translations.map((tr) => [tr.locale, { name: tr.name }])) };
 }

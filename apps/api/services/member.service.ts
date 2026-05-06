@@ -7,6 +7,11 @@ import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./asset.service.js";
 
+type MemberProfile = Awaited<ReturnType<typeof publicProfile>>;
+type PublicProfileMember = NonNullable<MemberProfile["member"]>;
+type LocalizedMember = PublicProfileMember & { localizedBio: string | null };
+type MemberProfileLocalized = Omit<MemberProfile, "member"> & { member: LocalizedMember | undefined };
+
 export async function listMembers() {
   return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
 }
@@ -142,9 +147,9 @@ export async function getMemberProfile(id: number) {
   return publicProfile(id);
 }
 
-export async function getMemberProfileLocalized(id: number, locale: Locale) {
+export async function getMemberProfileLocalized(id: number, locale: Locale): Promise<MemberProfileLocalized> {
   const profile = await publicProfile(id);
-  if (!profile.member) return profile;
+  if (!profile.member) return { ...profile, member: undefined };
   const tr = await db
     .selectFrom("member_translation")
     .select("bio")
@@ -153,7 +158,7 @@ export async function getMemberProfileLocalized(id: number, locale: Locale) {
     .executeTakeFirstOrThrow();
   return {
     ...profile,
-    member: Object.assign({}, profile.member, { localizedBio: tr.bio }),
+    member: { ...profile.member, localizedBio: tr.bio },
   };
 }
 

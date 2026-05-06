@@ -10,7 +10,6 @@ export const MEMBER_PUBLIC = [
   "lastName",
   "maternalName",
   "birthDate",
-  "bio",
   "status",
   "roleId",
   "memberTypeId",

@@ -33,7 +33,6 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "lastName",
     "maternalName",
     "birthDate",
-    "bio",
 
     "status",
     "resetPassword",
@@ -133,18 +132,18 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "deletedAt",
     "deleteAfter",
   ],
-  asset_binding: [
+  asset_binding_history: [
     "id",
     "resourceType",
     "resourceId",
     "slot",
     "assetId",
-    "isCurrent",
-    "replacedByBindingId",
-    "replacedAt",
+    "version",
+    "actorId",
+    "reason",
     "createdAt",
-    "deletedAt",
   ],
+  asset_binding_current: ["resourceType", "resourceId", "slot", "bindingId", "updatedAt"],
   asset_audit: ["id", "assetId", "bindingId", "action", "actorId", "reason", "createdAt"],
 };
 
@@ -308,7 +307,6 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("lastName", "text", (c) => c.notNull())
     .addColumn("maternalName", "text")
     .addColumn("birthDate", "text")
-    .addColumn("bio", "text")
 
     .addColumn("status", "integer", (c) => c.notNull())
     .addColumn("resetPassword", "integer", (c) => c.notNull())
@@ -584,18 +582,34 @@ export async function createTables(db: Kysely<Database>) {
     .execute();
 
   await db.schema
-    .createTable("asset_binding")
+    .createTable("asset_binding_history")
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("resourceType", "text", (c) => c.notNull())
     .addColumn("resourceId", "integer", (c) => c.notNull())
     .addColumn("slot", "text", (c) => c.notNull())
     .addColumn("assetId", "integer", (c) => c.notNull().references("asset.id"))
-    .addColumn("isCurrent", "integer", (c) => c.notNull())
-    .addColumn("replacedByBindingId", "integer", (c) => c.references("asset_binding.id"))
-    .addColumn("replacedAt", "text")
+    .addColumn("version", "integer", (c) => c.notNull())
+    .addColumn("actorId", "integer", (c) => c.references("member.id"))
+    .addColumn("reason", "text")
     .addColumn("createdAt", "text", (c) => c.notNull())
-    .addColumn("deletedAt", "text")
+    .addUniqueConstraint("asset_binding_history_owner_version_unique", [
+      "resourceType",
+      "resourceId",
+      "slot",
+      "version",
+    ])
+    .execute();
+
+  await db.schema
+    .createTable("asset_binding_current")
+    .ifNotExists()
+    .addColumn("resourceType", "text", (c) => c.notNull())
+    .addColumn("resourceId", "integer", (c) => c.notNull())
+    .addColumn("slot", "text", (c) => c.notNull())
+    .addColumn("bindingId", "integer", (c) => c.notNull().references("asset_binding_history.id").onDelete("cascade"))
+    .addColumn("updatedAt", "text", (c) => c.notNull())
+    .addPrimaryKeyConstraint("asset_binding_current_pk", ["resourceType", "resourceId", "slot"])
     .execute();
 
   await db.schema
@@ -603,7 +617,7 @@ export async function createTables(db: Kysely<Database>) {
     .ifNotExists()
     .addColumn("id", "integer", (c) => c.primaryKey().autoIncrement().notNull())
     .addColumn("assetId", "integer", (c) => c.references("asset.id"))
-    .addColumn("bindingId", "integer", (c) => c.references("asset_binding.id"))
+    .addColumn("bindingId", "integer", (c) => c.references("asset_binding_history.id"))
     .addColumn("action", "text", (c) => c.notNull())
     .addColumn("actorId", "integer", (c) => c.references("member.id"))
     .addColumn("reason", "text")
@@ -613,18 +627,22 @@ export async function createTables(db: Kysely<Database>) {
   await db.schema
     .createIndex("idx_asset_binding_current_unique")
     .ifNotExists()
-    .unique()
-    .on("asset_binding")
+    .on("asset_binding_current")
     .columns(["resourceType", "resourceId", "slot"])
-    .where("isCurrent", "=", 1)
-    .where("deletedAt", "is", null)
     .execute();
 
   await db.schema
     .createIndex("idx_asset_binding_lookup")
     .ifNotExists()
-    .on("asset_binding")
-    .columns(["resourceType", "resourceId", "slot", "isCurrent"])
+    .on("asset_binding_current")
+    .columns(["resourceType", "resourceId", "slot"])
+    .execute();
+
+  await db.schema
+    .createIndex("idx_asset_binding_history_lookup")
+    .ifNotExists()
+    .on("asset_binding_history")
+    .columns(["resourceType", "resourceId", "slot", "version"])
     .execute();
 
   await db.schema

@@ -14,6 +14,21 @@ export interface AuthorInput {
   isPrincipal: number;
 }
 
+type PublicationAuthor =
+  | {
+      kind: "registered";
+      memberId: number;
+      name: string;
+      photo: null;
+      photoUrl: string | null;
+      isPrincipal: number;
+    }
+  | {
+      kind: "external";
+      name: string;
+      isPrincipal: number;
+    };
+
 export interface PublicationFields {
   translations: LocalizedTranslations<{ title: string; abstract?: string }>;
   doi?: string;
@@ -135,7 +150,7 @@ export async function listPublications(locale: Locale) {
         : { kind: "external" as const, name: row.externalName ?? "", isPrincipal: row.isPrincipal },
     })),
   );
-  const authorsByPublication = new Map<number, ReturnType<typeof authorRows.map>>();
+  const authorsByPublication = new Map<number, PublicationAuthor[]>();
   for (const row of resolvedAuthorRows) {
     const current = authorsByPublication.get(row.publicationId) ?? [];
     current.push(row.entry);
