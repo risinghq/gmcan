@@ -91,11 +91,12 @@ export const linesResolver: ResolveFn<ResearchLineDisplay[]> = () => {
         moneda: monedasMap.get(project.currencyCode)?.symbol,
       }));
 
-      return lineas.slice(0, 3).map((line) => ({
-        ...line,
-        description: line.description ?? "",
-        proyectos: enrichedProjects.filter((project) => project.researchLineId === line.id && !project.endDate),
-      }));
+      return lineas.slice(0, 3).map((line) =>
+        Object.assign({}, line, {
+          description: line.description ?? "",
+          proyectos: enrichedProjects.filter((project) => project.researchLineId === line.id && !project.endDate),
+        }),
+      );
     }),
   );
 };

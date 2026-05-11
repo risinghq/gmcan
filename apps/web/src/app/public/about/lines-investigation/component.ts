@@ -1,3 +1,4 @@
+import { SlicePipe } from "@angular/common";
 import { Component, inject, input } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
@@ -15,7 +16,7 @@ import {
   selector: "app-lines-investigation",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
-  imports: [MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext],
+  imports: [MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe],
 })
 export default class LinesInvestigationComponent {
   router = inject(Router);
