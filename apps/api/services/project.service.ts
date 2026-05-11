@@ -65,6 +65,13 @@ export async function listProjectsLocalized(locale: Locale, statusCode?: Project
     .innerJoin("project_translation", (join) =>
       join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
     )
+    .innerJoin("research_line_translation", (join) =>
+      join
+        .onRef("research_line_translation.researchLineId", "=", "project.researchLineId")
+        .on("research_line_translation.locale", "=", locale),
+    )
+    .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
+    .innerJoin("currency", "currency.code", "project.currencyCode")
     .select([
       "project.id as id",
       "project_translation.title as title",
@@ -79,9 +86,48 @@ export async function listProjectsLocalized(locale: Locale, statusCode?: Project
       "project.fundingSourceCode as fundingSourceCode",
       "project.createdAt as createdAt",
       "project.updatedAt as updatedAt",
+      "research_line_translation.name as researchLine",
+      "funding_source.name as fundingSource",
+      "currency.symbol as currencySymbol",
     ]);
   if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
-  return query.execute();
+
+  const projects = await query.execute();
+  if (projects.length === 0) return [];
+
+  const projectIds = projects.map((p) => p.id);
+  const memberRows = await db
+    .selectFrom("project_member")
+    .innerJoin("member", "member.id", "project_member.memberId")
+    .select([
+      "project_member.projectId as projectId",
+      "member.id as memberId",
+      "member.firstName as firstName",
+      "member.lastName as lastName",
+      "member.maternalName as maternalName",
+    ])
+    .where("project_member.projectId", "in", projectIds)
+    .execute();
+
+  const memberEntries = await Promise.all(
+    memberRows.map(async (row) => ({
+      projectId: row.projectId,
+      entry: {
+        memberId: row.memberId,
+        name: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
+        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
+      },
+    })),
+  );
+
+  const membersByProject = new Map<number, { memberId: number; name: string; asset: string | null }[]>();
+  for (const { projectId, entry } of memberEntries) {
+    const current = membersByProject.get(projectId) ?? [];
+    current.push(entry);
+    membersByProject.set(projectId, current);
+  }
+
+  return projects.map((project) => Object.assign(project, { members: membersByProject.get(project.id) ?? [] }));
 }
 
 export async function listAdminProjects(

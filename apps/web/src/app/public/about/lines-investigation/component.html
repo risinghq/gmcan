@@ -18,7 +18,7 @@
           </div>
           <div class="project-rev">
             <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
-            proyecto.lineasInvestigacion }}
+            proyecto.researchLine }}
           </div>
           <div class="mt-16">
             <div class="flex-news flex-flow">
@@ -64,20 +64,20 @@
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
-              {{ proyecto.fuenteFinanciamiento }}
+              {{ proyecto.fundingSource }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
-              {{ proyecto.moneda }} {{ proyecto.fundedAmountMinor }}
+              {{ proyecto.currencySymbol }} {{ proyecto.fundedAmountMinor }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
-              {{ proyecto.fechaI }}
+              {{ proyecto.startDate | date:"MMMM y":"UTC":language().locale }}
             </div>
-            @if (proyecto.fechaF) {
+            @if (proyecto.endDate) {
             <div class="abstract">
               <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
-              {{ proyecto.fechaF }}
+              {{ proyecto.endDate | date:"MMMM y":"UTC":language().locale }}
             </div>
             }
           </div>
@@ -119,7 +119,7 @@
           </div>
           <div class="project-rev">
             <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
-            proyecto.lineasInvestigacion }}
+            proyecto.researchLine }}
           </div>
           <div class="mt-16">
             <div class="flex-news flex-flow">
@@ -165,20 +165,20 @@
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
-              {{ proyecto.fuenteFinanciamiento }}
+              {{ proyecto.fundingSource }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
-              {{ proyecto.moneda }} {{ proyecto.fundedAmountMinor }}
+              {{ proyecto.currencySymbol }} {{ proyecto.fundedAmountMinor }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
-              {{ proyecto.fechaI }}
+              {{ proyecto.startDate | date:"MMMM y":"UTC":language().locale }}
             </div>
-            @if (proyecto.fechaF) {
+            @if (proyecto.endDate) {
             <div class="abstract">
               <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
-              {{ proyecto.fechaF }}
+              {{ proyecto.endDate | date:"MMMM y":"UTC":language().locale }}
             </div>
             }
           </div>
@@ -220,7 +220,7 @@
           </div>
           <div class="project-rev">
             <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
-            proyecto.lineasInvestigacion }}
+            proyecto.researchLine }}
           </div>
           <div class="mt-16">
             <div class="flex-news flex-flow">
@@ -266,20 +266,20 @@
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
-              {{ proyecto.fuenteFinanciamiento }}
+              {{ proyecto.fundingSource }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
-              {{ proyecto.moneda }} {{ proyecto.fundedAmountMinor }}
+              {{ proyecto.currencySymbol }} {{ proyecto.fundedAmountMinor }}
             </div>
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
-              {{ proyecto.fechaI }}
+              {{ proyecto.startDate | date:"MMMM y":"UTC":language().locale }}
             </div>
-            @if (proyecto.fechaF) {
+            @if (proyecto.endDate) {
             <div class="abstract">
               <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
-              {{ proyecto.fechaF }}
+              {{ proyecto.endDate | date:"MMMM y":"UTC":language().locale }}
             </div>
             }
           </div>

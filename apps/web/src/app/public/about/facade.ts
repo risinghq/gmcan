@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Router } from "@angular/router";
+import { toNavigationAppError } from "@app/shared/errors/app-error";
 import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
 import type { Group } from "@app/shared/models/group";
 import type { Method } from "@app/shared/models/method";
@@ -49,18 +50,18 @@ export class AboutFacade {
   readonly group = signal<Group | null>(null);
 
   async loadMethods(): Promise<void> {
-    const result = await this.dataService.getMethods();
-    result.match(
-      (methods) => this.methods.set(methods),
-      (error) => this.errorHandler.handle(error),
-    );
+    try {
+      this.methods.set(await this.dataService.getMethods());
+    } catch (error) {
+      this.errorHandler.handle(toNavigationAppError(error));
+    }
   }
 
   async loadGroup(): Promise<void> {
-    const result = await this.dataService.getGroup();
-    result.match(
-      (group) => this.group.set(group),
-      (error) => this.errorHandler.handle(error),
-    );
+    try {
+      this.group.set(await this.dataService.getGroup());
+    } catch (error) {
+      this.errorHandler.handle(toNavigationAppError(error));
+    }
   }
 }

@@ -1,6 +1,7 @@
+import { inject } from "@angular/core";
 import { Routes } from "@angular/router";
 
-import { aboutUsResolver, facilitiesResolver, linesResolver } from "./about/data";
+import { AboutDataService } from "./about/data";
 import { detailNewsResolver } from "./detail-news/resolver";
 import { globalSearchResolver } from "./global-search/resolver";
 import { homeResolver } from "./home/resolver";
@@ -36,17 +37,17 @@ export default [
           {
             path: "",
             loadComponent: () => import("./about/about-us/component"),
-            resolve: { aboutus: aboutUsResolver },
+            resolve: { aboutus: () => inject(AboutDataService).getAbout() },
           },
           {
             path: "about",
             loadComponent: () => import("./about/about-us/component"),
-            resolve: { aboutus: aboutUsResolver },
+            resolve: { aboutus: () => inject(AboutDataService).getAbout() },
           },
           {
             path: "lines-investigation",
             loadComponent: () => import("./about/lines-investigation/component"),
-            resolve: { lineasProyecto: linesResolver },
+            resolve: { lineasProyecto: () => inject(AboutDataService).getLines() },
           },
           {
             path: "methods",
@@ -55,7 +56,7 @@ export default [
           {
             path: "facilities-resources",
             loadComponent: () => import("./about/facilities/component"),
-            resolve: { facilities: facilitiesResolver },
+            resolve: { facilities: () => inject(AboutDataService).getFacilities() },
           },
           { path: "works", loadComponent: () => import("./about/works/component") },
         ],
