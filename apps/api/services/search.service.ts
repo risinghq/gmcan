@@ -1,8 +1,8 @@
 import { type Locale } from "../lib/public-locale.js";
 import { listProjectSearchMemberRowsByProjectIds } from "../repositories/members.js";
 import { searchNewsRows } from "../repositories/news.js";
-import { listPublicationAuthorRowsByPublicationIds, searchPublicationRows } from "../repositories/publications.js";
 import { searchActiveProjectRows } from "../repositories/projects.js";
+import { listPublicationAuthorRowsByPublicationIds, searchPublicationRows } from "../repositories/publications.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 type PublicationAuthorEntry =
