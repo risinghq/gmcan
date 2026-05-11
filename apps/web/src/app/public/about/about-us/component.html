@@ -1,40 +1,38 @@
-@if (aboutus) {
 <div class="card-about">
-  @if (!aboutus.asset) {
+  @if (!aboutus().asset) {
   <img class="about-img" src="/img/grupal.jpg" />
-  } @if (aboutus.asset) {
-  <img class="about-img" src="{{ aboutus.asset }}" />
+  } @if (aboutus().asset) {
+  <img class="about-img" src="{{ aboutus().asset }}" />
   }
   <div class="about-text-div">
-    <div class="about-title">{{ language.aboutText[0].aboutUs }}</div>
+    <div class="about-title">{{ language().aboutText[0].aboutUs }}</div>
     <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus.description"></div>
-    <div class="about-title about-top">{{ language.aboutText[0].ourObjectives }}</div>
-    <div class="about-subtitle">{{ language.aboutText[0].ourObjectivesQuestion }}</div>
+    <div class="about-text" [innerHTML]="aboutus().description"></div>
+    <div class="about-title about-top">{{ language().aboutText[0].ourObjectives }}</div>
+    <div class="about-subtitle">{{ language().aboutText[0].ourObjectivesQuestion }}</div>
     <div class="about-sub-divi"></div>
     <div class="about-text">
-      @for (paragraph of aboutus.objectivesContent.introParagraphs; track paragraph) {
+      @for (paragraph of aboutus().objectivesContent.introParagraphs; track paragraph) {
       <p>{{ paragraph }}</p>
       }
       <ul>
-        @for (item of aboutus.objectivesContent.items; track item) {
+        @for (item of aboutus().objectivesContent.items; track item) {
         <li>{{ item }}</li>
         }
       </ul>
     </div>
-    <div class="about-title about-top">{{ language.aboutText[0].ourServices }}</div>
-    <div class="about-subtitle">{{ language.aboutText[0].ourServicesQuestion }}</div>
+    <div class="about-title about-top">{{ language().aboutText[0].ourServices }}</div>
+    <div class="about-subtitle">{{ language().aboutText[0].ourServicesQuestion }}</div>
     <div class="about-sub-divi"></div>
     <div class="about-text">
-      @for (paragraph of aboutus.servicesContent.introParagraphs; track paragraph) {
+      @for (paragraph of aboutus().servicesContent.introParagraphs; track paragraph) {
       <p>{{ paragraph }}</p>
       }
       <ul>
-        @for (item of aboutus.servicesContent.items; track item) {
+        @for (item of aboutus().servicesContent.items; track item) {
         <li>{{ item }}</li>
         }
       </ul>
     </div>
   </div>
 </div>
-}

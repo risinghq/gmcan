@@ -2,16 +2,16 @@
   <div class="lines-text-div">
     <div class="line-mb">
       <div class="line-img-div">
-        @if (lineasProyecto[0].asset) {
-        <img class="line-img" src="{{ lineasProyecto[0].asset }}" />
+        @if (lineasProyecto()[0].asset) {
+        <img class="line-img" src="{{ lineasProyecto()[0].asset }}" />
         }
       </div>
-      <div class="lines-title">{{ lineasProyecto[0].name }}</div>
+      <div class="lines-title">{{ lineasProyecto()[0].name }}</div>
       <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto[0].description }}</div>
-      <div class="lines-projects">{{ language.linesInvestigationText[0].projects }}</div>
+      <div class="lines-subtitle">{{ lineasProyecto()[0].description }}</div>
+      <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
       <div>
-        @for ( proyecto of lineasProyecto[0].proyectos | slice: (page0 - 1) * pageSize : (page0 - 1) * pageSize +
+        @for ( proyecto of lineasProyecto()[0].proyectos | slice: (page0 - 1) * pageSize : (page0 - 1) * pageSize +
         pageSize; track proyecto; let i = $index ) {
         <div class="project">
           <div class="project-code">{{ proyecto.code }}</div>
@@ -19,12 +19,12 @@
             <div class="project-title">{{ proyecto.title }}</div>
           </div>
           <div class="project-rev">
-            <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
+            <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
             proyecto.lineasInvestigacion }}
           </div>
           <div class="mt-16">
             <div class="flex-news flex-flow">
-              <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+              <strong class="resp-title">{{ this.language().projectsText[0].responsable }}:</strong>
               @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
@@ -49,8 +49,8 @@
                 aria-expanded="false"
                 aria-controls="collapseExample"
               >
-                {{ expandLabel( "line0", i, language.linesInvestigationText[0].seeMore,
-                language.linesInvestigationText[0].seeLess ) }}
+                {{ expandLabel( "line0", i, language().linesInvestigationText[0].seeMore,
+                language().linesInvestigationText[0].seeLess ) }}
               </a>
               <mat-icon
                 class="project-abs-icon"
@@ -65,31 +65,31 @@
           </div>
           <div class="collapse collapsed-resumen mt-16" id="collapseExample0{{ i }}">
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
               {{ proyecto.description }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
               {{ proyecto.fuenteFinanciamiento }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
               {{ proyecto.moneda }} {{ proyecto.fundedAmountMinor }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
               {{ proyecto.fechaI }}
             </div>
             @if (proyecto.fechaF) {
             <div class="abstract">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
               {{ proyecto.fechaF }}
             </div>
             }
           </div>
         </div>
-        } @if (lineasProyecto[0].proyectos.length > 5) {
-        <ngb-pagination [(page)]="page0" [pageSize]="pageSize" [collectionSize]="lineasProyecto[0].proyectos.length">
+        } @if (lineasProyecto()[0].proyectos.length > 5) {
+        <ngb-pagination [(page)]="page0" [pageSize]="pageSize" [collectionSize]="lineasProyecto()[0].proyectos.length">
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -109,16 +109,16 @@
     </div>
     <div class="line-mb">
       <div class="line-img-div">
-        @if (lineasProyecto[1].asset) {
-        <img class="line-img" src="{{ lineasProyecto[1].asset }}" />
+        @if (lineasProyecto()[1].asset) {
+        <img class="line-img" src="{{ lineasProyecto()[1].asset }}" />
         }
       </div>
-      <div class="lines-title">{{ lineasProyecto[1].name }}</div>
+      <div class="lines-title">{{ lineasProyecto()[1].name }}</div>
       <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto[1].description }}</div>
-      <div class="lines-projects">{{ language.linesInvestigationText[0].projects }}</div>
+      <div class="lines-subtitle">{{ lineasProyecto()[1].description }}</div>
+      <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
       <div>
-        @for ( proyecto of lineasProyecto[1].proyectos | slice: (page1 - 1) * pageSize : (page1 - 1) * pageSize +
+        @for ( proyecto of lineasProyecto()[1].proyectos | slice: (page1 - 1) * pageSize : (page1 - 1) * pageSize +
         pageSize; track proyecto; let i = $index ) {
         <div class="project">
           <div class="project-code">{{ proyecto.code }}</div>
@@ -126,12 +126,12 @@
             <div class="project-title">{{ proyecto.title }}</div>
           </div>
           <div class="project-rev">
-            <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
+            <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
             proyecto.lineasInvestigacion }}
           </div>
           <div class="mt-16">
             <div class="flex-news flex-flow">
-              <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+              <strong class="resp-title">{{ this.language().projectsText[0].responsable }}:</strong>
               @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
@@ -156,8 +156,8 @@
                 aria-expanded="false"
                 aria-controls="collapseExample"
               >
-                {{ expandLabel( "line1", i, this.language.projectsText[0].seeMore, this.language.projectsText[0].seeLess
-                ) }}
+                {{ expandLabel( "line1", i, this.language().projectsText[0].seeMore,
+                this.language().projectsText[0].seeLess ) }}
               </a>
               <mat-icon
                 class="project-abs-icon"
@@ -172,31 +172,31 @@
           </div>
           <div class="collapse collapsed-resumen mt-16" id="collapseExample1{{ i }}">
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
               {{ proyecto.description }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
               {{ proyecto.fuenteFinanciamiento }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
               {{ proyecto.moneda }} {{ proyecto.fundedAmountMinor }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
               {{ proyecto.fechaI }}
             </div>
             @if (proyecto.fechaF) {
             <div class="abstract">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
               {{ proyecto.fechaF }}
             </div>
             }
           </div>
         </div>
-        } @if (lineasProyecto[1].proyectos.length > 5) {
-        <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="lineasProyecto[1].proyectos.length">
+        } @if (lineasProyecto()[1].proyectos.length > 5) {
+        <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="lineasProyecto()[1].proyectos.length">
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -216,16 +216,16 @@
     </div>
     <div>
       <div class="line-img-div">
-        @if (lineasProyecto[2].asset) {
-        <img class="line-img" src="{{ lineasProyecto[2].asset }}" />
+        @if (lineasProyecto()[2].asset) {
+        <img class="line-img" src="{{ lineasProyecto()[2].asset }}" />
         }
       </div>
-      <div class="lines-title">{{ lineasProyecto[2].name }}</div>
+      <div class="lines-title">{{ lineasProyecto()[2].name }}</div>
       <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto[2].description }}</div>
-      <div class="lines-projects">{{ language.linesInvestigationText[0].projects }}</div>
+      <div class="lines-subtitle">{{ lineasProyecto()[2].description }}</div>
+      <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
       <div>
-        @for ( proyecto of lineasProyecto[2].proyectos | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize +
+        @for ( proyecto of lineasProyecto()[2].proyectos | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize +
         pageSize; track proyecto; let i = $index ) {
         <div class="project">
           <div class="project-code">{{ proyecto.code }}</div>
@@ -233,12 +233,12 @@
             <div class="project-title">{{ proyecto.title }}</div>
           </div>
           <div class="project-rev">
-            <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
+            <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
             proyecto.lineasInvestigacion }}
           </div>
           <div class="mt-16">
             <div class="flex-news flex-flow">
-              <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
+              <strong class="resp-title">{{ this.language().projectsText[0].responsable }}:</strong>
               @for (member of proyecto.members; track member) {
               <div class="project-members">
                 <div class="member-img-round">
@@ -263,8 +263,8 @@
                 aria-expanded="false"
                 aria-controls="collapseExample"
               >
-                {{ expandLabel( "line2", i, this.language.projectsText[0].seeMore, this.language.projectsText[0].seeLess
-                ) }}
+                {{ expandLabel( "line2", i, this.language().projectsText[0].seeMore,
+                this.language().projectsText[0].seeLess ) }}
               </a>
               <mat-icon
                 class="project-abs-icon"
@@ -279,31 +279,31 @@
           </div>
           <div class="collapse collapsed-resumen mt-16" id="collapseExample2{{ i }}">
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
               {{ proyecto.description }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
               {{ proyecto.fuenteFinanciamiento }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
               {{ proyecto.moneda }} {{ proyecto.fundedAmountMinor }}
             </div>
             <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
               {{ proyecto.fechaI }}
             </div>
             @if (proyecto.fechaF) {
             <div class="abstract">
-              <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+              <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
               {{ proyecto.fechaF }}
             </div>
             }
           </div>
         </div>
-        } @if (lineasProyecto[2].proyectos.length > 5) {
-        <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="lineasProyecto[2].proyectos.length">
+        } @if (lineasProyecto()[2].proyectos.length > 5) {
+        <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="lineasProyecto()[2].proyectos.length">
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>

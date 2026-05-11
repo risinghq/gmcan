@@ -1,48 +1,40 @@
-import { Injectable, computed, signal } from "@angular/core";
-import { Languages } from "@app/shared/models/languages";
+import { Injectable, computed, inject } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { Router } from "@angular/router";
 import { SessionService } from "@app/shared/services/session.service";
+import { map, startWith } from "rxjs";
 
 @Injectable()
 export class AboutFacade {
-  private readonly languageState = signal<(typeof Languages)[number]>(Languages[0]);
-  private readonly selectedCategoryState = signal("");
+  private readonly session = inject(SessionService);
+  private readonly router = inject(Router);
 
-  readonly language = this.languageState.asReadonly();
-  readonly selectedCategory = computed(() => this.selectedCategoryState());
+  readonly language = this.session.language;
 
-  constructor(private readonly session: SessionService) {}
+  private readonly currentRoute = toSignal(
+    this.router.events.pipe(
+      map(() => this.router.url),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
 
-  init(routeUrl: string): void {
-    this.languageState.set(this.session.language());
-    this.syncCategoryFromRoute(routeUrl);
-  }
-
-  setSelectedCategory(value: string): void {
-    this.selectedCategoryState.set(value);
-  }
-
-  private syncCategoryFromRoute(route: string): void {
-    const language = this.languageState();
-    switch (route) {
+  readonly selectedCategory = computed(() => {
+    const language = this.language();
+    switch (this.currentRoute()) {
       case "/home/about-us/about":
       case "/home/about-us":
-        this.selectedCategoryState.set(language.who);
-        break;
+        return language.who;
       case "/home/about-us/lines-investigation":
-        this.selectedCategoryState.set(language.linesInvestigation);
-        break;
+        return language.linesInvestigation;
       case "/home/about-us/methods":
-        this.selectedCategoryState.set(language.methods);
-        break;
+        return language.methods;
       case "/home/about-us/facilities-resources":
-        this.selectedCategoryState.set(language.resources);
-        break;
+        return language.resources;
       case "/home/about-us/works":
-        this.selectedCategoryState.set(language.futureWorks);
-        break;
+        return language.futureWorks;
       default:
-        this.selectedCategoryState.set("");
-        break;
+        return "";
     }
-  }
+  });
 }

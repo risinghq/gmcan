@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 
+import { aboutUsResolver, facilitiesResolver, linesResolver, methodsResolver, worksResolver } from "./about/resolvers";
 import { detailNewsResolver } from "./detail-news/resolver";
 import { globalSearchResolver } from "./global-search/resolver";
 import { homeResolver } from "./home/resolver";
@@ -32,15 +33,32 @@ export default [
         path: "about-us",
         loadComponent: () => import("./about/component"),
         children: [
-          { path: "", loadComponent: () => import("./about/about-us/component") },
-          { path: "about", loadComponent: () => import("./about/about-us/component") },
+          {
+            path: "",
+            loadComponent: () => import("./about/about-us/component"),
+            resolve: { aboutus: aboutUsResolver },
+          },
+          {
+            path: "about",
+            loadComponent: () => import("./about/about-us/component"),
+            resolve: { aboutus: aboutUsResolver },
+          },
           {
             path: "lines-investigation",
             loadComponent: () => import("./about/lines-investigation/component"),
+            resolve: { lineasProyecto: linesResolver },
           },
-          { path: "methods", loadComponent: () => import("./about/method/component") },
-          { path: "facilities-resources", loadComponent: () => import("./about/facilities/component") },
-          { path: "works", loadComponent: () => import("./about/works/component") },
+          {
+            path: "methods",
+            loadComponent: () => import("./about/method/component"),
+            resolve: { methods: methodsResolver },
+          },
+          {
+            path: "facilities-resources",
+            loadComponent: () => import("./about/facilities/component"),
+            resolve: { facilities: facilitiesResolver },
+          },
+          { path: "works", loadComponent: () => import("./about/works/component"), resolve: { info: worksResolver } },
         ],
       },
       {
