@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./public": "./src/public/index.ts",
-    "./admin": "./src/admin/index.ts"
+    "./admin": "./src/admin/index.ts",
+    "./error": "./src/common/error.ts"
   },
   "dependencies": {
     "zod": "^4.4.3"

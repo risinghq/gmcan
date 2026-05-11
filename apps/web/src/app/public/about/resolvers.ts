@@ -43,6 +43,7 @@ export const aboutUsResolver: ResolveFn<About> = () => {
     map((items) => {
       const about = items[0];
       if (!about) throw new Error("About section not found");
+      if (!about.asset) throw new Error("About section asset is required");
       return about;
     }),
   );
@@ -56,7 +57,15 @@ export const facilitiesResolver: ResolveFn<FacilitiesData> = () => {
       forkJoin({
         equipment: groupService.listPublicEquipment(group.id),
         software: groupService.listPublicSoftware(group.id),
-      }).pipe(map(({ equipment, software }) => ({ group, equipment, software }))),
+      }).pipe(
+        map(({ equipment, software }) => {
+          if (!group.assets.facilities) {
+            throw new Error("Facilities asset is required");
+          }
+
+          return { group, equipment, software };
+        }),
+      ),
     ),
   );
 };
@@ -97,6 +106,23 @@ export const linesResolver: ResolveFn<ResearchLineDisplay[]> = () => {
           proyectos: enrichedProjects.filter((project) => project.researchLineId === line.id && !project.endDate),
         }),
       );
+    }),
+    map((lines) => {
+      const missingAsset = lines.find((line) => !line.asset);
+      if (missingAsset) {
+        throw new Error(`Research line asset is required (line id ${missingAsset.id})`);
+      }
+
+      const memberWithoutAsset = lines
+        .flatMap((line) => line.proyectos)
+        .flatMap((project) => project.members)
+        .find((member) => !member.asset);
+
+      if (memberWithoutAsset) {
+        throw new Error(`Project member asset is required (member id ${memberWithoutAsset.memberId})`);
+      }
+
+      return lines;
     }),
   );
 };
