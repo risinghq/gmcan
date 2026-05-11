@@ -131,6 +131,7 @@ const SEED_BINDINGS: SeedBinding[] = [
     slot: "footer",
     source: "seed/group/footer.png",
   },
+  { table: "about_asset", ownerColumn: "aboutId", ownerId: 1, slot: "photo", source: "seed/about/grupal.jpg" },
 ];
 
 function resolveSeedPath(source: string): string {
