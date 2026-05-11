@@ -170,6 +170,46 @@ export async function searchProjects(q: string, locale: Locale, statusCode?: Pro
   return query.execute();
 }
 
+export async function searchActiveProjectRows(locale: Locale, like: string) {
+  return db
+    .selectFrom("project")
+    .innerJoin("project_translation", (join) =>
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
+    )
+    .leftJoin("research_line_translation", (join) =>
+      join
+        .onRef("research_line_translation.researchLineId", "=", "project.researchLineId")
+        .on("research_line_translation.locale", "=", locale),
+    )
+    .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
+    .select([
+      "project.id",
+      "project_translation.title as title",
+      "project.code",
+      "project.fundedAmountMinor",
+      "project_translation.description as description",
+      "project.statusCode",
+      "project.startDate",
+      "project.endDate",
+      "project.researchLineId",
+      "project.currencyCode",
+      "project.fundingSourceCode",
+      "research_line_translation.name as researchLine",
+      "funding_source.name as fundingSource",
+    ])
+    .where("project.statusCode", "=", "active")
+    .where((eb) =>
+      eb.or([
+        eb("project_translation.title", "like", like),
+        eb("project.code", "like", like),
+        eb("project_translation.description", "like", like),
+        eb("research_line_translation.name", "like", like),
+        eb("funding_source.name", "like", like),
+      ]),
+    )
+    .execute();
+}
+
 export async function createProject(data: ProjectAdminInput) {
   return db.transaction().execute(async (trx) => {
     const result = await trx.insertInto("project").values(toProjectRow(data)).executeTakeFirstOrThrow();

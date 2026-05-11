@@ -9,6 +9,13 @@ export interface ProjectMemberRow {
   maternalName: string | null;
 }
 
+export interface ProjectSearchMemberRow {
+  projectId: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
 export async function listProjectMemberRowsByProjectIds(projectIds: number[], orderByProject = false) {
   let query = db
     .selectFrom("project_member")
@@ -24,6 +31,15 @@ export async function listProjectMemberRowsByProjectIds(projectIds: number[], or
 
   if (orderByProject) query = query.orderBy("project_member.projectId", "asc");
   return query.execute() as Promise<ProjectMemberRow[]>;
+}
+
+export async function listProjectSearchMemberRowsByProjectIds(projectIds: number[]) {
+  return db
+    .selectFrom("project_member")
+    .innerJoin("member", "member.id", "project_member.memberId")
+    .select(["project_member.projectId", "member.id", "member.firstName", "member.lastName"])
+    .where("project_member.projectId", "in", projectIds)
+    .execute() as Promise<ProjectSearchMemberRow[]>;
 }
 
 export async function listProjectMembers(projectId: number) {
