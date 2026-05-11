@@ -1,6 +1,6 @@
 import { Routes } from "@angular/router";
 
-import { aboutUsResolver, facilitiesResolver, linesResolver, methodsResolver, worksResolver } from "./about/resolvers";
+import { aboutUsResolver, facilitiesResolver, linesResolver } from "./about/data";
 import { detailNewsResolver } from "./detail-news/resolver";
 import { globalSearchResolver } from "./global-search/resolver";
 import { homeResolver } from "./home/resolver";
@@ -51,14 +51,13 @@ export default [
           {
             path: "methods",
             loadComponent: () => import("./about/method/component"),
-            resolve: { methods: methodsResolver },
           },
           {
             path: "facilities-resources",
             loadComponent: () => import("./about/facilities/component"),
             resolve: { facilities: facilitiesResolver },
           },
-          { path: "works", loadComponent: () => import("./about/works/component"), resolve: { info: worksResolver } },
+          { path: "works", loadComponent: () => import("./about/works/component") },
         ],
       },
       {

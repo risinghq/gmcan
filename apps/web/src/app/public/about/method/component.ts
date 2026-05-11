@@ -1,5 +1,5 @@
-import { Component, inject, input } from "@angular/core";
-import type { Method } from "@app/shared/models/method";
+import { Component, inject } from "@angular/core";
+import { AboutFacade } from "@app/public/about/facade";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -10,13 +10,15 @@ import { SessionService } from "@app/shared/services/session.service";
   imports: [],
 })
 export default class MethodComponent {
-  private seo = inject(SeoService);
-  private session = inject(SessionService);
+  private readonly seo = inject(SeoService);
+  private readonly session = inject(SessionService);
+  private readonly facade = inject(AboutFacade);
 
   readonly language = this.session.language;
-  readonly methods = input.required<Method[]>();
+  readonly methods = this.facade.methods;
 
   constructor() {
     this.seo.setPageTitle("GMCAN | " + this.language().methods);
+    void this.facade.loadMethods();
   }
 }

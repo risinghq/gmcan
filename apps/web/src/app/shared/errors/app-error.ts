@@ -1,3 +1,5 @@
+import { HttpErrorResponse } from "@angular/common/http";
+import { ErrorEnvelopeSchema } from "@gmcan/contracts/error";
 import type { AppErrorCode } from "@gmcan/contracts/error";
 
 export type NavigationAppError = {
@@ -17,6 +19,18 @@ export class RouteDataError extends Error {
 export function toNavigationAppError(error: unknown): NavigationAppError {
   if (error instanceof RouteDataError) {
     return error.appError;
+  }
+
+  if (error instanceof HttpErrorResponse) {
+    const parsed = ErrorEnvelopeSchema.safeParse(error.error);
+    if (parsed.success) {
+      return {
+        code: parsed.data.error.code,
+        message: parsed.data.error.message,
+        details: parsed.data.error.details,
+        cause: error,
+      };
+    }
   }
 
   if (error instanceof Error) {

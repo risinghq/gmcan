@@ -1,6 +1,6 @@
 import { Component, computed, inject, input } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
-import type { FacilitiesData } from "@app/public/about/resolvers";
+import type { FacilitiesData } from "@app/public/about/data";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";

@@ -3,7 +3,7 @@ import { Component, inject, input } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
-import type { ResearchLineDisplay } from "@app/public/about/resolvers";
+import type { ResearchLineDisplay } from "@app/public/about/data";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,

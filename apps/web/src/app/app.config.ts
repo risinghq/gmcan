@@ -6,7 +6,6 @@ import localePy from "@angular/common/locales/es-PY";
 import localePt from "@angular/common/locales/pt";
 import {
   ApplicationConfig,
-  ErrorHandler,
   LOCALE_ID,
   inject,
   provideBrowserGlobalErrorListeners,
@@ -24,6 +23,7 @@ import {
   withNavigationErrorHandler,
 } from "@angular/router";
 import { toNavigationAppError } from "@app/shared/errors/app-error";
+import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
@@ -45,10 +45,8 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withNavigationErrorHandler((error) => {
         const mapped = toNavigationAppError(error.error ?? error);
-        inject(ErrorHandler).handleError(mapped.cause ?? mapped);
-        const urlTree = inject(Router).createUrlTree(["/error"], {
-          queryParams: { code: mapped.code },
-        });
+        inject(AppErrorHandlingService).handle(mapped);
+        const urlTree = inject(Router).createUrlTree(["/error"], { queryParams: { code: mapped.code } });
         return new RedirectCommand(urlTree);
       }),
     ),

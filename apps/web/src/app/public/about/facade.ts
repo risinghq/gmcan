@@ -1,13 +1,20 @@
-import { Injectable, computed, inject } from "@angular/core";
+import { Injectable, computed, inject, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Router } from "@angular/router";
+import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
+import type { Group } from "@app/shared/models/group";
+import type { Method } from "@app/shared/models/method";
 import { SessionService } from "@app/shared/services/session.service";
 import { map, startWith } from "rxjs";
+
+import { AboutDataService } from "./data";
 
 @Injectable()
 export class AboutFacade {
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
+  private readonly dataService = inject(AboutDataService);
+  private readonly errorHandler = inject(AppErrorHandlingService);
 
   readonly language = this.session.language;
 
@@ -37,4 +44,23 @@ export class AboutFacade {
         return "";
     }
   });
+
+  readonly methods = signal<Method[]>([]);
+  readonly group = signal<Group | null>(null);
+
+  async loadMethods(): Promise<void> {
+    const result = await this.dataService.getMethods();
+    result.match(
+      (methods) => this.methods.set(methods),
+      (error) => this.errorHandler.handle(error),
+    );
+  }
+
+  async loadGroup(): Promise<void> {
+    const result = await this.dataService.getGroup();
+    result.match(
+      (group) => this.group.set(group),
+      (error) => this.errorHandler.handle(error),
+    );
+  }
 }
