@@ -68,6 +68,24 @@
   object-fit: cover;
 }
 
+.line-toggle {
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  text-align: left;
+}
+
+.line-toggle-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.line-toggle-icon {
+  margin-left: auto;
+}
+
 @media (min-width: 1500px) {
   .lines-div {
     padding-left: 343px !important;

@@ -45,6 +45,7 @@ export type HomeViewModel = {
   newsItems: HomeNewsItem[];
   featuredNews: HomeNewsItem | null;
   lineasInvestigacion: ResearchLine[];
+  linesPreview: ResearchLine[];
   metodos: Method[];
   miembros: Member[];
   aboutUs: string[];

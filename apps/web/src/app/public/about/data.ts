@@ -67,12 +67,7 @@ export class AboutDataService {
       firstValueFrom(this.researchLinesService.list()),
       firstValueFrom(this.projectService.listProjects()),
     ]);
-
-    if (lineas.length < 3) {
-      failInvariant("At least 3 research lines are required for the About page", { actualCount: lineas.length });
-    }
-
-    const lines = lineas.slice(0, 3).map((line) =>
+    const lines = lineas.map((line) =>
       toResearchLineDisplay(
         line,
         projects.filter((p) => p.researchLineId === line.id && !p.endDate),

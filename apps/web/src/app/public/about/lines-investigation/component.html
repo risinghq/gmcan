@@ -1,16 +1,38 @@
 <div class="card-lines">
   <div class="lines-text-div">
+    @for (linea of lineasProyecto(); track linea.id) {
     <div class="line-mb">
-      <div class="line-img-div">
-        <img class="line-img" src="{{ lineasProyecto()[0].asset }}" />
-      </div>
-      <div class="lines-title">{{ lineasProyecto()[0].name }}</div>
-      <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto()[0].description }}</div>
+      <button type="button" class="line-toggle" (click)="toggleLine(linea.id)">
+        <div class="line-toggle-header">
+          <div class="line-img-div">
+            @if (linea.asset) {
+            <img class="line-img" src="{{ linea.asset }}" />
+            } @else {
+            <img class="line-img" src="/img/prop_estruc.jpg" />
+            }
+          </div>
+          <div>
+            <div class="lines-title">{{ linea.name }}</div>
+            <div class="line-line-div"></div>
+            <div class="lines-subtitle">{{ linea.description }}</div>
+          </div>
+          <mat-icon
+            class="project-abs-icon line-toggle-icon"
+            [class]="{
+              'abs-active': isLineExpanded(linea.id),
+              'abs-not-active': !isLineExpanded(linea.id),
+            }"
+          >
+            keyboard_arrow_down
+          </mat-icon>
+        </div>
+      </button>
+
+      @if (isLineExpanded(linea.id)) {
       <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
       <div>
-        @for ( proyecto of lineasProyecto()[0].proyectos | slice: (page0 - 1) * pageSize : (page0 - 1) * pageSize +
-        pageSize; track proyecto; let i = $index ) {
+        @for (proyecto of linea.proyectos | slice: (pageForLine(linea.id) - 1) * pageSize : (pageForLine(linea.id) - 1)
+        * pageSize + pageSize; track proyecto.id; let i = $index ) {
         <div class="project">
           <div class="project-code">{{ proyecto.code }}</div>
           <div class="flex-news project-mt">
@@ -23,7 +45,7 @@
           <div class="mt-16">
             <div class="flex-news flex-flow">
               <strong class="resp-title">{{ this.language().projectsText[0].responsable }}:</strong>
-              @for (member of proyecto.members; track member) {
+              @for (member of proyecto.members; track member.memberId) {
               <div class="project-members">
                 <div class="member-img-round">
                   <img class="member-img" src="{{ member.asset }}" />
@@ -34,30 +56,27 @@
             </div>
             <div class="flex-news">
               <a
-                [class.abstract-active]="isExpanded('line0', i)"
-                (click)="toggleExpanded('line0', i)"
+                [class.abstract-active]="isExpanded(projectKey(linea.id, i), i)"
+                (click)="toggleExpanded(projectKey(linea.id, i), i)"
                 class="project-abstract"
-                data-toggle="collapse"
-                href="#collapseExample0{{ i }}"
                 role="button"
-                aria-expanded="false"
-                aria-controls="collapseExample"
               >
-                {{ expandLabel( "line0", i, language().linesInvestigationText[0].seeMore,
+                {{ expandLabel( projectKey(linea.id, i), i, language().linesInvestigationText[0].seeMore,
                 language().linesInvestigationText[0].seeLess ) }}
               </a>
               <mat-icon
                 class="project-abs-icon"
                 [class]="{
-                    'abs-active': isExpanded('line0', i),
-                    'abs-not-active': !isExpanded('line0', i),
-                  }"
+                  'abs-active': isExpanded(projectKey(linea.id, i), i),
+                  'abs-not-active': !isExpanded(projectKey(linea.id, i), i),
+                }"
               >
                 keyboard_arrow_down
               </mat-icon>
             </div>
           </div>
-          <div class="collapse collapsed-resumen mt-16" id="collapseExample0{{ i }}">
+          @if (isExpanded(projectKey(linea.id, i), i)) {
+          <div class="collapsed-resumen mt-16">
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
               {{ proyecto.description }}
@@ -81,9 +100,15 @@
             </div>
             }
           </div>
+          }
         </div>
-        } @if (lineasProyecto()[0].proyectos.length > 5) {
-        <ngb-pagination [(page)]="page0" [pageSize]="pageSize" [collectionSize]="lineasProyecto()[0].proyectos.length">
+        } @if (linea.proyectos.length > pageSize) {
+        <ngb-pagination
+          [page]="pageForLine(linea.id)"
+          (pageChange)="setPageForLine(linea.id, $event)"
+          [pageSize]="pageSize"
+          [collectionSize]="linea.proyectos.length"
+        >
           <ng-template class="unique-left" ngbPaginationPrevious>
             <div class="h-ih">
               <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -100,208 +125,8 @@
         </ngb-pagination>
         }
       </div>
+      }
     </div>
-    <div class="line-mb">
-      <div class="line-img-div">
-        <img class="line-img" src="{{ lineasProyecto()[1].asset }}" />
-      </div>
-      <div class="lines-title">{{ lineasProyecto()[1].name }}</div>
-      <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto()[1].description }}</div>
-      <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
-      <div>
-        @for ( proyecto of lineasProyecto()[1].proyectos | slice: (page1 - 1) * pageSize : (page1 - 1) * pageSize +
-        pageSize; track proyecto; let i = $index ) {
-        <div class="project">
-          <div class="project-code">{{ proyecto.code }}</div>
-          <div class="flex-news project-mt">
-            <div class="project-title">{{ proyecto.title }}</div>
-          </div>
-          <div class="project-rev">
-            <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
-            proyecto.researchLine }}
-          </div>
-          <div class="mt-16">
-            <div class="flex-news flex-flow">
-              <strong class="resp-title">{{ this.language().projectsText[0].responsable }}:</strong>
-              @for (member of proyecto.members; track member) {
-              <div class="project-members">
-                <div class="member-img-round">
-                  <img class="member-img" src="{{ member.asset }}" />
-                </div>
-                <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
-              </div>
-              }
-            </div>
-            <div class="flex-news">
-              <a
-                [class.abstract-active]="isExpanded('line1', i)"
-                (click)="toggleExpanded('line1', i)"
-                class="project-abstract"
-                data-toggle="collapse"
-                href="#collapseExample1{{ i }}"
-                role="button"
-                aria-expanded="false"
-                aria-controls="collapseExample"
-              >
-                {{ expandLabel( "line1", i, this.language().projectsText[0].seeMore,
-                this.language().projectsText[0].seeLess ) }}
-              </a>
-              <mat-icon
-                class="project-abs-icon"
-                [class]="{
-                    'abs-active': isExpanded('line1', i),
-                    'abs-not-active': !isExpanded('line1', i),
-                  }"
-              >
-                keyboard_arrow_down
-              </mat-icon>
-            </div>
-          </div>
-          <div class="collapse collapsed-resumen mt-16" id="collapseExample1{{ i }}">
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
-              {{ proyecto.description }}
-            </div>
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
-              {{ proyecto.fundingSource }}
-            </div>
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
-              {{ proyecto.currencySymbol }} {{ proyecto.fundedAmountMinor }}
-            </div>
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
-              {{ proyecto.startDate | date:"MMMM y":"UTC":language().locale }}
-            </div>
-            @if (proyecto.endDate) {
-            <div class="abstract">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
-              {{ proyecto.endDate | date:"MMMM y":"UTC":language().locale }}
-            </div>
-            }
-          </div>
-        </div>
-        } @if (lineasProyecto()[1].proyectos.length > 5) {
-        <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="lineasProyecto()[1].proyectos.length">
-          <ng-template class="unique-left" ngbPaginationPrevious>
-            <div class="h-ih">
-              <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
-            </div>
-          </ng-template>
-          <ng-template ngbPaginationNumber let-page>
-            <div class="h-ih">{{ page }}</div>
-          </ng-template>
-          <ng-template ngbPaginationNext>
-            <div class="h-ih">
-              <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
-            </div>
-          </ng-template>
-        </ngb-pagination>
-        }
-      </div>
-    </div>
-    <div>
-      <div class="line-img-div">
-        <img class="line-img" src="{{ lineasProyecto()[2].asset }}" />
-      </div>
-      <div class="lines-title">{{ lineasProyecto()[2].name }}</div>
-      <div class="line-line-div"></div>
-      <div class="lines-subtitle">{{ lineasProyecto()[2].description }}</div>
-      <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
-      <div>
-        @for ( proyecto of lineasProyecto()[2].proyectos | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize +
-        pageSize; track proyecto; let i = $index ) {
-        <div class="project">
-          <div class="project-code">{{ proyecto.code }}</div>
-          <div class="flex-news project-mt">
-            <div class="project-title">{{ proyecto.title }}</div>
-          </div>
-          <div class="project-rev">
-            <strong class="resp-title">{{ this.language().projectsText[0].linesInvestigation }}: </strong>{{
-            proyecto.researchLine }}
-          </div>
-          <div class="mt-16">
-            <div class="flex-news flex-flow">
-              <strong class="resp-title">{{ this.language().projectsText[0].responsable }}:</strong>
-              @for (member of proyecto.members; track member) {
-              <div class="project-members">
-                <div class="member-img-round">
-                  <img class="member-img" src="{{ member.asset }}" />
-                </div>
-                <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
-              </div>
-              }
-            </div>
-            <div class="flex-news">
-              <a
-                [class.abstract-active]="isExpanded('line2', i)"
-                (click)="toggleExpanded('line2', i)"
-                class="project-abstract"
-                data-toggle="collapse"
-                href="#collapseExample2{{ i }}"
-                role="button"
-                aria-expanded="false"
-                aria-controls="collapseExample"
-              >
-                {{ expandLabel( "line2", i, this.language().projectsText[0].seeMore,
-                this.language().projectsText[0].seeLess ) }}
-              </a>
-              <mat-icon
-                class="project-abs-icon"
-                [class]="{
-                    'abs-active': isExpanded('line2', i),
-                    'abs-not-active': !isExpanded('line2', i),
-                  }"
-              >
-                keyboard_arrow_down
-              </mat-icon>
-            </div>
-          </div>
-          <div class="collapse collapsed-resumen mt-16" id="collapseExample2{{ i }}">
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
-              {{ proyecto.description }}
-            </div>
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].source }}: </strong>
-              {{ proyecto.fundingSource }}
-            </div>
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].amount }}: </strong>
-              {{ proyecto.currencySymbol }} {{ proyecto.fundedAmountMinor }}
-            </div>
-            <div class="abstract mb-8">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].dateStart }}: </strong>
-              {{ proyecto.startDate | date:"MMMM y":"UTC":language().locale }}
-            </div>
-            @if (proyecto.endDate) {
-            <div class="abstract">
-              <strong class="abstract-title"> {{ this.language().projectsText[0].dateEnd }}: </strong>
-              {{ proyecto.endDate | date:"MMMM y":"UTC":language().locale }}
-            </div>
-            }
-          </div>
-        </div>
-        } @if (lineasProyecto()[2].proyectos.length > 5) {
-        <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="lineasProyecto()[2].proyectos.length">
-          <ng-template class="unique-left" ngbPaginationPrevious>
-            <div class="h-ih">
-              <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
-            </div>
-          </ng-template>
-          <ng-template ngbPaginationNumber let-page>
-            <div class="h-ih">{{ page }}</div>
-          </ng-template>
-          <ng-template ngbPaginationNext>
-            <div class="h-ih">
-              <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
-            </div>
-          </ng-template>
-        </ngb-pagination>
-        }
-      </div>
-    </div>
+    }
   </div>
 </div>

@@ -26,17 +26,34 @@ export default class LinesInvestigationComponent {
   readonly language = this.session.language;
   readonly lineasProyecto = input.required<ResearchLineDisplay[]>();
 
-  public page0 = 1;
   public pageSize = 5;
-  public page1 = 1;
-  public pageSize2 = 5;
-  public page2 = 1;
-  public pageSize3 = 5;
+  public expandedLineId: number | null = null;
+  public pageByLineId: Record<number, number> = {};
 
   expandedKey: string | null = null;
 
   constructor() {
     this.titleService.setTitle("GMCAN | " + this.language().linesInvestigation);
+  }
+
+  toggleLine(lineId: number): void {
+    this.expandedLineId = this.expandedLineId === lineId ? null : lineId;
+  }
+
+  isLineExpanded(lineId: number): boolean {
+    return this.expandedLineId === lineId;
+  }
+
+  pageForLine(lineId: number): number {
+    return this.pageByLineId[lineId] ?? 1;
+  }
+
+  setPageForLine(lineId: number, page: number): void {
+    this.pageByLineId[lineId] = page;
+  }
+
+  projectKey(lineId: number, index: number): string {
+    return `${lineId}:${index}`;
   }
 
   toggleExpanded(section: string, index: number): void {
