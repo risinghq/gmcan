@@ -1,8 +1,5 @@
-import { Component, OnInit, inject } from "@angular/core";
-import { createGroup } from "@app/shared/models/factories";
-import type { Group } from "@app/shared/models/group";
-import { Languages } from "@app/shared/models/languages";
-import { GroupService } from "@app/shared/services/group.service";
+import { Component, inject } from "@angular/core";
+import { AboutFacade } from "@app/public/about/facade";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -11,26 +8,16 @@ import { SessionService } from "@app/shared/services/session.service";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
 })
-export default class WorksComponent implements OnInit {
-  private groupService = inject(GroupService);
-  private seo = inject(SeoService);
-  private session = inject(SessionService);
+export default class WorksComponent {
+  private readonly seo = inject(SeoService);
+  private readonly session = inject(SessionService);
+  private readonly facade = inject(AboutFacade);
 
-  public info: Group;
-  language: (typeof Languages)[number] = Languages[0];
+  readonly language = this.session.language;
+  readonly group = this.facade.group;
+
   constructor() {
-    this.info = createGroup();
-  }
-
-  ngOnInit(): void {
-    this.language = this.session.language();
-    this.seo.setPageTitle("GMCAN | " + this.language.futureWorks);
-    this.getGroupInfo();
-  }
-
-  getGroupInfo(): void {
-    this.groupService.getGroup().subscribe((res: Group) => {
-      this.info = res;
-    });
+    this.seo.setPageTitle("GMCAN | " + this.language().futureWorks);
+    void this.facade.loadGroup();
   }
 }

@@ -1,20 +1,16 @@
 <div class="card-facilities">
-  @if (!grupo.assets.facilities) {
-  <img class="facilities-img" src="/img/grupal.jpg" />
-  } @if (grupo.assets.facilities) {
-  <img class="facilities-img" src="{{ grupo.assets.facilities }}" />
-  }
+  <img class="facilities-img" src="{{ grupo().assets.facilities }}" />
   <div class="facilities-text-div">
-    <div class="facilities-title">{{ language.facilitiesText[0].title }}</div>
-    <div class="facilities-subtitle">{{ language.facilitiesText[0].subtitle }}</div>
+    <div class="facilities-title">{{ language().facilitiesText[0].title }}</div>
+    <div class="facilities-subtitle">{{ language().facilitiesText[0].subtitle }}</div>
     <div class="facilities-sub-divi"></div>
-    <div class="facilities-text">{{ grupo.facilities }}</div>
-    @if (equipos.length > 0 && equipos.length != undefined) {
-    <div class="equipment">{{ language.facilitiesText[0].equipment }}</div>
-    } @if (equipos.length > 0) {
+    <div class="facilities-text">{{ grupo().facilities }}</div>
+    @if (equipos().length > 0 && equipos().length != undefined) {
+    <div class="equipment">{{ language().facilitiesText[0].equipment }}</div>
+    } @if (equipos().length > 0) {
     <div>
-      @for (equipo of equipos; track equipo; let i = $index) {
-      <div class="publication" [class.no-border]="i + 1 == equipos.length">
+      @for (equipo of equipos(); track equipo; let i = $index) {
+      <div class="publication" [class.no-border]="i + 1 == equipos().length">
         <div class="equipment-name mb-equipment">{{ equipo.name }}</div>
         <mat-chip-set class="chip-row">
           <mat-chip class="equipo-chip">
@@ -37,17 +33,17 @@
       </div>
       }
     </div>
-    } @if (equipos.length > 0) {
-    <div class="equipment">{{ language.facilitiesText[0].software }}</div>
-    } @if (software.length > 0) {
+    } @if (equipos().length > 0) {
+    <div class="equipment">{{ language().facilitiesText[0].software }}</div>
+    } @if (software().length > 0) {
     <div>
-      @for (soft of software; track soft; let i = $index) {
-      <div class="publication" [class.no-border]="i + 1 == software.length">
+      @for (soft of software(); track soft; let i = $index) {
+      <div class="publication" [class.no-border]="i + 1 == software().length">
         <div class="equipment-name mb-8">{{ soft.name }}</div>
         <div class="soft-description mb-8">{{ soft.description }}</div>
         @if (soft.moreInfo) {
         <div class="soft-more">
-          {{ language.facilitiesText[0].moreInfo }}:
+          {{ language().facilitiesText[0].moreInfo }}:
           <a class="soft-link" href="{{ soft.moreInfo }}" target="_blank">{{ soft.moreInfo }}</a>
         </div>
         }

@@ -93,6 +93,7 @@ export class HomeDataService {
       newsItems: orderedNews,
       featuredNews: orderedNews[0] ?? null,
       lineasInvestigacion,
+      linesPreview: lineasInvestigacion.slice(0, 3),
       metodos,
       miembros,
       aboutUs,

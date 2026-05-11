@@ -14,7 +14,16 @@ import {
 } from "@angular/core";
 import { provideClientHydration, withEventReplay } from "@angular/platform-browser";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
-import { provideRouter, TitleStrategy, withComponentInputBinding } from "@angular/router";
+import {
+  RedirectCommand,
+  Router,
+  provideRouter,
+  TitleStrategy,
+  withComponentInputBinding,
+  withNavigationErrorHandler,
+} from "@angular/router";
+import { toNavigationAppError } from "@app/shared/errors/app-error";
+import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
@@ -31,7 +40,16 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes, withComponentInputBinding()),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withNavigationErrorHandler((error) => {
+        const mapped = toNavigationAppError(error.error ?? error);
+        inject(AppErrorHandlingService).handle(mapped);
+        const urlTree = inject(Router).createUrlTree(["/error"], { queryParams: { code: mapped.code } });
+        return new RedirectCommand(urlTree);
+      }),
+    ),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),

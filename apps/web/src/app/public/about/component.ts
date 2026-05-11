@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
+import { RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
 
 import { AboutFacade } from "./facade";
 
@@ -11,15 +11,6 @@ import { AboutFacade } from "./facade";
   imports: [MatIcon, RouterOutlet, RouterLink, RouterLinkActive],
   providers: [AboutFacade],
 })
-export default class AboutComponent implements OnInit {
-  private router = inject(Router);
+export default class AboutComponent {
   readonly facade = inject(AboutFacade);
-
-  ngOnInit(): void {
-    this.facade.init(this.router.url);
-  }
-
-  selected(element: string): void {
-    this.facade.setSelectedCategory(element);
-  }
 }

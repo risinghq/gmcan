@@ -1,8 +1,5 @@
-import { Component, OnInit, inject } from "@angular/core";
-import { Languages } from "@app/shared/models/languages";
-import { Method } from "@app/shared/models/method";
-import { GLOBAL } from "@app/shared/services/global";
-import { MethodsService } from "@app/shared/services/methods.service";
+import { Component, inject } from "@angular/core";
+import { AboutFacade } from "@app/public/about/facade";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -12,29 +9,16 @@ import { SessionService } from "@app/shared/services/session.service";
   styleUrl: "./component.scss",
   imports: [],
 })
-export default class MethodComponent implements OnInit {
-  private methodService = inject(MethodsService);
-  private seo = inject(SeoService);
-  private session = inject(SessionService);
+export default class MethodComponent {
+  private readonly seo = inject(SeoService);
+  private readonly session = inject(SessionService);
+  private readonly facade = inject(AboutFacade);
 
-  language: (typeof Languages)[number] = Languages[0];
-  url: string;
-
-  methods: Method[] = [];
+  readonly language = this.session.language;
+  readonly methods = this.facade.methods;
 
   constructor() {
-    this.url = GLOBAL.url;
-  }
-
-  ngOnInit(): void {
-    this.language = this.session.language();
-    this.seo.setPageTitle("GMCAN | " + this.language.methods);
-    this.loadMethods();
-  }
-
-  loadMethods(): void {
-    this.methodService.list().subscribe((res: Method[]) => {
-      this.methods = res;
-    });
+    this.seo.setPageTitle("GMCAN | " + this.language().methods);
+    void this.facade.loadMethods();
   }
 }

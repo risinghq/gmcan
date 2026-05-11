@@ -42,6 +42,7 @@ export default class HomeComponent implements OnInit {
   tesis = 0;
   resumenes = 0;
   lineasInvestigacion: HomeViewModel["lineasInvestigacion"] = [];
+  linesPreview: HomeViewModel["linesPreview"] = [];
   newsItems: HomeNewsItem[] = [];
   featuredNews: HomeNewsItem = {} as HomeNewsItem;
   aboutUs: string[] = [];
@@ -65,6 +66,7 @@ export default class HomeComponent implements OnInit {
     this.newsItems = home.newsItems;
     this.featuredNews = home.featuredNews ?? ({} as HomeNewsItem);
     this.lineasInvestigacion = home.lineasInvestigacion;
+    this.linesPreview = home.linesPreview;
     this.metodos = home.metodos;
     this.miembros = home.miembros;
     this.aboutUs = home.aboutUs;
