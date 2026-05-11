@@ -18,7 +18,7 @@ const STATUS_TO_CODE_MAP: Record<ErrorHttpStatus, AppErrorCode> = {
   403: "forbidden",
   404: "not_found",
   409: "conflict",
-  422: "invalid_request",
+  422: "invariant_violation",
   500: "internal_error",
   502: "upstream_failure",
   503: "upstream_failure",
