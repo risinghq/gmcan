@@ -31,7 +31,7 @@
   "dependencies": {
     "@gmcan/contracts": "workspace:*",
     "@hono/node-server": "^2.0.1",
-    "@hono/zod-validator": "^0.7.6",
+    "@hono/zod-validator": "^0.9.1",
     "@libsql/client": "^0.17.2",
     "bcrypt": "^6.0.0",
     "hono": "^4.12.16",
