@@ -7,7 +7,8 @@ import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
-import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "./assets/service.js";
+import { resolveAssetAccessLinks } from "./assets/service.js";
+import { memberPhotoPlaceholderView, resolveMemberPhotoView } from "./member-photo.service.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -48,7 +49,7 @@ function nameOf(first?: string | null, last?: string | null, maternal?: string |
   return [first, last, maternal].filter(Boolean).join(" ").trim();
 }
 
-async function attachAuthors(publicationId: number): Promise<PublicationAuthor[]> {
+async function attachAuthors(publicationId: number, locale: Locale = DEFAULT_LOCALE): Promise<PublicationAuthor[]> {
   const rows = await db
     .selectFrom("publication_author")
     .leftJoin("member", "member.id", "publication_author.memberId")
@@ -72,7 +73,11 @@ async function attachAuthors(publicationId: number): Promise<PublicationAuthor[]
           authorOrder: row.authorOrder,
           memberId: row.memberId,
           name: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
-          asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
+          ...(await resolveMemberPhotoView({
+            memberId: row.memberId,
+            fullName: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
+            locale,
+          })),
         } satisfies PublicationAuthor;
       }
 
@@ -237,7 +242,7 @@ export async function listPublications(
   const ids = publications.map((p) => p.id);
   const [subtypes, authorRows] = await Promise.all([
     subtypeByPublicationIds(ids),
-    Promise.all(ids.map(async (id) => [id, await attachAuthors(id)] as const)),
+    Promise.all(ids.map(async (id) => [id, await attachAuthors(id, locale)] as const)),
   ]);
   const authorsById = new Map(authorRows);
 
@@ -332,13 +337,14 @@ export async function listAdminPublications(
   }
   const firstAuthorEntries = await Promise.all(
     Array.from(firstAuthorRowsByPublication.entries()).map(async ([publicationId, row]) => {
-      if (!row.memberId) return [publicationId, { name: row.externalName ?? "", asset: null }] as const;
+      if (!row.memberId) {
+        const name = row.externalName ?? "";
+        return [publicationId, { name, ...memberPhotoPlaceholderView({ fullName: name, locale }) }] as const;
+      }
+      const name = nameOf(row.firstName, row.lastName, row.maternalName);
       return [
         publicationId,
-        {
-          name: nameOf(row.firstName, row.lastName, row.maternalName),
-          asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.memberId, slot: "photo" }),
-        },
+        { name, ...(await resolveMemberPhotoView({ memberId: row.memberId, fullName: name, locale })) },
       ] as const;
     }),
   );
@@ -351,6 +357,8 @@ export async function listAdminPublications(
     const journalName = subtype.kindCode === "journal_article" ? subtype.journalArticle.journalName : "";
     const universityName = subtype.kindCode === "thesis" ? subtype.thesis.universityName : "";
     const thesisKindName = subtype.kindCode === "thesis" ? subtype.thesis.thesisKindName : "";
+    const firstAuthor = firstAuthorByPublication.get(publication.id);
+    const placeholder = memberPhotoPlaceholderView({ fullName: "", locale });
 
     return {
       id: publication.id,
@@ -364,8 +372,9 @@ export async function listAdminPublications(
       doi: publication.doi,
       publishedAt: publication.publishedAt,
       publishedAtLabel: monthYearEs(publication.publishedAt),
-      firstAuthorName: firstAuthorByPublication.get(publication.id)?.name ?? "",
-      firstAuthorAsset: firstAuthorByPublication.get(publication.id)?.asset ?? null,
+      firstAuthorName: firstAuthor?.name ?? "",
+      firstAuthorPhotoUrl: firstAuthor?.photoUrl ?? placeholder.photoUrl,
+      firstAuthorPhotoAlt: firstAuthor?.photoAlt ?? placeholder.photoAlt,
     };
   });
 }
@@ -374,7 +383,7 @@ export async function getPublication(id: number, locale: Locale) {
   return (await listPublications(locale, { id }))[0] ?? null;
 }
 
-export async function getPublicationEditView(id: number) {
+export async function getPublicationEditView(id: number, locale: Locale = DEFAULT_LOCALE) {
   const publication = await db.selectFrom("publication").selectAll().where("id", "=", id).executeTakeFirst();
   if (!publication) return { publication: null, authors: [] as PublicationAuthor[] };
 
@@ -385,7 +394,7 @@ export async function getPublicationEditView(id: number) {
       .where("publicationId", "=", id)
       .execute(),
     subtypeByPublicationIds([id]),
-    attachAuthors(id),
+    attachAuthors(id, locale),
   ]);
 
   return {

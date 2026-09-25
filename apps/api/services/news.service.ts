@@ -4,6 +4,7 @@ import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminNewsListItem, AdminNewsListQuery, AdminNewsListResponse } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./assets/service.js";
+import { resolveMemberPhotoView } from "./member-photo.service.js";
 
 export interface NewsUpsertInput {
   translations: LocalizedTranslations<{ title: string; summary: string; body: string }>;
@@ -30,6 +31,19 @@ function statusLabel(statusCode: NewsStatusCode): string {
   if (statusCode === "published") return "Publicado";
   if (statusCode === "draft") return "Borrador";
   return "Archivado";
+}
+
+async function resolveNewsAuthor(
+  row: { authorId: number; firstName: string | null; lastName: string | null; maternalName: string | null },
+  locale: Locale,
+) {
+  const authorName = [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" ");
+  const { photoUrl, photoAlt } = await resolveMemberPhotoView({
+    memberId: row.authorId,
+    fullName: authorName,
+    locale,
+  });
+  return { authorName, authorPhotoUrl: photoUrl, authorPhotoAlt: photoAlt };
 }
 
 function toNewsRow(data: NewsUpsertInput) {
@@ -121,19 +135,23 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
 
   return {
     items: await Promise.all(
-      rows.map(async (row) => ({
-        id: row.id,
-        title: row.title,
-        summary: row.summary,
-        publishedAt: row.publishedAt,
-        asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
-        priority: row.priority,
-        authorId: row.authorId,
-        newsKindCode: row.newsKindCode,
-        authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-        authorAsset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.authorId, slot: "photo" }),
-        newsKindName: row.newsKindName ?? "",
-      })),
+      rows.map(async (row) => {
+        const author = await resolveNewsAuthor(row, locale);
+        return {
+          id: row.id,
+          title: row.title,
+          summary: row.summary,
+          publishedAt: row.publishedAt,
+          asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
+          priority: row.priority,
+          authorId: row.authorId,
+          newsKindCode: row.newsKindCode,
+          authorName: author.authorName,
+          authorPhotoUrl: author.authorPhotoUrl,
+          authorPhotoAlt: author.authorPhotoAlt,
+          newsKindName: row.newsKindName ?? "",
+        };
+      }),
     ),
     total: Number(totalRow.count),
     page: query.page,
@@ -179,8 +197,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale) {
   return {
     ...row,
     asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
-    authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-    authorAsset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.authorId, slot: "photo" }),
+    ...(await resolveNewsAuthor(row, locale)),
     newsKindName: row.newsKindName ?? "",
   };
 }
@@ -242,18 +259,22 @@ export async function listAdminNews(locale: Locale, query: AdminNewsListQuery): 
     .execute();
 
   const items: AdminNewsListItem[] = await Promise.all(
-    rows.map(async (row) => ({
-      id: row.id,
-      title: row.title,
-      publishedAt: row.publishedAt,
-      statusCode: row.statusCode,
-      authorId: row.authorId,
-      newsKindCode: row.newsKindCode,
-      statusLabel: statusLabel(row.statusCode),
-      categoryName: row.categoryName,
-      authorName: [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" "),
-      authorAsset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.authorId, slot: "photo" }),
-    })),
+    rows.map(async (row) => {
+      const author = await resolveNewsAuthor(row, locale);
+      return {
+        id: row.id,
+        title: row.title,
+        publishedAt: row.publishedAt,
+        statusCode: row.statusCode,
+        authorId: row.authorId,
+        newsKindCode: row.newsKindCode,
+        statusLabel: statusLabel(row.statusCode),
+        categoryName: row.categoryName,
+        authorName: author.authorName,
+        authorPhotoUrl: author.authorPhotoUrl,
+        authorPhotoAlt: author.authorPhotoAlt,
+      };
+    }),
   );
 
   return { items, total: Number(totalRow.count), page: query.page, pageSize: query.pageSize };

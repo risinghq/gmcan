@@ -1,12 +1,19 @@
-import { resolveAssetAccessUrl } from "../services/assets/service.js";
+import type { Locale } from "../lib/public-locale.js";
+import { resolveMemberPhotoView } from "../services/member-photo.service.js";
 
-export async function resolveMemberPhotoUrls(memberIds: number[]): Promise<Map<number, string | null>> {
-  const uniqueIds = Array.from(new Set(memberIds));
+export async function resolveMemberPhotoUrls(
+  memberInputs: Array<{ memberId: number; fullName: string }>,
+  locale: Locale,
+): Promise<Map<number, { photoUrl: string; photoAlt: string }>> {
+  const uniqueInputs = Array.from(new Map(memberInputs.map((input) => [input.memberId, input])).values());
   const resolved = await Promise.all(
-    uniqueIds.map(
-      async (memberId) =>
-        [memberId, await resolveAssetAccessUrl({ ownerType: "member", ownerId: memberId, slot: "photo" })] as const,
+    uniqueInputs.map(
+      async (input) =>
+        [
+          input.memberId,
+          await resolveMemberPhotoView({ memberId: input.memberId, fullName: input.fullName, locale }),
+        ] as const,
     ),
   );
-  return new Map<number, string | null>(resolved);
+  return new Map<number, { photoUrl: string; photoAlt: string }>(resolved);
 }

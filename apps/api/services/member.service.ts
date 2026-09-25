@@ -6,7 +6,7 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
-import { resolveAssetAccessUrl } from "./assets/service.js";
+import { memberFullName, resolveMemberPhotoView } from "./member-photo.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "isActive"] as const;
@@ -130,7 +130,11 @@ export async function listAdminMembers(
         memberTypeName: row.memberTypeName ?? "",
         prefixCode: row.prefixCode,
         prefixName: row.prefixName,
-        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
+        ...(await resolveMemberPhotoView({
+          memberId: row.id,
+          fullName: memberFullName(row),
+          locale,
+        })),
         publishability: {
           publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
           missing: { base: missingBase, translations: missingTranslations },
@@ -225,7 +229,7 @@ export async function searchMembers(q: string) {
     .execute();
 }
 
-export async function searchAuthorPool(q: string) {
+export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCALE) {
   const like = `%${q}%`;
   const [members, externals] = await Promise.all([
     db
@@ -252,7 +256,11 @@ export async function searchAuthorPool(q: string) {
       memberId: m.id,
       name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
       photo: null,
-      photoUrl: await resolveAssetAccessUrl({ ownerType: "member", ownerId: m.id, slot: "photo" }),
+      ...(await resolveMemberPhotoView({
+        memberId: m.id,
+        fullName: memberFullName(m),
+        locale,
+      })),
     })),
   );
 

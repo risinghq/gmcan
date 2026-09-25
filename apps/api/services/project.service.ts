@@ -43,15 +43,20 @@ export async function listProjectsLocalized(locale: Locale, statusCode?: Project
 
   const projectIds = projects.map((p) => p.id);
   const memberRows = await listProjectMemberRowsByProjectIds(projectIds);
-  const photoByMemberId = await resolveMemberPhotoUrls(memberRows.map((row) => row.memberId));
+  const photoByMemberId = await resolveMemberPhotoUrls(
+    memberRows.map((row) => ({ memberId: row.memberId, fullName: memberDisplayName(row) })),
+    locale,
+  );
 
-  const membersByProject = new Map<number, { memberId: number; name: string; asset: string | null }[]>();
+  const membersByProject = new Map<number, { memberId: number; name: string; photoUrl: string; photoAlt: string }[]>();
   for (const row of memberRows) {
     const current = membersByProject.get(row.projectId) ?? [];
+    const photo = photoByMemberId.get(row.memberId);
     current.push({
       memberId: row.memberId,
       name: memberDisplayName(row),
-      asset: photoByMemberId.get(row.memberId) ?? null,
+      photoUrl: photo?.photoUrl ?? "",
+      photoAlt: photo?.photoAlt ?? "",
     });
     membersByProject.set(row.projectId, current);
   }
@@ -69,15 +74,20 @@ export async function listAdminProjects(
 
   const projectIds = projects.map((project) => project.id);
   const memberRows = await listProjectMemberRowsByProjectIds(projectIds, true);
-  const photoByMemberId = await resolveMemberPhotoUrls(memberRows.map((row) => row.memberId));
+  const photoByMemberId = await resolveMemberPhotoUrls(
+    memberRows.map((row) => ({ memberId: row.memberId, fullName: memberDisplayName(row) })),
+    locale,
+  );
 
   const membersByProject = new Map<number, AdminProjectMemberListItem[]>();
   for (const row of memberRows) {
     const current = membersByProject.get(row.projectId) ?? [];
+    const photo = photoByMemberId.get(row.memberId);
     current.push({
       memberId: row.memberId,
       name: memberDisplayName(row),
-      asset: photoByMemberId.get(row.memberId) ?? null,
+      photoUrl: photo?.photoUrl ?? "",
+      photoAlt: photo?.photoAlt ?? "",
     });
     membersByProject.set(row.projectId, current);
   }
