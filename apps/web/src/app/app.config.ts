@@ -12,7 +12,12 @@ import {
   provideAppInitializer,
   provideZonelessChangeDetection,
 } from "@angular/core";
-import { provideClientHydration, withEventReplay } from "@angular/platform-browser";
+import {
+  provideClientHydration,
+  withEventReplay,
+  withHttpTransferCacheOptions,
+  withNoIncrementalHydration,
+} from "@angular/platform-browser";
 import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
 import {
   RedirectCommand,
@@ -25,6 +30,7 @@ import {
 import { toNavigationAppError } from "@app/shared/errors/app-error";
 import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
+import { GLOBAL } from "@app/shared/services/global";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
@@ -51,7 +57,16 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
-    provideClientHydration(withEventReplay()),
+    provideClientHydration(
+      withEventReplay(),
+      withNoIncrementalHydration(),
+      // authInterceptor sends every request with credentials, which Angular excludes from the transfer cache by
+      // default. Public API responses carry no per-user data, so they are safe to embed in the server-rendered page.
+      withHttpTransferCacheOptions({
+        includeRequestsWithCredentials: true,
+        filter: (req) => GLOBAL.isPublicApiRequest(req.url),
+      }),
+    ),
     provideAnimationsAsync(),
     provideCharts(withDefaultRegisterables()),
     DatePipe,
