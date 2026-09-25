@@ -30,7 +30,7 @@
             "assets": [{ "glob": "**/*", "input": "public" }],
             "styles": ["node_modules/animate.css/animate.css", "src/styles.scss"],
             "security": {
-              "allowedHosts": []
+              "allowedHosts": ["localhost", "161.35.230.134"]
             }
           },
           "configurations": {
