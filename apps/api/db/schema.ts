@@ -1,4 +1,13 @@
-import type { Generated, Insertable, Selectable, Updateable } from "kysely";
+import type {
+  ColumnType,
+  Generated,
+  InsertType,
+  Insertable,
+  Selectable,
+  SelectType,
+  Updateable,
+  UpdateType,
+} from "kysely";
 
 export type DateString = string;
 export type LocaleCode = string;
@@ -378,7 +387,22 @@ export interface AboutAssetTable {
   createdAt: DateString;
 }
 
-export interface Database {
+// Kysely marks a column optional on insert only when its insert type includes null or undefined,
+// and detects that with NonNullable, which does nothing while strictNullChecks is off.
+// Adding `void` (assignable from undefined) makes every column optional on insert while strictNullChecks is off.
+type OptionalOnInsert<Tables> = {
+  [T in keyof Tables]: {
+    [C in keyof Tables[T]]: ColumnType<
+      SelectType<Tables[T][C]>,
+      InsertType<Tables[T][C]> | void,
+      UpdateType<Tables[T][C]>
+    >;
+  };
+};
+
+export type Database = OptionalOnInsert<DatabaseTables>;
+
+interface DatabaseTables {
   locale: LocaleTable;
   gender: GenderTable;
   prefix: PrefixTable;
