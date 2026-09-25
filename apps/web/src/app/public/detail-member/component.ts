@@ -1,5 +1,5 @@
 import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
@@ -38,6 +38,7 @@ type PublicationDisplay = PublicPublication & {
   selector: "app-detail-member",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatProgressSpinner,
     MatIcon,

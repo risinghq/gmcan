@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatButton } from "@angular/material/button";
 import {
   MAT_DIALOG_DATA,
@@ -20,6 +20,7 @@ interface PublishabilityDialogData {
   selector: "app-publishability-dialog",
   standalone: true,
   imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButton],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: "./dialog.component.html",
 })
 export class PublishabilityDialogComponent {

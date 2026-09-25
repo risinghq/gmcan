@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import {
   AbstractControl,
   FormBuilder,
@@ -41,6 +41,7 @@ const MIN_PASSWORD_LENGTH = 8;
   templateUrl: "./perfil.component.html",
   styleUrl: "./perfil.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ReactiveFormsModule,
     MatFormField,

@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -12,6 +12,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-category",
   templateUrl: "./add-category.component.html",
   styleUrl: "./add-category.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddCategoryComponent implements OnInit, HasUnsavedChanges {

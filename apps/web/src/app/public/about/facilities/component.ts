@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from "@angular/core";
+import { Component, computed, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import { MatChip, MatChipSet } from "@angular/material/chips";
 import type { FacilitiesData } from "@app/public/about/data";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -9,6 +9,7 @@ import { SessionService } from "@app/shared/services/session.service";
   selector: "app-facilities",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatChipSet, MatChip],
 })
 export default class FacilitiesComponent {

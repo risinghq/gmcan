@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -16,6 +16,7 @@ import { ClassicEditor } from "ckeditor5";
   selector: "app-add-method",
   templateUrl: "./add-method.component.html",
   styleUrl: "./add-method.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
@@ -133,6 +134,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/method-preview.html",
   styleUrl: "../../../public/about/method/component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogClose],
 })
 export class DialogPreview4 {

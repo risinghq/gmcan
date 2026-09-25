@@ -1,5 +1,5 @@
 import { DatePipe, SlicePipe } from "@angular/common";
-import { Component, inject, input } from "@angular/core";
+import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
@@ -16,6 +16,7 @@ import {
   selector: "app-lines-investigation",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe, DatePipe],
 })
 export default class LinesInvestigationComponent {

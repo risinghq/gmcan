@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { AboutFacade } from "@app/public/about/facade";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -7,6 +7,7 @@ import { SessionService } from "@app/shared/services/session.service";
   selector: "app-method",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [],
 })
 export default class MethodComponent {

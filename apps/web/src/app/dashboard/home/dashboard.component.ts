@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import type { Group } from "@app/shared/models/group";
 import { AuthzService } from "@app/shared/services/authz.service";
@@ -12,6 +12,7 @@ import { BaseChartDirective } from "ng2-charts";
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
   styleUrl: "./dashboard.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
 })
 export default class DashboardComponent implements OnInit {

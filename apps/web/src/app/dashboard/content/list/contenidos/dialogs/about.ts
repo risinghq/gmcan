@@ -1,5 +1,5 @@
 import { DatePipe, TitleCasePipe } from "@angular/common";
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatDialogClose, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { GLOBAL } from "@app/shared/services/global";
 
@@ -9,6 +9,7 @@ import type { PreviewAboutData } from "../models";
   selector: "app-dialog-about-preview",
   templateUrl: "./about.html",
   styleUrl: "../../../../../public/about/about-us/component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogClose],
 })
 export class DialogAboutPreview {

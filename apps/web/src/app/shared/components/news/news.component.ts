@@ -1,5 +1,5 @@
 import { SlicePipe } from "@angular/common";
-import { Component, HostListener, computed, inject } from "@angular/core";
+import { Component, HostListener, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
 import type { PublicNewsListItem } from "@app/shared/models/news";
@@ -21,6 +21,7 @@ type NewsDisplay = PublicNewsListItem & {
   selector: "app-news",
   templateUrl: "./news.component.html",
   styleUrl: "./news.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [SlicePipe],
 })
 export default class NewsComponent {

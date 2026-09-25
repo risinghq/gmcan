@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Router, ActivatedRoute } from "@angular/router";
@@ -14,6 +14,7 @@ import { UiStateService } from "@app/shared/services/ui-state.service";
   selector: "app-change-pass",
   templateUrl: "./change-pass.component.html",
   styleUrl: "./change-pass.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class ChangePassComponent implements OnInit {

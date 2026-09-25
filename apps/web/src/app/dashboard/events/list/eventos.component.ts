@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, viewChild } from "@angular/core";
+import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -27,6 +27,7 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
   selector: "app-eventos",
   templateUrl: "./eventos.component.html",
   styleUrl: "./eventos.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatTabGroup,
     MatTab,

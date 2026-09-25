@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, viewChild } from "@angular/core";
+import { AfterViewInit, Component, Input, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -20,6 +20,7 @@ import { ContenidosState } from "../state";
 @Component({
   selector: "app-contenidos-lines-tab",
   templateUrl: "./lines.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     MatTable,

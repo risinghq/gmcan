@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, viewChild } from "@angular/core";
+import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -26,6 +26,7 @@ import { MemberService } from "@app/shared/services/member.service";
   selector: "app-miembros",
   templateUrl: "./miembros.component.html",
   styleUrl: "./miembros.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     MatTable,

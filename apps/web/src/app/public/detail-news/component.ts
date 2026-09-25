@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Meta, Title } from "@angular/platform-browser";
@@ -17,6 +17,7 @@ import type { DetailNewsViewModel } from "./types";
   selector: "app-detail-news",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatProgressSpinner, MatIcon, RouterLink, NewsComponent, SharedShareButtonsComponent],
 })
 export default class DetailNewsComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, MatSortHeader, Sort } from "@angular/material/sort";
@@ -40,6 +40,7 @@ interface NewsListItem {
   selector: "app-news-list",
   templateUrl: "./noticias.component.html",
   styleUrl: "./noticias.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatTabGroup,
     MatTab,

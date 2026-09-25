@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -25,6 +25,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-edit-software",
   templateUrl: "../add-software/add-software.component.html",
   styleUrl: "../add-software/add-software.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule],
 })
 export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges {
@@ -130,6 +131,7 @@ export default class EditSoftwareComponent implements OnInit, HasUnsavedChanges 
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase14 {

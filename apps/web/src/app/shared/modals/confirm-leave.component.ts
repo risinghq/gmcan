@@ -1,11 +1,12 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component } from "@angular/core";
+import { Component, ChangeDetectionStrategy } from "@angular/core";
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from "@angular/material/dialog";
 
 @Component({
   selector: "app-confirm-leave",
   standalone: true,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div class="title-div" mat-dialog-title>
       <span class="title-mat">¿Estás seguro que deseas volver sin guardar?</span>

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, inject } from "@angular/core";
+import { Component, HostListener, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
@@ -19,6 +19,7 @@ import { tap } from "rxjs";
   selector: "app-landing",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatSidenavContainer,
     MatSidenav,

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { Router } from "@angular/router";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -7,6 +7,7 @@ import { SessionService } from "@app/shared/services/session.service";
 @Component({
   selector: "app-not-found",
   templateUrl: "./not-found.component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: "./not-found.component.scss",
 })
 export default class NotFoundComponent implements OnInit {

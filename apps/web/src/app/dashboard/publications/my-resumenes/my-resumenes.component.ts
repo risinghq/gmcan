@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject, viewChild } from "@angular/core";
+import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -32,6 +32,7 @@ interface PublicationRow extends PublicPublicationWithAuthors {
   selector: "app-my-resumenes",
   templateUrl: "./my-resumenes.component.html",
   styleUrl: "./my-resumenes.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     MatTable,

@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import {
   MatDialog,
@@ -23,6 +23,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-edit-revista",
   templateUrl: "../add-revista/add-revista.component.html",
   styleUrl: "../add-revista/add-revista.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
@@ -130,6 +131,7 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase3 {

@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { AboutFacade } from "@app/public/about/facade";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -6,6 +6,7 @@ import { SessionService } from "@app/shared/services/session.service";
 @Component({
   selector: "app-works",
   templateUrl: "./component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: "./component.scss",
 })
 export default class WorksComponent {

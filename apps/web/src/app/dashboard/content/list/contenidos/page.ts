@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { MatTab, MatTabGroup } from "@angular/material/tabs";
 
 import { ContenidosState } from "./state";
@@ -12,6 +12,7 @@ import { ContenidosResourcesTab } from "./tabs/resources";
   selector: "app-contenidos-page",
   templateUrl: "./page.html",
   providers: [ContenidosState],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatTabGroup,
     MatTab,

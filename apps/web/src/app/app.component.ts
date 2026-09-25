@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from "@angular/core";
+import { Component, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { Router, RouterOutlet } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
@@ -14,6 +14,7 @@ import { UiStateService } from "@app/shared/services/ui-state.service";
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterOutlet],
 })
 export default class AppComponent {

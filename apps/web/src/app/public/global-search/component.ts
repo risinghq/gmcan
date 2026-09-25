@@ -1,5 +1,5 @@
 import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
-import { Component, DestroyRef, OnInit, inject } from "@angular/core";
+import { Component, DestroyRef, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
@@ -38,6 +38,7 @@ type MemberDisplay = SearchResults["members"][number];
   selector: "app-global-search",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     FormsModule,

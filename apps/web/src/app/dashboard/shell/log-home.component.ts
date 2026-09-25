@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -22,6 +22,7 @@ import { filter } from "rxjs";
   selector: "app-log-home",
   templateUrl: "./log-home.component.html",
   styleUrl: "./log-home.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatDrawerContainer,
     MatDrawer,

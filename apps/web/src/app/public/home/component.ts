@@ -1,5 +1,5 @@
 import { SlicePipe } from "@angular/common";
-import { Component, HostListener, inject, OnInit } from "@angular/core";
+import { Component, HostListener, inject, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { MatButton } from "@angular/material/button";
 import { MatCard } from "@angular/material/card";
 import { MatIcon } from "@angular/material/icon";
@@ -20,6 +20,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   selector: "app-home",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {

@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { AsyncPipe } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -66,6 +66,7 @@ interface ResumenDraft {
   templateUrl: "../add-resumen/add-resumen.component.html",
   styleUrl: "../add-resumen/add-resumen.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     FormsModule,
@@ -358,6 +359,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogErase8 {

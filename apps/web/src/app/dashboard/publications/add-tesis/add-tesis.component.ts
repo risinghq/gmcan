@@ -1,5 +1,5 @@
 import { AsyncPipe } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -40,6 +40,7 @@ interface ThesisDraft {
   templateUrl: "./add-tesis.component.html",
   styleUrl: "./add-tesis.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     FormsModule,

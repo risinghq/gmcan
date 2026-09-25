@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -12,6 +12,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-fuente",
   templateUrl: "./add-fuente.component.html",
   styleUrl: "./add-fuente.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddFuenteComponent implements OnInit, HasUnsavedChanges {

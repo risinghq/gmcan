@@ -1,4 +1,4 @@
-import { Component, inject, input } from "@angular/core";
+import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import type { About } from "@app/shared/models/about";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -7,6 +7,7 @@ import { SessionService } from "@app/shared/services/session.service";
   selector: "app-about-us",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [],
 })
 export default class AboutUsComponent {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
@@ -17,6 +17,7 @@ import { UiStateService } from "@app/shared/services/ui-state.service";
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrl: "./login.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class LoginComponent implements OnInit {

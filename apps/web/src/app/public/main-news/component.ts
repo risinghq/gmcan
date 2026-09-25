@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
@@ -30,6 +30,7 @@ type NewsTypeFilter = { code: "general" | "research" | "event"; name: string };
   selector: "app-main-news",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     MatProgressSpinner,

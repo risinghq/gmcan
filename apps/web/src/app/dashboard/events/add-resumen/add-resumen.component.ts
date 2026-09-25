@@ -1,5 +1,5 @@
 import { AsyncPipe } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatAutocompleteTrigger, MatAutocomplete } from "@angular/material/autocomplete";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -45,6 +45,7 @@ interface ResumenDraft {
   templateUrl: "./add-resumen.component.html",
   styleUrl: "./add-resumen.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     FormsModule,

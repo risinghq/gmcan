@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -37,6 +37,7 @@ import { AutosizeModule } from "ngx-autosize";
   templateUrl: "../add/add-member.component.html",
   styleUrl: "./edit-member.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     ReactiveFormsModule,
@@ -367,6 +368,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogCancel5 {

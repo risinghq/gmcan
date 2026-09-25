@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import {
   MatDialogActions,
   MatDialogClose,
@@ -13,6 +13,7 @@ import { DialogData } from "@app/shared/models/dialogdata";
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "./dialog-options.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogIdle {

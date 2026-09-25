@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
@@ -13,6 +13,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
   selector: "app-add-universidad",
   templateUrl: "./add-universidad.component.html",
   styleUrl: "./add-universidad.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class AddUniversidadComponent implements OnInit, HasUnsavedChanges {

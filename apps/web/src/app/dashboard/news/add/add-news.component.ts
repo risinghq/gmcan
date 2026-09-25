@@ -1,6 +1,6 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from "@angular/material/datepicker";
@@ -56,6 +56,7 @@ interface NewsPreviewData {
   templateUrl: "./add-news.component.html",
   styleUrl: "./add-news.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     FormsModule,
@@ -241,6 +242,7 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
 @Component({
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-options.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatDialogActions, MatDialogClose],
 })
 export class DialogPublish {
@@ -258,6 +260,7 @@ export class DialogPublish {
   selector: "dialog-content-example-dialog",
   templateUrl: "../../../shared/modals/dialog-preview.html",
   styleUrl: "../../../public/detail-news/component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatDialogClose],
 })
 export class DialogPreview {

@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, viewChild } from "@angular/core";
+import { Component, Input, AfterViewInit, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
@@ -22,6 +22,7 @@ import { ContenidosState } from "../state";
 @Component({
   selector: "app-contenidos-resources-tab",
   templateUrl: "./resources.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
     ReactiveFormsModule,

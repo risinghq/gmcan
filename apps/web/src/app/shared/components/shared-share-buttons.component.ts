@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input } from "@angular/core";
+import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 
 import { ShareService } from "../services/share.service";
 
@@ -36,6 +36,7 @@ import { ShareService } from "../services/share.service";
       </button>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .share-row {
       display: flex;

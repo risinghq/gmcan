@@ -1,5 +1,5 @@
 import { SlicePipe } from "@angular/common";
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -24,6 +24,7 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   selector: "app-projects",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     MatTabGroup,

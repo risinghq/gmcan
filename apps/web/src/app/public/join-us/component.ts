@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -20,6 +20,7 @@ import { AutosizeModule } from "ngx-autosize";
   selector: "app-join-us",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, FormsModule, ReactiveFormsModule, AutosizeModule, MatButton, NewsComponent],
 })
 export default class JoinUsComponent implements OnInit {
@@ -97,6 +98,7 @@ export default class JoinUsComponent implements OnInit {
 @Component({
   selector: "exitoso-dialog",
   templateUrl: "../../shared/modals/email-exitoso.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatButton],
 })
 export class EmailExitoso {

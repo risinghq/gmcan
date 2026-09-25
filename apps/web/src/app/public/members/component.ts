@@ -1,4 +1,4 @@
-import { Component, computed, inject } from "@angular/core";
+import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -18,6 +18,7 @@ type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
   selector: "app-members",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatIcon, MatTabGroup, MatTab, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent {

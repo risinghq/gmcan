@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -26,6 +26,7 @@ import { AutosizeModule } from "ngx-autosize";
   templateUrl: "./add-member.component.html",
   styleUrl: "./add-member.component.scss",
   providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,
     ReactiveFormsModule,
