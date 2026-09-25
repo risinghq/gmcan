@@ -73,15 +73,13 @@ router.post("/", zValidator("json", EventBody), async (c) => {
     await trx
       .insertInto("event_translation")
       .values(
-        Object.entries(translations).map(
-          ([locale, tr]): Omit<EventTranslationTable, "id"> => ({
-            eventId,
-            locale,
-            name: tr.name,
-            city: tr.city,
-            country: tr.country,
-          }),
-        ),
+        Object.entries(translations).map(([locale, tr]): Omit<EventTranslationTable, "id"> => ({
+          eventId,
+          locale,
+          name: tr.name,
+          city: tr.city,
+          country: tr.country,
+        })),
       )
       .execute();
     return eventId;
@@ -100,15 +98,13 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", EventBody), 
     await trx
       .insertInto("event_translation")
       .values(
-        Object.entries(translations).map(
-          ([locale, tr]): Omit<EventTranslationTable, "id"> => ({
-            eventId: id,
-            locale,
-            name: tr.name,
-            city: tr.city,
-            country: tr.country,
-          }),
-        ),
+        Object.entries(translations).map(([locale, tr]): Omit<EventTranslationTable, "id"> => ({
+          eventId: id,
+          locale,
+          name: tr.name,
+          city: tr.city,
+          country: tr.country,
+        })),
       )
       .execute();
   });
