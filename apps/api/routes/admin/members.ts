@@ -5,7 +5,7 @@ import { z } from "zod";
 import { okStatus } from "../../lib/contracts.js";
 import { LocaleCodeSchema } from "../../lib/locales.js";
 import { requirePermission, requireSelfOrPermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import { memberFullName, resolveMemberPhotoView } from "../../services/member-photo.service.js";
 import {
   addMemberToGroup,
   createMember,
@@ -88,7 +88,7 @@ router.get(
   zValidator("query", z.object({ q: z.string().default("") })),
   async (c) => {
     const { q } = c.req.valid("query");
-    const results = await searchAuthorPool(q);
+    const results = await searchAuthorPool(q, c.get("locale"));
     return c.json(results);
   },
 );
@@ -100,7 +100,7 @@ router.get("/:id", requirePermission("members.read"), zValidator("param", IdPara
   if (!member) return c.json({ error: "Not found" }, 404);
   return c.json({
     ...member,
-    asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: member.id, slot: "photo" }),
+    ...(await resolveMemberPhotoView({ memberId: member.id, fullName: memberFullName(member), locale })),
   });
 });
 

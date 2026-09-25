@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../../services/assets/service.js";
+import { memberFullName, resolveMemberPhotoView } from "../../../services/member-photo.service.js";
 import { globalSearch } from "../../../services/search.service.js";
 
 const router = new Hono();
@@ -37,7 +38,11 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
         row.authors.map(async (author) =>
           author.kind === "registered"
             ? Object.assign({}, author, {
-                asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: author.memberId, slot: "photo" }),
+                ...(await resolveMemberPhotoView({
+                  memberId: author.memberId,
+                  fullName: author.name,
+                  locale,
+                })),
               })
             : author,
         ),
@@ -48,7 +53,7 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const members = await Promise.all(
     result.members.map(async (row) =>
       Object.assign({}, row, {
-        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
+        ...(await resolveMemberPhotoView({ memberId: row.id, fullName: memberFullName(row), locale })),
       }),
     ),
   );
@@ -83,7 +88,11 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
       members: await Promise.all(
         row.members.map(async (member) =>
           Object.assign({}, member, {
-            asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: member.memberId, slot: "photo" }),
+            ...(await resolveMemberPhotoView({
+              memberId: member.memberId,
+              fullName: member.name,
+              locale,
+            })),
           }),
         ),
       ),

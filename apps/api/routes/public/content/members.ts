@@ -2,7 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../../services/assets/service.js";
+import { resolveAssetAccessLinks } from "../../../services/assets/service.js";
+import { memberFullName, resolveMemberPhotoView } from "../../../services/member-photo.service.js";
 import { getMemberProfileLocalized, listMembersLocalized } from "../../../services/member.service.js";
 
 const router = new Hono();
@@ -13,9 +14,7 @@ router.get("/", async (c) => {
   const rows = await listMembersLocalized(locale);
   const shaped = await Promise.all(
     rows.map(async (row) =>
-      Object.assign({}, row, {
-        asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: row.id, slot: "photo" }),
-      }),
+      Object.assign({}, row, await resolveMemberPhotoView({ memberId: row.id, fullName: memberFullName(row), locale })),
     ),
   );
   return c.json(shaped);
@@ -29,7 +28,11 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
   const member = {
     ...profile.member,
-    asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: profile.member.id, slot: "photo" }),
+    ...(await resolveMemberPhotoView({
+      memberId: profile.member.id,
+      fullName: memberFullName(profile.member),
+      locale,
+    })),
   };
 
   const publications = await Promise.all(

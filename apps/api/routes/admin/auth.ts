@@ -6,6 +6,7 @@ import { roleByCode } from "../../authz/permissions.js";
 import { verifyPassword } from "../../lib/password.js";
 import { capabilitiesForActor } from "../../middleware/authz.js";
 import { createSession, destroySession } from "../../middleware/session.js";
+import { memberFullName, resolveMemberPhotoView } from "../../services/member-photo.service.js";
 import { getMemberByEmail } from "../../services/member.service.js";
 
 const router = new Hono();
@@ -25,7 +26,12 @@ router.post("/login", zValidator("json", z.object({ email: z.email(), password: 
     ? capabilitiesForActor({ id: member.id, roleCode: member.roleCode, role, isActive: member.isActive })
     : [];
   await createSession(c, member.id);
-  return c.json({ user: { ...user, capabilities } });
+  const photo = await resolveMemberPhotoView({
+    memberId: member.id,
+    fullName: memberFullName(member),
+    locale: c.get("locale"),
+  });
+  return c.json({ user: { ...user, ...photo, capabilities } });
 });
 
 router.post("/logout", async (c) => {

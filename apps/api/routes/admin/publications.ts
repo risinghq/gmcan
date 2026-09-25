@@ -69,7 +69,7 @@ router.get("/", zValidator("query", AdminPublicationListQuerySchema), async (c) 
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const result = await getPublicationEditView(id);
+  const result = await getPublicationEditView(id, c.get("locale"));
   if (!result.publication) return c.json({ error: "Not found" }, 404);
   return c.json(result);
 });

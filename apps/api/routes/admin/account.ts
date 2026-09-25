@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { okStatus } from "../../lib/contracts.js";
 import { capabilitiesForActor, requirePermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import { memberFullName, resolveMemberPhotoView } from "../../services/member-photo.service.js";
 import { getMemberFull, getResetPasswordStatus, updatePassword } from "../../services/member.service.js";
 
 const router = new Hono();
@@ -17,7 +17,7 @@ router.get("/me", requirePermission("account.self.read"), async (c) => {
   const actor = c.get("actor");
   return c.json({
     ...member,
-    asset: await resolveAssetAccessUrl({ ownerType: "member", ownerId: member.id, slot: "photo" }),
+    ...(await resolveMemberPhotoView({ memberId: member.id, fullName: memberFullName(member), locale })),
     capabilities: capabilitiesForActor(actor),
   });
 });
