@@ -1,4 +1,5 @@
-import { Component, OnInit, HostListener, inject } from "@angular/core";
+import { Component, HostListener, OnInit, inject } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
@@ -6,14 +7,13 @@ import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/mat
 import { MatToolbar } from "@angular/material/toolbar";
 import { Title } from "@angular/platform-browser";
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
-import { createGroup } from "@app/shared/models/factories";
-import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
+import { tap } from "rxjs";
 
 @Component({
   selector: "app-landing",
@@ -45,7 +45,14 @@ export default class LandingComponent implements OnInit {
   private titleService = inject(Title);
 
   screenWidth: number;
-  public grupoinfo: Group;
+  readonly groupInfo = toSignal(
+    this.groupService.getGroup().pipe(
+      tap((group) => {
+        this.uiState.setGroupInfo(group);
+      }),
+    ),
+    { initialValue: this.uiState.groupInfo() },
+  );
   public url: string;
   enteredButton = false;
   isMatMenuOpen = false;
@@ -65,7 +72,6 @@ export default class LandingComponent implements OnInit {
     this.language = this.session.language();
     this.url = GLOBAL.url;
     this.screenWidth = this.browser.innerWidth();
-    this.grupoinfo = createGroup();
   }
 
   @HostListener("window:resize", ["$event"])
@@ -75,7 +81,6 @@ export default class LandingComponent implements OnInit {
 
   ngOnInit(): void {
     this.titleService.setTitle("GMCAN | UNMSM");
-    this.getGroupInfo();
   }
 
   lanSelected = 0;
@@ -85,13 +90,6 @@ export default class LandingComponent implements OnInit {
     this.language = Languages[this.lanSelected] ?? Languages[0];
     this.session.setLanguage(this.language, number);
     this.browser.reload();
-  }
-
-  getGroupInfo(): void {
-    this.groupService.getGroup().subscribe((group: Group) => {
-      this.grupoinfo = group;
-      this.uiState.setGroupInfo(this.grupoinfo);
-    });
   }
 
   inputExpand = false;

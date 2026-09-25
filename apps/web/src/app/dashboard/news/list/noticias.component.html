@@ -47,12 +47,7 @@
           <td mat-cell *matCellDef="let row" (click)="editNews(row.id)">
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                @if (row.authorAsset) {
-                  <img class="member-img" src="{{ row.authorAsset }}" alt="User photo" />
-                }
-                @if (!row.authorAsset) {
-                  <img class="member-img" src="/img/placeholders/user.png" alt="" />
-                }
+                <img class="member-img" src="{{ row.authorPhotoUrl }}" alt="{{ row.authorPhotoAlt }}" />
               </div>
               {{ row.authorName }}
             </div>

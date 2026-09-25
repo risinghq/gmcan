@@ -15,7 +15,6 @@
         </div>
       </div>
       <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
-        <!-- ID Column -->
         <ng-container matColumnDef="titulo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
           <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">
@@ -28,12 +27,7 @@
             @for (usuario of row.members; track usuario.memberId) {
               <div class="flex-news">
                 <div class="member-img-round mr-8">
-                  @if (usuario.asset) {
-                    <img class="member-img" src="{{ usuario.asset }}" alt="User photo" />
-                  }
-                  @if (!usuario.asset) {
-                    <img class="member-img" src="/img/placeholders/user.png" alt="" />
-                  }
+                  <img class="member-img" src="{{ usuario.photoUrl }}" alt="{{ usuario.photoAlt }}" />
                 </div>
                 {{ usuario.name }}
               </div>
@@ -71,7 +65,6 @@
         </div>
       </div>
       <table mat-table [dataSource]="dataSource2" [hidden]="displayedNotFound2" matSort>
-        <!-- ID Column -->
         <ng-container matColumnDef="nombre">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
           <td mat-cell *matCellDef="let row" (click)="editFuente(row.id)">
@@ -112,12 +105,7 @@
           @for (usuario of row.members; track usuario.memberId) {
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                @if (usuario.asset) {
-                  <img class="member-img" src="{{ usuario.asset }}" alt="User photo" />
-                }
-                @if (!usuario.asset) {
-                  <img class="member-img" src="/img/placeholders/user.png" alt="" />
-                }
+                <img class="member-img" src="{{ usuario.photoUrl }}" alt="{{ usuario.photoAlt }}" />
               </div>
               {{ usuario.name }}
             </div>

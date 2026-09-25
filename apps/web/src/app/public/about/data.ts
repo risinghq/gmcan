@@ -76,9 +76,6 @@ export class AboutDataService {
 
     for (const line of lines) {
       if (!line.asset) failInvariant("Research line asset is required", { lineId: line.id });
-      for (const member of line.proyectos.flatMap((p) => p.members)) {
-        if (!member.asset) failInvariant("Project member asset is required", { memberId: member.memberId });
-      }
     }
 
     return lines;

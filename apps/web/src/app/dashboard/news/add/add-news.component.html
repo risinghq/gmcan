@@ -86,12 +86,11 @@
               <mat-select [(ngModel)]="noticia.authorId" formControlName="authorId" name="authorId">
                 @for (autor of autores; track autor) {
                   <mat-option [value]="autor.id" class="mdc-list-item">
-                    @if (!autor.asset) {
-                      <img class="mdc-list-item__graphic img-user" src="/img/placeholders/user.png" />
-                    }
-                    @if (autor.asset) {
-                      <img class="mdc-list-item__graphic img-user" src="{{ autor.asset }}" />
-                    }
+                    <img
+                      class="mdc-list-item__graphic img-user"
+                      src="{{ autor.photoUrl }}"
+                      alt="{{ autor.photoAlt }}"
+                    />
                     <span class="mdc-list-item__text"
                       >{{ autor.firstName }} {{ autor.lastName
                       }}{{ autor.maternalName ? " " + autor.maternalName : "" }}</span

@@ -190,7 +190,7 @@
           </div>
           <div class="ml-24">
             <div class="text-category center">Imagen de perfil</div>
-            @if (!previewUrl && !member.asset) {
+            @if (!previewUrl && !member.photoUrl) {
               <div class="img-div">
                 <img class="img-src" src="/img/icons/upload.svg" />
               </div>
@@ -200,9 +200,9 @@
                 <img class="img-set" src="{{ previewUrl }}" />
               </div>
             }
-            @if (member.asset && !previewUrl) {
+            @if (member.photoUrl && !previewUrl) {
               <div class="img-preview">
-                <img class="img-set" src="{{ member.asset }}" />
+                <img class="img-set" src="{{ member.photoUrl }}" />
               </div>
             }
             <div class="green-text mt-16">

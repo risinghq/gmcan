@@ -30,14 +30,12 @@ export class DetailNewsDataService {
 
     const newsTypeNameLabel = newsItem.newsKindName ?? "";
     const authorNameLabel = newsItem.authorName ?? "";
-    const authorPhoto = newsItem.authorAsset ?? null;
     const authorId = newsItem.authorId ?? null;
 
     return {
       newsItem,
       newsTypeNameLabel,
       authorNameLabel,
-      authorPhoto,
       authorId,
       day,
       month,

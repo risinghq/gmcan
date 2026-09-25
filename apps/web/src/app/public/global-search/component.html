@@ -109,11 +109,7 @@
                 @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered") {
                 <div class="publication-members">
                   <div class="member-img-round">
-                    @if (autor.asset) {
-                    <img class="member-img" src="{{ autor.asset }}" alt="User photo" />
-                    } @if (!autor.asset) {
-                    <img class="member-img" src="/img/placeholders/user.png" alt="" />
-                    }
+                    <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
                   </div>
                   <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
                 </div>
@@ -216,11 +212,7 @@
                   @for (member of proyecto.members; track member) {
                   <div class="project-members">
                     <div class="member-img-round">
-                      @if (member.asset) {
-                      <img class="member-img" src="{{ member.asset }}" />
-                      } @if (!member.asset) {
-                      <img class="member-img" src="/img/placeholders/user.png" alt="" />
-                      }
+                      <img class="member-img" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
                     </div>
                     <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
                   </div>
@@ -321,11 +313,7 @@
             } @for (miembro of miembros; track miembro; let i = $index) {
             <div class="flex-news" [class.mb-24]="i + 1 != miembros.length">
               <div class="miembro-img-div">
-                @if (miembro.asset) {
-                <img class="member-img" src="{{ miembro.asset }}" alt="User photo" />
-                } @if (!miembro.asset) {
-                <img class="member-img" src="/img/placeholders/user.png" alt="" />
-                }
+                <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
               </div>
               <div class="miembro-text">
                 <div class="miembro-name full-width">

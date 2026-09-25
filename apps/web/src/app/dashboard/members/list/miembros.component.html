@@ -15,25 +15,18 @@
     }
   </div>
   <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
-    <!-- ID Column -->
     <ng-container matColumnDef="firstName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">
         <div class="flex-news">
           <div class="member-img-round mr-8">
-            @if (row.asset) {
-              <img class="member-img" src="{{ row.asset }}" alt="User photo" />
-            }
-            @if (!row.asset) {
-              <img class="member-img" src="/img/placeholders/user.png" alt="" />
-            }
+            <img class="member-img" src="{{ row.photoUrl }}" alt="{{ row.photoAlt }}" />
           </div>
           {{ row.firstName }}
         </div>
       </td>
     </ng-container>
 
-    <!-- Progress Column -->
     <ng-container matColumnDef="lastName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Apellido Paterno</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">
@@ -41,7 +34,6 @@
       </td>
     </ng-container>
 
-    <!-- Name Column -->
     <ng-container matColumnDef="maternalName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Apellido Materno</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">
@@ -49,7 +41,6 @@
       </td>
     </ng-container>
 
-    <!-- Color Column -->
     <ng-container matColumnDef="prefixName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Grado Académico</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">
@@ -57,13 +48,11 @@
       </td>
     </ng-container>
 
-    <!-- Estado Column -->
     <ng-container matColumnDef="memberTypeName">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Cargo</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">{{ row.memberTypeName }}</td>
     </ng-container>
 
-    <!-- Correo Column -->
     <ng-container matColumnDef="email">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Correo</th>
       <td mat-cell *matCellDef="let row" (click)="editMember(row.id)">{{ row.email }}</td>

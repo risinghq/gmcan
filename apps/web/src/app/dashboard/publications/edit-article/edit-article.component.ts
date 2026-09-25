@@ -150,7 +150,12 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
         this.selectedUser = principal.name;
         this.principalAuthor =
           principal.kind === "registered" && principal.memberId
-            ? { id: principal.memberId, name: principal.name, asset: principal.asset ?? null }
+            ? {
+                id: principal.memberId,
+                name: principal.name,
+                photoUrl: principal.photoUrl,
+                photoAlt: principal.photoAlt,
+              }
             : null;
         this.myControl.setValue(principal.name);
       }

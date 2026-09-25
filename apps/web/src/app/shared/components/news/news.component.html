@@ -1,8 +1,9 @@
 <div>
   <div class="news-title">
-    {{ title }}
+    {{ title() }}
   </div>
-  @if (featuredNews) {
+  @let view = vm();
+  @if (view.featuredNews; as featuredNews) {
     <div class="img-hover-zoom">
       @if (featuredNews.asset) {
         <img class="card-img-div" src="{{ featuredNews.asset }}" />
@@ -24,7 +25,7 @@
     </div>
   }
   <div class="other-news-div">
-    @for (newsItem of newsItems | slice: 0 : numberShown; track newsItem; let i = $index) {
+    @for (newsItem of view.newsItems | slice: 0 : numberShown; track newsItem.id; let i = $index) {
       <div class="other-news flex-news">
         <div class="other-news-text-div full-width pr-16">
           <div class="flex-news flex-news-2">

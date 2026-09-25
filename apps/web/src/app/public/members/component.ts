@@ -1,11 +1,11 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, computed, inject } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { Languages } from "@app/shared/models/languages";
 import type { Member } from "@app/shared/models/member";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -20,47 +20,44 @@ type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
   styleUrl: "./component.scss",
   imports: [MatIcon, MatTabGroup, MatTab, MatProgressSpinner, NewsComponent],
 })
-export default class MembersComponent implements OnInit {
+export default class MembersComponent {
   private router = inject(Router);
   private memberService = inject(MemberService);
   lookup = inject(LookupService);
   private session = inject(SessionService);
   private titleService = inject(Title);
 
-  public cargado = false;
-  public tipoMiembros: MemberTypeGroup[] = [];
-  public membrosNoActivos: MemberDisplay[] = [];
-  language: (typeof Languages)[number] = Languages[0];
-  allCharged = false;
+  readonly language = this.session.language();
+  private readonly memberTypes = this.lookup.memberTypes();
+  private readonly prefixesMap = new Map(this.lookup.prefixes().map((prefix) => [prefix.code, prefix]));
+  private readonly members = toSignal(this.memberService.listMembers());
+  readonly vm = computed(() => {
+    const members = this.members();
+    if (!members) {
+      return { loading: true, memberGroups: [] as MemberTypeGroup[], inactiveMembers: [] as MemberDisplay[] };
+    }
 
-  ngOnInit(): void {
-    this.language = this.session.language();
-    this.titleService.setTitle("GMCAN | " + this.language.members);
-    this.cargado = true;
-    this.tipoMiembros = this.lookup.memberTypes().map((t) => ({ code: t.code, name: t.name, members: [] }));
-    this.getMembers();
-  }
-
-  getMembers(): void {
-    this.memberService.listMembers().subscribe((res: Member[]) => {
-      if (res) {
-        const prefijos = this.lookup.prefixes();
-        const prefijosMap = new Map(prefijos.map((p) => [p.code, p]));
-
-        const processed = res.map((m): MemberDisplay => {
-          const asset = m.asset ?? "/img/placeholders/user.png";
-          const prefijo = m.prefixCode ? prefijosMap.get(m.prefixCode) : undefined;
-          const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
-          return { ...m, asset, prefix };
-        });
-
-        for (const tipoMiembro of this.tipoMiembros) {
-          tipoMiembro.members = processed.filter((m) => m.memberTypeCode === tipoMiembro.code && m.isActive === 1);
-        }
-        this.membrosNoActivos = processed.filter((m) => m.isActive !== 1);
-        this.allCharged = true;
-      }
+    const processed = members.map((member): MemberDisplay => {
+      const prefixItem = member.prefixCode ? this.prefixesMap.get(member.prefixCode) : undefined;
+      const prefix = prefixItem && prefixItem.label !== "none" && prefixItem.label !== "bach" ? prefixItem.label : "";
+      return { ...member, prefix };
     });
+
+    const memberGroups = this.memberTypes.map((memberType) => ({
+      code: memberType.code,
+      name: memberType.name,
+      members: processed.filter((member) => member.memberTypeCode === memberType.code && member.isActive === 1),
+    }));
+
+    return {
+      loading: false,
+      memberGroups,
+      inactiveMembers: processed.filter((member) => member.isActive !== 1),
+    };
+  });
+
+  constructor() {
+    this.titleService.setTitle("GMCAN | " + this.language.members);
   }
 
   profile(member: MemberDisplay): void {

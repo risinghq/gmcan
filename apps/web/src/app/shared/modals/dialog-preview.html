@@ -10,8 +10,8 @@
     <div class="flex-news other-div"></div>
     <div class="autor-div">
       <div class="autor-img-div">
-        @if (noticia.author?.asset) {
-        <img class="autor-img" src="{{noticia.author?.asset}}" />
+        @if (noticia.author) {
+        <img class="autor-img" src="{{noticia.author.photoUrl}}" alt="{{noticia.author.photoAlt}}" />
         }
       </div>
       <div class="autor-text">

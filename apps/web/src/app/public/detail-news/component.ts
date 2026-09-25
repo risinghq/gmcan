@@ -28,7 +28,6 @@ export default class DetailNewsComponent implements OnInit {
   newsItem: PublicNewsDetail = {} as PublicNewsDetail;
   newsTypeNameLabel = "";
   authorNameLabel = "";
-  authorPhoto: string | null = null;
   authorId: number | null = null;
   previouspage = "Inicio";
   previouslink = "/home";
@@ -46,7 +45,6 @@ export default class DetailNewsComponent implements OnInit {
     this.newsItem = newsData.newsItem;
     this.newsTypeNameLabel = newsData.newsTypeNameLabel;
     this.authorNameLabel = newsData.authorNameLabel;
-    this.authorPhoto = newsData.authorPhoto;
     this.authorId = newsData.authorId;
     this.day = newsData.day;
     this.month = newsData.month;

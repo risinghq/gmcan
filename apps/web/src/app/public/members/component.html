@@ -7,28 +7,29 @@
         <a class="member-link">{{ language.members }}</a>
       </div>
       <div class="member-card">
+        @let view = vm();
         <div class="member-title">{{ language.membersText[0].memberTitle }}</div>
         <div class="member-sub">{{ language.membersText[0].memberText }}</div>
         <mat-tab-group>
           <mat-tab label="{{ language.membersText[0].memberActual }}">
-            @if (!allCharged) {
+            @if (view.loading) {
             <div class="spinner-pad">
               <mat-spinner class="auto mb-8" />
               <div class="loading-text center">Cargando</div>
             </div>
-            } @if (allCharged) {
+            } @if (!view.loading) {
             <div class="members-container">
-              @for (tipoMiembro of tipoMiembros; track tipoMiembro) {
+              @for (tipoMiembro of view.memberGroups; track tipoMiembro.code) {
               <div class="member-type-container">
                 @if (tipoMiembro.members.length > 0) {
                 <div class="member-type-title">{{ tipoMiembro.name }}</div>
                 } @if (tipoMiembro.members.length > 0) {
                 <div class="row">
-                  @for (miembro of tipoMiembro.members; track miembro) {
+                  @for (miembro of tipoMiembro.members; track miembro.id) {
                   <div class="col-12 col-sm-6">
                     <div class="flex-news member-mt">
                       <div class="member-img-div">
-                        <img class="member-img" src="{{ miembro.asset }}" alt="foto" />
+                        <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
                       </div>
                       <div class="member-text">
                         <div class="member-name full-width">
@@ -55,11 +56,11 @@
           </mat-tab>
           <mat-tab label="{{ language.membersText[0].memberOld }}">
             <div class="row member-type-container">
-              @for (miembro of membrosNoActivos; track miembro) {
+              @for (miembro of view.inactiveMembers; track miembro.id) {
               <div class="col-12 col-sm-6">
                 <div class="flex-news member-mt">
                   <div class="member-img-div">
-                    <img class="member-img" src="/img/placeholders/user.png" />
+                    <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
                   </div>
                   <div class="member-text full-width">
                     <div class="member-name">

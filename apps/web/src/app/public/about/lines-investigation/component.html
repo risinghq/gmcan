@@ -48,7 +48,7 @@
               @for (member of proyecto.members; track member.memberId) {
               <div class="project-members">
                 <div class="member-img-round">
-                  <img class="member-img" src="{{ member.asset }}" />
+                  <img class="member-img" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
                 </div>
                 <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
               </div>

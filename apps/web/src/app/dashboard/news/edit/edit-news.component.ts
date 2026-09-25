@@ -41,7 +41,13 @@ interface NewsPreviewData {
   summary: string | null;
   asset: string | ArrayBuffer | null;
   newsTypeName: string | null;
-  author: { firstName: string; lastName: string; maternalName: string | null; asset: string | null } | null;
+  author: {
+    firstName: string;
+    lastName: string;
+    maternalName: string | null;
+    photoUrl: string;
+    photoAlt: string;
+  } | null;
   body: string | null;
   publishedAt: string | null;
 }
@@ -188,7 +194,13 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
       asset: this.previewUrl ?? this.noticia.asset,
       newsTypeName: cat?.name ?? null,
       author: aut
-        ? { firstName: aut.firstName, lastName: aut.lastName, maternalName: aut.maternalName, asset: aut.asset }
+        ? {
+            firstName: aut.firstName,
+            lastName: aut.lastName,
+            maternalName: aut.maternalName,
+            photoUrl: aut.photoUrl,
+            photoAlt: aut.photoAlt,
+          }
         : null,
       body: this.noticia.body ?? null,
       publishedAt,

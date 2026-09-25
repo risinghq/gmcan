@@ -30,7 +30,8 @@ interface NewsListItem {
   publishedAtLabel: string;
   categoryName: string;
   authorName: string;
-  authorAsset: string | null;
+  authorPhotoUrl: string;
+  authorPhotoAlt: string;
   statusCode: "draft" | "published" | "archived";
   statusLabel: string;
 }
@@ -120,7 +121,8 @@ export default class NewsListComponent implements OnInit {
       publishedAtLabel,
       categoryName: news.categoryName,
       authorName: news.authorName,
-      authorAsset: news.authorAsset,
+      authorPhotoUrl: news.authorPhotoUrl,
+      authorPhotoAlt: news.authorPhotoAlt,
       statusCode: news.statusCode,
       statusLabel: news.statusLabel,
     };

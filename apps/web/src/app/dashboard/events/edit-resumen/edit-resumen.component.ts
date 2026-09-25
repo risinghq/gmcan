@@ -40,7 +40,8 @@ import { startWith, map } from "rxjs/operators";
 interface AuthorSearchResult {
   id: number;
   name: string;
-  asset: string | null;
+  photoUrl: string;
+  photoAlt: string;
 }
 
 interface AuthorFormRow {

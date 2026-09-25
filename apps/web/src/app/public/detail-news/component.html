@@ -27,9 +27,7 @@
           <div class="news-abstract">{{ newsItem.summary }}</div>
           <div class="author-div">
             <div class="author-img-div">
-              @if (authorPhoto) {
-              <img class="author-img" src="{{ authorPhoto }}" />
-              }
+              <img class="author-img" src="{{ newsItem.authorPhotoUrl }}" alt="{{ newsItem.authorPhotoAlt }}" />
             </div>
             <div class="author-text">
               <div class="news-type">{{ newsTypeNameLabel }}</div>
