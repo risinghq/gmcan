@@ -12,7 +12,8 @@ export interface Member {
   maternalName: string | null;
   birthDate: string | null;
   bio: string | null;
-  asset: string | null;
+  photoUrl: string;
+  photoAlt: string;
   isActive: number;
   roleCode: "administrator" | "researcher" | "visitor";
   memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";

@@ -10,7 +10,8 @@ export interface AdminNewsListItem {
   statusLabel: string;
   categoryName: string;
   authorName: string;
-  authorAsset: string | null;
+  authorPhotoUrl: string;
+  authorPhotoAlt: string;
 }
 
 export type AdminNewsSortBy = "publishedAt" | "title" | "statusCode" | "authorName" | "categoryName";
@@ -37,7 +38,8 @@ export interface AdminNewsListResponse {
 export interface AdminProjectMemberListItem {
   memberId: number;
   name: string;
-  asset: string | null;
+  photoUrl: string;
+  photoAlt: string;
 }
 
 export interface AdminProjectListItem {
@@ -71,7 +73,8 @@ export interface AdminMemberListItem {
   memberTypeName: string;
   prefixCode: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
   prefixName: string | null;
-  asset: string | null;
+  photoUrl: string;
+  photoAlt: string;
   publishability?: {
     publishable: boolean;
     missing: {

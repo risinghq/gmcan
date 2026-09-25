@@ -42,7 +42,8 @@ export const AdminPublicationListItemSchema = z.object({
   doi: z.string().nullable(),
   publishedAtLabel: z.string(),
   firstAuthorName: z.string(),
-  firstAuthorAsset: z.string().nullable(),
+  firstAuthorPhotoUrl: z.string(),
+  firstAuthorPhotoAlt: z.string(),
 });
 
 export const AdminPublicationListQuerySchema = z.object({

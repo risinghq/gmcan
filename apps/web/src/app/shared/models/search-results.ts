@@ -25,7 +25,8 @@ export interface SearchResults {
     maternalName: string | null;
     birthDate: string | null;
     bio: string | null;
-    asset: string | null;
+    photoUrl: string;
+    photoAlt: string;
     isActive: number;
     roleCode: "administrator" | "researcher" | "visitor";
     memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
@@ -54,6 +55,6 @@ export interface SearchResults {
     currencyCode: "pen" | "usd";
     researchLine: string;
     fundingSource: string;
-    members: { memberId: number; name: string; asset: string | null }[];
+    members: { memberId: number; name: string; photoUrl: string; photoAlt: string }[];
   }[];
 }

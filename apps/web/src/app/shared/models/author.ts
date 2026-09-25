@@ -1,14 +1,16 @@
 export interface AuthorSearchResult {
   id: number;
   name: string;
-  asset: string | null;
+  photoUrl: string;
+  photoAlt: string;
 }
 
 export interface AuthorEntry {
   kind: "registered" | "external";
   memberId?: number;
   name: string;
-  asset?: string | null;
+  photoUrl?: string;
+  photoAlt?: string;
   authorOrder: number;
 }
 

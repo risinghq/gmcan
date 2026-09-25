@@ -8,7 +8,8 @@ export const PublicationAuthorSchema = z.discriminatedUnion("kind", [
     authorOrder: z.number(),
     memberId: z.number(),
     name: z.string(),
-    asset: z.string().nullable(),
+    photoUrl: z.string(),
+    photoAlt: z.string(),
   }),
   z.object({
     kind: z.literal("external"),
