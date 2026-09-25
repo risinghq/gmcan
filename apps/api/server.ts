@@ -30,6 +30,7 @@ import PublicLookupRoutes from "./routes/public/content/lookup.js";
 import PublicMembersRoutes from "./routes/public/content/members.js";
 import PublicMethodsRoutes from "./routes/public/content/methods.js";
 import PublicNewsRoutes from "./routes/public/content/news.js";
+import PublicPlaceholdersRoutes from "./routes/public/content/placeholders.js";
 import PublicProjectsRoutes from "./routes/public/content/projects.js";
 import PublicPublicationsRoutes from "./routes/public/content/publications.js";
 import PublicResearchLinesRoutes from "./routes/public/content/research-lines.js";
@@ -94,6 +95,7 @@ adminApi.route("/ref", AdminRefRoutes);
 // Public operational endpoint (explicitly locale-agnostic)
 app.route("/api/email", PublicEmailRoutes);
 app.route("/api", publicContentApi);
+app.route("/api/placeholders", PublicPlaceholdersRoutes);
 app.route("/admin", adminApi);
 
 serve({ fetch: app.fetch, port: 3000 });
