@@ -1,7 +1,10 @@
+import type { Transaction } from "kysely";
+
 import { db } from "../db/client.js";
-import type { NewsRow, NewsStatusCode } from "../db/schema.js";
+import type { Database, NewsRow, NewsStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { type Locale } from "../lib/public-locale.js";
+import { newsSearchFilter } from "../repositories/news.js";
 import type { AdminNewsListItem, AdminNewsListQuery, AdminNewsListResponse } from "./admin-list.types.js";
 import { resolveAssetAccessUrl } from "./assets/service.js";
 import { resolveMemberPhotoView } from "./member-photo.service.js";
@@ -56,25 +59,23 @@ function toNewsRow(data: NewsUpsertInput) {
   };
 }
 
-async function replaceNewsTranslations(
+async function insertNewsTranslations(
+  trx: Transaction<Database>,
   newsId: number,
-  translations: Record<string, { title: string; summary: string; body: string }>,
+  translations: NewsUpsertInput["translations"],
 ) {
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom("news_translation").where("newsId", "=", newsId).execute();
-    await trx
-      .insertInto("news_translation")
-      .values(
-        Object.entries(translations).map(([locale, tr]) => ({
-          newsId,
-          locale,
-          title: tr.title,
-          summary: tr.summary,
-          body: tr.body,
-        })),
-      )
-      .execute();
-  });
+  await trx
+    .insertInto("news_translation")
+    .values(
+      Object.entries(translations).map(([locale, tr]) => ({
+        newsId,
+        locale,
+        title: tr.title,
+        summary: tr.summary,
+        body: tr.body,
+      })),
+    )
+    .execute();
 }
 
 export async function listPublicNews(locale: Locale, query: PublicNewsListQuery) {
@@ -96,19 +97,8 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
 
   if (query.newsKindCode !== undefined) base = base.where("news.newsKindCode", "=", query.newsKindCode);
 
-  if (query.q) {
-    const like = `%${query.q}%`;
-    base = base.where((eb) =>
-      eb.or([
-        eb("news_translation.title", "like", like),
-        eb("news_translation.summary", "like", like),
-        eb("member.firstName", "like", like),
-        eb("member.lastName", "like", like),
-        eb("member.maternalName", "like", like),
-        eb("news_kind_translation.name", "like", like),
-      ]),
-    );
-  }
+  const search = newsSearchFilter(locale, query.q ?? "");
+  if (search) base = base.where(search);
 
   const totalRow = await base.select(({ fn }) => fn.count<number>("news.id").as("count")).executeTakeFirstOrThrow();
 
@@ -220,18 +210,8 @@ export async function listAdminNews(locale: Locale, query: AdminNewsListQuery): 
   if (query.statusCode !== undefined) base = base.where("news.statusCode", "=", query.statusCode);
   if (query.newsKindCode !== undefined) base = base.where("news.newsKindCode", "=", query.newsKindCode);
   if (query.authorId !== undefined) base = base.where("news.authorId", "=", query.authorId);
-  if (query.q) {
-    base = base.where((eb) =>
-      eb.or([
-        eb("news_translation.title", "like", `%${query.q}%`),
-        eb("news_translation.summary", "like", `%${query.q}%`),
-        eb("member.firstName", "like", `%${query.q}%`),
-        eb("member.lastName", "like", `%${query.q}%`),
-        eb("member.maternalName", "like", `%${query.q}%`),
-        eb("news_kind_translation.name", "like", `%${query.q}%`),
-      ]),
-    );
-  }
+  const search = newsSearchFilter(locale, query.q ?? "");
+  if (search) base = base.where(search);
 
   const totalRow = await base.select(({ fn }) => fn.count<number>("news.id").as("count")).executeTakeFirstOrThrow();
 
@@ -307,28 +287,29 @@ export async function toAdminNewsView(row: NewsRow) {
 }
 
 export async function createNews(data: NewsUpsertInput) {
+  const now = new Date().toISOString();
   return db.transaction().execute(async (trx) => {
-    const result = await trx.insertInto("news").values(toNewsRow(data)).executeTakeFirstOrThrow();
+    const result = await trx
+      .insertInto("news")
+      .values({ ...toNewsRow(data), publishedAt: data.publishedAt ?? now, createdAt: now, updatedAt: now })
+      .executeTakeFirstOrThrow();
     const id = Number(result.insertId);
-    await trx
-      .insertInto("news_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          newsId: id,
-          locale,
-          title: tr.title,
-          summary: tr.summary,
-          body: tr.body,
-        })),
-      )
-      .execute();
+    await insertNewsTranslations(trx, id, data.translations);
     return id;
   });
 }
 
 export async function updateNews(id: number, data: NewsUpsertInput) {
-  await db.updateTable("news").set(toNewsRow(data)).where("id", "=", id).execute();
-  await replaceNewsTranslations(id, data.translations);
+  const now = new Date().toISOString();
+  await db.transaction().execute(async (trx) => {
+    await trx
+      .updateTable("news")
+      .set({ ...toNewsRow(data), updatedAt: now })
+      .where("id", "=", id)
+      .execute();
+    await trx.deleteFrom("news_translation").where("newsId", "=", id).execute();
+    await insertNewsTranslations(trx, id, data.translations);
+  });
 }
 
 export async function deleteNews(id: number) {
