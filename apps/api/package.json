@@ -24,6 +24,7 @@
     "start": "bun --env-file=../../.env server.ts",
     "lint": "oxlint",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "bun test",
     "check": "bun run lint && bun run typecheck",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
