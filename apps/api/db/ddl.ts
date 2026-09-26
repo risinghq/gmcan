@@ -73,6 +73,7 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
   ],
   news: ["id", "statusCode", "publishedAt", "priority", "authorId", "newsKindCode", "createdAt", "updatedAt"],
   news_translation: ["newsId", "locale", "title", "summary", "body"],
+  news_fts: ["title", "summary", "authorName", "kindName", "newsId", "locale"],
   publication: ["id", "kindCode", "doi", "publishedAt", "createdAt", "updatedAt"],
   publication_translation: ["publicationId", "locale", "title", "abstract"],
   journal_article: ["publicationId", "journalId", "issue"],
@@ -708,4 +709,94 @@ export async function createTables(db: Kysely<Database>) {
     .on("publication_author")
     .column("memberId")
     .execute();
+
+  await ensureNewsSearchIndex(db);
+}
+
+// Append a WHERE on t (news_translation) and n (news) to choose which rows to index.
+const insertNewsFtsRows = sql`
+  INSERT INTO news_fts (title, summary, authorName, kindName, newsId, locale)
+  SELECT
+    t.title,
+    t.summary,
+    m.firstName || ' ' || m.lastName || ' ' || COALESCE(m.maternalName, ''),
+    k.name,
+    t.newsId,
+    t.locale
+  FROM news_translation t
+  JOIN news n ON n.id = t.newsId
+  LEFT JOIN member m ON m.id = n.authorId
+  LEFT JOIN news_kind_translation k ON k.newsKindCode = n.newsKindCode AND k.locale = t.locale
+`;
+
+/** Creates news_fts and its triggers if missing, backfilling the index when the table is new. Idempotent. */
+export async function ensureNewsSearchIndex(db: Kysely<Database>) {
+  await db.transaction().execute(async (trx) => {
+    const existing = await sql`SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'news_fts'`.execute(trx);
+
+    await sql`
+      CREATE VIRTUAL TABLE IF NOT EXISTS news_fts USING fts5(
+        title,
+        summary,
+        authorName,
+        kindName,
+        newsId UNINDEXED,
+        locale UNINDEXED,
+        tokenize = 'unicode61 remove_diacritics 2'
+      )
+    `.execute(trx);
+
+    await sql`
+      CREATE TRIGGER IF NOT EXISTS news_translation_fts_ai AFTER INSERT ON news_translation BEGIN
+        ${insertNewsFtsRows} WHERE t.newsId = NEW.newsId AND t.locale = NEW.locale;
+      END
+    `.execute(trx);
+
+    await sql`
+      CREATE TRIGGER IF NOT EXISTS news_translation_fts_au
+      AFTER UPDATE OF newsId, locale, title, summary ON news_translation BEGIN
+        DELETE FROM news_fts WHERE newsId = OLD.newsId AND locale = OLD.locale;
+        ${insertNewsFtsRows} WHERE t.newsId = NEW.newsId AND t.locale = NEW.locale;
+      END
+    `.execute(trx);
+
+    await sql`
+      CREATE TRIGGER IF NOT EXISTS news_translation_fts_ad AFTER DELETE ON news_translation BEGIN
+        DELETE FROM news_fts WHERE newsId = OLD.newsId AND locale = OLD.locale;
+      END
+    `.execute(trx);
+
+    await sql`
+      CREATE TRIGGER IF NOT EXISTS news_fts_news_au AFTER UPDATE OF authorId, newsKindCode ON news
+      WHEN OLD.authorId IS NOT NEW.authorId OR OLD.newsKindCode IS NOT NEW.newsKindCode
+      BEGIN
+        DELETE FROM news_fts WHERE newsId = NEW.id;
+        ${insertNewsFtsRows} WHERE t.newsId = NEW.id;
+      END
+    `.execute(trx);
+
+    await sql`
+      CREATE TRIGGER IF NOT EXISTS news_fts_member_au AFTER UPDATE OF firstName, lastName, maternalName ON member
+      WHEN OLD.firstName IS NOT NEW.firstName
+        OR OLD.lastName IS NOT NEW.lastName
+        OR OLD.maternalName IS NOT NEW.maternalName
+      BEGIN
+        DELETE FROM news_fts WHERE newsId IN (SELECT id FROM news WHERE authorId = NEW.id);
+        ${insertNewsFtsRows} WHERE n.authorId = NEW.id;
+      END
+    `.execute(trx);
+
+    await sql`
+      CREATE TRIGGER IF NOT EXISTS news_fts_news_kind_translation_au
+      AFTER UPDATE OF newsKindCode, locale, name ON news_kind_translation BEGIN
+        DELETE FROM news_fts
+        WHERE locale IN (OLD.locale, NEW.locale)
+          AND newsId IN (SELECT id FROM news WHERE newsKindCode IN (OLD.newsKindCode, NEW.newsKindCode));
+        ${insertNewsFtsRows}
+        WHERE t.locale IN (OLD.locale, NEW.locale) AND n.newsKindCode IN (OLD.newsKindCode, NEW.newsKindCode);
+      END
+    `.execute(trx);
+
+    if (existing.rows.length === 0) await insertNewsFtsRows.execute(trx);
+  });
 }

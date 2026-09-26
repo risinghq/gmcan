@@ -2,7 +2,7 @@ import { sql } from "kysely";
 
 import { env } from "../config/env.js";
 import { db } from "./client.js";
-import { createTables, EXPECTED_COLUMNS } from "./ddl.js";
+import { createTables, ensureNewsSearchIndex, EXPECTED_COLUMNS } from "./ddl.js";
 import { seed } from "./seed.js";
 
 interface PragmaColumn {
@@ -13,8 +13,21 @@ async function sweepExpiredSessions() {
   await db.deleteFrom("session").where("expiresAt", "<", new Date().toISOString()).execute();
 }
 
+// Production gets no createTables, seed, or drift check; only the search index, which it cannot run without.
+async function ensureProductionNewsSearchIndex() {
+  try {
+    await ensureNewsSearchIndex(db);
+  } catch (error) {
+    const cause = error instanceof Error ? error.message : String(error);
+    console.error(`[DB] Could not build the news search index; news search will fail until this is fixed: ${cause}`);
+  }
+}
+
 export async function bootstrap() {
-  if (env.NODE_ENV === "production") return;
+  if (env.NODE_ENV === "production") {
+    await ensureProductionNewsSearchIndex();
+    return;
+  }
 
   await sql`PRAGMA foreign_keys = ON`.execute(db);
 
