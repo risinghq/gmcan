@@ -32,7 +32,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           )
           .execute()
       : Promise.resolve([]),
-    types.has("news") ? searchNewsRows(locale, like) : Promise.resolve([]),
+    types.has("news") ? searchNewsRows(locale, q) : Promise.resolve([]),
     types.has("projects") ? searchActiveProjectRows(locale, like) : Promise.resolve([]),
   ]);
 
@@ -47,9 +47,13 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
           kind: "registered",
           memberId: row.memberId,
           authorOrder: row.authorOrder,
-          name: `${row.memberFirstName ?? ""} ${row.memberLastName ?? ""}${row.memberMaternalName ? " " + row.memberMaternalName : ""}`.trim(),
+          name: [row.memberFirstName, row.memberLastName, row.memberMaternalName].filter(Boolean).join(" "),
         }
-      : { kind: "external", name: row.externalName ?? "", authorOrder: row.authorOrder };
+      : {
+          kind: "external",
+          name: row.externalName ?? "",
+          authorOrder: row.authorOrder,
+        };
 
     const current = authorsByPublication.get(row.publicationId) ?? [];
     current.push(entry);
@@ -78,7 +82,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     members,
     news: newsRows.map((row) =>
       Object.assign({}, row, {
-        authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" ").trim(),
+        authorName: [row.authorFirstName, row.authorLastName].filter(Boolean).join(" "),
       }),
     ),
     projects,

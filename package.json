@@ -17,7 +17,7 @@
     "test": "bun --filter './apps/*' test",
     "lint": "oxlint .",
     "typecheck": "bun run --filter web typecheck && bun run --filter api typecheck",
-    "check:test": "bun run --filter web test:ci",
+    "check:test": "bun run --filter web test:ci && bun run --filter api test",
     "check": "bun run lint && bun run typecheck && bun run check:test",
     "format": "oxfmt .",
     "format:check": "oxfmt --check ."
