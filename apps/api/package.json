@@ -38,7 +38,7 @@
     "hono": "^4.13.9",
     "kysely": "^0.29.6",
     "kysely-libsql": "^0.7.1",
-    "resend": "^6.29.0",
+    "resend": "^6.30.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
