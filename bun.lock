@@ -18,7 +18,7 @@
         "@hono/zod-validator": "^0.9.1",
         "@libsql/client": "^0.18.0",
         "bcrypt": "^6.0.0",
-        "hono": "^4.13.9",
+        "hono": "^4.13.10",
         "kysely": "^0.29.6",
         "kysely-libsql": "^0.7.1",
         "resend": "^6.29.0",
@@ -1023,7 +1023,7 @@
 
     "hastscript": ["hastscript@9.0.1", "", { "dependencies": { "@types/hast": "3.0.4", "comma-separated-tokens": "2.0.3", "hast-util-parse-selector": "4.0.0", "property-information": "7.1.0", "space-separated-tokens": "2.0.2" } }, "sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w=="],
 
-    "hono": ["hono@4.13.9", "", {}, "sha512-7dMkQmZoC4E6F7AtaQSPhlWAdnBti+j7rreMZl8QB4jFiEhP9TWbGWUMi8WYzBCgmgulxuvLQupKqo+Co6Omyg=="],
+    "hono": ["hono@4.13.10", "", {}, "sha512-dQuLsa5oO+47QVMVMaaD9cIv8ctmVtK1iRvwWngkfloFJMeFeuoUFDswIqZGxmGX3hrRzREgEArjkK9OgsQEhA=="],
 
     "hosted-git-info": ["hosted-git-info@10.1.1", "", { "dependencies": { "lru-cache": "^11.1.0" } }, "sha512-DeOnSPAvOndYKfw075gt8yZzQ7S2hNztw34zBTfhIzLhmBTswIBg5/y+pqu/VD5cYWm5goAFTusDmUEmKZ0PEQ=="],
 
