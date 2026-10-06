@@ -88,5 +88,5 @@ expire after 300 seconds.
 At each start outside production, after seeding, the API moves every file in
 `.storage` that no binding references into `.storage/.quarantine` and appends
 `<time>\t<file>\t<reason>` to `.quarantine/report.tsv`. Files whose names begin
-with a dot are skipped. Put new files in through the upload endpoint, not by
-copying them into `.storage`.
+with a dot are skipped. A file copied into `.storage` by hand is quarantined at
+the next start.

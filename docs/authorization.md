@@ -1,7 +1,7 @@
 # Authorization
 
-Everything under `/admin` needs a signed-in member. The public API
-(`/api/*`) needs nothing.
+Everything under `/admin` except `/admin/auth/login` and `/admin/auth/logout`
+needs a signed-in member. The public API (`/api/*`) needs nothing.
 
 ## Sign in and out
 
@@ -68,7 +68,7 @@ The API enforces the permissions itself.
 
 [`middleware/authz.ts`](../apps/api/middleware/authz.ts) provides the guards:
 
-- `loadActor` runs on all of `/admin`. It loads the member behind the session
+- `loadActor` runs on `/admin`, except login and logout. It loads the member behind the session
   and puts `{ id, role }` on the request. It answers 401 if the member no
   longer exists.
 - `requirePermission(permission)` answers `403 {"error":"Forbidden"}` unless the
@@ -77,9 +77,11 @@ The API enforces the permissions itself.
   lets through an actor who has the elevated permission, or whose own id is the
   `:id` in the URL and who has the self permission. Member translations use it.
 
-Most admin routers apply one guard to all `GET` requests (`<area>.read`) and
-another to every other method (`<area>.write`). Members and account routes
-guard each endpoint.
+The news, publications, projects, events, research-line, method, group, asset
+and reference-data routers apply one guard to `GET` requests (`<area>.read`) and
+another to every other method (`<area>.write`). The members, account and
+dashboard routes guard each endpoint, and `/admin/email` requires
+`content.write` for every method.
 
 The `account.self.*` permissions are checked by identity: `can()` in
 [`authz/policy.ts`](../apps/api/authz/policy.ts) lets an actor use them on

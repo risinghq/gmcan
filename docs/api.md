@@ -2,8 +2,9 @@
 
 The API is a Hono app on port 3000. [`server.ts`](../apps/api/server.ts) mounts
 every route; each resource is one file under
-[`routes/`](../apps/api/routes). Responses are JSON unless noted. Public
-responses follow `Accept-Language` ([localization](localization.md)).
+[`routes/`](../apps/api/routes). Responses are JSON unless noted. Translated
+text in the public content endpoints follows `Accept-Language`
+([localization](localization.md)).
 
 ```console
 $ curl -s 'http://localhost:3000/api/search?q=nano&types=news' | head -c 160
@@ -26,6 +27,8 @@ These endpoints require no sign-in. All paths start with `/api`.
 | `GET /research-lines`, `GET /methods`         | Research lines and methods, each also at `/:id`                                   |
 | `GET /software`, `GET /equipment`             | Software and computing equipment                                                  |
 | `GET /group`, `GET /group/:id/about`          | The research group's page text, and its about section                             |
+| `GET /group/:groupId/software`                | The software of one group                                                         |
+| `GET /group/:groupId/equipment`               | The equipment of one group                                                        |
 | `GET /lookup`                                 | Reference lists the pages need (kinds, types, journals, and so on)                |
 | `GET /search?q=&types=`                       | Search across publications, members, news and projects                            |
 | `GET /assets/:id`, `GET /assets/:id/download` | A file ([assets](assets.md))                                                      |
@@ -45,8 +48,9 @@ answers four empty lists. `types` is a comma-separated subset of
 
 ## Admin endpoints
 
-All paths start with `/admin` and need the `sid` cookie
-([authorization](authorization.md)). Writes use JSON bodies, except file uploads.
+All paths start with `/admin`. Every path except `/auth/login` and
+`/auth/logout` needs the `sid` cookie ([authorization](authorization.md)).
+Writes use JSON bodies, except file uploads.
 
 | Path              | Permission (read / write)                  | Resource                                                                                                                                  |
 | ----------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |

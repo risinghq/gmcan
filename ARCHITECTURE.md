@@ -51,11 +51,15 @@ inline.
 
 [`server.ts`](apps/api/server.ts) mounts three trees:
 
-| Mount        | Directory                                                         | Middleware                            |
-| ------------ | ----------------------------------------------------------------- | ------------------------------------- |
-| `/api/email` | [`routes/public/operational`](apps/api/routes/public/operational) | none                                  |
-| `/api/*`     | [`routes/public/content`](apps/api/routes/public/content)         | `requireRequestLocale`                |
-| `/admin/*`   | [`routes/admin`](apps/api/routes/admin)                           | locale, `requireSession`, `loadActor` |
+| Mount        | Directory                                                         | Middleware             |
+| ------------ | ----------------------------------------------------------------- | ---------------------- |
+| `/api/email` | [`routes/public/operational`](apps/api/routes/public/operational) | none                   |
+| `/api/*`     | [`routes/public/content`](apps/api/routes/public/content)         | `requireRequestLocale` |     | `/admin/*` | [`routes/admin`](apps/api/routes/admin) | locale, `requireSession`, `loadActor` |
+
+`/api/placeholders` is mounted after `/api`, from the same directory, and the
+`/api/*` locale middleware matches it. `/admin/auth/login` and
+`/admin/auth/logout` skip `requireSession`
+([`middleware/auth-exempt.ts`](apps/api/middleware/auth-exempt.ts)).
 
 Each route file default-exports one Hono router for its resource. Endpoints are
 listed in [docs/api.md](docs/api.md).
@@ -132,8 +136,9 @@ and lazy-loaded routes. Source is in
 | [`shared/guards/`](apps/web/src/app/shared/guards)     | Dashboard route guards                                    |
 
 [`token.interceptor.ts`](apps/web/src/app/token.interceptor.ts) sends every
-request with credentials, adds `Accept-Language` to public API calls, and sends
-the user to `/login` when an admin call returns 401. API base URLs come from
+request with credentials, adds `Accept-Language` to public API calls, and
+clears the session state when an admin call returns 401, redirecting to `/login`
+if the user is on a dashboard page. API base URLs come from
 [`environments/`](apps/web/src/environments), read through `GLOBAL` in
 [`shared/services/global.ts`](apps/web/src/app/shared/services/global.ts). The
 production build swaps in `environment.prod.ts`.

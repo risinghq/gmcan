@@ -55,8 +55,9 @@ $ curl -s -H 'Accept-Language: en' 'http://localhost:3000/api/news?pageSize=1'
 - Public pages for publications, news, members, projects, research lines,
   methods, software and equipment, plus one search across publications, members,
   news and projects.
-- Every public response follows the request's `Accept-Language` header
-  (`es` or `en`).
+- Public content endpoints choose the language of translated text from the
+  request's `Accept-Language` header (`es` or `en`). File and email endpoints
+  return the same content in either language.
 - A dashboard for members to write news, manage publications, projects and
   members, and edit the group's own pages.
 - Three roles (administrator, researcher, visitor) with a fixed permission set

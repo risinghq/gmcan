@@ -7,7 +7,9 @@ is stored per locale; everything else is stored once.
 ## Choosing the locale of a response
 
 [`middleware/public-locale.ts`](../apps/api/middleware/public-locale.ts) runs on
-`/api/*` (except `/api/email`) and on `/admin/*`. It reads `Accept-Language`,
+every `/api` path except `/api/email/*`, and on `/admin/*`. That includes the
+asset and placeholder image endpoints, which return the same bytes in every
+locale and only carry the header. It reads `Accept-Language`,
 keeps the language part of each entry (`en-US` becomes `en`), and takes the
 first entry in header order that is supported. It ignores `q` weights. With no
 supported entry it uses `DEFAULT_LOCALE`.
