@@ -91,19 +91,6 @@
   color: #000000;
 }
 
-.member-email {
-  width: 200px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  height: max-content;
-  margin-top: 4px;
-  @extend .plex-sans;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: #30393a;
-}
-
 .member-profile {
   @extend .plex-sans;
   line-height: 0.75;
@@ -111,14 +98,10 @@
   color: var(--deep-green);
 }
 
-.email-icon,
 .profile-icon {
   height: auto;
   width: auto;
   vertical-align: middle;
-}
-.email-icon {
-  color: #b5b5b5;
 }
 .profile-icon {
   font-size: 16px;
@@ -168,9 +151,7 @@
   }
   .member-link-active,
   .member-link,
-  .member-profile,
-  .member-email,
-  .email-icon {
+  .member-profile {
     font-size: 15px;
   }
   .member-card {
@@ -222,9 +203,7 @@
   }
   .member-link-active,
   .member-link,
-  .member-profile,
-  .member-email,
-  .email-icon {
+  .member-profile {
     font-size: 15px;
   }
   .member-card {
@@ -286,9 +265,7 @@
     font-size: 16px;
   }
   .member-sub,
-  .member-profile,
-  .member-email,
-  .email-icon {
+  .member-profile {
     font-size: 13px;
   }
   .members-container {

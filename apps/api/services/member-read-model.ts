@@ -4,31 +4,23 @@ import type { Locale } from "../lib/public-locale.js";
 
 const REQUIRED_TRANSLATED_FIELDS = ["bio"] as const;
 
-export function localizedMemberSelectQuery(locale: Locale) {
-  return db
+export function publicLocalizedMemberSelectQuery(locale: Locale) {
+  let query = db
     .selectFrom("member")
     .innerJoin("member_translation", (join) =>
       join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
     )
     .select([
       "member.id as id",
-      "member.dni as dni",
-      "member.email as email",
       "member.firstName as firstName",
       "member.lastName as lastName",
       "member.maternalName as maternalName",
-      "member.birthDate as birthDate",
       "member_translation.bio as bio",
       "member.isActive as isActive",
       "member.roleCode as roleCode",
       "member.memberTypeCode as memberTypeCode",
       "member.prefixCode as prefixCode",
-      "member.genderCode as genderCode",
-    ]);
-}
-
-export function publicLocalizedMemberSelectQuery(locale: Locale) {
-  let query = localizedMemberSelectQuery(locale)
+    ])
     .where("member.isActive", "=", 1)
     .where("member.dni", "!=", "")
     .where("member.email", "!=", "")

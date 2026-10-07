@@ -6,12 +6,9 @@ import { PublicPublicationWithAuthorsSchema } from "./publication.js";
 
 export const PublicMemberSchema = z.object({
   id: z.number(),
-  dni: z.string(),
-  email: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   maternalName: z.string().nullable(),
-  birthDate: z.string().nullable(),
   bio: z.string().nullable(),
   photoUrl: z.string(),
   photoAlt: z.string(),

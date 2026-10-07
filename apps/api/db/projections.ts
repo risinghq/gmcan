@@ -2,21 +2,6 @@ import type { SelectExpression } from "kysely";
 
 import type { Database } from "./schema.js";
 
-export const MEMBER_PUBLIC = [
-  "id",
-  "dni",
-  "email",
-  "firstName",
-  "lastName",
-  "maternalName",
-  "birthDate",
-  "isActive",
-  "roleCode",
-  "memberTypeCode",
-  "prefixCode",
-  "genderCode",
-] as const satisfies ReadonlyArray<SelectExpression<Database, "member">>;
-
 export const MEMBER_NAME = ["id", "dni", "firstName", "lastName", "maternalName"] as const satisfies ReadonlyArray<
   SelectExpression<Database, "member">
 >;

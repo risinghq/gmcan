@@ -102,20 +102,6 @@
   color: #b5b5b5;
 }
 
-.member-email {
-  margin-top: 8px;
-  @extend .plex-sans;
-  line-height: 1;
-  letter-spacing: 0.3px;
-}
-
-.email-icon {
-  margin-right: 8px;
-  height: auto;
-  width: auto;
-  vertical-align: middle;
-}
-
 .detail-member-resum {
   margin-top: 24px;
   @extend .plex-sans;
@@ -160,12 +146,8 @@
   .member-detail-link,
   .back-text,
   .member-detail-active,
-  .member-email,
   .detail-member-resum {
     font-size: 15px;
-  }
-  .email-icon {
-    font-size: 20px;
   }
   .member-detail-card {
     padding: 32px 40px;
@@ -204,12 +186,8 @@
   .member-detail-link,
   .back-text,
   .member-detail-active,
-  .member-email,
   .detail-member-resum {
     font-size: 15px;
-  }
-  .email-icon {
-    font-size: 20px;
   }
   .member-detail-card {
     padding: 32px 40px;
@@ -256,14 +234,12 @@
   .member-detail-card {
     padding: 16px;
   }
-  .member-detail-title,
-  .email-icon {
+  .member-detail-title {
     font-size: 16px;
   }
   .member-detail-sub,
   .back-text,
   .member-detail-type,
-  .member-email,
   .detail-member-resum {
     font-size: 13px;
   }
