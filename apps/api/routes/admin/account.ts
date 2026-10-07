@@ -1,42 +1,29 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { getCookie } from "hono/cookie";
 import { z } from "zod";
 
 import { okStatus } from "../../lib/contracts.js";
-import { capabilitiesForActor, requirePermission } from "../../middleware/authz.js";
-import { memberFullName, resolveMemberPhotoView } from "../../services/member-photo.service.js";
-import { getMemberFull, getResetPasswordStatus, updatePassword } from "../../services/member.service.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
+import { requirePermission } from "../../middleware/authz.js";
+import { getAccountView } from "../../services/account.service.js";
+import { updatePassword } from "../../services/member.service.js";
 
 const router = new Hono();
 
 router.get("/me", requirePermission("account.self.read"), async (c) => {
-  const memberId = c.get("memberId");
-  const locale = c.get("locale");
-  const member = await getMemberFull(memberId, locale);
-  if (!member) return c.json({ error: "Not found" }, 404);
-  const actor = c.get("actor");
-  return c.json({
-    ...member,
-    ...(await resolveMemberPhotoView({ memberId: member.id, fullName: memberFullName(member), locale })),
-    capabilities: capabilitiesForActor(actor),
-  });
-});
-
-router.get("/reset-status", requirePermission("account.self.read"), async (c) => {
-  const email = c.get("email");
-  const row = await getResetPasswordStatus(email);
-  if (!row) return c.json({ error: "Not found" }, 404);
-  return c.json({ passwordResetRequired: row.passwordResetRequired });
+  const view = await getAccountView(c.get("memberId"), c.get("locale"));
+  if (!view) throw notFound();
+  return c.json(view);
 });
 
 router.put(
   "/password",
   requirePermission("account.self.write"),
-  zValidator("json", z.object({ password: z.string().min(1) })),
+  validate("json", z.object({ password: z.string().min(1) })),
   async (c) => {
     const { password } = c.req.valid("json");
-    const email = c.get("email");
-    await updatePassword(email, password);
+    await updatePassword(c.get("memberId"), password, getCookie(c, "sid"));
     return c.json(okStatus());
   },
 );

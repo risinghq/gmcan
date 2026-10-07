@@ -1,37 +1,25 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { roleByCode } from "../../authz/permissions.js";
+import { unauthorized } from "../../lib/errors/app-error.js";
 import { verifyPassword } from "../../lib/password.js";
-import { capabilitiesForActor } from "../../middleware/authz.js";
+import { validate } from "../../lib/validate.js";
 import { createSession, destroySession } from "../../middleware/session.js";
-import { memberFullName, resolveMemberPhotoView } from "../../services/member-photo.service.js";
+import { getAccountView } from "../../services/account.service.js";
 import { getMemberByEmail } from "../../services/member.service.js";
 
 const router = new Hono();
 
-router.post("/login", zValidator("json", z.object({ email: z.email(), password: z.string().min(1) })), async (c) => {
+router.post("/login", validate("json", z.object({ email: z.email(), password: z.string().min(1) })), async (c) => {
   const { email, password } = c.req.valid("json");
   const member = await getMemberByEmail(email);
 
-  if (!member || member.isActive !== 1) return c.json({ error: "Invalid credentials" }, 401);
+  if (!member || member.isActive !== 1) throw unauthorized("Invalid credentials");
+  if (!(await verifyPassword(password, member.passwordHash))) throw unauthorized("Invalid credentials");
 
-  const match = await verifyPassword(password, member.passwordHash);
-  if (!match) return c.json({ error: "Invalid credentials" }, 401);
-
-  const { passwordHash: _pw, ...user } = member;
-  const role = roleByCode[member.roleCode];
-  const capabilities = role
-    ? capabilitiesForActor({ id: member.id, roleCode: member.roleCode, role, isActive: member.isActive })
-    : [];
   await createSession(c, member.id);
-  const photo = await resolveMemberPhotoView({
-    memberId: member.id,
-    fullName: memberFullName(member),
-    locale: c.get("locale"),
-  });
-  return c.json({ user: { ...user, ...photo, capabilities } });
+  const user = await getAccountView(member.id, c.get("locale"));
+  return c.json({ user });
 });
 
 router.post("/logout", async (c) => {
