@@ -32,95 +32,99 @@ export interface RefDependencyCount {
   canDelete: boolean;
 }
 
+function ref(path: string): string {
+  return GLOBAL.admin(`ref/${path}`);
+}
+
 @Injectable({ providedIn: "root" })
 export class RefService {
   private http = inject(HttpClient);
 
   // News types
   listNewsTypes(): Observable<RefItem[]> {
-    return this.http.get<RefItem[]>(`${GLOBAL.url}admin/ref/news-type`);
+    return this.http.get<RefItem[]>(ref("news-type"));
   }
 
   createNewsType(body: { name: string }): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/ref/news-type`, body);
+    return this.http.post<{ id: number }>(ref("news-type"), body);
   }
 
   updateNewsType(id: number, body: { name: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/ref/news-type/${id}`, body);
+    return this.http.put<{ status: number }>(ref(`news-type/${id}`), body);
   }
 
   deleteNewsType(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/news-type/${id}`);
+    return this.http.delete<{ status: number }>(ref(`news-type/${id}`));
   }
 
   getNewsTypeCount(id: number): Observable<RefDependencyCount> {
-    return this.http.get<RefDependencyCount>(`${GLOBAL.url}admin/ref/news-type/${id}/count`);
+    return this.http.get<RefDependencyCount>(ref(`news-type/${id}/count`));
   }
 
   // Journals
   listJournals(): Observable<JournalItem[]> {
-    return this.http.get<JournalItem[]>(`${GLOBAL.url}admin/ref/journal`);
+    return this.http.get<JournalItem[]>(ref("journal"));
   }
 
   createJournal(body: { name: string }): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/ref/journal`, body);
+    return this.http.post<{ id: number }>(ref("journal"), body);
   }
 
   updateJournal(id: number, body: { name: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/ref/journal/${id}`, body);
+    return this.http.put<{ status: number }>(ref(`journal/${id}`), body);
   }
 
   deleteJournal(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/journal/${id}`);
+    return this.http.delete<{ status: number }>(ref(`journal/${id}`));
   }
 
   getJournalDependencies(id: number): Observable<RefDependenciesResponse> {
-    return this.http.get<RefDependenciesResponse>(`${GLOBAL.url}admin/ref/journal/${id}/dependencies`);
+    return this.http.get<RefDependenciesResponse>(ref(`journal/${id}/dependencies`));
   }
 
   // Universities
   listUniversities(): Observable<UniversityItem[]> {
-    return this.http.get<UniversityItem[]>(`${GLOBAL.url}admin/ref/university`);
+    return this.http.get<UniversityItem[]>(ref("university"));
   }
 
   createUniversity(body: { name: string }): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/ref/university`, body);
+    return this.http.post<{ id: number }>(ref("university"), body);
   }
 
   updateUniversity(id: number, body: { name: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/ref/university/${id}`, body);
+    return this.http.put<{ status: number }>(ref(`university/${id}`), body);
   }
 
   deleteUniversity(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/university/${id}`);
+    return this.http.delete<{ status: number }>(ref(`university/${id}`));
   }
 
   getUniversityDependencies(id: number): Observable<RefDependenciesResponse> {
-    return this.http.get<RefDependenciesResponse>(`${GLOBAL.url}admin/ref/university/${id}/dependencies`);
+    return this.http.get<RefDependenciesResponse>(ref(`university/${id}/dependencies`));
   }
 
   getEventDependencies(id: number): Observable<RefDependenciesResponse> {
-    return this.http.get<RefDependenciesResponse>(`${GLOBAL.url}admin/ref/event/${id}/dependencies`);
+    return this.http.get<RefDependenciesResponse>(ref(`event/${id}/dependencies`));
   }
 
   // Funding sources
   listFundingSources(): Observable<FundingSourceItem[]> {
-    return this.http.get<FundingSourceItem[]>(`${GLOBAL.url}admin/ref/funding-source`);
+    return this.http.get<FundingSourceItem[]>(ref("funding-source"));
   }
 
   getFundingSource(id: number): Observable<FundingSourceItem> {
-    return this.http.get<FundingSourceItem>(`${GLOBAL.url}admin/ref/funding-source/${id}`);
+    return this.http.get<FundingSourceItem>(ref(`funding-source/${id}`));
   }
 
   createFundingSource(body: { name: string }): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(`${GLOBAL.url}admin/ref/funding-source`, body);
+    return this.http.post<{ id: number }>(ref("funding-source"), body);
   }
 
   updateFundingSource(id: number, body: { name: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(`${GLOBAL.url}admin/ref/funding-source/${id}`, body);
+    return this.http.put<{ status: number }>(ref(`funding-source/${id}`), body);
   }
 
   deleteFundingSource(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(`${GLOBAL.url}admin/ref/funding-source/${id}`);
+    return this.http.delete<{ status: number }>(ref(`funding-source/${id}`));
   }
 }
