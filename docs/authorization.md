@@ -68,9 +68,9 @@ The API enforces the permissions itself.
 
 [`middleware/authz.ts`](../apps/api/middleware/authz.ts) provides the guards:
 
-- `loadActor` runs on `/admin`, except login and logout. It loads the member behind the session
-  and puts `{ id, role }` on the request. It answers 401 if the member no
-  longer exists.
+- `loadActor` runs on `/admin`, except login and logout. It loads the member
+  behind the session and puts `{ id, role }` on the request. It answers 401 if
+  the member no longer exists.
 - `requirePermission(permission)` answers `403 {"error":"Forbidden"}` unless the
   actor's role has the permission.
 - `requireSelfOrPermission({ resourceParam, selfPermission, elevatedPermission })`
@@ -87,8 +87,10 @@ The `account.self.*` permissions are checked by identity: `can()` in
 [`authz/policy.ts`](../apps/api/authz/policy.ts) lets an actor use them on
 their own record only.
 
-Each denial is written to the console as one JSON line with
-`"type":"authz_denied"`, the actor, the path, and the permission.
+When `requirePermission` or `requireSelfOrPermission` answers 403, it writes one
+JSON line with `console.warn`: `"type":"authz_denied"`, `actorId`, `role`,
+`path`, `method`, `permission` and `reason`. The 401 and 403 answers of
+`requireSession` and `loadActor` are not logged.
 
 ## Password reset
 

@@ -51,10 +51,11 @@ inline.
 
 [`server.ts`](apps/api/server.ts) mounts three trees:
 
-| Mount        | Directory                                                         | Middleware             |
-| ------------ | ----------------------------------------------------------------- | ---------------------- |
-| `/api/email` | [`routes/public/operational`](apps/api/routes/public/operational) | none                   |
-| `/api/*`     | [`routes/public/content`](apps/api/routes/public/content)         | `requireRequestLocale` |     | `/admin/*` | [`routes/admin`](apps/api/routes/admin) | locale, `requireSession`, `loadActor` |
+| Mount        | Directory                                                         | Middleware                            |
+| ------------ | ----------------------------------------------------------------- | ------------------------------------- |
+| `/api/email` | [`routes/public/operational`](apps/api/routes/public/operational) | none                                  |
+| `/api/*`     | [`routes/public/content`](apps/api/routes/public/content)         | `requireRequestLocale`                |
+| `/admin/*`   | [`routes/admin`](apps/api/routes/admin)                           | locale, `requireSession`, `loadActor` |
 
 `/api/placeholders` is mounted after `/api`, from the same directory, and the
 `/api/*` locale middleware matches it. `/admin/auth/login` and

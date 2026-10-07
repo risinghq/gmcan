@@ -78,10 +78,10 @@ as `{ "inline": ..., "download": ... }` instead. A member with no photo gets
 ### Private files
 
 An asset's `visibility` is `public` or `private`. Uploads through the API are
-always `public`. A `private` asset is served only with `?expires=<unix seconds>&token=<hex>`,
-where `token` is the HMAC-SHA256 of `<id>:<expires>` keyed with
-`ASSET_SIGNING_SECRET`. The URLs the API puts in responses for private assets
-expire after 300 seconds.
+always `public`. A `private` asset is served only with
+`?expires=<unix seconds>&token=<hex>`, where `token` is the HMAC-SHA256 of
+`<id>:<expires>` keyed with `ASSET_SIGNING_SECRET`. The URLs the API puts in
+responses for private assets expire after 300 seconds.
 
 ## Orphan files
 

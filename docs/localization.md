@@ -54,7 +54,7 @@ Routes that take a locale in the URL, such as
 
 ## Add a locale
 
-1. Add its code to `SUPPORTED_LOCALES`. The `locale` table is filled from the
+1. Add its code to `SUPPORTED_LOCALES`. The `locale` table is filled from that
    list at startup.
 2. Write translation rows for it. Admin writes now require them, and existing
    rows have none.
