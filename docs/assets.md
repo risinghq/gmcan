@@ -1,9 +1,10 @@
 # Assets
 
-Assets are the uploaded photos and PDFs. They live on disk under
-`apps/api/.storage`, relative to the directory the API starts in. The database
-records each file in the `asset` table and binds it to the record that shows
-it.
+Assets are the uploaded photos and PDFs. They live in an R2 bucket, the
+`STORAGE` binding in [`wrangler.jsonc`](../apps/api/wrangler.jsonc)
+(`gmcan-assets` in production, emulated under `apps/api/.wrangler/state` by
+`wrangler dev`). The database records each file in the `asset` table and binds
+it to the record that shows it.
 
 ## Owners and slots
 
@@ -50,7 +51,7 @@ curl -b cookies.txt -X POST http://localhost:3000/admin/assets/restore \
   -H 'Content-Type: application/json' -d '{"assetId":4}'
 ```
 
-An upload stores the file as `<uuid-v7>.<ext>` in `.storage`, inserts an `asset`
+An upload stores the file as `<uuid>.<ext>` in the bucket, inserts an `asset`
 row, and inserts a binding with the next `version` number for that owner and
 slot. The binding with the highest version is the current file. The previous
 file's asset is marked `soft_deleted` and stamped with a `deleteAfter` date 90
@@ -58,9 +59,8 @@ days ahead. Nothing in the API deletes files at that date.
 
 Every upload, replace, delete and restore adds a row to `asset_audit`.
 
-A soft-deleted asset is no longer served: its URL answers `404`.
-The API answers `400` for an unsupported slot or file type, `404` when the owner
-does not exist.
+A soft-deleted asset is no longer served: its URL answers `404`. The API answers
+`400` for an unsupported slot or file type, `404` when the owner does not exist.
 
 ## Serving files
 
@@ -85,8 +85,5 @@ responses for private assets expire after 300 seconds.
 
 ## Orphan files
 
-At each start outside production, after seeding, the API moves every file in
-`.storage` that no binding references into `.storage/.quarantine` and appends
-`<time>\t<file>\t<reason>` to `.quarantine/report.tsv`. Files whose names begin
-with a dot are skipped. A file copied into `.storage` by hand is quarantined at
-the next start.
+Nothing reconciles the bucket with the `asset` table. An object that no row
+references stays until someone deletes it with `wrangler r2 object delete`.

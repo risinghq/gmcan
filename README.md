@@ -7,41 +7,36 @@ members edit that content. Pages and content are in Spanish and English.
 
 The repository is a Bun workspace with three packages:
 
-| Package                                    | What it is                                              |
-| ------------------------------------------ | ------------------------------------------------------- |
-| [`apps/web`](apps/web)                     | Angular 22 app, server-side rendered, served on `:4200` |
-| [`apps/api`](apps/api)                     | Hono HTTP API on `:3000`, storing data in libSQL        |
-| [`packages/contracts`](packages/contracts) | Zod schemas and types shared by the web app and the API |
+| Package                                    | What it is                                                   |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| [`apps/web`](apps/web)                     | Angular 22 app, served by a Cloudflare Worker                |
+| [`apps/api`](apps/api)                     | Hono HTTP API, a Cloudflare Worker storing data in D1 and R2 |
+| [`packages/contracts`](packages/contracts) | Zod schemas and types shared by the web app and the API      |
+
+Both apps run on Cloudflare Workers, locally under `wrangler dev` and in
+production. See [Deployment](docs/deployment.md).
 
 ## Run it
 
 You need [Bun](https://bun.sh) 1.4.2 (`mise install` reads it from
-[`mise.toml`](mise.toml)).
+[`mise.toml`](mise.toml)). No Cloudflare account is needed to run locally:
+wrangler emulates D1 and R2 under `apps/api/.wrangler/state`.
 
 ```sh
 bun install
-cp .env.example .env
-```
-
-Edit `.env` before the first start. The API refuses to start with an invalid
-file, and the shipped template is invalid:
-
-- Set `ASSET_SIGNING_SECRET` to any non-empty string.
-- Set `RESEND_API_KEY` to any non-empty string. Only the contact form and the
-  password reset email need a real Resend key.
-- Delete the `INSTITUTIONAL_EMAIL=` line, or set it to an address.
-
-Then start both apps:
-
-```sh
+cp apps/api/.dev.vars.example apps/api/.dev.vars
+bun run --filter api migrate
+SEED_PASSWORD=password123 bun run --filter api seed
 bun run dev
 ```
 
-The first start creates `apps/api/data/gmcan.db` and fills it with sample
-content. Startup is complete when the API prints `[DB] Ready`.
+`migrate` creates the tables in the local database and `seed` fills it with
+sample content and files. Without `SEED_PASSWORD` the seed generates a password
+and prints it. `bun run dev` starts the API on <http://localhost:3000> and the
+web app on <http://localhost:4200>.
 
 Open <http://localhost:4200>. To sign in to the dashboard, go to
-<http://localhost:4200/login> with `admin@gmcan.dev` and `password123`.
+<http://localhost:4200/login> with `admin@gmcan.dev` and the seed password.
 
 You can also query the API directly:
 
@@ -65,11 +60,13 @@ $ curl -s -H 'Accept-Language: en' 'http://localhost:3000/api/news?pageSize=1'
 - File uploads for photos and PDFs. Each upload is a new version, and deleted
   files can be restored.
 - Full-text news search backed by SQLite FTS5.
-- Password reset and membership-request email through Resend.
+- Password reset and membership-request email through Cloudflare Email Service
+  once a sending domain is configured. Until then both answer
+  `503 Email is not configured`.
 
 ## Documentation
 
-- [Manual](docs/README.md): configuration, database, API, authorization,
-  assets, localization.
+- [Manual](docs/README.md): deployment, configuration, database, API,
+  authorization, assets, localization.
 - [Architecture](ARCHITECTURE.md): what each package and module owns.
 - [Contributing](CONTRIBUTING.md): checks, tests and conventions.

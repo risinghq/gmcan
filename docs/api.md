@@ -1,9 +1,9 @@
 # API
 
-The API is a Hono app on port 3000. [`server.ts`](../apps/api/server.ts) mounts
-every route; each resource is one file under
-[`routes/`](../apps/api/routes). Responses are JSON unless noted. Translated
-text in the public content endpoints follows `Accept-Language`
+The API is a Hono app, a Cloudflare Worker that listens on port 3000 under
+`wrangler dev`. [`app.ts`](../apps/api/app.ts) mounts every route; each resource
+is one file under [`routes/`](../apps/api/routes). Responses are JSON unless
+noted. Translated text in the public content endpoints follows `Accept-Language`
 ([localization](localization.md)).
 
 ```console

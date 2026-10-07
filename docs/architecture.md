@@ -37,7 +37,7 @@ after sign-in and after 2 hours without a request.
 | active | ended  | the holder, through `POST /admin/auth/logout`                               |
 | active | ended  | `requireSession`, when the session is past 8 hours or idle for 2 hours      |
 | active | ended  | `requireSession`, when its member no longer exists or is inactive           |
-| active | ended  | startup, which deletes sessions past 8 hours, and again every 6 hours       |
+| active | ended  | the hourly cron, which deletes sessions past 8 hours or idle for 2 hours    |
 
 An ended session is a deleted row. No transition moves an ended session back to
 active, so reactivating a member does not revive earlier sessions. The member
@@ -83,16 +83,11 @@ file, and no job purges soft-deleted assets. Someone removes them by hand.
 
 ## Web server configuration
 
-The web build carries no deployment URLs. The SSR server reads them when it
-starts and serves them to the browser at `/config.json`.
+The production web build carries no deployment URLs. The web Worker sets the API
+and site URL to the origin of each request and serves them to the browser at
+`/config.json` ([configuration](configuration.md#web-app)).
 
-| Variable           | Format                                                          |
-| ------------------ | --------------------------------------------------------------- |
-| `API_URL`          | Public URL of the API, for example `https://api.example.org`.   |
-| `APP_URL`          | Public URL of this site, for example `https://www.example.org`. |
-| `NG_ALLOWED_HOSTS` | Comma-separated hosts the site serves. Required in production.  |
-
-`API_URL` and `APP_URL` are accepted with or without a trailing slash. Code
-builds API addresses only with `GLOBAL.api(path)` and `GLOBAL.admin(path)`, and
-site addresses with `GLOBAL.app(path)`. These join the base and the path with
-exactly one slash. Never append a path to `GLOBAL.url` by hand.
+The URLs are accepted with or without a trailing slash. Code builds API
+addresses only with `GLOBAL.api(path)` and `GLOBAL.admin(path)`, and site
+addresses with `GLOBAL.app(path)`. These join the base and the path with exactly
+one slash. Never append a path to `GLOBAL.url` by hand.

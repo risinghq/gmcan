@@ -17,9 +17,8 @@ $ curl -b cookies.txt http://localhost:3000/admin/dashboard/summary
 ```
 
 A successful login creates a row in the `session` table and sets the `sid`
-cookie: `HttpOnly`, `SameSite=Strict`, `Secure` when `NODE_ENV` is
-`production`. The logic is in
-[`middleware/session.ts`](../apps/api/middleware/session.ts).
+cookie: `HttpOnly`, `SameSite=Strict`, `Secure` when `NODE_ENV` is `production`.
+The logic is in [`middleware/session.ts`](../apps/api/middleware/session.ts).
 
 | Limit        | Value                                                    |
 | ------------ | -------------------------------------------------------- |
@@ -31,11 +30,13 @@ A missing, unknown or expired session gets `401 {"error":"Unauthorized"}` or
 get `401 {"error":"Invalid credentials"}`.
 
 `POST /admin/auth/logout` deletes the session and answers `204` with
-`Clear-Site-Data: "cookies","storage"`. Login and logout are the only
-`/admin` paths that skip the session check
+`Clear-Site-Data: "cookies","storage"`. Login and logout are the only `/admin`
+paths that skip the session check
 ([`middleware/auth-exempt.ts`](../apps/api/middleware/auth-exempt.ts)).
-Passwords are stored as bcrypt hashes with 12 rounds
-([`lib/password.ts`](../apps/api/lib/password.ts)).
+Passwords are stored as scrypt hashes (`N=16384, r=8, p=5`, a random salt per
+password) in `scrypt$N$r$p$salt$key` form
+([`lib/password.ts`](../apps/api/lib/password.ts)). Each hash records its own
+parameters, so verification keeps working if the cost changes.
 
 The API allows CORS with credentials for one origin, `FRONTEND_URL`
 ([configuration](configuration.md)).
@@ -59,8 +60,8 @@ Each member has one role. Permissions are fixed per role in
 `content` covers the group pages, research lines, methods, equipment, software
 and file uploads. `refs` covers the reference data under `/admin/ref`.
 
-The login response and `GET /admin/account/me` list the member's permissions
-as `capabilities`. The dashboard menu shows entries according to that list
+The login response and `GET /admin/account/me` list the member's permissions as
+`capabilities`. The dashboard menu shows entries according to that list
 ([`log-home.component.html`](../apps/web/src/app/dashboard/shell/log-home.component.html)).
 The API enforces the permissions itself.
 
@@ -84,8 +85,8 @@ dashboard routes guard each endpoint, and `/admin/email` requires
 `content.write` for every method.
 
 The `account.self.*` permissions are checked by identity: `can()` in
-[`authz/policy.ts`](../apps/api/authz/policy.ts) lets an actor use them on
-their own record only.
+[`authz/policy.ts`](../apps/api/authz/policy.ts) lets an actor use them on their
+own record only.
 
 When `requirePermission` or `requireSelfOrPermission` answers 403, it writes one
 JSON line with `console.warn`: `"type":"authz_denied"`, `actorId`, `role`,
@@ -102,6 +103,9 @@ Three public endpoints under `/api/email` implement the emailed reset:
 | `POST /password-reset/verify`  | Answers with the member's name and email if the token is valid, else 400.                                             |
 | `POST /password-reset/confirm` | Sets a new password of at least 8 characters, clears the token. Invalid token gets 400.                               |
 
-A signed-in member changes their own password with `PUT /admin/account/password`.
-An administrator sets any member's password with
+Without email configured ([configuration](configuration.md#email)) the request
+endpoint answers `503` and stores no token.
+
+A signed-in member changes their own password with
+`PUT /admin/account/password`. An administrator sets any member's password with
 `PUT /admin/email/member-password`.
