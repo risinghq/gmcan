@@ -60,9 +60,16 @@ class D1Driver implements Driver {
   async destroy() {}
 }
 
+/** SqliteAdapter reports one connection, so Kysely would queue every query behind the previous one. D1 has no such limit. */
+class D1Adapter extends SqliteAdapter {
+  override get supportsMultipleConnections(): boolean {
+    return true;
+  }
+}
+
 export function d1Dialect(database: D1Database): Dialect {
   return {
-    createAdapter: () => new SqliteAdapter(),
+    createAdapter: () => new D1Adapter(),
     createDriver: () => new D1Driver(database),
     createQueryCompiler: () => new SqliteQueryCompiler(),
     createIntrospector: (db) => new SqliteIntrospector(db),
