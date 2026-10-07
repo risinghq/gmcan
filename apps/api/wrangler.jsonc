@@ -17,6 +17,8 @@
     "FRONTEND_URL": "https://gmcan-web.caefisica.workers.dev",
     "SUPPORTED_LOCALES": "es,en",
     "DEFAULT_LOCALE": "es",
+    // Resend's shared test sender. It delivers only to the Resend account owner's address.
+    "EMAIL_FROM": "onboarding@resend.dev",
   },
   "triggers": { "crons": ["17 * * * *"] },
   "d1_databases": [

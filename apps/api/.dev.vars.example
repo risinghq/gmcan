@@ -6,6 +6,7 @@ FRONTEND_URL=http://localhost:4200
 # Generate real values with: openssl rand -hex 32
 ASSET_SIGNING_SECRET=dev-only-signing-secret
 
-# Email is off until a sender domain is on Cloudflare DNS (see docs/deployment.md).
-# EMAIL_FROM=gmcan@your-domain.example
-# INSTITUTIONAL_EMAIL=gmcan@your-domain.example
+# Email is off until RESEND_API_KEY and EMAIL_FROM are set (see docs/deployment.md#email).
+# RESEND_API_KEY=re_...
+# EMAIL_FROM=onboarding@resend.dev
+# INSTITUTIONAL_EMAIL=you@example.com

@@ -9,8 +9,9 @@ const EnvSchema = z
     BACKEND_URL: z.url().optional(),
     FRONTEND_URL: z.url().optional(),
     ASSET_SIGNING_SECRET: required("ASSET_SIGNING_SECRET"),
-    // Email is off until a sender domain is on Cloudflare DNS. Both are needed to send.
+    // Email is off until EMAIL_FROM and RESEND_API_KEY are both set.
     EMAIL_FROM: z.email("EMAIL_FROM must be an email address").optional(),
+    RESEND_API_KEY: z.string().min(1, "RESEND_API_KEY must not be empty").optional(),
     INSTITUTIONAL_EMAIL: z.email("INSTITUTIONAL_EMAIL must be an email address").optional(),
     SEED_PASSWORD: z.string().min(8).optional(),
     SUPPORTED_LOCALES: z.string().optional(),
