@@ -74,7 +74,7 @@ table, and the `Database` interface that Kysely uses to type queries. Groups:
 | Lookups      | `locale`, `gender`, `prefix`, `role`, `member_type`, `publication_kind`, `news_kind`, `thesis_kind`, `currency`, `funding_source` |
 | Content      | `news`, `publication`, `journal_article`, `conference_paper`, `thesis`, `project`, `event`, `journal`, `university`               |
 | Group pages  | `research_group`, `research_line`, `method`, `equipment`, `software`, `about`                                                     |
-| People       | `member`, `session`, and the links `member_group`, `project_member`, `publication_author`                                         |
+| People       | `member`, `session`, `password_reset`, and the links `member_group`, `project_member`, `publication_author`                       |
 | Files        | `asset`, `asset_audit` and one `<owner>_asset` binding table per owner type                                                       |
 | Translations | `<table>_translation` for each table with localized text                                                                          |
 | Search       | `news_fts`, an FTS5 virtual table kept current by triggers. It is not in `schema.ts`; the first migration creates it.             |

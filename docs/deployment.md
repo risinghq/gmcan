@@ -146,16 +146,18 @@ with `RenderMode.Server`, and deploy the web app again.
 
 `gmcan-api` runs `17 * * * *` (hourly). Each run deletes sessions past their 8
 hour life or idle for 2 hours
-([`sweepExpiredSessions`](../apps/api/middleware/session.ts)). Expired sessions
-are also refused on every request, so the sweep only keeps the table small.
+([`sweepExpiredSessions`](../apps/api/middleware/session.ts)), and password
+reset tokens past their 24 hours
+([`sweepExpiredResets`](../apps/api/services/password-reset.service.ts)).
+Expired sessions and tokens are also refused on every use, so the sweep only
+keeps the tables small.
 
 ## Email
 
 Mail goes through [Resend](https://resend.com). It is off until a key is set.
 The contact form (`POST /api/email/contact`) and the password reset request
-(`POST /api/email/password-reset/request`) answer
-`503 {"error":{"message":"Email is not configured"}}` meanwhile. Everything else
-works.
+(`POST /api/email/password-reset/request`) answer a 503 error with the message
+`Email is not configured` meanwhile. Everything else works.
 
 `EMAIL_FROM` is `onboarding@resend.dev` in
 [`apps/api/wrangler.jsonc`](../apps/api/wrangler.jsonc), Resend's shared test
