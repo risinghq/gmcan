@@ -23,6 +23,7 @@ const migrate = Bun.spawnSync(
 if (migrate.exitCode !== 0) throw new Error(`Applying migrations failed:\n${migrate.stdout}\n${migrate.stderr}`);
 
 await import("../scripts/cloudflare-bun.js");
+(await import("./query-counter.js")).installQueryCounter();
 const { seedLocales, seedLookups } = await import("../db/seed/lookups.js");
 
 await seedLocales();
