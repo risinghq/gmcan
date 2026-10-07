@@ -2,8 +2,8 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessLinks, resolveAssetAccessUrl } from "../../../services/assets/service.js";
-import { memberFullName, resolveMemberPhotoView } from "../../../services/member-photo.service.js";
+import { resolveAssetAccessLinkMap, resolveAssetAccessUrls } from "../../../services/assets/service.js";
+import { memberFullName, resolveMemberPhotoViews } from "../../../services/member-photo.service.js";
 import { globalSearch } from "../../../services/search.service.js";
 
 const router = new Hono();
@@ -25,79 +25,71 @@ router.get("/", zValidator("query", SearchQuery), async (c) => {
   const requested = new Set(types.split(",").map((t) => t.trim()));
   const result = await globalSearch(term, requested, locale);
 
-  const publications = await Promise.all(
-    result.publications.map(async (row) => ({
-      id: row.id,
-      title: row.title,
-      abstract: row.abstract,
-      asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
-      doi: row.doi,
-      publishedAt: row.publishedAt,
-      kindCode: row.kindCode,
-      authors: await Promise.all(
-        row.authors.map(async (author) =>
-          author.kind === "registered"
-            ? Object.assign({}, author, {
-                ...(await resolveMemberPhotoView({
-                  memberId: author.memberId,
-                  fullName: author.name,
-                  locale,
-                })),
-              })
-            : author,
-        ),
-      ),
-    })),
-  );
-
-  const members = await Promise.all(
-    result.members.map(async (row) =>
-      Object.assign({}, row, {
-        ...(await resolveMemberPhotoView({ memberId: row.id, fullName: memberFullName(row), locale })),
-      }),
+  const registeredAuthors = result.publications.flatMap((row) =>
+    row.authors.flatMap((author) =>
+      author.kind === "registered" ? [{ memberId: author.memberId, fullName: author.name }] : [],
     ),
   );
-
-  const news = await Promise.all(
-    result.news.map(async (row) => ({
-      id: row.id,
-      title: row.title,
-      publishedAt: row.publishedAt,
-      asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
-      newsKindCode: row.newsKindCode,
-      statusCode: row.statusCode,
-      authorName: row.authorName,
-    })),
-  );
-
-  const projects = await Promise.all(
-    result.projects.map(async (row) => ({
-      id: row.id,
-      title: row.title,
-      code: row.code,
-      fundedAmountMinor: row.fundedAmountMinor,
-      description: row.description,
-      statusCode: row.statusCode,
-      startDate: row.startDate,
-      endDate: row.endDate,
-      researchLineId: row.researchLineId,
-      fundingSourceCode: row.fundingSourceCode,
-      currencyCode: row.currencyCode,
-      researchLine: row.researchLine,
-      fundingSource: row.fundingSource,
-      members: await Promise.all(
-        row.members.map(async (member) =>
-          Object.assign({}, member, {
-            ...(await resolveMemberPhotoView({
-              memberId: member.memberId,
-              fullName: member.name,
-              locale,
-            })),
-          }),
+  const [publicationAssets, newsAssets, photos] = await Promise.all([
+    resolveAssetAccessLinkMap({
+      ownerType: "publication",
+      ownerIds: result.publications.map((row) => row.id),
+      slot: "file",
+    }),
+    resolveAssetAccessUrls({ ownerType: "news", ownerIds: result.news.map((row) => row.id), slot: "photo" }),
+    resolveMemberPhotoViews(
+      [
+        ...registeredAuthors,
+        ...result.members.map((row) => ({ memberId: row.id, fullName: memberFullName(row) })),
+        ...result.projects.flatMap((row) =>
+          row.members.map((member) => ({ memberId: member.memberId, fullName: member.name })),
         ),
-      ),
-    })),
-  );
+      ],
+      locale,
+    ),
+  ]);
+
+  const publications = result.publications.map((row) => ({
+    id: row.id,
+    title: row.title,
+    abstract: row.abstract,
+    asset: publicationAssets.get(row.id) ?? null,
+    doi: row.doi,
+    publishedAt: row.publishedAt,
+    kindCode: row.kindCode,
+    authors: row.authors.map((author) =>
+      author.kind === "registered" ? Object.assign({}, author, photos.get(author.memberId)) : author,
+    ),
+  }));
+
+  const members = result.members.map((row) => Object.assign({}, row, photos.get(row.id)));
+
+  const news = result.news.map((row) => ({
+    id: row.id,
+    title: row.title,
+    publishedAt: row.publishedAt,
+    asset: newsAssets.get(row.id) ?? null,
+    newsKindCode: row.newsKindCode,
+    statusCode: row.statusCode,
+    authorName: row.authorName,
+  }));
+
+  const projects = result.projects.map((row) => ({
+    id: row.id,
+    title: row.title,
+    code: row.code,
+    fundedAmountMinor: row.fundedAmountMinor,
+    description: row.description,
+    statusCode: row.statusCode,
+    startDate: row.startDate,
+    endDate: row.endDate,
+    researchLineId: row.researchLineId,
+    fundingSourceCode: row.fundingSourceCode,
+    currencyCode: row.currencyCode,
+    researchLine: row.researchLine,
+    fundingSource: row.fundingSource,
+    members: row.members.map((member) => Object.assign({}, member, photos.get(member.memberId))),
+  }));
 
   return c.json({ publications, members, news, projects });
 });

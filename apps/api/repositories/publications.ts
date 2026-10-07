@@ -1,4 +1,4 @@
-import { db } from "../db/client.js";
+import { db, queryInChunks } from "../db/client.js";
 import type { Locale } from "../lib/public-locale.js";
 
 export async function searchPublicationRows(locale: Locale, like: string) {
@@ -24,20 +24,22 @@ export async function searchPublicationRows(locale: Locale, like: string) {
 }
 
 export async function listPublicationAuthorRowsByPublicationIds(publicationIds: number[]) {
-  return db
-    .selectFrom("publication_author")
-    .leftJoin("member", "member.id", "publication_author.memberId")
-    .select([
-      "publication_author.publicationId",
-      "publication_author.authorOrder",
-      "publication_author.externalName",
-      "publication_author.memberId",
-      "member.firstName as memberFirstName",
-      "member.lastName as memberLastName",
-      "member.maternalName as memberMaternalName",
-    ])
-    .where("publication_author.publicationId", "in", publicationIds)
-    .orderBy("publication_author.publicationId", "asc")
-    .orderBy("publication_author.authorOrder", "asc")
-    .execute();
+  return queryInChunks(publicationIds, (chunk) =>
+    db
+      .selectFrom("publication_author")
+      .leftJoin("member", "member.id", "publication_author.memberId")
+      .select([
+        "publication_author.publicationId",
+        "publication_author.authorOrder",
+        "publication_author.externalName",
+        "publication_author.memberId",
+        "member.firstName as memberFirstName",
+        "member.lastName as memberLastName",
+        "member.maternalName as memberMaternalName",
+      ])
+      .where("publication_author.publicationId", "in", chunk)
+      .orderBy("publication_author.publicationId", "asc")
+      .orderBy("publication_author.authorOrder", "asc")
+      .execute(),
+  );
 }

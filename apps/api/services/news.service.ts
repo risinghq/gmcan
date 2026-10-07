@@ -6,8 +6,8 @@ import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { type Locale } from "../lib/public-locale.js";
 import { newsSearchFilter } from "../repositories/news.js";
 import type { AdminNewsListItem, AdminNewsListQuery, AdminNewsListResponse } from "./admin-list.types.js";
-import { resolveAssetAccessUrl } from "./assets/service.js";
-import { resolveMemberPhotoView } from "./member-photo.service.js";
+import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "./assets/service.js";
+import { resolveMemberPhotoViews } from "./member-photo.service.js";
 
 export interface NewsUpsertInput {
   translations: LocalizedTranslations<{ title: string; summary: string; body: string }>;
@@ -35,17 +35,32 @@ function statusLabel(statusCode: NewsStatusCode): string {
   return "Archivado";
 }
 
-async function resolveNewsAuthor(
-  row: { authorId: number; firstName: string | null; lastName: string | null; maternalName: string | null },
-  locale: Locale,
-) {
-  const authorName = [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" ");
-  const { photoUrl, photoAlt } = await resolveMemberPhotoView({
-    memberId: row.authorId,
-    fullName: authorName,
+type NewsAuthorRow = {
+  authorId: number;
+  firstName: string | null;
+  lastName: string | null;
+  maternalName: string | null;
+};
+
+/** Names and photos of every author in the rows, with one asset query for all of them. */
+async function resolveNewsAuthors(rows: NewsAuthorRow[], locale: Locale) {
+  const names = new Map(
+    rows.map((row) => [row.authorId, [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" ")]),
+  );
+  const photos = await resolveMemberPhotoViews(
+    [...names].map(([memberId, fullName]) => ({ memberId, fullName })),
     locale,
-  });
-  return { authorName, authorPhotoUrl: photoUrl, authorPhotoAlt: photoAlt };
+  );
+  return new Map(
+    [...names].map(([authorId, authorName]) => {
+      const photo = photos.get(authorId)!;
+      return [authorId, { authorName, authorPhotoUrl: photo.photoUrl, authorPhotoAlt: photo.photoAlt }];
+    }),
+  );
+}
+
+async function resolveNewsAuthor(row: NewsAuthorRow, locale: Locale) {
+  return (await resolveNewsAuthors([row], locale)).get(row.authorId)!;
 }
 
 function toNewsRow(data: NewsUpsertInput) {
@@ -115,26 +130,29 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
     .offset(offset)
     .execute();
 
+  const [authors, assets] = await Promise.all([
+    resolveNewsAuthors(rows, locale),
+    resolveAssetAccessUrls({ ownerType: "news", ownerIds: rows.map((row) => row.id), slot: "photo" }),
+  ]);
+
   return {
-    items: await Promise.all(
-      rows.map(async (row) => {
-        const author = await resolveNewsAuthor(row, locale);
-        return {
-          id: row.id,
-          title: row.title,
-          summary: row.summary,
-          publishedAt: row.publishedAt,
-          asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: row.id, slot: "photo" }),
-          priority: row.priority,
-          authorId: row.authorId,
-          newsKindCode: row.newsKindCode,
-          authorName: author.authorName,
-          authorPhotoUrl: author.authorPhotoUrl,
-          authorPhotoAlt: author.authorPhotoAlt,
-          newsKindName: row.newsKindName ?? "",
-        };
-      }),
-    ),
+    items: rows.map((row) => {
+      const author = authors.get(row.authorId)!;
+      return {
+        id: row.id,
+        title: row.title,
+        summary: row.summary,
+        publishedAt: row.publishedAt,
+        asset: assets.get(row.id) ?? null,
+        priority: row.priority,
+        authorId: row.authorId,
+        newsKindCode: row.newsKindCode,
+        authorName: author.authorName,
+        authorPhotoUrl: author.authorPhotoUrl,
+        authorPhotoAlt: author.authorPhotoAlt,
+        newsKindName: row.newsKindName ?? "",
+      };
+    }),
     total: Number(totalRow.count),
     page: query.page,
     pageSize: query.pageSize,
@@ -231,24 +249,23 @@ export async function listAdminNews(locale: Locale, query: AdminNewsListQuery): 
     .offset(offset)
     .execute();
 
-  const items: AdminNewsListItem[] = await Promise.all(
-    rows.map(async (row) => {
-      const author = await resolveNewsAuthor(row, locale);
-      return {
-        id: row.id,
-        title: row.title,
-        publishedAt: row.publishedAt,
-        statusCode: row.statusCode,
-        authorId: row.authorId,
-        newsKindCode: row.newsKindCode,
-        statusLabel: statusLabel(row.statusCode),
-        categoryName: row.categoryName,
-        authorName: author.authorName,
-        authorPhotoUrl: author.authorPhotoUrl,
-        authorPhotoAlt: author.authorPhotoAlt,
-      };
-    }),
-  );
+  const authors = await resolveNewsAuthors(rows, locale);
+  const items: AdminNewsListItem[] = rows.map((row) => {
+    const author = authors.get(row.authorId)!;
+    return {
+      id: row.id,
+      title: row.title,
+      publishedAt: row.publishedAt,
+      statusCode: row.statusCode,
+      authorId: row.authorId,
+      newsKindCode: row.newsKindCode,
+      statusLabel: statusLabel(row.statusCode),
+      categoryName: row.categoryName,
+      authorName: author.authorName,
+      authorPhotoUrl: author.authorPhotoUrl,
+      authorPhotoAlt: author.authorPhotoAlt,
+    };
+  });
 
   return { items, total: Number(totalRow.count), page: query.page, pageSize: query.pageSize };
 }

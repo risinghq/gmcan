@@ -1,6 +1,6 @@
 import type { Compilable } from "kysely";
 
-import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
+import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import type { MethodRow, ResearchLineRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { type Locale } from "../lib/public-locale.js";
@@ -130,12 +130,12 @@ export async function updateGroupProjectsSection(
 
 export async function listAbout(groupId: number) {
   const rows = await db.selectFrom("about").selectAll().where("groupId", "=", groupId).execute();
-  return Promise.all(
-    rows.map(async (row) =>
-      Object.assign({}, row, {
-        translations: await db.selectFrom("about_translation").selectAll().where("aboutId", "=", row.id).execute(),
-      }),
-    ),
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) => db.selectFrom("about_translation").selectAll().where("aboutId", "in", chunk).execute(),
+  );
+  return rows.map((row) =>
+    Object.assign({}, row, { translations: translations.filter((tr) => tr.aboutId === row.id) }),
   );
 }
 
@@ -251,21 +251,27 @@ export async function getResearchLineLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function toAdminResearchLineView(row: ResearchLineRow) {
-  const translations = await db
-    .selectFrom("research_line_translation")
-    .select(["locale", "name", "description"])
-    .where("researchLineId", "=", row.id)
-    .execute();
-  return {
+export async function toAdminResearchLineViews(rows: ResearchLineRow[]) {
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) =>
+      db
+        .selectFrom("research_line_translation")
+        .select(["researchLineId", "locale", "name", "description"])
+        .where("researchLineId", "in", chunk)
+        .execute(),
+  );
+  return rows.map((row) => ({
     id: row.id,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     translations: Object.fromEntries(
-      translations.map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
+      translations
+        .filter((tr) => tr.researchLineId === row.id)
+        .map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
     ),
-  };
+  }));
 }
 
 export async function createResearchLine(data: {
@@ -350,21 +356,27 @@ export async function getMethodLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function toAdminMethodView(row: MethodRow) {
-  const translations = await db
-    .selectFrom("method_translation")
-    .select(["locale", "name", "description"])
-    .where("methodId", "=", row.id)
-    .execute();
-  return {
+export async function toAdminMethodViews(rows: MethodRow[]) {
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) =>
+      db
+        .selectFrom("method_translation")
+        .select(["methodId", "locale", "name", "description"])
+        .where("methodId", "in", chunk)
+        .execute(),
+  );
+  return rows.map((row) => ({
     id: row.id,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     translations: Object.fromEntries(
-      translations.map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
+      translations
+        .filter((tr) => tr.methodId === row.id)
+        .map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
     ),
-  };
+  }));
 }
 
 export async function createMethod(data: {

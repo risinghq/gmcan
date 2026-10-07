@@ -1,4 +1,4 @@
-import { db } from "../db/client.js";
+import { db, queryInChunks } from "../db/client.js";
 import { MEMBER_NAME } from "../db/projections.js";
 
 export interface ProjectMemberRow {
@@ -17,29 +17,35 @@ export interface ProjectSearchMemberRow {
 }
 
 export async function listProjectMemberRowsByProjectIds(projectIds: number[], orderByProject = false) {
-  let query = db
-    .selectFrom("project_member")
-    .innerJoin("member", "member.id", "project_member.memberId")
-    .select([
-      "project_member.projectId as projectId",
-      "member.id as memberId",
-      "member.firstName as firstName",
-      "member.lastName as lastName",
-      "member.maternalName as maternalName",
-    ])
-    .where("project_member.projectId", "in", projectIds);
+  return queryInChunks(projectIds, (chunk) => {
+    let query = db
+      .selectFrom("project_member")
+      .innerJoin("member", "member.id", "project_member.memberId")
+      .select([
+        "project_member.projectId as projectId",
+        "member.id as memberId",
+        "member.firstName as firstName",
+        "member.lastName as lastName",
+        "member.maternalName as maternalName",
+      ])
+      .where("project_member.projectId", "in", chunk);
 
-  if (orderByProject) query = query.orderBy("project_member.projectId", "asc");
-  return query.execute() as Promise<ProjectMemberRow[]>;
+    if (orderByProject) query = query.orderBy("project_member.projectId", "asc");
+    return query.execute() as Promise<ProjectMemberRow[]>;
+  });
 }
 
 export async function listProjectSearchMemberRowsByProjectIds(projectIds: number[]) {
-  return db
-    .selectFrom("project_member")
-    .innerJoin("member", "member.id", "project_member.memberId")
-    .select(["project_member.projectId", "member.id", "member.firstName", "member.lastName"])
-    .where("project_member.projectId", "in", projectIds)
-    .execute() as Promise<ProjectSearchMemberRow[]>;
+  return queryInChunks(
+    projectIds,
+    (chunk) =>
+      db
+        .selectFrom("project_member")
+        .innerJoin("member", "member.id", "project_member.memberId")
+        .select(["project_member.projectId", "member.id", "member.firstName", "member.lastName"])
+        .where("project_member.projectId", "in", chunk)
+        .execute() as Promise<ProjectSearchMemberRow[]>,
+  );
 }
 
 export async function listProjectMembers(projectId: number) {

@@ -1,6 +1,6 @@
 import type { Compilable } from "kysely";
 
-import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
+import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME } from "../db/projections.js";
 import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
 import { memberProjects, memberPublications } from "../db/views.js";
@@ -8,7 +8,7 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
-import { memberFullName, resolveMemberPhotoView } from "./member-photo.service.js";
+import { memberFullName, resolveMemberPhotoViews } from "./member-photo.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "isActive"] as const;
@@ -79,15 +79,14 @@ export async function listAdminMembers(
 
   const rows = await query.orderBy("member.lastName", "asc").execute();
   const memberIds = rows.map((row) => row.id);
-  const translationRows =
-    memberIds.length === 0
-      ? []
-      : await db
-          .selectFrom("member_translation")
-          .select(["memberId", "locale", "bio"])
-          .where("memberId", "in", memberIds)
-          .where("locale", "in", SUPPORTED_LOCALES)
-          .execute();
+  const translationRows = await queryInChunks(memberIds, (chunk) =>
+    db
+      .selectFrom("member_translation")
+      .select(["memberId", "locale", "bio"])
+      .where("memberId", "in", chunk)
+      .where("locale", "in", SUPPORTED_LOCALES)
+      .execute(),
+  );
 
   const translationsByMember = new Map<number, Map<string, string | null>>();
   for (const tr of translationRows) {
@@ -95,51 +94,51 @@ export async function listAdminMembers(
     translationsByMember.get(tr.memberId)!.set(tr.locale, tr.bio);
   }
 
-  return Promise.all(
-    rows.map(async (row) => {
-      const missingBase: string[] = [];
-      if (!row.dni) missingBase.push("dni");
-      if (!row.email) missingBase.push("email");
-      if (!row.firstName) missingBase.push("firstName");
-      if (!row.lastName) missingBase.push("lastName");
-      if (row.isActive !== 1) missingBase.push("isActive");
-
-      const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
-      const missingTranslations: Record<string, string[]> = {};
-      for (const supportedLocale of SUPPORTED_LOCALES) {
-        const missing: string[] = [];
-        const bio = memberTranslations.get(supportedLocale);
-        if (!bio || bio.trim().length === 0) missing.push("bio");
-        if (missing.length > 0) missingTranslations[supportedLocale] = missing;
-      }
-
-      return {
-        id: row.id,
-        dni: row.dni,
-        email: row.email,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        maternalName: row.maternalName,
-        birthDate: row.birthDate,
-        bio: row.bio,
-        isActive: row.isActive,
-        roleCode: row.roleCode,
-        memberTypeCode: row.memberTypeCode,
-        memberTypeName: row.memberTypeName ?? "",
-        prefixCode: row.prefixCode,
-        prefixName: row.prefixName,
-        ...(await resolveMemberPhotoView({
-          memberId: row.id,
-          fullName: memberFullName(row),
-          locale,
-        })),
-        publishability: {
-          publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
-          missing: { base: missingBase, translations: missingTranslations },
-        },
-      };
-    }),
+  const photos = await resolveMemberPhotoViews(
+    rows.map((row) => ({ memberId: row.id, fullName: memberFullName(row) })),
+    locale,
   );
+
+  return rows.map((row) => {
+    const missingBase: string[] = [];
+    if (!row.dni) missingBase.push("dni");
+    if (!row.email) missingBase.push("email");
+    if (!row.firstName) missingBase.push("firstName");
+    if (!row.lastName) missingBase.push("lastName");
+    if (row.isActive !== 1) missingBase.push("isActive");
+
+    const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
+    const missingTranslations: Record<string, string[]> = {};
+    for (const supportedLocale of SUPPORTED_LOCALES) {
+      const missing: string[] = [];
+      const bio = memberTranslations.get(supportedLocale);
+      if (!bio || bio.trim().length === 0) missing.push("bio");
+      if (missing.length > 0) missingTranslations[supportedLocale] = missing;
+    }
+
+    return {
+      id: row.id,
+      dni: row.dni,
+      email: row.email,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      maternalName: row.maternalName,
+      birthDate: row.birthDate,
+      bio: row.bio,
+      isActive: row.isActive,
+      roleCode: row.roleCode,
+      memberTypeCode: row.memberTypeCode,
+      memberTypeName: row.memberTypeName ?? "",
+      prefixCode: row.prefixCode,
+      prefixName: row.prefixName,
+      photoUrl: photos.get(row.id)!.photoUrl,
+      photoAlt: photos.get(row.id)!.photoAlt,
+      publishability: {
+        publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
+        missing: { base: missingBase, translations: missingTranslations },
+      },
+    };
+  });
 }
 
 export async function listMemberNames() {
@@ -237,18 +236,20 @@ export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCAL
       .execute(),
   ]);
 
-  const resolvedMembers = await Promise.all(
-    members.map(async (m) => ({
-      kind: "registered" as const,
-      memberId: m.id,
-      name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
-      photo: null,
-      ...(await resolveMemberPhotoView({
+  const photos = await resolveMemberPhotoViews(
+    members.map((m) => ({ memberId: m.id, fullName: memberFullName(m) })),
+    locale,
+  );
+  const resolvedMembers = members.map((m) =>
+    Object.assign(
+      {
+        kind: "registered" as const,
         memberId: m.id,
-        fullName: memberFullName(m),
-        locale,
-      })),
-    })),
+        name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
+        photo: null,
+      },
+      photos.get(m.id)!,
+    ),
   );
 
   return [

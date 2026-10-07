@@ -2,7 +2,6 @@ import type { ProjectStatusCode } from "../db/schema.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
-import { resolveMemberPhotoUrls } from "../repositories/assets-read.js";
 import {
   addMemberToProject as addMemberToProjectRepo,
   listMemberProjects as listMemberProjectsRepo,
@@ -26,6 +25,7 @@ import {
   updateProject as updateProjectRepo,
 } from "../repositories/projects.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
+import { resolveMemberPhotoViews } from "./member-photo.service.js";
 
 export type { ProjectAdminInput } from "../repositories/projects.js";
 
@@ -43,7 +43,7 @@ export async function listProjectsLocalized(locale: Locale, statusCode?: Project
 
   const projectIds = projects.map((p) => p.id);
   const memberRows = await listProjectMemberRowsByProjectIds(projectIds);
-  const photoByMemberId = await resolveMemberPhotoUrls(
+  const photoByMemberId = await resolveMemberPhotoViews(
     memberRows.map((row) => ({ memberId: row.memberId, fullName: memberDisplayName(row) })),
     locale,
   );
@@ -74,7 +74,7 @@ export async function listAdminProjects(
 
   const projectIds = projects.map((project) => project.id);
   const memberRows = await listProjectMemberRowsByProjectIds(projectIds, true);
-  const photoByMemberId = await resolveMemberPhotoUrls(
+  const photoByMemberId = await resolveMemberPhotoViews(
     memberRows.map((row) => ({ memberId: row.memberId, fullName: memberDisplayName(row) })),
     locale,
   );
