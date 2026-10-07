@@ -1,10 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { PublicMember } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminMemberListItem } from "../models/admin-list";
 import type { AuthorSearchResult } from "../models/author";
-import type { Member, MemberFull, MemberGroup, MemberProfile, MemberPublishability } from "../models/member";
+import type { MemberFull, MemberGroup, MemberProfile, MemberPublishability } from "../models/member";
 import { GLOBAL } from "./global";
 
 export interface MemberCreateBody {
@@ -42,8 +43,8 @@ export class MemberService {
   private http = inject(HttpClient);
 
   // Public
-  listMembers(): Observable<Member[]> {
-    return this.http.get<Member[]>(GLOBAL.api("members"));
+  listMembers(): Observable<PublicMember[]> {
+    return this.http.get<PublicMember[]>(GLOBAL.api("members"));
   }
 
   getMemberProfile(id: number): Observable<MemberProfile> {

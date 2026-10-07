@@ -12,7 +12,6 @@ export const PublicMemberSchema = z.object({
   bio: z.string().nullable(),
   photoUrl: z.string(),
   photoAlt: z.string(),
-  isActive: z.number(),
   roleCode: RoleCodeSchema,
   memberTypeCode: MemberTypeCodeSchema,
   prefixCode: PrefixCodeSchema.nullable(),

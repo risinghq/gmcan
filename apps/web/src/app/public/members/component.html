@@ -10,56 +10,26 @@
         @let view = vm();
         <div class="member-title">{{ language.membersText[0].memberTitle }}</div>
         <div class="member-sub">{{ language.membersText[0].memberText }}</div>
-        <mat-tab-group>
-          <mat-tab label="{{ language.membersText[0].memberActual }}">
-            @if (view.loading) {
-            <div class="spinner-pad">
-              <mat-spinner class="auto mb-8" />
-              <div class="loading-text center">Cargando</div>
-            </div>
-            } @if (!view.loading) {
-            <div class="members-container">
-              @for (tipoMiembro of view.memberGroups; track tipoMiembro.code) {
-              <div class="member-type-container">
-                @if (tipoMiembro.members.length > 0) {
-                <div class="member-type-title">{{ tipoMiembro.name }}</div>
-                } @if (tipoMiembro.members.length > 0) {
-                <div class="row">
-                  @for (miembro of tipoMiembro.members; track miembro.id) {
-                  <div class="col-12 col-sm-6">
-                    <div class="flex-news member-mt">
-                      <div class="member-img-div">
-                        <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
-                      </div>
-                      <div class="member-text">
-                        <div class="member-name full-width">
-                          {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
-                        </div>
-                        <div class="member-profile" (click)="profile(miembro)">
-                          {{ language.membersText[0].seeProfile }}
-                          <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  }
-                </div>
-                }
-              </div>
-              }
-            </div>
-            }
-          </mat-tab>
-          <mat-tab label="{{ language.membersText[0].memberOld }}">
-            <div class="row member-type-container">
-              @for (miembro of view.inactiveMembers; track miembro.id) {
+        @if (view.loading) {
+        <div class="spinner-pad">
+          <mat-spinner class="auto mb-8" />
+          <div class="loading-text center">Cargando</div>
+        </div>
+        } @else {
+        <div class="members-container">
+          @for (tipoMiembro of view.memberGroups; track tipoMiembro.code) {
+          <div class="member-type-container">
+            @if (tipoMiembro.members.length > 0) {
+            <div class="member-type-title">{{ tipoMiembro.name }}</div>
+            <div class="row">
+              @for (miembro of tipoMiembro.members; track miembro.id) {
               <div class="col-12 col-sm-6">
                 <div class="flex-news member-mt">
                   <div class="member-img-div">
                     <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
                   </div>
-                  <div class="member-text full-width">
-                    <div class="member-name">
+                  <div class="member-text">
+                    <div class="member-name full-width">
                       {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                     </div>
                     <div class="member-profile" (click)="profile(miembro)">
@@ -71,8 +41,11 @@
               </div>
               }
             </div>
-          </mat-tab>
-        </mat-tab-group>
+            }
+          </div>
+          }
+        </div>
+        }
       </div>
     </div>
     <div class="col-lg-4 col-sm-6 col-12">

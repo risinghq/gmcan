@@ -2,16 +2,15 @@ import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/c
 import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
-import type { Member } from "@app/shared/models/member";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
+import type { PublicMember } from "@gmcan/contracts/public";
 
-type MemberDisplay = Member & { prefix: string };
+type MemberDisplay = PublicMember & { prefix: string };
 type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
 
 @Component({
@@ -19,7 +18,7 @@ type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIcon, MatTabGroup, MatTab, MatProgressSpinner, NewsComponent],
+  imports: [MatIcon, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent {
   private router = inject(Router);
@@ -35,7 +34,7 @@ export default class MembersComponent {
   readonly vm = computed(() => {
     const members = this.members();
     if (!members) {
-      return { loading: true, memberGroups: [] as MemberTypeGroup[], inactiveMembers: [] as MemberDisplay[] };
+      return { loading: true, memberGroups: [] as MemberTypeGroup[] };
     }
 
     const processed = members.map((member): MemberDisplay => {
@@ -47,14 +46,10 @@ export default class MembersComponent {
     const memberGroups = this.memberTypes.map((memberType) => ({
       code: memberType.code,
       name: memberType.name,
-      members: processed.filter((member) => member.memberTypeCode === memberType.code && member.isActive === 1),
+      members: processed.filter((member) => member.memberTypeCode === memberType.code),
     }));
 
-    return {
-      loading: false,
-      memberGroups,
-      inactiveMembers: processed.filter((member) => member.isActive !== 1),
-    };
+    return { loading: false, memberGroups };
   });
 
   constructor() {

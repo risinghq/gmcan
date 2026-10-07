@@ -85,14 +85,6 @@
   margin-left: 24px;
 }
 
-.member-detail-active {
-  @extend .plex-sans;
-  font-style: italic;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: var(--deep-green);
-}
-
 .member-detail-type {
   margin-top: 8px;
   @extend .plex-sans;
@@ -145,7 +137,6 @@
   .member-detail-link-active,
   .member-detail-link,
   .back-text,
-  .member-detail-active,
   .detail-member-resum {
     font-size: 15px;
   }
@@ -185,7 +176,6 @@
   .member-detail-link-active,
   .member-detail-link,
   .back-text,
-  .member-detail-active,
   .detail-member-resum {
     font-size: 15px;
   }
@@ -227,8 +217,7 @@
   }
   .member-detail-link-active,
   .member-detail-link,
-  .member-detail-subtitle,
-  .member-detail-active {
+  .member-detail-subtitle {
     font-size: 13px;
   }
   .member-detail-card {

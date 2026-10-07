@@ -6,14 +6,13 @@ import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
-import type { Member } from "@app/shared/models/member";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { parseLocalDate } from "@app/shared/utils/date";
-import type { PublicPublication } from "@gmcan/contracts/public";
+import type { PublicMember, PublicPublication } from "@gmcan/contracts/public";
 import {
   NgbPagination,
   NgbPaginationPrevious,
@@ -21,7 +20,7 @@ import {
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 
-type MemberDisplay = Member & { active: string; prefix: string; tipoMiembro: string };
+type MemberDisplay = PublicMember & { prefix: string; tipoMiembro: string };
 
 type PublicationDisplay = PublicPublication & {
   fecha: string;
@@ -126,12 +125,8 @@ export default class DetailMemberComponent implements OnInit {
       const prefijo = m.prefixCode ? prefijosMap.get(m.prefixCode) : undefined;
       const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
       const memberType = memberTypesMap.get(m.memberTypeCode);
-      const active =
-        m.isActive === 1
-          ? (this.language.detailMemberText?.[0]?.activeMember ?? "")
-          : (this.language.detailMemberText?.[0]?.oldMember ?? "");
 
-      this.usuario = { ...m, active, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
+      this.usuario = { ...m, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
       this.titleService.setTitle("GMCAN | " + m.firstName + " " + m.lastName);
 
       this.publicaciones = (res.publications ?? []).map((pub): PublicationDisplay => {
