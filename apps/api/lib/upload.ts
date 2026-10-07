@@ -71,7 +71,10 @@ export async function saveUploadedFile(
   return key;
 }
 
-export async function serveAsset(c: Context, options: { assetKey: string; asAttachment?: boolean }): Promise<Response> {
+export async function serveAsset(
+  c: Context,
+  options: { assetKey: string; asAttachment?: boolean; private?: boolean },
+): Promise<Response> {
   const key = normalizeAssetKey(options.assetKey);
   if (!key) return c.json({ error: "Invalid asset key" }, 400);
 
@@ -82,7 +85,9 @@ export async function serveAsset(c: Context, options: { assetKey: string; asAtta
     "Content-Type": MIME_TYPES[extensionOf(key)] ?? "application/octet-stream",
   };
   if (options.asAttachment) headers["Content-Disposition"] = `attachment; filename="${key}"`;
-  else headers["Cache-Control"] = "public, max-age=31536000, immutable";
+  // Private assets are reached through a short-lived signed URL, so no shared cache may keep them.
+  if (options.private) headers["Cache-Control"] = "private, no-store";
+  else if (!options.asAttachment) headers["Cache-Control"] = "public, max-age=31536000, immutable";
   // Buffered because uploads are small and a streamed body cannot cross wrangler's local proxy.
   return c.body(await object.arrayBuffer(), 200, headers);
 }
