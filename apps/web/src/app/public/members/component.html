@@ -35,10 +35,6 @@
                         <div class="member-name full-width">
                           {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                         </div>
-                        <div class="member-email">
-                          <mat-icon class="email-icon"> email </mat-icon>
-                          {{ miembro.email }}
-                        </div>
                         <div class="member-profile" (click)="profile(miembro)">
                           {{ language.membersText[0].seeProfile }}
                           <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
@@ -66,14 +62,6 @@
                     <div class="member-name">
                       {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                     </div>
-                    @if (miembro.isActive === 3) {
-                    <div class="member-email cursive">In memoriam</div>
-                    } @if (miembro.isActive !== 3) {
-                    <div class="member-email">
-                      <mat-icon class="email-icon"> email </mat-icon>
-                      {{ miembro.email }}
-                    </div>
-                    }
                     <div class="member-profile" (click)="profile(miembro)">
                       {{ language.membersText[0].seeProfile }}
                       <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>

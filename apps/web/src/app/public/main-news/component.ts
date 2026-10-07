@@ -94,7 +94,6 @@ export default class MainNewsComponent implements OnInit {
     this.allCharged = false;
     this.newsService
       .listNews({
-        statusCode: "published",
         newsKindCode: this.selectedCategoryCode ?? undefined,
         sortBy: "publishedAt",
         sortOrder: "desc",

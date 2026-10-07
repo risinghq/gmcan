@@ -9,11 +9,22 @@ interface PragmaColumn {
   name: string;
 }
 
+// A failed sweep must not stop the server because requireSession rejects expired sessions.
 async function sweepExpiredSessions() {
-  await db.deleteFrom("session").where("expiresAt", "<", new Date().toISOString()).execute();
+  try {
+    await db.deleteFrom("session").where("expiresAt", "<", new Date().toISOString()).execute();
+  } catch (error) {
+    const cause = error instanceof Error ? error.message : String(error);
+    console.error(`[DB] Could not delete expired sessions: ${cause}`);
+  }
 }
 
-// Production gets no createTables, seed, or drift check; only the search index, which it cannot run without.
+async function startSessionSweep() {
+  await sweepExpiredSessions();
+  setInterval(sweepExpiredSessions, 6 * 60 * 60 * 1000);
+}
+
+// Search cannot run without the index, but a failure to build it must not stop the server.
 async function ensureProductionNewsSearchIndex() {
   try {
     await ensureNewsSearchIndex(db);
@@ -24,8 +35,10 @@ async function ensureProductionNewsSearchIndex() {
 }
 
 export async function bootstrap() {
+  // Production gets no createTables, seed, or drift check; only the search index and the session sweep.
   if (env.NODE_ENV === "production") {
     await ensureProductionNewsSearchIndex();
+    await startSessionSweep();
     return;
   }
 
@@ -57,8 +70,7 @@ export async function bootstrap() {
 
   await seed();
 
-  await sweepExpiredSessions();
-  setInterval(sweepExpiredSessions, 6 * 60 * 60 * 1000);
+  await startSessionSweep();
 
   console.log("[DB] Ready");
 }

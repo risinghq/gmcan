@@ -4,7 +4,6 @@ import { NewsKindCodeSchema, NewsStatusCodeSchema } from "./common.js";
 
 export const PublicNewsListQuerySchema = z.object({
   q: z.string().trim().optional(),
-  statusCode: NewsStatusCodeSchema.default("published"),
   newsKindCode: NewsKindCodeSchema.optional(),
   sortBy: z.enum(["publishedAt", "title"]).default("publishedAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),

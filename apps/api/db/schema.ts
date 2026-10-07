@@ -24,7 +24,7 @@ export type FundingSourceCode = "vrip" | "none";
 export type NewsStatusCode = "draft" | "published" | "archived";
 export type ProjectStatusCode = "planned" | "active" | "completed" | "archived";
 export type AssetVisibility = "public" | "private";
-export type AssetLifecycleStatus = "active" | "soft_deleted" | "hard_deleted" | "quarantined";
+export type AssetLifecycleStatus = "active" | "soft_deleted";
 
 export interface LocaleTable {
   code: LocaleCode;
@@ -312,7 +312,6 @@ export interface AssetTable {
   createdBy: number | null;
   createdAt: DateString;
   deletedAt: DateString | null;
-  deleteAfter: DateString | null;
 }
 export interface AssetAuditTable {
   id: Generated<number>;

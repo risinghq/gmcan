@@ -79,7 +79,7 @@ export default class MiembrosComponent implements OnInit {
     this.memberService.listAdminMembers().subscribe((rows) => {
       this.items = isActiveMode
         ? rows.filter((member) => member.isActive === 1)
-        : rows.filter((member) => member.isActive === 0 || member.isActive === 3);
+        : rows.filter((member) => member.isActive === 0);
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();

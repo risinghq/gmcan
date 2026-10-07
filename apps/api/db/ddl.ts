@@ -109,7 +109,6 @@ export const EXPECTED_COLUMNS: Record<string, readonly string[]> = {
     "createdBy",
     "createdAt",
     "deletedAt",
-    "deleteAfter",
   ],
   asset_audit: ["id", "assetId", "action", "actorId", "reason", "createdAt"],
   member_asset: ["memberId", "slot", "version", "assetId", "actorId", "reason", "createdAt"],
@@ -548,13 +547,9 @@ export async function createTables(db: Kysely<Database>) {
     .addColumn("createdBy", "integer", (c) => c.references("member.id").onDelete("set null"))
     .addColumn("createdAt", "text", (c) => c.notNull())
     .addColumn("deletedAt", "text")
-    .addColumn("deleteAfter", "text")
     .addCheckConstraint("asset_size_bytes_check", sql`sizeBytes >= 0`)
     .addCheckConstraint("asset_visibility_check", sql`visibility in ('public','private')`)
-    .addCheckConstraint(
-      "asset_lifecycle_status_check",
-      sql`lifecycleStatus in ('active','soft_deleted','hard_deleted','quarantined')`,
-    )
+    .addCheckConstraint("asset_lifecycle_status_check", sql`lifecycleStatus in ('active','soft_deleted')`)
     .execute();
 
   await db.schema

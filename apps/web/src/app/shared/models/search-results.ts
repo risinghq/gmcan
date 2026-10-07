@@ -18,12 +18,9 @@ export interface SearchResults {
   }[];
   members: {
     id: number;
-    dni: string;
-    email: string;
     firstName: string;
     lastName: string;
     maternalName: string | null;
-    birthDate: string | null;
     bio: string | null;
     photoUrl: string;
     photoAlt: string;

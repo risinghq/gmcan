@@ -7,7 +7,6 @@ if (q !== undefined) {
   const { listPublicNews } = await import("../../services/news.service.js");
   const res = await listPublicNews("es", {
     q,
-    statusCode: "published",
     sortBy: "publishedAt",
     sortOrder: "desc",
     page: 1,

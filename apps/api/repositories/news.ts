@@ -33,5 +33,6 @@ export async function searchNewsRows(locale: Locale, q: string) {
       "member.lastName as authorLastName",
     ])
     .where(filter)
+    .where("news.statusCode", "=", "published")
     .execute();
 }

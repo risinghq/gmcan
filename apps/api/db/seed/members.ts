@@ -1,10 +1,12 @@
+import { randomBytes } from "node:crypto";
+
+import { env } from "../../config/env.js";
 import { Gender, MemberType, Prefix, Role } from "../../lib/enums.js";
 import { SUPPORTED_LOCALES } from "../../lib/locales.js";
 import { hashPassword } from "../../lib/password.js";
 import { db } from "../client.js";
 
 const today = new Date().toISOString().split("T")[0];
-const DEFAULT_PASSWORD = "password123";
 const BIO_PLACEHOLDER = "Miembro del GMCAN";
 
 const SEED_MEMBERS = [
@@ -350,13 +352,23 @@ export async function seedMembers() {
 }
 
 async function upsertMembers() {
+  const existing = new Set((await db.selectFrom("member").select("dni").execute()).map((member) => member.dni));
+  const newMembers = SEED_MEMBERS.filter((member) => !existing.has(member.dni));
+  if (newMembers.length === 0) return;
+
+  const password = env.SEED_PASSWORD ?? randomBytes(12).toString("base64url");
+  if (env.SEED_PASSWORD === undefined) {
+    console.log(`[seed] Seeded members sign in with the generated password: ${password}`);
+  }
+  const passwordHash = hashPassword(password);
+
   await db
     .insertInto("member")
     .values(
-      SEED_MEMBERS.map((member) => ({
+      newMembers.map((member) => ({
         dni: member.dni,
         email: member.email,
-        passwordHash: hashPassword(DEFAULT_PASSWORD),
+        passwordHash,
         firstName: member.firstName,
         lastName: member.lastName,
         maternalName: member.maternalName,

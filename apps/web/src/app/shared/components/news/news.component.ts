@@ -43,7 +43,6 @@ export default class NewsComponent {
   );
   private readonly newsResponse = toSignal(
     this.newsService.listNews({
-      statusCode: "published",
       sortBy: "publishedAt",
       sortOrder: "desc",
       page: 1,

@@ -15,7 +15,7 @@ router.post("/login", zValidator("json", z.object({ email: z.email(), password: 
   const { email, password } = c.req.valid("json");
   const member = await getMemberByEmail(email);
 
-  if (!member) return c.json({ error: "Invalid credentials" }, 401);
+  if (!member || member.isActive !== 1) return c.json({ error: "Invalid credentials" }, 401);
 
   const match = await verifyPassword(password, member.passwordHash);
   if (!match) return c.json({ error: "Invalid credentials" }, 401);

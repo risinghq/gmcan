@@ -11,17 +11,10 @@ import { ensureOwnerExists, getCurrentAssetId, getNextVersion } from "./repo.js"
 import type { AssetDeleteRequest, AssetLinks, AssetWriteRequest, OwnerType } from "./types.js";
 import { assertSlotForOwner } from "./validators.js";
 
-const RETENTION_DAYS = 90;
 const SIGN_SECRET = env.ASSET_SIGNING_SECRET;
 
 function nowIso(): string {
   return new Date().toISOString();
-}
-
-function plusDays(days: number): string {
-  const date = new Date();
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString();
 }
 
 function extensionFromName(fileName: string): string {
@@ -61,7 +54,6 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
         createdBy: input.actorId,
         createdAt: nowIso(),
         deletedAt: null,
-        deleteAfter: null,
       })
       .executeTakeFirstOrThrow();
 
@@ -83,7 +75,7 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
     if (previousAssetId) {
       await trx
         .updateTable("asset")
-        .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
+        .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso() })
         .where("id", "=", previousAssetId)
         .execute();
       await trx
@@ -112,7 +104,7 @@ export async function deleteCurrentAsset(input: AssetDeleteRequest): Promise<voi
 
   await db
     .updateTable("asset")
-    .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso(), deleteAfter: plusDays(RETENTION_DAYS) })
+    .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso() })
     .where("id", "=", assetId)
     .execute();
 
@@ -126,11 +118,7 @@ export async function restoreAsset(assetId: number, actorId: number | null): Pro
   const row = await db.selectFrom("asset").select("id").where("id", "=", assetId).executeTakeFirst();
   if (!row) throw new Error("Asset not found");
 
-  await db
-    .updateTable("asset")
-    .set({ lifecycleStatus: "active", deletedAt: null, deleteAfter: null })
-    .where("id", "=", assetId)
-    .execute();
+  await db.updateTable("asset").set({ lifecycleStatus: "active", deletedAt: null }).where("id", "=", assetId).execute();
 
   await db
     .insertInto("asset_audit")

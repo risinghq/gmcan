@@ -157,18 +157,6 @@
   color: #000000;
 }
 
-.miembro-email {
-  width: 200px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  margin-top: 4px;
-  @extend .plex-sans;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: #30393a;
-}
-
 .miembro-profile {
   @extend .plex-sans;
   line-height: 0.75;
@@ -176,14 +164,10 @@
   color: var(--deep-green);
 }
 
-.email-icon,
 .profile-icon {
   height: auto;
   width: auto;
   vertical-align: middle;
-}
-.email-icon {
-  color: #b5b5b5;
 }
 .profile-icon {
   font-size: 16px;
@@ -254,9 +238,7 @@
   .miembro-profile {
     margin-top: 8px;
   }
-  .miembro-profile,
-  .miembro-email,
-  .email-icon {
+  .miembro-profile {
     font-size: 15px;
   }
   .miembro-text {
@@ -321,9 +303,7 @@
   .miembro-profile {
     margin-top: 4px;
   }
-  .miembro-profile,
-  .miembro-email,
-  .email-icon {
+  .miembro-profile {
     font-size: 13px;
   }
   .miembro-text {

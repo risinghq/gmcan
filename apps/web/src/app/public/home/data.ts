@@ -38,7 +38,6 @@ export class HomeDataService {
       firstValueFrom(this.projectService.listProjects()),
       firstValueFrom(
         this.newsService.listNews({
-          statusCode: "published",
           sortBy: "publishedAt",
           sortOrder: "desc",
           page: 1,

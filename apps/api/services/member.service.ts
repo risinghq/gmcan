@@ -1,7 +1,7 @@
 import { db } from "../db/client.js";
-import { MEMBER_ACTIVE, MEMBER_NAME, MEMBER_PUBLIC } from "../db/projections.js";
+import { MEMBER_ACTIVE, MEMBER_NAME } from "../db/projections.js";
 import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
-import { memberProjects, memberPublications, publicProfile } from "../db/views.js";
+import { memberProjects, memberPublications } from "../db/views.js";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
@@ -18,10 +18,6 @@ export interface MemberPublishability {
     base: string[];
     translations: Record<string, string[]>;
   };
-}
-
-export async function listMembers() {
-  return db.selectFrom("member").select(MEMBER_PUBLIC).execute();
 }
 
 export async function listMembersLocalized(locale: Locale) {
@@ -156,10 +152,6 @@ export async function listMembersByType(memberTypeCode: MemberTypeCode) {
   return db.selectFrom("member").select(MEMBER_ACTIVE).where("memberTypeCode", "=", memberTypeCode).execute();
 }
 
-export async function getMember(id: number) {
-  return db.selectFrom("member").select(MEMBER_PUBLIC).where("id", "=", id).executeTakeFirst();
-}
-
 export async function getMemberFull(id: number, locale: Locale = DEFAULT_LOCALE) {
   return db
     .selectFrom("member")
@@ -191,17 +183,26 @@ export async function getMemberFull(id: number, locale: Locale = DEFAULT_LOCALE)
 export async function getMemberByEmail(email: string) {
   return db
     .selectFrom("member")
-    .select([...MEMBER_PUBLIC, "passwordHash", "passwordResetRequired", "resetToken", "resetExpiresAt"])
+    .select([
+      "id",
+      "dni",
+      "email",
+      "firstName",
+      "lastName",
+      "maternalName",
+      "birthDate",
+      "isActive",
+      "roleCode",
+      "memberTypeCode",
+      "prefixCode",
+      "genderCode",
+      "passwordHash",
+      "passwordResetRequired",
+      "resetToken",
+      "resetExpiresAt",
+    ])
     .where("email", "=", email)
     .executeTakeFirst();
-}
-
-export async function getMemberByDni(dni: string) {
-  return db.selectFrom("member").select(MEMBER_PUBLIC).where("dni", "=", dni).executeTakeFirst();
-}
-
-export async function getMemberProfile(id: number) {
-  return publicProfile(id);
 }
 
 export async function getMemberProfileLocalized(id: number, locale: Locale) {
@@ -211,22 +212,6 @@ export async function getMemberProfileLocalized(id: number, locale: Locale) {
     memberPublications(id),
   ]);
   return { member, projects, publications };
-}
-
-export async function searchMembers(q: string) {
-  const term = `%${q}%`;
-  return db
-    .selectFrom("member")
-    .select(MEMBER_PUBLIC)
-    .where((eb) =>
-      eb.or([
-        eb("firstName", "like", term),
-        eb("lastName", "like", term),
-        eb("maternalName", "like", term),
-        eb("email", "like", term),
-      ]),
-    )
-    .execute();
 }
 
 export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCALE) {

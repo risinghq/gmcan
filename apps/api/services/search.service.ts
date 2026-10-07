@@ -23,12 +23,7 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     types.has("members")
       ? publicLocalizedMemberSelectQuery(locale)
           .where((eb) =>
-            eb.or([
-              eb("firstName", "like", like),
-              eb("lastName", "like", like),
-              eb("maternalName", "like", like),
-              eb("email", "like", like),
-            ]),
+            eb.or([eb("firstName", "like", like), eb("lastName", "like", like), eb("maternalName", "like", like)]),
           )
           .execute()
       : Promise.resolve([]),

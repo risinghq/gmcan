@@ -14,6 +14,11 @@ export class SeoService {
     this.meta.updateTag({ name: "description", content: description });
   }
 
+  setOpenGraphLocation(url: string, image: string): void {
+    this.meta.updateTag({ property: "og:url", content: url });
+    this.meta.updateTag({ property: "og:image", content: image });
+  }
+
   setOpenGraphTitle(title: string): void {
     this.meta.updateTag({ property: "og:title", content: title });
   }

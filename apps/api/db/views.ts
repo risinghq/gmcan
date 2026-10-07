@@ -1,5 +1,4 @@
 import { db } from "./client.js";
-import { MEMBER_PUBLIC } from "./projections.js";
 
 export interface AuthorEntry {
   kind: "registered" | "external";
@@ -65,13 +64,4 @@ export async function memberPublications(memberId: number) {
     .selectAll("publication")
     .where("publication_author.memberId", "=", memberId)
     .execute();
-}
-
-export async function publicProfile(memberId: number) {
-  const [member, projects, publications] = await Promise.all([
-    db.selectFrom("member").select(MEMBER_PUBLIC).where("id", "=", memberId).executeTakeFirst(),
-    memberProjects(memberId),
-    memberPublications(memberId),
-  ]);
-  return { member, projects, publications };
 }
