@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -36,6 +36,8 @@ export default class JoinUsComponent implements OnInit {
 
   public user: FormGroup;
   public validation = true;
+  public sending = signal(false);
+  public sendFailed = signal(false);
   public email: EmailBody = createEmailBody();
   constructor() {
     this.user = this.fb.group({
@@ -61,20 +63,29 @@ export default class JoinUsComponent implements OnInit {
   }
 
   sendEmail(): void {
-    if (!this.user.invalid) {
+    if (!this.user.invalid && !this.sending()) {
+      this.sending.set(true);
+      this.sendFailed.set(false);
       this.email.nombre = this.user.controls["nombre"].value;
       this.email.razon = this.user.controls["razon"].value;
       this.email.correo = this.user.controls["correo"].value;
       this.email.telefono = this.user.controls["telefono"].value;
       this.emailService
         .sendMembershipApplication({
-          nombre: this.email.nombre ?? "",
-          razon: this.email.razon ?? "",
-          correo: this.email.correo ?? "",
-          telefono: this.email.telefono ?? "",
+          name: this.email.nombre ?? "",
+          reason: this.email.razon ?? "",
+          email: this.email.correo ?? "",
+          phone: this.email.telefono ?? "",
         })
-        .subscribe((_res) => {
-          this.openDialog();
+        .subscribe({
+          next: () => {
+            this.sending.set(false);
+            this.openDialog();
+          },
+          error: () => {
+            this.sending.set(false);
+            this.sendFailed.set(true);
+          },
         });
     }
   }

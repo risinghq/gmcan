@@ -96,19 +96,12 @@ export default class LoginComponent implements OnInit {
     if (this.emailForm.invalid) {
       return;
     }
-    const request = {
-      email: this.emailForm.controls["email"].value as string,
-    };
-    this.emailService.sendPasswordReset(request).subscribe({
-      next: (res) => {
-        if (res?.success) {
-          this.exito = res.message;
-        } else {
-          this.error = res?.message || "Ocurrió un error al procesar la solicitud.";
-        }
+    this.emailService.requestPasswordReset(this.emailForm.controls["email"].value as string).subscribe({
+      next: () => {
+        this.exito = "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.";
       },
       error: () => {
-        this.error = "Hubo un problema de conexión. Intente más tarde.";
+        this.error = "No se pudo procesar la solicitud. Intente más tarde.";
       },
     });
   }

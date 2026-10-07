@@ -62,10 +62,18 @@
             </div>
           </div>
           <div class="full-width mb-16-8">
-            <button mat-button [disabled]="user.invalid" class="full-width email-btn btn-under" (click)="sendEmail()">
+            <button
+              mat-button
+              [disabled]="user.invalid || sending()"
+              class="full-width email-btn btn-under"
+              (click)="sendEmail()"
+            >
               <div class="btn-under">{{ language.joinUsText[0].send }}</div>
             </button>
           </div>
+          @if (sendFailed()) {
+          <div class="send-error" role="alert">{{ language.joinUsText[0].sendFailed }}</div>
+          }
         </form>
       </div>
     </div>

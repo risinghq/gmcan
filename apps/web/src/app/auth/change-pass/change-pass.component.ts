@@ -88,11 +88,8 @@ export default class ChangePassComponent implements OnInit {
     this.error = null;
 
     this.emailService.verifyResetToken(token).subscribe({
-      next: (response) => {
-        this.tokenValid = response.valid;
-        if (!response.valid) {
-          this.error = "Token inválido o expirado. Por favor, solicita un nuevo enlace.";
-        }
+      next: () => {
+        this.tokenValid = true;
       },
       error: () => {
         this.error = "Token inválido o expirado. Por favor, solicita un nuevo enlace.";
@@ -132,16 +129,12 @@ export default class ChangePassComponent implements OnInit {
     this.error = null;
 
     this.emailService.resetPassword(this.resetToken, this.passwordForm.value.password as string).subscribe({
-      next: (response) => {
-        if (response.status === 1) {
-          this.success = true;
-          this.passwordForm.reset();
-          setTimeout(() => {
-            this.router.navigate(["/login"]);
-          }, 3000);
-        } else {
-          this.error = "Error al cambiar la contraseña";
-        }
+      next: () => {
+        this.success = true;
+        this.passwordForm.reset();
+        setTimeout(() => {
+          this.router.navigate(["/login"]);
+        }, 3000);
       },
       error: () => {
         this.error = "Error al cambiar la contraseña. Por favor intenta nuevamente.";
