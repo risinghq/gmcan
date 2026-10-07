@@ -22,7 +22,8 @@ override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
 | ---------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `NODE_ENV`             | `development`           | `development`, `test` or `production`. Production requires `BACKEND_URL` and changes the default frontend URL. |
 | `ASSET_SIGNING_SECRET` | none, required          | Key that signs temporary URLs for private files ([assets](assets.md#private-files)). A secret.                 |
-| `EMAIL_FROM`           | none                    | Sender address. With the `EMAIL` binding it turns email on ([deployment](deployment.md#email)).                |
+| `EMAIL_FROM`           | none                    | Sender address. With `RESEND_API_KEY` it turns email on ([deployment](deployment.md#email)).                   |
+| `RESEND_API_KEY`       | none                    | Resend API key. A secret.                                                                                      |
 | `INSTITUTIONAL_EMAIL`  | none                    | Address that receives membership requests. Must be a valid email when set.                                     |
 | `FRONTEND_URL`         | by `NODE_ENV`           | Origin allowed by CORS, and the base of password reset links.                                                  |
 | `BACKEND_URL`          | `http://localhost:3000` | Public base URL of the API, used to build file URLs in responses. In production, the public site URL.          |
@@ -40,9 +41,9 @@ override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
 
 ## Email
 
-[`lib/mail.ts`](../apps/api/lib/mail.ts) sends through the `EMAIL` binding
-(Cloudflare Email Service). It needs the binding, `EMAIL_FROM`, and for the
-contact form `INSTITUTIONAL_EMAIL`. When any is missing, the contact form and
+[`lib/mail.ts`](../apps/api/lib/mail.ts) sends through Resend's HTTP API. It
+needs `RESEND_API_KEY`, `EMAIL_FROM`, and for the contact form
+`INSTITUTIONAL_EMAIL`. When any is missing, the contact form and
 `POST /api/email/password-reset/request` answer
 `503 {"error":{"code":"upstream_failure","message":"Email is not configured"}}`
 and change nothing. The password reset request refuses before it looks up the

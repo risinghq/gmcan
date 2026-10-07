@@ -60,9 +60,8 @@ $ curl -s -H 'Accept-Language: en' 'http://localhost:3000/api/news?pageSize=1'
 - File uploads for photos and PDFs. Each upload is a new version, and deleted
   files can be restored.
 - Full-text news search backed by SQLite FTS5.
-- Password reset and membership-request email through Cloudflare Email Service
-  once a sending domain is configured. Until then both answer
-  `503 Email is not configured`.
+- Password reset and membership-request email through Resend once
+  `RESEND_API_KEY` is set. Until then both answer `503 Email is not configured`.
 
 ## Documentation
 

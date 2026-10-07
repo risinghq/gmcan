@@ -110,6 +110,20 @@ curl -si -X POST https://<site>/admin/auth/login \
 `bunx wrangler tail gmcan-web` and `bunx wrangler tail gmcan-api` stream logs.
 Both Workers have Workers Logs turned on.
 
+## Caching
+
+Public content endpoints (`GET /api/*` except `/api/email`) answer
+`Cache-Control: public, max-age=60`
+([`middleware/public-cache.ts`](../apps/api/middleware/public-cache.ts)). The
+web Worker stores those answers in the data center's cache, keyed by URL and
+`Accept-Language`, and replies from it without calling `gmcan-api`. Responses
+carry `X-Cache: HIT` or `MISS`. An edit in the dashboard can therefore take up
+to 60 seconds to show on the public site. Admin responses and private files
+(`private, no-store`) are never cached; public files are immutable.
+
+Images in `apps/web/public/img` are sized for the page that shows them. Keep new
+ones under a few hundred KB.
+
 ## Rendering
 
 Every page renders in the browser. Rendering a page on the server takes about
@@ -129,40 +143,32 @@ are also refused on every request, so the sweep only keeps the table small.
 
 ## Email
 
-Email is off in a fresh deployment. The contact form (`POST /api/email/contact`)
-and the password reset request (`POST /api/email/password-reset/request`) answer
-`503 {"error":{"message":"Email is not configured"}}`. Everything else works.
+Mail goes through [Resend](https://resend.com). It is off until a key is set.
+The contact form (`POST /api/email/contact`) and the password reset request
+(`POST /api/email/password-reset/request`) answer
+`503 {"error":{"message":"Email is not configured"}}` meanwhile. Everything else
+works.
 
-To turn it on, the sending domain must be on Cloudflare DNS:
+`EMAIL_FROM` is `onboarding@resend.dev` in
+[`apps/api/wrangler.jsonc`](../apps/api/wrangler.jsonc), Resend's shared test
+sender. It delivers only to the address of the Resend account owner. To turn
+email on with it:
 
-1. Add the domain to the Cloudflare account and move its nameservers to
-   Cloudflare.
-2. Onboard the domain for Email Service in the dashboard (Compute, Email
-   Service) and publish the DNS records it asks for.
-3. In [`apps/api/wrangler.jsonc`](../apps/api/wrangler.jsonc), add the binding
-   and the two variables:
+1. Create a Resend API key (Resend dashboard, API Keys) and set it as a secret:
 
-   ```jsonc
-   "send_email": [{ "name": "EMAIL" }],
-   "vars": {
-     // existing vars ...
-     "EMAIL_FROM": "gmcan@your-domain.example",
-     "INSTITUTIONAL_EMAIL": "gmcan@your-domain.example"
-   }
+   ```sh
+   cd apps/api
+   bunx wrangler secret put RESEND_API_KEY
    ```
 
-   `EMAIL_FROM` is the sender, on the onboarded domain. `INSTITUTIONAL_EMAIL`
-   receives membership requests.
+2. Set `INSTITUTIONAL_EMAIL`, the address that receives membership requests, to
+   the Resend account owner's address under `vars` in `wrangler.jsonc`, then run
+   `bun run deploy` in `apps/api`.
 
-4. If the site moves to the new domain, update `BACKEND_URL` and `FRONTEND_URL`
-   to it (password reset links use `FRONTEND_URL`), and add its host to
-   `security.allowedHosts` in `angular.json`. Attach the domain to `gmcan-web`
-   as a custom domain.
-
-5. Run `bun run deploy` in `apps/api` and in `apps/web`.
-
-No code changes are needed: [`lib/mail.ts`](../apps/api/lib/mail.ts) sends
-through the `EMAIL` binding as soon as it and `EMAIL_FROM` exist.
+With the test sender a password reset reaches only a member whose email is the
+owner's address. For other recipients, verify a domain in Resend (Domains, add
+the DNS records it shows), set `EMAIL_FROM` to an address on it, and deploy
+again. `lib/mail.ts` needs no change.
 
 ## Resetting
 

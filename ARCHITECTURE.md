@@ -8,7 +8,7 @@ browser ──► apps/web (Angular app on a Worker)
                 │  service binding
                 └──► apps/api (Hono Worker) ──► D1 database
                                            └──► R2 bucket (uploaded files)
-                                           └──► Email Service (when configured)
+                                           └──► Resend (when configured)
 ```
 
 In production the browser talks only to the web Worker, which serves pages and
@@ -148,3 +148,34 @@ user is on a dashboard page. API base URLs come from
 [`environments/`](apps/web/src/environments), read through `GLOBAL` in
 [`shared/services/global.ts`](apps/web/src/app/shared/services/global.ts). The
 production build swaps in `environment.prod.ts`.
+
+### Edge cache
+
+[`server.ts`](apps/web/src/server.ts) is the web Worker's entry point. It keeps
+public API reads in the Cache API (`caches.default`) of the data center that
+served the request, so a repeat read skips the hop to the API Worker and every
+query behind it.
+
+| Aspect            | Rule                                                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What is cached    | `GET` responses under `/api/` that are `200` and carry `Cache-Control: public` with a positive `max-age`. `/api/email/*` and all `/admin/*` calls are not. |
+| Who marks them    | [`middleware/public-cache.ts`](apps/api/middleware/public-cache.ts) adds `public, max-age=60` to public content reads. Private files send `no-store`.      |
+| Key               | The request URL, query string included, plus the `Accept-Language` header, because the API picks the content language from it.                             |
+| Expiry            | 60 seconds, set by the web Worker on the stored copy. Asset URLs are immutable for a year in the browser, but their edge copy also lasts a minute.         |
+| Who populates it  | The web Worker, on a miss, with `ctx.waitUntil(cache.put(...))` after the API answers. Nothing else writes to it.                                          |
+| What invalidates  | Nothing. There is no purge. An entry leaves the cache only when its 60 seconds run out.                                                                    |
+| Visible to client | `X-Cache: HIT` or `MISS` on every API response that went through the cache.                                                                                |
+
+Each entry is in one of three states. It is absent until a request misses; it is
+fresh from the `put` until 60 seconds later, and `HIT`s serve it unchanged; then
+the runtime treats it as absent again and the next request refills it. Only the
+web Worker moves an entry between states, and each data center has its own copy,
+so two visitors in different cities can see different versions during the same
+minute.
+
+After an admin write, a public page can show the old content for up to 60
+seconds from the edge, and up to another 60 seconds if the visitor's browser
+holds its own copy of the response (`max-age=60`). The browser that made the
+edit is the exception: `GroupService` drops its own per-language cache after
+each write. Server-side rendering reaches the API through the service binding
+directly, so rendered HTML never comes from this cache.
