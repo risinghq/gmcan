@@ -25,6 +25,10 @@ describe("environment", () => {
     expect(() => parseEnv({ ...validEnv, [key]: "not-an-address" })).toThrow(key);
   });
 
+  test("an empty RESEND_API_KEY is rejected and named", () => {
+    expect(() => parseEnv({ ...validEnv, RESEND_API_KEY: "" })).toThrow("RESEND_API_KEY");
+  });
+
   test("production requires BACKEND_URL", () => {
     expect(() => parseEnv({ ...validEnv, NODE_ENV: "production" })).toThrow("BACKEND_URL");
     expect(parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test" }).BACKEND_URL).toBe(

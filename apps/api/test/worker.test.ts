@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { createHmac } from "node:crypto";
 
 import { app } from "../app.js";
 import { atomic, db } from "../db/client.js";
@@ -112,6 +113,28 @@ describe("email", () => {
   });
 });
 
+describe("caching", () => {
+  test("public reads may be shared and admin reads may not", async () => {
+    const methods = await app.request("/api/methods");
+    expect(methods.status).toBe(200);
+    expect(methods.headers.get("cache-control")).toBe("public, max-age=60");
+
+    const admin = await app.request("/admin/account/me");
+    expect(admin.status).toBe(401);
+    expect(admin.headers.get("cache-control")).toBeNull();
+  });
+
+  test("a failed public read is not cacheable", async () => {
+    const res = await app.request("/api/methods/999999");
+    expect(res.status).toBe(404);
+    expect(res.headers.get("cache-control")).toBeNull();
+  });
+
+  test("Kysely may run D1 queries concurrently", () => {
+    expect(db.getExecutor().adapter.supportsMultipleConnections).toBe(true);
+  });
+});
+
 describe("assets in R2", () => {
   test("a stored asset is served with its type and cache headers", async () => {
     await putObject("test/pixel.png", new Uint8Array([1, 2, 3]));
@@ -137,6 +160,32 @@ describe("assets in R2", () => {
     expect(res.headers.get("content-type")).toBe("image/png");
     expect(res.headers.get("cache-control")).toContain("immutable");
     expect(new Uint8Array(await res.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
+  });
+
+  test("a private asset is never cacheable by a shared cache", async () => {
+    await putObject("test/secret.png", new Uint8Array([9]));
+    const row = await db
+      .insertInto("asset")
+      .values({
+        storageKey: "test/secret.png",
+        bucket: "r2",
+        mimeDetected: "image/png",
+        ext: "png",
+        sizeBytes: 1,
+        sha256: "2",
+        visibility: "private",
+        lifecycleStatus: "active",
+        createdBy: null,
+        createdAt: "2026-01-01",
+        deletedAt: null,
+      })
+      .executeTakeFirstOrThrow();
+    const expires = Math.floor(Date.now() / 1000) + 60;
+    const token = createHmac("sha256", "test-secret").update(`${row.insertId}:${expires}`).digest("hex");
+
+    const res = await app.request(`/api/assets/${row.insertId}?expires=${expires}&token=${token}`);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("cache-control")).toBe("private, no-store");
   });
 
   test("an asset whose object is missing is not found", async () => {
