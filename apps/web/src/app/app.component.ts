@@ -7,6 +7,7 @@ import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 
@@ -24,6 +25,7 @@ export default class AppComponent {
   private browser = inject(BrowserService);
   fb = inject(FormBuilder);
   private router = inject(Router);
+  private seo = inject(SeoService);
 
   screenWidth: number;
   public grupoinfo: Group;
@@ -41,6 +43,7 @@ export default class AppComponent {
     this.lanSelected = this.session.languageId();
     this.language = this.session.language();
     this.url = GLOBAL.url;
+    this.seo.setOpenGraphLocation(GLOBAL.appUrl, GLOBAL.app("img/gmcan.jpg"));
     // set screenWidth on page load
     this.screenWidth = this.browser.innerWidth();
     this.grupoinfo = createGroup();
