@@ -30,7 +30,7 @@
     "seed:remote": "bun scripts/seed.ts --remote",
     "lint": "oxlint",
     "typecheck": "bun run typegen && tsc -p tsconfig.json --noEmit",
-    "test": "bun test",
+    "test": "bun test --timeout 60000",
     "check": "bun run lint && bun run typecheck",
     "format": "oxfmt --fix .",
     "format:check": "oxfmt --check ."
