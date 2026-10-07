@@ -1,51 +1,56 @@
-import { join } from "node:path";
+import { AngularAppEngine, createRequestHandler } from "@angular/ssr";
 
-import {
-  AngularNodeAppEngine,
-  createNodeRequestHandler,
-  isMainModule,
-  writeResponseToNodeResponse,
-} from "@angular/ssr/node";
-import express from "express";
+import { applyRuntimeConfig, currentRuntimeConfig } from "./runtime-config";
 
-import { applyServerEnv, currentRuntimeConfig } from "./runtime-config";
-
-const browserDistFolder = join(import.meta.dirname, "../browser");
-const SERVER_PORT = 4200;
-
-const app = express();
-const angularApp = new AngularNodeAppEngine();
-
-app.get("/config.json", (_req, res) => {
-  res.setHeader("Cache-Control", "no-store");
-  res.json(currentRuntimeConfig());
-});
-
-app.use(
-  express.static(browserDistFolder, {
-    maxAge: "1y",
-    index: false,
-    redirect: false,
-  }),
-);
-
-app.use((req, res, next) => {
-  angularApp
-    .handle(req)
-    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
-    .catch(next);
-});
-
-if (isMainModule(import.meta.url)) {
-  // The production build has no deployment URLs. Supply API_URL and APP_URL when the server starts.
-  applyServerEnv(process.env);
-  app.listen(SERVER_PORT, (error) => {
-    if (error) {
-      throw error;
-    }
-
-    console.log(`Node Express server listening on http://localhost:${SERVER_PORT}`);
-  });
+interface WebEnv {
+  /** The API worker served under /api and /admin so the browser stays on one origin. */
+  API?: { fetch(request: Request): Promise<Response> };
+  ASSETS?: { fetch(request: Request): Promise<Response> };
+  /** The site's canonical public URL, defaulting to the request origin. */
+  APP_URL?: string;
 }
 
-export const reqHandler = createNodeRequestHandler(app);
+// Cloudflare reports the scheme after terminating TLS.
+// The host always comes from the request itself.
+const engine = new AngularAppEngine({ trustProxyHeaders: ["x-forwarded-proto"] });
+const nativeFetch = globalThis.fetch.bind(globalThis);
+let routedOrigin: string | undefined;
+
+function isApiPath(pathname: string): boolean {
+  return pathname.startsWith("/api/") || pathname.startsWith("/admin/");
+}
+
+/** Routes SSR calls for the site's origin to the API worker's service binding. */
+function routeApiCalls(env: WebEnv, origin: string): void {
+  const api = env.API;
+  if (!api || routedOrigin === origin) return;
+  routedOrigin = origin;
+  globalThis.fetch = async (input, init) => {
+    // The Workers runtime rejects the `credentials` option.
+    const { credentials: _credentials, ...rest } = init ?? {};
+    const request = new Request(input, rest);
+    const url = new URL(request.url);
+    if (url.origin === origin && isApiPath(url.pathname)) return api.fetch(request);
+    return nativeFetch(request);
+  };
+}
+
+async function handle(request: Request, env: WebEnv = {}): Promise<Response> {
+  const url = new URL(request.url);
+  const origin = env.APP_URL ?? url.origin;
+  if (env.API) applyRuntimeConfig({ apiUrl: origin, appUrl: origin });
+
+  if (url.pathname === "/config.json") {
+    return Response.json(currentRuntimeConfig(), { headers: { "Cache-Control": "no-store" } });
+  }
+  if (env.API && isApiPath(url.pathname)) return env.API.fetch(request);
+
+  routeApiCalls(env, origin);
+  const response = await engine.handle(request);
+  if (response) return response;
+  return env.ASSETS ? env.ASSETS.fetch(request) : new Response("Not found", { status: 404 });
+}
+
+export const reqHandler = createRequestHandler((request) => handle(request));
+
+export default { fetch: handle };
