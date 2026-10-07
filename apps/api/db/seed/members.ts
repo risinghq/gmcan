@@ -5,6 +5,7 @@ import { Gender, MemberType, Prefix, Role } from "../../lib/enums.js";
 import { SUPPORTED_LOCALES } from "../../lib/locales.js";
 import { hashPassword } from "../../lib/password.js";
 import { db } from "../client.js";
+import { insertInChunks } from "./chunks.js";
 
 const today = new Date().toISOString().split("T")[0];
 const BIO_PLACEHOLDER = "Miembro del GMCAN";
@@ -360,33 +361,34 @@ async function upsertMembers() {
   if (env.SEED_PASSWORD === undefined) {
     console.log(`[seed] Seeded members sign in with the generated password: ${password}`);
   }
-  const passwordHash = hashPassword(password);
+  const passwordHash = await hashPassword(password);
 
-  await db
-    .insertInto("member")
-    .values(
-      newMembers.map((member) => ({
-        dni: member.dni,
-        email: member.email,
-        passwordHash,
-        firstName: member.firstName,
-        lastName: member.lastName,
-        maternalName: member.maternalName,
-        isActive: member.isActive,
-        passwordResetRequired: member.passwordResetRequired,
-        roleCode: member.roleCode,
-        memberTypeCode: member.memberTypeCode,
-        prefixCode: member.prefixCode,
-        genderCode: member.genderCode,
-        createdAt: member.createdAt,
-        updatedAt: member.updatedAt,
-        birthDate: member.birthDate,
-        resetToken: null,
-        resetExpiresAt: null,
-      })),
-    )
-    .onConflict((oc) => oc.column("dni").doNothing())
-    .execute();
+  await insertInChunks(
+    newMembers.map((member) => ({
+      dni: member.dni,
+      email: member.email,
+      passwordHash,
+      firstName: member.firstName,
+      lastName: member.lastName,
+      maternalName: member.maternalName,
+      isActive: member.isActive,
+      passwordResetRequired: member.passwordResetRequired,
+      roleCode: member.roleCode,
+      memberTypeCode: member.memberTypeCode,
+      prefixCode: member.prefixCode,
+      genderCode: member.genderCode,
+      createdAt: member.createdAt,
+      updatedAt: member.updatedAt,
+      birthDate: member.birthDate,
+      resetToken: null,
+      resetExpiresAt: null,
+    })),
+    (chunk) =>
+      db
+        .insertInto("member")
+        .values(chunk)
+        .onConflict((oc) => oc.column("dni").doNothing()),
+  );
 }
 
 async function upsertMemberTranslations() {
@@ -396,22 +398,23 @@ async function upsertMemberTranslations() {
 
   const memberByDni = new Map(seededMembers.map((member) => [member.dni, member.id]));
 
-  await db
-    .insertInto("member_translation")
-    .values(
-      SEED_MEMBERS.flatMap((member) => {
-        const memberId = memberByDni.get(member.dni);
-        if (!memberId) return [];
+  await insertInChunks(
+    SEED_MEMBERS.flatMap((member) => {
+      const memberId = memberByDni.get(member.dni);
+      if (!memberId) return [];
 
-        return SUPPORTED_LOCALES.map((locale) => ({
-          memberId,
-          locale,
-          bio: bioForLocale(member, locale),
-        }));
-      }),
-    )
-    .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
-    .execute();
+      return SUPPORTED_LOCALES.map((locale) => ({
+        memberId,
+        locale,
+        bio: bioForLocale(member, locale),
+      }));
+    }),
+    (chunk) =>
+      db
+        .insertInto("member_translation")
+        .values(chunk)
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
+  );
 }
 
 async function upsertMemberGroups() {
@@ -419,15 +422,16 @@ async function upsertMemberGroups() {
   const members = await db.selectFrom("member").select(["id", "dni"]).where("dni", "in", dnis).execute();
   const memberByDni = new Map(members.map((member) => [member.dni, member.id]));
 
-  await db
-    .insertInto("member_group")
-    .values(
-      MEMBER_GROUP_LINKS.flatMap((link) => {
-        const memberId = memberByDni.get(link.memberDni);
-        if (!memberId) return [];
-        return [{ memberId, groupId: link.groupId, createdAt: today, updatedAt: today }];
-      }),
-    )
-    .onConflict((oc) => oc.doNothing())
-    .execute();
+  await insertInChunks(
+    MEMBER_GROUP_LINKS.flatMap((link) => {
+      const memberId = memberByDni.get(link.memberDni);
+      if (!memberId) return [];
+      return [{ memberId, groupId: link.groupId, createdAt: today, updatedAt: today }];
+    }),
+    (chunk) =>
+      db
+        .insertInto("member_group")
+        .values(chunk)
+        .onConflict((oc) => oc.doNothing()),
+  );
 }

@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { db } from "../../db/client.js";
+import { atomic, db, insertedId, lastInsertId } from "../../db/client.js";
 import type { EventTranslationTable } from "../../db/schema.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { requirePermission } from "../../middleware/authz.js";
@@ -67,47 +67,39 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
 
 router.post("/", zValidator("json", EventBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const id = await db.transaction().execute(async (trx) => {
-    const result = await trx.insertInto("event").values({}).executeTakeFirstOrThrow();
-    const eventId = Number(result.insertId);
-    await trx
-      .insertInto("event_translation")
-      .values(
-        Object.entries(translations).map(([locale, tr]): Omit<EventTranslationTable, "id"> => ({
-          eventId,
-          locale,
-          name: tr.name,
-          city: tr.city,
-          country: tr.country,
-        })),
-      )
-      .execute();
-    return eventId;
-  });
+  const results = await atomic([
+    db.insertInto("event").values({}),
+    db.insertInto("event_translation").values(
+      Object.entries(translations).map(([locale, tr]) => ({
+        eventId: lastInsertId("event"),
+        locale,
+        name: tr.name,
+        city: tr.city,
+        country: tr.country,
+      })),
+    ),
+  ]);
 
-  return c.json({ id }, 201);
+  return c.json({ id: insertedId(results, 0) }, 201);
 });
 
 router.put("/:id", zValidator("param", IdParam), zValidator("json", EventBody), async (c) => {
   const { id } = c.req.valid("param");
   const { translations } = c.req.valid("json");
 
-  await db.transaction().execute(async (trx) => {
-    await trx.selectFrom("event").select("id").where("id", "=", id).executeTakeFirstOrThrow();
-    await trx.deleteFrom("event_translation").where("eventId", "=", id).execute();
-    await trx
-      .insertInto("event_translation")
-      .values(
-        Object.entries(translations).map(([locale, tr]): Omit<EventTranslationTable, "id"> => ({
-          eventId: id,
-          locale,
-          name: tr.name,
-          city: tr.city,
-          country: tr.country,
-        })),
-      )
-      .execute();
-  });
+  await db.selectFrom("event").select("id").where("id", "=", id).executeTakeFirstOrThrow();
+  await atomic([
+    db.deleteFrom("event_translation").where("eventId", "=", id),
+    db.insertInto("event_translation").values(
+      Object.entries(translations).map(([locale, tr]): Omit<EventTranslationTable, "id"> => ({
+        eventId: id,
+        locale,
+        name: tr.name,
+        city: tr.city,
+        country: tr.country,
+      })),
+    ),
+  ]);
 
   return c.json({ status: 1 });
 });

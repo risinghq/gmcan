@@ -36,6 +36,19 @@ export async function createSession(c: Context, memberId: number): Promise<void>
   });
 }
 
+/** Deletes sessions past their absolute expiry or idle timeout. */
+export async function sweepExpiredSessions(now = new Date()): Promise<void> {
+  await db
+    .deleteFrom("session")
+    .where((eb) =>
+      eb.or([
+        eb("expiresAt", "<", now.toISOString()),
+        eb("lastActiveAt", "<", new Date(now.getTime() - IDLE_TIMEOUT_MS).toISOString()),
+      ]),
+    )
+    .execute();
+}
+
 export async function destroySession(c: Context): Promise<void> {
   const id = getCookie(c, "sid");
   if (id) {

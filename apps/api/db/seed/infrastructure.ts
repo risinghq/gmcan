@@ -1,11 +1,11 @@
 import { db } from "../client.js";
+import { insertInChunks } from "./chunks.js";
 
 const today = new Date().toISOString().split("T")[0];
 
 export async function seedEquipment() {
-  await db
-    .insertInto("equipment")
-    .values([
+  await insertInChunks(
+    [
       {
         id: 1,
         name: "ThinkStation P500",
@@ -182,9 +182,13 @@ export async function seedEquipment() {
         createdAt: "2020-04-10",
         updatedAt: "2020-04-10",
       },
-    ])
-    .onConflict((oc) => oc.doNothing())
-    .execute();
+    ],
+    (chunk) =>
+      db
+        .insertInto("equipment")
+        .values(chunk)
+        .onConflict((oc) => oc.doNothing()),
+  );
 }
 
 export async function seedSoftware() {

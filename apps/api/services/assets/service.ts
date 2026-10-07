@@ -1,10 +1,11 @@
 import { createHmac } from "node:crypto";
 
 import type { Context } from "hono";
+import type { Compilable } from "kysely";
 
 import { getBackendUrl } from "../../config.js";
 import { env } from "../../config/env.js";
-import { db } from "../../db/client.js";
+import { atomic, db, lastInsertId } from "../../db/client.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../../lib/upload.js";
 import { OWNER_CONFIG } from "./policy.js";
 import { ensureOwnerExists, getCurrentAssetId, getNextVersion } from "./repo.js";
@@ -27,7 +28,7 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
   await ensureOwnerExists(input.ownerType, input.ownerId);
 
   const cfg = OWNER_CONFIG[input.ownerType];
-  const buffer = Buffer.from(await input.file.arrayBuffer());
+  const buffer = new Uint8Array(await input.file.arrayBuffer());
   const storageKey = await saveUploadedFile(input.file, {
     kind: cfg.kindBySlot[input.slot],
     bytes: buffer,
@@ -39,62 +40,58 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
   const previousAssetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
   const version = await getNextVersion(input.ownerType, input.ownerId, input.slot);
 
-  await db.transaction().execute(async (trx) => {
-    const assetInsert = await trx
-      .insertInto("asset")
-      .values({
-        storageKey,
-        bucket: "local",
-        mimeDetected,
-        ext,
-        sizeBytes: buffer.byteLength,
-        sha256: sha256Buffer(buffer),
-        visibility: "public",
-        lifecycleStatus: "active",
-        createdBy: input.actorId,
-        createdAt: nowIso(),
-        deletedAt: null,
-      })
-      .executeTakeFirstOrThrow();
+  const queries: Compilable[] = [
+    db.insertInto("asset").values({
+      storageKey,
+      bucket: "r2",
+      mimeDetected,
+      ext,
+      sizeBytes: buffer.byteLength,
+      sha256: sha256Buffer(buffer),
+      visibility: "public",
+      lifecycleStatus: "active",
+      createdBy: input.actorId,
+      createdAt: nowIso(),
+      deletedAt: null,
+    }),
+    db.insertInto(cfg.table).values({
+      [cfg.ownerColumn]: input.ownerId,
+      slot: input.slot,
+      version,
+      assetId: lastInsertId("asset"),
+      actorId: input.actorId,
+      reason: "upload",
+      createdAt: nowIso(),
+    } as never),
+  ];
 
-    const assetId = Number(assetInsert.insertId);
-
-    await trx
-      .insertInto(cfg.table)
-      .values({
-        [cfg.ownerColumn]: input.ownerId,
-        slot: input.slot,
-        version,
-        assetId,
-        actorId: input.actorId,
-        reason: "upload",
-        createdAt: nowIso(),
-      } as never)
-      .execute();
-
-    if (previousAssetId) {
-      await trx
+  if (previousAssetId) {
+    queries.push(
+      db
         .updateTable("asset")
         .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso() })
-        .where("id", "=", previousAssetId)
-        .execute();
-      await trx
-        .insertInto("asset_audit")
-        .values({
-          action: "replace",
-          assetId: previousAssetId,
-          actorId: input.actorId,
-          reason: null,
-          createdAt: nowIso(),
-        })
-        .execute();
-    }
+        .where("id", "=", previousAssetId),
+      db.insertInto("asset_audit").values({
+        action: "replace",
+        assetId: previousAssetId,
+        actorId: input.actorId,
+        reason: null,
+        createdAt: nowIso(),
+      }),
+    );
+  }
 
-    await trx
-      .insertInto("asset_audit")
-      .values({ action: "upload", assetId, actorId: input.actorId, reason: null, createdAt: nowIso() })
-      .execute();
-  });
+  // The new asset stays the newest asset row, so lastInsertId still names it after the earlier statements.
+  queries.push(
+    db.insertInto("asset_audit").values({
+      action: "upload",
+      assetId: lastInsertId("asset"),
+      actorId: input.actorId,
+      reason: null,
+      createdAt: nowIso(),
+    }),
+  );
+  await atomic(queries);
 }
 
 export async function deleteCurrentAsset(input: AssetDeleteRequest): Promise<void> {

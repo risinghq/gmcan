@@ -1,4 +1,6 @@
-import { db } from "../db/client.js";
+import type { Compilable } from "kysely";
+
+import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME } from "../db/projections.js";
 import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
 import { memberProjects, memberPublications } from "../db/views.js";
@@ -282,37 +284,33 @@ export async function createMember(data: {
 }) {
   const { password, translation, ...rest } = data;
   const now = new Date().toISOString();
-  return db.transaction().execute(async (trx) => {
-    const result = await trx
-      .insertInto("member")
-      .values({
-        ...rest,
-        passwordHash: hashPassword(password),
-        passwordResetRequired: 0,
-        resetToken: null,
-        resetExpiresAt: null,
-        createdAt: now,
-        updatedAt: now,
-      })
-      .executeTakeFirstOrThrow();
-
-    const memberId = Number(result.insertId);
-    await trx
+  const memberId = lastInsertId("member");
+  const queries: Compilable[] = [
+    db.insertInto("member").values({
+      ...rest,
+      passwordHash: await hashPassword(password),
+      passwordResetRequired: 0,
+      resetToken: null,
+      resetExpiresAt: null,
+      createdAt: now,
+      updatedAt: now,
+    }),
+    db
       .insertInto("member_translation")
       .values(SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: null })))
-      .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing())
-      .execute();
+      .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing()),
+  ];
 
-    if (translation) {
-      await trx
+  if (translation) {
+    queries.push(
+      db
         .insertInto("member_translation")
         .values({ memberId, locale: translation.locale, bio: translation.bio })
-        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
-        .execute();
-    }
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
+    );
+  }
 
-    return memberId;
-  });
+  return insertedId(await atomic(queries), 0);
 }
 
 export async function updateMember(
@@ -332,8 +330,8 @@ export async function updateMember(
   },
 ) {
   const now = new Date().toISOString();
-  await db.transaction().execute(async (trx) => {
-    await trx
+  const queries: Compilable[] = [
+    db
       .updateTable("member")
       .set({
         email: data.email,
@@ -348,17 +346,19 @@ export async function updateMember(
         genderCode: data.genderCode,
         updatedAt: now,
       })
-      .where("id", "=", id)
-      .execute();
+      .where("id", "=", id),
+  ];
 
-    if (data.translation) {
-      await trx
+  if (data.translation) {
+    queries.push(
+      db
         .insertInto("member_translation")
         .values({ memberId: id, locale: data.translation.locale, bio: data.translation.bio })
-        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
-        .execute();
-    }
-  });
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
+    );
+  }
+
+  await atomic(queries);
 }
 
 export async function updateMemberTranslation(id: number, locale: string, bio: string) {
@@ -431,7 +431,12 @@ export async function deleteMember(id: number) {
 export async function updatePassword(email: string, newPassword: string) {
   await db
     .updateTable("member")
-    .set({ passwordHash: hashPassword(newPassword), passwordResetRequired: 0, resetToken: null, resetExpiresAt: null })
+    .set({
+      passwordHash: await hashPassword(newPassword),
+      passwordResetRequired: 0,
+      resetToken: null,
+      resetExpiresAt: null,
+    })
     .where("email", "=", email)
     .execute();
 }
@@ -462,7 +467,12 @@ export async function getMemberByResetToken(token: string) {
 export async function consumeResetToken(memberId: number, newPassword: string) {
   await db
     .updateTable("member")
-    .set({ passwordHash: hashPassword(newPassword), resetToken: null, resetExpiresAt: null, passwordResetRequired: 0 })
+    .set({
+      passwordHash: await hashPassword(newPassword),
+      resetToken: null,
+      resetExpiresAt: null,
+      passwordResetRequired: 0,
+    })
     .where("id", "=", memberId)
     .execute();
 }

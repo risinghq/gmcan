@@ -1,7 +1,8 @@
 import type { AdminPublicationListItem, AdminPublicationSubtype } from "@gmcan/contracts/admin";
 import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import type { RawBuilder } from "kysely";
 
-import { db } from "../db/client.js";
+import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
 import type { PublicationKindCode, ThesisKindCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
@@ -426,170 +427,101 @@ export async function searchPublications(q: string, locale: Locale = DEFAULT_LOC
 }
 
 export async function createPublication(data: PublicationFields, authors: AuthorInput[]) {
-  return db.transaction().execute(async (trx) => {
-    const result = await trx
-      .insertInto("publication")
-      .values({
-        kindCode: data.subtype.kindCode,
-        doi: data.doi ?? null,
-        publishedAt: data.publishedAt,
-      })
-      .executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
+  const publicationId = lastInsertId("publication");
+  const results = await atomic([
+    db.insertInto("publication").values({
+      kindCode: data.subtype.kindCode,
+      doi: data.doi ?? null,
+      publishedAt: data.publishedAt,
+    }),
+    translationsInsert(publicationId, data.translations),
+    subtypeInsert(publicationId, data.subtype),
+    ...authorsInsert(publicationId, authors),
+  ]);
+  return insertedId(results, 0);
+}
 
-    await trx
-      .insertInto("publication_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          publicationId: id,
-          locale,
-          title: tr.title,
-          abstract: tr.abstract ?? null,
-        })),
-      )
-      .execute();
+type PublicationRef = number | RawBuilder<number>;
 
-    if (data.subtype.kindCode === "journal_article") {
-      await trx
-        .insertInto("journal_article")
-        .values({
-          publicationId: id,
-          journalId: data.subtype.journalArticle.journalId ?? null,
-          issue: data.subtype.journalArticle.issue ?? null,
-        })
-        .execute();
-    } else if (data.subtype.kindCode === "conference_paper") {
-      await trx
-        .insertInto("conference_paper")
-        .values({ publicationId: id, eventId: data.subtype.conferencePaper.eventId })
-        .execute();
-    } else {
-      await trx
-        .insertInto("thesis")
-        .values({
-          publicationId: id,
-          universityId: data.subtype.thesis.universityId,
-          thesisKindCode: data.subtype.thesis.thesisKindCode,
-        })
-        .execute();
-    }
+function translationsInsert(publicationId: PublicationRef, translations: PublicationFields["translations"]) {
+  return db.insertInto("publication_translation").values(
+    Object.entries(translations).map(([locale, tr]) => ({
+      publicationId,
+      locale,
+      title: tr.title,
+      abstract: tr.abstract ?? null,
+    })),
+  );
+}
 
-    if (authors.length > 0) {
-      await trx
-        .insertInto("publication_author")
-        .values(
-          authors.map((a) => ({
-            publicationId: id,
-            authorOrder: a.authorOrder,
-            externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-            memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          })),
-        )
-        .execute();
-    }
-
-    return id;
+function subtypeInsert(publicationId: PublicationRef, subtype: PublicationSubtypeInput) {
+  if (subtype.kindCode === "journal_article") {
+    return db.insertInto("journal_article").values({
+      publicationId,
+      journalId: subtype.journalArticle.journalId ?? null,
+      issue: subtype.journalArticle.issue ?? null,
+    });
+  }
+  if (subtype.kindCode === "conference_paper") {
+    return db.insertInto("conference_paper").values({ publicationId, eventId: subtype.conferencePaper.eventId });
+  }
+  return db.insertInto("thesis").values({
+    publicationId,
+    universityId: subtype.thesis.universityId,
+    thesisKindCode: subtype.thesis.thesisKindCode,
   });
 }
 
+function authorsInsert(publicationId: PublicationRef, authors: AuthorInput[]) {
+  if (authors.length === 0) return [];
+  return [
+    db.insertInto("publication_author").values(
+      authors.map((a) => ({
+        publicationId,
+        authorOrder: a.authorOrder,
+        externalName: a.kind === "external" ? (a.externalName ?? null) : null,
+        memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
+      })),
+    ),
+  ];
+}
+
 export async function updatePublication(id: number, data: PublicationFields, authors: AuthorInput[]) {
-  await db.transaction().execute(async (trx) => {
-    await trx
+  await atomic([
+    db
       .updateTable("publication")
       .set({
         kindCode: data.subtype.kindCode,
         doi: data.doi ?? null,
         publishedAt: data.publishedAt,
       })
-      .where("id", "=", id)
-      .execute();
-
-    await trx.deleteFrom("journal_article").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("conference_paper").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("thesis").where("publicationId", "=", id).execute();
-
-    if (data.subtype.kindCode === "journal_article") {
-      await trx
-        .insertInto("journal_article")
-        .values({
-          publicationId: id,
-          journalId: data.subtype.journalArticle.journalId ?? null,
-          issue: data.subtype.journalArticle.issue ?? null,
-        })
-        .execute();
-    } else if (data.subtype.kindCode === "conference_paper") {
-      await trx
-        .insertInto("conference_paper")
-        .values({ publicationId: id, eventId: data.subtype.conferencePaper.eventId })
-        .execute();
-    } else {
-      await trx
-        .insertInto("thesis")
-        .values({
-          publicationId: id,
-          universityId: data.subtype.thesis.universityId,
-          thesisKindCode: data.subtype.thesis.thesisKindCode,
-        })
-        .execute();
-    }
-
-    await trx.deleteFrom("publication_translation").where("publicationId", "=", id).execute();
-    await trx
-      .insertInto("publication_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          publicationId: id,
-          locale,
-          title: tr.title,
-          abstract: tr.abstract ?? null,
-        })),
-      )
-      .execute();
-
-    await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
-    if (authors.length > 0) {
-      await trx
-        .insertInto("publication_author")
-        .values(
-          authors.map((a) => ({
-            publicationId: id,
-            authorOrder: a.authorOrder,
-            externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-            memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          })),
-        )
-        .execute();
-    }
-  });
+      .where("id", "=", id),
+    db.deleteFrom("journal_article").where("publicationId", "=", id),
+    db.deleteFrom("conference_paper").where("publicationId", "=", id),
+    db.deleteFrom("thesis").where("publicationId", "=", id),
+    subtypeInsert(id, data.subtype),
+    db.deleteFrom("publication_translation").where("publicationId", "=", id),
+    translationsInsert(id, data.translations),
+    db.deleteFrom("publication_author").where("publicationId", "=", id),
+    ...authorsInsert(id, authors),
+  ]);
 }
 
 export async function deletePublication(id: number) {
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("journal_article").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("conference_paper").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("thesis").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("publication").where("id", "=", id).execute();
-  });
+  await atomic([
+    db.deleteFrom("publication_author").where("publicationId", "=", id),
+    db.deleteFrom("journal_article").where("publicationId", "=", id),
+    db.deleteFrom("conference_paper").where("publicationId", "=", id),
+    db.deleteFrom("thesis").where("publicationId", "=", id),
+    db.deleteFrom("publication").where("id", "=", id),
+  ]);
 }
 
 export async function replaceAuthors(publicationId: number, authors: AuthorInput[]) {
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom("publication_author").where("publicationId", "=", publicationId).execute();
-    if (authors.length > 0) {
-      await trx
-        .insertInto("publication_author")
-        .values(
-          authors.map((a) => ({
-            publicationId,
-            authorOrder: a.authorOrder,
-            externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-            memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          })),
-        )
-        .execute();
-    }
-  });
+  await atomic([
+    db.deleteFrom("publication_author").where("publicationId", "=", publicationId),
+    ...authorsInsert(publicationId, authors),
+  ]);
 }
 
 export async function listAuthorsByPublication(publicationId: number) {

@@ -1,7 +1,7 @@
-import type { Transaction } from "kysely";
+import type { RawBuilder } from "kysely";
 
-import { db } from "../db/client.js";
-import type { Database, NewsRow, NewsStatusCode } from "../db/schema.js";
+import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
+import type { NewsRow, NewsStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { type Locale } from "../lib/public-locale.js";
 import { newsSearchFilter } from "../repositories/news.js";
@@ -58,23 +58,16 @@ function toNewsRow(data: NewsUpsertInput) {
   };
 }
 
-async function insertNewsTranslations(
-  trx: Transaction<Database>,
-  newsId: number,
-  translations: NewsUpsertInput["translations"],
-) {
-  await trx
-    .insertInto("news_translation")
-    .values(
-      Object.entries(translations).map(([locale, tr]) => ({
-        newsId,
-        locale,
-        title: tr.title,
-        summary: tr.summary,
-        body: tr.body,
-      })),
-    )
-    .execute();
+function insertNewsTranslations(newsId: number | RawBuilder<number>, translations: NewsUpsertInput["translations"]) {
+  return db.insertInto("news_translation").values(
+    Object.entries(translations).map(([locale, tr]) => ({
+      newsId,
+      locale,
+      title: tr.title,
+      summary: tr.summary,
+      body: tr.body,
+    })),
+  );
 }
 
 export async function listPublicNews(locale: Locale, query: PublicNewsListQuery) {
@@ -288,28 +281,25 @@ export async function toAdminNewsView(row: NewsRow) {
 
 export async function createNews(data: NewsUpsertInput) {
   const now = new Date().toISOString();
-  return db.transaction().execute(async (trx) => {
-    const result = await trx
+  const results = await atomic([
+    db
       .insertInto("news")
-      .values({ ...toNewsRow(data), publishedAt: data.publishedAt ?? now, createdAt: now, updatedAt: now })
-      .executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
-    await insertNewsTranslations(trx, id, data.translations);
-    return id;
-  });
+      .values({ ...toNewsRow(data), publishedAt: data.publishedAt ?? now, createdAt: now, updatedAt: now }),
+    insertNewsTranslations(lastInsertId("news"), data.translations),
+  ]);
+  return insertedId(results, 0);
 }
 
 export async function updateNews(id: number, data: NewsUpsertInput) {
   const now = new Date().toISOString();
-  await db.transaction().execute(async (trx) => {
-    await trx
+  await atomic([
+    db
       .updateTable("news")
       .set({ ...toNewsRow(data), updatedAt: now })
-      .where("id", "=", id)
-      .execute();
-    await trx.deleteFrom("news_translation").where("newsId", "=", id).execute();
-    await insertNewsTranslations(trx, id, data.translations);
-  });
+      .where("id", "=", id),
+    db.deleteFrom("news_translation").where("newsId", "=", id),
+    insertNewsTranslations(id, data.translations),
+  ]);
 }
 
 export async function deleteNews(id: number) {

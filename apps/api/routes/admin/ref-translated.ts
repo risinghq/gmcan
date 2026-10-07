@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { db } from "../../db/client.js";
+import { atomic, db, insertedId, lastInsertId } from "../../db/client.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { getUniversityPublicationDependencyCount } from "../../services/publication.service.js";
@@ -115,37 +115,31 @@ router.get("/university/:id", zValidator("param", IdParam), async (c) => {
 
 router.post("/university", zValidator("json", NamedTranslationBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const id = await db.transaction().execute(async (trx) => {
-    const created = await trx.insertInto("university").defaultValues().executeTakeFirstOrThrow();
-    const universityId = Number(created.insertId);
-    await trx
-      .insertInto("university_translation")
-      .values(
-        Object.entries(translations).map(([locale, payload]) => ({
-          universityId,
-          locale,
-          name: payload.name,
-        })),
-      )
-      .execute();
-    return universityId;
-  });
-  return c.json({ id }, 201);
+  const results = await atomic([
+    db.insertInto("university").defaultValues(),
+    db.insertInto("university_translation").values(
+      Object.entries(translations).map(([locale, payload]) => ({
+        universityId: lastInsertId("university"),
+        locale,
+        name: payload.name,
+      })),
+    ),
+  ]);
+  return c.json({ id: insertedId(results, 0) }, 201);
 });
 
 router.put("/university/:id", zValidator("param", IdParam), zValidator("json", NamedTranslationBody), async (c) => {
   const { id } = c.req.valid("param");
   const { translations } = c.req.valid("json");
-  await db.transaction().execute(async (trx) => {
-    await trx.selectFrom("university").select("id").where("id", "=", id).executeTakeFirstOrThrow();
-    await trx.deleteFrom("university_translation").where("universityId", "=", id).execute();
-    await trx
+  await db.selectFrom("university").select("id").where("id", "=", id).executeTakeFirstOrThrow();
+  await atomic([
+    db.deleteFrom("university_translation").where("universityId", "=", id),
+    db
       .insertInto("university_translation")
       .values(
         Object.entries(translations).map(([locale, payload]) => ({ universityId: id, locale, name: payload.name })),
-      )
-      .execute();
-  });
+      ),
+  ]);
   return c.json(okStatus());
 });
 

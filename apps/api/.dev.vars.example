@@ -1,0 +1,11 @@
+# Copy to .dev.vars for `bun run start`. These override the vars in wrangler.jsonc locally.
+NODE_ENV=development
+BACKEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:4200
+
+# Generate real values with: openssl rand -hex 32
+ASSET_SIGNING_SECRET=dev-only-signing-secret
+
+# Email is off until a sender domain is on Cloudflare DNS (see docs/deployment.md).
+# EMAIL_FROM=gmcan@your-domain.example
+# INSTITUTIONAL_EMAIL=gmcan@your-domain.example
