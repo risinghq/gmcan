@@ -21,7 +21,7 @@ function getEmailConfig() {
   const isDev = env.NODE_ENV === "development";
   return {
     from: isDev ? "Development <onboarding@resend.dev>" : "GMCAN <gmcan@unmsm.edu.pe>",
-    institutionalTo: isDev ? "delivered@resend.dev" : env.INSTITUTIONAL_EMAIL!,
+    institutionalTo: isDev ? "delivered@resend.dev" : env.INSTITUTIONAL_EMAIL,
   };
 }
 
