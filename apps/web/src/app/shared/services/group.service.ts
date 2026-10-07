@@ -1,20 +1,34 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, MonoTypeOperatorFunction, shareReplay, tap } from "rxjs";
 
 import type { About, LocalizedAboutSectionContent, LocalizedHomeServicesTeaserContent } from "../models/about";
 import type { Equipment } from "../models/equipment";
 import type { Group } from "../models/group";
 import type { Software } from "../models/software";
 import { GLOBAL } from "./global";
+import { SessionService } from "./session.service";
 
 @Injectable({ providedIn: "root" })
 export class GroupService {
   private http = inject(HttpClient);
+  private session = inject(SessionService);
+  private groupByLanguage = new Map<string, Observable<Group>>();
 
   // Public
+  /** Every component asks for the group, so one request per language serves them all until an admin edit. */
   getGroup(): Observable<Group> {
-    return this.http.get<Group>(GLOBAL.api("group"));
+    const language = this.session.language().locale === "en" ? "en" : "es";
+    let group = this.groupByLanguage.get(language);
+    if (!group) {
+      group = this.http.get<Group>(GLOBAL.api("group")).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+      this.groupByLanguage.set(language, group);
+    }
+    return group;
+  }
+
+  private dropsGroup<T>(): MonoTypeOperatorFunction<T> {
+    return tap(() => this.groupByLanguage.clear());
   }
 
   listPublicAbout(groupId: number): Observable<About[]> {
@@ -35,33 +49,39 @@ export class GroupService {
   }
 
   updateInfo(id: number, data: { email?: string; phone?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/info`), data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/info`), data).pipe(this.dropsGroup());
   }
 
   updateSummary(id: number, data: { summary: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/summary`), data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/summary`), data).pipe(this.dropsGroup());
   }
 
   updateFacilities(id: number, data: { facilities?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/facilities`), data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/facilities`), data).pipe(this.dropsGroup());
   }
 
   updateFutureWork(id: number, data: { futureWork?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/future-work`), data);
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/future-work`), data).pipe(this.dropsGroup());
   }
 
   updatePublicationsSection(id: number, data: { publicationsSection?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/publications-section`), data);
+    return this.http
+      .put<{ status: number }>(GLOBAL.admin(`group/${id}/publications-section`), data)
+      .pipe(this.dropsGroup());
   }
 
   updateProjectsSection(id: number, data: { projectsSection?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/projects-section`), data);
+    return this.http
+      .put<{ status: number }>(GLOBAL.admin(`group/${id}/projects-section`), data)
+      .pipe(this.dropsGroup());
   }
 
   uploadAsset(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
     const formData = new FormData();
     formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(GLOBAL.admin(`assets/research_group/${id}/${slot}`), formData);
+    return this.http
+      .put<{ status: number }>(GLOBAL.admin(`assets/research_group/${id}/${slot}`), formData)
+      .pipe(this.dropsGroup());
   }
 
   // About (admin)
