@@ -13,7 +13,6 @@ router.get("/", zValidator("query", PublicNewsListQuerySchema), async (c) => {
   const query = c.req.valid("query");
   const response = await listPublicNews(locale, {
     q: query.q,
-    statusCode: query.statusCode,
     newsKindCode: query.newsKindCode,
     sortBy: query.sortBy,
     sortOrder: query.sortOrder,

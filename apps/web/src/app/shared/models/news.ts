@@ -30,7 +30,6 @@ export interface PublicNewsListItem {
 
 export interface PublicNewsListQuery {
   q?: string;
-  statusCode?: "draft" | "published" | "archived";
   newsKindCode?: "general" | "research" | "event";
   sortBy?: "publishedAt" | "title";
   sortOrder?: "asc" | "desc";

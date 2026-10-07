@@ -22,7 +22,6 @@ export type PublicNewsSortBy = "publishedAt" | "title";
 
 export interface PublicNewsListQuery {
   q?: string;
-  statusCode: NewsStatusCode;
   newsKindCode?: "general" | "research" | "event";
   sortBy: PublicNewsSortBy;
   sortOrder: "asc" | "desc";
@@ -93,7 +92,7 @@ export async function listPublicNews(locale: Locale, query: PublicNewsListQuery)
         .onRef("news_kind_translation.newsKindCode", "=", "news.newsKindCode")
         .on("news_kind_translation.locale", "=", locale),
     )
-    .where("news.statusCode", "=", query.statusCode);
+    .where("news.statusCode", "=", "published");
 
   if (query.newsKindCode !== undefined) base = base.where("news.newsKindCode", "=", query.newsKindCode);
 
@@ -180,6 +179,7 @@ export async function getPublicNewsDetail(id: number, locale: Locale) {
       "news_kind_translation.name as newsKindName",
     ])
     .where("news.id", "=", id)
+    .where("news.statusCode", "=", "published")
     .executeTakeFirst();
 
   if (!row) return null;
