@@ -26,12 +26,11 @@ import { MemberService, type MemberUpdateBody } from "@app/shared/services/membe
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
 
-type MemberStatus = 0 | 1 | 3;
+type MemberStatus = 0 | 1;
 
 const MEMBER_STATUS = {
   INACTIVE: 0,
   ACTIVE: 1,
-  BLOCKED: 3,
 } as const satisfies Record<string, MemberStatus>;
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -71,7 +70,6 @@ export default class PerfilComponent implements OnInit {
   readonly memberStatusOptions = [
     { value: MEMBER_STATUS.ACTIVE, label: "Activo" },
     { value: MEMBER_STATUS.INACTIVE, label: "Inactivo" },
-    { value: MEMBER_STATUS.BLOCKED, label: "Bloqueado" },
   ];
   get bioLocales() {
     return this.lookup.locales().supported;

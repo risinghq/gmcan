@@ -28,6 +28,7 @@ const RoleCode = z.enum(["administrator", "researcher", "visitor"]);
 const MemberTypeCode = z.enum(["researcher", "phd_student", "master_student", "undergraduate_student", "collaborator"]);
 const PrefixCode = z.enum(["dr", "dra", "mg", "lic", "bach", "ing", "none"]);
 const GenderCode = z.enum(["male", "female"]);
+const IsActive = z.number().int().min(0).max(1);
 
 const CreateBody = z.object({
   dni: z.string().min(1),
@@ -37,7 +38,7 @@ const CreateBody = z.object({
   lastName: z.string().min(1),
   maternalName: z.string().optional(),
   birthDate: z.string().optional(),
-  isActive: z.number().int(),
+  isActive: IsActive,
   roleCode: RoleCode,
   memberTypeCode: MemberTypeCode,
   prefixCode: PrefixCode.nullish(),
@@ -51,7 +52,7 @@ const UpdateBody = z.object({
   lastName: z.string().min(1),
   maternalName: z.string().optional(),
   birthDate: z.string().optional(),
-  isActive: z.number().int(),
+  isActive: IsActive,
   roleCode: RoleCode,
   memberTypeCode: MemberTypeCode,
   prefixCode: PrefixCode.nullish(),
@@ -61,7 +62,7 @@ const UpdateBody = z.object({
 
 const FilterQuery = z.object({
   q: z.string().optional(),
-  isActive: z.coerce.number().int().optional(),
+  isActive: z.coerce.number().pipe(IsActive).optional(),
   memberTypeCode: MemberTypeCode.optional(),
 });
 

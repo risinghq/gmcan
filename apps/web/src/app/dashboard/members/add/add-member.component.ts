@@ -117,19 +117,12 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
     return this.memberForm.dirty;
   }
 
-  adHono = 0;
-
   setCoord(value: number): void {
     this.member.roleCode = value === 1 ? "administrator" : "researcher";
   }
 
-  adHonorem(value: number): void {
-    this.adHono = value;
-  }
-
-  oldMem = 0;
   oldMember(value: number): void {
-    this.oldMem = value;
+    this.member.isActive = value;
   }
 
   errPass = false;
@@ -140,15 +133,6 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
       const values = this.memberForm.getRawValue();
       const firstName = values.middleName ? `${values.firstName} ${values.middleName}`.trim() : values.firstName;
       const birthDate = values.birthDate ? new Date(values.birthDate).toLocaleDateString("sv") : undefined;
-
-      let status: number;
-      if (this.adHono === 3) {
-        status = 3;
-      } else if (this.oldMem === 0) {
-        status = 0;
-      } else {
-        status = 1;
-      }
 
       this.memberService.verifyEmail(values.email).subscribe((result) => {
         if (!result.exists) {
@@ -163,7 +147,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
                 lastName: values.lastName,
                 maternalName: values.maternalName ?? undefined,
                 birthDate,
-                isActive: status,
+                isActive: this.member.isActive,
                 roleCode: this.member.roleCode,
                 memberTypeCode: values.memberTypeCode,
                 prefixCode: values.prefixCode || undefined,

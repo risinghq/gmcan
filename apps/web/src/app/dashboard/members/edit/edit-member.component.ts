@@ -166,19 +166,12 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
     this.memberForm.controls["confirmPassword"].setValue("");
   }
 
-  adHono = 0;
-
   setCoord(value: number): void {
     this.member.roleCode = value === 1 ? "administrator" : "researcher";
   }
 
-  adHonorem(value: number): void {
-    this.adHono = value;
-  }
-
-  oldMem = 0;
   oldMember(value: number): void {
-    this.oldMem = value;
+    this.member.isActive = value;
   }
 
   errPass = false;
@@ -189,17 +182,6 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
       const values = this.memberForm.getRawValue();
       const firstName = values.middleName ? `${values.firstName} ${values.middleName}`.trim() : values.firstName;
       const birthDate = values.birthDate ? toIsoDate(values.birthDate) : undefined;
-
-      let status: number;
-      if (this.adHono === 3) {
-        status = 3;
-      } else if (this.oldMem === 0) {
-        status = 0;
-      } else if (!values.status) {
-        status = 1;
-      } else {
-        status = values.status;
-      }
 
       const doUpdate = () => {
         const password = values.password;
@@ -216,7 +198,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
             lastName: values.lastName,
             maternalName: values.maternalName ?? undefined,
             birthDate,
-            isActive: status,
+            isActive: this.member.isActive,
             roleCode: this.member.roleCode,
             memberTypeCode: values.memberTypeCode,
             prefixCode: values.prefixCode || undefined,

@@ -258,36 +258,9 @@
           </div>
         </div>
         <div class="full-width mb-16">
-          <div class="text-category">¿Ad honorem? (¿Fallecido?)</div>
-          <div class="boxed">
-            <input
-              type="radio"
-              id="fallecidoYes"
-              name="fallecido"
-              [checked]="member.isActive == 0 || member.isActive == 1"
-              (click)="adHonorem(1)"
-            />
-            <label class="mr-16" for="fallecidoYes">No</label>
-            <input
-              type="radio"
-              id="fallecidoNo"
-              name="fallecido"
-              [checked]="member.isActive == 3"
-              (click)="adHonorem(3)"
-            />
-            <label for="fallecidoNo">Sí</label>
-          </div>
-        </div>
-        <div class="full-width mb-16">
           <div class="text-category">¿Miembro antiguo? (Ex-miembro)</div>
           <div class="boxed">
-            <input
-              type="radio"
-              id="exMemberYes"
-              name="ex"
-              [checked]="member.isActive == 3 || member.isActive == 1"
-              (click)="oldMember(1)"
-            />
+            <input type="radio" id="exMemberYes" name="ex" [checked]="member.isActive == 1" (click)="oldMember(1)" />
             <label class="mr-16" for="exMemberYes">No</label>
             <input type="radio" id="exMemberNo" name="ex" [checked]="member.isActive == 0" (click)="oldMember(0)" />
             <label for="exMemberNo">Sí</label>
