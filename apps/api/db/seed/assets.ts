@@ -208,7 +208,6 @@ export async function seedAssetsAndBindings() {
         createdBy: null,
         createdAt: now,
         deletedAt: null,
-        deleteAfter: null,
       })
       .onConflict((oc) =>
         oc.column("storageKey").doUpdateSet({
@@ -218,7 +217,6 @@ export async function seedAssetsAndBindings() {
           sha256,
           lifecycleStatus: "active",
           deletedAt: null,
-          deleteAfter: null,
         }),
       )
       .execute();
