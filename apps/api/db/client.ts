@@ -29,6 +29,22 @@ export function atomic(queries: Compilable[]) {
   return runAtomic(env.DB, queries);
 }
 
+type RowsOf<Queries extends readonly Compilable[]> = {
+  [Index in keyof Queries]: Queries[Index] extends Compilable<infer Row> ? Row[] : never;
+};
+
+/**
+ * Runs independent reads as one D1 call and returns each query's rows in query order. Use it when a
+ * request already knows all of its reads up front: separate calls each pay a network round trip to
+ * the database, and D1 runs them one at a time anyway. Reads that need an earlier result cannot join.
+ */
+export async function readBatch<const Queries extends readonly Compilable[]>(
+  queries: Queries,
+): Promise<RowsOf<Queries>> {
+  const results = await runAtomic(env.DB, [...queries]);
+  return results.map((result) => result.rows) as RowsOf<Queries>;
+}
+
 /**
  * Returns the newest row id for a table with an autoincrement key.
  * Use it when a later query in the batch needs the id from an earlier insert.
