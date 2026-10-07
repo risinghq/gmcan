@@ -23,13 +23,10 @@ async function insertMember(values: { dni: string; email: string; isActive: numb
       lastName: "Torres",
       maternalName: null,
       birthDate: BIRTH_DATE,
-      passwordResetRequired: 0,
       roleCode: "researcher",
       memberTypeCode: "researcher",
       prefixCode: null,
       genderCode: "female",
-      resetToken: null,
-      resetExpiresAt: null,
       createdAt: "2026-01-01",
       updatedAt: "2026-01-01",
     })

@@ -32,13 +32,10 @@ beforeEach(async () => {
       maternalName: null,
       birthDate: null,
       isActive: 1,
-      passwordResetRequired: 0,
       roleCode: "researcher",
       memberTypeCode: "researcher",
       prefixCode: null,
       genderCode: null,
-      resetToken: null,
-      resetExpiresAt: null,
       createdAt: "2026-01-01",
       updatedAt: "2026-01-01",
     })
@@ -104,12 +101,7 @@ describe("email", () => {
       return error;
     };
     expect(await withoutTrace(known)).toEqual(await withoutTrace(unknown));
-    const author = await db
-      .selectFrom("member")
-      .select("resetToken")
-      .where("id", "=", authorId)
-      .executeTakeFirstOrThrow();
-    expect(author.resetToken).toBeNull();
+    expect(await db.selectFrom("password_reset").select("tokenHash").execute()).toEqual([]);
   });
 });
 
