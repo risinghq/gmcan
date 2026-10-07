@@ -24,10 +24,13 @@ a Worker cannot fetch its own public URL.
 
 `gmcan-api` runs in `aws:us-east-1` (`placement` in its `wrangler.jsonc`),
 beside the D1 primary, which D1 placed in `ENAM` (see `running_in_region` in
-`bunx wrangler d1 info gmcan`). A listing endpoint issues one query per row, and
-a query from a distant Worker costs a full network round trip. Without the
-placement, `/api/publications` took 3.6 s from South America; with it, 1.4 s.
-Move the placement if the database is recreated in another region.
+`bunx wrangler d1 info gmcan`). A listing endpoint runs several rounds of
+dependent queries, and a round from a distant Worker costs a full network round
+trip. Reads a request knows up front go to D1 as one batch
+([`readBatch`](../apps/api/db/client.ts)), so a round is one trip. Without the
+placement, a listing with three rounds took about 100 ms longer from South
+America, and the single-round endpoints gained nothing. Move the placement if
+the database is recreated in another region.
 
 The web worker takes its API and site URLs from the origin of each request and
 serves them to the browser at `/config.json`. Set `APP_URL` as a variable on
@@ -117,9 +120,14 @@ Public content endpoints (`GET /api/*` except `/api/email`) answer
 ([`middleware/public-cache.ts`](../apps/api/middleware/public-cache.ts)). The
 web Worker stores those answers in the data center's cache, keyed by URL and
 `Accept-Language`, and replies from it without calling `gmcan-api`. Responses
-carry `X-Cache: HIT` or `MISS`. An edit in the dashboard can therefore take up
-to 60 seconds to show on the public site. Admin responses and private files
-(`private, no-store`) are never cached; public files are immutable.
+carry `X-Cache: HIT`, `STALE` or `MISS`. A copy is fresh for 60 seconds. For the
+next hour the data center still replies from it (`STALE`) and refreshes it in
+the background, so a visitor waits for `gmcan-api` only when the data center
+holds nothing for that URL. An edit in the dashboard therefore shows on the
+first request after 60 seconds if that request is the one that refreshes the
+copy, and on the next one otherwise. Files under `/api/assets` are never served
+stale. Admin responses and private files (`private, no-store`) are never cached.
+Public files are immutable.
 
 Images in `apps/web/public/img` are sized for the page that shows them. Keep new
 ones under a few hundred KB.
