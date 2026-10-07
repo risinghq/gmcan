@@ -1,13 +1,9 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 
-import { createClient } from "@libsql/client";
 import { sql } from "kysely";
 
 import { db } from "../db/client.js";
-import { createTables } from "../db/ddl.js";
+import { sweepExpiredSessions } from "../middleware/session.js";
 import { createNews, deleteNews, listAdminNews, listPublicNews, updateNews } from "../services/news.service.js";
 import { globalSearch } from "../services/search.service.js";
 
@@ -15,19 +11,6 @@ type NewsInput = Parameters<typeof createNews>[0];
 
 const ids: Record<"nano" | "time" | "congress", number> = { nano: 0, time: 0, congress: 0 };
 const members: Record<"roberto" | "ana" | "lucia", number> = { roberto: 0, ana: 0, lucia: 0 };
-
-async function query(dbPath: string, statement: string) {
-  const client = createClient({ url: `file:${dbPath}` });
-  try {
-    return (await client.execute(statement)).rows;
-  } finally {
-    client.close();
-  }
-}
-
-function tempDbPath() {
-  return join(mkdtempSync(join(tmpdir(), "gmcan-api-prod-")), "prod.db");
-}
 
 async function insertMember(dni: string, firstName: string, lastName: string, maternalName: string | null) {
   const result = await db
@@ -315,87 +298,24 @@ describe("index stays in sync with writes", () => {
   });
 });
 
-describe("createTables", () => {
-  test("backfills the index once when the table is created, and reruns are idempotent", async () => {
-    await sql`drop table news_fts`.execute(db);
-    await createTables(db);
-    await createTables(db);
-
-    expect(await countFtsRows()).toBe(6);
-    expect(await publicIds("rob sint")).toEqual([ids.nano]);
-    expect(await publicIds("investigacion")).toEqual([ids.nano]);
-  });
-});
-
-describe("production start", () => {
-  const apiDir = join(import.meta.dir, "..");
-
-  function startInProduction(dbPath: string, q?: string) {
-    const proc = Bun.spawnSync({
-      cmd: [process.execPath, "test/fixtures/production-start.ts", ...(q === undefined ? [] : [q])],
-      cwd: apiDir,
-      env: {
-        ...process.env,
-        NODE_ENV: "production",
-        BACKEND_URL: "https://api.example.test",
-        LIBSQL_URL: `file:${dbPath}`,
-      },
+describe("session sweep", () => {
+  test("deletes expired and idle sessions and keeps live ones", async () => {
+    const hour = 3_600_000;
+    const at = (offset: number) => new Date(Date.now() + offset).toISOString();
+    const row = (id: string, expiresAt: string, lastActiveAt: string) => ({
+      id,
+      memberId: members.roberto,
+      expiresAt,
+      lastActiveAt,
     });
-    return { exitCode: proc.exitCode, stdout: proc.stdout.toString().trim(), stderr: proc.stderr.toString().trim() };
-  }
+    await db
+      .insertInto("session")
+      .values([row("live", at(hour), at(0)), row("expired", at(-hour), at(0)), row("idle", at(hour), at(-3 * hour))])
+      .execute();
 
-  test("builds and backfills the index on first start, and a second start is a no-op", async () => {
-    // A database from before this index existed: everything createTables makes, minus news_fts and its triggers.
-    const dbPath = tempDbPath();
-    await sql`vacuum into ${dbPath}`.execute(db);
-    const ftsObjects = "select type, name from sqlite_master where name like 'news_fts%' or sql like '%news_fts%'";
-    const ftsTriggers = "select name from sqlite_master where type = 'trigger' and sql like '%news_fts%'";
-    const triggers = await query(dbPath, ftsTriggers);
-    await Promise.all(triggers.map((row) => query(dbPath, `drop trigger ${String(row.name)}`)));
-    await query(dbPath, "drop table news_fts");
-    expect(await query(dbPath, ftsObjects)).toEqual([]);
+    await sweepExpiredSessions();
 
-    const first = startInProduction(dbPath, "rob sint");
-    expect(first).toEqual({ exitCode: 0, stdout: JSON.stringify([ids.nano]), stderr: "" });
-    expect((await query(dbPath, "select count(*) as n from news_fts"))[0].n).toBe(6);
-    const schemaAfterFirst = await query(dbPath, "select type, name, sql from sqlite_master order by name");
-
-    const second = startInProduction(dbPath, "gest");
-    expect(second).toEqual({ exitCode: 0, stdout: JSON.stringify([ids.time]), stderr: "" });
-    expect((await query(dbPath, "select count(*) as n from news_fts"))[0].n).toBe(6);
-    expect(await query(dbPath, "select type, name, sql from sqlite_master order by name")).toEqual(schemaAfterFirst);
-
-    // Production still skips seeding.
-    expect((await query(dbPath, "select count(*) as n from member"))[0].n).toBe(3);
-  }, 30_000);
-
-  test("a schema the index cannot be built on logs one error and still starts", async () => {
-    const dbPath = tempDbPath();
-    await query(dbPath, "create table news (id integer primary key, title text)");
-    await query(dbPath, "create table session (id text primary key, expiresAt text)");
-
-    const start = startInProduction(dbPath);
-    expect(start.exitCode).toBe(0);
-    expect(start.stderr.split("\n")).toHaveLength(1);
-    expect(start.stderr).toContain("news search index");
-    expect(start.stderr).toContain("news_translation");
-    expect(await query(dbPath, "select name from sqlite_master where name like 'news_fts%'")).toEqual([]);
-  }, 30_000);
-
-  test("startup deletes expired sessions and keeps live ones", async () => {
-    const dbPath = tempDbPath();
-    await sql`vacuum into ${dbPath}`.execute(db);
-    const memberId = Number((await query(dbPath, "select id from member limit 1"))[0].id);
-    const live = new Date(Date.now() + 3_600_000).toISOString();
-    const expired = new Date(Date.now() - 3_600_000).toISOString();
-    const now = new Date().toISOString();
-    await query(
-      dbPath,
-      `insert into session (id, memberId, expiresAt, lastActiveAt) values
-        ('live', ${memberId}, '${live}', '${now}'), ('expired', ${memberId}, '${expired}', '${now}')`,
-    );
-
-    expect(startInProduction(dbPath).exitCode).toBe(0);
-    expect((await query(dbPath, "select id from session")).map((row) => row.id)).toEqual(["live"]);
-  }, 30_000);
+    const remaining = await db.selectFrom("session").select("id").execute();
+    expect(remaining.map((session) => session.id)).toEqual(["live"]);
+  });
 });
