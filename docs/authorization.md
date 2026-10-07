@@ -25,9 +25,10 @@ The logic is in [`middleware/session.ts`](../apps/api/middleware/session.ts).
 | Lifetime     | 8 hours from login                                       |
 | Idle timeout | 2 hours since the last request. Every request resets it. |
 
-A missing, unknown or expired session gets `401 {"error":"Unauthorized"}` or
-`401 {"error":"Session expired"}`. An unknown email and a wrong password both
-get `401 {"error":"Invalid credentials"}`.
+A missing, unknown or expired session gets a 401 `unauthorized` error with the
+message `Unauthorized` or `Session expired`. An unknown email and a wrong
+password both get a 401 `unauthorized` error with the message
+`Invalid credentials`. All errors have the [envelope](api.md#errors).
 
 `POST /admin/auth/logout` deletes the session and answers `204` with
 `Clear-Site-Data: "cookies","storage"`. Login and logout are the only `/admin`
@@ -72,7 +73,7 @@ The API enforces the permissions itself.
 - `loadActor` runs on `/admin`, except login and logout. It loads the member
   behind the session and puts `{ id, role }` on the request. It answers 401 if
   the member no longer exists.
-- `requirePermission(permission)` answers `403 {"error":"Forbidden"}` unless the
+- `requirePermission(permission)` answers a 403 `forbidden` error unless the
   actor's role has the permission.
 - `requireSelfOrPermission({ resourceParam, selfPermission, elevatedPermission })`
   lets through an actor who has the elevated permission, or whose own id is the
@@ -97,11 +98,22 @@ JSON line with `console.warn`: `"type":"authz_denied"`, `actorId`, `role`,
 
 Three public endpoints under `/api/email` implement the emailed reset:
 
-| Endpoint                       | Behavior                                                                                                              |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `POST /password-reset/request` | Stores a random token valid for 24 hours and emails a link. Answers `success` whether or not the email is registered. |
-| `POST /password-reset/verify`  | Answers with the member's name and email if the token is valid, else 400.                                             |
-| `POST /password-reset/confirm` | Sets a new password of at least 8 characters, clears the token. Invalid token gets 400.                               |
+| Endpoint                       | Behavior                                                                                                               |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `POST /password-reset/request` | Emails a link with a random token valid for 24 hours. Answers `{"status":1}` whether or not the email is registered.   |
+| `POST /password-reset/verify`  | Answers `{"status":1}` if the token is valid, else 400.                                                                |
+| `POST /password-reset/confirm` | Sets a new password of at least 8 characters, spends the token and ends the member's sessions. Invalid token gets 400. |
+
+The token reaches the member only in that email. No response carries it, and
+only its SHA-256 digest is stored, in `password_reset`, one row per member. A
+new request replaces the previous token. The lookup and the send run after the
+response, so a registered and an unknown address are answered alike in time. The
+scheduled sweep deletes expired rows.
+
+An administrator who changes a member's password
+(`PUT /admin/email/member-password`) ends that member's sessions too. Any
+password change, by the member or an administrator, also voids an outstanding
+reset link.
 
 Without email configured ([configuration](configuration.md#email)) the request
 endpoint answers `503` and stores no token.

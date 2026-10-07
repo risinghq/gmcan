@@ -16,7 +16,6 @@ export function publicLocalizedMemberSelectQuery(locale: Locale) {
       "member.lastName as lastName",
       "member.maternalName as maternalName",
       "member_translation.bio as bio",
-      "member.isActive as isActive",
       "member.roleCode as roleCode",
       "member.memberTypeCode as memberTypeCode",
       "member.prefixCode as prefixCode",

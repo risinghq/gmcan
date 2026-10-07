@@ -40,11 +40,13 @@ CREATE TABLE "research_group" ("id" integer not null primary key autoincrement, 
 
 CREATE TABLE "research_group_translation" ("groupId" integer not null references "research_group" ("id") on delete cascade, "locale" text not null references "locale" ("code") on delete restrict, "summary" text not null, "facilities" text, "futureWork" text, "publicationsSection" text, "projectsSection" text, constraint "research_group_translation_pk" primary key ("groupId", "locale"));
 
-CREATE TABLE "member" ("id" integer not null primary key autoincrement, "dni" text not null unique, "email" text not null unique, "passwordHash" text not null, "firstName" text not null, "lastName" text not null, "maternalName" text, "birthDate" text, "isActive" integer not null, "passwordResetRequired" integer not null, "roleCode" text not null references "role" ("code"), "memberTypeCode" text not null references "member_type" ("code"), "prefixCode" text references "prefix" ("code"), "genderCode" text references "gender" ("code"), "resetToken" text, "resetExpiresAt" text, "createdAt" text not null, "updatedAt" text not null, constraint "member_is_active_check" check (isActive in (0,1)), constraint "member_password_reset_required_check" check (passwordResetRequired in (0,1)));
+CREATE TABLE "member" ("id" integer not null primary key autoincrement, "dni" text not null unique, "email" text not null unique, "passwordHash" text not null, "firstName" text not null, "lastName" text not null, "maternalName" text, "birthDate" text, "isActive" integer not null, "roleCode" text not null references "role" ("code"), "memberTypeCode" text not null references "member_type" ("code"), "prefixCode" text references "prefix" ("code"), "genderCode" text references "gender" ("code"), "createdAt" text not null, "updatedAt" text not null, constraint "member_is_active_check" check (isActive in (0,1)));
 
 CREATE TABLE "member_translation" ("memberId" integer not null references "member" ("id") on delete cascade, "locale" text not null references "locale" ("code") on delete restrict, "bio" text, constraint "member_translation_pk" primary key ("memberId", "locale"));
 
 CREATE TABLE "session" ("id" text not null primary key, "memberId" integer not null references "member" ("id") on delete cascade, "expiresAt" text not null, "lastActiveAt" text not null);
+
+CREATE TABLE "password_reset" ("tokenHash" text not null primary key, "memberId" integer not null unique references "member" ("id") on delete cascade, "expiresAt" text not null);
 
 CREATE TABLE "research_line" ("id" integer not null primary key autoincrement, "groupId" integer not null references "research_group" ("id") on delete cascade, "createdAt" text not null, "updatedAt" text not null);
 

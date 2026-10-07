@@ -129,13 +129,10 @@ export interface MemberTable {
   maternalName: string | null;
   birthDate: DateString | null;
   isActive: number;
-  passwordResetRequired: number;
   roleCode: RoleCode;
   memberTypeCode: MemberTypeCode;
   prefixCode: PrefixCode | null;
   genderCode: GenderCode | null;
-  resetToken: string | null;
-  resetExpiresAt: DateString | null;
   createdAt: DateString;
   updatedAt: DateString;
 }
@@ -149,6 +146,11 @@ export interface SessionTable {
   memberId: number;
   expiresAt: DateString;
   lastActiveAt: DateString;
+}
+export interface PasswordResetTable {
+  tokenHash: string;
+  memberId: number;
+  expiresAt: DateString;
 }
 
 export interface ResearchLineTable {
@@ -426,6 +428,7 @@ interface DatabaseTables {
   member: MemberTable;
   member_translation: MemberTranslationTable;
   session: SessionTable;
+  password_reset: PasswordResetTable;
   research_line: ResearchLineTable;
   research_line_translation: ResearchLineTranslationTable;
   method: MethodTable;

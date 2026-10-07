@@ -3,6 +3,7 @@ import type { Context, MiddlewareHandler, Next } from "hono";
 import { permissionsForRole, roleByCode } from "../authz/permissions.js";
 import { can } from "../authz/policy.js";
 import type { Actor, Permission } from "../authz/types.js";
+import { forbidden, unauthorized } from "../lib/errors/app-error.js";
 import { getMemberFull } from "../services/member.service.js";
 import { AUTH_EXEMPT_PATHS } from "./auth-exempt.js";
 
@@ -31,14 +32,14 @@ export const loadActor: MiddlewareHandler = async (c: Context, next: Next) => {
   if (AUTH_EXEMPT_PATHS.has(c.req.path)) return next();
 
   const memberId = c.get("memberId");
-  if (!memberId) return c.json({ error: "Unauthorized" }, 401);
+  if (!memberId) throw unauthorized();
 
   const locale = c.get("locale");
   const member = await getMemberFull(memberId, locale);
-  if (!member) return c.json({ error: "Unauthorized" }, 401);
+  if (!member) throw unauthorized();
 
   const role = roleByCode[member.roleCode];
-  if (!role) return c.json({ error: "Forbidden" }, 403);
+  if (!role) throw forbidden();
 
   c.set("actor", {
     id: member.id,
@@ -55,7 +56,7 @@ export function requirePermission(permission: Permission): MiddlewareHandler {
     const actor = c.get("actor");
     if (!can(actor, permission)) {
       logDenial(c, permission, "missing_permission");
-      return c.json({ error: "Forbidden" }, 403);
+      throw forbidden();
     }
     await next();
   };
@@ -86,7 +87,7 @@ export function requireSelfOrPermission(options: SelfOrPermissionGuardOptions): 
     }
 
     logDenial(c, elevatedPermission, "missing_permission_or_not_self");
-    return c.json({ error: "Forbidden" }, 403);
+    throw forbidden();
   };
 }
 

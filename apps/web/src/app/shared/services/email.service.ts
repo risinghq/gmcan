@@ -5,40 +5,35 @@ import { Observable } from "rxjs";
 import { GLOBAL } from "./global";
 
 export interface MembershipApplication {
-  nombre: string;
-  razon: string;
-  correo: string;
-  telefono: string;
-}
-
-export interface EmailResponse {
-  success: boolean;
-  message: string;
-  emailId?: string;
-  error?: string;
-}
-
-export interface PasswordResetRequest {
+  name: string;
+  reason: string;
   email: string;
+  phone: string;
+}
+
+export interface StatusResponse {
+  status: number;
 }
 
 @Injectable({ providedIn: "root" })
 export class EmailService {
   private http = inject(HttpClient);
 
-  sendMembershipApplication(application: MembershipApplication): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(GLOBAL.api("email"), application);
+  sendMembershipApplication(application: MembershipApplication): Observable<StatusResponse> {
+    return this.http.post<StatusResponse>(GLOBAL.api("email/contact"), application);
   }
 
-  sendPasswordReset(request: PasswordResetRequest): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(GLOBAL.admin("auth/password-reset"), request);
+  /** Every address gets the same answer. The link reaches the member by email only. */
+  requestPasswordReset(email: string): Observable<StatusResponse> {
+    return this.http.post<StatusResponse>(GLOBAL.api("email/password-reset/request"), { email });
   }
 
-  verifyResetToken(token: string): Observable<{ valid: boolean }> {
-    return this.http.post<{ valid: boolean }>(GLOBAL.admin("auth/verify-reset-token"), { token });
+  /** Return 400 when the token is unknown or expired. */
+  verifyResetToken(token: string): Observable<StatusResponse> {
+    return this.http.post<StatusResponse>(GLOBAL.api("email/password-reset/verify"), { token });
   }
 
-  resetPassword(token: string, newPassword: string): Observable<{ status: number }> {
-    return this.http.post<{ status: number }>(GLOBAL.admin("auth/reset-password"), { token, newPassword });
+  resetPassword(token: string, newPassword: string): Observable<StatusResponse> {
+    return this.http.post<StatusResponse>(GLOBAL.api("email/password-reset/confirm"), { token, newPassword });
   }
 }

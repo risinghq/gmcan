@@ -49,7 +49,6 @@
   margin-bottom: 24px;
 }
 
-.input-email,
 .input-password {
   background-color: #f5f5f5;
   outline: none;
@@ -112,20 +111,9 @@ form .ng-dirty.ng-invalid {
   text-align: center;
 }
 
-.forgot {
-  margin-top: 24px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  color: #30393a;
-}
-
 .login-subtitle {
   letter-spacing: 0.3px;
   color: #30393a;
-}
-
-.recover-back {
-  margin-top: 32px;
 }
 
 .succesful-title {
@@ -156,9 +144,7 @@ form .ng-dirty.ng-invalid {
     margin-top: 40px;
   }
   .back-text,
-  .input-email,
   .input-password,
-  .forgot,
   .login-subtitle {
     font-size: 15px;
   }
@@ -201,9 +187,7 @@ form .ng-dirty.ng-invalid {
     margin-top: 32px;
   }
   .back-text,
-  .input-email,
   .input-password,
-  .forgot,
   .login-subtitle {
     font-size: 13px;
   }

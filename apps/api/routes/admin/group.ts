@@ -1,11 +1,11 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 
 import type { LocalizedTranslations } from "../../lib/admin-translations.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { AppError } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createEquipment,
@@ -37,24 +37,14 @@ const AboutSectionSchema = z.object({
   items: z.array(z.string().trim().min(1)),
 });
 
+/** Stored content that is absent or malformed is a data fault, not a client error. */
 function parseJsonContentStrict<T>(raw: string | null, schema: z.ZodType<T>, field: string): T {
-  if (!raw) {
-    throw new HTTPException(500, {
-      res: new Response(JSON.stringify({ error: "Missing translation", code: "MISSING_TRANSLATION", field }), {
-        status: 500,
-        headers: { "content-type": "application/json" },
-      }),
-    });
-  }
+  const missing = () => new AppError("internal_error", "Missing translation", 500, { field });
+  if (!raw) throw missing();
   try {
     return schema.parse(JSON.parse(raw));
   } catch {
-    throw new HTTPException(500, {
-      res: new Response(JSON.stringify({ error: "Missing translation", code: "MISSING_TRANSLATION", field }), {
-        status: 500,
-        headers: { "content-type": "application/json" },
-      }),
-    });
+    throw missing();
   }
 }
 
@@ -70,8 +60,8 @@ router.get("/", async (c) => {
 
 router.put(
   "/:id/info",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ email: z.string().optional(), phone: z.string().optional() })),
+  validate("param", IdParam),
+  validate("json", z.object({ email: z.string().optional(), phone: z.string().optional() })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -82,8 +72,8 @@ router.put(
 
 router.put(
   "/:id/summary",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ summary: z.string().min(1) }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ summary: z.string().min(1) }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -94,8 +84,8 @@ router.put(
 
 router.put(
   "/:id/facilities",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ facilities: z.string().optional() }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ facilities: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -106,8 +96,8 @@ router.put(
 
 router.put(
   "/:id/future-work",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ futureWork: z.string().optional() }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ futureWork: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -118,8 +108,8 @@ router.put(
 
 router.put(
   "/:id/publications-section",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ publicationsSection: z.string().optional() }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ publicationsSection: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -130,8 +120,8 @@ router.put(
 
 router.put(
   "/:id/projects-section",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ projectsSection: z.string().optional() }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ projectsSection: z.string().optional() }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -141,7 +131,7 @@ router.put(
 );
 
 // About
-router.get("/:id/about", zValidator("param", IdParam), async (c) => {
+router.get("/:id/about", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const rows = await listAbout(id);
   return c.json(
@@ -177,8 +167,8 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
 
 router.put(
   "/about/:id/description",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ description: z.string().min(1) }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ description: z.string().min(1) }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -189,8 +179,8 @@ router.put(
 
 router.put(
   "/about/:id/objectives",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ objectivesContent: AboutSectionSchema }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ objectivesContent: AboutSectionSchema }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -207,8 +197,8 @@ router.put(
 
 router.put(
   "/about/:id/services",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ translations: translationsSchema({ servicesContent: AboutSectionSchema }) })),
+  validate("param", IdParam),
+  validate("json", z.object({ translations: translationsSchema({ servicesContent: AboutSectionSchema }) })),
   async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
@@ -225,8 +215,8 @@ router.put(
 
 router.put(
   "/about/:id/home-services-teaser",
-  zValidator("param", IdParam),
-  zValidator(
+  validate("param", IdParam),
+  validate(
     "json",
     z.object({
       translations: translationsSchema({
@@ -251,7 +241,7 @@ router.put(
 // Software
 router.get(
   "/:groupId/software",
-  zValidator("param", z.object({ groupId: z.coerce.number().int().positive() })),
+  validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
   async (c) => {
     const { groupId } = c.req.valid("param");
     const rows = await listSoftware(groupId);
@@ -261,7 +251,7 @@ router.get(
 
 router.post(
   "/software",
-  zValidator(
+  validate(
     "json",
     z.object({
       translations: translationsSchema({
@@ -281,8 +271,8 @@ router.post(
 
 router.put(
   "/software/:id",
-  zValidator("param", IdParam),
-  zValidator(
+  validate("param", IdParam),
+  validate(
     "json",
     z.object({
       translations: translationsSchema({
@@ -300,7 +290,7 @@ router.put(
   },
 );
 
-router.delete("/software/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/software/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteSoftware(id);
   return c.json(okStatus());
@@ -309,7 +299,7 @@ router.delete("/software/:id", zValidator("param", IdParam), async (c) => {
 // Equipment
 router.get(
   "/:groupId/equipment",
-  zValidator("param", z.object({ groupId: z.coerce.number().int().positive() })),
+  validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
   async (c) => {
     const { groupId } = c.req.valid("param");
     const rows = await listEquipment(groupId);
@@ -319,7 +309,7 @@ router.get(
 
 router.post(
   "/equipment",
-  zValidator(
+  validate(
     "json",
     z.object({
       name: z.string().min(1),
@@ -339,8 +329,8 @@ router.post(
 
 router.put(
   "/equipment/:id",
-  zValidator("param", IdParam),
-  zValidator(
+  validate("param", IdParam),
+  validate(
     "json",
     z.object({
       name: z.string().min(1),
@@ -358,7 +348,7 @@ router.put(
   },
 );
 
-router.delete("/equipment/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/equipment/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteEquipment(id);
   return c.json(okStatus());

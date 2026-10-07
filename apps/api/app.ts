@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 
 import { getFrontendUrl } from "./config.js";
 import { loadActor } from "./middleware/authz.js";
-import { onError } from "./middleware/error.js";
+import { onError, onNotFound } from "./middleware/error.js";
 import { publicCache } from "./middleware/public-cache.js";
 import { requireRequestLocale } from "./middleware/public-locale.js";
 import { requireSession } from "./middleware/session.js";
@@ -35,13 +35,14 @@ import PublicPublicationsRoutes from "./routes/public/content/publications.js";
 import PublicResearchLinesRoutes from "./routes/public/content/research-lines.js";
 import PublicSearchRoutes from "./routes/public/content/search.js";
 import PublicSoftwareRoutes from "./routes/public/content/software.js";
-import PublicEmailRoutes from "./routes/public/operational/email.js";
+import { createEmailRouter } from "./routes/public/operational/email.js";
 
 export const app = new Hono({ strict: false });
 const publicContentApi = new Hono({ strict: false });
 const adminApi = new Hono({ strict: false });
 
 app.onError(onError);
+app.notFound(onNotFound);
 
 app.use(
   "*",
@@ -88,7 +89,7 @@ adminApi.route("/methods", AdminMethodsRoutes);
 adminApi.route("/group", AdminGroupRoutes);
 adminApi.route("/ref", AdminRefRoutes);
 
-app.route("/api/email", PublicEmailRoutes);
+app.route("/api/email", createEmailRouter());
 app.route("/api", publicContentApi);
 app.route("/api/placeholders", PublicPlaceholdersRoutes);
 app.route("/admin", adminApi);

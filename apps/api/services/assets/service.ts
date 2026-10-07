@@ -6,6 +6,7 @@ import type { Compilable } from "kysely";
 import { getBackendUrl } from "../../config.js";
 import { env } from "../../config/env.js";
 import { atomic, db, lastInsertId } from "../../db/client.js";
+import { badRequest, notFound, unauthorized } from "../../lib/errors/app-error.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../../lib/upload.js";
 import { OWNER_CONFIG } from "./policy.js";
 import { type ActiveAsset, ensureOwnerExists, getActiveAssets, getCurrentAssetId, getNextVersion } from "./repo.js";
@@ -33,7 +34,7 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
     kind: cfg.kindBySlot[input.slot],
     bytes: buffer,
   });
-  if (!storageKey) throw new Error("Invalid file type");
+  if (!storageKey) throw badRequest("Invalid file type");
 
   const ext = extensionFromName(input.file.name);
   const mimeDetected = input.file.type || "application/octet-stream";
@@ -97,7 +98,7 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
 export async function deleteCurrentAsset(input: AssetDeleteRequest): Promise<void> {
   assertSlotForOwner(input.ownerType, input.slot);
   const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
-  if (!assetId) throw new Error("Current asset binding not found");
+  if (!assetId) throw notFound("Current asset binding not found");
 
   await db
     .updateTable("asset")
@@ -113,7 +114,7 @@ export async function deleteCurrentAsset(input: AssetDeleteRequest): Promise<voi
 
 export async function restoreAsset(assetId: number, actorId: number | null): Promise<void> {
   const row = await db.selectFrom("asset").select("id").where("id", "=", assetId).executeTakeFirst();
-  if (!row) throw new Error("Asset not found");
+  if (!row) throw notFound("Asset not found");
 
   await db.updateTable("asset").set({ lifecycleStatus: "active", deletedAt: null }).where("id", "=", assetId).execute();
 
@@ -208,15 +209,15 @@ export async function serveAssetById(
     .where("id", "=", assetId)
     .where("lifecycleStatus", "=", "active")
     .executeTakeFirst();
-  if (!row) return c.json({ error: "File not found" }, 404);
+  if (!row) throw notFound("File not found");
 
   if (row.visibility === "private") {
-    if (!options.token || !options.expires) return c.json({ error: "Unauthorized" }, 401);
-    if (options.expires < Math.floor(Date.now() / 1000)) return c.json({ error: "Token expired" }, 401);
-    if (signAccess(assetId, options.expires) !== options.token) return c.json({ error: "Invalid token" }, 401);
+    if (!options.token || !options.expires) throw unauthorized();
+    if (options.expires < Math.floor(Date.now() / 1000)) throw unauthorized("Token expired");
+    if (signAccess(assetId, options.expires) !== options.token) throw unauthorized("Invalid token");
   }
 
   const key = normalizeAssetKey(row.storageKey);
-  if (!key) return c.json({ error: "Invalid asset key" }, 400);
+  if (!key) throw badRequest("Invalid asset key");
   return serveAsset(c, { assetKey: key, asAttachment: options.asAttachment, private: row.visibility === "private" });
 }

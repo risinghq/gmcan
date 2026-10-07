@@ -119,26 +119,6 @@
   cursor: pointer;
   color: var(--dark-forest-green);
 }
-/* tabs de publicacion */
-::ng-deep .mat-tab-label {
-  width: 100% !important;
-  height: 32px !important;
-}
-
-::ng-deep .mat-ink-bar {
-  background-color: #000000 !important;
-}
-
-::ng-deep .mat-tab-body-content {
-  overflow: hidden !important;
-}
-
-::ng-deep .mat-tab-label-active .mat-tab-label-content,
-::ng-deep .mat-tab-label-active {
-  color: black;
-  opacity: 1 !important;
-}
-
 @media (min-width: 1500px) {
   .member-div {
     padding-left: 343px !important;

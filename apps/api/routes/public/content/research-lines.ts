@@ -1,7 +1,8 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { notFound } from "../../../lib/errors/app-error.js";
+import { validate } from "../../../lib/validate.js";
 import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../../services/assets/service.js";
 import { getResearchLineLocalized, listResearchLinesLocalized } from "../../../services/group.service.js";
 
@@ -29,11 +30,11 @@ router.get("/", async (c) => {
   );
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const row = await getResearchLineLocalized(id, locale);
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
   return c.json({
     id: row.id,
     name: row.name,

@@ -1,4 +1,4 @@
-import type { Compilable } from "kysely";
+import type { Compilable, Expression, SqlBool } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME } from "../db/projections.js";
@@ -173,35 +173,16 @@ export async function getMemberFull(id: number, locale: Locale = DEFAULT_LOCALE)
       "member.memberTypeCode as memberTypeCode",
       "member.prefixCode as prefixCode",
       "member.genderCode as genderCode",
-      "member.passwordResetRequired as passwordResetRequired",
-      "member.resetToken as resetToken",
-      "member.resetExpiresAt as resetExpiresAt",
     ])
     .where("member.id", "=", id)
     .executeTakeFirst();
 }
 
+/** Sign-in and password reset use this read. It is the only read that returns `passwordHash`. */
 export async function getMemberByEmail(email: string) {
   return db
     .selectFrom("member")
-    .select([
-      "id",
-      "dni",
-      "email",
-      "firstName",
-      "lastName",
-      "maternalName",
-      "birthDate",
-      "isActive",
-      "roleCode",
-      "memberTypeCode",
-      "prefixCode",
-      "genderCode",
-      "passwordHash",
-      "passwordResetRequired",
-      "resetToken",
-      "resetExpiresAt",
-    ])
+    .select(["id", "firstName", "isActive", "roleCode", "passwordHash"])
     .where("email", "=", email)
     .executeTakeFirst();
 }
@@ -290,9 +271,6 @@ export async function createMember(data: {
     db.insertInto("member").values({
       ...rest,
       passwordHash: await hashPassword(password),
-      passwordResetRequired: 0,
-      resetToken: null,
-      resetExpiresAt: null,
       createdAt: now,
       updatedAt: now,
     }),
@@ -429,53 +407,39 @@ export async function deleteMember(id: number) {
   await db.deleteFrom("member").where("id", "=", id).execute();
 }
 
-export async function updatePassword(email: string, newPassword: string) {
-  await db
-    .updateTable("member")
-    .set({
-      passwordHash: await hashPassword(newPassword),
-      passwordResetRequired: 0,
-      resetToken: null,
-      resetExpiresAt: null,
-    })
-    .where("email", "=", email)
-    .execute();
+/**
+ * The queries that change a password, end the member's sessions and spend their reset token, so
+ * neither a stolen session nor an emailed link outlives the password. `keepSessionId` spares the
+ * session that made the change. `guard` makes every query apply only while it holds, so a batch
+ * that lost a race changes nothing. The password update comes first: its affected-row count says
+ * whether the guard held. The reset row goes last because the guard may read it.
+ */
+export async function passwordChangeQueries(
+  memberId: number,
+  newPassword: string,
+  options: { keepSessionId?: string; guard?: Expression<SqlBool> } = {},
+): Promise<Compilable[]> {
+  const { keepSessionId, guard } = options;
+  return [
+    db
+      .updateTable("member")
+      .set({ passwordHash: await hashPassword(newPassword) })
+      .where("id", "=", memberId)
+      .$if(guard !== undefined, (qb) => qb.where(guard as Expression<SqlBool>)),
+    db
+      .deleteFrom("session")
+      .where("memberId", "=", memberId)
+      .$if(keepSessionId !== undefined, (qb) => qb.where("id", "!=", keepSessionId as string))
+      .$if(guard !== undefined, (qb) => qb.where(guard as Expression<SqlBool>)),
+    db
+      .deleteFrom("password_reset")
+      .where("memberId", "=", memberId)
+      .$if(guard !== undefined, (qb) => qb.where(guard as Expression<SqlBool>)),
+  ];
 }
 
-export async function getResetPasswordStatus(email: string) {
-  return db.selectFrom("member").select("passwordResetRequired").where("email", "=", email).executeTakeFirst();
-}
-
-export async function setResetToken(memberId: number, token: string, expiresAt: string) {
-  await db
-    .updateTable("member")
-    .set({ resetToken: token, resetExpiresAt: expiresAt, passwordResetRequired: 1 })
-    .where("id", "=", memberId)
-    .execute();
-}
-
-export async function getMemberByResetToken(token: string) {
-  const now = new Date().toISOString();
-  return db
-    .selectFrom("member")
-    .select(["id", "firstName", "email"])
-    .where("resetToken", "=", token)
-    .where("resetExpiresAt", ">", now)
-    .where("passwordResetRequired", "=", 1)
-    .executeTakeFirst();
-}
-
-export async function consumeResetToken(memberId: number, newPassword: string) {
-  await db
-    .updateTable("member")
-    .set({
-      passwordHash: await hashPassword(newPassword),
-      resetToken: null,
-      resetExpiresAt: null,
-      passwordResetRequired: 0,
-    })
-    .where("id", "=", memberId)
-    .execute();
+export async function updatePassword(memberId: number, newPassword: string, keepSessionId?: string) {
+  await atomic(await passwordChangeQueries(memberId, newPassword, { keepSessionId }));
 }
 
 export async function listMemberGroups(memberId: number) {

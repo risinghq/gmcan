@@ -55,7 +55,7 @@ Writes use JSON bodies, except file uploads.
 | Path              | Permission (read / write)                  | Resource                                                                                                                                  |
 | ----------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `/auth`           | none                                       | `POST /login`, `POST /logout`                                                                                                             |
-| `/account`        | `account.self.read` / `account.self.write` | `GET /me`, `GET /reset-status`, `PUT /password`                                                                                           |
+| `/account`        | `account.self.read` / `account.self.write` | `GET /me`, `PUT /password`                                                                                                                |
 | `/dashboard`      | `analytics.read`                           | `GET /summary`: counts of members and publications by type                                                                                |
 | `/news`           | `news.read` / `news.write`                 | Paged list with filters, get, create, update, delete                                                                                      |
 | `/publications`   | `publications.read` / `publications.write` | List, get, create, update, delete, `PUT /:id/authors`                                                                                     |
@@ -74,26 +74,28 @@ Create endpoints answer `201 { "id": <number> }`. Update and delete answer
 
 ## Errors
 
-A handler that rejects a request answers `{ "error": "<message>" }` with 400,
-401, 403 or 404. Input that fails zod validation answers 400 with the zod error
-(`{ "success": false, "error": { "name": "ZodError", ... } }`).
-
-An exception that escapes a handler goes through `onError`
-([`middleware/error.ts`](../apps/api/middleware/error.ts)), which answers the
-envelope defined in
+Every error answer of the API, from a route, a guard, the validator or an
+unknown path, has the envelope defined in
 [`packages/contracts/src/common/error.ts`](../packages/contracts/src/common/error.ts):
 
 ```json
 {
   "ok": false,
   "error": {
-    "code": "internal_error",
-    "status": 500,
-    "message": "Internal server error",
+    "code": "not_found",
+    "status": 404,
+    "message": "Not found",
     "traceId": "…"
   }
 }
 ```
+
+Code throws an `AppError` (`badRequest`, `unauthorized`, `forbidden`, `notFound`
+in [`lib/errors/app-error.ts`](../apps/api/lib/errors/app-error.ts)), and
+`onError` and `onNotFound` in
+[`middleware/error.ts`](../apps/api/middleware/error.ts) turn it into the
+envelope. Input that fails validation answers 400 `invalid_request` with the zod
+issues in `details`.
 
 `code` is one of `invalid_request`, `unauthorized`, `forbidden`, `not_found`,
 `conflict`, `upstream_failure`, `invariant_violation` and `internal_error`.

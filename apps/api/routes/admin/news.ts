@@ -1,9 +1,10 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import { resolveAssetAccessUrl } from "../../services/assets/service.js";
 import {
@@ -50,16 +51,16 @@ router.use("*", async (c, next) => {
   return requirePermission("news.write")(c, next);
 });
 
-router.get("/", zValidator("query", ListQuery), async (c) => {
+router.get("/", validate("query", ListQuery), async (c) => {
   const locale = c.get("locale");
   const query = c.req.valid("query");
   return c.json(await listAdminNews(locale, query));
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getNewsItem(id);
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
   const view = await toAdminNewsView(row);
   return c.json({
     ...view,
@@ -67,20 +68,20 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   });
 });
 
-router.post("/", zValidator("json", NewsBody), async (c) => {
+router.post("/", validate("json", NewsBody), async (c) => {
   const data: NewsUpsertInput = c.req.valid("json");
   const id = await createNews(data);
   return c.json({ id }, 201);
 });
 
-router.put("/:id", zValidator("param", IdParam), zValidator("json", NewsBody), async (c) => {
+router.put("/:id", validate("param", IdParam), validate("json", NewsBody), async (c) => {
   const { id } = c.req.valid("param");
   const data: NewsUpsertInput = c.req.valid("json");
   await updateNews(id, data);
   return c.json(okStatus());
 });
 
-router.delete("/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteNews(id);
   return c.json(okStatus());

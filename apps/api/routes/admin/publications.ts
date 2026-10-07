@@ -1,10 +1,11 @@
 import { AdminPublicationListQuerySchema } from "@gmcan/contracts/admin";
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   createPublication,
@@ -61,39 +62,39 @@ router.use("*", async (c, next) => {
   return requirePermission("publications.write")(c, next);
 });
 
-router.get("/", zValidator("query", AdminPublicationListQuerySchema), async (c) => {
+router.get("/", validate("query", AdminPublicationListQuerySchema), async (c) => {
   const locale = c.get("locale");
   const filters = c.req.valid("query");
   return c.json(await listAdminPublications(filters, locale));
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const result = await getPublicationEditView(id, c.get("locale"));
-  if (!result.publication) return c.json({ error: "Not found" }, 404);
+  if (!result.publication) throw notFound();
   return c.json(result);
 });
 
-router.post("/", zValidator("json", CreateBody), async (c) => {
+router.post("/", validate("json", CreateBody), async (c) => {
   const { data, authors } = c.req.valid("json");
   const id = await createPublication(data as PublicationFields, authors as AuthorInput[]);
   return c.json({ id }, 201);
 });
 
-router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody), async (c) => {
+router.put("/:id", validate("param", IdParam), validate("json", UpdateBody), async (c) => {
   const { id } = c.req.valid("param");
   const { data, authors } = c.req.valid("json");
   await updatePublication(id, data as PublicationFields, authors as AuthorInput[]);
   return c.json(okStatus());
 });
 
-router.delete("/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deletePublication(id);
   return c.json(okStatus());
 });
 
-router.put("/:id/authors", zValidator("param", IdParam), zValidator("json", z.array(AuthorEntry)), async (c) => {
+router.put("/:id/authors", validate("param", IdParam), validate("json", z.array(AuthorEntry)), async (c) => {
   const { id } = c.req.valid("param");
   const authors = c.req.valid("json");
   await replaceAuthors(id, authors as AuthorInput[]);

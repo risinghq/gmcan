@@ -36,7 +36,8 @@ import. Its three entry points are listed in
 
 [`worker.ts`](apps/api/worker.ts) is the Worker entry: `fetch` serves the Hono
 app built in [`app.ts`](apps/api/app.ts), and `scheduled` sweeps expired
-sessions. A request passes through these layers, top to bottom:
+sessions and password reset tokens. A request passes through these layers, top
+to bottom:
 
 | Layer        | Directory                                | Owns                                                             |
 | ------------ | ---------------------------------------- | ---------------------------------------------------------------- |
@@ -88,13 +89,49 @@ batch ([database](docs/database.md#transactions)).
 
 [`db/projections.ts`](apps/api/db/projections.ts) holds the column lists that
 decide which `member` fields leave the database layer (`MEMBER_PUBLIC`,
-`MEMBER_ACTIVE`, `MEMBER_NAME`). They keep `passwordHash` and reset tokens out
-of responses. [`db/views.ts`](apps/api/db/views.ts) composes them into the
-joined reads that build a member profile and a publication with its authors.
+`MEMBER_ACTIVE`, `MEMBER_NAME`). They keep `passwordHash` out of responses.
+[`db/views.ts`](apps/api/db/views.ts) composes them into the joined reads that
+build a member profile and a publication with its authors.
 
 News search is an FTS5 table with triggers, created by the first migration and
 queried from [`repositories/news.ts`](apps/api/repositories/news.ts). Migrations
 and seeding are in [docs/database.md](docs/database.md).
+
+### Sessions and reset tokens
+
+Two tables hold state that concurrent requests move: `session` (one row per
+sign-in) and `password_reset` (at most one row per member, keyed by the SHA-256
+digest of the token). Each row is in one of the states below, and only the owner
+listed may move it. D1 runs batches one after another, so a batch is the unit
+that cannot interleave; a lookup followed by a later write can.
+
+| Row              | Transition               | Owner                                                                                                   | When                                                                                            |
+| ---------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `session`        | none → live              | `createSession` ([`middleware/session.ts`](apps/api/middleware/session.ts))                             | A login with a correct password of an active member.                                            |
+| `session`        | live → live (idle clock) | `requireSession`                                                                                        | Every authenticated request.                                                                    |
+| `session`        | live → gone              | `requireSession`                                                                                        | Past 8 hours, idle for 2 hours, or the member is gone or inactive.                              |
+| `session`        | live → gone              | `destroySession`                                                                                        | Logout.                                                                                         |
+| `session`        | live → gone              | `passwordChangeQueries` ([`services/member.service.ts`](apps/api/services/member.service.ts))           | Any password change: all the member's sessions, except the one that made a self-service change. |
+| `session`        | live → gone              | `sweepExpiredSessions`                                                                                  | The scheduled worker, for rows nobody presented again.                                          |
+| `password_reset` | none or live → live      | `issueResetToken` ([`services/password-reset.service.ts`](apps/api/services/password-reset.service.ts)) | A reset request for an active member; it replaces the member's previous row.                    |
+| `password_reset` | live → gone, once        | `passwordChangeQueries`, through `resetPasswordWithToken` or a change below                             | Any password change: a confirm, a self-service change or an administrator's, in the same batch. |
+| `password_reset` | live → gone              | `sweepExpiredResets`                                                                                    | The scheduled worker, past the 24 hours.                                                        |
+
+Invariants:
+
+- A reset token is spent at most once. The statements that change the password
+  and the sessions carry a guard that the live token row exists, and the batch
+  deletes the row last, so of two confirms with one token the second changes
+  nothing and reports failure. Every password change deletes the member's reset
+  row, so a link emailed before a change cannot override it. Deleting a member
+  deletes both tables' rows by cascade.
+- A password change and the end of the member's sessions happen in the same
+  batch; no state has the new password with an old session alive.
+- Only the digest of a token is stored, and no read selects `password_reset` for
+  a response. The plain token exists in the email that carries it.
+- A login that races a password change may leave a session created after the
+  change. It is bound by the same limits as any other and ends at the next
+  change, logout or expiry.
 
 ### Assets
 

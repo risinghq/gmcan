@@ -1,9 +1,10 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "../../db/client.js";
 import { okStatus } from "../../lib/contracts.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import {
   getEventPublicationDependencyCount,
   getJournalPublicationDependencyCount,
@@ -22,28 +23,28 @@ router.get("/funding-source", async (c) =>
 router.get("/currency", async (c) => c.json(await db.selectFrom("currency").select(["code", "symbol"]).execute()));
 
 router.get("/journal", async (c) => c.json(await db.selectFrom("journal").selectAll().execute()));
-router.get("/journal/:id", zValidator("param", IdParam), async (c) => {
+router.get("/journal/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await db.selectFrom("journal").selectAll().where("id", "=", id).executeTakeFirst();
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
   return c.json(row);
 });
-router.post("/journal", zValidator("json", JournalBody), async (c) => {
+router.post("/journal", validate("json", JournalBody), async (c) => {
   const result = await db.insertInto("journal").values(c.req.valid("json")).executeTakeFirstOrThrow();
   return c.json({ id: Number(result.insertId) }, 201);
 });
-router.put("/journal/:id", zValidator("param", IdParam), zValidator("json", JournalBody), async (c) => {
+router.put("/journal/:id", validate("param", IdParam), validate("json", JournalBody), async (c) => {
   const { id } = c.req.valid("param");
   await db.updateTable("journal").set(c.req.valid("json")).where("id", "=", id).execute();
   return c.json(okStatus());
 });
-router.delete("/journal/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/journal/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("journal").where("id", "=", id).execute();
   return c.json(okStatus());
 });
 
-router.get("/journal/:id/dependencies", zValidator("param", IdParam), async (c) => {
+router.get("/journal/:id/dependencies", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const journalArticle = await getJournalPublicationDependencyCount(id);
   return c.json({
@@ -53,7 +54,7 @@ router.get("/journal/:id/dependencies", zValidator("param", IdParam), async (c) 
   });
 });
 
-router.get("/event/:id/dependencies", zValidator("param", IdParam), async (c) => {
+router.get("/event/:id/dependencies", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const conferencePaper = await getEventPublicationDependencyCount(id);
   return c.json({

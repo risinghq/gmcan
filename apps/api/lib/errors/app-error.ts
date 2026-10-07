@@ -12,6 +12,13 @@ export class AppError extends Error {
   }
 }
 
+/** Routes and middleware throw these errors. `onError` turns them into the API envelope. */
+export const badRequest = (message: string, details?: unknown) =>
+  new AppError("invalid_request", message, 400, details);
+export const unauthorized = (message = "Unauthorized") => new AppError("unauthorized", message, 401);
+export const forbidden = (message = "Forbidden") => new AppError("forbidden", message, 403);
+export const notFound = (message = "Not found") => new AppError("not_found", message, 404);
+
 const STATUS_TO_CODE_MAP: Record<ErrorHttpStatus, AppErrorCode> = {
   400: "invalid_request",
   401: "unauthorized",
@@ -24,21 +31,6 @@ const STATUS_TO_CODE_MAP: Record<ErrorHttpStatus, AppErrorCode> = {
   503: "upstream_failure",
 };
 
-const CODE_TO_STATUS_MAP: Record<AppErrorCode, ErrorHttpStatus> = {
-  invalid_request: 400,
-  unauthorized: 401,
-  forbidden: 403,
-  not_found: 404,
-  conflict: 409,
-  upstream_failure: 502,
-  invariant_violation: 422,
-  internal_error: 500,
-};
-
 export function statusToErrorCode(status: ErrorHttpStatus): AppErrorCode {
   return STATUS_TO_CODE_MAP[status];
-}
-
-export function codeToErrorStatus(code: AppErrorCode): ErrorHttpStatus {
-  return CODE_TO_STATUS_MAP[code];
 }

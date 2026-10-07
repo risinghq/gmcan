@@ -46,13 +46,6 @@
   text-decoration: none;
 }
 
-.join-text {
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-
 .back-icon {
   margin-right: 8px;
   width: max-content !important;
@@ -99,6 +92,12 @@
   border: solid 2px gray;
 }
 
+.send-error {
+  color: #a00000;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
 .email-title {
   font-weight: bold;
   line-height: 1.33;
@@ -115,14 +114,6 @@ form .ng-dirty.ng-invalid {
   border: red solid 1px;
 }
 
-.error {
-  border-radius: 4px;
-  color: white;
-  background-color: rgba(160, 0, 0, 0.85);
-  padding: 8px;
-  text-align: center;
-}
-
 @media (min-width: 1500px) {
   .join-div {
     padding-left: 343px !important;
@@ -136,8 +127,7 @@ form .ng-dirty.ng-invalid {
   .join-link-active,
   .join-link,
   .back-text,
-  .input-email,
-  .error {
+  .input-email {
     font-size: 15px;
   }
   .email-btn,
@@ -183,8 +173,7 @@ form .ng-dirty.ng-invalid {
   .join-link-active,
   .join-link,
   .back-text,
-  .input-email,
-  .error {
+  .input-email {
     font-size: 15px;
   }
   .email-btn,
@@ -232,8 +221,7 @@ form .ng-dirty.ng-invalid {
   .back-text,
   .email-btn,
   .email-subtitle,
-  .input-email,
-  .error {
+  .input-email {
     font-size: 13px;
   }
 

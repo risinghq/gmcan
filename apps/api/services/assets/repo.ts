@@ -1,12 +1,13 @@
 import { sql } from "kysely";
 
 import { db, queryInChunks } from "../../db/client.js";
+import { notFound } from "../../lib/errors/app-error.js";
 import { OWNER_CONFIG } from "./policy.js";
 import type { OwnerType } from "./types.js";
 
 export async function ensureOwnerExists(ownerType: OwnerType, ownerId: number): Promise<void> {
   const row = await db.selectFrom(ownerType).select("id").where("id", "=", ownerId).executeTakeFirst();
-  if (!row) throw new Error("Owner not found");
+  if (!row) throw notFound("Owner not found");
 }
 
 export async function getCurrentAssetId(ownerType: OwnerType, ownerId: number, slot: string): Promise<number | null> {

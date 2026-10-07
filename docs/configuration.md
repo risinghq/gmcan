@@ -44,10 +44,10 @@ override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
 [`lib/mail.ts`](../apps/api/lib/mail.ts) sends through Resend's HTTP API. It
 needs `RESEND_API_KEY`, `EMAIL_FROM`, and for the contact form
 `INSTITUTIONAL_EMAIL`. When any is missing, the contact form and
-`POST /api/email/password-reset/request` answer
-`503 {"error":{"code":"upstream_failure","message":"Email is not configured"}}`
-and change nothing. The password reset request refuses before it looks up the
-address, so the answer does not reveal which addresses are registered.
+`POST /api/email/password-reset/request` answer a 503 `upstream_failure` error
+with the message `Email is not configured` and change nothing. The password
+reset request refuses before it looks up the address, so the answer does not
+reveal which addresses are registered.
 
 ## Ports
 

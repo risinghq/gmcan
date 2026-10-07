@@ -75,8 +75,6 @@ export const Languages = [
       {
         memberTitle: "Nuestros Miembros",
         memberText: "Conoce a las increíbles personas que hacen grande al grupo.",
-        memberActual: "Miembros actuales",
-        memberOld: "Antiguos Miembros",
         seeProfile: "Ver Perfil",
       },
     ],
@@ -139,8 +137,6 @@ export const Languages = [
         abstract: "Resumen",
         seeMore: "Ver resumen",
         seeLess: "Ocultar resumen",
-        activeMember: "Miembro Activo",
-        oldMember: "Antiguo Miembro",
       },
     ],
     detailNewsText: [
@@ -180,6 +176,7 @@ export const Languages = [
         talkabout: "Cuéntanos un poco sobre ti",
         email: "Déjanos tu correo y un teléfono de contacto para comunicarnos contigo",
         send: "Enviar",
+        sendFailed: "No pudimos enviar tu mensaje. Inténtalo de nuevo más tarde.",
         name: "Nombre completo",
         reason: "¿A qué te dedicas? ¿Qué te motiva a querer ser parte del GMCAN?",
         emailPlace: "Correo",
@@ -274,8 +271,6 @@ export const Languages = [
       {
         memberTitle: "Members",
         memberText: "Meet the people who make our group amazing.",
-        memberActual: "Active Members",
-        memberOld: "Old Members",
         seeProfile: "View profile",
       },
     ],
@@ -338,8 +333,6 @@ export const Languages = [
         abstract: "Abstract",
         seeMore: "See More",
         seeLess: "See Less",
-        activeMember: "Active member",
-        oldMember: "Old Member",
       },
     ],
     detailNewsText: [
@@ -379,6 +372,7 @@ export const Languages = [
         talkabout: "Tell us a bit about yourself",
         email: "Give us your email and phone number to contact you.",
         send: "Send",
+        sendFailed: "We could not send your message. Please try again later.",
         name: "Name",
         reason: "What do you do? What motivates you to want to be part of GMCAN?",
         emailPlace: "Email",

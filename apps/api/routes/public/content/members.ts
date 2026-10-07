@@ -1,7 +1,8 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { notFound } from "../../../lib/errors/app-error.js";
+import { validate } from "../../../lib/validate.js";
 import { resolveAssetAccessLinkMap } from "../../../services/assets/service.js";
 import {
   memberFullName,
@@ -23,11 +24,11 @@ router.get("/", async (c) => {
   return c.json(rows.map((row) => Object.assign({}, row, photos.get(row.id))));
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const profile = await getMemberProfileLocalized(id, locale);
-  if (!profile.member) return c.json({ error: "Not found" }, 404);
+  if (!profile.member) throw notFound();
 
   const member = {
     ...profile.member,

@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import { env } from "cloudflare:workers";
 import type { Context } from "hono";
 
+import { badRequest, notFound } from "./errors/app-error.js";
+
 export const MIME_TYPES: Record<string, string> = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
@@ -76,10 +78,10 @@ export async function serveAsset(
   options: { assetKey: string; asAttachment?: boolean; private?: boolean },
 ): Promise<Response> {
   const key = normalizeAssetKey(options.assetKey);
-  if (!key) return c.json({ error: "Invalid asset key" }, 400);
+  if (!key) throw badRequest("Invalid asset key");
 
   const object = await env.STORAGE.get(key);
-  if (!object) return c.json({ error: "File not found" }, 404);
+  if (!object) throw notFound("File not found");
 
   const headers: Record<string, string> = {
     "Content-Type": MIME_TYPES[extensionOf(key)] ?? "application/octet-stream",

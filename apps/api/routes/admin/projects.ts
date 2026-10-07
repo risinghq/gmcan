@@ -1,9 +1,9 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToProject,
@@ -48,44 +48,44 @@ router.use("*", async (c, next) => {
   return requirePermission("projects.write")(c, next);
 });
 
-router.get("/", zValidator("query", FilterQuery), async (c) => {
+router.get("/", validate("query", FilterQuery), async (c) => {
   const locale = c.get("locale");
   const { statusCode, q } = c.req.valid("query");
   return c.json(await listAdminProjects(locale, statusCode, q));
 });
 
-router.post("/", zValidator("json", ProjectBody), async (c) => {
+router.post("/", validate("json", ProjectBody), async (c) => {
   const data = c.req.valid("json");
   const id = await createProject(data);
   return c.json({ id }, 201);
 });
 
-router.put("/:id", zValidator("param", IdParam), zValidator("json", ProjectBody), async (c) => {
+router.put("/:id", validate("param", IdParam), validate("json", ProjectBody), async (c) => {
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateProject(id, data);
   return c.json(okStatus());
 });
 
-router.delete("/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteProject(id);
   return c.json(okStatus());
 });
 
-router.put("/:id/end", zValidator("param", IdParam), async (c) => {
+router.put("/:id/end", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await endProject(id);
   return c.json(okStatus());
 });
 
-router.put("/:id/restart", zValidator("param", IdParam), async (c) => {
+router.put("/:id/restart", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await restartProject(id);
   return c.json(okStatus());
 });
 
-router.get("/:id/members", zValidator("param", IdParam), async (c) => {
+router.get("/:id/members", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const rows = await listProjectMembers(id);
   return c.json(rows);
@@ -93,8 +93,8 @@ router.get("/:id/members", zValidator("param", IdParam), async (c) => {
 
 router.post(
   "/:id/members",
-  zValidator("param", IdParam),
-  zValidator("json", z.object({ memberId: z.number().int() })),
+  validate("param", IdParam),
+  validate("json", z.object({ memberId: z.number().int() })),
   async (c) => {
     const { id } = c.req.valid("param");
     const { memberId } = c.req.valid("json");
@@ -105,7 +105,7 @@ router.post(
 
 router.delete(
   "/:id/members/:memberId",
-  zValidator("param", IdParam.extend({ memberId: z.coerce.number().int().positive() })),
+  validate("param", IdParam.extend({ memberId: z.coerce.number().int().positive() })),
   async (c) => {
     const { id, memberId } = c.req.valid("param");
     await removeMemberFromProject(id, memberId);
