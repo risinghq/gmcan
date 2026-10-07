@@ -67,8 +67,15 @@ export const requireSession = async (c: Context, next: Next) => {
 
   await db.updateTable("session").set({ lastActiveAt: now.toISOString() }).where("id", "=", id).execute();
 
-  const member = await db.selectFrom("member").select(["email"]).where("id", "=", session.memberId).executeTakeFirst();
-  if (!member) return c.json({ error: "Unauthorized" }, 401);
+  const member = await db
+    .selectFrom("member")
+    .select(["email", "isActive"])
+    .where("id", "=", session.memberId)
+    .executeTakeFirst();
+  if (!member || member.isActive !== 1) {
+    await db.deleteFrom("session").where("id", "=", id).execute();
+    return c.json({ error: "Unauthorized" }, 401);
+  }
 
   c.set("memberId", session.memberId);
   c.set("email", member.email);
