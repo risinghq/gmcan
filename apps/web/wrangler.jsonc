@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gmcan-web",
+  "main": "dist/tesisFront/server/server.mjs",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "alias": { "xhr2": "./cloudflare/xhr2.js" },
+  "assets": { "binding": "ASSETS", "directory": "dist/tesisFront/browser" },
+  // The browser reaches the API only through this site, so its session cookie stays same-site.
+  "services": [{ "binding": "API", "service": "gmcan-api" }],
+}

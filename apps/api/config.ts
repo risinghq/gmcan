@@ -8,10 +8,20 @@ const FRONTEND_URLS: Record<typeof env.NODE_ENV, string> = {
 
 const LOCAL_BACKEND_URL = "http://localhost:3000";
 
+type UrlEnv = Pick<typeof env, "NODE_ENV" | "FRONTEND_URL" | "BACKEND_URL">;
+
+export function resolveFrontendUrl(config: UrlEnv): string {
+  return config.FRONTEND_URL ?? FRONTEND_URLS[config.NODE_ENV];
+}
+
+export function resolveBackendUrl(config: UrlEnv): string {
+  return (config.BACKEND_URL ?? LOCAL_BACKEND_URL).replace(/\/+$/, "");
+}
+
 export function getFrontendUrl(): string {
-  return env.FRONTEND_URL ?? FRONTEND_URLS[env.NODE_ENV];
+  return resolveFrontendUrl(env);
 }
 
 export function getBackendUrl(): string {
-  return (env.BACKEND_URL ?? LOCAL_BACKEND_URL).replace(/\/+$/, "");
+  return resolveBackendUrl(env);
 }

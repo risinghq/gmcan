@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { getFrontendUrl } from "./config.js";
 import { loadActor } from "./middleware/authz.js";
 import { onError } from "./middleware/error.js";
+import { publicCache } from "./middleware/public-cache.js";
 import { requireRequestLocale } from "./middleware/public-locale.js";
 import { requireSession } from "./middleware/session.js";
 import AdminAccountRoutes from "./routes/admin/account.js";
@@ -53,6 +54,7 @@ app.use(
 );
 
 publicContentApi.use("*", requireRequestLocale);
+publicContentApi.use("*", publicCache);
 publicContentApi.route("/publications", PublicPublicationsRoutes);
 publicContentApi.route("/members", PublicMembersRoutes);
 publicContentApi.route("/projects", PublicProjectsRoutes);

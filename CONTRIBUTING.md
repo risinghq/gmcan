@@ -2,10 +2,10 @@
 
 ## Set up
 
-Follow [Run it](README.md#run-it) in the README. You need Bun 1.4.2 and a
-valid `.env`. The Angular CLI and the Hono API both run from the repository
-root with `bun run dev`. `bun run dev:web` and `bun run dev:api` start one of
-them.
+Follow [Run it](README.md#run-it) in the README. You need Bun 1.4.2, an
+`apps/api/.dev.vars` and a migrated, seeded local database. The Angular CLI and
+the API under `wrangler dev` both run from the repository root with
+`bun run dev`. `bun run dev:web` and `bun run dev:api` start one of them.
 
 ## Check your change
 
@@ -31,10 +31,10 @@ change. [oxfmt](oxfmt.config.ts) formats TypeScript and Markdown: print width
 ## Tests
 
 API tests live in [`apps/api/test`](apps/api/test) and run with `bun test` from
-`apps/api`. [`test/setup.ts`](apps/api/test/setup.ts) gives them a fresh libSQL
-file in the system temp directory, creates the tables and seeds the lookup
-tables, so tests run against a real database and never touch
-`data/gmcan.db`. Write new API tests the same way: call the service or the
+`apps/api`. [`test/setup.ts`](apps/api/test/setup.ts) gives them a fresh local
+D1 and R2 emulation in the system temp directory, applies the migrations and
+seeds the lookup tables, so tests run against a real database and never touch
+`.wrangler/state`. Write new API tests the same way: call the service or the
 route, and assert on the stored result.
 
 Web tests are `*.spec.ts` files next to the code and run by `ng test` (vitest).
@@ -46,22 +46,25 @@ Web tests are `*.spec.ts` files next to the code and run by `ng test` (vitest).
 changes:
 
 - **A new public or admin endpoint.** Add a router under
-  [`apps/api/routes`](apps/api/routes), mount it in
-  [`server.ts`](apps/api/server.ts), and guard admin routes with
-  `requirePermission` ([authorization](docs/authorization.md)). Put a shape that
-  the web app also reads in `packages/contracts`.
+  [`apps/api/routes`](apps/api/routes), mount it in [`app.ts`](apps/api/app.ts),
+  and guard admin routes with `requirePermission`
+  ([authorization](docs/authorization.md)). Put a shape that the web app also
+  reads in `packages/contracts`.
 - **A new permission.** Add it to `Permission` in
   [`authz/types.ts`](apps/api/authz/types.ts) and to the roles that hold it in
   [`authz/permissions.ts`](apps/api/authz/permissions.ts). The web app's
   `Capability` type in
   [`shared/models/capabilities.ts`](apps/web/src/app/shared/models/capabilities.ts)
   mirrors the list.
-- **A schema change.** Edit the table in [`db/schema.ts`](apps/api/db/schema.ts),
-  its definition in [`db/ddl.ts`](apps/api/db/ddl.ts) and its entry in
-  `EXPECTED_COLUMNS`. Existing databases are not migrated: delete your local
-  file to pick up the change ([database](docs/database.md#reset-the-database)).
-- **A new owner of uploaded files.** Create its `<owner>_asset` table (schema,
-  DDL and `EXPECTED_COLUMNS`), add it to `OWNER_CONFIG` in
+- **A schema change.** Add a numbered SQL file under
+  [`apps/api/migrations`](apps/api/migrations) and update the table's type in
+  [`db/schema.ts`](apps/api/db/schema.ts)
+  ([database](docs/database.md#migrations)).
+- **A write that touches several tables.** Run it as one `atomic()` batch, not
+  `db.transaction()`, which D1 does not support
+  ([database](docs/database.md#transactions)).
+- **A new owner of uploaded files.** Create its `<owner>_asset` table (a
+  migration and `schema.ts`), add it to `OWNER_CONFIG` in
   [`services/assets/policy.ts`](apps/api/services/assets/policy.ts), and to the
   owner types in [`services/assets/types.ts`](apps/api/services/assets/types.ts)
   and [`validators.ts`](apps/api/services/assets/validators.ts)

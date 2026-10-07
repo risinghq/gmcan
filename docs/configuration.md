@@ -1,61 +1,72 @@
 # Configuration
 
-The API reads its settings from environment variables.
+The API reads its settings from the Worker's bindings and variables.
 [`config/env.ts`](../apps/api/config/env.ts) validates them with zod when the
-process starts and exits with the list of problems if any value is invalid.
+Worker loads and fails with the list of problems if any value is invalid.
 
-`bun run dev:api` and `bun run start` in `apps/api` load `../../.env`, the
-`.env` at the repository root. [`.env.example`](../.env.example) is the
-template. It is not valid as shipped: `RESEND_API_KEY=` and
-`INSTITUTIONAL_EMAIL=` are empty strings, and the schema rejects both.
+| Where                                                    | What it holds                                                |
+| -------------------------------------------------------- | ------------------------------------------------------------ |
+| `vars` in [`wrangler.jsonc`](../apps/api/wrangler.jsonc) | Non-secret settings, committed. Production values            |
+| `apps/api/.dev.vars`                                     | Local overrides and secrets. Not committed                   |
+| `wrangler secret put` or `--secrets-file`                | Secrets of the deployed Worker ([deployment](deployment.md)) |
+
+[`.dev.vars.example`](../apps/api/.dev.vars.example) is the template for
+`.dev.vars`. Copy it before the first `bun run dev`. Values in `.dev.vars`
+override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
+`FRONTEND_URL` take their local values instead of the production ones in
+`wrangler.jsonc`.
 
 ## Variables
 
-| Variable               | Default                    | Meaning                                                                                     |
-| ---------------------- | -------------------------- | ------------------------------------------------------------------------------------------- |
-| `NODE_ENV`             | `development`              | `development`, `test` or `production`. Production changes startup, cookies, URLs and email. |
-| `LIBSQL_URL`           | `file:./data/gmcan.db`     | libSQL database. A `file:` path is relative to `apps/api`.                                  |
-| `LIBSQL_AUTH_TOKEN`    | none                       | Auth token for a remote libSQL server such as sqld or Turso.                                |
-| `ASSET_SIGNING_SECRET` | none, required             | Key that signs temporary URLs for private files ([assets](assets.md#private-files)).        |
-| `RESEND_API_KEY`       | none, required in practice | Resend key. The API creates its email client at startup and fails without a value.          |
-| `INSTITUTIONAL_EMAIL`  | none                       | Address that receives membership requests. Must be a valid email when set.                  |
-| `FRONTEND_URL`         | by `NODE_ENV`              | Origin allowed by CORS, and the base of password reset links.                               |
-| `BACKEND_URL`          | by `NODE_ENV`              | Public base URL of the API, used to build file URLs in responses.                           |
-| `SUPPORTED_LOCALES`    | `es,en`                    | Comma-separated locale codes ([localization](localization.md)).                             |
-| `DEFAULT_LOCALE`       | first supported locale     | Locale used when a request names none that is supported.                                    |
+| Variable               | Default                 | Meaning                                                                                                        |
+| ---------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`             | `development`           | `development`, `test` or `production`. Production requires `BACKEND_URL` and changes the default frontend URL. |
+| `ASSET_SIGNING_SECRET` | none, required          | Key that signs temporary URLs for private files ([assets](assets.md#private-files)). A secret.                 |
+| `EMAIL_FROM`           | none                    | Sender address. With `RESEND_API_KEY` it turns email on ([deployment](deployment.md#email)).                   |
+| `RESEND_API_KEY`       | none                    | Resend API key. A secret.                                                                                      |
+| `INSTITUTIONAL_EMAIL`  | none                    | Address that receives membership requests. Must be a valid email when set.                                     |
+| `FRONTEND_URL`         | by `NODE_ENV`           | Origin allowed by CORS, and the base of password reset links.                                                  |
+| `BACKEND_URL`          | `http://localhost:3000` | Public base URL of the API, used to build file URLs in responses. In production, the public site URL.          |
+| `SUPPORTED_LOCALES`    | `es,en`                 | Comma-separated locale codes ([localization](localization.md)).                                                |
+| `DEFAULT_LOCALE`       | first supported locale  | Locale used when a request names none that is supported.                                                       |
+| `SEED_PASSWORD`        | generated               | Password the seed gives every sample member, at least 8 characters. Read only by the seed.                     |
 
-`FRONTEND_URL` and `BACKEND_URL` default per environment
-([`config.ts`](../apps/api/config.ts)):
+`FRONTEND_URL` defaults per environment ([`config.ts`](../apps/api/config.ts)):
 
-| `NODE_ENV`    | `FRONTEND_URL`               | `BACKEND_URL`                |
-| ------------- | ---------------------------- | ---------------------------- |
-| `development` | `http://localhost:4200`      | `http://localhost:3000`      |
-| `test`        | `http://localhost:4200`      | `http://localhost:3000`      |
-| `production`  | `https://gmcan.unmsm.edu.pe` | `http://161.35.230.134:3000` |
-
-`.env.example` also lists `JWT_SECRET`. Nothing reads it.
+| `NODE_ENV`    | `FRONTEND_URL`               |
+| ------------- | ---------------------------- |
+| `development` | `http://localhost:4200`      |
+| `test`        | `http://localhost:4200`      |
+| `production`  | `https://gmcan.unmsm.edu.pe` |
 
 ## Email
 
-[`routes/public/operational/email.ts`](../apps/api/routes/public/operational/email.ts)
-sends through Resend. In `development` every message is sent from
-`onboarding@resend.dev` and the membership request goes to
-`delivered@resend.dev`, so no `INSTITUTIONAL_EMAIL` is needed. In any other
-environment the sender is `gmcan@unmsm.edu.pe` and membership requests go to
-`INSTITUTIONAL_EMAIL`.
+[`lib/mail.ts`](../apps/api/lib/mail.ts) sends through Resend's HTTP API. It
+needs `RESEND_API_KEY`, `EMAIL_FROM`, and for the contact form
+`INSTITUTIONAL_EMAIL`. When any is missing, the contact form and
+`POST /api/email/password-reset/request` answer
+`503 {"error":{"code":"upstream_failure","message":"Email is not configured"}}`
+and change nothing. The password reset request refuses before it looks up the
+address, so the answer does not reveal which addresses are registered.
 
 ## Ports
 
-The API listens on port 3000 and the web server on 4200. Neither is
-configurable by environment variable; they are set in
-[`server.ts`](../apps/api/server.ts) and
-[`apps/web/src/server.ts`](../apps/web/src/server.ts).
+`bun run dev` starts the API with `wrangler dev` on port 3000 and the web app
+with `ng serve` on port 4200. The API's port is the `--port` flag of the `start`
+script in [`apps/api/package.json`](../apps/api/package.json).
 
 ## Web app
 
-The Angular app has no environment variables. It reads the API and site URLs
-from [`src/environments/environment.ts`](../apps/web/src/environments/environment.ts).
-`ng build` in its default production configuration replaces that file with
+The Angular build carries no deployment URLs in production. The web Worker
+([`apps/web/src/server.ts`](../apps/web/src/server.ts)) sets the API and site
+URL to its own origin on every request and serves them at `/config.json`. Set
+the `APP_URL` variable on `gmcan-web` to use a different canonical origin.
+
+In development, `ng serve` reads
+[`src/environments/environment.ts`](../apps/web/src/environments/environment.ts)
+(`http://localhost:3000` and `http://localhost:4200`); `ng build` in its
+production configuration replaces it with
 [`environment.prod.ts`](../apps/web/src/environments/environment.prod.ts).
 Server-side rendering accepts the hosts listed under `security.allowedHosts` in
-[`angular.json`](../apps/web/angular.json).
+[`angular.json`](../apps/web/angular.json): `localhost` and `*.workers.dev`. Add
+the host of a custom domain there.

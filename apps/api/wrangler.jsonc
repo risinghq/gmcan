@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gmcan-api",
+  "main": "worker.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Reached only through the web worker's service binding.
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  // Many endpoints issue a query per listed row. Running beside the database makes each one cheap.
+  "placement": { "mode": "targeted", "region": "aws:us-east-1" },
+  "vars": {
+    "NODE_ENV": "production",
+    // The public site: the web worker serves the API under /api and /admin.
+    "BACKEND_URL": "https://gmcan-web.caefisica.workers.dev",
+    "FRONTEND_URL": "https://gmcan-web.caefisica.workers.dev",
+    "SUPPORTED_LOCALES": "es,en",
+    "DEFAULT_LOCALE": "es",
+    // Resend's shared test sender. It delivers only to the Resend account owner's address.
+    "EMAIL_FROM": "onboarding@resend.dev",
+  },
+  "triggers": { "crons": ["17 * * * *"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "gmcan",
+      "database_id": "ca04087b-ab58-4381-9961-6f74d19cc261",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [{ "binding": "STORAGE", "bucket_name": "gmcan-assets" }],
+}

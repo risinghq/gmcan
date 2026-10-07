@@ -1,4 +1,6 @@
-import { db } from "../db/client.js";
+import type { Compilable } from "kysely";
+
+import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import type { MethodRow, ResearchLineRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { type Locale } from "../lib/public-locale.js";
@@ -16,15 +18,15 @@ async function replaceTranslations(table: TTable, ownerId: number, values: Recor
   } as const;
   const ownerColumn = ownerColumnByTable[table];
 
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom(table).where(ownerColumn, "=", ownerId).execute();
-    if (rows.length > 0) {
-      await trx
+  const queries: Compilable[] = [db.deleteFrom(table).where(ownerColumn, "=", ownerId)];
+  if (rows.length > 0) {
+    queries.push(
+      db
         .insertInto(table)
-        .values(rows.map(({ locale, payload }) => Object.assign({ [ownerColumn]: ownerId, locale }, payload)))
-        .execute();
-    }
-  });
+        .values(rows.map(({ locale, payload }) => Object.assign({ [ownerColumn]: ownerId, locale }, payload))),
+    );
+  }
+  await atomic(queries);
 }
 
 type TTable =
@@ -128,12 +130,12 @@ export async function updateGroupProjectsSection(
 
 export async function listAbout(groupId: number) {
   const rows = await db.selectFrom("about").selectAll().where("groupId", "=", groupId).execute();
-  return Promise.all(
-    rows.map(async (row) =>
-      Object.assign({}, row, {
-        translations: await db.selectFrom("about_translation").selectAll().where("aboutId", "=", row.id).execute(),
-      }),
-    ),
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) => db.selectFrom("about_translation").selectAll().where("aboutId", "in", chunk).execute(),
+  );
+  return rows.map((row) =>
+    Object.assign({}, row, { translations: translations.filter((tr) => tr.aboutId === row.id) }),
   );
 }
 
@@ -249,43 +251,45 @@ export async function getResearchLineLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function toAdminResearchLineView(row: ResearchLineRow) {
-  const translations = await db
-    .selectFrom("research_line_translation")
-    .select(["locale", "name", "description"])
-    .where("researchLineId", "=", row.id)
-    .execute();
-  return {
+export async function toAdminResearchLineViews(rows: ResearchLineRow[]) {
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) =>
+      db
+        .selectFrom("research_line_translation")
+        .select(["researchLineId", "locale", "name", "description"])
+        .where("researchLineId", "in", chunk)
+        .execute(),
+  );
+  return rows.map((row) => ({
     id: row.id,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     translations: Object.fromEntries(
-      translations.map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
+      translations
+        .filter((tr) => tr.researchLineId === row.id)
+        .map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
     ),
-  };
+  }));
 }
 
 export async function createResearchLine(data: {
   groupId: number;
   translations: LocalizedTranslations<{ name: string; description?: string }>;
 }) {
-  return db.transaction().execute(async (trx) => {
-    const result = await trx.insertInto("research_line").values({ groupId: data.groupId }).executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
-    await trx
-      .insertInto("research_line_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          researchLineId: id,
-          locale,
-          name: tr.name,
-          description: tr.description ?? null,
-        })),
-      )
-      .execute();
-    return id;
-  });
+  const results = await atomic([
+    db.insertInto("research_line").values({ groupId: data.groupId }),
+    db.insertInto("research_line_translation").values(
+      Object.entries(data.translations).map(([locale, tr]) => ({
+        researchLineId: lastInsertId("research_line"),
+        locale,
+        name: tr.name,
+        description: tr.description ?? null,
+      })),
+    ),
+  ]);
+  return insertedId(results, 0);
 }
 
 export async function updateResearchLine(
@@ -352,43 +356,45 @@ export async function getMethodLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function toAdminMethodView(row: MethodRow) {
-  const translations = await db
-    .selectFrom("method_translation")
-    .select(["locale", "name", "description"])
-    .where("methodId", "=", row.id)
-    .execute();
-  return {
+export async function toAdminMethodViews(rows: MethodRow[]) {
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) =>
+      db
+        .selectFrom("method_translation")
+        .select(["methodId", "locale", "name", "description"])
+        .where("methodId", "in", chunk)
+        .execute(),
+  );
+  return rows.map((row) => ({
     id: row.id,
     groupId: row.groupId,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     translations: Object.fromEntries(
-      translations.map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
+      translations
+        .filter((tr) => tr.methodId === row.id)
+        .map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
     ),
-  };
+  }));
 }
 
 export async function createMethod(data: {
   groupId: number;
   translations: LocalizedTranslations<{ name: string; description: string }>;
 }) {
-  return db.transaction().execute(async (trx) => {
-    const result = await trx.insertInto("method").values({ groupId: data.groupId }).executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
-    await trx
-      .insertInto("method_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          methodId: id,
-          locale,
-          name: tr.name,
-          description: tr.description,
-        })),
-      )
-      .execute();
-    return id;
-  });
+  const results = await atomic([
+    db.insertInto("method").values({ groupId: data.groupId }),
+    db.insertInto("method_translation").values(
+      Object.entries(data.translations).map(([locale, tr]) => ({
+        methodId: lastInsertId("method"),
+        locale,
+        name: tr.name,
+        description: tr.description,
+      })),
+    ),
+  ]);
+  return insertedId(results, 0);
 }
 
 export async function updateMethod(
@@ -440,46 +446,36 @@ export async function createSoftware(data: {
   moreInfo?: string;
   groupId: number;
 }) {
-  return db.transaction().execute(async (trx) => {
-    const result = await trx
-      .insertInto("software")
-      .values({ moreInfo: data.moreInfo, groupId: data.groupId })
-      .executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
-    await trx
-      .insertInto("software_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          softwareId: id,
-          locale,
-          name: tr.name ?? null,
-          description: tr.description ?? null,
-        })),
-      )
-      .execute();
-    return id;
-  });
+  const results = await atomic([
+    db.insertInto("software").values({ moreInfo: data.moreInfo, groupId: data.groupId }),
+    db.insertInto("software_translation").values(
+      Object.entries(data.translations).map(([locale, tr]) => ({
+        softwareId: lastInsertId("software"),
+        locale,
+        name: tr.name ?? null,
+        description: tr.description ?? null,
+      })),
+    ),
+  ]);
+  return insertedId(results, 0);
 }
 
 export async function updateSoftware(
   id: number,
   data: { translations: LocalizedTranslations<{ name?: string; description?: string }>; moreInfo?: string },
 ) {
-  await db.transaction().execute(async (trx) => {
-    await trx.updateTable("software").set({ moreInfo: data.moreInfo }).where("id", "=", id).execute();
-    await trx.deleteFrom("software_translation").where("softwareId", "=", id).execute();
-    await trx
-      .insertInto("software_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          softwareId: id,
-          locale,
-          name: tr.name ?? null,
-          description: tr.description ?? null,
-        })),
-      )
-      .execute();
-  });
+  await atomic([
+    db.updateTable("software").set({ moreInfo: data.moreInfo }).where("id", "=", id),
+    db.deleteFrom("software_translation").where("softwareId", "=", id),
+    db.insertInto("software_translation").values(
+      Object.entries(data.translations).map(([locale, tr]) => ({
+        softwareId: id,
+        locale,
+        name: tr.name ?? null,
+        description: tr.description ?? null,
+      })),
+    ),
+  ]);
 }
 
 export async function deleteSoftware(id: number) {

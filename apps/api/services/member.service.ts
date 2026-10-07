@@ -1,4 +1,6 @@
-import { db } from "../db/client.js";
+import type { Compilable } from "kysely";
+
+import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import { MEMBER_ACTIVE, MEMBER_NAME } from "../db/projections.js";
 import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
 import { memberProjects, memberPublications } from "../db/views.js";
@@ -6,7 +8,7 @@ import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
-import { memberFullName, resolveMemberPhotoView } from "./member-photo.service.js";
+import { memberFullName, resolveMemberPhotoViews } from "./member-photo.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 
 const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "isActive"] as const;
@@ -77,15 +79,14 @@ export async function listAdminMembers(
 
   const rows = await query.orderBy("member.lastName", "asc").execute();
   const memberIds = rows.map((row) => row.id);
-  const translationRows =
-    memberIds.length === 0
-      ? []
-      : await db
-          .selectFrom("member_translation")
-          .select(["memberId", "locale", "bio"])
-          .where("memberId", "in", memberIds)
-          .where("locale", "in", SUPPORTED_LOCALES)
-          .execute();
+  const translationRows = await queryInChunks(memberIds, (chunk) =>
+    db
+      .selectFrom("member_translation")
+      .select(["memberId", "locale", "bio"])
+      .where("memberId", "in", chunk)
+      .where("locale", "in", SUPPORTED_LOCALES)
+      .execute(),
+  );
 
   const translationsByMember = new Map<number, Map<string, string | null>>();
   for (const tr of translationRows) {
@@ -93,51 +94,51 @@ export async function listAdminMembers(
     translationsByMember.get(tr.memberId)!.set(tr.locale, tr.bio);
   }
 
-  return Promise.all(
-    rows.map(async (row) => {
-      const missingBase: string[] = [];
-      if (!row.dni) missingBase.push("dni");
-      if (!row.email) missingBase.push("email");
-      if (!row.firstName) missingBase.push("firstName");
-      if (!row.lastName) missingBase.push("lastName");
-      if (row.isActive !== 1) missingBase.push("isActive");
-
-      const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
-      const missingTranslations: Record<string, string[]> = {};
-      for (const supportedLocale of SUPPORTED_LOCALES) {
-        const missing: string[] = [];
-        const bio = memberTranslations.get(supportedLocale);
-        if (!bio || bio.trim().length === 0) missing.push("bio");
-        if (missing.length > 0) missingTranslations[supportedLocale] = missing;
-      }
-
-      return {
-        id: row.id,
-        dni: row.dni,
-        email: row.email,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        maternalName: row.maternalName,
-        birthDate: row.birthDate,
-        bio: row.bio,
-        isActive: row.isActive,
-        roleCode: row.roleCode,
-        memberTypeCode: row.memberTypeCode,
-        memberTypeName: row.memberTypeName ?? "",
-        prefixCode: row.prefixCode,
-        prefixName: row.prefixName,
-        ...(await resolveMemberPhotoView({
-          memberId: row.id,
-          fullName: memberFullName(row),
-          locale,
-        })),
-        publishability: {
-          publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
-          missing: { base: missingBase, translations: missingTranslations },
-        },
-      };
-    }),
+  const photos = await resolveMemberPhotoViews(
+    rows.map((row) => ({ memberId: row.id, fullName: memberFullName(row) })),
+    locale,
   );
+
+  return rows.map((row) => {
+    const missingBase: string[] = [];
+    if (!row.dni) missingBase.push("dni");
+    if (!row.email) missingBase.push("email");
+    if (!row.firstName) missingBase.push("firstName");
+    if (!row.lastName) missingBase.push("lastName");
+    if (row.isActive !== 1) missingBase.push("isActive");
+
+    const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
+    const missingTranslations: Record<string, string[]> = {};
+    for (const supportedLocale of SUPPORTED_LOCALES) {
+      const missing: string[] = [];
+      const bio = memberTranslations.get(supportedLocale);
+      if (!bio || bio.trim().length === 0) missing.push("bio");
+      if (missing.length > 0) missingTranslations[supportedLocale] = missing;
+    }
+
+    return {
+      id: row.id,
+      dni: row.dni,
+      email: row.email,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      maternalName: row.maternalName,
+      birthDate: row.birthDate,
+      bio: row.bio,
+      isActive: row.isActive,
+      roleCode: row.roleCode,
+      memberTypeCode: row.memberTypeCode,
+      memberTypeName: row.memberTypeName ?? "",
+      prefixCode: row.prefixCode,
+      prefixName: row.prefixName,
+      photoUrl: photos.get(row.id)!.photoUrl,
+      photoAlt: photos.get(row.id)!.photoAlt,
+      publishability: {
+        publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
+        missing: { base: missingBase, translations: missingTranslations },
+      },
+    };
+  });
 }
 
 export async function listMemberNames() {
@@ -235,18 +236,20 @@ export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCAL
       .execute(),
   ]);
 
-  const resolvedMembers = await Promise.all(
-    members.map(async (m) => ({
-      kind: "registered" as const,
-      memberId: m.id,
-      name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
-      photo: null,
-      ...(await resolveMemberPhotoView({
+  const photos = await resolveMemberPhotoViews(
+    members.map((m) => ({ memberId: m.id, fullName: memberFullName(m) })),
+    locale,
+  );
+  const resolvedMembers = members.map((m) =>
+    Object.assign(
+      {
+        kind: "registered" as const,
         memberId: m.id,
-        fullName: memberFullName(m),
-        locale,
-      })),
-    })),
+        name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
+        photo: null,
+      },
+      photos.get(m.id)!,
+    ),
   );
 
   return [
@@ -282,37 +285,33 @@ export async function createMember(data: {
 }) {
   const { password, translation, ...rest } = data;
   const now = new Date().toISOString();
-  return db.transaction().execute(async (trx) => {
-    const result = await trx
-      .insertInto("member")
-      .values({
-        ...rest,
-        passwordHash: hashPassword(password),
-        passwordResetRequired: 0,
-        resetToken: null,
-        resetExpiresAt: null,
-        createdAt: now,
-        updatedAt: now,
-      })
-      .executeTakeFirstOrThrow();
-
-    const memberId = Number(result.insertId);
-    await trx
+  const memberId = lastInsertId("member");
+  const queries: Compilable[] = [
+    db.insertInto("member").values({
+      ...rest,
+      passwordHash: await hashPassword(password),
+      passwordResetRequired: 0,
+      resetToken: null,
+      resetExpiresAt: null,
+      createdAt: now,
+      updatedAt: now,
+    }),
+    db
       .insertInto("member_translation")
       .values(SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: null })))
-      .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing())
-      .execute();
+      .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing()),
+  ];
 
-    if (translation) {
-      await trx
+  if (translation) {
+    queries.push(
+      db
         .insertInto("member_translation")
         .values({ memberId, locale: translation.locale, bio: translation.bio })
-        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
-        .execute();
-    }
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
+    );
+  }
 
-    return memberId;
-  });
+  return insertedId(await atomic(queries), 0);
 }
 
 export async function updateMember(
@@ -332,8 +331,8 @@ export async function updateMember(
   },
 ) {
   const now = new Date().toISOString();
-  await db.transaction().execute(async (trx) => {
-    await trx
+  const queries: Compilable[] = [
+    db
       .updateTable("member")
       .set({
         email: data.email,
@@ -348,17 +347,19 @@ export async function updateMember(
         genderCode: data.genderCode,
         updatedAt: now,
       })
-      .where("id", "=", id)
-      .execute();
+      .where("id", "=", id),
+  ];
 
-    if (data.translation) {
-      await trx
+  if (data.translation) {
+    queries.push(
+      db
         .insertInto("member_translation")
         .values({ memberId: id, locale: data.translation.locale, bio: data.translation.bio })
-        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
-        .execute();
-    }
-  });
+        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
+    );
+  }
+
+  await atomic(queries);
 }
 
 export async function updateMemberTranslation(id: number, locale: string, bio: string) {
@@ -431,7 +432,12 @@ export async function deleteMember(id: number) {
 export async function updatePassword(email: string, newPassword: string) {
   await db
     .updateTable("member")
-    .set({ passwordHash: hashPassword(newPassword), passwordResetRequired: 0, resetToken: null, resetExpiresAt: null })
+    .set({
+      passwordHash: await hashPassword(newPassword),
+      passwordResetRequired: 0,
+      resetToken: null,
+      resetExpiresAt: null,
+    })
     .where("email", "=", email)
     .execute();
 }
@@ -462,7 +468,12 @@ export async function getMemberByResetToken(token: string) {
 export async function consumeResetToken(memberId: number, newPassword: string) {
   await db
     .updateTable("member")
-    .set({ passwordHash: hashPassword(newPassword), resetToken: null, resetExpiresAt: null, passwordResetRequired: 0 })
+    .set({
+      passwordHash: await hashPassword(newPassword),
+      resetToken: null,
+      resetExpiresAt: null,
+      passwordResetRequired: 0,
+    })
     .where("id", "=", memberId)
     .execute();
 }

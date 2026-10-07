@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../../services/assets/service.js";
+import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../../services/assets/service.js";
 import {
   listAboutLocalized,
   listEquipment,
@@ -23,6 +23,11 @@ router.get("/", async (c) => {
   const groups = await listGroupsLocalized(locale);
   const row = groups[0];
   if (!row) return c.json({ error: "Not found" }, 404);
+  const [facilities, header, footer] = await Promise.all(
+    (["facilities", "header", "footer"] as const).map((slot) =>
+      resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot }),
+    ),
+  );
   return c.json({
     id: row.id,
     summary: row.summary,
@@ -31,15 +36,7 @@ router.get("/", async (c) => {
     phone: row.phone,
     name: row.name,
     fullName: row.fullName,
-    assets: {
-      facilities: await resolveAssetAccessUrl({
-        ownerType: "research_group",
-        ownerId: row.id,
-        slot: "facilities",
-      }),
-      header: await resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot: "header" }),
-      footer: await resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot: "footer" }),
-    },
+    assets: { facilities, header, footer },
     facilities: row.facilities,
     futureWork: row.futureWork,
     publicationsSection: row.publicationsSection,
@@ -53,20 +50,24 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const rows = await listAboutLocalized(id, locale);
-  const shaped = await Promise.all(
-    rows.map(async (row) => ({
+  const assets = await resolveAssetAccessUrls({
+    ownerType: "about",
+    ownerIds: rows.map((row) => row.id),
+    slot: "photo",
+  });
+  return c.json(
+    rows.map((row) => ({
       id: row.id,
       description: row.description,
       objectivesContent: AboutSectionSchema.parse(JSON.parse(row.objectivesContent)),
       servicesContent: AboutSectionSchema.parse(JSON.parse(row.servicesContent)),
       homeServicesTeaserContent: HomeTeaserSchema.parse(JSON.parse(row.homeServicesTeaserContent)),
-      asset: await resolveAssetAccessUrl({ ownerType: "about", ownerId: row.id, slot: "photo" }),
+      asset: assets.get(row.id) ?? null,
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     })),
   );
-  return c.json(shaped);
 });
 
 router.get(

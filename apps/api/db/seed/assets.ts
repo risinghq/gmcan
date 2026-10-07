@@ -2,7 +2,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { STORAGE_ROOT, assetExists, quarantineAsset, sha256Buffer } from "../../lib/upload.js";
+import { assetExists, putObject, sha256Buffer } from "../../lib/upload.js";
+import { MEMBER_PHOTO_PLACEHOLDER_KEY } from "../../routes/public/content/placeholders.js";
 import { db } from "../client.js";
 import type { Database } from "../schema.js";
 
@@ -181,7 +182,10 @@ async function insertTypedBinding(binding: SeedBinding, ownerId: number, assetId
 
 export async function seedAssetsAndBindings() {
   const now = new Date().toISOString();
-  fs.mkdirSync(STORAGE_ROOT, { recursive: true });
+  await putObject(
+    MEMBER_PHOTO_PLACEHOLDER_KEY,
+    fs.readFileSync(path.resolve(process.cwd(), "assets/member-photo-placeholder.png")),
+  );
 
   for (const binding of SEED_BINDINGS) {
     const ownerId = await resolveOwnerId(binding);
@@ -192,13 +196,13 @@ export async function seedAssetsAndBindings() {
     const storageKey = `${sha256}.${ext}`;
     const mimeDetected = guessMimeByExt(ext);
 
-    if (!assetExists(storageKey)) fs.writeFileSync(path.join(STORAGE_ROOT, storageKey), buffer);
+    if (!(await assetExists(storageKey))) await putObject(storageKey, buffer);
 
     await db
       .insertInto("asset")
       .values({
         storageKey,
-        bucket: "local",
+        bucket: "r2",
         mimeDetected,
         ext,
         sizeBytes: buffer.byteLength,
@@ -225,58 +229,4 @@ export async function seedAssetsAndBindings() {
     if (!asset) throw new Error(`Asset row not found for storageKey=${storageKey}`);
     await insertTypedBinding(binding, ownerId, asset.id, now);
   }
-}
-
-export async function auditAndQuarantineOrphans() {
-  const rows = await Promise.all([
-    db
-      .selectFrom("member_asset")
-      .innerJoin("asset", "asset.id", "member_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-    db
-      .selectFrom("news_asset")
-      .innerJoin("asset", "asset.id", "news_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-    db
-      .selectFrom("method_asset")
-      .innerJoin("asset", "asset.id", "method_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-    db
-      .selectFrom("research_line_asset")
-      .innerJoin("asset", "asset.id", "research_line_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-    db
-      .selectFrom("publication_asset")
-      .innerJoin("asset", "asset.id", "publication_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-    db
-      .selectFrom("research_group_asset")
-      .innerJoin("asset", "asset.id", "research_group_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-    db
-      .selectFrom("about_asset")
-      .innerJoin("asset", "asset.id", "about_asset.assetId")
-      .select("asset.storageKey")
-      .execute(),
-  ]);
-  const referenced = new Set(rows.flat().map((row) => row.storageKey));
-  fs.mkdirSync(STORAGE_ROOT, { recursive: true });
-  const files = fs
-    .readdirSync(STORAGE_ROOT, { withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name)
-    .filter((name) => !name.startsWith("."));
-  const missingReferenced = [...referenced].filter((key) => !assetExists(key));
-  const moved: string[] = [];
-  for (const file of files) {
-    if (referenced.has(file)) continue;
-    if (await quarantineAsset({ assetKey: file, reason: "orphan-audit" })) moved.push(file);
-  }
-  return { missingReferenced, moved };
 }

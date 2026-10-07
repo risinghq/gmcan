@@ -1,13 +1,14 @@
 import { createHmac } from "node:crypto";
 
 import type { Context } from "hono";
+import type { Compilable } from "kysely";
 
 import { getBackendUrl } from "../../config.js";
 import { env } from "../../config/env.js";
-import { db } from "../../db/client.js";
+import { atomic, db, lastInsertId } from "../../db/client.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../../lib/upload.js";
 import { OWNER_CONFIG } from "./policy.js";
-import { ensureOwnerExists, getCurrentAssetId, getNextVersion } from "./repo.js";
+import { type ActiveAsset, ensureOwnerExists, getActiveAssets, getCurrentAssetId, getNextVersion } from "./repo.js";
 import type { AssetDeleteRequest, AssetLinks, AssetWriteRequest, OwnerType } from "./types.js";
 import { assertSlotForOwner } from "./validators.js";
 
@@ -27,7 +28,7 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
   await ensureOwnerExists(input.ownerType, input.ownerId);
 
   const cfg = OWNER_CONFIG[input.ownerType];
-  const buffer = Buffer.from(await input.file.arrayBuffer());
+  const buffer = new Uint8Array(await input.file.arrayBuffer());
   const storageKey = await saveUploadedFile(input.file, {
     kind: cfg.kindBySlot[input.slot],
     bytes: buffer,
@@ -39,62 +40,58 @@ export async function putAsset(input: AssetWriteRequest): Promise<void> {
   const previousAssetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
   const version = await getNextVersion(input.ownerType, input.ownerId, input.slot);
 
-  await db.transaction().execute(async (trx) => {
-    const assetInsert = await trx
-      .insertInto("asset")
-      .values({
-        storageKey,
-        bucket: "local",
-        mimeDetected,
-        ext,
-        sizeBytes: buffer.byteLength,
-        sha256: sha256Buffer(buffer),
-        visibility: "public",
-        lifecycleStatus: "active",
-        createdBy: input.actorId,
-        createdAt: nowIso(),
-        deletedAt: null,
-      })
-      .executeTakeFirstOrThrow();
+  const queries: Compilable[] = [
+    db.insertInto("asset").values({
+      storageKey,
+      bucket: "r2",
+      mimeDetected,
+      ext,
+      sizeBytes: buffer.byteLength,
+      sha256: sha256Buffer(buffer),
+      visibility: "public",
+      lifecycleStatus: "active",
+      createdBy: input.actorId,
+      createdAt: nowIso(),
+      deletedAt: null,
+    }),
+    db.insertInto(cfg.table).values({
+      [cfg.ownerColumn]: input.ownerId,
+      slot: input.slot,
+      version,
+      assetId: lastInsertId("asset"),
+      actorId: input.actorId,
+      reason: "upload",
+      createdAt: nowIso(),
+    } as never),
+  ];
 
-    const assetId = Number(assetInsert.insertId);
-
-    await trx
-      .insertInto(cfg.table)
-      .values({
-        [cfg.ownerColumn]: input.ownerId,
-        slot: input.slot,
-        version,
-        assetId,
-        actorId: input.actorId,
-        reason: "upload",
-        createdAt: nowIso(),
-      } as never)
-      .execute();
-
-    if (previousAssetId) {
-      await trx
+  if (previousAssetId) {
+    queries.push(
+      db
         .updateTable("asset")
         .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso() })
-        .where("id", "=", previousAssetId)
-        .execute();
-      await trx
-        .insertInto("asset_audit")
-        .values({
-          action: "replace",
-          assetId: previousAssetId,
-          actorId: input.actorId,
-          reason: null,
-          createdAt: nowIso(),
-        })
-        .execute();
-    }
+        .where("id", "=", previousAssetId),
+      db.insertInto("asset_audit").values({
+        action: "replace",
+        assetId: previousAssetId,
+        actorId: input.actorId,
+        reason: null,
+        createdAt: nowIso(),
+      }),
+    );
+  }
 
-    await trx
-      .insertInto("asset_audit")
-      .values({ action: "upload", assetId, actorId: input.actorId, reason: null, createdAt: nowIso() })
-      .execute();
-  });
+  // The new asset stays the newest asset row, so lastInsertId still names it after the earlier statements.
+  queries.push(
+    db.insertInto("asset_audit").values({
+      action: "upload",
+      assetId: lastInsertId("asset"),
+      actorId: input.actorId,
+      reason: null,
+      createdAt: nowIso(),
+    }),
+  );
+  await atomic(queries);
 }
 
 export async function deleteCurrentAsset(input: AssetDeleteRequest): Promise<void> {
@@ -144,24 +141,29 @@ function makePublicAssetUrl(assetId: number, asAttachment: boolean): string {
   return `${getBackendUrl()}${makeAssetPath(assetId, asAttachment)}`;
 }
 
+function accessUrl(asset: ActiveAsset | undefined): string | null {
+  if (!asset) return null;
+  return asset.visibility === "private"
+    ? makeSignedAssetUrl(asset.id, 300, false)
+    : makePublicAssetUrl(asset.id, false);
+}
+
+function accessLinks(asset: ActiveAsset | undefined): AssetLinks | null {
+  if (!asset) return null;
+  const isPrivate = asset.visibility === "private";
+  return {
+    inline: isPrivate ? makeSignedAssetUrl(asset.id, 300, false) : makePublicAssetUrl(asset.id, false),
+    download: isPrivate ? makeSignedAssetUrl(asset.id, 300, true) : makePublicAssetUrl(asset.id, true),
+  };
+}
+
 export async function resolveAssetAccessUrl(input: {
   ownerType: OwnerType;
   ownerId: number;
   slot: string;
 }): Promise<string | null> {
   assertSlotForOwner(input.ownerType, input.slot);
-
-  const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
-  if (!assetId) return null;
-
-  const asset = await db
-    .selectFrom("asset")
-    .select(["visibility", "lifecycleStatus"])
-    .where("id", "=", assetId)
-    .executeTakeFirst();
-
-  if (!asset || asset.lifecycleStatus !== "active") return null;
-  return asset.visibility === "private" ? makeSignedAssetUrl(assetId, 300, false) : makePublicAssetUrl(assetId, false);
+  return accessUrl((await getActiveAssets(input.ownerType, [input.ownerId], input.slot)).get(input.ownerId));
 }
 
 export async function resolveAssetAccessLinks(input: {
@@ -170,22 +172,29 @@ export async function resolveAssetAccessLinks(input: {
   slot: string;
 }): Promise<AssetLinks | null> {
   assertSlotForOwner(input.ownerType, input.slot);
+  return accessLinks((await getActiveAssets(input.ownerType, [input.ownerId], input.slot)).get(input.ownerId));
+}
 
-  const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
-  if (!assetId) return null;
+/** Resolves the slot of many owners with one query per 90 owners. Every requested owner has an entry. */
+export async function resolveAssetAccessUrls(input: {
+  ownerType: OwnerType;
+  ownerIds: number[];
+  slot: string;
+}): Promise<Map<number, string | null>> {
+  assertSlotForOwner(input.ownerType, input.slot);
+  const assets = await getActiveAssets(input.ownerType, input.ownerIds, input.slot);
+  return new Map(input.ownerIds.map((id) => [id, accessUrl(assets.get(id))]));
+}
 
-  const asset = await db
-    .selectFrom("asset")
-    .select(["visibility", "lifecycleStatus"])
-    .where("id", "=", assetId)
-    .executeTakeFirst();
-
-  if (!asset || asset.lifecycleStatus !== "active") return null;
-  const isPrivate = asset.visibility === "private";
-  return {
-    inline: isPrivate ? makeSignedAssetUrl(assetId, 300, false) : makePublicAssetUrl(assetId, false),
-    download: isPrivate ? makeSignedAssetUrl(assetId, 300, true) : makePublicAssetUrl(assetId, true),
-  };
+/** Like `resolveAssetAccessUrls`, with the inline and download links of each file. */
+export async function resolveAssetAccessLinkMap(input: {
+  ownerType: OwnerType;
+  ownerIds: number[];
+  slot: string;
+}): Promise<Map<number, AssetLinks | null>> {
+  assertSlotForOwner(input.ownerType, input.slot);
+  const assets = await getActiveAssets(input.ownerType, input.ownerIds, input.slot);
+  return new Map(input.ownerIds.map((id) => [id, accessLinks(assets.get(id))]));
 }
 
 export async function serveAssetById(
@@ -209,5 +218,5 @@ export async function serveAssetById(
 
   const key = normalizeAssetKey(row.storageKey);
   if (!key) return c.json({ error: "Invalid asset key" }, 400);
-  return serveAsset(c, { assetKey: key, asAttachment: options.asAttachment });
+  return serveAsset(c, { assetKey: key, asAttachment: options.asAttachment, private: row.visibility === "private" });
 }

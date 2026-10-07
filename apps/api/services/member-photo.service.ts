@@ -1,6 +1,6 @@
 import { getBackendUrl } from "../config.js";
 import type { Locale } from "../lib/public-locale.js";
-import { resolveAssetAccessUrl } from "./assets/service.js";
+import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "./assets/service.js";
 
 const MEMBER_PHOTO_FALLBACK_URL = `${getBackendUrl()}/api/placeholders/member-photo`;
 
@@ -31,4 +31,21 @@ export async function resolveMemberPhotoView(input: {
   const assetUrl = await resolveAssetAccessUrl({ ownerType: "member", ownerId: input.memberId, slot: "photo" });
 
   return { photoUrl: assetUrl ?? placeholder.photoUrl, photoAlt: placeholder.photoAlt };
+}
+
+/** Photo views of many members with one asset query per 90 members. The first name given for an id wins. */
+export async function resolveMemberPhotoViews(
+  members: Array<{ memberId: number; fullName: string }>,
+  locale: Locale,
+): Promise<Map<number, MemberPhotoView>> {
+  const names = new Map<number, string>();
+  for (const member of members) if (!names.has(member.memberId)) names.set(member.memberId, member.fullName);
+
+  const urls = await resolveAssetAccessUrls({ ownerType: "member", ownerIds: [...names.keys()], slot: "photo" });
+  return new Map(
+    [...names].map(([memberId, fullName]) => {
+      const placeholder = memberPhotoPlaceholderView({ fullName, locale });
+      return [memberId, { photoUrl: urls.get(memberId) ?? placeholder.photoUrl, photoAlt: placeholder.photoAlt }];
+    }),
+  );
 }

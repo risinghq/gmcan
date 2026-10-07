@@ -1,4 +1,6 @@
-import { db } from "../db/client.js";
+import type { RawBuilder } from "kysely";
+
+import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
 import type { ProjectRow, ProjectStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import type { Locale } from "../lib/public-locale.js";
@@ -32,20 +34,24 @@ async function replaceProjectTranslations(
   projectId: number,
   translations: Record<string, { title: string; description: string }>,
 ) {
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom("project_translation").where("projectId", "=", projectId).execute();
-    await trx
-      .insertInto("project_translation")
-      .values(
-        Object.entries(translations).map(([locale, tr]) => ({
-          projectId,
-          locale,
-          title: tr.title,
-          description: tr.description,
-        })),
-      )
-      .execute();
-  });
+  await atomic([
+    db.deleteFrom("project_translation").where("projectId", "=", projectId),
+    insertProjectTranslations(projectId, translations),
+  ]);
+}
+
+function insertProjectTranslations(
+  projectId: number | RawBuilder<number>,
+  translations: Record<string, { title: string; description: string }>,
+) {
+  return db.insertInto("project_translation").values(
+    Object.entries(translations).map(([locale, tr]) => ({
+      projectId,
+      locale,
+      title: tr.title,
+      description: tr.description,
+    })),
+  );
 }
 
 export async function listProjects(statusCode?: ProjectStatusCode) {
@@ -211,22 +217,11 @@ export async function searchActiveProjectRows(locale: Locale, like: string) {
 }
 
 export async function createProject(data: ProjectAdminInput) {
-  return db.transaction().execute(async (trx) => {
-    const result = await trx.insertInto("project").values(toProjectRow(data)).executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
-    await trx
-      .insertInto("project_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          projectId: id,
-          locale,
-          title: tr.title,
-          description: tr.description,
-        })),
-      )
-      .execute();
-    return id;
-  });
+  const results = await atomic([
+    db.insertInto("project").values(toProjectRow(data)),
+    insertProjectTranslations(lastInsertId("project"), data.translations),
+  ]);
+  return insertedId(results, 0);
 }
 
 export async function updateProject(id: number, data: ProjectAdminInput) {

@@ -1,14 +1,15 @@
 import type { AdminPublicationListItem, AdminPublicationSubtype } from "@gmcan/contracts/admin";
 import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import type { RawBuilder } from "kysely";
 
-import { db } from "../db/client.js";
+import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import type { PublicationKindCode, ThesisKindCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
-import { resolveAssetAccessLinks } from "./assets/service.js";
-import { memberPhotoPlaceholderView, resolveMemberPhotoView } from "./member-photo.service.js";
+import { resolveAssetAccessLinkMap } from "./assets/service.js";
+import { memberPhotoPlaceholderView, resolveMemberPhotoViews } from "./member-photo.service.js";
 
 export interface AuthorInput {
   kind: "registered" | "external";
@@ -49,52 +50,79 @@ function nameOf(first?: string | null, last?: string | null, maternal?: string |
   return [first, last, maternal].filter(Boolean).join(" ").trim();
 }
 
-async function attachAuthors(publicationId: number, locale: Locale = DEFAULT_LOCALE): Promise<PublicationAuthor[]> {
-  const rows = await db
-    .selectFrom("publication_author")
-    .leftJoin("member", "member.id", "publication_author.memberId")
-    .select([
-      "publication_author.authorOrder",
-      "publication_author.externalName",
-      "publication_author.memberId",
-      "member.firstName as memberFirstName",
-      "member.lastName as memberLastName",
-      "member.maternalName as memberMaternalName",
-    ])
-    .where("publication_author.publicationId", "=", publicationId)
-    .orderBy("publication_author.authorOrder", "asc")
-    .execute();
-
-  return Promise.all(
-    rows.map(async (row) => {
-      if (row.memberId) {
-        return {
-          kind: "registered",
-          authorOrder: row.authorOrder,
-          memberId: row.memberId,
-          name: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
-          ...(await resolveMemberPhotoView({
-            memberId: row.memberId,
-            fullName: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
-            locale,
-          })),
-        } satisfies PublicationAuthor;
-      }
-
-      return {
-        kind: "external",
-        authorOrder: row.authorOrder,
-        name: row.externalName ?? "",
-      } satisfies PublicationAuthor;
-    }),
+/** The authors of every publication, in author order: one author query and one photo query for all of them. */
+async function authorsByPublicationIds(
+  publicationIds: number[],
+  locale: Locale = DEFAULT_LOCALE,
+): Promise<Map<number, PublicationAuthor[]>> {
+  const rows = await queryInChunks(publicationIds, (chunk) =>
+    db
+      .selectFrom("publication_author")
+      .leftJoin("member", "member.id", "publication_author.memberId")
+      .select([
+        "publication_author.publicationId",
+        "publication_author.authorOrder",
+        "publication_author.externalName",
+        "publication_author.memberId",
+        "member.firstName as memberFirstName",
+        "member.lastName as memberLastName",
+        "member.maternalName as memberMaternalName",
+      ])
+      .where("publication_author.publicationId", "in", chunk)
+      .orderBy("publication_author.authorOrder", "asc")
+      .execute(),
   );
+
+  const photos = await resolveMemberPhotoViews(
+    rows.flatMap((row) =>
+      row.memberId
+        ? [
+            {
+              memberId: row.memberId,
+              fullName: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
+            },
+          ]
+        : [],
+    ),
+    locale,
+  );
+
+  const authors = new Map<number, PublicationAuthor[]>(publicationIds.map((id) => [id, []]));
+  for (const row of rows) {
+    authors.get(row.publicationId)?.push(
+      row.memberId
+        ? ({
+            kind: "registered",
+            authorOrder: row.authorOrder,
+            memberId: row.memberId,
+            name: nameOf(row.memberFirstName, row.memberLastName, row.memberMaternalName),
+            ...photos.get(row.memberId)!,
+          } satisfies PublicationAuthor)
+        : ({
+            kind: "external",
+            authorOrder: row.authorOrder,
+            name: row.externalName ?? "",
+          } satisfies PublicationAuthor),
+    );
+  }
+  return authors;
+}
+
+async function attachAuthors(publicationId: number, locale: Locale = DEFAULT_LOCALE): Promise<PublicationAuthor[]> {
+  return (await authorsByPublicationIds([publicationId], locale)).get(publicationId) ?? [];
 }
 
 async function subtypeByPublicationIds(publicationIds: number[]) {
   const [journalRows, conferenceRows, thesisRows] = await Promise.all([
-    db.selectFrom("journal_article").selectAll().where("publicationId", "in", publicationIds).execute(),
-    db.selectFrom("conference_paper").selectAll().where("publicationId", "in", publicationIds).execute(),
-    db.selectFrom("thesis").selectAll().where("publicationId", "in", publicationIds).execute(),
+    queryInChunks(publicationIds, (chunk) =>
+      db.selectFrom("journal_article").selectAll().where("publicationId", "in", chunk).execute(),
+    ),
+    queryInChunks(publicationIds, (chunk) =>
+      db.selectFrom("conference_paper").selectAll().where("publicationId", "in", chunk).execute(),
+    ),
+    queryInChunks(publicationIds, (chunk) =>
+      db.selectFrom("thesis").selectAll().where("publicationId", "in", chunk).execute(),
+    ),
   ]);
 
   const subtypes = new Map<number, PublicationSubtypeInput>();
@@ -122,52 +150,58 @@ async function adminSubtypeByPublicationIds(
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<Map<number, AdminPublicationSubtype>> {
   const [journalRows, conferenceRows, thesisRows] = await Promise.all([
-    db
-      .selectFrom("journal_article")
-      .leftJoin("journal", "journal.id", "journal_article.journalId")
-      .select([
-        "journal_article.publicationId as publicationId",
-        "journal_article.journalId as journalId",
-        "journal.name as journalName",
-        "journal_article.issue as issue",
-      ])
-      .where("journal_article.publicationId", "in", publicationIds)
-      .execute(),
-    db
-      .selectFrom("conference_paper")
-      .leftJoin("event_translation", (join) =>
-        join
-          .onRef("event_translation.eventId", "=", "conference_paper.eventId")
-          .on("event_translation.locale", "=", locale),
-      )
-      .select([
-        "conference_paper.publicationId as publicationId",
-        "conference_paper.eventId as eventId",
-        "event_translation.name as eventName",
-      ])
-      .where("conference_paper.publicationId", "in", publicationIds)
-      .execute(),
-    db
-      .selectFrom("thesis")
-      .leftJoin("university_translation", (join) =>
-        join
-          .onRef("university_translation.universityId", "=", "thesis.universityId")
-          .on("university_translation.locale", "=", locale),
-      )
-      .leftJoin("thesis_kind_translation", (join) =>
-        join
-          .onRef("thesis_kind_translation.thesisKindCode", "=", "thesis.thesisKindCode")
-          .on("thesis_kind_translation.locale", "=", locale),
-      )
-      .select([
-        "thesis.publicationId as publicationId",
-        "thesis.universityId as universityId",
-        "university_translation.name as universityName",
-        "thesis.thesisKindCode as thesisKindCode",
-        "thesis_kind_translation.name as thesisKindName",
-      ])
-      .where("thesis.publicationId", "in", publicationIds)
-      .execute(),
+    queryInChunks(publicationIds, (chunk) =>
+      db
+        .selectFrom("journal_article")
+        .leftJoin("journal", "journal.id", "journal_article.journalId")
+        .select([
+          "journal_article.publicationId as publicationId",
+          "journal_article.journalId as journalId",
+          "journal.name as journalName",
+          "journal_article.issue as issue",
+        ])
+        .where("journal_article.publicationId", "in", chunk)
+        .execute(),
+    ),
+    queryInChunks(publicationIds, (chunk) =>
+      db
+        .selectFrom("conference_paper")
+        .leftJoin("event_translation", (join) =>
+          join
+            .onRef("event_translation.eventId", "=", "conference_paper.eventId")
+            .on("event_translation.locale", "=", locale),
+        )
+        .select([
+          "conference_paper.publicationId as publicationId",
+          "conference_paper.eventId as eventId",
+          "event_translation.name as eventName",
+        ])
+        .where("conference_paper.publicationId", "in", chunk)
+        .execute(),
+    ),
+    queryInChunks(publicationIds, (chunk) =>
+      db
+        .selectFrom("thesis")
+        .leftJoin("university_translation", (join) =>
+          join
+            .onRef("university_translation.universityId", "=", "thesis.universityId")
+            .on("university_translation.locale", "=", locale),
+        )
+        .leftJoin("thesis_kind_translation", (join) =>
+          join
+            .onRef("thesis_kind_translation.thesisKindCode", "=", "thesis.thesisKindCode")
+            .on("thesis_kind_translation.locale", "=", locale),
+        )
+        .select([
+          "thesis.publicationId as publicationId",
+          "thesis.universityId as universityId",
+          "university_translation.name as universityName",
+          "thesis.thesisKindCode as thesisKindCode",
+          "thesis_kind_translation.name as thesisKindName",
+        ])
+        .where("thesis.publicationId", "in", chunk)
+        .execute(),
+    ),
   ]);
 
   const subtypes = new Map<number, AdminPublicationSubtype>();
@@ -240,32 +274,30 @@ export async function listPublications(
 
   if (publications.length === 0) return [];
   const ids = publications.map((p) => p.id);
-  const [subtypes, authorRows] = await Promise.all([
+  const [subtypes, authorsById, assets] = await Promise.all([
     subtypeByPublicationIds(ids),
-    Promise.all(ids.map(async (id) => [id, await attachAuthors(id, locale)] as const)),
+    authorsByPublicationIds(ids, locale),
+    resolveAssetAccessLinkMap({ ownerType: "publication", ownerIds: ids, slot: "file" }),
   ]);
-  const authorsById = new Map(authorRows);
 
-  return Promise.all(
-    publications.map(async (row) => {
-      const subtype = subtypes.get(row.id);
-      if (!subtype) throw new Error(`Publication ${row.id} is missing subtype data`);
+  return publications.map((row) => {
+    const subtype = subtypes.get(row.id);
+    if (!subtype) throw new Error(`Publication ${row.id} is missing subtype data`);
 
-      return {
-        id: row.id,
-        kindCode: row.kindCode,
-        title: row.title,
-        asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: row.id, slot: "file" }),
-        abstract: row.abstract,
-        doi: row.doi,
-        publishedAt: row.publishedAt,
-        updatedAt: row.updatedAt,
-        createdAt: row.createdAt,
-        subtype,
-        authors: authorsById.get(row.id) ?? [],
-      } satisfies PublicPublicationWithAuthors;
-    }),
-  );
+    return {
+      id: row.id,
+      kindCode: row.kindCode,
+      title: row.title,
+      asset: assets.get(row.id) ?? null,
+      abstract: row.abstract,
+      doi: row.doi,
+      publishedAt: row.publishedAt,
+      updatedAt: row.updatedAt,
+      createdAt: row.createdAt,
+      subtype,
+      authors: authorsById.get(row.id) ?? [],
+    } satisfies PublicPublicationWithAuthors;
+  });
 }
 
 export async function listAdminPublications(
@@ -304,21 +336,23 @@ export async function listAdminPublications(
   const ids = publications.map((publication) => publication.id);
   const [subtypes, authorRows] = await Promise.all([
     adminSubtypeByPublicationIds(ids, locale),
-    db
-      .selectFrom("publication_author")
-      .leftJoin("member", "member.id", "publication_author.memberId")
-      .select([
-        "publication_author.publicationId as publicationId",
-        "publication_author.externalName as externalName",
-        "publication_author.memberId as memberId",
-        "member.firstName as firstName",
-        "member.lastName as lastName",
-        "member.maternalName as maternalName",
-      ])
-      .where("publication_author.publicationId", "in", ids)
-      .orderBy("publication_author.publicationId", "asc")
-      .orderBy("publication_author.authorOrder", "asc")
-      .execute(),
+    queryInChunks(ids, (chunk) =>
+      db
+        .selectFrom("publication_author")
+        .leftJoin("member", "member.id", "publication_author.memberId")
+        .select([
+          "publication_author.publicationId as publicationId",
+          "publication_author.externalName as externalName",
+          "publication_author.memberId as memberId",
+          "member.firstName as firstName",
+          "member.lastName as lastName",
+          "member.maternalName as maternalName",
+        ])
+        .where("publication_author.publicationId", "in", chunk)
+        .orderBy("publication_author.publicationId", "asc")
+        .orderBy("publication_author.authorOrder", "asc")
+        .execute(),
+    ),
   ]);
 
   const firstAuthorRowsByPublication = new Map<
@@ -335,20 +369,24 @@ export async function listAdminPublications(
     if (firstAuthorRowsByPublication.has(row.publicationId)) continue;
     firstAuthorRowsByPublication.set(row.publicationId, row);
   }
-  const firstAuthorEntries = await Promise.all(
-    Array.from(firstAuthorRowsByPublication.entries()).map(async ([publicationId, row]) => {
+  const photos = await resolveMemberPhotoViews(
+    [...firstAuthorRowsByPublication.values()].flatMap((row) =>
+      row.memberId ? [{ memberId: row.memberId, fullName: nameOf(row.firstName, row.lastName, row.maternalName) }] : [],
+    ),
+    locale,
+  );
+  const firstAuthorByPublication = new Map(
+    [...firstAuthorRowsByPublication].map(([publicationId, row]) => {
       if (!row.memberId) {
         const name = row.externalName ?? "";
         return [publicationId, { name, ...memberPhotoPlaceholderView({ fullName: name, locale }) }] as const;
       }
-      const name = nameOf(row.firstName, row.lastName, row.maternalName);
       return [
         publicationId,
-        { name, ...(await resolveMemberPhotoView({ memberId: row.memberId, fullName: name, locale })) },
+        { name: nameOf(row.firstName, row.lastName, row.maternalName), ...photos.get(row.memberId)! },
       ] as const;
     }),
   );
-  const firstAuthorByPublication = new Map(firstAuthorEntries);
 
   return publications.map((publication) => {
     const subtype = subtypes.get(publication.id);
@@ -426,170 +464,101 @@ export async function searchPublications(q: string, locale: Locale = DEFAULT_LOC
 }
 
 export async function createPublication(data: PublicationFields, authors: AuthorInput[]) {
-  return db.transaction().execute(async (trx) => {
-    const result = await trx
-      .insertInto("publication")
-      .values({
-        kindCode: data.subtype.kindCode,
-        doi: data.doi ?? null,
-        publishedAt: data.publishedAt,
-      })
-      .executeTakeFirstOrThrow();
-    const id = Number(result.insertId);
+  const publicationId = lastInsertId("publication");
+  const results = await atomic([
+    db.insertInto("publication").values({
+      kindCode: data.subtype.kindCode,
+      doi: data.doi ?? null,
+      publishedAt: data.publishedAt,
+    }),
+    translationsInsert(publicationId, data.translations),
+    subtypeInsert(publicationId, data.subtype),
+    ...authorsInsert(publicationId, authors),
+  ]);
+  return insertedId(results, 0);
+}
 
-    await trx
-      .insertInto("publication_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          publicationId: id,
-          locale,
-          title: tr.title,
-          abstract: tr.abstract ?? null,
-        })),
-      )
-      .execute();
+type PublicationRef = number | RawBuilder<number>;
 
-    if (data.subtype.kindCode === "journal_article") {
-      await trx
-        .insertInto("journal_article")
-        .values({
-          publicationId: id,
-          journalId: data.subtype.journalArticle.journalId ?? null,
-          issue: data.subtype.journalArticle.issue ?? null,
-        })
-        .execute();
-    } else if (data.subtype.kindCode === "conference_paper") {
-      await trx
-        .insertInto("conference_paper")
-        .values({ publicationId: id, eventId: data.subtype.conferencePaper.eventId })
-        .execute();
-    } else {
-      await trx
-        .insertInto("thesis")
-        .values({
-          publicationId: id,
-          universityId: data.subtype.thesis.universityId,
-          thesisKindCode: data.subtype.thesis.thesisKindCode,
-        })
-        .execute();
-    }
+function translationsInsert(publicationId: PublicationRef, translations: PublicationFields["translations"]) {
+  return db.insertInto("publication_translation").values(
+    Object.entries(translations).map(([locale, tr]) => ({
+      publicationId,
+      locale,
+      title: tr.title,
+      abstract: tr.abstract ?? null,
+    })),
+  );
+}
 
-    if (authors.length > 0) {
-      await trx
-        .insertInto("publication_author")
-        .values(
-          authors.map((a) => ({
-            publicationId: id,
-            authorOrder: a.authorOrder,
-            externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-            memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          })),
-        )
-        .execute();
-    }
-
-    return id;
+function subtypeInsert(publicationId: PublicationRef, subtype: PublicationSubtypeInput) {
+  if (subtype.kindCode === "journal_article") {
+    return db.insertInto("journal_article").values({
+      publicationId,
+      journalId: subtype.journalArticle.journalId ?? null,
+      issue: subtype.journalArticle.issue ?? null,
+    });
+  }
+  if (subtype.kindCode === "conference_paper") {
+    return db.insertInto("conference_paper").values({ publicationId, eventId: subtype.conferencePaper.eventId });
+  }
+  return db.insertInto("thesis").values({
+    publicationId,
+    universityId: subtype.thesis.universityId,
+    thesisKindCode: subtype.thesis.thesisKindCode,
   });
 }
 
+function authorsInsert(publicationId: PublicationRef, authors: AuthorInput[]) {
+  if (authors.length === 0) return [];
+  return [
+    db.insertInto("publication_author").values(
+      authors.map((a) => ({
+        publicationId,
+        authorOrder: a.authorOrder,
+        externalName: a.kind === "external" ? (a.externalName ?? null) : null,
+        memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
+      })),
+    ),
+  ];
+}
+
 export async function updatePublication(id: number, data: PublicationFields, authors: AuthorInput[]) {
-  await db.transaction().execute(async (trx) => {
-    await trx
+  await atomic([
+    db
       .updateTable("publication")
       .set({
         kindCode: data.subtype.kindCode,
         doi: data.doi ?? null,
         publishedAt: data.publishedAt,
       })
-      .where("id", "=", id)
-      .execute();
-
-    await trx.deleteFrom("journal_article").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("conference_paper").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("thesis").where("publicationId", "=", id).execute();
-
-    if (data.subtype.kindCode === "journal_article") {
-      await trx
-        .insertInto("journal_article")
-        .values({
-          publicationId: id,
-          journalId: data.subtype.journalArticle.journalId ?? null,
-          issue: data.subtype.journalArticle.issue ?? null,
-        })
-        .execute();
-    } else if (data.subtype.kindCode === "conference_paper") {
-      await trx
-        .insertInto("conference_paper")
-        .values({ publicationId: id, eventId: data.subtype.conferencePaper.eventId })
-        .execute();
-    } else {
-      await trx
-        .insertInto("thesis")
-        .values({
-          publicationId: id,
-          universityId: data.subtype.thesis.universityId,
-          thesisKindCode: data.subtype.thesis.thesisKindCode,
-        })
-        .execute();
-    }
-
-    await trx.deleteFrom("publication_translation").where("publicationId", "=", id).execute();
-    await trx
-      .insertInto("publication_translation")
-      .values(
-        Object.entries(data.translations).map(([locale, tr]) => ({
-          publicationId: id,
-          locale,
-          title: tr.title,
-          abstract: tr.abstract ?? null,
-        })),
-      )
-      .execute();
-
-    await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
-    if (authors.length > 0) {
-      await trx
-        .insertInto("publication_author")
-        .values(
-          authors.map((a) => ({
-            publicationId: id,
-            authorOrder: a.authorOrder,
-            externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-            memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          })),
-        )
-        .execute();
-    }
-  });
+      .where("id", "=", id),
+    db.deleteFrom("journal_article").where("publicationId", "=", id),
+    db.deleteFrom("conference_paper").where("publicationId", "=", id),
+    db.deleteFrom("thesis").where("publicationId", "=", id),
+    subtypeInsert(id, data.subtype),
+    db.deleteFrom("publication_translation").where("publicationId", "=", id),
+    translationsInsert(id, data.translations),
+    db.deleteFrom("publication_author").where("publicationId", "=", id),
+    ...authorsInsert(id, authors),
+  ]);
 }
 
 export async function deletePublication(id: number) {
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom("publication_author").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("journal_article").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("conference_paper").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("thesis").where("publicationId", "=", id).execute();
-    await trx.deleteFrom("publication").where("id", "=", id).execute();
-  });
+  await atomic([
+    db.deleteFrom("publication_author").where("publicationId", "=", id),
+    db.deleteFrom("journal_article").where("publicationId", "=", id),
+    db.deleteFrom("conference_paper").where("publicationId", "=", id),
+    db.deleteFrom("thesis").where("publicationId", "=", id),
+    db.deleteFrom("publication").where("id", "=", id),
+  ]);
 }
 
 export async function replaceAuthors(publicationId: number, authors: AuthorInput[]) {
-  await db.transaction().execute(async (trx) => {
-    await trx.deleteFrom("publication_author").where("publicationId", "=", publicationId).execute();
-    if (authors.length > 0) {
-      await trx
-        .insertInto("publication_author")
-        .values(
-          authors.map((a) => ({
-            publicationId,
-            authorOrder: a.authorOrder,
-            externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-            memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          })),
-        )
-        .execute();
-    }
-  });
+  await atomic([
+    db.deleteFrom("publication_author").where("publicationId", "=", publicationId),
+    ...authorsInsert(publicationId, authors),
+  ]);
 }
 
 export async function listAuthorsByPublication(publicationId: number) {

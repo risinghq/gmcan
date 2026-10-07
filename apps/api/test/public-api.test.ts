@@ -18,7 +18,7 @@ async function insertMember(values: { dni: string; email: string; isActive: numb
     .insertInto("member")
     .values({
       ...values,
-      passwordHash: hashPassword(PASSWORD),
+      passwordHash: await hashPassword(PASSWORD),
       firstName: "Ana",
       lastName: "Torres",
       maternalName: null,

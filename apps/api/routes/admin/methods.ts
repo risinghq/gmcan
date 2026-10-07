@@ -5,13 +5,13 @@ import { z } from "zod";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { requirePermission } from "../../middleware/authz.js";
-import { resolveAssetAccessUrl } from "../../services/assets/service.js";
+import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../services/assets/service.js";
 import {
   createMethod,
   deleteMethod,
   getMethod,
   listMethods,
-  toAdminMethodView,
+  toAdminMethodViews,
   updateMethod,
 } from "../../services/group.service.js";
 
@@ -40,23 +40,19 @@ router.use("*", async (c, next) => {
 
 router.get("/", async (c) => {
   const rows = await listMethods();
-  return c.json(
-    await Promise.all(
-      rows.map(async (row) => {
-        const view = await toAdminMethodView(row);
-        return Object.assign({}, view, {
-          asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: view.id, slot: "photo" }),
-        });
-      }),
-    ),
-  );
+  const [views, assets] = await Promise.all([
+    toAdminMethodViews(rows),
+    resolveAssetAccessUrls({ ownerType: "method", ownerIds: rows.map((row) => row.id), slot: "photo" }),
+  ]);
+  return c.json(views.map((view) => Object.assign({}, view, { asset: assets.get(view.id) ?? null })));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMethod(id);
   if (!row) return c.json({ error: "Not found" }, 404);
-  const view = await toAdminMethodView(row);
+  const [view] = await toAdminMethodViews([row]);
+  if (!view) return c.json({ error: "Not found" }, 404);
   return c.json(
     Object.assign({}, view, {
       asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: view.id, slot: "photo" }),

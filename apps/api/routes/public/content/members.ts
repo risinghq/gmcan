@@ -2,8 +2,12 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessLinks } from "../../../services/assets/service.js";
-import { memberFullName, resolveMemberPhotoView } from "../../../services/member-photo.service.js";
+import { resolveAssetAccessLinkMap } from "../../../services/assets/service.js";
+import {
+  memberFullName,
+  resolveMemberPhotoView,
+  resolveMemberPhotoViews,
+} from "../../../services/member-photo.service.js";
 import { getMemberProfileLocalized, listMembersLocalized } from "../../../services/member.service.js";
 
 const router = new Hono();
@@ -12,12 +16,11 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 router.get("/", async (c) => {
   const locale = c.get("locale");
   const rows = await listMembersLocalized(locale);
-  const shaped = await Promise.all(
-    rows.map(async (row) =>
-      Object.assign({}, row, await resolveMemberPhotoView({ memberId: row.id, fullName: memberFullName(row), locale })),
-    ),
+  const photos = await resolveMemberPhotoViews(
+    rows.map((row) => ({ memberId: row.id, fullName: memberFullName(row) })),
+    locale,
   );
-  return c.json(shaped);
+  return c.json(rows.map((row) => Object.assign({}, row, photos.get(row.id))));
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {
@@ -35,12 +38,15 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
     })),
   };
 
-  const publications = await Promise.all(
-    profile.publications.map(async (publication) => ({
-      ...publication,
-      asset: await resolveAssetAccessLinks({ ownerType: "publication", ownerId: publication.id, slot: "file" }),
-    })),
-  );
+  const assets = await resolveAssetAccessLinkMap({
+    ownerType: "publication",
+    ownerIds: profile.publications.map((publication) => publication.id),
+    slot: "file",
+  });
+  const publications = profile.publications.map((publication) => ({
+    ...publication,
+    asset: assets.get(publication.id) ?? null,
+  }));
 
   return c.json({
     ...profile,

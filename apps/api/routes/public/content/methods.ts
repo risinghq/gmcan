@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { resolveAssetAccessUrl } from "../../../services/assets/service.js";
+import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../../services/assets/service.js";
 import { getMethodLocalized, listMethodsLocalized } from "../../../services/group.service.js";
 
 const router = new Hono();
@@ -11,18 +11,22 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 router.get("/", async (c) => {
   const locale = c.get("locale");
   const rows = await listMethodsLocalized(locale);
-  const shaped = await Promise.all(
-    rows.map(async (row) => ({
+  const assets = await resolveAssetAccessUrls({
+    ownerType: "method",
+    ownerIds: rows.map((row) => row.id),
+    slot: "photo",
+  });
+  return c.json(
+    rows.map((row) => ({
       id: row.id,
       name: row.name,
       description: row.description,
-      asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: row.id, slot: "photo" }),
+      asset: assets.get(row.id) ?? null,
       groupId: row.groupId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     })),
   );
-  return c.json(shaped);
 });
 
 router.get("/:id", zValidator("param", IdParam), async (c) => {

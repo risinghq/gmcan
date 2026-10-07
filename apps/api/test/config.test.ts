@@ -1,103 +1,53 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 
-const apiDir = join(import.meta.dir, "..");
-const bun = process.execPath;
+import { resolveBackendUrl, resolveFrontendUrl } from "../config.js";
+import { parseEnv } from "../config/env.js";
 
-const validEnv: Record<string, string> = {
-  ASSET_SIGNING_SECRET: "secret",
-  RESEND_API_KEY: "re_key",
-  INSTITUTIONAL_EMAIL: "group@example.test",
-};
-
-function run(args: string[], env: Record<string, string>) {
-  const proc = Bun.spawnSync({
-    cmd: [bun, ...args],
-    cwd: apiDir,
-    env: { PATH: process.env.PATH ?? "", HOME: process.env.HOME ?? "", ...env },
-  });
-  return { exitCode: proc.exitCode, stdout: proc.stdout.toString().trim(), stderr: proc.stderr.toString().trim() };
-}
-
-function loadConfig(env: Record<string, string>, envFile?: string) {
-  const args = envFile ? [`--env-file=${envFile}`] : [];
-  return run([...args, "test/fixtures/load-config.ts"], env);
-}
+const validEnv = { ASSET_SIGNING_SECRET: "secret" };
 
 describe("environment", () => {
-  test(".env.example is a working template", () => {
-    const res = loadConfig({}, "../../.env.example");
-    expect(res.stderr).toBe("");
-    expect(res.exitCode).toBe(0);
+  test("a minimal environment is valid and email stays off", () => {
+    const env = parseEnv(validEnv);
+    expect(env.NODE_ENV).toBe("development");
+    expect(env.EMAIL_FROM).toBeUndefined();
+    expect(env.INSTITUTIONAL_EMAIL).toBeUndefined();
   });
 
-  test(".env.example lists only keys the code reads", async () => {
-    const template = await Bun.file(join(apiDir, "../../.env.example")).text();
-    const keys = [...template.matchAll(/^#?\s*([A-Z][A-Z0-9_]+)=/gm)].map((m) => m[1]);
-    const source = await Promise.all(["config/env.ts", "config.ts"].map((f) => Bun.file(join(apiDir, f)).text()));
-    for (const key of keys) expect(source.join("\n")).toContain(key);
+  test("a missing ASSET_SIGNING_SECRET is rejected and named", () => {
+    expect(() => parseEnv({})).toThrow("ASSET_SIGNING_SECRET");
   });
 
-  for (const key of ["RESEND_API_KEY", "INSTITUTIONAL_EMAIL"]) {
-    test(`a missing ${key} stops startup and names it`, () => {
-      const { [key]: _omitted, ...env } = validEnv;
-      const res = loadConfig(env);
-      expect(res.exitCode).not.toBe(0);
-      expect(res.stderr).toContain(key);
-    });
+  test("an empty ASSET_SIGNING_SECRET is rejected and named", () => {
+    expect(() => parseEnv({ ASSET_SIGNING_SECRET: "" })).toThrow("ASSET_SIGNING_SECRET");
+  });
 
-    test(`an empty ${key} stops startup and names it`, () => {
-      const res = loadConfig({ ...validEnv, [key]: "" });
-      expect(res.exitCode).not.toBe(0);
-      expect(res.stderr).toContain(key);
-    });
-  }
+  test.each(["EMAIL_FROM", "INSTITUTIONAL_EMAIL"])("%s must be an email address", (key) => {
+    expect(() => parseEnv({ ...validEnv, [key]: "not-an-address" })).toThrow(key);
+  });
+
+  test("an empty RESEND_API_KEY is rejected and named", () => {
+    expect(() => parseEnv({ ...validEnv, RESEND_API_KEY: "" })).toThrow("RESEND_API_KEY");
+  });
 
   test("production requires BACKEND_URL", () => {
-    const res = loadConfig({ ...validEnv, NODE_ENV: "production" });
-    expect(res.exitCode).not.toBe(0);
-    expect(res.stderr).toContain("BACKEND_URL");
-  });
-
-  test("production uses the configured BACKEND_URL", () => {
-    const res = loadConfig({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test/" });
-    expect(res.exitCode).toBe(0);
-    expect(JSON.parse(res.stdout).backend).toBe("https://api.example.test");
+    expect(() => parseEnv({ ...validEnv, NODE_ENV: "production" })).toThrow("BACKEND_URL");
+    expect(parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test" }).BACKEND_URL).toBe(
+      "https://api.example.test",
+    );
   });
 });
 
-function newDatabase() {
-  return `file:${join(mkdtempSync(join(tmpdir(), "gmcan-seed-")), "seed.db")}`;
-}
+describe("public URLs", () => {
+  test("the backend URL drops trailing slashes", () => {
+    const env = parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test/" });
+    expect(resolveBackendUrl(env)).toBe("https://api.example.test");
+  });
 
-function seed(libsqlUrl: string, env: Record<string, string>, candidates: string[]) {
-  const res = run(["test/fixtures/seed-members.ts", ...candidates], { ...validEnv, LIBSQL_URL: libsqlUrl, ...env });
-  expect(res.exitCode).toBe(0);
-  return {
-    accepted: JSON.parse(res.stdout.split("\n").at(-1)!) as string[],
-    generated: res.stdout.match(/generated password: (\S+)/)?.[1],
-  };
-}
-
-describe("seeded member password", () => {
-  test("is read from SEED_PASSWORD", () => {
-    const res = seed(newDatabase(), { SEED_PASSWORD: "from-the-environment" }, ["from-the-environment", "password123"]);
-    expect(res.accepted).toEqual(["from-the-environment"]);
-    expect(res.generated).toBeUndefined();
-  }, 30_000);
-
-  test("is generated and printed when SEED_PASSWORD is unset", () => {
-    const url = newDatabase();
-    const first = seed(url, {}, ["password123"]);
-    expect(first.accepted).toEqual([]);
-    expect(first.generated).toBeDefined();
-
-    const second = seed(url, {}, ["password123", first.generated!]);
-    expect(second.accepted).toEqual([first.generated!]);
-    expect(second.generated).toBeUndefined();
-
-    expect(seed(newDatabase(), {}, []).generated).not.toBe(first.generated);
-  }, 60_000);
+  test("the frontend URL is configurable and defaults per environment", () => {
+    const production = parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test" });
+    expect(resolveFrontendUrl(production)).toBe("https://gmcan.unmsm.edu.pe");
+    const configured = parseEnv({ ...validEnv, FRONTEND_URL: "https://web.example.test" });
+    expect(resolveFrontendUrl(configured)).toBe("https://web.example.test");
+    expect(resolveFrontendUrl(parseEnv(validEnv))).toBe("http://localhost:4200");
+  });
 });

@@ -45,7 +45,7 @@ beforeEach(async () => {
     .insertInto("asset")
     .values({
       storageKey: "test/photo.png",
-      bucket: "local",
+      bucket: "r2",
       mimeDetected: "image/png",
       ext: "png",
       sizeBytes: 1,
