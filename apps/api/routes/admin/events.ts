@@ -1,10 +1,11 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { atomic, db, insertedId, lastInsertId } from "../../db/client.js";
 import type { EventTranslationTable } from "../../db/schema.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 
 const router = new Hono();
@@ -43,10 +44,10 @@ router.get("/", async (c) => {
   return c.json(rows);
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await db.selectFrom("event").select(["id"]).where("id", "=", id).executeTakeFirst();
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
 
   const translations = await db
     .selectFrom("event_translation")
@@ -65,7 +66,7 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   });
 });
 
-router.post("/", zValidator("json", EventBody), async (c) => {
+router.post("/", validate("json", EventBody), async (c) => {
   const { translations } = c.req.valid("json");
   const results = await atomic([
     db.insertInto("event").values({}),
@@ -83,7 +84,7 @@ router.post("/", zValidator("json", EventBody), async (c) => {
   return c.json({ id: insertedId(results, 0) }, 201);
 });
 
-router.put("/:id", zValidator("param", IdParam), zValidator("json", EventBody), async (c) => {
+router.put("/:id", validate("param", IdParam), validate("json", EventBody), async (c) => {
   const { id } = c.req.valid("param");
   const { translations } = c.req.valid("json");
 
@@ -104,7 +105,7 @@ router.put("/:id", zValidator("param", IdParam), zValidator("json", EventBody), 
   return c.json({ status: 1 });
 });
 
-router.delete("/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("event").where("id", "=", id).execute();
   return c.json({ status: 1 });

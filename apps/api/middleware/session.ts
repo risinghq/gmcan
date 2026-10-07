@@ -5,6 +5,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
 import { env } from "../config/env.js";
 import { db } from "../db/client.js";
+import { unauthorized } from "../lib/errors/app-error.js";
 import { AUTH_EXEMPT_PATHS } from "./auth-exempt.js";
 
 declare module "hono" {
@@ -61,21 +62,21 @@ export const requireSession = async (c: Context, next: Next) => {
   if (AUTH_EXEMPT_PATHS.has(c.req.path)) return next();
 
   const id = getCookie(c, "sid");
-  if (!id) return c.json({ error: "Unauthorized" }, 401);
+  if (!id) throw unauthorized();
 
   const session = await db.selectFrom("session").selectAll().where("id", "=", id).executeTakeFirst();
-  if (!session) return c.json({ error: "Unauthorized" }, 401);
+  if (!session) throw unauthorized();
 
   const now = new Date();
 
   if (new Date(session.expiresAt) < now) {
     await db.deleteFrom("session").where("id", "=", id).execute();
-    return c.json({ error: "Session expired" }, 401);
+    throw unauthorized("Session expired");
   }
 
   if (new Date(session.lastActiveAt).getTime() + IDLE_TIMEOUT_MS < now.getTime()) {
     await db.deleteFrom("session").where("id", "=", id).execute();
-    return c.json({ error: "Session expired" }, 401);
+    throw unauthorized("Session expired");
   }
 
   await db.updateTable("session").set({ lastActiveAt: now.toISOString() }).where("id", "=", id).execute();
@@ -87,7 +88,7 @@ export const requireSession = async (c: Context, next: Next) => {
     .executeTakeFirst();
   if (!member || member.isActive !== 1) {
     await db.deleteFrom("session").where("id", "=", id).execute();
-    return c.json({ error: "Unauthorized" }, 401);
+    throw unauthorized();
   }
 
   c.set("memberId", session.memberId);

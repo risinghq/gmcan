@@ -1,7 +1,8 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { notFound } from "../../../lib/errors/app-error.js";
+import { validate } from "../../../lib/validate.js";
 import { getPublication, listPublications } from "../../../services/publication.service.js";
 
 const router = new Hono();
@@ -13,7 +14,7 @@ const PublicPublicationListQuerySchema = z.object({
   university: z.coerce.number().int().positive().optional(),
 });
 
-router.get("/", zValidator("query", PublicPublicationListQuerySchema), async (c) => {
+router.get("/", validate("query", PublicPublicationListQuerySchema), async (c) => {
   const locale = c.get("locale");
   const { kindCode, event, journal, university } = c.req.valid("query");
 
@@ -27,11 +28,11 @@ router.get("/", zValidator("query", PublicPublicationListQuerySchema), async (c)
   );
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const pub = await getPublication(id, locale);
-  if (!pub) return c.json({ error: "Not found" }, 404);
+  if (!pub) throw notFound();
   return c.json(pub);
 });
 

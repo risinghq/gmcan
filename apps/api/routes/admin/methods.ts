@@ -1,9 +1,10 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../services/assets/service.js";
 import {
@@ -47,12 +48,12 @@ router.get("/", async (c) => {
   return c.json(views.map((view) => Object.assign({}, view, { asset: assets.get(view.id) ?? null })));
 });
 
-router.get("/:id", zValidator("param", IdParam), async (c) => {
+router.get("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await getMethod(id);
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
   const [view] = await toAdminMethodViews([row]);
-  if (!view) return c.json({ error: "Not found" }, 404);
+  if (!view) throw notFound();
   return c.json(
     Object.assign({}, view, {
       asset: await resolveAssetAccessUrl({ ownerType: "method", ownerId: view.id, slot: "photo" }),
@@ -60,20 +61,20 @@ router.get("/:id", zValidator("param", IdParam), async (c) => {
   );
 });
 
-router.post("/", zValidator("json", Body), async (c) => {
+router.post("/", validate("json", Body), async (c) => {
   const data = c.req.valid("json");
   const id = await createMethod(data);
   return c.json({ id }, 201);
 });
 
-router.put("/:id", zValidator("param", IdParam), zValidator("json", UpdateBody), async (c) => {
+router.put("/:id", validate("param", IdParam), validate("json", UpdateBody), async (c) => {
   const { id } = c.req.valid("param");
   const data = c.req.valid("json");
   await updateMethod(id, data);
   return c.json(okStatus());
 });
 
-router.delete("/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await deleteMethod(id);
   return c.json(okStatus());

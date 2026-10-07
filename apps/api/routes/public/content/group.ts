@@ -1,7 +1,8 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { notFound } from "../../../lib/errors/app-error.js";
+import { validate } from "../../../lib/validate.js";
 import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../../services/assets/service.js";
 import {
   listAboutLocalized,
@@ -22,7 +23,7 @@ router.get("/", async (c) => {
   const locale = c.get("locale");
   const groups = await listGroupsLocalized(locale);
   const row = groups[0];
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
   const [facilities, header, footer] = await Promise.all(
     (["facilities", "header", "footer"] as const).map((slot) =>
       resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot }),
@@ -46,7 +47,7 @@ router.get("/", async (c) => {
   });
 });
 
-router.get("/:id/about", zValidator("param", IdParam), async (c) => {
+router.get("/:id/about", validate("param", IdParam), async (c) => {
   const locale = c.get("locale");
   const { id } = c.req.valid("param");
   const rows = await listAboutLocalized(id, locale);
@@ -72,7 +73,7 @@ router.get("/:id/about", zValidator("param", IdParam), async (c) => {
 
 router.get(
   "/:groupId/software",
-  zValidator("param", z.object({ groupId: z.coerce.number().int().positive() })),
+  validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
   async (c) => {
     const locale = c.get("locale");
     const { groupId } = c.req.valid("param");
@@ -93,7 +94,7 @@ router.get(
 
 router.get(
   "/:groupId/equipment",
-  zValidator("param", z.object({ groupId: z.coerce.number().int().positive() })),
+  validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
   async (c) => {
     const { groupId } = c.req.valid("param");
     const rows = await listEquipment(groupId);

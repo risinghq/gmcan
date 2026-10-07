@@ -1,10 +1,11 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { atomic, db, insertedId, lastInsertId } from "../../db/client.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
+import { notFound } from "../../lib/errors/app-error.js";
+import { validate } from "../../lib/validate.js";
 import { getUniversityPublicationDependencyCount } from "../../services/publication.service.js";
 
 const router = new Hono();
@@ -101,10 +102,10 @@ router.get("/university", async (c) => {
   return c.json(Array.from(byId.entries()).map(([id, translations]) => ({ id, translations })));
 });
 
-router.get("/university/:id", zValidator("param", IdParam), async (c) => {
+router.get("/university/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const row = await db.selectFrom("university").select("id").where("id", "=", id).executeTakeFirst();
-  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row) throw notFound();
   const translations = await db
     .selectFrom("university_translation")
     .select(["locale", "name"])
@@ -113,7 +114,7 @@ router.get("/university/:id", zValidator("param", IdParam), async (c) => {
   return c.json({ id, translations: Object.fromEntries(translations.map((tr) => [tr.locale, { name: tr.name }])) });
 });
 
-router.post("/university", zValidator("json", NamedTranslationBody), async (c) => {
+router.post("/university", validate("json", NamedTranslationBody), async (c) => {
   const { translations } = c.req.valid("json");
   const results = await atomic([
     db.insertInto("university").defaultValues(),
@@ -128,7 +129,7 @@ router.post("/university", zValidator("json", NamedTranslationBody), async (c) =
   return c.json({ id: insertedId(results, 0) }, 201);
 });
 
-router.put("/university/:id", zValidator("param", IdParam), zValidator("json", NamedTranslationBody), async (c) => {
+router.put("/university/:id", validate("param", IdParam), validate("json", NamedTranslationBody), async (c) => {
   const { id } = c.req.valid("param");
   const { translations } = c.req.valid("json");
   await db.selectFrom("university").select("id").where("id", "=", id).executeTakeFirstOrThrow();
@@ -143,13 +144,13 @@ router.put("/university/:id", zValidator("param", IdParam), zValidator("json", N
   return c.json(okStatus());
 });
 
-router.delete("/university/:id", zValidator("param", IdParam), async (c) => {
+router.delete("/university/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   await db.deleteFrom("university").where("id", "=", id).execute();
   return c.json(okStatus());
 });
 
-router.get("/university/:id/dependencies", zValidator("param", IdParam), async (c) => {
+router.get("/university/:id/dependencies", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const thesis = await getUniversityPublicationDependencyCount(id);
   return c.json({

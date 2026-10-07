@@ -1,9 +1,10 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { okStatus } from "../../lib/contracts.js";
+import { badRequest } from "../../lib/errors/app-error.js";
 import { extractFirstFile } from "../../lib/upload.js";
+import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import { deleteCurrentAsset, putAsset, restoreAsset } from "../../services/assets/service.js";
 import type { OwnerType } from "../../services/assets/types.js";
@@ -24,46 +25,26 @@ router.put("/", async (c) => {
     ownerId: body.ownerId,
     slot: body.slot,
   });
-  if (!parsed.success) return c.json({ error: "Invalid payload" }, 400);
+  if (!parsed.success) throw badRequest("Invalid request", parsed.error.issues);
 
   const file = extractFirstFile(body);
-  if (!file) return c.json({ error: "No file uploaded" }, 400);
+  if (!file) throw badRequest("No file uploaded");
 
-  try {
-    assertSlotForOwner(parsed.data.ownerType as OwnerType, parsed.data.slot);
-    await putAsset({ ...parsed.data, slot: parsed.data.slot as never, file, actorId: c.get("memberId") });
-  } catch (error) {
-    if (error instanceof Error && (error.message.includes("Unsupported slot") || error.message.includes("Invalid"))) {
-      return c.json({ error: error.message }, 400);
-    }
-    if (error instanceof Error && error.message === "Owner not found") return c.json({ error: error.message }, 404);
-    throw error;
-  }
+  assertSlotForOwner(parsed.data.ownerType as OwnerType, parsed.data.slot);
+  await putAsset({ ...parsed.data, slot: parsed.data.slot as never, file, actorId: c.get("memberId") });
   return c.json(okStatus());
 });
 
-router.delete("/", zValidator("json", CanonicalAssetPayloadSchema), async (c) => {
+router.delete("/", validate("json", CanonicalAssetPayloadSchema), async (c) => {
   const payload = c.req.valid("json");
-  try {
-    assertSlotForOwner(payload.ownerType as OwnerType, payload.slot);
-    await deleteCurrentAsset({ ...payload, slot: payload.slot as never, actorId: c.get("memberId") });
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
-    if (error instanceof Error && error.message.includes("Unsupported slot"))
-      return c.json({ error: error.message }, 400);
-    throw error;
-  }
+  assertSlotForOwner(payload.ownerType as OwnerType, payload.slot);
+  await deleteCurrentAsset({ ...payload, slot: payload.slot as never, actorId: c.get("memberId") });
   return c.json(okStatus());
 });
 
-router.post("/restore", zValidator("json", RestoreBody), async (c) => {
+router.post("/restore", validate("json", RestoreBody), async (c) => {
   const { assetId } = c.req.valid("json");
-  try {
-    await restoreAsset(assetId, c.get("memberId"));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("not found")) return c.json({ error: error.message }, 404);
-    throw error;
-  }
+  await restoreAsset(assetId, c.get("memberId"));
   return c.json(okStatus());
 });
 

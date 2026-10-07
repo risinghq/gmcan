@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { badRequest } from "../../lib/errors/app-error.js";
 import { OWNER_CONFIG } from "./policy.js";
 import type { OwnerType } from "./types.js";
 
@@ -22,6 +23,6 @@ export const CanonicalAssetPayloadSchema = z.object({
 export function assertSlotForOwner(ownerType: OwnerType, slot: string): void {
   const config = OWNER_CONFIG[ownerType];
   if (!config.slots.includes(slot as never)) {
-    throw new Error(`Unsupported slot '${slot}' for ownerType '${ownerType}'`);
+    throw badRequest(`Unsupported slot '${slot}' for ownerType '${ownerType}'`);
   }
 }
