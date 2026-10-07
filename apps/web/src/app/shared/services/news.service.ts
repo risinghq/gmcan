@@ -15,13 +15,18 @@ export interface NewsUpsertBody {
   translations: Record<string, { title: string; summary: string; body: string }>;
 }
 
+/** Query parameters without the unset ones: HttpClient would send an undefined value as the text "undefined". */
+function definedParams(query: object): Record<string, string | number | boolean> {
+  return Object.fromEntries(Object.entries(query).filter(([, value]) => value !== undefined && value !== null));
+}
+
 @Injectable({ providedIn: "root" })
 export class NewsService {
   private http = inject(HttpClient);
 
   // Public
   listNews(query: PublicNewsListQuery = {}): Observable<PublicNewsListResponse> {
-    return this.http.get<PublicNewsListResponse>(GLOBAL.api("news"), { params: { ...query } });
+    return this.http.get<PublicNewsListResponse>(GLOBAL.api("news"), { params: definedParams(query) });
   }
 
   getNews(id: number): Observable<PublicNewsDetail> {
@@ -30,7 +35,7 @@ export class NewsService {
 
   // Admin
   listAdminNews(query: AdminNewsListQuery): Observable<AdminNewsListResponse> {
-    return this.http.get<AdminNewsListResponse>(GLOBAL.admin("news"), { params: { ...query } });
+    return this.http.get<AdminNewsListResponse>(GLOBAL.admin("news"), { params: definedParams(query) });
   }
 
   getAdminNews(id: number): Observable<News> {
