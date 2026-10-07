@@ -32,6 +32,16 @@ needs the id of a row inserted earlier in the batch uses `lastInsertId(table)`,
 and the caller reads ids back with `insertedId(results, index)`. A batch cannot
 branch on an earlier result, so decide in code before building it.
 
+Every query is one network round trip to the database, and D1 runs queries one
+at a time, so reads that run in parallel gain nothing from `Promise.all`. When a
+request knows several reads up front, pass the query builders (without
+`.execute()`) to `readBatch()` from [`db/client.ts`](../apps/api/db/client.ts).
+It sends them as one batch and returns each query's rows in order, as
+`getLookupData` does for the twelve lists of `/api/lookup`. The batch belongs to
+one request, and if one read in it fails, the whole call rejects. A read that
+needs an earlier result cannot join a batch, so fetch what a response needs in
+as few dependent steps as you can.
+
 D1 allows 100 bound parameters per statement. Insert many rows with
 [`insertInChunks`](../apps/api/db/seed/chunks.ts).
 

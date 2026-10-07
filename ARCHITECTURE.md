@@ -151,31 +151,67 @@ production build swaps in `environment.prod.ts`.
 
 ### Edge cache
 
-[`server.ts`](apps/web/src/server.ts) is the web Worker's entry point. It keeps
-public API reads in the Cache API (`caches.default`) of the data center that
-served the request, so a repeat read skips the hop to the API Worker and every
-query behind it.
+[`server.ts`](apps/web/src/server.ts) is the web Worker's entry point, and
+[`api-cache.ts`](apps/web/src/api-cache.ts) holds the cache. It keeps public API
+reads in the Cache API (`caches.default`) of the data center that served the
+request, so a repeat read skips the hop to the API Worker and every query behind
+it.
 
 | Aspect            | Rule                                                                                                                                                       |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | What is cached    | `GET` responses under `/api/` that are `200` and carry `Cache-Control: public` with a positive `max-age`. `/api/email/*` and all `/admin/*` calls are not. |
 | Who marks them    | [`middleware/public-cache.ts`](apps/api/middleware/public-cache.ts) adds `public, max-age=60` to public content reads. Private files send `no-store`.      |
 | Key               | The request URL, query string included, plus the `Accept-Language` header, because the API picks the content language from it.                             |
-| Expiry            | 60 seconds, set by the web Worker on the stored copy. Asset URLs are immutable for a year in the browser, but their edge copy also lasts a minute.         |
+| Expiry            | Fresh for 60 seconds, then stale for an hour, as the web Worker records on the stored copy. Asset copies are fresh for a minute and never stale.           |
 | Who populates it  | The web Worker, on a miss, with `ctx.waitUntil(cache.put(...))` after the API answers. Nothing else writes to it.                                          |
-| What invalidates  | Nothing. There is no purge. An entry leaves the cache only when its 60 seconds run out.                                                                    |
-| Visible to client | `X-Cache: HIT` or `MISS` on every API response that went through the cache.                                                                                |
+| What invalidates  | Nothing. There is no purge. A refresh replaces an entry, and an entry leaves the cache when its stale hour runs out.                                       |
+| Visible to client | `X-Cache: HIT`, `STALE` or `MISS` on every API response that went through the cache.                                                                       |
 
-Each entry is in one of three states. It is absent until a request misses; it is
+Each entry is in one of four states. It is absent until a request misses; it is
 fresh from the `put` until 60 seconds later, and `HIT`s serve it unchanged; then
-the runtime treats it as absent again and the next request refills it. Only the
-web Worker moves an entry between states, and each data center has its own copy,
-so two visitors in different cities can see different versions during the same
-minute.
+it is stale for an hour, and the next request gets it as `STALE` while the web
+Worker fetches a new copy in the background; then the runtime treats it as
+absent again. Only the web Worker moves an entry between states, and each data
+center has its own copy, so two visitors in different cities can see different
+versions during the same minute.
 
-After an admin write, a public page can show the old content for up to 60
-seconds from the edge, and up to another 60 seconds if the visitor's browser
-holds its own copy of the response (`max-age=60`). The browser that made the
-edit is the exception: `GroupService` drops its own per-language cache after
-each write. Server-side rendering reaches the API through the service binding
-directly, so rendered HTML never comes from this cache.
+The web Worker also keeps a `refreshing` set of cache keys, in the module scope
+of `api-cache.ts`. It stops a burst of requests for one stale entry from each
+starting a refresh. It lives in the memory of one isolate, so it is not shared
+with other isolates or other data centers, and it holds no data a visitor sees.
+A key has two states:
+
+| State  | Entered when                                          | Left when                                                               |
+| ------ | ----------------------------------------------------- | ----------------------------------------------------------------------- |
+| Absent | The isolate starts, or a refresh for the key finishes | A request finds the entry stale and starts its refresh                  |
+| Held   | The request that found the entry stale adds the key   | The refresh ends: the API answered, the API call threw, or `put` failed |
+
+While a key is held, other requests for it get the stale copy and start nothing.
+The refresh removes the key in a `finally`, so every way it ends releases the
+key. How it ends decides the entry:
+
+- The API answers with a shareable response: the entry is replaced and is fresh
+  again.
+- The API answers with anything else, such as a 404: the entry is deleted, so
+  the next request is a `MISS`.
+- The refresh throws, for example because the API Worker is unavailable: the
+  error reaches `waitUntil`, the old entry stays, and the next request after the
+  failure finds the key absent and tries again. Visitors keep getting `STALE`
+  copies until the stale hour ends.
+
+When the runtime evicts the isolate, the set goes with it. The next request is
+served by a new isolate with an empty set, finds the entry still stale in the
+data center's cache, and starts one refresh. Two isolates can refresh the same
+entry at once, and the second `put` overwrites the first with an equally recent
+copy. A refresh that the runtime abandons without running its `finally` can
+leave a key held in an isolate that stays alive. The entry then stays stale
+until its retention runs out, after which the request is a `MISS`, which does
+not use the set and writes a new entry.
+
+After an admin write, a public page can show the old content from the edge until
+the first request after 60 seconds has refreshed the copy, and up to another 60
+seconds if the visitor's browser holds its own copy of the response
+(`max-age=60`). The browser that made the edit is the exception: `GroupService`
+drops its own per-language cache after each write. Server-side rendering reaches
+the API through the service binding directly, so rendered HTML never comes from
+this cache.
