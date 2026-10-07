@@ -16,6 +16,19 @@ type NewsInput = Parameters<typeof createNews>[0];
 const ids: Record<"nano" | "time" | "congress", number> = { nano: 0, time: 0, congress: 0 };
 const members: Record<"roberto" | "ana" | "lucia", number> = { roberto: 0, ana: 0, lucia: 0 };
 
+async function query(dbPath: string, statement: string) {
+  const client = createClient({ url: `file:${dbPath}` });
+  try {
+    return (await client.execute(statement)).rows;
+  } finally {
+    client.close();
+  }
+}
+
+function tempDbPath() {
+  return join(mkdtempSync(join(tmpdir(), "gmcan-api-prod-")), "prod.db");
+}
+
 async function insertMember(dni: string, firstName: string, lastName: string, maternalName: string | null) {
   const result = await db
     .insertInto("member")
@@ -95,7 +108,6 @@ beforeEach(async () => {
 async function publicIds(q: string | undefined, locale = "es") {
   const res = await listPublicNews(locale, {
     q,
-    statusCode: "published",
     sortBy: "publishedAt",
     sortOrder: "desc",
     page: 1,
@@ -186,7 +198,6 @@ describe("news list search", () => {
 
     const published = await listPublicNews("es", {
       q: "ana",
-      statusCode: "published",
       sortBy: "publishedAt",
       sortOrder: "desc",
       page: 1,
@@ -227,7 +238,7 @@ describe("global news search", () => {
     expect(await globalIds("nanomat")).toEqual([ids.nano]);
     expect(await globalIds("sintesis")).toEqual([ids.nano]);
     expect(await globalIds("consejos")).toEqual([ids.time]);
-    expect(await globalIds("congreso")).toEqual([ids.congress]);
+    expect(await globalIds("congreso")).toEqual([]);
     expect(await globalIds("roberto")).toEqual([]);
     expect(await globalIds("investigacion")).toEqual([]);
     expect(await globalIds("management", "es")).toEqual([]);
@@ -323,22 +334,14 @@ describe("production start", () => {
     const proc = Bun.spawnSync({
       cmd: [process.execPath, "test/fixtures/production-start.ts", ...(q === undefined ? [] : [q])],
       cwd: apiDir,
-      env: { ...process.env, NODE_ENV: "production", LIBSQL_URL: `file:${dbPath}` },
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        BACKEND_URL: "https://api.example.test",
+        LIBSQL_URL: `file:${dbPath}`,
+      },
     });
     return { exitCode: proc.exitCode, stdout: proc.stdout.toString().trim(), stderr: proc.stderr.toString().trim() };
-  }
-
-  async function query(dbPath: string, statement: string) {
-    const client = createClient({ url: `file:${dbPath}` });
-    try {
-      return (await client.execute(statement)).rows;
-    } finally {
-      client.close();
-    }
-  }
-
-  function tempDbPath() {
-    return join(mkdtempSync(join(tmpdir(), "gmcan-api-prod-")), "prod.db");
   }
 
   test("builds and backfills the index on first start, and a second start is a no-op", async () => {
@@ -347,7 +350,8 @@ describe("production start", () => {
     await sql`vacuum into ${dbPath}`.execute(db);
     const ftsObjects = "select type, name from sqlite_master where name like 'news_fts%' or sql like '%news_fts%'";
     const ftsTriggers = "select name from sqlite_master where type = 'trigger' and sql like '%news_fts%'";
-    for (const row of await query(dbPath, ftsTriggers)) await query(dbPath, `drop trigger ${String(row.name)}`);
+    const triggers = await query(dbPath, ftsTriggers);
+    await Promise.all(triggers.map((row) => query(dbPath, `drop trigger ${String(row.name)}`)));
     await query(dbPath, "drop table news_fts");
     expect(await query(dbPath, ftsObjects)).toEqual([]);
 
@@ -368,6 +372,7 @@ describe("production start", () => {
   test("a schema the index cannot be built on logs one error and still starts", async () => {
     const dbPath = tempDbPath();
     await query(dbPath, "create table news (id integer primary key, title text)");
+    await query(dbPath, "create table session (id text primary key, expiresAt text)");
 
     const start = startInProduction(dbPath);
     expect(start.exitCode).toBe(0);
@@ -375,5 +380,22 @@ describe("production start", () => {
     expect(start.stderr).toContain("news search index");
     expect(start.stderr).toContain("news_translation");
     expect(await query(dbPath, "select name from sqlite_master where name like 'news_fts%'")).toEqual([]);
+  }, 30_000);
+
+  test("startup deletes expired sessions and keeps live ones", async () => {
+    const dbPath = tempDbPath();
+    await sql`vacuum into ${dbPath}`.execute(db);
+    const memberId = Number((await query(dbPath, "select id from member limit 1"))[0].id);
+    const live = new Date(Date.now() + 3_600_000).toISOString();
+    const expired = new Date(Date.now() - 3_600_000).toISOString();
+    const now = new Date().toISOString();
+    await query(
+      dbPath,
+      `insert into session (id, memberId, expiresAt, lastActiveAt) values
+        ('live', ${memberId}, '${live}', '${now}'), ('expired', ${memberId}, '${expired}', '${now}')`,
+    );
+
+    expect(startInProduction(dbPath).exitCode).toBe(0);
+    expect((await query(dbPath, "select id from session")).map((row) => row.id)).toEqual(["live"]);
   }, 30_000);
 });
