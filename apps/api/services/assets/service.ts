@@ -8,7 +8,7 @@ import { env } from "../../config/env.js";
 import { atomic, db, lastInsertId } from "../../db/client.js";
 import { normalizeAssetKey, saveUploadedFile, serveAsset, sha256Buffer } from "../../lib/upload.js";
 import { OWNER_CONFIG } from "./policy.js";
-import { ensureOwnerExists, getCurrentAssetId, getNextVersion } from "./repo.js";
+import { type ActiveAsset, ensureOwnerExists, getActiveAssets, getCurrentAssetId, getNextVersion } from "./repo.js";
 import type { AssetDeleteRequest, AssetLinks, AssetWriteRequest, OwnerType } from "./types.js";
 import { assertSlotForOwner } from "./validators.js";
 
@@ -141,24 +141,29 @@ function makePublicAssetUrl(assetId: number, asAttachment: boolean): string {
   return `${getBackendUrl()}${makeAssetPath(assetId, asAttachment)}`;
 }
 
+function accessUrl(asset: ActiveAsset | undefined): string | null {
+  if (!asset) return null;
+  return asset.visibility === "private"
+    ? makeSignedAssetUrl(asset.id, 300, false)
+    : makePublicAssetUrl(asset.id, false);
+}
+
+function accessLinks(asset: ActiveAsset | undefined): AssetLinks | null {
+  if (!asset) return null;
+  const isPrivate = asset.visibility === "private";
+  return {
+    inline: isPrivate ? makeSignedAssetUrl(asset.id, 300, false) : makePublicAssetUrl(asset.id, false),
+    download: isPrivate ? makeSignedAssetUrl(asset.id, 300, true) : makePublicAssetUrl(asset.id, true),
+  };
+}
+
 export async function resolveAssetAccessUrl(input: {
   ownerType: OwnerType;
   ownerId: number;
   slot: string;
 }): Promise<string | null> {
   assertSlotForOwner(input.ownerType, input.slot);
-
-  const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
-  if (!assetId) return null;
-
-  const asset = await db
-    .selectFrom("asset")
-    .select(["visibility", "lifecycleStatus"])
-    .where("id", "=", assetId)
-    .executeTakeFirst();
-
-  if (!asset || asset.lifecycleStatus !== "active") return null;
-  return asset.visibility === "private" ? makeSignedAssetUrl(assetId, 300, false) : makePublicAssetUrl(assetId, false);
+  return accessUrl((await getActiveAssets(input.ownerType, [input.ownerId], input.slot)).get(input.ownerId));
 }
 
 export async function resolveAssetAccessLinks(input: {
@@ -167,22 +172,29 @@ export async function resolveAssetAccessLinks(input: {
   slot: string;
 }): Promise<AssetLinks | null> {
   assertSlotForOwner(input.ownerType, input.slot);
+  return accessLinks((await getActiveAssets(input.ownerType, [input.ownerId], input.slot)).get(input.ownerId));
+}
 
-  const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
-  if (!assetId) return null;
+/** Resolves the slot of many owners with one query per 90 owners. Every requested owner has an entry. */
+export async function resolveAssetAccessUrls(input: {
+  ownerType: OwnerType;
+  ownerIds: number[];
+  slot: string;
+}): Promise<Map<number, string | null>> {
+  assertSlotForOwner(input.ownerType, input.slot);
+  const assets = await getActiveAssets(input.ownerType, input.ownerIds, input.slot);
+  return new Map(input.ownerIds.map((id) => [id, accessUrl(assets.get(id))]));
+}
 
-  const asset = await db
-    .selectFrom("asset")
-    .select(["visibility", "lifecycleStatus"])
-    .where("id", "=", assetId)
-    .executeTakeFirst();
-
-  if (!asset || asset.lifecycleStatus !== "active") return null;
-  const isPrivate = asset.visibility === "private";
-  return {
-    inline: isPrivate ? makeSignedAssetUrl(assetId, 300, false) : makePublicAssetUrl(assetId, false),
-    download: isPrivate ? makeSignedAssetUrl(assetId, 300, true) : makePublicAssetUrl(assetId, true),
-  };
+/** Like `resolveAssetAccessUrls`, with the inline and download links of each file. */
+export async function resolveAssetAccessLinkMap(input: {
+  ownerType: OwnerType;
+  ownerIds: number[];
+  slot: string;
+}): Promise<Map<number, AssetLinks | null>> {
+  assertSlotForOwner(input.ownerType, input.slot);
+  const assets = await getActiveAssets(input.ownerType, input.ownerIds, input.slot);
+  return new Map(input.ownerIds.map((id) => [id, accessLinks(assets.get(id))]));
 }
 
 export async function serveAssetById(
@@ -206,5 +218,5 @@ export async function serveAssetById(
 
   const key = normalizeAssetKey(row.storageKey);
   if (!key) return c.json({ error: "Invalid asset key" }, 400);
-  return serveAsset(c, { assetKey: key, asAttachment: options.asAttachment });
+  return serveAsset(c, { assetKey: key, asAttachment: options.asAttachment, private: row.visibility === "private" });
 }
