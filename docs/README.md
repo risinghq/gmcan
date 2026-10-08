@@ -13,6 +13,8 @@
    locale.
 8. [Architecture notes](architecture.md): states that concurrent requests can
    change, and who moves them.
+9. [Performance](performance.md): measuring cold and warm time to first byte on
+   the deployed app, and when a change is worth keeping.
 
 To run the project, start with the [README](../README.md). For how the code is
 organized, read [ARCHITECTURE.md](../ARCHITECTURE.md).

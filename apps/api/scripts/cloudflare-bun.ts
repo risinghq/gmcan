@@ -29,6 +29,27 @@ for (const key of OVERRIDABLE) {
   if (value !== undefined) env[key] = value;
 }
 
+// Bun cannot receive an R2 stream from the platform proxy. Reading `body` throws a DataCloneError.
+// The emulated bucket therefore rebuilds each object's body from its bytes. The deployed Worker streams from R2.
+const bucket = env.STORAGE as R2Bucket;
+env.STORAGE = new Proxy(bucket, {
+  get(target, property) {
+    if (property !== "get") {
+      const value = Reflect.get(target, property) as unknown;
+      return typeof value === "function" ? value.bind(target) : value;
+    }
+    return async (...args: Parameters<R2Bucket["get"]>) => {
+      const object = await target.get(...args);
+      if (!object || !("arrayBuffer" in object)) return object;
+      const bytes = await object.arrayBuffer();
+      return Object.create(object, {
+        body: { value: new Blob([bytes]).stream() },
+        arrayBuffer: { value: async () => bytes },
+      });
+    };
+  },
+});
+
 plugin({
   name: "cloudflare-workers",
   setup(build) {

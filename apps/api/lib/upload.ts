@@ -85,13 +85,14 @@ export async function serveAsset(
 
   const headers: Record<string, string> = {
     "Content-Type": MIME_TYPES[extensionOf(key)] ?? "application/octet-stream",
+    "Content-Length": String(object.size),
   };
   if (options.asAttachment) headers["Content-Disposition"] = `attachment; filename="${key}"`;
   // Private assets are reached through a short-lived signed URL, so no shared cache may keep them.
   if (options.private) headers["Cache-Control"] = "private, no-store";
   else if (!options.asAttachment) headers["Cache-Control"] = "public, max-age=31536000, immutable";
-  // Buffered because uploads are small and a streamed body cannot cross wrangler's local proxy.
-  return c.body(await object.arrayBuffer(), 200, headers);
+  // Streamed so the first byte leaves when R2 starts answering, not after the whole file has arrived.
+  return c.body(object.body, 200, headers);
 }
 
 export async function assetExists(assetKey: string): Promise<boolean> {
