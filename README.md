@@ -13,8 +13,8 @@ The repository is a Bun workspace with three packages:
 | [`apps/api`](apps/api)                     | Hono HTTP API, a Cloudflare Worker storing data in D1 and R2 |
 | [`packages/contracts`](packages/contracts) | Zod schemas and types shared by the web app and the API      |
 
-Both apps run on Cloudflare Workers, locally under `wrangler dev` and in
-production. See [Deployment](docs/deployment.md).
+Both apps deploy as Cloudflare Workers ([Deployment](docs/deployment.md)).
+Locally the API runs under `wrangler dev` and the web app under `ng serve`.
 
 ## Run it
 
@@ -60,12 +60,13 @@ $ curl -s -H 'Accept-Language: en' 'http://localhost:3000/api/news?pageSize=1'
 - File uploads for photos and PDFs. Each upload is a new version, and deleted
   files can be restored.
 - Full-text news search backed by SQLite FTS5.
-- Password reset and membership-request email through Resend once
-  `RESEND_API_KEY` is set. Until then both answer `503 Email is not configured`.
+- Password reset and membership-request email through Resend. Until email is
+  configured both answer `503 Email is not configured`
+  ([Configuration](docs/configuration.md#email)).
 
 ## Documentation
 
 - [Manual](docs/README.md): deployment, configuration, database, API,
   authorization, assets, localization.
-- [Architecture](ARCHITECTURE.md): what each package and module owns.
-- [Contributing](CONTRIBUTING.md): checks, tests and conventions.
+- [Architecture](docs/architecture.md): what each package and module owns.
+- [Contributing](.github/CONTRIBUTING.md): checks, tests and conventions.
