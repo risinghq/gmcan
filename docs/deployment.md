@@ -23,18 +23,15 @@ also routes the server-side renderer's own `/api` calls to the binding, because
 a Worker cannot fetch its own public URL.
 
 `gmcan-api` runs in `aws:us-east-1` (`placement` in its `wrangler.jsonc`),
-beside the D1 primary, which D1 placed in `ENAM` (see `running_in_region` in
-`bunx wrangler d1 info gmcan`). A listing endpoint runs several rounds of
-dependent queries, and a round from a distant Worker costs a full network round
-trip. Reads a request knows up front go to D1 as one batch
-([`readBatch`](../apps/api/db/client.ts)), so a round is one trip. Without the
-placement, a listing with three rounds took about 100 ms longer from South
-America, and the single-round endpoints gained nothing. Move the placement if
-the database is recreated in another region.
+beside the D1 primary (`running_in_region` in `bunx wrangler d1 info gmcan`
+names its region). A listing endpoint runs several rounds of dependent queries,
+and a round from a distant Worker costs a full network round trip. Reads a
+request knows up front go to D1 as one batch
+([`readBatch`](../apps/api/db/client.ts)), so a round is one trip. Move the
+placement if the database is recreated in another region.
 
-The web worker takes its API and site URLs from the origin of each request and
-serves them to the browser at `/config.json`. Set `APP_URL` as a variable on
-`gmcan-web` to pin a canonical origin instead.
+The web Worker takes its API and site URLs from the origin of each request. See
+[configuration](configuration.md#web-app).
 
 ## Prerequisites
 
@@ -86,8 +83,9 @@ Run from `apps/api` unless noted.
    bun run deploy
    ```
 
-6. Load sample content, or skip this and create content from the dashboard
-   ([database](database.md#sample-data)):
+6. Run the seed ([database](database.md#sample-data)). The migrations insert no
+   rows, and only the seed creates the locales, roles, lookup values and the
+   administrator you sign in as:
 
    ```sh
    SEED_PASSWORD=<at least 8 characters> bun run seed:remote
@@ -95,6 +93,12 @@ Run from `apps/api` unless noted.
 
    The remote database and bucket must be empty. Without `SEED_PASSWORD` the
    seed generates a password and prints it.
+
+   The seed also loads all the sample content and 20 sample accounts that share
+   that password: one administrator, four researchers who can write news,
+   projects and publications, and fifteen visitors. Delete the accounts you do
+   not want from the dashboard, or change their passwords, before you publish
+   the site.
 
 Subsequent releases: `bun run migrate:remote` if a migration was added, then
 `bun run deploy` in `apps/api` and in `apps/web`.
@@ -115,49 +119,35 @@ Both Workers have Workers Logs turned on.
 
 ## Caching
 
-Public content endpoints (`GET /api/*` except `/api/email`) answer
-`Cache-Control: public, max-age=60`
-([`middleware/public-cache.ts`](../apps/api/middleware/public-cache.ts)). The
-web Worker stores those answers in the data center's cache, keyed by URL and
-`Accept-Language`, and replies from it without calling `gmcan-api`. Responses
-carry `X-Cache: HIT`, `STALE` or `MISS`. A copy is fresh for 60 seconds. For the
-next hour the data center still replies from it (`STALE`) and refreshes it in
-the background, so a visitor waits for `gmcan-api` only when the data center
-holds nothing for that URL. An edit in the dashboard therefore shows on the
-first request after 60 seconds if that request is the one that refreshes the
-copy, and on the next one otherwise. Files under `/api/assets` are never served
-stale. Admin responses and private files (`private, no-store`) are never cached.
-Public files are immutable.
-
-Images in `apps/web/public/img` are sized for the page that shows them. Keep new
-ones under a few hundred KB.
+The web Worker caches public API reads and refreshes them in the background, so
+a dashboard edit does not show at once. [Caching](caching.md) has the rules and
+the delay.
 
 ## Rendering
 
-Every page renders in the browser. Rendering a page on the server takes about
-100 to 300 ms of CPU, and the Workers free plan stops a request at 10 ms, so
-server rendering fails there with error 1102. On the Workers Paid plan you can
-render public pages on the server: in
-[`app.routes.server.ts`](../apps/web/src/app/app.routes.server.ts), list
-`dashboard/**`, `login` and `reset-password` with `RenderMode.Client`, then `**`
-with `RenderMode.Server`, and deploy the web app again.
+Every page renders in the browser. The Workers free plan stops a request at 10
+ms of CPU and fails it with error 1102; the Workers Paid plan allows more. On
+the Paid plan you can render public pages on the server: in
+[`app.routes.server.ts`](../apps/web/src/app/app.routes.server.ts), replace the
+single `**` route with `dashboard/**`, `login` and `reset-password` set to
+`RenderMode.Client`, then `**` set to `RenderMode.Server`, and deploy the web
+app again.
 
 ## Scheduled work
 
-`gmcan-api` runs `17 * * * *` (hourly). Each run deletes sessions past their 8
-hour life or idle for 2 hours
-([`sweepExpiredSessions`](../apps/api/middleware/session.ts)), and password
-reset tokens past their 24 hours
-([`sweepExpiredResets`](../apps/api/services/password-reset.service.ts)).
-Expired sessions and tokens are also refused on every use, so the sweep only
-keeps the tables small.
+`gmcan-api` runs `17 * * * *` (hourly). Each run deletes expired sessions
+([`sweepExpiredSessions`](../apps/api/middleware/session.ts)) and expired
+password reset tokens
+([`sweepExpiredResets`](../apps/api/services/password-reset.service.ts)); the
+lifetimes are in [authorization](authorization.md#sign-in-and-out). Expired
+sessions and tokens are also refused on every use, so the sweep only keeps the
+tables small.
 
 ## Email
 
-Mail goes through [Resend](https://resend.com). It is off until a key is set.
-The contact form (`POST /api/email/contact`) and the password reset request
-(`POST /api/email/password-reset/request`) answer a 503 error with the message
-`Email is not configured` meanwhile. Everything else works.
+Mail goes through [Resend](https://resend.com). Until the settings in
+[configuration](configuration.md#email) are complete, the contact form and the
+password reset request answer 503 and everything else works.
 
 `EMAIL_FROM` is `onboarding@resend.dev` in
 [`apps/api/wrangler.jsonc`](../apps/api/wrangler.jsonc), Resend's shared test

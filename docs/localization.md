@@ -54,11 +54,21 @@ Routes that take a locale in the URL, such as
 
 ## Add a locale
 
-1. Add its code to `SUPPORTED_LOCALES`. The `locale` table is filled from that
-   list at startup.
-2. Write translation rows for it. Admin writes now require them, and existing
+1. Add its code to `SUPPORTED_LOCALES`.
+2. Put the code in the `locale` table. Every translation table references it, so
+   a translation row for an unlisted locale is refused. Only `seedLocales` in
+   [`db/seed/lookups.ts`](../apps/api/db/seed/lookups.ts) fills the table from
+   `SUPPORTED_LOCALES`, and it runs only when seeding, so a new database needs
+   nothing more. A database that is already seeded needs one row, from
+   `apps/api` (`--remote` instead of `--local` for the deployed database):
+
+   ```sh
+   bunx wrangler d1 execute gmcan --local --command "INSERT INTO locale (code) VALUES ('pt')"
+   ```
+
+3. Write translation rows for it. Admin writes now require them, and existing
    rows have none.
-3. The web app's languages and interface strings are in
+4. The web app's languages and interface strings are in
    [`shared/models/languages.ts`](../apps/web/src/app/shared/models/languages.ts);
    add an entry there to let visitors choose it.
 

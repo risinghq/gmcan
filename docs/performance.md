@@ -73,18 +73,16 @@ middleware layers. `ttfb.ts` then gives each route a request:
 The four public `POST /api/email/*` routes are measured on the throwaway copy
 without sending any mail. The copy has no `RESEND_API_KEY` and no
 `INSTITUTIONAL_EMAIL`, so `contact` and `password-reset/request` answer 503 at
-their configuration check, before the send. That is the choice made here: they
-time routing, validation and the check, not a Resend call.
-`password-reset/verify` and `password-reset/confirm` look up a token no member
-holds, and would answer 400 without a write. The database they read, which is
-production's, has no `password_reset` table, so on the copy both answered 500 in
-all 30 samples. They have no timing row for that reason: `report` lists each as
-`failed: 500`, and the times of those 500 answers (a failed query, not the
-lookup) are only in the dropped-samples table. Once the table exists they answer
-400 and get a row. A run that includes these routes refuses to start when the
-copy holds a `RESEND_API_KEY` secret.
+their configuration check, before the send. They time routing, validation and
+the check, not a Resend call. `password-reset/verify` and
+`password-reset/confirm` look up a token no member holds and answer 400 without
+a write. That needs a database with the `password_reset` table
+([`migrate:remote`](database.md#migrations)); without it both answer 500, and
+`report` lists them as `failed: 500` with no timing row. A run that includes
+these routes refuses to start when the copy holds a `RESEND_API_KEY` secret.
 
-A cold sample costs one deploy, so a full run takes hours. Split it with
+A cold sample costs one deploy, so a full run deploys once per sample of each
+route (30 samples by default, `--samples` changes it). Split it with
 `--part 1/5` and run the parts at once on separate arms, or measure only some
 routes with `--routes "/api/projects,/api/search"`. A run keeps its rows in the
 `--out` file and skips the samples already there, so restart it after any
@@ -135,8 +133,4 @@ drift, so what still differs between them is noise.
 Keep a change only when its p50 gain is larger than the spread of the slower of
 the two versions, and the gain shows in both the cold and the warm column when
 the change should affect both. A gain inside the spread is not a result, even
-when the medians differ. One change can serve several routes through one code
-path: the asset streaming in `serveAsset` is kept although `/api/assets/:id` in
-the cold column falls short of the base spread, because three of the four
-columns clear it, both routes share that path, and all three interleaved runs
-show the same sign.
+when the medians differ.

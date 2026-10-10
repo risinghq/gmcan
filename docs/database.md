@@ -17,10 +17,11 @@ bun run --filter api migrate          # the local database
 bun run --filter api migrate:remote   # the deployed database
 ```
 
-To change the schema, add the next numbered file (`0002_<name>.sql`) and update
-the matching interface in [`db/schema.ts`](../apps/api/db/schema.ts), which only
-types the queries. Edit no applied migration. While the data is disposable, you
-can instead delete `apps/api/.wrangler/state` and migrate again.
+To change the schema, add the next numbered file (`<number>_<name>.sql`, after
+the highest in the directory) and update the matching interface in
+[`db/schema.ts`](../apps/api/db/schema.ts), which only types the queries. Edit
+no applied migration. While the data is disposable, you can instead delete
+`apps/api/.wrangler/state` and migrate again.
 
 ## Transactions
 
@@ -47,10 +48,11 @@ D1 allows 100 bound parameters per statement. Insert many rows with
 
 ## Sample data
 
-The seed fills lookup tables (genders, prefixes, roles, member, publication and
-news kinds, currencies), the research group, its research lines, methods,
-equipment and software, members, news, journals, universities, events, a project
-and publications, then uploads sample files to R2 and binds them
+The migrations insert no rows, so the seed is what fills the `locale` table, the
+lookup tables (genders, prefixes, roles, member, publication and news kinds,
+currencies), the research group, its research lines, methods, equipment and
+software, members, news, journals, universities, events, a project and
+publications, then uploads sample files to R2 and binds them
 ([assets](assets.md)).
 
 ```sh
