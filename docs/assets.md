@@ -54,8 +54,8 @@ curl -b cookies.txt -X POST http://localhost:3000/admin/assets/restore \
 An upload stores the file as `<uuid>.<ext>` in the bucket, inserts an `asset`
 row, and inserts a binding with the next `version` number for that owner and
 slot. The binding with the highest version is the current file. The previous
-file's asset is marked `soft_deleted` and stamped with a `deleteAfter` date 90
-days ahead. Nothing in the API deletes files at that date.
+file's asset is marked `soft_deleted` and gets a `deletedAt` time. The row and
+the file stay in place ([state](state.md#assets)).
 
 Every upload, replace, delete and restore adds a row to `asset_audit`.
 
@@ -80,10 +80,11 @@ as `{ "inline": ..., "download": ... }` instead. A member with no photo gets
 An asset's `visibility` is `public` or `private`. Uploads through the API are
 always `public`. A `private` asset is served only with
 `?expires=<unix seconds>&token=<hex>`, where `token` is the HMAC-SHA256 of
-`<id>:<expires>` keyed with `ASSET_SIGNING_SECRET`. The URLs the API puts in
-responses for private assets expire after 300 seconds.
+`<id>:<expires>` keyed with `ASSET_SIGNING_SECRET`. A missing, expired or
+invalid token answers `401`. The URLs the API puts in responses for private
+assets expire after 300 seconds.
 
 ## Orphan files
 
 Nothing reconciles the bucket with the `asset` table. An object that no row
-references stays until someone deletes it with `wrangler r2 object delete`.
+references stays in the bucket. `wrangler r2 object delete` removes it.

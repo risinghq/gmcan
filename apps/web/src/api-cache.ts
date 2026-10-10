@@ -70,7 +70,6 @@ export async function cachedApiFetch(
   const keyUrl = new URL(request.url);
   keyUrl.searchParams.set("__language", request.headers.get("Accept-Language") ?? "");
   const key = new Request(keyUrl, { method: "GET" });
-  // A deleted asset must stop being served within the fresh period, so assets are never served stale.
   const retainSeconds = pathname.startsWith("/api/assets/") ? FRESH_SECONDS : FRESH_SECONDS + STALE_SECONDS;
 
   const hit = await cache.match(key);

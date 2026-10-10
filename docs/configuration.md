@@ -42,8 +42,8 @@ override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
 ## Email
 
 [`lib/mail.ts`](../apps/api/lib/mail.ts) sends through Resend's HTTP API. It
-needs `RESEND_API_KEY`, `EMAIL_FROM`, and for the contact form
-`INSTITUTIONAL_EMAIL`. When any is missing, the contact form and
+needs `RESEND_API_KEY` and `EMAIL_FROM`. The contact form also needs
+`INSTITUTIONAL_EMAIL`. When one is missing, `POST /api/email/contact` and
 `POST /api/email/password-reset/request` answer a 503 `upstream_failure` error
 with the message `Email is not configured` and change nothing. The password
 reset request refuses before it looks up the address, so the answer does not
@@ -66,7 +66,14 @@ In development, `ng serve` reads
 [`src/environments/environment.ts`](../apps/web/src/environments/environment.ts)
 (`http://localhost:3000` and `http://localhost:4200`); `ng build` in its
 production configuration replaces it with
-[`environment.prod.ts`](../apps/web/src/environments/environment.prod.ts).
+[`environment.prod.ts`](../apps/web/src/environments/environment.prod.ts). The
+URLs are accepted with or without a trailing slash. Code builds API addresses
+only with `GLOBAL.api(path)` and `GLOBAL.admin(path)`, and site addresses with
+`GLOBAL.app(path)`
+([`global.ts`](../apps/web/src/app/shared/services/global.ts)). These join the
+base and the path with exactly one slash, so do not append a path to
+`GLOBAL.url` by hand.
+
 Server-side rendering accepts the hosts listed under `security.allowedHosts` in
 [`angular.json`](../apps/web/angular.json): `localhost` and `*.workers.dev`. Add
 the host of a custom domain there.

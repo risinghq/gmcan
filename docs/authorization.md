@@ -71,8 +71,9 @@ The API enforces the permissions itself.
 [`middleware/authz.ts`](../apps/api/middleware/authz.ts) provides the guards:
 
 - `loadActor` runs on `/admin`, except login and logout. It loads the member
-  behind the session and puts `{ id, role }` on the request. It answers 401 if
-  the member no longer exists.
+  behind the session and puts `{ id, roleCode, role, isActive }` on the request.
+  It answers 401 if the member no longer exists and 403 if the member's role is
+  unknown.
 - `requirePermission(permission)` answers a 403 `forbidden` error unless the
   actor's role has the permission.
 - `requireSelfOrPermission({ resourceParam, selfPermission, elevatedPermission })`
@@ -110,10 +111,12 @@ new request replaces the previous token. The lookup and the send run after the
 response, so a registered and an unknown address are answered alike in time. The
 scheduled sweep deletes expired rows.
 
-An administrator who changes a member's password
-(`PUT /admin/email/member-password`) ends that member's sessions too. Any
-password change, by the member or an administrator, also voids an outstanding
-reset link.
+Any password change, by the member or by an administrator
+(`PUT /admin/email/member-password`), ends all of the member's sessions and
+voids an outstanding reset link. The one exception is a member who changes their
+own password while signed in: the session that made the change stays. That
+covers an administrator who sets their own password through
+`PUT /admin/email/member-password`.
 
 Without email configured ([configuration](configuration.md#email)) the request
 endpoint answers `503` and stores no token.
