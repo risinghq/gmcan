@@ -24,7 +24,6 @@ import { MethodsService } from "@app/shared/services/methods.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { ClassicEditor } from "ckeditor5";
 
 import { DialogAboutPreview } from "./dialogs/about";
 import { DialogFuturePreview } from "./dialogs/future";
@@ -48,7 +47,6 @@ export class ContenidosState {
   private readonly session = inject(SessionService);
 
   readonly files = new ContenidosFiles();
-  readonly Editor = ClassicEditor;
   readonly url = GLOBAL.url;
 
   readonly displayedColumns: string[] = ["nombre"];
@@ -115,6 +113,7 @@ export class ContenidosState {
     this.groupService.listGroups().subscribe((res) => {
       if (res.length > 0) {
         this.group = res[0];
+        this.trabajosFuturosForm.patchValue({ futureWork: this.group.futureWork ?? "" });
         this.getContenidos();
         this.getEquipos();
         this.getSoftware();
@@ -180,11 +179,16 @@ export class ContenidosState {
     this.groupService.listAdminAbout(this.group.id).subscribe((res) => {
       if (res.length > 0) {
         this.aboutUs = this.normalizeAbout(res[0]);
+        this.descripcionForm.patchValue({
+          description: this.aboutUs.description,
+          asset: this.aboutUs.asset,
+        });
       }
     });
   }
 
   submitQuienesSomos(): void {
+    this.aboutUs.description = this.descripcionForm.controls["description"].value ?? "";
     this.groupService
       .updateAboutDescription(this.aboutUs.id, {
         description: this.aboutUs.description,
@@ -246,6 +250,7 @@ export class ContenidosState {
   }
 
   submitTrabajosFuturos(): void {
+    this.group.futureWork = this.trabajosFuturosForm.controls["futureWork"].value ?? "";
     this.groupService
       .updateFutureWork(this.group.id, {
         futureWork: this.group.futureWork ?? undefined,
@@ -314,12 +319,14 @@ export class ContenidosState {
 
   previewAbout(): void {
     const about = structuredClone(this.aboutUs);
+    about.description = this.descripcionForm.controls["description"].value ?? "";
     const data: PreviewAboutData = { about };
     this.dialog.open(DialogAboutPreview, { width: "871px", id: "previewAboutUs", data }).afterClosed().subscribe();
   }
 
   previewFuture(): void {
     const group = structuredClone(this.group);
+    group.futureWork = this.trabajosFuturosForm.controls["futureWork"].value ?? "";
     const data: PreviewFutureData = { group };
     this.dialog
       .open(DialogFuturePreview, { width: "871px", id: "previewTrabajosFuturos", data })

@@ -4,20 +4,19 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogClose } from "@angul
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
 import type { Method } from "@app/shared/models/method";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
-import { ClassicEditor } from "ckeditor5";
 
 @Component({
   selector: "app-add-method",
   templateUrl: "./add-method.component.html",
   styleUrl: "./add-method.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, RichTextEditorComponent],
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
@@ -27,7 +26,6 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
   private methodService = inject(MethodsService);
 
-  public Editor = ClassicEditor;
   button_text = "Guardar método";
   metodo: Method;
   public methodForm: FormGroup;
@@ -61,6 +59,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 
   submitMethod(): void {
     if (this.methodForm.valid) {
+      this.metodo.description = this.methodForm.controls["description"].value ?? "";
       this.methodService
         .create({
           name: this.metodo.name,
@@ -119,6 +118,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
 
   previewMethod(): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
+    method.description = this.methodForm.controls["description"].value ?? "";
     method.asset = typeof this.previewUrl === "string" ? this.previewUrl : null;
     this.previewDialog = this.dialog.open(DialogPreview4, {
       width: "871px",

@@ -122,7 +122,7 @@
           <div class="text-category">Contenido <span class="red-text">*</span></div>
           <div class="green-text right plex-sans" (click)="previewNews()">Vista Previa</div>
         </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="noticia.body" formControlName="body" name="body" />
+        <app-rich-text-editor formControlName="body" />
       </div>
       <div class="flex-news">
         @if (edit) {

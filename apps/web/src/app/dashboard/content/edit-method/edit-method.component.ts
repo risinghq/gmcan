@@ -13,21 +13,20 @@ import {
 import { MatIcon } from "@angular/material/icon";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Method } from "@app/shared/models/method";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
-import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
-import { ClassicEditor } from "ckeditor5";
 
 @Component({
   selector: "app-edit-method",
   templateUrl: "../add-method/add-method.component.html",
   styleUrl: "../add-method/add-method.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIcon, FormsModule, ReactiveFormsModule, CKEditorModule],
+  imports: [MatIcon, FormsModule, ReactiveFormsModule, RichTextEditorComponent],
 })
 export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
@@ -37,7 +36,6 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
   private snackBar = inject(MatSnackBar);
   private methodService = inject(MethodsService);
 
-  public Editor = ClassicEditor;
   button_text = "Actualizar información";
   metodo: Method;
   public methodForm: FormGroup;
@@ -45,8 +43,8 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   constructor() {
     this.methodForm = this.formBuilder.group({
-      nombre: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
-      descripcion: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      name: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
+      description: ["", [Validators.required, SpaceValidator.cannotContainSpace]],
     });
     this.metodo = {
       id: 0,
@@ -73,12 +71,14 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
     this.methodService.get(idMethod).subscribe((result: Method) => {
       if (result) {
         this.metodo = result;
+        this.methodForm.patchValue({ name: result.name, description: result.description });
       }
     });
   }
 
   submitMethod(): void {
     if (this.methodForm.valid) {
+      this.metodo.description = this.methodForm.controls["description"].value ?? "";
       this.methodService
         .update(this.metodo.id, {
           name: this.metodo.name,
@@ -168,6 +168,7 @@ export default class EditMethodComponent implements OnInit, HasUnsavedChanges {
 
   previewMethod(): void {
     const method: Method = JSON.parse(JSON.stringify(this.metodo));
+    method.description = this.methodForm.controls["description"].value ?? "";
     method.asset = this.metodo.asset;
     if (this.previewUrl) {
       method.asset = typeof this.previewUrl === "string" ? this.previewUrl : null;

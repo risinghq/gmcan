@@ -1,0 +1,64 @@
+.rich-text-editor {
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.rich-text-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 6px;
+  border-bottom: 1px solid #d4d4d4;
+  background: #f8f8f8;
+}
+
+.rich-text-toolbar-button,
+.rich-text-toolbar-select {
+  min-height: 32px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #222222;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rich-text-toolbar-button {
+  min-width: 32px;
+  padding: 4px 8px;
+}
+
+.rich-text-toolbar-select {
+  padding: 4px;
+}
+
+.rich-text-toolbar-button:hover,
+.rich-text-toolbar-button[aria-pressed="true"],
+.rich-text-toolbar-select:hover,
+.rich-text-toolbar-select:focus-visible {
+  border-color: #006400;
+  background: #e7f0e7;
+}
+
+.rich-text-editor .ProseMirror {
+  min-height: 160px;
+  padding: 12px;
+  outline: none;
+  font-family: "IBM Plex Sans", sans-serif;
+  line-height: 1.5;
+}
+
+.rich-text-editor .ProseMirror > :first-child {
+  margin-top: 0;
+}
+
+.rich-text-editor .ProseMirror > :last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-editor .ProseMirror a {
+  color: #006400;
+  text-decoration: underline;
+}
