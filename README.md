@@ -18,7 +18,7 @@ Locally the API runs under `wrangler dev` and the web app under `ng serve`.
 
 ## Run it
 
-You need [Bun](https://bun.sh) 1.4.2 (`mise install` reads it from
+You need [Bun](https://bun.sh) 1.4.3 (`mise install` reads it from
 [`mise.toml`](mise.toml)). No Cloudflare account is needed to run locally:
 wrangler emulates D1 and R2 under `apps/api/.wrangler/state`.
 

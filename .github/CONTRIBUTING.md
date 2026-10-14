@@ -2,7 +2,7 @@
 
 ## Set up
 
-Follow [Run it](../README.md#run-it) in the README. You need Bun 1.4.2, an
+Follow [Run it](../README.md#run-it) in the README. You need Bun 1.4.3, an
 `apps/api/.dev.vars` and a migrated, seeded local database. The Angular CLI and
 the API under `wrangler dev` both run from the repository root with
 `bun run dev`. `bun run dev:web` and `bun run dev:api` start one of them.
