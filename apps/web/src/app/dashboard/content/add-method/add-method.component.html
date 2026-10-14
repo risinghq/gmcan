@@ -48,7 +48,7 @@
           <div class="text-category">Descripcion <span class="red-text">*</span></div>
           <div class="green-text top-auto right plex-sans" (click)="previewMethod()">Vista Previa</div>
         </div>
-        <ckeditor [editor]="Editor" [(ngModel)]="metodo.description" formControlName="description" name="description" />
+        <app-rich-text-editor formControlName="description" />
       </div>
       <div class="flex-news">
         @if (edit) {

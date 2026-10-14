@@ -1,0 +1,88 @@
+<div class="rich-text-editor">
+  <div class="rich-text-toolbar" role="toolbar" aria-label="Text formatting">
+    <select
+      class="rich-text-toolbar-select"
+      aria-label="Text style"
+      [value]="currentBlock"
+      (change)="setBlock($event)"
+      (mousedown)="$event.preventDefault()"
+    >
+      @for (option of headingOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+    <button
+      type="button"
+      mat-button
+      class="rich-text-toolbar-button"
+      data-action="bold"
+      aria-label="Bold"
+      [attr.aria-pressed]="editor.isActive('bold')"
+      (mousedown)="$event.preventDefault()"
+      (click)="toggleBold()"
+    >
+      <strong>B</strong>
+    </button>
+    <button
+      type="button"
+      mat-button
+      class="rich-text-toolbar-button"
+      data-action="italic"
+      aria-label="Italic"
+      [attr.aria-pressed]="editor.isActive('italic')"
+      (mousedown)="$event.preventDefault()"
+      (click)="toggleItalic()"
+    >
+      <em>I</em>
+    </button>
+    <button
+      type="button"
+      mat-button
+      class="rich-text-toolbar-button"
+      data-action="underline"
+      aria-label="Underline"
+      [attr.aria-pressed]="editor.isActive('underline')"
+      (mousedown)="$event.preventDefault()"
+      (click)="toggleUnderline()"
+    >
+      <u>U</u>
+    </button>
+    <button
+      type="button"
+      mat-button
+      class="rich-text-toolbar-button"
+      data-action="bullet-list"
+      aria-label="Bulleted list"
+      [attr.aria-pressed]="editor.isActive('bulletList')"
+      (mousedown)="$event.preventDefault()"
+      (click)="toggleBulletList()"
+    >
+      • List
+    </button>
+    <button
+      type="button"
+      mat-button
+      class="rich-text-toolbar-button"
+      data-action="ordered-list"
+      aria-label="Numbered list"
+      [attr.aria-pressed]="editor.isActive('orderedList')"
+      (mousedown)="$event.preventDefault()"
+      (click)="toggleOrderedList()"
+    >
+      1. List
+    </button>
+    <button
+      type="button"
+      mat-button
+      class="rich-text-toolbar-button"
+      data-action="link"
+      aria-label="Add link"
+      [attr.aria-pressed]="editor.isActive('link')"
+      (mousedown)="$event.preventDefault()"
+      (click)="setLink()"
+    >
+      Link
+    </button>
+  </div>
+  <tiptap-editor [editor]="editor" aria-label="Rich text content" />
+</div>

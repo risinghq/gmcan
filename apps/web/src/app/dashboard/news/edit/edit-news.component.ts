@@ -19,6 +19,7 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { DialogData } from "@app/shared/models/dialogdata";
 import { createNews } from "@app/shared/models/factories";
@@ -30,8 +31,6 @@ import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
-import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
-import { ClassicEditor } from "ckeditor5";
 import { AutosizeModule } from "ngx-autosize";
 
 import { toNewsUpsertBody } from "../flow/news-payload";
@@ -71,7 +70,7 @@ interface NewsPreviewData {
     MatSelect,
     MatOption,
     AutosizeModule,
-    CKEditorModule,
+    RichTextEditorComponent,
   ],
 })
 export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
@@ -84,7 +83,6 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   lookup = inject(LookupService);
   private memberService = inject(MemberService);
 
-  public Editor = ClassicEditor;
   noticia: News;
   publishedAtObj?: Date;
   edit = true;
@@ -168,6 +166,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   publishMethod(mode: "published" | "draft"): void {
+    this.noticia.body = this.newsForm.controls["body"].value ?? "";
     const publishedAt = this.publishedAtObj ? toIsoDate(this.publishedAtObj) : undefined;
     const body = toNewsUpsertBody(this.noticia, mode, publishedAt);
     if (!body) return;
@@ -203,7 +202,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
             photoAlt: aut.photoAlt,
           }
         : null,
-      body: this.noticia.body ?? null,
+      body: this.newsForm.controls["body"].value ?? null,
       publishedAt,
     };
     this.previewDialog = this.dialog.open(DialogPreview2, {

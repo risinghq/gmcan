@@ -1,6 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
+import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
 
 import { ContenidosState } from "../state";
 
@@ -8,7 +8,7 @@ import { ContenidosState } from "../state";
   selector: "app-contenidos-about-tab",
   templateUrl: "./about.html",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [FormsModule, ReactiveFormsModule, CKEditorModule],
+  imports: [FormsModule, ReactiveFormsModule, RichTextEditorComponent],
 })
 export class ContenidosAboutTab {
   @Input({ required: true }) state!: ContenidosState;

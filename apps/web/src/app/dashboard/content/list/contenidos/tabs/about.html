@@ -34,12 +34,7 @@
         <div class="text-category">Descripción <span class="red-text">*</span></div>
         <div class="green-text right plex-sans" (click)="state.previewAbout()">Vista Previa</div>
       </div>
-      <ckeditor
-        [editor]="state.Editor"
-        [(ngModel)]="state.aboutUs.description"
-        formControlName="description"
-        name="description"
-      />
+      <app-rich-text-editor formControlName="description" />
     </div>
     <div class="right black-btn mb-12">
       <div class="link link-set" (click)="state.submitQuienesSomos()">Actualizar información</div>
