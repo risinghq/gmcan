@@ -167,15 +167,6 @@ export async function resolveAssetAccessUrl(input: {
   return accessUrl((await getActiveAssets(input.ownerType, [input.ownerId], input.slot)).get(input.ownerId));
 }
 
-export async function resolveAssetAccessLinks(input: {
-  ownerType: OwnerType;
-  ownerId: number;
-  slot: string;
-}): Promise<AssetLinks | null> {
-  assertSlotForOwner(input.ownerType, input.slot);
-  return accessLinks((await getActiveAssets(input.ownerType, [input.ownerId], input.slot)).get(input.ownerId));
-}
-
 /** Resolves the slot of many owners with one query per 90 owners. Every requested owner has an entry. */
 export async function resolveAssetAccessUrls(input: {
   ownerType: OwnerType;

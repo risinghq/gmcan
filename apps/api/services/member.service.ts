@@ -1,7 +1,6 @@
 import type { Compilable, Expression, SqlBool } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
-import { MEMBER_ACTIVE, MEMBER_NAME } from "../db/projections.js";
 import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
 import { memberProjects, memberPublications } from "../db/views.js";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
@@ -10,9 +9,6 @@ import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { memberFullName, resolveMemberPhotoViews } from "./member-photo.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
-
-const REQUIRED_MEMBER_BASE_FIELDS = ["dni", "email", "firstName", "lastName", "isActive"] as const;
-const REQUIRED_MEMBER_TRANSLATED_FIELDS = ["bio"] as const;
 
 export interface MemberPublishability {
   publishable: boolean;
@@ -141,18 +137,6 @@ export async function listAdminMembers(
   });
 }
 
-export async function listMemberNames() {
-  return db.selectFrom("member").select(MEMBER_NAME).execute();
-}
-
-export async function listActiveMembers(isActive: number) {
-  return db.selectFrom("member").select(MEMBER_ACTIVE).where("isActive", "=", isActive).execute();
-}
-
-export async function listMembersByType(memberTypeCode: MemberTypeCode) {
-  return db.selectFrom("member").select(MEMBER_ACTIVE).where("memberTypeCode", "=", memberTypeCode).execute();
-}
-
 export async function getMemberFull(id: number, locale: Locale = DEFAULT_LOCALE) {
   return db
     .selectFrom("member")
@@ -243,10 +227,6 @@ export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCAL
 
 export async function verifyEmailExists(email: string) {
   return db.selectFrom("member").select("id").where("email", "=", email).executeTakeFirst();
-}
-
-export async function verifyDniExists(dni: string) {
-  return db.selectFrom("member").select("id").where("dni", "=", dni).executeTakeFirst();
 }
 
 export async function createMember(data: {
@@ -357,7 +337,7 @@ export async function getMemberTranslation(id: number, locale: string) {
     .executeTakeFirst();
 }
 
-export async function evaluateMemberPublishability(id: number): Promise<MemberPublishability> {
+export async function getMemberPublishability(id: number): Promise<MemberPublishability> {
   const member = await db
     .selectFrom("member")
     .select(["id", "dni", "email", "firstName", "lastName", "isActive"])
@@ -393,15 +373,6 @@ export async function evaluateMemberPublishability(id: number): Promise<MemberPu
   const publishable = missingBase.length === 0 && Object.keys(missingTranslations).length === 0;
   return { publishable, missing: { base: missingBase, translations: missingTranslations } };
 }
-
-export async function getMemberPublishability(id: number): Promise<MemberPublishability> {
-  return evaluateMemberPublishability(id);
-}
-
-export const MEMBER_PUBLISHABILITY_REQUIREMENTS = {
-  base: REQUIRED_MEMBER_BASE_FIELDS,
-  translated: REQUIRED_MEMBER_TRANSLATED_FIELDS,
-} as const;
 
 export async function deleteMember(id: number) {
   await db.deleteFrom("member").where("id", "=", id).execute();
@@ -444,10 +415,6 @@ export async function updatePassword(memberId: number, newPassword: string, keep
 
 export async function listMemberGroups(memberId: number) {
   return db.selectFrom("member_group").selectAll().where("memberId", "=", memberId).execute();
-}
-
-export async function listGroupMembers(groupId: number) {
-  return db.selectFrom("member_group").selectAll().where("groupId", "=", groupId).execute();
 }
 
 export async function addMemberToGroup(memberId: number, groupId: number) {

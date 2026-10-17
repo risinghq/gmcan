@@ -447,22 +447,6 @@ export async function getPublicationEditView(id: number, locale: Locale = DEFAUL
   };
 }
 
-export async function searchPublications(q: string, locale: Locale = DEFAULT_LOCALE) {
-  const like = `%${q}%`;
-  return db
-    .selectFrom("publication")
-    .innerJoin("publication_translation", (join) =>
-      join
-        .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", locale),
-    )
-    .select(["publication.id", "publication.kindCode", "publication.doi", "publication.publishedAt"])
-    .where((eb) =>
-      eb.or([eb("publication_translation.title", "like", like), eb("publication_translation.abstract", "like", like)]),
-    )
-    .execute();
-}
-
 export async function createPublication(data: PublicationFields, authors: AuthorInput[]) {
   const publicationId = lastInsertId("publication");
   const results = await atomic([
@@ -559,19 +543,6 @@ export async function replaceAuthors(publicationId: number, authors: AuthorInput
     db.deleteFrom("publication_author").where("publicationId", "=", publicationId),
     ...authorsInsert(publicationId, authors),
   ]);
-}
-
-export async function listAuthorsByPublication(publicationId: number) {
-  return attachAuthors(publicationId);
-}
-
-export async function listPublicationsByMember(memberId: number) {
-  return db
-    .selectFrom("publication")
-    .innerJoin("publication_author", "publication_author.publicationId", "publication.id")
-    .selectAll("publication")
-    .where("publication_author.memberId", "=", memberId)
-    .execute();
 }
 
 export async function getJournalPublicationDependencyCount(journalId: number) {

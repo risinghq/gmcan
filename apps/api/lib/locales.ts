@@ -41,24 +41,3 @@ export function normalizeLocale(locale: string | undefined | null): LocaleCode {
   if (isSupportedLocale(normalized)) return normalized;
   return DEFAULT_LOCALE;
 }
-
-export function assertLocale(locale: string): LocaleCode {
-  return LocaleCodeSchema.parse(locale);
-}
-
-export function makeLocalizedMapSchema<T extends z.ZodTypeAny>(valueSchema: T) {
-  return z.record(z.string(), valueSchema).superRefine((value, ctx) => {
-    const keys = new Set(Object.keys(value));
-    for (const locale of SUPPORTED_LOCALES) {
-      if (!keys.has(locale)) {
-        ctx.addIssue({ code: "custom", message: `Missing translations.${locale}` });
-      }
-    }
-
-    for (const key of keys) {
-      if (!SUPPORTED_LOCALES.includes(key)) {
-        ctx.addIssue({ code: "custom", message: `Unsupported locale key: ${key}` });
-      }
-    }
-  });
-}
