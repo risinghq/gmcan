@@ -3,7 +3,6 @@ import type { Equipment } from "./equipment";
 import { createGroup, type Group } from "./group";
 import type { MemberFull } from "./member";
 import type { News } from "./news";
-import type { Project } from "./project";
 import type { ResearchLine } from "./research-line";
 import type { Software } from "./software";
 
@@ -44,24 +43,6 @@ export function createNews(): News {
     newsKindCode: "general",
     updatedAt: null,
     createdAt: null,
-  };
-}
-
-export function createProject(): Project {
-  return {
-    id: 0,
-    title: "",
-    code: "",
-    fundedAmountMinor: 0,
-    description: "",
-    statusCode: "planned",
-    startDate: "",
-    endDate: null,
-    researchLineId: 0,
-    currencyCode: "pen",
-    fundingSourceCode: "none",
-    createdAt: null,
-    updatedAt: null,
   };
 }
 
