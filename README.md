@@ -18,21 +18,21 @@ Locally the API runs under `wrangler dev` and the web app under `ng serve`.
 
 ## Run it
 
-You need [Bun](https://bun.sh) 1.4.3 (`mise install` reads it from
-[`mise.toml`](mise.toml)). No Cloudflare account is needed to run locally:
-wrangler emulates D1 and R2 under `apps/api/.wrangler/state`.
+You need [mise](https://mise.jdx.dev). `mise install` installs the pinned Bun,
+Node and gitleaks from [`mise.toml`](mise.toml). No Cloudflare account is needed
+to run locally: wrangler emulates D1 and R2 under `apps/api/.wrangler/state`.
 
 ```sh
-bun install
+mise run install
 cp apps/api/.dev.vars.example apps/api/.dev.vars
 bun run --filter api migrate
 SEED_PASSWORD=password123 bun run --filter api seed
-bun run dev
+mise run dev
 ```
 
 `migrate` creates the tables in the local database and `seed` fills it with
 sample content and files. Without `SEED_PASSWORD` the seed generates a password
-and prints it. `bun run dev` starts the API on <http://localhost:3000> and the
+and prints it. `mise run dev` starts the API on <http://localhost:3000> and the
 web app on <http://localhost:4200>.
 
 Open <http://localhost:4200>. To sign in to the dashboard, go to
