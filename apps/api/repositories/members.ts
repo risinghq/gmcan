@@ -57,10 +57,6 @@ export async function listProjectMembers(projectId: number) {
     .execute();
 }
 
-export async function listMemberProjects(memberId: number) {
-  return db.selectFrom("project_member").selectAll().where("memberId", "=", memberId).execute();
-}
-
 export async function addMemberToProject(projectId: number, memberId: number) {
   const now = new Date().toISOString();
   await db.insertInto("project_member").values({ projectId, memberId, createdAt: now, updatedAt: now }).execute();

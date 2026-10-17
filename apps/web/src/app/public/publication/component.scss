@@ -47,8 +47,6 @@
   color: var(--deep-green);
 }
 
-/*Publication text*/
-
 .card-publication-title {
   @extend .plex-sans;
   font-weight: bold;
@@ -66,7 +64,6 @@
   color: #000000;
 }
 
-/* tabs de publicacion */
 ::ng-deep .mat-tab-label {
   width: 100% !important;
   height: 32px !important;
@@ -92,7 +89,6 @@
   margin: 0px;
 }
 
-/*Buscador CSS*/
 .input-search-publication {
   width: 100%;
   vertical-align: middle;
@@ -123,8 +119,6 @@
   letter-spacing: 0.3px;
   color: #9595b2;
 }
-
-/* Publication CSS */
 
 .publication {
   padding-top: 16px;
@@ -305,8 +299,6 @@
   -ms-transform: rotate(0deg);
   -webkit-transform: rotate(0deg);
 }
-
-/*Responsive CSS*/
 
 @media (min-width: 1500px) {
   .publication-div {
@@ -494,7 +486,6 @@
   height: inherit;
 }
 
-/*Paginator CSS*/
 ::ng-deep .pagination {
   margin-top: 22px;
 }
@@ -538,7 +529,6 @@
   color: black !important;
 }
 
-/* tabs de publicacion */
 ::ng-deep .mat-tab-label {
   width: 100% !important;
   height: 32px !important;

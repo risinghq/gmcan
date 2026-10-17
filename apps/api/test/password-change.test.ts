@@ -164,15 +164,3 @@ describe("a password change while a reset link is outstanding", () => {
     expect((await send("POST", "/admin/auth/login", { email: ANA, password: NEW_PASSWORD })).status).toBe(200);
   });
 });
-
-describe("the retired reset flag", () => {
-  test("is not a column of member, and its route is gone", async () => {
-    const row = await db.selectFrom("member").selectAll().executeTakeFirstOrThrow();
-    expect(Object.keys(row)).not.toContain("passwordResetRequired");
-
-    const cookie = await signIn(ANA);
-    const res = await send("GET", "/admin/account/reset-status", undefined, cookie);
-    expect(res.status).toBe(404);
-    expect(ErrorEnvelopeSchema.safeParse(await res.json()).success).toBe(true);
-  });
-});

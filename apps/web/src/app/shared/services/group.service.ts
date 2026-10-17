@@ -15,7 +15,6 @@ export class GroupService {
   private session = inject(SessionService);
   private groupByLanguage = new Map<string, Observable<Group>>();
 
-  // Public
   /** Every component asks for the group, so one request per language serves them all until an admin edit. */
   getGroup(): Observable<Group> {
     const language = this.session.language().locale === "en" ? "en" : "es";
@@ -43,7 +42,6 @@ export class GroupService {
     return this.http.get<Equipment[]>(GLOBAL.api(`group/${groupId}/equipment`));
   }
 
-  // Admin
   listGroups(): Observable<Group[]> {
     return this.http.get<Group[]>(GLOBAL.admin("group"));
   }
@@ -84,7 +82,6 @@ export class GroupService {
       .pipe(this.dropsGroup());
   }
 
-  // About (admin)
   listAdminAbout(groupId: number): Observable<About[]> {
     return this.http.get<About[]>(GLOBAL.admin(`group/${groupId}/about`));
   }
@@ -120,7 +117,6 @@ export class GroupService {
     return this.http.put<{ status: number }>(GLOBAL.admin(`assets/about/${id}/photo`), formData);
   }
 
-  // Software (under group routes)
   listSoftware(groupId: number): Observable<Software[]> {
     return this.http.get<Software[]>(GLOBAL.admin(`group/${groupId}/software`));
   }
@@ -149,7 +145,6 @@ export class GroupService {
     return this.http.delete<{ status: number }>(GLOBAL.admin(`group/software/${id}`));
   }
 
-  // Equipment (under group routes)
   listEquipment(groupId: number): Observable<Equipment[]> {
     return this.http.get<Equipment[]>(GLOBAL.admin(`group/${groupId}/equipment`));
   }

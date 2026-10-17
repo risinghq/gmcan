@@ -558,7 +558,6 @@ svg {
   color: #9595b2;
 }
 
-/* Tipo de noticia*/
 .news-type {
   line-height: 1;
   letter-spacing: 0.3px;
@@ -575,7 +574,6 @@ mat-spinner {
   stroke: var(--deep-green) !important;
 }
 
-/* share CSS*/
 .share-div {
   margin-left: auto;
   position: relative;
@@ -600,8 +598,6 @@ mat-spinner {
   margin-left: 8px;
 }
 
-/* CSS No encontrados */
-
 .not-found {
   @extend .plex-sans;
   text-align: center;
@@ -612,8 +608,6 @@ mat-spinner {
 .flex-flow {
   flex-flow: wrap;
 }
-
-/*CSS mb mt*/
 
 circle {
   stroke-width: 7% !important;
@@ -661,13 +655,10 @@ circle {
   margin-left: 16px;
 }
 
-/*font size specifics*/
-
 .fs-13 {
   font-size: 13px;
 }
 
-/*Ventana emergente de correo*/
 .email-text {
   @extend .plex-sans;
   font-weight: bold;
@@ -842,8 +833,6 @@ circle {
   color: #30393a;
 }
 
-/* CSS MODALS*/
-
 #idleTimer {
   padding: 32px 40px !important;
 }
@@ -877,8 +866,6 @@ circle {
   border: unset;
   outline: unset;
 }
-
-/* FIN CSS MODALS*/
 
 .black-btn {
   cursor: pointer;
@@ -914,8 +901,6 @@ circle {
     background-color: #a00000 !important;
   }
 }
-
-/* Adding CSS */
 
 .pad {
   padding: 32px;

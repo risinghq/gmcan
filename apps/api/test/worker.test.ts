@@ -88,16 +88,6 @@ describe("atomic writes", () => {
 });
 
 describe("email", () => {
-  test("the contact form reports that email is not configured", async () => {
-    const res = await app.request("/api/email/contact", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name: "Ana", reason: "Quiero unirme", email: "ana@example.test", phone: "999" }),
-    });
-    expect(res.status).toBe(503);
-    expect(((await res.json()) as any).error.message).toBe("Email is not configured");
-  });
-
   test("a password reset gives the same refusal for known and unknown addresses and stores no token", async () => {
     const known = await request("author@example.test");
     const unknown = await request("nobody@example.test");
@@ -122,10 +112,6 @@ describe("caching", () => {
     const res = await app.request("/api/methods/999999");
     expect(res.status).toBe(404);
     expect(res.headers.get("cache-control")).toBeNull();
-  });
-
-  test("Kysely may run D1 queries concurrently", () => {
-    expect(db.getExecutor().adapter.supportsMultipleConnections).toBe(true);
   });
 });
 

@@ -4,8 +4,6 @@
 
 $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 
-/*CSS MAIN TOOLBAR*/
-
 .logo-nav {
   cursor: pointer;
   outline: none;
@@ -144,7 +142,6 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   margin-left: 40px;
 }
 
-/*Contactenos CSS*/
 .contact-div {
   background-color: rgba(0, 0, 0, 0.2);
 }
@@ -160,7 +157,6 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   margin-top: auto;
 }
 
-/*Links CSS*/
 .fs-13 {
   line-height: 1;
   width: max-content;
@@ -296,7 +292,6 @@ mat-sidenav {
   margin-bottom: auto;
 }
 
-/*Responsive Stuff*/
 @media (min-width: 1025px) {
   .active-language {
     color: var(--deep-green) !important;
@@ -458,7 +453,6 @@ mat-sidenav {
   }
 }
 
-/*Real Responsive*/
 @media (min-width: 1500px) {
   .footer-down-bar {
     margin-left: 19px;

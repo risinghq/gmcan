@@ -130,7 +130,6 @@ router.put(
   },
 );
 
-// About
 router.get("/:id/about", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
   const rows = await listAbout(id);
@@ -238,7 +237,6 @@ router.put(
   },
 );
 
-// Software
 router.get(
   "/:groupId/software",
   validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
@@ -296,7 +294,6 @@ router.delete("/software/:id", validate("param", IdParam), async (c) => {
   return c.json(okStatus());
 });
 
-// Equipment
 router.get(
   "/:groupId/equipment",
   validate("param", z.object({ groupId: z.coerce.number().int().positive() })),

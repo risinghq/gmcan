@@ -23,22 +23,16 @@ describe("NewsService", () => {
     http.verify();
   });
 
-  it("leaves unset filters out of the public list request", () => {
-    news
-      .listNews({ newsKindCode: undefined, sortBy: "publishedAt", sortOrder: "desc", page: 1, pageSize: 10 })
-      .subscribe();
+  it("sends the chosen filters and leaves unset ones out of the public list request", () => {
+    news.listNews({ newsKindCode: undefined, page: 1 }).subscribe();
+    const unset = http.expectOne((req) => req.url === "https://api.example.test/api/news");
+    expect(unset.request.params.has("newsKindCode")).toBe(false);
+    expect(unset.request.params.get("page")).toBe("1");
+    unset.flush({ items: [], total: 0, page: 1, pageSize: 10 });
 
-    const request = http.expectOne((req) => req.url === "https://api.example.test/api/news");
-    expect(request.request.params.has("newsKindCode")).toBe(false);
-    expect(request.request.params.get("page")).toBe("1");
-    request.flush({ items: [], total: 0, page: 1, pageSize: 10 });
-  });
-
-  it("sends a chosen category", () => {
     news.listNews({ newsKindCode: "event" }).subscribe();
-
-    const request = http.expectOne((req) => req.url === "https://api.example.test/api/news");
-    expect(request.request.params.get("newsKindCode")).toBe("event");
-    request.flush({ items: [], total: 0, page: 1, pageSize: 10 });
+    const chosen = http.expectOne((req) => req.url === "https://api.example.test/api/news");
+    expect(chosen.request.params.get("newsKindCode")).toBe("event");
+    chosen.flush({ items: [], total: 0, page: 1, pageSize: 10 });
   });
 });

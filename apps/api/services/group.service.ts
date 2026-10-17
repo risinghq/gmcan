@@ -36,10 +36,6 @@ type TTable =
   | "method_translation"
   | "software_translation";
 
-export async function getGroup(id: number) {
-  return db.selectFrom("research_group").selectAll().where("id", "=", id).executeTakeFirst();
-}
-
 export async function listGroups() {
   return db.selectFrom("research_group").selectAll().execute();
 }

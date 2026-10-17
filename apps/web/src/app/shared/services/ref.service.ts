@@ -40,7 +40,6 @@ function ref(path: string): string {
 export class RefService {
   private http = inject(HttpClient);
 
-  // News types
   listNewsTypes(): Observable<RefItem[]> {
     return this.http.get<RefItem[]>(ref("news-type"));
   }
@@ -61,7 +60,6 @@ export class RefService {
     return this.http.get<RefDependencyCount>(ref(`news-type/${id}/count`));
   }
 
-  // Journals
   listJournals(): Observable<JournalItem[]> {
     return this.http.get<JournalItem[]>(ref("journal"));
   }
@@ -82,7 +80,6 @@ export class RefService {
     return this.http.get<RefDependenciesResponse>(ref(`journal/${id}/dependencies`));
   }
 
-  // Universities
   listUniversities(): Observable<UniversityItem[]> {
     return this.http.get<UniversityItem[]>(ref("university"));
   }
@@ -107,7 +104,6 @@ export class RefService {
     return this.http.get<RefDependenciesResponse>(ref(`event/${id}/dependencies`));
   }
 
-  // Funding sources
   listFundingSources(): Observable<FundingSourceItem[]> {
     return this.http.get<FundingSourceItem[]>(ref("funding-source"));
   }

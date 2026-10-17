@@ -13,20 +13,18 @@ describe("environment", () => {
     expect(env.INSTITUTIONAL_EMAIL).toBeUndefined();
   });
 
-  test("a missing ASSET_SIGNING_SECRET is rejected and named", () => {
-    expect(() => parseEnv({})).toThrow("ASSET_SIGNING_SECRET");
-  });
-
-  test("an empty ASSET_SIGNING_SECRET is rejected and named", () => {
-    expect(() => parseEnv({ ASSET_SIGNING_SECRET: "" })).toThrow("ASSET_SIGNING_SECRET");
-  });
-
-  test.each(["EMAIL_FROM", "INSTITUTIONAL_EMAIL"])("%s must be an email address", (key) => {
-    expect(() => parseEnv({ ...validEnv, [key]: "not-an-address" })).toThrow(key);
-  });
-
-  test("an empty RESEND_API_KEY is rejected and named", () => {
-    expect(() => parseEnv({ ...validEnv, RESEND_API_KEY: "" })).toThrow("RESEND_API_KEY");
+  test.each([
+    ["a missing ASSET_SIGNING_SECRET", {}, "ASSET_SIGNING_SECRET"],
+    ["an empty ASSET_SIGNING_SECRET", { ASSET_SIGNING_SECRET: "" }, "ASSET_SIGNING_SECRET"],
+    ["an empty RESEND_API_KEY", { ...validEnv, RESEND_API_KEY: "" }, "RESEND_API_KEY"],
+    ["an EMAIL_FROM that is not an address", { ...validEnv, EMAIL_FROM: "not-an-address" }, "EMAIL_FROM"],
+    [
+      "an INSTITUTIONAL_EMAIL that is not an address",
+      { ...validEnv, INSTITUTIONAL_EMAIL: "not-an-address" },
+      "INSTITUTIONAL_EMAIL",
+    ],
+  ])("%s is rejected and named", (_case, raw, key) => {
+    expect(() => parseEnv(raw)).toThrow(key);
   });
 
   test("production requires BACKEND_URL", () => {

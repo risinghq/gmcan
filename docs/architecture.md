@@ -86,11 +86,10 @@ tables themselves are created by the SQL files in
 so multi-statement writes run as one `atomic()` batch
 ([database](database.md#transactions)).
 
-[`db/projections.ts`](../apps/api/db/projections.ts) holds the column lists of
-the `member` table that keep `passwordHash` out of responses (`MEMBER_NAME`,
-`MEMBER_ACTIVE`). [`db/views.ts`](../apps/api/db/views.ts) holds the joined
-reads for a publication with its authors and for the projects and publications
-of a member.
+[`db/projections.ts`](../apps/api/db/projections.ts) holds the column list of
+the `member` table that keeps `passwordHash` out of responses (`MEMBER_NAME`).
+[`db/views.ts`](../apps/api/db/views.ts) holds the joined reads for the projects
+and publications of a member.
 
 News search is an FTS5 table with triggers, created by the first migration and
 queried from [`repositories/news.ts`](../apps/api/repositories/news.ts).

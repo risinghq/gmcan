@@ -40,13 +40,11 @@ export async function sendResend(
   }
 }
 
-/** Sends one message. Throws a 503 AppError while email is not configured. */
 export async function sendMail(mail: Mail): Promise<void> {
   assertMailConfigured();
   await sendResend({ apiKey: env.RESEND_API_KEY as string, from: env.EMAIL_FROM as string }, mail);
 }
 
-/** Abstract the email boundary so callers can provide a test mailer. */
 export interface Mailer {
   assertConfigured(): void;
   send(mail: Mail): Promise<void>;

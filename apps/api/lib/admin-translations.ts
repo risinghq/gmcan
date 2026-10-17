@@ -1,12 +1,6 @@
 import { z } from "zod";
 
-import { SUPPORTED_LOCALES, type LocaleCode, type LocalizedMap } from "./locales.js";
-
-export const ADMIN_LOCALES = SUPPORTED_LOCALES;
-export const LocaleSchema = z.string().refine((value) => ADMIN_LOCALES.includes(value), {
-  message: "Unsupported locale",
-});
-export type AdminLocale = LocaleCode;
+import { SUPPORTED_LOCALES, type LocalizedMap } from "./locales.js";
 
 export function translationsSchema<TShape extends z.ZodRawShape>(shape: TShape) {
   const itemSchema = z.object(shape);

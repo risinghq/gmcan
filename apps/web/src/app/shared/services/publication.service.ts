@@ -28,7 +28,6 @@ export interface PublicationFilters {
 export class PublicationService {
   private http = inject(HttpClient);
 
-  // Public
   listPublications(filters?: PublicationFilters): Observable<PublicPublicationWithAuthors[]> {
     return this.http.get<PublicPublicationWithAuthors[]>(GLOBAL.api("publications"), {
       params: filters as Record<string, string | number> | undefined,
@@ -47,7 +46,6 @@ export class PublicationService {
     return this.http.get(GLOBAL.api(`assets/${assetId}/download`), { responseType: "blob" });
   }
 
-  // Admin
   listAdminPublications(filters?: AdminPublicationListQuery): Observable<AdminPublicationListItem[]> {
     return this.http.get<AdminPublicationListItem[]>(GLOBAL.admin("publications"), {
       params: filters as Record<string, string | number> | undefined,

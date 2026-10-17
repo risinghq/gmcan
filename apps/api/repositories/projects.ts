@@ -1,7 +1,7 @@
 import type { RawBuilder } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
-import type { ProjectRow, ProjectStatusCode } from "../db/schema.js";
+import type { ProjectStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import type { Locale } from "../lib/public-locale.js";
 
@@ -52,12 +52,6 @@ function insertProjectTranslations(
       description: tr.description,
     })),
   );
-}
-
-export async function listProjects(statusCode?: ProjectStatusCode) {
-  let query = db.selectFrom("project").selectAll();
-  if (statusCode !== undefined) query = query.where("statusCode", "=", statusCode);
-  return query.execute();
 }
 
 export async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectStatusCode) {
@@ -126,18 +120,6 @@ export async function listAdminProjectRows(locale: Locale, statusCode?: ProjectS
   return query.orderBy("project.startDate", "desc").execute();
 }
 
-export async function listProjectTranslations(projectId: number) {
-  return db
-    .selectFrom("project_translation")
-    .select(["locale", "title", "description"])
-    .where("projectId", "=", projectId)
-    .execute();
-}
-
-export async function getProject(id: number) {
-  return db.selectFrom("project").selectAll().where("id", "=", id).executeTakeFirst();
-}
-
 export async function getProjectLocalized(id: number, locale: Locale) {
   return db
     .selectFrom("project")
@@ -161,19 +143,6 @@ export async function getProjectLocalized(id: number, locale: Locale) {
     ])
     .where("project.id", "=", id)
     .executeTakeFirst();
-}
-
-export async function searchProjects(q: string, locale: Locale, statusCode?: ProjectStatusCode) {
-  const like = `%${q}%`;
-  let query = db
-    .selectFrom("project")
-    .innerJoin("project_translation", (join) =>
-      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
-    )
-    .selectAll("project")
-    .where((eb) => eb.or([eb("project_translation.title", "like", like), eb("project.code", "like", like)]));
-  if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
-  return query.execute();
 }
 
 export async function searchActiveProjectRows(locale: Locale, like: string) {
@@ -240,25 +209,4 @@ export async function endProject(id: number) {
 
 export async function restartProject(id: number) {
   await db.updateTable("project").set({ endDate: null, statusCode: "active" }).where("id", "=", id).execute();
-}
-
-export async function toAdminProjectView(project: ProjectRow) {
-  const translations = await listProjectTranslations(project.id);
-
-  return {
-    id: project.id,
-    code: project.code,
-    fundedAmountMinor: project.fundedAmountMinor,
-    statusCode: project.statusCode,
-    startDate: project.startDate,
-    endDate: project.endDate,
-    researchLineId: project.researchLineId,
-    currencyCode: project.currencyCode,
-    fundingSourceCode: project.fundingSourceCode,
-    createdAt: project.createdAt,
-    updatedAt: project.updatedAt,
-    translations: Object.fromEntries(
-      translations.map((tr) => [tr.locale, { title: tr.title, description: tr.description }]),
-    ),
-  };
 }
