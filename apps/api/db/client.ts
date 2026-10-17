@@ -53,7 +53,6 @@ export function lastInsertId(table: keyof Database & string): RawBuilder<number>
   return sql<number>`(select max(id) from ${sql.table(table)})`;
 }
 
-/** Returns the id created by the insert at the given batch position. */
 export function insertedId(results: Awaited<ReturnType<typeof atomic>>, index: number): number {
   const id = results[index]?.insertId;
   if (id === undefined) throw new Error(`The query at position ${index} inserted no row`);
