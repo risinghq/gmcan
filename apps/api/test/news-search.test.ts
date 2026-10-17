@@ -295,16 +295,17 @@ describe("index stays in sync with writes", () => {
   });
 });
 
+const at = (offset: number) => new Date(Date.now() + offset).toISOString();
+const row = (id: string, expiresAt: string, lastActiveAt: string) => ({
+  id,
+  memberId: members.roberto,
+  expiresAt,
+  lastActiveAt,
+});
+
 describe("session sweep", () => {
   test("deletes expired and idle sessions and keeps live ones", async () => {
     const hour = 3_600_000;
-    const at = (offset: number) => new Date(Date.now() + offset).toISOString();
-    const row = (id: string, expiresAt: string, lastActiveAt: string) => ({
-      id,
-      memberId: members.roberto,
-      expiresAt,
-      lastActiveAt,
-    });
     await db
       .insertInto("session")
       .values([row("live", at(hour), at(0)), row("expired", at(-hour), at(0)), row("idle", at(hour), at(-3 * hour))])

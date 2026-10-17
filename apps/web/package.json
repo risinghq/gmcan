@@ -19,16 +19,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "test:ci": "ng test --watch=false --no-progress",
     "preview": "ng build && wrangler dev --port 4200",
-    "deploy": "ng build && wrangler deploy",
-    "lint": "oxlint",
-    "typecheck": "bun x tsc -p tsconfig.app.json --noEmit",
-    "check": "bun run lint && bun run typecheck && bun run test:ci",
-    "format": "oxfmt --fix .",
-    "format:check": "oxfmt --check ."
+    "deploy": "ng build && wrangler deploy"
   },
   "dependencies": {
     "@angular/animations": "^22.2.2",

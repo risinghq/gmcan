@@ -38,6 +38,7 @@ async function insertAsset(owner: { table: "member_asset" | "news_asset"; column
     .execute();
 }
 
+/* oxlint-disable no-await-in-loop -- foreign-key order and generated IDs require serial writes */
 async function clear() {
   for (const table of ["news_asset", "member_asset", "news", "asset", "member"] as const) {
     await db.deleteFrom(table).execute();
@@ -91,6 +92,8 @@ async function seed(rows: number) {
   }
 }
 
+/* oxlint-enable no-await-in-loop */
+
 const listings: Record<string, () => Promise<unknown>> = {
   "/api/news": async () => (await app.request("/api/news?pageSize=50")).json(),
   "/api/members": async () => (await app.request("/api/members")).json(),
@@ -136,7 +139,7 @@ describe("id lists stay under the D1 bound-parameter limit", () => {
       return chunk;
     });
     expect(sizes).toEqual([90, 90, 70]);
-    expect([...rows].sort((a, b) => a - b)).toEqual(Array.from({ length: 250 }, (_, i) => i + 1));
+    expect(rows.toSorted((a, b) => a - b)).toEqual(Array.from({ length: 250 }, (_, i) => i + 1));
   });
 
   test("a photo lookup for 250 members runs against the real database", async () => {

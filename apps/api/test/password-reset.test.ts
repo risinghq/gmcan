@@ -120,7 +120,7 @@ describe("confirming a reset", () => {
     const statuses = (await Promise.all([confirm(token, "first password!"), confirm(token, "second password!")])).map(
       (res) => res.status,
     );
-    expect([...statuses].sort()).toEqual([200, 400]);
+    expect(statuses.toSorted()).toEqual([200, 400]);
 
     const winner = statuses[0] === 200 ? "first password!" : "second password!";
     const loser = statuses[0] === 200 ? "second password!" : "first password!";
@@ -302,11 +302,10 @@ describe("requesting a reset", () => {
     const { mailer, sent } = recordingMailer({ configured: false });
     const { requestReset, queued } = emailApp(mailer);
 
-    for (const email of [EMAIL, "nobody@example.test"]) {
-      const res = await requestReset(email);
-      expect(res.status).toBe(503);
-      expect(ErrorEnvelopeSchema.safeParse(await res.json()).success).toBe(true);
-    }
+    const responses = await Promise.all([EMAIL, "nobody@example.test"].map((email) => requestReset(email)));
+    const bodies = await Promise.all(responses.map((res) => res.json()));
+    expect(responses.map((res) => res.status)).toEqual([503, 503]);
+    for (const body of bodies) expect(ErrorEnvelopeSchema.safeParse(body).success).toBe(true);
     expect(queued).toHaveLength(0);
     expect(sent).toHaveLength(0);
     expect(await db.selectFrom("password_reset").select("memberId").execute()).toEqual([]);

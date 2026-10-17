@@ -125,13 +125,13 @@ describe("an administrator changing another member's password", () => {
   });
 });
 
-describe("a password change while a reset link is outstanding", () => {
-  const post = (path: string, body: unknown) => send("POST", path, body);
-  const outstanding = async (memberId: number) =>
-    db.selectFrom("password_reset").select("memberId").where("memberId", "=", memberId).execute();
-  const idOf = async (email: string) =>
-    (await db.selectFrom("member").select("id").where("email", "=", email).executeTakeFirstOrThrow()).id;
+const post = (path: string, body: unknown) => send("POST", path, body);
+const outstanding = async (memberId: number) =>
+  db.selectFrom("password_reset").select("memberId").where("memberId", "=", memberId).execute();
+const idOf = async (email: string) =>
+  (await db.selectFrom("member").select("id").where("email", "=", email).executeTakeFirstOrThrow()).id;
 
+describe("a password change while a reset link is outstanding", () => {
   test("a member changing their own password spends the link", async () => {
     const ana = await idOf(ANA);
     const luis = await idOf(LUIS);

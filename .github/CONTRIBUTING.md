@@ -2,36 +2,38 @@
 
 ## Set up
 
-Follow [Run it](../README.md#run-it) in the README. You need Bun 1.4.3, an
-`apps/api/.dev.vars` and a migrated, seeded local database. The Angular CLI and
-the API under `wrangler dev` both run from the repository root with
-`bun run dev`. `bun run dev:web` and `bun run dev:api` start one of them.
+Follow [Run it](../README.md#run-it) in the README. Install the toolchain with
+`mise install`; you also need an `apps/api/.dev.vars` and a migrated, seeded
+local database. The Angular CLI and the API under `wrangler dev` both run from
+the repository root with `mise run dev`. `mise run dev:web` and
+`mise run dev:api` start one of them.
 
 ## Check your change
 
 Run this before you open a pull request:
 
 ```sh
-bun run check
+mise run check
 ```
 
-It runs, in order:
+It runs these tasks and never writes tracked files:
 
-| Step  | Command              | What it covers                                |
-| ----- | -------------------- | --------------------------------------------- |
-| Lint  | `bun run lint`       | oxlint over the whole repository              |
-| Types | `bun run typecheck`  | `tsc --noEmit` for `apps/web` and `apps/api`  |
-| Tests | `bun run check:test` | Web tests (vitest) and API tests (`bun test`) |
+| Task        | What it covers                                                 |
+| ----------- | -------------------------------------------------------------- |
+| `lint`      | oxlint (warnings fail), oxfmt `--check` and a gitleaks scan    |
+| `typecheck` | `tsc --noEmit` for `apps/web` and `apps/api`                   |
+| `test`      | Web tests (vitest) and API tests (`bun test`)                  |
+| `build`     | The Angular build and a `wrangler deploy --dry-run` of the API |
 
-Format with `bun run format`. `bun run format:check` reports files it would
-change. [oxfmt](../oxfmt.config.ts) formats TypeScript and Markdown: print width
-120 for code, imports sorted with a blank line between groups. Lint rules are in
-[`oxlint.config.ts`](../oxlint.config.ts).
+`mise run fix` applies safe oxlint fixes and formats with oxfmt.
+[oxfmt](../.oxfmtrc.json) formats TypeScript, Markdown, YAML and JSON: print
+width 120 for code, 80 for the rest, imports sorted with a blank line between
+groups. Lint rules are in [`.oxlintrc.json`](../.oxlintrc.json).
 
 ## Tests
 
-API tests live in [`apps/api/test`](../apps/api/test) and run with `bun test`
-from `apps/api`. [`test/setup.ts`](../apps/api/test/setup.ts), preloaded by
+API tests live in [`apps/api/test`](../apps/api/test) and run with
+`mise run test:api`. [`test/setup.ts`](../apps/api/test/setup.ts), preloaded by
 [`bunfig.toml`](../apps/api/bunfig.toml), gives them a fresh local D1 and R2
 emulation in the system temp directory, applies the migrations and seeds the
 lookup tables, so tests run against a real database and never touch
@@ -39,7 +41,7 @@ lookup tables, so tests run against a real database and never touch
 route, and assert on the stored result.
 
 Web tests are `*.spec.ts` files next to the code and run by `ng test` (vitest).
-`bun run check:test` runs them once with `--watch=false`.
+`mise run test:web` runs them once with `--watch=false`.
 
 ## Where changes go
 
