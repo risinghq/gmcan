@@ -7,21 +7,6 @@
     "packages/*"
   ],
   "type": "module",
-  "scripts": {
-    "dev": "bun --filter './apps/*' start",
-    "dev:web": "bun --filter web start",
-    "dev:api": "bun --filter api start",
-    "build": "bun --filter './apps/*' build",
-    "build:web": "bun --filter web build",
-    "build:api": "bun --filter api build",
-    "test": "bun --filter './apps/*' test",
-    "lint": "oxlint .",
-    "typecheck": "bun run --filter web typecheck && bun run --filter api typecheck",
-    "check:test": "bun run --filter web test:ci && bun run --filter api test",
-    "check": "bun run lint && bun run typecheck && bun run check:test",
-    "format": "oxfmt .",
-    "format:check": "oxfmt --check ."
-  },
   "devDependencies": {
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0"
@@ -29,6 +14,5 @@
   "engines": {
     "bun": ">=1.0.0",
     "node": ">=20.19.0"
-  },
-  "packageManager": "bun@1.4.3"
+  }
 }

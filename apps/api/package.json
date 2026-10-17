@@ -21,19 +21,12 @@
   "main": "worker.ts",
   "scripts": {
     "start": "wrangler dev --port 3000",
-    "build": "wrangler deploy --dry-run --outdir dist",
     "deploy": "wrangler deploy",
     "typegen": "wrangler types --strict-vars=false",
     "migrate": "wrangler d1 migrations apply gmcan --local",
     "migrate:remote": "wrangler d1 migrations apply gmcan --remote",
     "seed": "bun scripts/seed.ts",
-    "seed:remote": "bun scripts/seed.ts --remote",
-    "lint": "oxlint",
-    "typecheck": "bun run typegen && tsc -p tsconfig.json --noEmit",
-    "test": "bun test --timeout 60000",
-    "check": "bun run lint && bun run typecheck",
-    "format": "oxfmt --fix .",
-    "format:check": "oxfmt --check ."
+    "seed:remote": "bun scripts/seed.ts --remote"
   },
   "dependencies": {
     "@gmcan/contracts": "workspace:*",

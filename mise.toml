@@ -1,2 +1,86 @@
 [tools]
 bun = "1.4.3"
+node = "24.22.0"
+gitleaks = "8.30.1"
+
+[tasks.install]
+description = "Install dependencies from bun.lock without resolving"
+run = "bun install --frozen-lockfile"
+
+[tasks."lint:js"]
+description = "Check JavaScript and TypeScript with oxlint"
+run = "bunx oxlint --deny-warnings ."
+
+[tasks."lint:format"]
+description = "Check formatting of code, Markdown, YAML and JSON with oxfmt"
+run = "bunx oxfmt --check ."
+
+[tasks."lint:secrets"]
+description = "Scan the tree for secrets with gitleaks"
+run = "gitleaks dir --no-banner --redact ."
+
+[tasks.lint]
+description = "Check the whole repository without writing"
+depends = ["lint:js", "lint:format", "lint:secrets"]
+
+[tasks.fix]
+description = "Apply safe oxlint fixes and format with oxfmt"
+run = ["bunx oxlint --fix .", "bunx oxfmt --write ."]
+
+[tasks."typecheck:api"]
+description = "Type-check apps/api"
+dir = "apps/api"
+run = ["bun run typegen", "bunx tsc -p tsconfig.json --noEmit"]
+
+[tasks."typecheck:web"]
+description = "Type-check apps/web"
+dir = "apps/web"
+run = "bunx tsc -p tsconfig.app.json --noEmit"
+
+[tasks.typecheck]
+description = "Type-check both apps"
+depends = ["typecheck:api", "typecheck:web"]
+
+[tasks."test:api"]
+description = "Run the API tests with bun test"
+dir = "apps/api"
+run = "bun test --timeout 60000"
+
+[tasks."test:web"]
+description = "Run the web tests once with vitest"
+dir = "apps/web"
+run = "bunx ng test --watch=false --no-progress"
+
+[tasks.test]
+description = "Run all tests"
+depends = ["test:api", "test:web"]
+
+[tasks."build:api"]
+description = "Bundle the API Worker with a wrangler dry run"
+dir = "apps/api"
+run = "bunx wrangler deploy --dry-run --outdir dist"
+
+[tasks."build:web"]
+description = "Build the Angular app"
+dir = "apps/web"
+run = "bunx ng build"
+
+[tasks.build]
+description = "Build both apps"
+depends = ["build:api", "build:web"]
+
+[tasks.check]
+description = "Run lint, typecheck, test and build without changing tracked files"
+depends = ["lint", "typecheck", "test", "build"]
+
+[tasks.dev]
+description = "Start the API on :3000 and the web app on :4200"
+run = "bun --filter './apps/*' start"
+
+[tasks."dev:api"]
+description = "Start the API on :3000"
+run = "bun --filter api start"
+
+[tasks."dev:web"]
+description = "Start the web app on :4200"
+run = "bun --filter web start"
