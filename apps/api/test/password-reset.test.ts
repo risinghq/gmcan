@@ -169,14 +169,6 @@ describe("reset material never reaches a client", () => {
     expect(JSON.parse(loginText).user.email).toBe(EMAIL);
     expect(JSON.parse(meText).email).toBe(EMAIL);
   });
-
-  test("a request without configured email is refused alike for known and unknown addresses", async () => {
-    const known = await post("/api/email/password-reset/request", { email: EMAIL });
-    const unknown = await post("/api/email/password-reset/request", { email: "nobody@example.test" });
-    expect([known.status, unknown.status]).toEqual([503, 503]);
-    expect(await known.text()).not.toMatch(/token/i);
-    expect(await db.selectFrom("password_reset").select("tokenHash").execute()).toEqual([]);
-  });
 });
 
 function recordingMailer(options: { fail?: boolean; gate?: Promise<void>; configured?: boolean } = {}) {

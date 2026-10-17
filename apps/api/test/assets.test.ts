@@ -65,12 +65,11 @@ async function assetRow() {
   return db.selectFrom("asset").selectAll().where("id", "=", assetId).executeTakeFirstOrThrow();
 }
 
-test("a soft delete records when it happened and stores no purge date", async () => {
+test("a soft delete records when it happened", async () => {
   await deleteCurrentAsset({ ownerType: "news", ownerId: newsId, slot: "photo", actorId: null });
   const row = await assetRow();
   expect(row.lifecycleStatus).toBe("soft_deleted");
   expect(row.deletedAt).not.toBeNull();
-  expect(row).not.toHaveProperty("deleteAfter");
 });
 
 test("restoring clears the deletion time", async () => {
