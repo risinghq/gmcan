@@ -52,6 +52,11 @@ describe("reads of one request", () => {
   });
 });
 
+const failing = async () => {
+  await readBatch([db.selectFrom("no_such_table" as never).selectAll()]);
+  return new Response("unreachable");
+};
+
 describe("concurrent requests", () => {
   test("each request pays for its own D1 call and shares nothing", async () => {
     const trips = await countRoundTrips(async () => {
@@ -61,10 +66,6 @@ describe("concurrent requests", () => {
   });
 
   test("a failing read in one request does not reject another request", async () => {
-    const failing = async () => {
-      await readBatch([db.selectFrom("no_such_table" as never).selectAll()]);
-      return new Response("unreachable");
-    };
     const [first, failed, second] = await Promise.allSettled([
       app.request("/api/lookup"),
       failing(),

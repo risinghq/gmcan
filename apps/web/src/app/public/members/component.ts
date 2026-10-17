@@ -37,6 +37,7 @@ export default class MembersComponent {
       return { loading: true, memberGroups: [] as MemberTypeGroup[] };
     }
 
+    // oxlint-disable-next-line oxc/no-map-spread -- the members come from a signal, so each needs a copy
     const processed = members.map((member): MemberDisplay => {
       const prefixItem = member.prefixCode ? this.prefixesMap.get(member.prefixCode) : undefined;
       const prefix = prefixItem && prefixItem.label !== "none" && prefixItem.label !== "bach" ? prefixItem.label : "";

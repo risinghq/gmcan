@@ -43,10 +43,22 @@ beforeEach(async () => {
   authorId = Number(author.insertId);
 });
 
+const insert = () => db.insertInto("locale").values({ code: "zz" });
+
+const request = (email: string) =>
+  app.request("/api/email/password-reset/request", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+const withoutTrace = async (res: Response) => {
+  const { traceId: _traceId, ...error } = ((await res.json()) as any).error;
+  return error;
+};
+
 describe("atomic writes", () => {
   test("a failing statement rolls back the statements before it", async () => {
-    const insert = () => db.insertInto("locale").values({ code: "zz" });
-
     await expect(atomic([insert(), insert()])).rejects.toThrow();
     expect(await db.selectFrom("locale").select("code").where("code", "=", "zz").execute()).toEqual([]);
   });
@@ -87,19 +99,9 @@ describe("email", () => {
   });
 
   test("a password reset gives the same refusal for known and unknown addresses and stores no token", async () => {
-    const request = (email: string) =>
-      app.request("/api/email/password-reset/request", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
     const known = await request("author@example.test");
     const unknown = await request("nobody@example.test");
     expect([known.status, unknown.status]).toEqual([503, 503]);
-    const withoutTrace = async (res: Response) => {
-      const { traceId: _traceId, ...error } = ((await res.json()) as any).error;
-      return error;
-    };
     expect(await withoutTrace(known)).toEqual(await withoutTrace(unknown));
     expect(await db.selectFrom("password_reset").select("tokenHash").execute()).toEqual([]);
   });

@@ -60,6 +60,7 @@ async function pushToCloudflare() {
   wrangler("d1", "execute", "gmcan", "--remote", "--yes", "--file", sqlFile);
 
   const keys = (await env.STORAGE.list()).objects.map((object) => object.key);
+  /* oxlint-disable no-await-in-loop -- uploads reuse one temp file, so process them serially */
   for (const key of keys) {
     const object = await env.STORAGE.get(key);
     if (!object) continue;
@@ -78,4 +79,5 @@ async function pushToCloudflare() {
       contentType,
     );
   }
+  /* oxlint-enable no-await-in-loop */
 }
