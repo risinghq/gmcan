@@ -1,5 +1,3 @@
-/* Members CSS */
-
 @use "../publication/component.scss";
 
 .plex-serif {
@@ -261,7 +259,6 @@
   }
 }
 
-/*Paginator CSS*/
 ::ng-deep .pagination {
   margin-top: 22px;
 }
@@ -305,7 +302,6 @@
   color: black !important;
 }
 
-/* tabs de publicacion */
 ::ng-deep .mat-tab-label {
   width: 100% !important;
   height: 32px !important;

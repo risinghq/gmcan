@@ -3,11 +3,6 @@ import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 
 import { ShareService } from "../services/share.service";
 
-/**
- * Reusable social share buttons component.
- * Displays Facebook and Twitter share buttons with hover effects.
- * Encapsulates share logic and styling for consistency across the app.
- */
 @Component({
   selector: "app-shared-share-buttons",
   standalone: true,

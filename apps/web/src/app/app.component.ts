@@ -44,7 +44,6 @@ export default class AppComponent {
     this.language = this.session.language();
     this.url = GLOBAL.url;
     this.seo.setOpenGraphLocation(GLOBAL.appUrl, GLOBAL.app("img/gmcan.jpg"));
-    // set screenWidth on page load
     this.screenWidth = this.browser.innerWidth();
     this.grupoinfo = createGroup();
   }

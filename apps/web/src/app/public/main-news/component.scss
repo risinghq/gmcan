@@ -97,13 +97,11 @@
   height: 116px !important;
 }
 
-/*zoom-effect*/
 .img-hover-zoom,
 .img-hover-zoom-2 {
-  overflow: hidden; /* [1.2] Hide the overflowing of child elements */
+  overflow: hidden;
 }
 
-/* [2] Transition property for smooth transformation of images */
 .img-hover-zoom img {
   transition: transform 0.5s ease;
 }
@@ -112,7 +110,6 @@
   transition: transform 0.5s ease;
 }
 
-/* [3] Finally, transforming the image when container gets hovered */
 .img-hover-zoom:hover img {
   transform: scale(1.2);
 }
@@ -141,8 +138,6 @@
 .news {
   border-bottom: 1px #e5e5e5 solid;
 }
-
-/*Categorias list*/
 
 .category-title {
   font-weight: bold;
@@ -280,7 +275,6 @@
   padding: unset;
 }
 
-/*Paginator CSS*/
 ::ng-deep .pagination {
   margin-top: 22px;
 }

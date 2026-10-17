@@ -22,12 +22,10 @@ export interface ProjectBody {
 export class ProjectService {
   private http = inject(HttpClient);
 
-  // Public
   listProjects(): Observable<ProjectWithMembers[]> {
     return this.http.get<ProjectWithMembers[]>(GLOBAL.api("projects"));
   }
 
-  // Admin
   listAdminProjects(): Observable<AdminProjectListItem[]> {
     return this.http.get<AdminProjectListItem[]>(GLOBAL.admin("projects"));
   }

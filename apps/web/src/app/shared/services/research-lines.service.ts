@@ -20,12 +20,10 @@ export interface ResearchLineUpdateBody {
 export class ResearchLinesService {
   private http = inject(HttpClient);
 
-  // Public
   list(): Observable<ResearchLine[]> {
     return this.http.get<ResearchLine[]>(GLOBAL.api("research-lines"));
   }
 
-  // Admin
   listAdmin(): Observable<ResearchLine[]> {
     return this.http.get<ResearchLine[]>(GLOBAL.admin("research-lines"));
   }

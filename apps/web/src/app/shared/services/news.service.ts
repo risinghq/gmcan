@@ -24,7 +24,6 @@ function definedParams(query: object): Record<string, string | number | boolean>
 export class NewsService {
   private http = inject(HttpClient);
 
-  // Public
   listNews(query: PublicNewsListQuery = {}): Observable<PublicNewsListResponse> {
     return this.http.get<PublicNewsListResponse>(GLOBAL.api("news"), { params: definedParams(query) });
   }
@@ -33,7 +32,6 @@ export class NewsService {
     return this.http.get<PublicNewsDetail>(GLOBAL.api(`news/${id}`));
   }
 
-  // Admin
   listAdminNews(query: AdminNewsListQuery): Observable<AdminNewsListResponse> {
     return this.http.get<AdminNewsListResponse>(GLOBAL.admin("news"), { params: definedParams(query) });
   }

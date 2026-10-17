@@ -42,7 +42,6 @@ export interface MemberUpdateBody {
 export class MemberService {
   private http = inject(HttpClient);
 
-  // Public
   listMembers(): Observable<PublicMember[]> {
     return this.http.get<PublicMember[]>(GLOBAL.api("members"));
   }
@@ -51,7 +50,6 @@ export class MemberService {
     return this.http.get<MemberProfile>(GLOBAL.api(`members/${id}`));
   }
 
-  // Admin
   listAdminMembers(params?: {
     isActive?: number;
     memberTypeCode?: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";

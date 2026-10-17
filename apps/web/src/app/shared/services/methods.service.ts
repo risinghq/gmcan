@@ -20,12 +20,10 @@ export interface MethodUpdateBody {
 export class MethodsService {
   private http = inject(HttpClient);
 
-  // Public
   list(): Observable<Method[]> {
     return this.http.get<Method[]>(GLOBAL.api("methods"));
   }
 
-  // Admin
   listAdmin(): Observable<Method[]> {
     return this.http.get<Method[]>(GLOBAL.admin("methods"));
   }

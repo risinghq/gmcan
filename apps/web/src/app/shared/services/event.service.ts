@@ -21,12 +21,10 @@ export interface EventBody {
 export class EventService {
   private http = inject(HttpClient);
 
-  // Public
   list(): Observable<EventItem[]> {
     return this.http.get<EventItem[]>(GLOBAL.api("events"));
   }
 
-  // Admin
   listAdmin(): Observable<EventItem[]> {
     return this.http.get<EventItem[]>(GLOBAL.admin("events"));
   }
