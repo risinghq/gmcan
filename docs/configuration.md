@@ -11,8 +11,8 @@ Worker loads and fails with the list of problems if any value is invalid.
 | `wrangler secret put` or `--secrets-file`                | Secrets of the deployed Worker ([deployment](deployment.md)) |
 
 [`.dev.vars.example`](../apps/api/.dev.vars.example) is the template for
-`.dev.vars`. Copy it before the first `mise run dev`. Values in `.dev.vars`
-override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
+`.dev.vars`. Copy it before the first `bun --filter './apps/*' start`. Values in
+`.dev.vars` override `vars` locally, which is how `NODE_ENV`, `BACKEND_URL` and
 `FRONTEND_URL` take their local values instead of the production ones in
 `wrangler.jsonc`.
 
@@ -51,9 +51,10 @@ reveal which addresses are registered.
 
 ## Ports
 
-`mise run dev` starts the API with `wrangler dev` on port 3000 and the web app
-with `ng serve` on port 4200. The API's port is the `--port` flag of the `start`
-script in [`apps/api/package.json`](../apps/api/package.json).
+`bun --filter './apps/*' start` starts the API with `wrangler dev` on port 3000
+and the web app with `ng serve` on port 4200. The API's port is the `--port`
+flag of the `start` script in
+[`apps/api/package.json`](../apps/api/package.json).
 
 ## Web app
 

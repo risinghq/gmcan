@@ -23,17 +23,17 @@ Node and gitleaks from [`mise.toml`](mise.toml). No Cloudflare account is needed
 to run locally: wrangler emulates D1 and R2 under `apps/api/.wrangler/state`.
 
 ```sh
-mise run install
+bun run deps
 cp apps/api/.dev.vars.example apps/api/.dev.vars
 bun run --filter api migrate
 SEED_PASSWORD=password123 bun run --filter api seed
-mise run dev
+bun --filter './apps/*' start
 ```
 
 `migrate` creates the tables in the local database and `seed` fills it with
 sample content and files. Without `SEED_PASSWORD` the seed generates a password
-and prints it. `mise run dev` starts the API on <http://localhost:3000> and the
-web app on <http://localhost:4200>.
+and prints it. `bun --filter './apps/*' start` starts the API on
+<http://localhost:3000> and the web app on <http://localhost:4200>.
 
 Open <http://localhost:4200>. To sign in to the dashboard, go to
 <http://localhost:4200/login> with `admin@gmcan.dev` and the seed password.

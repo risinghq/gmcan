@@ -5,27 +5,27 @@
 Follow [Run it](../README.md#run-it) in the README. Install the toolchain with
 `mise install`; you also need an `apps/api/.dev.vars` and a migrated, seeded
 local database. The Angular CLI and the API under `wrangler dev` both run from
-the repository root with `mise run dev`. `mise run dev:web` and
-`mise run dev:api` start one of them.
+the repository root with `bun --filter './apps/*' start`.
+`bun --filter web start` and `bun --filter api start` start one of them.
 
 ## Check your change
 
 Run this before you open a pull request:
 
 ```sh
-mise run check
+bun run check
 ```
 
-It runs these tasks and never writes tracked files:
+It runs these scripts and never writes tracked files:
 
-| Task        | What it covers                                                 |
+| Script      | What it covers                                                 |
 | ----------- | -------------------------------------------------------------- |
 | `lint`      | oxlint (warnings fail), oxfmt `--check` and a gitleaks scan    |
 | `typecheck` | `tsc --noEmit` for `apps/web` and `apps/api`                   |
 | `test`      | Web tests (vitest) and API tests (`bun test`)                  |
 | `build`     | The Angular build and a `wrangler deploy --dry-run` of the API |
 
-`mise run fix` applies safe oxlint fixes and formats with oxfmt.
+`bun run fix` applies safe oxlint fixes and formats with oxfmt.
 [oxfmt](../.oxfmtrc.json) formats TypeScript, Markdown, YAML and JSON: print
 width 120 for code, 80 for the rest, imports sorted with a blank line between
 groups. Lint rules are in [`.oxlintrc.json`](../.oxlintrc.json).
@@ -33,7 +33,7 @@ groups. Lint rules are in [`.oxlintrc.json`](../.oxlintrc.json).
 ## Tests
 
 API tests live in [`apps/api/test`](../apps/api/test) and run with
-`mise run test:api`. [`test/setup.ts`](../apps/api/test/setup.ts), preloaded by
+`bun run test:api`. [`test/setup.ts`](../apps/api/test/setup.ts), preloaded by
 [`bunfig.toml`](../apps/api/bunfig.toml), gives them a fresh local D1 and R2
 emulation in the system temp directory, applies the migrations and seeds the
 lookup tables, so tests run against a real database and never touch
@@ -41,7 +41,7 @@ lookup tables, so tests run against a real database and never touch
 route, and assert on the stored result.
 
 Web tests are `*.spec.ts` files next to the code and run by `ng test` (vitest).
-`mise run test:web` runs them once with `--watch=false`.
+`bun run test:web` runs them once with `--watch=false`.
 
 ## Where changes go
 
