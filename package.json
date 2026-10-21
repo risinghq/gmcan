@@ -7,6 +7,24 @@
     "packages/*"
   ],
   "type": "module",
+  "scripts": {
+    "build": "bun run build:api && bun run build:web",
+    "build:api": "cd apps/api && bunx wrangler deploy --dry-run --outdir dist",
+    "build:web": "cd apps/web && bunx ng build",
+    "check": "bun run lint && bun run typecheck && bun run test && bun run build",
+    "deps": "bun install --frozen-lockfile",
+    "fix": "bunx oxlint --fix . && bunx oxfmt --write .",
+    "lint": "bun run lint:js && bun run lint:format && bun run secrets",
+    "lint:format": "bunx oxfmt --check .",
+    "lint:js": "bunx oxlint --deny-warnings .",
+    "secrets": "gitleaks dir --no-banner --redact .",
+    "test": "bun run test:api && bun run test:web",
+    "test:api": "cd apps/api && bun test --timeout 60000",
+    "test:web": "cd apps/web && bunx ng test --watch=false --no-progress",
+    "typecheck": "bun run typecheck:api && bun run typecheck:web",
+    "typecheck:api": "cd apps/api && bun run typegen && bunx tsc -p tsconfig.json --noEmit",
+    "typecheck:web": "cd apps/web && bunx tsc -p tsconfig.app.json --noEmit"
+  },
   "devDependencies": {
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0"
