@@ -26,8 +26,8 @@
     "typecheck:web": "cd apps/web && bunx tsc -p tsconfig.app.json --noEmit"
   },
   "devDependencies": {
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0"
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0"
   },
   "engines": {
     "bun": ">=1.0.0",
