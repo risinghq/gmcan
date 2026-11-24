@@ -1,0 +1,236 @@
+// The publication list item, shared by the publications page and the home page.
+// The including stylesheet must define .plex-sans: the rules extend it.
+
+@mixin base {
+  .publication {
+    padding-top: 16px;
+    padding-bottom: 20px;
+    border-bottom: solid 2px #d7d7e1;
+  }
+
+  .publication-type {
+    margin-top: auto;
+    margin-bottom: auto;
+    height: max-content;
+    width: max-content;
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    border-radius: 4px;
+  }
+  .publication-type-1 {
+    color: var(--deep-green);
+    background-color: rgba(3, 147, 0, 0.2);
+  }
+  .publication-type-2 {
+    color: #b78f00;
+    background-color: rgba(226, 177, 0, 0.3);
+  }
+  .publication-type-3 {
+    color: #640000;
+    background-color: rgba(255, 0, 0, 0.2);
+  }
+  .publication-mt {
+    margin-top: 8px;
+  }
+  .publication-title {
+    @extend .plex-sans;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+  .publication-date {
+    margin-top: auto;
+    margin-bottom: auto;
+    @extend .plex-sans;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #939393;
+  }
+  .publication-rev {
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    color: #939393;
+  }
+
+  .line-1 {
+    line-height: 1;
+  }
+  .elipse {
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 10px;
+    width: 4px;
+    height: 4px;
+    background-color: #c4c4c4;
+  }
+  .link-DOI {
+    text-decoration: underline;
+  }
+  .link-DOI:hover {
+    color: black;
+  }
+
+  .member-img-round {
+    overflow: hidden;
+    width: 20px;
+    height: 20px;
+    border-radius: 40.5px;
+    background-color: #c4c4c4;
+  }
+  .member-img {
+    vertical-align: unset;
+    background-color: #c4c4c4;
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+  }
+
+  .publication-members {
+    display: flex;
+  }
+
+  .member-name:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .member-name {
+    margin-left: 8px;
+    margin-right: 8px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+  .publication-authors {
+    margin-left: 4px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+
+  .mt-16 {
+    height: 36px;
+    padding-top: 16px;
+  }
+
+  @media (max-width: 336px) {
+    .mt-16 {
+      height: 52px !important;
+    }
+  }
+
+  .publication-green:hover {
+    cursor: pointer;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--deep-green);
+  }
+  .abstract-active {
+    text-decoration: underline;
+  }
+  .publication-abstract {
+    margin-left: auto;
+    @extend .plex-sans;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+
+  .abstract-title {
+    @extend .plex-sans;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+  .abstract {
+    padding-top: 4px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+  .publication-green {
+    @extend .plex-sans;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: var(--deep-green) !important;
+    margin-right: 16px;
+  }
+  .publication-abs-icon {
+    height: auto;
+    width: auto;
+    font-size: 20px;
+    vertical-align: middle;
+    -webkit-transition: -webkit-transform 0.8s ease-in-out;
+    -ms-transition: -ms-transform 0.8s ease-in-out;
+    transition: transform 0.8s ease-in-out;
+  }
+
+  .abs-active {
+    transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+  }
+  .abs-not-active {
+    transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+  }
+}
+
+// Include inside a media query for viewports wider than 960px.
+@mixin wide {
+  .publication-type {
+    padding: 4px 8px 4px 8px;
+  }
+  .publication-type,
+  .publication-title,
+  .publication-date,
+  .publication-rev,
+  .member-name,
+  .publication-authors,
+  .publication-abstract,
+  .abstract-title,
+  .abstract,
+  .publication-green {
+    font-size: 15px;
+  }
+  .publication-date {
+    margin-left: unset;
+  }
+  .collapsed-resumen {
+    padding-top: 16px;
+  }
+}
+
+// Include inside a media query for viewports up to 960px.
+@mixin narrow {
+  .publication-type {
+    font-size: 12px;
+  }
+  .publication-title,
+  .publication-rev,
+  .member-name,
+  .publication-authors,
+  .publication-abstract,
+  .abstract-title,
+  .abstract,
+  .publication-green {
+    font-size: 13px;
+  }
+  .publication-date {
+    margin-left: 8px;
+    font-size: 13px;
+  }
+  .publication-type {
+    padding: 2px 4px 2px 4px;
+  }
+  .collapsed-resumen {
+    padding-top: 8px;
+  }
+}
