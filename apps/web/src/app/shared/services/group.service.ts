@@ -1,11 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { AssetSlot } from "@gmcan/contracts/admin";
 import { Observable, MonoTypeOperatorFunction, shareReplay, tap } from "rxjs";
 
 import type { About, LocalizedAboutSectionContent, LocalizedHomeServicesTeaserContent } from "../models/about";
 import type { Equipment } from "../models/equipment";
 import type { Group } from "../models/group";
 import type { Software } from "../models/software";
+import { AssetService } from "./asset.service";
 import { GLOBAL } from "./global";
 import { SessionService } from "./session.service";
 
@@ -13,6 +15,7 @@ import { SessionService } from "./session.service";
 export class GroupService {
   private http = inject(HttpClient);
   private session = inject(SessionService);
+  private assets = inject(AssetService);
   private groupByLanguage = new Map<string, Observable<Group>>();
 
   /** Every component asks for the group, so one request per language serves them all until an admin edit. */
@@ -74,12 +77,8 @@ export class GroupService {
       .pipe(this.dropsGroup());
   }
 
-  uploadAsset(id: number, slot: "facilities" | "header" | "footer", file: File): Observable<{ status: number }> {
-    const formData = new FormData();
-    formData.append("asset", file, file.name);
-    return this.http
-      .put<{ status: number }>(GLOBAL.admin(`assets/research_group/${id}/${slot}`), formData)
-      .pipe(this.dropsGroup());
+  uploadAsset(id: number, slot: AssetSlot<"research_group">, file: File): Observable<{ status: number }> {
+    return this.assets.put({ ownerType: "research_group", ownerId: id, slot }, file).pipe(this.dropsGroup());
   }
 
   listAdminAbout(groupId: number): Observable<About[]> {
@@ -109,12 +108,6 @@ export class GroupService {
     data: { homeServicesTeaserContent: LocalizedHomeServicesTeaserContent },
   ): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/home-services-teaser`), data);
-  }
-
-  uploadAboutAsset(id: number, file: File): Observable<{ status: number }> {
-    const formData = new FormData();
-    formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(GLOBAL.admin(`assets/about/${id}/photo`), formData);
   }
 
   listSoftware(groupId: number): Observable<Software[]> {

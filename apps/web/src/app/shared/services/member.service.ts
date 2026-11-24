@@ -83,16 +83,6 @@ export class MemberService {
     return this.http.delete<{ status: number }>(GLOBAL.admin(`members/${id}`));
   }
 
-  uploadAsset(id: number, file: File): Observable<{ status: number }> {
-    const formData = new FormData();
-    formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(GLOBAL.admin(`assets/member/${id}/photo`), formData);
-  }
-
-  deleteAsset(id: number): Observable<{ status: number }> {
-    return this.http.delete<{ status: number }>(GLOBAL.admin(`assets/member/${id}/photo`));
-  }
-
   searchAuthors(q: string): Observable<AuthorSearchResult[]> {
     return this.http.get<AuthorSearchResult[]>(GLOBAL.admin("members/authors/search"), { params: { q } });
   }

@@ -15,6 +15,7 @@ import { countMissingRequirements, publishabilityTooltip } from "@app/shared/mem
 import { createMemberFull } from "@app/shared/models/factories";
 import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -45,6 +46,7 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   private memberService = inject(MemberService);
   lookup = inject(LookupService);
   private snackBar = inject(MatSnackBar);
@@ -157,7 +159,7 @@ export default class AddMemberComponent implements OnInit, HasUnsavedChanges {
               .subscribe((res) => {
                 if (res.id) {
                   if (this.fileData) {
-                    this.memberService.uploadAsset(res.id, this.fileData).subscribe();
+                    this.assets.put({ ownerType: "member", ownerId: res.id, slot: "photo" }, this.fileData).subscribe();
                   }
                   this.openSnackBar("Miembro agregado exitosamente");
                   this.memberForm.markAsPristine();

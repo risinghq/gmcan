@@ -7,6 +7,7 @@ import { Router } from "@angular/router";
 import { createResearchLine } from "@app/shared/models/factories";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -21,6 +22,7 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   private router = inject(Router);
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
@@ -61,7 +63,9 @@ export default class AddLineaComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.id) {
             if (this.fileData) {
-              this.researchLinesService.uploadAsset(result.id, this.fileData).subscribe();
+              this.assets
+                .put({ ownerType: "research_line", ownerId: result.id, slot: "photo" }, this.fileData)
+                .subscribe();
             }
             this.lineaForm.markAsPristine();
             this.return();

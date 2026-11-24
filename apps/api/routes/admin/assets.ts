@@ -1,3 +1,4 @@
+import { AssetTargetSchema } from "@gmcan/contracts/admin";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -7,8 +8,6 @@ import { extractFirstFile } from "../../lib/upload.js";
 import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import { deleteCurrentAsset, putAsset, restoreAsset } from "../../services/assets/service.js";
-import type { OwnerType } from "../../services/assets/types.js";
-import { CanonicalAssetPayloadSchema, assertSlotForOwner } from "../../services/assets/validators.js";
 
 const router = new Hono();
 const RestoreBody = z.object({ assetId: z.number().int().positive() });
@@ -20,7 +19,7 @@ router.use("*", async (c, next) => {
 
 router.put("/", async (c) => {
   const body = await c.req.parseBody({ all: true });
-  const parsed = CanonicalAssetPayloadSchema.safeParse({
+  const parsed = AssetTargetSchema.safeParse({
     ownerType: body.ownerType,
     ownerId: body.ownerId,
     slot: body.slot,
@@ -30,15 +29,12 @@ router.put("/", async (c) => {
   const file = extractFirstFile(body);
   if (!file) throw badRequest("No file uploaded");
 
-  assertSlotForOwner(parsed.data.ownerType as OwnerType, parsed.data.slot);
-  await putAsset({ ...parsed.data, slot: parsed.data.slot as never, file, actorId: c.get("memberId") });
+  await putAsset({ ...parsed.data, file, actorId: c.get("memberId") });
   return c.json(okStatus());
 });
 
-router.delete("/", validate("json", CanonicalAssetPayloadSchema), async (c) => {
-  const payload = c.req.valid("json");
-  assertSlotForOwner(payload.ownerType as OwnerType, payload.slot);
-  await deleteCurrentAsset({ ...payload, slot: payload.slot as never, actorId: c.get("memberId") });
+router.delete("/", validate("json", AssetTargetSchema), async (c) => {
+  await deleteCurrentAsset({ ...c.req.valid("json"), actorId: c.get("memberId") });
   return c.json(okStatus());
 });
 

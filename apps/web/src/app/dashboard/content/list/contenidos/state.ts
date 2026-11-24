@@ -18,6 +18,7 @@ import { createGroup, type Group } from "@app/shared/models/factories";
 import type { Method } from "@app/shared/models/method";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import type { Software } from "@app/shared/models/software";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { MethodsService } from "@app/shared/services/methods.service";
@@ -37,6 +38,8 @@ export class ContenidosState {
   private static readonly INFO_UPDATED_MESSAGE = "Información actualizada exitosamente";
 
   private readonly formBuilder = inject(FormBuilder);
+
+  private readonly assets = inject(AssetService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -196,7 +199,7 @@ export class ContenidosState {
       .subscribe((res) => {
         if (res.status === 1) {
           const file = this.files.get("about");
-          if (file) this.groupService.uploadAboutAsset(this.aboutUs.id, file).subscribe();
+          if (file) this.assets.put({ ownerType: "about", ownerId: this.aboutUs.id, slot: "photo" }, file).subscribe();
           this.openSnackBar(ContenidosState.CONTENT_UPDATED_MESSAGE);
         }
       });

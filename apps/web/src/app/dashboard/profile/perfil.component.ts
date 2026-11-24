@@ -19,6 +19,7 @@ import { PublishabilityDialogComponent } from "@app/shared/member-publishability
 import { countMissingRequirements, publishabilityTooltip } from "@app/shared/member-publishability/utils";
 import { createMemberFull } from "@app/shared/models/factories";
 import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
+import { AssetService } from "@app/shared/services/asset.service";
 import { AuthService } from "@app/shared/services/auth.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -59,6 +60,7 @@ const MIN_PASSWORD_LENGTH = 8;
 })
 export default class PerfilComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   private memberService = inject(MemberService);
   private authService = inject(AuthService);
   lookup = inject(LookupService);
@@ -240,7 +242,7 @@ export default class PerfilComponent implements OnInit {
           if (result.status !== 1) return;
 
           if (this.fileData) {
-            this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
+            this.assets.put({ ownerType: "member", ownerId: this.memberId!, slot: "photo" }, this.fileData).subscribe({
               next: () => {
                 this.fileData = null;
                 this.preview.set(null);

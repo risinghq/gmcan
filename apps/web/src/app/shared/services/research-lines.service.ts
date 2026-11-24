@@ -43,10 +43,4 @@ export class ResearchLinesService {
   delete(id: number): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(GLOBAL.admin(`research-lines/${id}`));
   }
-
-  uploadAsset(id: number, file: File): Observable<{ status: number }> {
-    const formData = new FormData();
-    formData.append("asset", file, file.name);
-    return this.http.put<{ status: number }>(GLOBAL.admin(`assets/research_line/${id}/photo`), formData);
-  }
 }

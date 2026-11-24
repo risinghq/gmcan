@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
 import type { Method } from "@app/shared/models/method";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -20,6 +21,7 @@ import { SpaceValidator } from "@app/shared/services/spacevalidator";
 })
 export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   route = inject(ActivatedRoute);
   private router = inject(Router);
   dialog = inject(MatDialog);
@@ -69,7 +71,7 @@ export default class AddMethodComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.id) {
             if (this.fileData) {
-              this.methodService.uploadAsset(result.id, this.fileData).subscribe();
+              this.assets.put({ ownerType: "method", ownerId: result.id, slot: "photo" }, this.fileData).subscribe();
             }
             this.methodForm.markAsPristine();
             this.return();

@@ -9,6 +9,7 @@ import { db } from "../db/client.js";
 import { hashPassword } from "../lib/password.js";
 import { putObject } from "../lib/upload.js";
 import { onError } from "../middleware/error.js";
+import { createNews } from "../services/news.service.js";
 
 const EMAIL = "ana.torres@example.test";
 const PASSWORD = "correct horse battery";
@@ -54,6 +55,24 @@ function send(method: string, path: string, body?: unknown, cookie?: string) {
     headers: { ...(body === undefined ? {} : { "content-type": "application/json" }), ...(cookie ? { cookie } : {}) },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+}
+
+function insertNews() {
+  return createNews({
+    statusCode: "published",
+    authorId: memberId,
+    newsKindCode: "general",
+    translations: { es: { title: "t", summary: "s", body: "b" }, en: { title: "t", summary: "s", body: "b" } },
+  });
+}
+
+function assetForm(newsId: number, file: File) {
+  const form = new FormData();
+  form.set("ownerType", "news");
+  form.set("ownerId", String(newsId));
+  form.set("slot", "photo");
+  form.set("file", file);
+  return form;
 }
 
 async function expectError(res: Response, status: number, code: string) {
@@ -227,6 +246,45 @@ describe("admin assets", () => {
     form.set("slot", "photo");
     const noFile = await app.request("/admin/assets", { method: "PUT", headers: { cookie }, body: form });
     await expectError(noFile, 400, "invalid_request");
+  });
+
+  test("a news photo uploads through PUT and soft-deletes through DELETE", async () => {
+    const cookie = await cookieFor("administrator");
+    const newsId = await insertNews();
+    const put = await app.request("/admin/assets", {
+      method: "PUT",
+      headers: { cookie },
+      body: assetForm(newsId, new File([new Uint8Array([1, 2, 3])], "photo.png", { type: "image/png" })),
+    });
+    expect(put.status).toBe(200);
+
+    const binding = await db
+      .selectFrom("news_asset")
+      .innerJoin("asset", "asset.id", "news_asset.assetId")
+      .select(["asset.id", "asset.lifecycleStatus", "asset.sizeBytes"])
+      .where("news_asset.newsId", "=", newsId)
+      .executeTakeFirstOrThrow();
+    expect(binding).toMatchObject({ lifecycleStatus: "active", sizeBytes: 3 });
+
+    const del = await send("DELETE", "/admin/assets", { ownerType: "news", ownerId: newsId, slot: "photo" }, cookie);
+    expect(del.status).toBe(200);
+    const after = await db
+      .selectFrom("asset")
+      .select("lifecycleStatus")
+      .where("id", "=", binding.id)
+      .executeTakeFirstOrThrow();
+    expect(after.lifecycleStatus).toBe("soft_deleted");
+  });
+
+  test("a file whose extension the slot refuses is invalid_request", async () => {
+    const cookie = await cookieFor("administrator");
+    const newsId = await insertNews();
+    const res = await app.request("/admin/assets", {
+      method: "PUT",
+      headers: { cookie },
+      body: assetForm(newsId, new File([new Uint8Array([1])], "script.exe")),
+    });
+    await expectError(res, 400, "invalid_request");
   });
 
   test("an unknown owner or asset is not_found", async () => {
