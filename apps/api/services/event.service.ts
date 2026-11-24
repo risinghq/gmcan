@@ -55,7 +55,7 @@ export async function getEventTranslations(id: number) {
 
 export async function createEvent(translations: LocalizedTranslations<EventTranslationInput>) {
   const results = await atomic([
-    db.insertInto("event").values({}),
+    db.insertInto("event").defaultValues(),
     db.insertInto("event_translation").values(
       Object.entries(translations).map(([locale, tr]) => ({
         eventId: lastInsertId("event"),
