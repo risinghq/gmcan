@@ -1,27 +1,224 @@
+import type { RawBuilder } from "kysely";
+
+import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
+import { MEMBER_NAME } from "../db/projections.js";
 import type { ProjectStatusCode } from "../db/schema.js";
+import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { type Locale } from "../lib/public-locale.js";
-import {
-  addMemberToProject as addMemberToProjectRepo,
-  listProjectMemberRowsByProjectIds,
-  listProjectMembers as listProjectMembersRepo,
-  removeMemberFromProject as removeMemberFromProjectRepo,
-} from "../repositories/members.js";
-import {
-  createProject as createProjectRepo,
-  deleteProject as deleteProjectRepo,
-  endProject as endProjectRepo,
-  getProjectLocalized as getProjectLocalizedRepo,
-  listAdminProjectRows,
-  listProjectsLocalizedRows,
-  restartProject as restartProjectRepo,
-  type ProjectAdminInput,
-  updateProject as updateProjectRepo,
-} from "../repositories/projects.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
 import { resolveMemberPhotoViews } from "./member-photo.service.js";
 
-export type { ProjectAdminInput } from "../repositories/projects.js";
+export interface ProjectAdminInput {
+  code: string;
+  fundedAmountMinor: number;
+  statusCode?: ProjectStatusCode;
+  startDate: string;
+  endDate?: string;
+  researchLineId: number;
+  currencyCode: "pen" | "usd";
+  fundingSourceCode: "vrip" | "none";
+  translations: LocalizedTranslations<{ title: string; description: string }>;
+}
+
+function toProjectRow(data: ProjectAdminInput) {
+  return {
+    code: data.code,
+    fundedAmountMinor: data.fundedAmountMinor,
+    statusCode: data.statusCode ?? "planned",
+    startDate: data.startDate,
+    endDate: data.endDate,
+    researchLineId: data.researchLineId,
+    currencyCode: data.currencyCode,
+    fundingSourceCode: data.fundingSourceCode,
+  };
+}
+
+async function replaceProjectTranslations(
+  projectId: number,
+  translations: Record<string, { title: string; description: string }>,
+) {
+  await atomic([
+    db.deleteFrom("project_translation").where("projectId", "=", projectId),
+    insertProjectTranslations(projectId, translations),
+  ]);
+}
+
+function insertProjectTranslations(
+  projectId: number | RawBuilder<number>,
+  translations: Record<string, { title: string; description: string }>,
+) {
+  return db.insertInto("project_translation").values(
+    Object.entries(translations).map(([locale, tr]) => ({
+      projectId,
+      locale,
+      title: tr.title,
+      description: tr.description,
+    })),
+  );
+}
+
+async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectStatusCode) {
+  let query = db
+    .selectFrom("project")
+    .innerJoin("project_translation", (join) =>
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
+    )
+    .leftJoin("research_line_translation", (join) =>
+      join
+        .onRef("research_line_translation.researchLineId", "=", "project.researchLineId")
+        .on("research_line_translation.locale", "=", locale),
+    )
+    .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
+    .innerJoin("currency", "currency.code", "project.currencyCode")
+    .select([
+      "project.id as id",
+      "project_translation.title as title",
+      "project.code as code",
+      "project.fundedAmountMinor as fundedAmountMinor",
+      "project_translation.description as description",
+      "project.statusCode as statusCode",
+      "project.startDate as startDate",
+      "project.endDate as endDate",
+      "project.researchLineId as researchLineId",
+      "project.currencyCode as currencyCode",
+      "project.fundingSourceCode as fundingSourceCode",
+      "project.createdAt as createdAt",
+      "project.updatedAt as updatedAt",
+      "research_line_translation.name as researchLine",
+      "funding_source.name as fundingSource",
+      "currency.symbol as currencySymbol",
+    ]);
+  if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
+  return query.execute();
+}
+
+async function listAdminProjectRows(locale: Locale, statusCode?: ProjectStatusCode, q?: string) {
+  let query = db
+    .selectFrom("project")
+    .innerJoin("project_translation", (join) =>
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
+    )
+    .select([
+      "project.id as id",
+      "project_translation.title as title",
+      "project.code as code",
+      "project.fundedAmountMinor as fundedAmountMinor",
+      "project_translation.description as description",
+      "project.statusCode as statusCode",
+      "project.startDate as startDate",
+      "project.endDate as endDate",
+      "project.researchLineId as researchLineId",
+      "project.currencyCode as currencyCode",
+      "project.fundingSourceCode as fundingSourceCode",
+    ]);
+
+  if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
+  if (q) {
+    const like = `%${q}%`;
+    query = query.where((eb) =>
+      eb.or([eb("project_translation.title", "like", like), eb("project.code", "like", like)]),
+    );
+  }
+
+  return query.orderBy("project.startDate", "desc").execute();
+}
+
+export async function getProjectLocalized(id: number, locale: Locale) {
+  return db
+    .selectFrom("project")
+    .innerJoin("project_translation", (join) =>
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
+    )
+    .select([
+      "project.id as id",
+      "project_translation.title as title",
+      "project.code as code",
+      "project.fundedAmountMinor as fundedAmountMinor",
+      "project_translation.description as description",
+      "project.statusCode as statusCode",
+      "project.startDate as startDate",
+      "project.endDate as endDate",
+      "project.researchLineId as researchLineId",
+      "project.currencyCode as currencyCode",
+      "project.fundingSourceCode as fundingSourceCode",
+      "project.createdAt as createdAt",
+      "project.updatedAt as updatedAt",
+    ])
+    .where("project.id", "=", id)
+    .executeTakeFirst();
+}
+
+export async function createProject(data: ProjectAdminInput) {
+  const results = await atomic([
+    db.insertInto("project").values(toProjectRow(data)),
+    insertProjectTranslations(lastInsertId("project"), data.translations),
+  ]);
+  return insertedId(results, 0);
+}
+
+export async function updateProject(id: number, data: ProjectAdminInput) {
+  await db.updateTable("project").set(toProjectRow(data)).where("id", "=", id).execute();
+  await replaceProjectTranslations(id, data.translations);
+}
+
+export async function deleteProject(id: number) {
+  await db.deleteFrom("project").where("id", "=", id).execute();
+}
+
+export async function endProject(id: number) {
+  const endDate = new Date().toISOString().slice(0, 10);
+  await db.updateTable("project").set({ endDate, statusCode: "completed" }).where("id", "=", id).execute();
+}
+
+export async function restartProject(id: number) {
+  await db.updateTable("project").set({ endDate: null, statusCode: "active" }).where("id", "=", id).execute();
+}
+
+interface ProjectMemberRow {
+  projectId: number;
+  memberId: number;
+  firstName: string;
+  lastName: string;
+  maternalName: string | null;
+}
+
+async function listProjectMemberRowsByProjectIds(projectIds: number[], orderByProject = false) {
+  return queryInChunks(projectIds, (chunk) => {
+    let query = db
+      .selectFrom("project_member")
+      .innerJoin("member", "member.id", "project_member.memberId")
+      .select([
+        "project_member.projectId as projectId",
+        "member.id as memberId",
+        "member.firstName as firstName",
+        "member.lastName as lastName",
+        "member.maternalName as maternalName",
+      ])
+      .where("project_member.projectId", "in", chunk);
+
+    if (orderByProject) query = query.orderBy("project_member.projectId", "asc");
+    return query.execute() as Promise<ProjectMemberRow[]>;
+  });
+}
+
+export async function listProjectMembers(projectId: number) {
+  return db
+    .selectFrom("member")
+    .innerJoin("project_member", "project_member.memberId", "member.id")
+    .select([...MEMBER_NAME, "member.email as email"])
+    .where("project_member.projectId", "=", projectId)
+    .execute();
+}
+
+export async function addMemberToProject(projectId: number, memberId: number) {
+  const now = new Date().toISOString();
+  await db.insertInto("project_member").values({ projectId, memberId, createdAt: now, updatedAt: now }).execute();
+}
+
+export async function removeMemberFromProject(projectId: number, memberId: number) {
+  await db.deleteFrom("project_member").where("projectId", "=", projectId).where("memberId", "=", memberId).execute();
+}
 
 function memberDisplayName(row: { firstName: string; lastName: string; maternalName: string | null }): string {
   return [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" ");
@@ -97,40 +294,4 @@ export async function listAdminProjects(
     startDateLabel: monthYearEs(project.startDate),
     members: membersByProject.get(project.id) ?? [],
   }));
-}
-
-export async function getProjectLocalized(id: number, locale: Locale) {
-  return getProjectLocalizedRepo(id, locale);
-}
-
-export async function createProject(data: ProjectAdminInput) {
-  return createProjectRepo(data);
-}
-
-export async function updateProject(id: number, data: ProjectAdminInput) {
-  await updateProjectRepo(id, data);
-}
-
-export async function deleteProject(id: number) {
-  await deleteProjectRepo(id);
-}
-
-export async function endProject(id: number) {
-  await endProjectRepo(id);
-}
-
-export async function restartProject(id: number) {
-  await restartProjectRepo(id);
-}
-
-export async function listProjectMembers(projectId: number) {
-  return listProjectMembersRepo(projectId);
-}
-
-export async function addMemberToProject(projectId: number, memberId: number) {
-  await addMemberToProjectRepo(projectId, memberId);
-}
-
-export async function removeMemberFromProject(projectId: number, memberId: number) {
-  await removeMemberFromProjectRepo(projectId, memberId);
 }

@@ -1,9 +1,134 @@
+import { db, queryInChunks } from "../db/client.js";
 import { type Locale } from "../lib/public-locale.js";
-import { listProjectSearchMemberRowsByProjectIds } from "../repositories/members.js";
-import { searchNewsRows } from "../repositories/news.js";
-import { searchActiveProjectRows } from "../repositories/projects.js";
-import { listPublicationAuthorRowsByPublicationIds, searchPublicationRows } from "../repositories/publications.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
+import { newsSearchFilter } from "./news.service.js";
+
+async function searchPublicationRows(locale: Locale, like: string) {
+  return db
+    .selectFrom("publication")
+    .innerJoin("publication_translation", (join) =>
+      join
+        .onRef("publication_translation.publicationId", "=", "publication.id")
+        .on("publication_translation.locale", "=", locale),
+    )
+    .select([
+      "publication.id",
+      "publication.kindCode",
+      "publication.doi",
+      "publication.publishedAt",
+      "publication_translation.title as title",
+      "publication_translation.abstract as abstract",
+    ])
+    .where((eb) =>
+      eb.or([eb("publication_translation.title", "like", like), eb("publication_translation.abstract", "like", like)]),
+    )
+    .execute();
+}
+
+async function listPublicationAuthorRowsByPublicationIds(publicationIds: number[]) {
+  return queryInChunks(publicationIds, (chunk) =>
+    db
+      .selectFrom("publication_author")
+      .leftJoin("member", "member.id", "publication_author.memberId")
+      .select([
+        "publication_author.publicationId",
+        "publication_author.authorOrder",
+        "publication_author.externalName",
+        "publication_author.memberId",
+        "member.firstName as memberFirstName",
+        "member.lastName as memberLastName",
+        "member.maternalName as memberMaternalName",
+      ])
+      .where("publication_author.publicationId", "in", chunk)
+      .orderBy("publication_author.publicationId", "asc")
+      .orderBy("publication_author.authorOrder", "asc")
+      .execute(),
+  );
+}
+
+async function searchNewsRows(locale: Locale, q: string) {
+  const filter = newsSearchFilter(locale, q, ["title", "summary"]);
+  if (!filter) return [];
+  return db
+    .selectFrom("news")
+    .leftJoin("news_translation", (join) =>
+      join.onRef("news_translation.newsId", "=", "news.id").on("news_translation.locale", "=", locale),
+    )
+    .leftJoin("member", "member.id", "news.authorId")
+    .select([
+      "news.id",
+      "news_translation.title as title",
+      "news.publishedAt",
+      "news.authorId",
+      "news.newsKindCode",
+      "news.statusCode",
+      "member.firstName as authorFirstName",
+      "member.lastName as authorLastName",
+    ])
+    .where(filter)
+    .where("news.statusCode", "=", "published")
+    .execute();
+}
+
+async function searchActiveProjectRows(locale: Locale, like: string) {
+  return db
+    .selectFrom("project")
+    .innerJoin("project_translation", (join) =>
+      join.onRef("project_translation.projectId", "=", "project.id").on("project_translation.locale", "=", locale),
+    )
+    .leftJoin("research_line_translation", (join) =>
+      join
+        .onRef("research_line_translation.researchLineId", "=", "project.researchLineId")
+        .on("research_line_translation.locale", "=", locale),
+    )
+    .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
+    .select([
+      "project.id",
+      "project_translation.title as title",
+      "project.code",
+      "project.fundedAmountMinor",
+      "project_translation.description as description",
+      "project.statusCode",
+      "project.startDate",
+      "project.endDate",
+      "project.researchLineId",
+      "project.currencyCode",
+      "project.fundingSourceCode",
+      "research_line_translation.name as researchLine",
+      "funding_source.name as fundingSource",
+    ])
+    .where("project.statusCode", "=", "active")
+    .where((eb) =>
+      eb.or([
+        eb("project_translation.title", "like", like),
+        eb("project.code", "like", like),
+        eb("project_translation.description", "like", like),
+        eb("research_line_translation.name", "like", like),
+        eb("funding_source.name", "like", like),
+      ]),
+    )
+    .execute();
+}
+
+interface ProjectSearchMemberRow {
+  projectId: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+async function listProjectSearchMemberRowsByProjectIds(projectIds: number[]) {
+  return queryInChunks(
+    projectIds,
+    (chunk) =>
+      db
+        .selectFrom("project_member")
+        .innerJoin("member", "member.id", "project_member.memberId")
+        .select(["project_member.projectId", "member.id", "member.firstName", "member.lastName"])
+        .where("project_member.projectId", "in", chunk)
+        .execute() as Promise<ProjectSearchMemberRow[]>,
+  );
+}
 
 type PublicationAuthorEntry =
   | { kind: "registered"; memberId: number; authorOrder: number; name: string }

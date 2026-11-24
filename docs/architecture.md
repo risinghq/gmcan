@@ -36,18 +36,19 @@ Hono app built in [`app.ts`](../apps/api/app.ts), and `scheduled` sweeps expired
 sessions and password reset tokens. A request passes through these layers, top
 to bottom:
 
-| Layer        | Directory                                   | Owns                                                             |
-| ------------ | ------------------------------------------- | ---------------------------------------------------------------- |
-| Middleware   | [`middleware/`](../apps/api/middleware)     | Locale, session, actor loading, permission guards, error mapping |
-| Routes       | [`routes/`](../apps/api/routes)             | URL, input validation (zod), status codes                        |
-| Services     | [`services/`](../apps/api/services)         | Business rules and response shaping, one file per aggregate      |
-| Repositories | [`repositories/`](../apps/api/repositories) | Reusable queries for members, news, projects and publications    |
-| Database     | [`db/`](../apps/api/db)                     | Kysely client on D1, schema types, seed, shared column lists     |
+| Layer      | Directory                               | Owns                                                                 |
+| ---------- | --------------------------------------- | -------------------------------------------------------------------- |
+| Middleware | [`middleware/`](../apps/api/middleware) | Locale, session, actor loading, permission guards, error mapping     |
+| Routes     | [`routes/`](../apps/api/routes)         | URL, input validation (zod), status codes                            |
+| Services   | [`services/`](../apps/api/services)     | Queries, business rules and response shaping, one file per aggregate |
+| Database   | [`db/`](../apps/api/db)                 | Kysely client on D1, schema types, seed, shared column lists         |
 
-The layers are not strict. The reference-data routes in
-[`routes/admin/ref-basic.ts`](../apps/api/routes/admin/ref-basic.ts) query the
-database directly, and services that need a query nobody else reuses write it
-inline.
+The layers are strict: a route calls services, and a service calls `db/`. A
+route never imports `db/`. The `no-restricted-imports` override for
+`apps/api/routes/**` in [`.oxlintrc.json`](../.oxlintrc.json) fails the lint on
+such an import; a type-only import is allowed. Each service owns every query of
+its aggregate. Another service that needs one of them calls the owning service,
+as search calls `newsSearchFilter` from the news service.
 
 ### Route tree
 
@@ -92,7 +93,7 @@ the `member` table that keeps `passwordHash` out of responses (`MEMBER_NAME`).
 and publications of a member.
 
 News search is an FTS5 table with triggers, created by the first migration and
-queried from [`repositories/news.ts`](../apps/api/repositories/news.ts).
+queried from [`services/news.service.ts`](../apps/api/services/news.service.ts).
 Migrations and seeding are in [database](database.md).
 
 ### Sessions and reset tokens
