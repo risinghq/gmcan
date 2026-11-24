@@ -253,7 +253,7 @@ router.post(
     "json",
     z.object({
       translations: translationsSchema({
-        name: z.string().optional(),
+        name: z.string().min(1),
         description: z.string().optional(),
       }),
       moreInfo: z.string().optional(),
@@ -274,7 +274,7 @@ router.put(
     "json",
     z.object({
       translations: translationsSchema({
-        name: z.string().optional(),
+        name: z.string().min(1),
         description: z.string().optional(),
       }),
       moreInfo: z.string().optional(),

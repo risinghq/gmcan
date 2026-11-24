@@ -64,7 +64,11 @@ export async function listGroupsLocalized(locale: Locale) {
 }
 
 export async function updateGroupInfo(id: number, data: { email?: string; phone?: string }) {
-  await db.updateTable("research_group").set(data).where("id", "=", id).execute();
+  await db
+    .updateTable("research_group")
+    .set({ ...data, updatedAt: new Date().toISOString() })
+    .where("id", "=", id)
+    .execute();
 }
 
 export async function updateGroupSummary(
@@ -274,8 +278,9 @@ export async function createResearchLine(data: {
   groupId: number;
   translations: LocalizedTranslations<{ name: string; description?: string }>;
 }) {
+  const now = new Date().toISOString();
   const results = await atomic([
-    db.insertInto("research_line").values({ groupId: data.groupId }),
+    db.insertInto("research_line").values({ groupId: data.groupId, createdAt: now, updatedAt: now }),
     db.insertInto("research_line_translation").values(
       Object.entries(data.translations).map(([locale, tr]) => ({
         researchLineId: lastInsertId("research_line"),
@@ -379,8 +384,9 @@ export async function createMethod(data: {
   groupId: number;
   translations: LocalizedTranslations<{ name: string; description: string }>;
 }) {
+  const now = new Date().toISOString();
   const results = await atomic([
-    db.insertInto("method").values({ groupId: data.groupId }),
+    db.insertInto("method").values({ groupId: data.groupId, createdAt: now, updatedAt: now }),
     db.insertInto("method_translation").values(
       Object.entries(data.translations).map(([locale, tr]) => ({
         methodId: lastInsertId("method"),
@@ -438,17 +444,20 @@ export async function listSoftwareLocalized(locale: Locale, groupId?: number) {
 }
 
 export async function createSoftware(data: {
-  translations: LocalizedTranslations<{ name?: string; description?: string }>;
+  translations: LocalizedTranslations<{ name: string; description?: string }>;
   moreInfo?: string;
   groupId: number;
 }) {
+  const now = new Date().toISOString();
   const results = await atomic([
-    db.insertInto("software").values({ moreInfo: data.moreInfo, groupId: data.groupId }),
+    db
+      .insertInto("software")
+      .values({ moreInfo: data.moreInfo, groupId: data.groupId, createdAt: now, updatedAt: now }),
     db.insertInto("software_translation").values(
       Object.entries(data.translations).map(([locale, tr]) => ({
         softwareId: lastInsertId("software"),
         locale,
-        name: tr.name ?? null,
+        name: tr.name,
         description: tr.description ?? null,
       })),
     ),
@@ -458,16 +467,19 @@ export async function createSoftware(data: {
 
 export async function updateSoftware(
   id: number,
-  data: { translations: LocalizedTranslations<{ name?: string; description?: string }>; moreInfo?: string },
+  data: { translations: LocalizedTranslations<{ name: string; description?: string }>; moreInfo?: string },
 ) {
   await atomic([
-    db.updateTable("software").set({ moreInfo: data.moreInfo }).where("id", "=", id),
+    db
+      .updateTable("software")
+      .set({ moreInfo: data.moreInfo, updatedAt: new Date().toISOString() })
+      .where("id", "=", id),
     db.deleteFrom("software_translation").where("softwareId", "=", id),
     db.insertInto("software_translation").values(
       Object.entries(data.translations).map(([locale, tr]) => ({
         softwareId: id,
         locale,
-        name: tr.name ?? null,
+        name: tr.name,
         description: tr.description ?? null,
       })),
     ),
@@ -492,7 +504,11 @@ export async function createEquipment(data: {
   storage?: string;
   groupId: number;
 }) {
-  const result = await db.insertInto("equipment").values(data).executeTakeFirst();
+  const now = new Date().toISOString();
+  const result = await db
+    .insertInto("equipment")
+    .values({ ...data, createdAt: now, updatedAt: now })
+    .executeTakeFirst();
   return Number(result.insertId);
 }
 
@@ -500,7 +516,11 @@ export async function updateEquipment(
   id: number,
   data: { name: string; cpu?: string; gpu?: string; ram?: string; storage?: string },
 ) {
-  await db.updateTable("equipment").set(data).where("id", "=", id).execute();
+  await db
+    .updateTable("equipment")
+    .set({ ...data, updatedAt: new Date().toISOString() })
+    .where("id", "=", id)
+    .execute();
 }
 
 export async function deleteEquipment(id: number) {
