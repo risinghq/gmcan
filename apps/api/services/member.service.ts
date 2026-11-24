@@ -394,7 +394,7 @@ export async function passwordChangeQueries(
   return [
     db
       .updateTable("member")
-      .set({ passwordHash: await hashPassword(newPassword) })
+      .set({ passwordHash: await hashPassword(newPassword), updatedAt: new Date().toISOString() })
       .where("id", "=", memberId)
       .$if(guard !== undefined, (qb) => qb.where(guard as Expression<SqlBool>)),
     db

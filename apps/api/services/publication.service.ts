@@ -449,11 +449,14 @@ export async function getPublicationEditView(id: number, locale: Locale = DEFAUL
 
 export async function createPublication(data: PublicationFields, authors: AuthorInput[]) {
   const publicationId = lastInsertId("publication");
+  const now = new Date().toISOString();
   const results = await atomic([
     db.insertInto("publication").values({
       kindCode: data.subtype.kindCode,
       doi: data.doi ?? null,
       publishedAt: data.publishedAt,
+      createdAt: now,
+      updatedAt: now,
     }),
     translationsInsert(publicationId, data.translations),
     subtypeInsert(publicationId, data.subtype),
@@ -515,6 +518,7 @@ export async function updatePublication(id: number, data: PublicationFields, aut
         kindCode: data.subtype.kindCode,
         doi: data.doi ?? null,
         publishedAt: data.publishedAt,
+        updatedAt: new Date().toISOString(),
       })
       .where("id", "=", id),
     db.deleteFrom("journal_article").where("publicationId", "=", id),

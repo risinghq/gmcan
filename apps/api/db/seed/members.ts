@@ -324,7 +324,8 @@ const MEMBER_GROUP_LINKS: Array<{ memberDni: string; groupId: number }> = [
 ];
 
 function bioForLocale(member: (typeof SEED_MEMBERS)[number], locale: string) {
-  return member.localizedBio?.[locale] ?? member.localizedBio?.es ?? BIO_PLACEHOLDER;
+  const bios: Partial<Record<string, string>> | undefined = member.localizedBio;
+  return bios?.[locale] ?? bios?.es ?? BIO_PLACEHOLDER;
 }
 
 export async function seedMembers() {

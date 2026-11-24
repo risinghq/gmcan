@@ -150,15 +150,20 @@ export async function getProjectLocalized(id: number, locale: Locale) {
 }
 
 export async function createProject(data: ProjectAdminInput) {
+  const now = new Date().toISOString();
   const results = await atomic([
-    db.insertInto("project").values(toProjectRow(data)),
+    db.insertInto("project").values({ ...toProjectRow(data), createdAt: now, updatedAt: now }),
     insertProjectTranslations(lastInsertId("project"), data.translations),
   ]);
   return insertedId(results, 0);
 }
 
 export async function updateProject(id: number, data: ProjectAdminInput) {
-  await db.updateTable("project").set(toProjectRow(data)).where("id", "=", id).execute();
+  await db
+    .updateTable("project")
+    .set({ ...toProjectRow(data), updatedAt: new Date().toISOString() })
+    .where("id", "=", id)
+    .execute();
   await replaceProjectTranslations(id, data.translations);
 }
 
@@ -167,12 +172,20 @@ export async function deleteProject(id: number) {
 }
 
 export async function endProject(id: number) {
-  const endDate = new Date().toISOString().slice(0, 10);
-  await db.updateTable("project").set({ endDate, statusCode: "completed" }).where("id", "=", id).execute();
+  const now = new Date().toISOString();
+  await db
+    .updateTable("project")
+    .set({ endDate: now.slice(0, 10), statusCode: "completed", updatedAt: now })
+    .where("id", "=", id)
+    .execute();
 }
 
 export async function restartProject(id: number) {
-  await db.updateTable("project").set({ endDate: null, statusCode: "active" }).where("id", "=", id).execute();
+  await db
+    .updateTable("project")
+    .set({ endDate: null, statusCode: "active", updatedAt: new Date().toISOString() })
+    .where("id", "=", id)
+    .execute();
 }
 
 interface ProjectMemberRow {

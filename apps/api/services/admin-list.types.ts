@@ -8,7 +8,8 @@ export interface AdminNewsListItem {
   authorId: number;
   newsKindCode: "general" | "research" | "event";
   statusLabel: string;
-  categoryName: string;
+  // null when the news kind has no translation in the request locale.
+  categoryName: string | null;
   authorName: string;
   authorPhotoUrl: string;
   authorPhotoAlt: string;
