@@ -85,18 +85,6 @@ export default [
         data: { pageTitle: projectEditTitle },
         canDeactivate: [canDeactivateGuard],
       },
-      {
-        path: "add-fuente",
-        loadComponent: () => import("./projects/add-fuente/add-fuente.component"),
-        title: "Proyectos - Agregar fuente",
-        canDeactivate: [canDeactivateGuard],
-      },
-      {
-        path: "edit-fuente/:id",
-        loadComponent: () => import("./projects/edit-fuente/edit-fuente.component"),
-        title: "Proyectos - Editar fuente",
-        canDeactivate: [canDeactivateGuard],
-      },
       { path: "news", loadComponent: () => import("./news/list/noticias.component"), title: "Noticias" },
       {
         path: "add-news",
@@ -111,18 +99,6 @@ export default [
         resolve: { news: newsResolver, authors: adminMembersResolver },
         data: { toolbarBadge: newsToolbarBadge },
         title: "Noticias - Editar noticia",
-        canDeactivate: [canDeactivateGuard],
-      },
-      {
-        path: "add-category",
-        loadComponent: () => import("./news/add-category/add-category.component"),
-        title: "Noticias - Agregar categoría",
-        canDeactivate: [canDeactivateGuard],
-      },
-      {
-        path: "edit-category/:id",
-        loadComponent: () => import("./news/edit-category/edit-category.component"),
-        title: "Noticias - Editar categoría",
         canDeactivate: [canDeactivateGuard],
       },
       { path: "perfil", loadComponent: () => import("./profile/perfil.component"), title: "Mi Perfil" },

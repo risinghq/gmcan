@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, computed, inject, signal, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
@@ -20,8 +20,6 @@ import { Router } from "@angular/router";
 import type { AdminProjectListItem } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
-import type { FundingSourceItem } from "@app/shared/services/ref.service";
-import { RefService } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
 @Component({
@@ -52,22 +50,22 @@ export default class ProyectosComponent implements OnInit {
   router = inject(Router);
   projectService = inject(ProjectService);
   lookup = inject(LookupService);
-  private refService = inject(RefService);
   private tabState = inject(TabStateService);
 
   displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
   displayedColumns2: string[] = ["nombre"];
   dataSource = new MatTableDataSource<AdminProjectListItem>([]);
-  dataSource2: MatTableDataSource<FundingSourceItem> = new MatTableDataSource<FundingSourceItem>([]);
-  fundingSources: FundingSourceItem[] = [];
   items: AdminProjectListItem[] = [];
   selectedTab = 0;
 
   readonly paginator = viewChild.required(MatPaginator);
   readonly matSort = viewChild.required(MatSort);
 
-  readonly paginator2 = viewChild.required(MatPaginator);
-  readonly sort2 = viewChild.required(MatSort);
+  private readonly fundingSearch = signal("");
+  readonly filteredFundingSources = computed(() => {
+    const search = this.fundingSearch();
+    return this.lookup.fundingSources().filter((source) => source.name.toLowerCase().includes(search));
+  });
 
   ejecucion = false;
 
@@ -75,20 +73,10 @@ export default class ProyectosComponent implements OnInit {
     this.selectedTab = this.tabState.projectTab();
     if (window.location.href.includes("ejecucion")) {
       this.ejecucion = true;
-      this.loadFundingSources();
       this.loadList(true);
     } else {
       this.loadList(false);
     }
-  }
-
-  loadFundingSources(): void {
-    this.refService.listFundingSources().subscribe((sources) => {
-      this.fundingSources = sources;
-      this.dataSource2 = new MatTableDataSource(this.fundingSources);
-      this.dataSource2.sort = this.sort2();
-      this.dataSource2.paginator = this.paginator2();
-    });
   }
 
   loadList(activeMode: boolean): void {
@@ -122,15 +110,8 @@ export default class ProyectosComponent implements OnInit {
     this.displayedNotFound = this.dataSource.filteredData.length === 0;
   }
 
-  displayedNotFound2 = false;
-
-  applyFilter2(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource2.paginator) {
-      this.dataSource2.paginator.firstPage();
-    }
-    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
+  onFundingSearch(event: Event): void {
+    this.fundingSearch.set((event.target as HTMLInputElement).value.trim().toLowerCase());
   }
 
   changedTab(event: number): void {
@@ -143,13 +124,5 @@ export default class ProyectosComponent implements OnInit {
 
   editProject(id: number): void {
     this.router.navigate(["dashboard/edit-project/" + id]);
-  }
-
-  addFuente(): void {
-    this.router.navigate(["dashboard/add-fuente"]);
-  }
-
-  editFuente(id: number): void {
-    this.router.navigate(["dashboard/edit-fuente/" + id]);
   }
 }
