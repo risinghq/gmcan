@@ -25,6 +25,7 @@ import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/aut
 import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
@@ -80,6 +81,7 @@ interface ThesisDraft {
 })
 export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly publicationService = inject(PublicationService);
@@ -230,7 +232,9 @@ export default class EditTesisComponent implements OnInit, HasUnsavedChanges {
     this.publicationService.updatePublication(this.publicacion.id, data, this.buildSaveList()).subscribe((response) => {
       if (response.status === 1) {
         if (this.fileData) {
-          this.publicationService.uploadAsset(this.publicacion.id, this.fileData).subscribe();
+          this.assets
+            .put({ ownerType: "publication", ownerId: this.publicacion.id, slot: "file" }, this.fileData)
+            .subscribe();
         }
         this.publicacionForm.markAsPristine();
         this.return();

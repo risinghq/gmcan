@@ -25,6 +25,7 @@ import { DialogData } from "@app/shared/models/dialogdata";
 import { createMemberFull } from "@app/shared/models/factories";
 import type { MemberFull, MemberPublishability } from "@app/shared/models/member";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -56,6 +57,7 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   private memberService = inject(MemberService);
@@ -208,7 +210,9 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
           .subscribe((res) => {
             if (res.status === 1) {
               if (this.fileData) {
-                this.memberService.uploadAsset(this.member.id, this.fileData).subscribe();
+                this.assets
+                  .put({ ownerType: "member", ownerId: this.member.id, slot: "photo" }, this.fileData)
+                  .subscribe();
               }
               this.openSnackBar("Miembro actualizado exitosamente");
               this.loadPublishability();

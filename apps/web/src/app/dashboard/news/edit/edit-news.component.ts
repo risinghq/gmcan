@@ -25,6 +25,7 @@ import { DialogData } from "@app/shared/models/dialogdata";
 import { createNews } from "@app/shared/models/factories";
 import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
@@ -74,6 +75,7 @@ interface NewsPreviewData {
 })
 export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   private newsService = inject(NewsService);
@@ -163,7 +165,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     this.newsService.updateNews(this.noticia.id, body).subscribe((result) => {
       if (result.status === 1) {
         if (this.fileData) {
-          this.newsService.uploadAsset(this.noticia.id, this.fileData).subscribe();
+          this.assets.put({ ownerType: "news", ownerId: this.noticia.id, slot: "photo" }, this.fileData).subscribe();
         }
         this.newsForm.markAsPristine();
         this.return();

@@ -100,28 +100,22 @@ export async function deleteCurrentAsset(input: AssetDeleteRequest): Promise<voi
   const assetId = await getCurrentAssetId(input.ownerType, input.ownerId, input.slot);
   if (!assetId) throw notFound("Current asset binding not found");
 
-  await db
-    .updateTable("asset")
-    .set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso() })
-    .where("id", "=", assetId)
-    .execute();
-
-  await db
-    .insertInto("asset_audit")
-    .values({ action: "soft_delete", assetId, actorId: input.actorId, reason: null, createdAt: nowIso() })
-    .execute();
+  await atomic([
+    db.updateTable("asset").set({ lifecycleStatus: "soft_deleted", deletedAt: nowIso() }).where("id", "=", assetId),
+    db
+      .insertInto("asset_audit")
+      .values({ action: "soft_delete", assetId, actorId: input.actorId, reason: null, createdAt: nowIso() }),
+  ]);
 }
 
 export async function restoreAsset(assetId: number, actorId: number | null): Promise<void> {
   const row = await db.selectFrom("asset").select("id").where("id", "=", assetId).executeTakeFirst();
   if (!row) throw notFound("Asset not found");
 
-  await db.updateTable("asset").set({ lifecycleStatus: "active", deletedAt: null }).where("id", "=", assetId).execute();
-
-  await db
-    .insertInto("asset_audit")
-    .values({ action: "restore", assetId, actorId, reason: null, createdAt: nowIso() })
-    .execute();
+  await atomic([
+    db.updateTable("asset").set({ lifecycleStatus: "active", deletedAt: null }).where("id", "=", assetId),
+    db.insertInto("asset_audit").values({ action: "restore", assetId, actorId, reason: null, createdAt: nowIso() }),
+  ]);
 }
 
 function signAccess(assetId: number, expiresAt: number): string {

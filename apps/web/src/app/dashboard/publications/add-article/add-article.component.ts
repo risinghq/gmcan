@@ -22,6 +22,7 @@ import { buildArticlePayload } from "@app/dashboard/publications/flow/publicatio
 import type { AuthorSearchResult } from "@app/shared/models/author";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
@@ -65,6 +66,7 @@ interface ArticleDraft {
 })
 export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private publicationService = inject(PublicationService);
@@ -178,7 +180,7 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
     this.publicationService.createPublication(data, this.buildSaveList()).subscribe((result) => {
       if (result.id != null) {
         if (this.fileData) {
-          this.publicationService.uploadAsset(result.id, this.fileData).subscribe();
+          this.assets.put({ ownerType: "publication", ownerId: result.id, slot: "file" }, this.fileData).subscribe();
         }
         this.publicacionForm.markAsPristine();
         this.return();

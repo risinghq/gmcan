@@ -17,6 +17,7 @@ import { DialogData } from "@app/shared/models/dialogdata";
 import { createResearchLine } from "@app/shared/models/factories";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
+import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
@@ -31,6 +32,7 @@ import { AutosizeModule } from "ngx-autosize";
 })
 export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private readonly assets = inject(AssetService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   dialog = inject(MatDialog);
@@ -80,7 +82,9 @@ export default class EditLineaComponent implements OnInit, HasUnsavedChanges {
         .subscribe((result) => {
           if (result.status === 1) {
             if (this.fileData) {
-              this.researchLinesService.uploadAsset(this.lineaInvestigacion.id, this.fileData).subscribe();
+              this.assets
+                .put({ ownerType: "research_line", ownerId: this.lineaInvestigacion.id, slot: "photo" }, this.fileData)
+                .subscribe();
             }
             this.lineaForm.markAsPristine();
             this.return();
