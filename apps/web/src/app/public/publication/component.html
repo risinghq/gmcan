@@ -15,7 +15,7 @@
         <div class="card-publication-title">{{ language.publicationsText[0].publicationsTitle }}</div>
         <div class="card-publication-text">{{ infoText }}</div>
         <mat-tab-group (selectedTabChange)="changeTab($event)">
-          @for (tab of tabLabels; track tab; let j = $index) {
+          @for (tab of tabLabels(); track $index) {
           <mat-tab label="{{ tab.label }}">
             <form class="flex-news" [formGroup]="searchForm">
               <div class="input-search-publication">

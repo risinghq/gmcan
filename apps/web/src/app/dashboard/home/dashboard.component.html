@@ -104,19 +104,17 @@
           </div>
           <div class="gray-box right">
             <div class="item-subtitle">Miembros activos</div>
-            <div class="bg-number mt-8">{{ total }}</div>
+            <div class="bg-number mt-8">{{ members().total }}</div>
           </div>
         </div>
         <div class="mt-12" style="display: block">
           <canvas
             baseChart
-            [type]="chartType"
-            [datasets]="chartDatasets"
-            [labels]="chartLabels"
-            [options]="chartOptions"
+            type="pie"
+            [datasets]="members().datasets"
+            [labels]="members().labels"
+            [options]="membersChartOptions"
             [legend]="true"
-            (chartHover)="chartHovered($event)"
-            (chartClick)="chartClicked($event)"
           >
           </canvas>
         </div>
@@ -129,19 +127,17 @@
           </div>
           <div class="gray-box right">
             <div class="item-subtitle">Publicaciones</div>
-            <div class="bg-number mt-8">{{ total2 }}</div>
+            <div class="bg-number mt-8">{{ publications().total }}</div>
           </div>
         </div>
         <div class="mt-12" style="display: block">
           <canvas
             baseChart
-            [type]="chartType2"
-            [datasets]="chartDatasets2"
-            [labels]="chartLabels2"
-            [options]="chartOptions2"
+            type="bar"
+            [datasets]="publications().datasets"
+            [labels]="publications().labels"
+            [options]="publicationsChartOptions"
             [legend]="false"
-            (chartHover)="chartHovered2($event)"
-            (chartClick)="chartClicked2($event)"
           >
           </canvas>
         </div>

@@ -63,6 +63,11 @@
   opacity: unset !important;
 }
 
+button {
+  display: block;
+  font: inherit;
+}
+
 .btn-black {
   padding: 8px;
   width: 100%;

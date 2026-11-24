@@ -1,21 +1,25 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, inject } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
-import { catchError, of, share } from "rxjs";
+import { Injectable, inject, signal } from "@angular/core";
+import { catchError, defer, firstValueFrom, of } from "rxjs";
 
 import type { LookupData } from "../models/lookup";
 import { GLOBAL } from "./global";
 
+// Pages and resolvers read lookups synchronously, so the app initializer awaits load() before the first route renders.
 @Injectable({ providedIn: "root" })
 export class LookupService {
   private http = inject(HttpClient);
 
-  private readonly lookup$ = this.http.get<LookupData>(GLOBAL.api("lookup")).pipe(
-    share(),
-    catchError(() => of(this.getEmptyLookup())),
-  );
+  private readonly data = signal<LookupData>(this.getEmptyLookup());
 
-  private readonly data = toSignal(this.lookup$, { initialValue: this.getEmptyLookup() });
+  // The build extracts routes with no request, so no API URL exists and GLOBAL.api throws. defer turns that
+  // throw into the same empty lookup as a failed request.
+  async load(): Promise<void> {
+    const data = await firstValueFrom(
+      defer(() => this.http.get<LookupData>(GLOBAL.api("lookup"))).pipe(catchError(() => of(this.getEmptyLookup()))),
+    );
+    this.data.set(data);
+  }
 
   private getEmptyLookup(): LookupData {
     return {

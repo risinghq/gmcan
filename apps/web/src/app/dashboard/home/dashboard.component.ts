@@ -1,12 +1,28 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { RouterLink, RouterLinkActive } from "@angular/router";
-import type { Group } from "@app/shared/models/group";
 import { AuthzService } from "@app/shared/services/authz.service";
-import { DashboardService } from "@app/shared/services/dashboard.service";
+import { type DashboardCountItem, DashboardService } from "@app/shared/services/dashboard.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { GroupService } from "@app/shared/services/group.service";
-import { UiStateService } from "@app/shared/services/ui-state.service";
+import type { ChartDataset, ChartOptions } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
+
+const PALETTE = [
+  "rgba(13,56,0,1)",
+  "rgba(0,133,51,1)",
+  "rgba(0,204,24,1)",
+  "rgba(120,240,0,1)",
+  "rgba(142,236,152,1)",
+  "rgba(0,48,0,1)",
+];
+
+function chart(items: DashboardCountItem[], label: string, style: Partial<ChartDataset>) {
+  return {
+    total: items.reduce((sum, item) => sum + item.count, 0),
+    labels: items.map((item) => item.label),
+    datasets: [{ ...style, data: items.map((item) => item.count), label }] as ChartDataset[],
+  };
+}
 
 @Component({
   selector: "app-dashboard",
@@ -15,110 +31,28 @@ import { BaseChartDirective } from "ng2-charts";
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
 })
-export default class DashboardComponent implements OnInit {
+export default class DashboardComponent {
   authz = inject(AuthzService);
-  groupService = inject(GroupService);
-  private dashboardService = inject(DashboardService);
-  private uiState = inject(UiStateService);
+  private readonly summary = toSignal(inject(DashboardService).getSummary());
 
-  screenWidth = window.innerWidth;
   readonly manualUrl = GLOBAL.app("grupo/get-manual");
-  public grupoinfo: Group;
 
-  constructor() {
-    this.grupoinfo = this.uiState.groupInfo();
-  }
-
-  ngOnInit(): void {
-    this.getGrupoInfo();
-    this.loadDashboardSummary();
-  }
-
-  getGrupoInfo(): void {
-    this.grupoinfo = this.uiState.groupInfo();
-  }
-
-  total = 0;
-  total2 = 0;
-
-  loadDashboardSummary(): void {
-    this.dashboardService.getSummary().subscribe((summary) => {
-      this.total = summary.membersByType.reduce((sum, item) => sum + item.count, 0);
-      this.chartLabels = summary.membersByType.map((item) => item.label);
-      this.chartDatasets = [{ data: summary.membersByType.map((item) => item.count), label: "Miembros" }];
-
-      this.total2 = summary.publicationsByKind.reduce((sum, item) => sum + item.count, 0);
-      this.chartLabels2 = summary.publicationsByKind.map((item) => item.label);
-      this.chartDatasets2 = [{ data: summary.publicationsByKind.map((item) => item.count), label: "Cantidad" }];
-    });
-  }
-
-  public chartType: any = "pie";
-
-  public chartDatasets: Array<any> = [
-    {
-      data: [],
-      label: "Miembros",
-      backgroundColor: [
-        "rgba(13,56,0,1)",
-        "rgba(0,133,51,1)",
-        "rgba(0,204,24,1)",
-        "rgba(120,240,0,1)",
-        "rgba(142,236,152,1)",
-        "rgba(0,48,0,1)",
-      ],
-      hoverBackgroundColor: [
-        "rgba(13,56,0,0.8)",
-        "rgba(0,133,51,0.8)",
-        "rgba(0,204,24,0.8)",
-        "rgba(120,240,0,0.8)",
-        "rgba(142,236,152,0.8)",
-        "rgba(0,48,0,0.8)",
-      ],
+  readonly members = computed(() =>
+    chart(this.summary()?.membersByType ?? [], "Miembros", {
+      backgroundColor: PALETTE,
+      hoverBackgroundColor: PALETTE.map((color) => color.replace(",1)", ",0.8)")),
       borderWidth: 2,
-    },
-  ];
+    }),
+  );
 
-  public chartLabels: string[] = [];
-
-  public chartOptions: any = {
-    responsive: true,
-  };
-  public chartClicked(_e: any): void {}
-  public chartHovered(_e: any): void {}
-
-  public chartType2: any = "bar";
-
-  public chartDatasets2: Array<any> = [
-    {
-      data: [],
-      label: "Cantidad",
-      backgroundColor: [
-        "rgba(13,56,0,1)",
-        "rgba(0,133,51,1)",
-        "rgba(0,204,24,1)",
-        "rgba(120,240,0,1)",
-        "rgba(142,236,152,1)",
-        "rgba(0,48,0,1)",
-      ],
-      borderColor: [
-        "rgba(13,56,0,1)",
-        "rgba(13,56,0,1)",
-        "rgba(13,56,0,1)",
-        "rgba(13,56,0,1)",
-        "rgba(13,56,0,1)",
-        "rgba(13,56,0,1)",
-      ],
+  readonly publications = computed(() =>
+    chart(this.summary()?.publicationsByKind ?? [], "Cantidad", {
+      backgroundColor: PALETTE,
+      borderColor: PALETTE[0],
       borderWidth: 2,
-    },
-  ];
+    }),
+  );
 
-  public chartLabels2: string[] = [];
-
-  public chartOptions2: any = {
-    responsive: true,
-    indexAxis: "y",
-  };
-  public chartClicked2(_e: any): void {}
-  public chartHovered2(_e: any): void {}
+  readonly membersChartOptions: ChartOptions = { responsive: true };
+  readonly publicationsChartOptions: ChartOptions = { responsive: true, indexAxis: "y" };
 }

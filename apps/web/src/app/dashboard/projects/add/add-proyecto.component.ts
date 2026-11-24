@@ -9,14 +9,12 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
-import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { toIsoDate } from "@app/shared/utils/date";
 import { AutosizeModule } from "ngx-autosize";
@@ -63,10 +61,9 @@ interface ProjectMemberRow {
 })
 export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
   router = inject(Router);
   private snackBar = inject(MatSnackBar);
-  private memberService = inject(MemberService);
-  private researchLinesService = inject(ResearchLinesService);
   lookup = inject(LookupService);
   private projectService = inject(ProjectService);
 
@@ -104,34 +101,21 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.loadResearchLines();
+    const data = this.route.snapshot.data;
+    this.researchLines = data["researchLines"] as ResearchLine[];
+    const members = (data["members"] as AdminMemberListItem[]).toSorted((a, b) =>
+      a.firstName.localeCompare(b.firstName),
+    );
+    this.memberOptions = members.map((m) => ({
+      id: m.id,
+      name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
+    }));
+    this.miembrosProyecto = [this.newMemberRow()];
+    this.setupMemberFilters();
   }
 
   isDirty(): boolean {
     return this.proyectoForm.dirty;
-  }
-
-  loadResearchLines(): void {
-    this.researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
-      if (result) {
-        this.researchLines = result;
-        this.loadMembers();
-      }
-    });
-  }
-
-  loadMembers(): void {
-    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
-      if (result) {
-        const sortedMembers = result.toSorted((a, b) => a.firstName.localeCompare(b.firstName));
-        this.memberOptions = sortedMembers.map((m) => ({
-          id: m.id,
-          name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
-        }));
-        this.miembrosProyecto = [this.newMemberRow()];
-        this.setupMemberFilters();
-      }
-    });
   }
 
   private newMemberRow(): ProjectMemberRow {

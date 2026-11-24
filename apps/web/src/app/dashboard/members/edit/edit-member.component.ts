@@ -1,5 +1,5 @@
 import { CdkScrollable } from "@angular/cdk/scrolling";
-import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy, signal } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatIconButton } from "@angular/material/button";
 import { provideNativeDateAdapter } from "@angular/material/core";
@@ -84,7 +84,7 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   edit = true;
   selectedBioLocale = "es";
   bioByLocale: Record<string, string> = {};
-  publishability: MemberPublishability | null = null;
+  readonly publishability = signal<MemberPublishability | null>(null);
 
   constructor() {
     this.memberForm = this.formBuilder.group({
@@ -288,28 +288,27 @@ export default class EditMemberComponent implements OnInit, HasUnsavedChanges {
   }
 
   missingRequirementsCount(): number {
-    if (!this.publishability) return 0;
-    return countMissingRequirements(this.publishability);
+    const publishability = this.publishability();
+    return publishability ? countMissingRequirements(publishability) : 0;
   }
 
   publishabilityTooltip(): string {
-    return publishabilityTooltip(this.publishability);
+    return publishabilityTooltip(this.publishability());
   }
 
   private loadPublishability(): void {
     if (!this.member.id) return;
-    this.memberService.getMemberPublishability(this.member.id).subscribe((data) => {
-      this.publishability = data;
-    });
+    this.memberService.getMemberPublishability(this.member.id).subscribe((data) => this.publishability.set(data));
   }
 
   openPublishabilityDetails(): void {
-    if (!this.publishability) return;
+    const publishability = this.publishability();
+    if (!publishability) return;
     this.dialog.open(PublishabilityDialogComponent, {
       width: "560px",
       data: {
         memberName: `${this.member.firstName} ${this.member.lastName}`.trim(),
-        publishability: this.publishability,
+        publishability,
       },
     });
   }

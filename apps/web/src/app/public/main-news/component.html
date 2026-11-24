@@ -1,4 +1,5 @@
 <div class="main-news-div">
+  @let allCharged = !news.isLoading(); @let newsItems = items(); @let total = news.value()?.total ?? 0;
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="main-news-links">
@@ -35,7 +36,7 @@
         </div>
         } @if (newsItems.length > 0 && allCharged) {
         <div>
-          @for (newsItem of newsItems; track newsItem) {
+          @for (newsItem of newsItems; track newsItem.id) {
           <div class="news flex-news">
             <div
               class="img-hover-zoom-2 img-div-zoom right pl-24"

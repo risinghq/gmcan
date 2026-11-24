@@ -26,9 +26,7 @@ import type { Project } from "@app/shared/models/project";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
-import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { parseLocalDate, requireLocalDate, toIsoDate } from "@app/shared/utils/date";
@@ -78,8 +76,6 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   route = inject(ActivatedRoute);
   router = inject(Router);
   private snackBar = inject(MatSnackBar);
-  private memberService = inject(MemberService);
-  private researchLinesService = inject(ResearchLinesService);
   lookup = inject(LookupService);
   private projectService = inject(ProjectService);
   dialog = inject(MatDialog);
@@ -123,8 +119,10 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   ngOnInit(): void {
     const resolved = this.route.snapshot.data["project"] as Project;
     this.bindProject(resolved);
-    this.loadResearchLines();
-    this.loadProjectMembers(this.projectId);
+    const data = this.route.snapshot.data;
+    this.researchLines = data["researchLines"] as ResearchLine[];
+    this.bindMemberOptions(data["members"] as AdminMemberListItem[]);
+    this.bindProjectMembers(data["projectMembers"] as { memberId: number; name: string }[]);
   }
 
   isDirty(): boolean {
@@ -154,48 +152,33 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
     }
   }
 
-  loadResearchLines(): void {
-    this.researchLinesService.listAdmin().subscribe((result: ResearchLine[]) => {
-      if (result) {
-        this.researchLines = result;
-        this.loadMembers();
-      }
-    });
+  private bindMemberOptions(members: AdminMemberListItem[]): void {
+    this.memberOptions = members
+      .toSorted((a, b) => a.firstName.localeCompare(b.firstName))
+      .map((m) => ({
+        id: m.id,
+        name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
+      }));
   }
 
-  loadMembers(): void {
-    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
-      if (result) {
-        result.sort((a, b) => a.firstName.localeCompare(b.firstName));
-        this.memberOptions = result.map((m) => ({
-          id: m.id,
-          name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
-        }));
-      }
-    });
-  }
-
-  loadProjectMembers(projectId: number): void {
-    this.projectService.getProjectMembers(projectId).subscribe((members) => {
-      const rows = members as { memberId: number; name: string }[];
-      this.originalMemberIds = rows.map((r) => r.memberId);
-      if (rows.length > 0) {
-        this.miembrosProyecto = rows.map((r, i) => {
-          const row: ProjectMemberRow = {
-            id: i + 1,
-            memberId: r.memberId,
-            name: r.name,
-            myControl: new FormControl<string>(r.name, { nonNullable: true }),
-          };
-          row.filteredOptions = row.myControl.valueChanges.pipe(
-            startWith(r.name),
-            map((v) => this.filterMembers(v ?? "")),
-          );
-          return row;
-        });
-      } else {
-        this.miembrosProyecto = [this.newMemberRow()];
-      }
+  private bindProjectMembers(rows: { memberId: number; name: string }[]): void {
+    this.originalMemberIds = rows.map((r) => r.memberId);
+    if (rows.length === 0) {
+      this.miembrosProyecto = [this.newMemberRow()];
+      return;
+    }
+    this.miembrosProyecto = rows.map((r, i) => {
+      const row: ProjectMemberRow = {
+        id: i + 1,
+        memberId: r.memberId,
+        name: r.name,
+        myControl: new FormControl<string>(r.name, { nonNullable: true }),
+      };
+      row.filteredOptions = row.myControl.valueChanges.pipe(
+        startWith(r.name),
+        map((v) => this.filterMembers(v ?? "")),
+      );
+      return row;
     });
   }
 

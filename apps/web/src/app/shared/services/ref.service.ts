@@ -64,6 +64,10 @@ export class RefService {
     return this.http.get<JournalItem[]>(ref("journal"));
   }
 
+  getJournal(id: number): Observable<JournalItem> {
+    return this.http.get<JournalItem>(ref(`journal/${id}`));
+  }
+
   createJournal(body: { name: string }): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(ref("journal"), body);
   }

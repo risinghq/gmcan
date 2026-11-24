@@ -6,41 +6,41 @@
     </div>
   </div>
   <div class="login-card">
-    <img class="logo-icon" src="{{ grupoinfo.assets.header }}" alt="logo" />
-    @if (!recoverValue) {
-      <form [formGroup]="loginForm">
+    <img class="logo-icon" [src]="grupoinfo().assets.header" alt="logo" />
+    @if (!recoverValue()) {
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
         <div class="login-title">
           {{ language.login }}
         </div>
         <input
           class="input-email full-width"
-          placeholder="{{ language.loginText[0].email }}"
+          [placeholder]="language.loginText[0].email"
           name="email"
           formControlName="email"
-          autocomplete="off"
+          type="email"
+          autocomplete="username"
           required
         />
         <input
           class="input-password mt-input-16 full-width"
-          placeholder="{{ language.loginText[0].password }}"
+          [placeholder]="language.loginText[0].password"
           name="password"
           formControlName="password"
-          autocomplete="off"
+          autocomplete="current-password"
           required
           type="password"
         />
-        <div (click)="login()" [class]="{ 'btn-grey': loginForm.invalid, 'btn-black': !loginForm.invalid }">
+        <button type="submit" [class]="{ 'btn-grey': loginForm.invalid, 'btn-black': !loginForm.invalid }">
           <div class="link">
             {{ language.loginText[0].login }}
           </div>
-        </div>
+        </button>
         <div class="forgot link" (click)="change()">
           {{ language.loginText[0].forgot }}
         </div>
       </form>
-    }
-    @if (recoverValue) {
-      <form [formGroup]="emailForm">
+    } @else {
+      <form [formGroup]="emailForm" (ngSubmit)="recover()">
         <div class="flex-news back-div recover-back" (click)="change()">
           <mat-icon class="back-icon"> arrow_back </mat-icon>
           <div class="back-text">
@@ -53,26 +53,27 @@
         </div>
         <input
           class="input-email full-width"
-          placeholder="{{ language.loginText[0].email }}"
+          [placeholder]="language.loginText[0].email"
           name="email"
           formControlName="email"
-          autocomplete="off"
+          type="email"
+          autocomplete="email"
           required
         />
-        <div (click)="recover()" [class]="{ 'btn-grey': emailForm.invalid, 'btn-black': !emailForm.invalid }">
+        <button type="submit" [class]="{ 'btn-grey': emailForm.invalid, 'btn-black': !emailForm.invalid }">
           <div class="link">Recuperar contraseña</div>
-        </div>
+        </button>
       </form>
     }
   </div>
-  @if (error) {
+  @if (error(); as message) {
     <div class="error">
-      {{ error }}
+      {{ message }}
     </div>
   }
-  @if (exito) {
+  @if (exito(); as message) {
     <div class="exito">
-      {{ exito }}
+      {{ message }}
     </div>
   }
 </div>

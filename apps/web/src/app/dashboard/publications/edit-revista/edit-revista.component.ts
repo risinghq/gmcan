@@ -18,6 +18,7 @@ import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import type { JournalItem } from "@app/shared/services/ref.service";
 import { RefService } from "@app/shared/services/ref.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
+import type { RefDependenciesResponse } from "@gmcan/contracts/admin";
 
 @Component({
   selector: "app-edit-revista",
@@ -47,27 +48,14 @@ export default class EditRevistaComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getRevista();
+    const data = this.route.snapshot.data;
+    const journal = data["journal"] as JournalItem;
+    this.revista = { id: journal.id, name: journal.name };
+    this.notCanDo = (data["dependencies"] as RefDependenciesResponse).canDelete;
   }
 
   isDirty(): boolean {
     return this.revistaForm.dirty;
-  }
-
-  getRevista(): void {
-    const id = Number(this.route.snapshot.params["id"] ?? 0);
-    this.refService.listJournals().subscribe((journals) => {
-      const found = journals.find((r) => r.id === id);
-      if (!found) return;
-      this.revista = { id: found.id, name: found.name };
-      this.checkCanDelete(id);
-    });
-  }
-
-  checkCanDelete(id: number): void {
-    this.refService.getJournalDependencies(id).subscribe((res) => {
-      this.notCanDo = res.canDelete;
-    });
   }
 
   submitRevista(): void {

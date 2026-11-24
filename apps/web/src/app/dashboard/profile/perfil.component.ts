@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import {
   AbstractControl,
   FormBuilder,
@@ -25,6 +25,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService, type MemberUpdateBody } from "@app/shared/services/member.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
+import { finalize } from "rxjs";
 
 type MemberStatus = 0 | 1;
 
@@ -75,10 +76,37 @@ export default class PerfilComponent implements OnInit {
     return this.lookup.locales().supported;
   }
   selectedBioLocale = "es";
-  bioByLocale: Record<string, string> = {};
-  publishability: MemberPublishability | null = null;
+  private readonly bios = signal<Record<string, string>>({});
+  private readonly publishabilityState = signal<MemberPublishability | null>(null);
+  private readonly memberState = signal<MemberFull>(createMemberFull());
+  private readonly preview = signal<string | ArrayBuffer | null>(null);
+  private readonly savingProfile = signal(false);
+  private readonly savingPassword = signal(false);
 
-  member: MemberFull = { ...createMemberFull() };
+  get bioByLocale(): Record<string, string> {
+    return this.bios();
+  }
+
+  get publishability(): MemberPublishability | null {
+    return this.publishabilityState();
+  }
+
+  get member(): MemberFull {
+    return this.memberState();
+  }
+
+  get previewUrl(): string | ArrayBuffer | null {
+    return this.preview();
+  }
+
+  get isSavingProfile(): boolean {
+    return this.savingProfile();
+  }
+
+  get isSavingPassword(): boolean {
+    return this.savingPassword();
+  }
+
   memberId: number | null = null;
   roleCode: MemberFull["roleCode"] | null = null;
 
@@ -107,9 +135,6 @@ export default class PerfilComponent implements OnInit {
   );
 
   fileData: File | null = null;
-  previewUrl: string | ArrayBuffer | null = null;
-  isSavingProfile = false;
-  isSavingPassword = false;
 
   get tipoMiembros() {
     return this.lookup.memberTypes();
@@ -157,7 +182,7 @@ export default class PerfilComponent implements OnInit {
     this.authService.tryRestoreSession().subscribe((result) => {
       if (!result) return;
 
-      this.member = { ...result };
+      this.memberState.set({ ...result });
       this.memberId = result.id;
       this.roleCode = result.roleCode;
       const splitNames = this.splitFirstAndMiddleName(result.firstName);
@@ -179,7 +204,7 @@ export default class PerfilComponent implements OnInit {
         bio: result.bio ?? "",
         status: (result.isActive as MemberStatus) ?? MEMBER_STATUS.ACTIVE,
       });
-      this.bioByLocale[this.selectedBioLocale] = result.bio ?? "";
+      this.setBio(this.selectedBioLocale, result.bio ?? "");
       this.loadPublishability();
     });
   }
@@ -206,28 +231,28 @@ export default class PerfilComponent implements OnInit {
       translation: { locale: this.selectedBioLocale, bio },
     };
 
-    this.isSavingProfile = true;
-    this.memberService.updateMember(this.memberId, body).subscribe({
-      next: (result) => {
-        if (result.status !== 1) return;
+    this.savingProfile.set(true);
+    this.memberService
+      .updateMember(this.memberId, body)
+      .pipe(finalize(() => this.savingProfile.set(false)))
+      .subscribe({
+        next: (result) => {
+          if (result.status !== 1) return;
 
-        if (this.fileData) {
-          this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
-            next: () => {
-              this.fileData = null;
-              this.previewUrl = null;
-            },
-          });
-        }
-        this.uiState.setProfileUpdated(true);
-        this.openSnackBar("Información actualizada exitosamente");
-        this.getUser();
-      },
-      error: () => this.openSnackBar("No se pudo actualizar el perfil", "snack-error"),
-      complete: () => {
-        this.isSavingProfile = false;
-      },
-    });
+          if (this.fileData) {
+            this.memberService.uploadAsset(this.memberId!, this.fileData).subscribe({
+              next: () => {
+                this.fileData = null;
+                this.preview.set(null);
+              },
+            });
+          }
+          this.uiState.setProfileUpdated(true);
+          this.openSnackBar("Información actualizada exitosamente");
+          this.getUser();
+        },
+        error: () => this.openSnackBar("No se pudo actualizar el perfil", "snack-error"),
+      });
   }
 
   actualizarPassword(): void {
@@ -237,29 +262,29 @@ export default class PerfilComponent implements OnInit {
     }
 
     const newPassword = this.passwordForm.controls.newPassword.value ?? "";
-    this.isSavingPassword = true;
-    this.authService.updateMyPassword({ newPassword }).subscribe({
-      next: (result) => {
-        if (result.status !== 1) return;
-        this.passwordForm.reset();
-        this.openSnackBar("Contraseña actualizada exitosamente");
-      },
-      error: () => this.openSnackBar("No se pudo actualizar la contraseña", "snack-error"),
-      complete: () => {
-        this.isSavingPassword = false;
-      },
-    });
+    this.savingPassword.set(true);
+    this.authService
+      .updateMyPassword({ newPassword })
+      .pipe(finalize(() => this.savingPassword.set(false)))
+      .subscribe({
+        next: (result) => {
+          if (result.status !== 1) return;
+          this.passwordForm.reset();
+          this.openSnackBar("Contraseña actualizada exitosamente");
+        },
+        error: () => this.openSnackBar("No se pudo actualizar la contraseña", "snack-error"),
+      });
   }
 
   fileProgress(fileInput: Event): void {
     const input = fileInput.target as HTMLInputElement;
     this.fileData = input.files?.[0] ?? null;
-    this.preview();
+    this.loadPreview();
   }
 
-  preview(): void {
+  private loadPreview(): void {
     if (!this.fileData) {
-      this.previewUrl = null;
+      this.preview.set(null);
       return;
     }
 
@@ -269,7 +294,7 @@ export default class PerfilComponent implements OnInit {
     const reader = new FileReader();
     reader.readAsDataURL(this.fileData);
     reader.addEventListener("load", () => {
-      this.previewUrl = reader.result;
+      this.preview.set(reader.result);
     });
   }
 
@@ -287,14 +312,18 @@ export default class PerfilComponent implements OnInit {
     this.selectedBioLocale = locale;
     if (this.memberId == null) return;
     this.memberService.getMemberTranslation(this.memberId, locale).subscribe((row) => {
-      this.bioByLocale[locale] = row.bio ?? "";
-      this.profileForm.controls.bio.setValue(this.bioByLocale[locale]);
+      this.setBio(locale, row.bio ?? "");
+      this.profileForm.controls.bio.setValue(row.bio ?? "");
       this.loadPublishability();
     });
   }
 
   onBioChange(value: string): void {
-    this.bioByLocale[this.selectedBioLocale] = value;
+    this.setBio(this.selectedBioLocale, value);
+  }
+
+  private setBio(locale: string, bio: string): void {
+    this.bios.update((bios) => ({ ...bios, [locale]: bio }));
   }
 
   missingRequirementsCount(): number {
@@ -309,7 +338,7 @@ export default class PerfilComponent implements OnInit {
   private loadPublishability(): void {
     if (this.memberId == null) return;
     this.memberService.getMemberPublishability(this.memberId).subscribe((data) => {
-      this.publishability = data;
+      this.publishabilityState.set(data);
     });
   }
 

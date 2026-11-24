@@ -1,5 +1,6 @@
 import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, computed, effect, inject, ChangeDetectionStrategy } from "@angular/core";
+import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Title } from "@angular/platform-browser";
@@ -19,6 +20,7 @@ import {
   NgbPaginationNumber,
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
+import { map } from "rxjs";
 
 type MemberDisplay = PublicMember & { prefix: string; tipoMiembro: string };
 
@@ -61,26 +63,77 @@ export default class DetailMemberComponent implements OnInit {
   private readonly browser = inject(BrowserService);
   private readonly titleService = inject(Title);
 
-  public usuario: MemberDisplay | null = null;
-  public publicaciones: PublicationDisplay[] = [];
-  public cargado = false;
+  private readonly memberId = toSignal(this.route.paramMap.pipe(map((params) => Number(params.get("id")))));
+
+  private readonly profile = rxResource({
+    params: () => this.memberId() || undefined,
+    stream: ({ params }) => this.memberService.getMemberProfile(params),
+  });
+
+  readonly loading = this.profile.isLoading;
+
+  readonly member = computed((): MemberDisplay | null => {
+    const m = this.profile.value()?.member;
+    if (!m) return null;
+    const prefijo = m.prefixCode ? this.lookup.prefixes().find((p) => p.code === m.prefixCode) : undefined;
+    const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
+    const memberType = this.lookup.memberTypes().find((t) => t.code === m.memberTypeCode);
+    return { ...m, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
+  });
+
+  readonly publications = computed((): PublicationDisplay[] => {
+    const pubTypesMap = new Map(this.lookup.publicationKinds().map((t) => [t.code, t]));
+    const thesisTypesMap = new Map(this.lookup.thesisKinds().map((t) => [t.code, t]));
+    const journalsMap = new Map(this.lookup.journals().map((j) => [j.id, j]));
+    const universitiesMap = new Map(this.lookup.universities().map((u) => [u.id, u]));
+    const eventsMap = new Map(this.lookup.events().map((e) => [e.id, e]));
+
+    // oxlint-disable-next-line oxc/no-map-spread -- the publications come from a resource signal, so each needs a copy
+    return (this.profile.value()?.publications ?? []).map((pub): PublicationDisplay => {
+      const d = parseLocalDate(pub.publishedAt);
+      const fecha = d ? (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "") : "";
+
+      const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
+      const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
+      const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
+      const journalId = pub.subtype.kindCode === "journal_article" ? pub.subtype.journalArticle.journalId : null;
+      const evento = eventId ? eventsMap.get(eventId) : undefined;
+
+      return {
+        ...pub,
+        fecha,
+        tipoPublicacion: pubTypesMap.get(pub.kindCode)?.name,
+        tipoTesis: thesisKindCode ? thesisTypesMap.get(thesisKindCode)?.name : undefined,
+        revista: journalId ? journalsMap.get(journalId)?.name : undefined,
+        universidad: universityId ? (universitiesMap.get(universityId)?.name ?? undefined) : undefined,
+        evento: evento?.name,
+        ciudad: evento?.city ?? undefined,
+        pais: evento?.country ?? undefined,
+      };
+    });
+  });
+
   public previouspage = "Inicio";
   public previouslink = "/home";
   page = 1;
   pageSize = 5;
+  expandedKey: string | null = null;
 
   language: (typeof Languages)[number] = Languages[0];
 
-  ngOnInit(): void {
-    this.language = this.session.language();
-    const origin = parsePublicOrigin(this.route);
-    const originInfo = getPublicOriginInfo(origin);
-    this.previouslink = originInfo.route;
-    this.previouspage = originInfo.label;
-    this.loadProfile();
+  constructor() {
+    effect(() => {
+      const m = this.member();
+      if (m) this.titleService.setTitle("GMCAN | " + m.firstName + " " + m.lastName);
+    });
   }
 
-  expandedKey: string | null = null;
+  ngOnInit(): void {
+    this.language = this.session.language();
+    const originInfo = getPublicOriginInfo(parsePublicOrigin(this.route));
+    this.previouslink = originInfo.route;
+    this.previouspage = originInfo.label;
+  }
 
   toggleExpanded(section: string, index: number): void {
     const key = `${section}:${index}`;
@@ -99,70 +152,7 @@ export default class DetailMemberComponent implements OnInit {
     this.browser.scrollIntoViewById("main-toolbar");
   }
 
-  private loadProfile(): void {
-    const id = Number(this.route.snapshot.params["id"]);
-    if (!id) return;
-
-    const prefijos = this.lookup.prefixes();
-    const prefijosMap = new Map(prefijos.map((p) => [p.code, p]));
-    const memberTypes = this.lookup.memberTypes();
-    const memberTypesMap = new Map(memberTypes.map((t) => [t.code, t]));
-    const pubTypes = this.lookup.publicationKinds();
-    const pubTypesMap = new Map(pubTypes.map((t) => [t.code, t]));
-    const thesisTypes = this.lookup.thesisKinds();
-    const thesisTypesMap = new Map(thesisTypes.map((t) => [t.code, t]));
-    const journals = this.lookup.journals();
-    const journalsMap = new Map(journals.map((j) => [j.id, j]));
-    const universities = this.lookup.universities();
-    const universitiesMap = new Map(universities.map((u) => [u.id, u]));
-    const events = this.lookup.events();
-    const eventsMap = new Map(events.map((e) => [e.id, e]));
-
-    this.memberService.getMemberProfile(id).subscribe((res) => {
-      if (!res?.member) return;
-
-      const m = res.member;
-      const prefijo = m.prefixCode ? prefijosMap.get(m.prefixCode) : undefined;
-      const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
-      const memberType = memberTypesMap.get(m.memberTypeCode);
-
-      this.usuario = { ...m, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
-      this.titleService.setTitle("GMCAN | " + m.firstName + " " + m.lastName);
-
-      this.publicaciones = (res.publications ?? []).map((pub): PublicationDisplay => {
-        const d = parseLocalDate(pub.publishedAt);
-        const fecha = d ? (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "") : "";
-
-        const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
-        const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
-        const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
-        const journalId = pub.subtype.kindCode === "journal_article" ? pub.subtype.journalArticle.journalId : null;
-        const evento = eventId ? eventsMap.get(eventId) : undefined;
-
-        return Object.assign({} as PublicationDisplay, pub, {
-          fecha,
-          tipoPublicacion: pubTypesMap.get(pub.kindCode)?.name,
-          tipoTesis: thesisKindCode ? thesisTypesMap.get(thesisKindCode)?.name : undefined,
-          revista: journalId ? journalsMap.get(journalId)?.name : undefined,
-          universidad: universityId ? (universitiesMap.get(universityId)?.name ?? undefined) : undefined,
-          evento: evento?.name,
-          ciudad: evento?.city ?? undefined,
-          pais: evento?.country ?? undefined,
-        });
-      });
-
-      this.cargado = true;
-    });
-  }
-
   return(): void {
     this.router.navigateByUrl(this.previouslink);
-  }
-
-  profile(memberId: number | undefined): void {
-    if (!memberId) return;
-    const origin = parsePublicOrigin(this.route);
-    this.router.navigate(["/home/detail-member/" + memberId], { queryParams: { from: origin } });
-    this.loadProfile();
   }
 }
