@@ -8,5 +8,24 @@
     "style": "off",
     "perf": "warn",
     "nursery": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["apps/api/routes/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/db/*"],
+                "allowTypeImports": true,
+                "message": "Routes call services. Move the query into the service that owns the aggregate."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }
