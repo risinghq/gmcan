@@ -18,7 +18,6 @@ import {
   withHttpTransferCacheOptions,
   withNoIncrementalHydration,
 } from "@angular/platform-browser";
-import { provideAnimationsAsync } from "@angular/platform-browser/animations/async";
 import {
   RedirectCommand,
   Router,
@@ -67,7 +66,6 @@ export const appConfig: ApplicationConfig = {
         filter: (req) => GLOBAL.isPublicApiRequest(req.url),
       }),
     ),
-    provideAnimationsAsync(),
     provideCharts(withDefaultRegisterables()),
     DatePipe,
     TitleCasePipe,
