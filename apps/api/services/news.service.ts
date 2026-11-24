@@ -1,13 +1,22 @@
-import type { RawBuilder } from "kysely";
+import { type RawBuilder, sql } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId } from "../db/client.js";
 import type { NewsRow, NewsStatusCode } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
+import { ftsPrefixQuery } from "../lib/fts.js";
 import { type Locale } from "../lib/public-locale.js";
-import { newsSearchFilter } from "../repositories/news.js";
 import type { AdminNewsListItem, AdminNewsListQuery, AdminNewsListResponse } from "./admin-list.types.js";
 import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "./assets/service.js";
 import { resolveMemberPhotoViews } from "./member-photo.service.js";
+
+type NewsFtsColumn = "title" | "summary" | "authorName" | "kindName";
+
+/** A filter on `news.id` for news whose `locale` text matches `q`, or null when `q` has no word. */
+export function newsSearchFilter(locale: Locale, q: string, columns?: readonly NewsFtsColumn[]) {
+  const match = ftsPrefixQuery(q, columns);
+  if (!match) return null;
+  return sql<boolean>`news.id in (select newsId from news_fts where news_fts match ${match} and locale = ${locale})`;
+}
 
 export interface NewsUpsertInput {
   translations: LocalizedTranslations<{ title: string; summary: string; body: string }>;
