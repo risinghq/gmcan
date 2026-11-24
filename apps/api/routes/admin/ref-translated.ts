@@ -1,12 +1,22 @@
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { atomic, db, insertedId, lastInsertId } from "../../db/client.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { notFound } from "../../lib/errors/app-error.js";
 import { validate } from "../../lib/validate.js";
 import { getUniversityPublicationDependencyCount } from "../../services/publication.service.js";
+import {
+  createUniversity,
+  deleteUniversity,
+  getUniversityTranslations,
+  listMemberTypeTranslations,
+  listNewsKindTranslations,
+  listPublicationKindTranslations,
+  listThesisKindTranslations,
+  listUniversityTranslations,
+  updateUniversity,
+} from "../../services/ref.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -14,139 +24,30 @@ const NamedTranslationBody = z.object({
   translations: translationsSchema({ name: z.string().min(1) }),
 });
 
-function setTranslation<T>(byCode: Map<string, Record<string, T>>, code: string, locale: string, value: T) {
-  const translations = byCode.get(code);
-  if (translations) {
-    translations[locale] = value;
-    return;
-  }
-  byCode.set(code, { [locale]: value } as Record<string, T>);
-}
-
-router.get("/member-type", async (c) => {
-  const rows = await db
-    .selectFrom("member_type")
-    .innerJoin("member_type_translation", "member_type_translation.memberTypeCode", "member_type.code")
-    .select([
-      "member_type.code as code",
-      "member_type_translation.locale as locale",
-      "member_type_translation.name as name",
-      "member_type_translation.nameSingular as nameSingular",
-    ])
-    .execute();
-
-  const byCode = new Map<string, Record<string, { name: string; nameSingular: string }>>();
-  for (const row of rows)
-    setTranslation(byCode, row.code, row.locale, { name: row.name, nameSingular: row.nameSingular });
-
-  return c.json(Array.from(byCode.entries()).map(([code, translations]) => ({ code, translations })));
-});
-
-router.get("/publication-kind", async (c) => {
-  const rows = await db
-    .selectFrom("publication_kind")
-    .innerJoin(
-      "publication_kind_translation",
-      "publication_kind_translation.publicationKindCode",
-      "publication_kind.code",
-    )
-    .select([
-      "publication_kind.code as code",
-      "publication_kind_translation.locale as locale",
-      "publication_kind_translation.name as name",
-    ])
-    .execute();
-  const byCode = new Map<string, Record<string, { name: string }>>();
-  for (const row of rows) setTranslation(byCode, row.code, row.locale, { name: row.name });
-  return c.json(Array.from(byCode.entries()).map(([code, translations]) => ({ code, translations })));
-});
-
-router.get("/thesis-kind", async (c) => {
-  const rows = await db
-    .selectFrom("thesis_kind")
-    .innerJoin("thesis_kind_translation", "thesis_kind_translation.thesisKindCode", "thesis_kind.code")
-    .select([
-      "thesis_kind.code as code",
-      "thesis_kind_translation.locale as locale",
-      "thesis_kind_translation.name as name",
-    ])
-    .execute();
-  const byCode = new Map<string, Record<string, { name: string }>>();
-  for (const row of rows) setTranslation(byCode, row.code, row.locale, { name: row.name });
-  return c.json(Array.from(byCode.entries()).map(([code, translations]) => ({ code, translations })));
-});
-
-router.get("/news-kind", async (c) => {
-  const rows = await db
-    .selectFrom("news_kind")
-    .innerJoin("news_kind_translation", "news_kind_translation.newsKindCode", "news_kind.code")
-    .select(["news_kind.code as code", "news_kind_translation.locale as locale", "news_kind_translation.name as name"])
-    .execute();
-  const byCode = new Map<string, Record<string, { name: string }>>();
-  for (const row of rows) setTranslation(byCode, row.code, row.locale, { name: row.name });
-  return c.json(Array.from(byCode.entries()).map(([code, translations]) => ({ code, translations })));
-});
-
-router.get("/university", async (c) => {
-  const rows = await db
-    .selectFrom("university")
-    .innerJoin("university_translation", "university_translation.universityId", "university.id")
-    .select(["university.id as id", "university_translation.locale as locale", "university_translation.name as name"])
-    .execute();
-  const byId = new Map<number, Record<string, { name: string }>>();
-  for (const row of rows) {
-    const current = byId.get(row.id) ?? {};
-    current[row.locale] = { name: row.name };
-    byId.set(row.id, current);
-  }
-  return c.json(Array.from(byId.entries()).map(([id, translations]) => ({ id, translations })));
-});
+router.get("/member-type", async (c) => c.json(await listMemberTypeTranslations()));
+router.get("/publication-kind", async (c) => c.json(await listPublicationKindTranslations()));
+router.get("/thesis-kind", async (c) => c.json(await listThesisKindTranslations()));
+router.get("/news-kind", async (c) => c.json(await listNewsKindTranslations()));
+router.get("/university", async (c) => c.json(await listUniversityTranslations()));
 
 router.get("/university/:id", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const row = await db.selectFrom("university").select("id").where("id", "=", id).executeTakeFirst();
-  if (!row) throw notFound();
-  const translations = await db
-    .selectFrom("university_translation")
-    .select(["locale", "name"])
-    .where("universityId", "=", id)
-    .execute();
-  return c.json({ id, translations: Object.fromEntries(translations.map((tr) => [tr.locale, { name: tr.name }])) });
+  const university = await getUniversityTranslations(c.req.valid("param").id);
+  if (!university) throw notFound();
+  return c.json(university);
 });
 
 router.post("/university", validate("json", NamedTranslationBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const results = await atomic([
-    db.insertInto("university").defaultValues(),
-    db.insertInto("university_translation").values(
-      Object.entries(translations).map(([locale, payload]) => ({
-        universityId: lastInsertId("university"),
-        locale,
-        name: payload.name,
-      })),
-    ),
-  ]);
-  return c.json({ id: insertedId(results, 0) }, 201);
+  return c.json({ id: await createUniversity(translations) }, 201);
 });
 
 router.put("/university/:id", validate("param", IdParam), validate("json", NamedTranslationBody), async (c) => {
-  const { id } = c.req.valid("param");
-  const { translations } = c.req.valid("json");
-  await db.selectFrom("university").select("id").where("id", "=", id).executeTakeFirstOrThrow();
-  await atomic([
-    db.deleteFrom("university_translation").where("universityId", "=", id),
-    db
-      .insertInto("university_translation")
-      .values(
-        Object.entries(translations).map(([locale, payload]) => ({ universityId: id, locale, name: payload.name })),
-      ),
-  ]);
+  await updateUniversity(c.req.valid("param").id, c.req.valid("json").translations);
   return c.json(okStatus());
 });
 
 router.delete("/university/:id", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  await db.deleteFrom("university").where("id", "=", id).execute();
+  await deleteUniversity(c.req.valid("param").id);
   return c.json(okStatus());
 });
 

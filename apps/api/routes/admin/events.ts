@@ -1,12 +1,17 @@
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { atomic, db, insertedId, lastInsertId } from "../../db/client.js";
-import type { EventTranslationTable } from "../../db/schema.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { notFound } from "../../lib/errors/app-error.js";
 import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
+import {
+  createEvent,
+  deleteEvent,
+  getEventTranslations,
+  listAdminEvents,
+  updateEvent,
+} from "../../services/event.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
@@ -27,87 +32,31 @@ router.use("*", async (c, next) => {
 });
 
 router.get("/", async (c) => {
-  const locale = c.get("locale");
-  const rows = await db
-    .selectFrom("event")
-    .innerJoin("event_translation", (join) =>
-      join.onRef("event_translation.eventId", "=", "event.id").on("event_translation.locale", "=", locale),
-    )
-    .select([
-      "event.id as id",
-      "event_translation.name as name",
-      "event_translation.city as city",
-      "event_translation.country as country",
-    ])
-    .orderBy("event_translation.name", "asc")
-    .execute();
-  return c.json(rows);
+  return c.json(await listAdminEvents(c.get("locale")));
 });
 
 router.get("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  const row = await db.selectFrom("event").select(["id"]).where("id", "=", id).executeTakeFirst();
-  if (!row) throw notFound();
-
-  const translations = await db
-    .selectFrom("event_translation")
-    .select(["locale", "name", "city", "country"])
-    .where("eventId", "=", id)
-    .execute();
-
-  return c.json({
-    id,
-    translations: Object.fromEntries(
-      translations.map((tr) => [
-        tr.locale,
-        { name: tr.name, city: tr.city ?? undefined, country: tr.country ?? undefined },
-      ]),
-    ),
-  });
+  const event = await getEventTranslations(id);
+  if (!event) throw notFound();
+  return c.json(event);
 });
 
 router.post("/", validate("json", EventBody), async (c) => {
   const { translations } = c.req.valid("json");
-  const results = await atomic([
-    db.insertInto("event").values({}),
-    db.insertInto("event_translation").values(
-      Object.entries(translations).map(([locale, tr]) => ({
-        eventId: lastInsertId("event"),
-        locale,
-        name: tr.name,
-        city: tr.city,
-        country: tr.country,
-      })),
-    ),
-  ]);
-
-  return c.json({ id: insertedId(results, 0) }, 201);
+  return c.json({ id: await createEvent(translations) }, 201);
 });
 
 router.put("/:id", validate("param", IdParam), validate("json", EventBody), async (c) => {
   const { id } = c.req.valid("param");
   const { translations } = c.req.valid("json");
-
-  await db.selectFrom("event").select("id").where("id", "=", id).executeTakeFirstOrThrow();
-  await atomic([
-    db.deleteFrom("event_translation").where("eventId", "=", id),
-    db.insertInto("event_translation").values(
-      Object.entries(translations).map(([locale, tr]): Omit<EventTranslationTable, "id"> => ({
-        eventId: id,
-        locale,
-        name: tr.name,
-        city: tr.city,
-        country: tr.country,
-      })),
-    ),
-  ]);
-
+  await updateEvent(id, translations);
   return c.json({ status: 1 });
 });
 
 router.delete("/:id", validate("param", IdParam), async (c) => {
   const { id } = c.req.valid("param");
-  await db.deleteFrom("event").where("id", "=", id).execute();
+  await deleteEvent(id);
   return c.json({ status: 1 });
 });
 

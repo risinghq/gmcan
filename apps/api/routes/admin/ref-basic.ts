@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
 
-import { db } from "../../db/client.js";
 import { okStatus } from "../../lib/contracts.js";
 import { notFound } from "../../lib/errors/app-error.js";
 import { validate } from "../../lib/validate.js";
@@ -9,38 +8,44 @@ import {
   getEventPublicationDependencyCount,
   getJournalPublicationDependencyCount,
 } from "../../services/publication.service.js";
+import {
+  createJournal,
+  deleteJournal,
+  getJournal,
+  listCurrencies,
+  listFundingSources,
+  listGenders,
+  listJournals,
+  listPrefixes,
+  listRoles,
+  updateJournal,
+} from "../../services/ref.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
 const JournalBody = z.object({ name: z.string().min(1) });
 
-router.get("/gender", async (c) => c.json(await db.selectFrom("gender").select(["code", "name"]).execute()));
-router.get("/prefix", async (c) => c.json(await db.selectFrom("prefix").select(["code", "label"]).execute()));
-router.get("/role", async (c) => c.json(await db.selectFrom("role").select(["code", "name"]).execute()));
-router.get("/funding-source", async (c) =>
-  c.json(await db.selectFrom("funding_source").select(["code", "name"]).execute()),
-);
-router.get("/currency", async (c) => c.json(await db.selectFrom("currency").select(["code", "symbol"]).execute()));
+router.get("/gender", async (c) => c.json(await listGenders()));
+router.get("/prefix", async (c) => c.json(await listPrefixes()));
+router.get("/role", async (c) => c.json(await listRoles()));
+router.get("/funding-source", async (c) => c.json(await listFundingSources()));
+router.get("/currency", async (c) => c.json(await listCurrencies()));
 
-router.get("/journal", async (c) => c.json(await db.selectFrom("journal").selectAll().execute()));
+router.get("/journal", async (c) => c.json(await listJournals()));
 router.get("/journal/:id", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const row = await db.selectFrom("journal").selectAll().where("id", "=", id).executeTakeFirst();
+  const row = await getJournal(c.req.valid("param").id);
   if (!row) throw notFound();
   return c.json(row);
 });
 router.post("/journal", validate("json", JournalBody), async (c) => {
-  const result = await db.insertInto("journal").values(c.req.valid("json")).executeTakeFirstOrThrow();
-  return c.json({ id: Number(result.insertId) }, 201);
+  return c.json({ id: await createJournal(c.req.valid("json")) }, 201);
 });
 router.put("/journal/:id", validate("param", IdParam), validate("json", JournalBody), async (c) => {
-  const { id } = c.req.valid("param");
-  await db.updateTable("journal").set(c.req.valid("json")).where("id", "=", id).execute();
+  await updateJournal(c.req.valid("param").id, c.req.valid("json"));
   return c.json(okStatus());
 });
 router.delete("/journal/:id", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  await db.deleteFrom("journal").where("id", "=", id).execute();
+  await deleteJournal(c.req.valid("param").id);
   return c.json(okStatus());
 });
 
