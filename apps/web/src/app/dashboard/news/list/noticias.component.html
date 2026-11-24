@@ -13,11 +13,8 @@
       </select>
       <select class="input-search-text" (change)="onNewsTypeChange($event)">
         <option value="">Todas las categorías</option>
-        <option value="general">General</option>
-        <option value="research">Investigación</option>
-        <option value="event">Evento</option>
-        @for (newsType of newsTypes(); track newsType.id) {
-          <option [value]="newsType.name.toLowerCase()">{{ newsType.name }}</option>
+        @for (newsType of newsTypes(); track newsType.code) {
+          <option [value]="newsType.code">{{ newsType.name }}</option>
         }
       </select>
       <div class="center btn-black" (click)="addNews()">
@@ -87,16 +84,13 @@
         <input class="input-search-text" (keyup)="onCategorySearch($event)" placeholder="Buscar categoría por nombre" />
         <mat-icon class="icon-search-toolbar">search</mat-icon>
       </div>
-      <div class="center btn-black" (click)="addCategory()">
-        <a class="link"> Agregar categoría </a>
-      </div>
     </div>
 
     @if (filteredNewsTypes().length > 0) {
       <table mat-table [dataSource]="filteredNewsTypes()">
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Nombre de categoría</th>
-          <td mat-cell *matCellDef="let row" (click)="editCategory(row.id)">{{ row.name }}</td>
+          <td mat-cell *matCellDef="let row">{{ row.name }}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>

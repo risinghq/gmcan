@@ -18,9 +18,8 @@ import {
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admin-list";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
-import type { RefItem } from "@app/shared/services/ref.service";
-import { RefService } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 import { parseLocalDate } from "@app/shared/utils/date";
 
@@ -62,7 +61,7 @@ interface NewsListItem {
 })
 export default class NewsListComponent implements OnInit {
   private readonly newsService = inject(NewsService);
-  private readonly refService = inject(RefService);
+  private readonly lookup = inject(LookupService);
   private readonly titlecasePipe = inject(TitleCasePipe);
   private readonly datePipe = inject(DatePipe);
   private readonly router = inject(Router);
@@ -82,18 +81,12 @@ export default class NewsListComponent implements OnInit {
   sortBy: AdminNewsSortBy = "publishedAt";
   sortOrder: "asc" | "desc" = "desc";
 
-  readonly newsTypes = signal<RefItem[]>([]);
+  readonly newsTypes = computed(() => this.lookup.newsKinds());
   private readonly categorySearch = signal("");
   readonly filteredNewsTypes = computed(() => {
     const search = this.categorySearch();
     return this.newsTypes().filter((x) => x.name.toLowerCase().includes(search));
   });
-
-  private loadNewsTypes(): void {
-    this.refService.listNewsTypes().subscribe((newsTypes: RefItem[]) => {
-      this.newsTypes.set(newsTypes);
-    });
-  }
 
   private loadNews(): void {
     this.newsService
@@ -174,14 +167,6 @@ export default class NewsListComponent implements OnInit {
     this.categorySearch.set((event.target as HTMLInputElement).value.trim().toLowerCase());
   }
 
-  addCategory(): void {
-    this.router.navigate(["dashboard/add-category"]);
-  }
-
-  editCategory(id: number): void {
-    this.router.navigate(["dashboard/edit-category/" + id]);
-  }
-
   addNews(): void {
     this.router.navigate(["dashboard/add-news"]);
   }
@@ -196,7 +181,6 @@ export default class NewsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedTab = this.tabState.newsTab();
-    this.loadNewsTypes();
     this.loadNews();
   }
 }

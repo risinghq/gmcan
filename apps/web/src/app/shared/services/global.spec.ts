@@ -33,11 +33,11 @@ describe.each(formats)("API_URL %s", (_label, apiUrl) => {
     const http = TestBed.inject(HttpTestingController);
     const refs = TestBed.inject(RefService);
 
-    refs.listNewsTypes().subscribe();
-    refs.deleteFundingSource(4).subscribe();
+    refs.listJournals().subscribe();
+    refs.deleteJournal(4).subscribe();
 
-    http.expectOne({ method: "GET", url: "https://api.example.test/admin/ref/news-type" });
-    http.expectOne({ method: "DELETE", url: "https://api.example.test/admin/ref/funding-source/4" });
+    http.expectOne({ method: "GET", url: "https://api.example.test/admin/ref/journal" });
+    http.expectOne({ method: "DELETE", url: "https://api.example.test/admin/ref/journal/4" });
     http.verify();
   });
 });
