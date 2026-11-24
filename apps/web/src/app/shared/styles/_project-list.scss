@@ -1,0 +1,169 @@
+// The project list item, shared by the projects page and the home page.
+// The including stylesheet must define .plex-sans: the rules extend it.
+
+// The expandable summary under a project.
+@mixin summary {
+  .abstract {
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+
+  .resp-title {
+    font-weight: 500;
+    margin-right: 8px;
+  }
+
+  .abstract-title {
+    font-weight: normal;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+
+  .project-abstract {
+    margin-left: auto;
+    @extend .plex-sans;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+}
+
+@mixin base {
+  .project {
+    padding-top: 16px;
+    padding-bottom: 20px;
+    border-bottom: solid 2px #d7d7e1;
+  }
+
+  .project-code {
+    border-radius: 4px;
+    width: max-content;
+    padding: 6px 8px;
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: 0.3px;
+    color: #939393;
+    background-color: #e8e8e8;
+  }
+  .project-mt {
+    margin-top: 8px;
+  }
+  .project-title {
+    @extend .plex-sans;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+  .project-date {
+    margin-top: auto;
+    margin-bottom: auto;
+    @extend .plex-sans;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #939393;
+  }
+  .project-rev {
+    @extend .plex-sans;
+    letter-spacing: 0.3px;
+    color: #939393;
+  }
+
+  .line-1 {
+    line-height: 1;
+  }
+  .elipse {
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 10px;
+    width: 4px;
+    height: 4px;
+    background-color: #c4c4c4;
+  }
+
+  .member-img-round {
+    overflow: hidden;
+    width: 20px;
+    height: 20px;
+    border-radius: 40.5px;
+    background-color: #c4c4c4;
+  }
+  .member-img {
+    vertical-align: unset;
+    background-color: #c4c4c4;
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+  }
+
+  .project-members {
+    display: flex;
+  }
+
+  .member-name:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .member-name {
+    margin-left: 8px;
+    margin-right: 8px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+  .project-authors {
+    margin-left: 4px;
+    @extend .plex-sans;
+    font-weight: 300;
+    line-height: 1.33;
+    letter-spacing: 0.3px;
+    color: #000000;
+  }
+
+  .project-abs-icon {
+    height: auto;
+    width: auto;
+    font-size: 20px;
+    vertical-align: middle;
+    -webkit-transition: -webkit-transform 0.8s ease-in-out;
+    -ms-transition: -ms-transform 0.8s ease-in-out;
+    transition: transform 0.8s ease-in-out;
+  }
+
+  .abs-active {
+    transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+  }
+  .abs-not-active {
+    transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+  }
+}
+
+// Include inside a media query for viewports wider than 960px.
+@mixin wide {
+  .abstract-title,
+  .abstract,
+  .project-abstract,
+  .member-name,
+  .resp-title {
+    font-size: 15px;
+  }
+}
+
+// Include inside a media query for viewports up to 960px.
+@mixin narrow {
+  .abstract-title,
+  .abstract,
+  .project-abstract,
+  .member-name,
+  .resp-title {
+    font-size: 13px;
+  }
+}

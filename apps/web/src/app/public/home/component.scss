@@ -1,4 +1,6 @@
-@use "../global-search/component.scss";
+@use "../../shared/styles/publication-list";
+@use "../../shared/styles/project-list";
+@use "../../shared/components/news/news.component.scss";
 
 $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 
@@ -8,6 +10,35 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 
 .plex-sans {
   font-family: "IBM Plex Sans", serif;
+}
+
+@include publication-list.base;
+@include project-list.summary;
+@include project-list.base;
+
+.project-mt {
+  margin-top: 16px;
+}
+.project-pt {
+  padding-top: 16px;
+}
+
+@media (min-width: 961px) {
+  @include publication-list.wide;
+  @include project-list.wide;
+}
+
+@media (max-width: 960px) {
+  @include publication-list.narrow;
+  @include project-list.narrow;
+  .btn-black {
+    margin-top: 16px;
+  }
+  .mat-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+  }
 }
 
 .home-div {
