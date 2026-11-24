@@ -1,7 +1,6 @@
 import { Component, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder } from "@angular/forms";
 import { Router, RouterOutlet } from "@angular/router";
-import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -28,7 +27,6 @@ export default class AppComponent {
   private seo = inject(SeoService);
 
   screenWidth: number;
-  public grupoinfo: Group;
   public url: string;
   enteredButton = false;
   isMatMenuOpen = false;
@@ -45,7 +43,6 @@ export default class AppComponent {
     this.url = GLOBAL.url;
     this.seo.setOpenGraphLocation(GLOBAL.appUrl, GLOBAL.app("img/gmcan.jpg"));
     this.screenWidth = this.browser.innerWidth();
-    this.grupoinfo = createGroup();
   }
 
   @HostListener("window:resize", ["$event"])
@@ -65,10 +62,7 @@ export default class AppComponent {
   }
 
   getGroupInfo(): void {
-    this.groupService.getGroup().subscribe((res: Group) => {
-      this.grupoinfo = res;
-      this.uiState.setGroupInfo(res);
-    });
+    this.groupService.getGroup().subscribe((res: Group) => this.uiState.setGroupInfo(res));
   }
   searchGlobal(value: string): void {
     this.router.navigate(["/search/" + value]);

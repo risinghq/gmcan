@@ -1,24 +1,19 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRouteSnapshot, RouterStateSnapshot, TitleStrategy } from "@angular/router";
+import { RouterStateSnapshot, TitleStrategy } from "@angular/router";
+import { deepestChild, routeTitle } from "@app/shared/routing/derived-data";
 
 @Injectable()
 export class AppTitleStrategy extends TitleStrategy {
-  constructor(private readonly title: Title) {
-    super();
-  }
+  private readonly title = inject(Title);
 
   override updateTitle(snapshot: RouterStateSnapshot): void {
-    const routeTitle = this.buildTitle(snapshot);
-    if (!routeTitle) return;
-    this.title.setTitle(`GMCAN | ${routeTitle}`);
+    const title = this.buildTitle(snapshot);
+    if (!title) return;
+    this.title.setTitle(`GMCAN | ${title}`);
   }
 
   override buildTitle(snapshot: RouterStateSnapshot): string | undefined {
-    let route: ActivatedRouteSnapshot | null = snapshot.root;
-    while (route?.firstChild) {
-      route = route.firstChild;
-    }
-    return route?.title ? this.getResolvedTitleForRoute(route) : undefined;
+    return routeTitle(deepestChild(snapshot.root));
   }
 }

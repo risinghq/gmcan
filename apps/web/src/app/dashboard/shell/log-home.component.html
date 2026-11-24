@@ -1,7 +1,7 @@
 <mat-drawer-container class="example-container" style="height: 100%" [hidden]="enterAny">
   <mat-drawer #drawer class="example-sidenav mdc-drawer" mode="side" [opened]="!enterAny">
     <nav class="mdc-list">
-      <img class="dashboard-icon" src="{{ grupoinfo.assets.header }}" alt="logo" />
+      <img class="dashboard-icon" [src]="grupoinfo().assets.header" alt="logo" />
       <a
         class="mdc-list-item"
         routerLink="/dashboard"
@@ -177,23 +177,25 @@
         <mat-icon>menu</mat-icon>
       </button>
       <div class="flex-news">
-        <div class="tool-text middle">{{ dashboardTitle }}</div>
-        @if (authz.can("news.write") && toolbarBadge) {
-          <div class="publish-news" [class.publish-news-draft]="toolbarBadge.tone === 'draft'">
-            {{ toolbarBadge.label }}
-          </div>
+        <div class="tool-text middle">{{ dashboardTitle() }}</div>
+        @if (toolbarBadge(); as badge) {
+          @if (authz.can("news.write")) {
+            <div class="publish-news" [class.publish-news-draft]="badge.tone === 'draft'">
+              {{ badge.label }}
+            </div>
+          }
         }
       </div>
       <div class="right user-div flex-news">
-        <div class="user-img" [hidden]="!user?.photoUrl">
-          <img class="img-css" src="{{ user?.photoUrl }}" alt="{{ user?.photoAlt ?? '' }}" />
+        <div class="user-img" [hidden]="!user()?.photoUrl">
+          <img class="img-css" [src]="user()?.photoUrl ?? ''" [alt]="user()?.photoAlt ?? ''" />
         </div>
         <div class="ml-16">
           <div class="user-name">
-            {{ userDisplayName }}
+            {{ userDisplayName() }}
           </div>
           <div class="user-email">
-            {{ user?.email }}
+            {{ user()?.email }}
           </div>
         </div>
         <div class="ml-24">
@@ -228,7 +230,7 @@
   </div>
 </mat-drawer-container>
 <div class="block-div" [hidden]="!enterAny">
-  <img class="icon-bad mb-56" src="{{ grupoinfo.assets.header }}" alt="logo" />
+  <img class="icon-bad mb-56" [src]="grupoinfo().assets.header" alt="logo" />
   <div class="bad-experience mb-64">
     Para brindarte una mejor experiencia, recomendamos acceder al administrador desde una computadora de escritorio o
     laptop

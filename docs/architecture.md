@@ -137,6 +137,29 @@ the `@app/*` path alias.
 | [`shared/services/`](../apps/web/src/app/shared/services) | One HTTP service per API resource, plus session and authz |
 | [`shared/models/`](../apps/web/src/app/shared/models)     | Client-side types for API payloads                        |
 | [`shared/guards/`](../apps/web/src/app/shared/guards)     | Dashboard route guards                                    |
+| [`shared/routing/`](../apps/web/src/app/shared/routing)   | Page title strategy and route-derived data                |
+
+### Rendering without zone.js
+
+Angular re-renders a view only when a signal it reads changes or when an event
+fires inside it. A plain field assigned in a `subscribe` callback, a timer or a
+`FileReader` callback updates the component without re-rendering it, so the page
+shows stale values. In development, that also raises NG0100.
+
+- Hold any state that an asynchronous callback writes in a `signal`, and hold
+  state derived from it in a `computed`.
+- Load the data a page needs before it renders, with a route resolver. The
+  component then reads `route.snapshot.data` synchronously in `ngOnInit`.
+- Resolvers on one route run concurrently and cannot read each other's results.
+  Put a value that depends on resolved data, such as a page title or a toolbar
+  badge, in static route `data` as a `Derive<T>` function from
+  [`derived-data.ts`](../apps/web/src/app/shared/routing/derived-data.ts). The
+  title strategy and the dashboard shell evaluate it after navigation ends.
+
+To find stale bindings, add
+`provideCheckNoChangesConfig({ exhaustive: true, interval: 500 })` to
+`app.config.ts` while developing. Each NG0100 in the console names the stale
+binding. Do not commit the setting.
 
 [`token.interceptor.ts`](../apps/web/src/app/token.interceptor.ts) sends every
 request with credentials, adds `Accept-Language` to public API calls, and clears

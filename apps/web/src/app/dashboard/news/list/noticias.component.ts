@@ -1,5 +1,5 @@
 import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, MatSortHeader, Sort } from "@angular/material/sort";
@@ -72,8 +72,8 @@ export default class NewsListComponent implements OnInit {
   displayedColumns2: string[] = ["name"];
   selectedTab = 0;
 
-  items: NewsListItem[] = [];
-  total = 0;
+  readonly items = signal<NewsListItem[]>([]);
+  readonly total = signal(0);
   pageSize = 10;
   pageIndex = 0;
   search = "";
@@ -82,14 +82,16 @@ export default class NewsListComponent implements OnInit {
   sortBy: AdminNewsSortBy = "publishedAt";
   sortOrder: "asc" | "desc" = "desc";
 
-  newsTypes: RefItem[] = [];
-  filteredNewsTypes: RefItem[] = [];
-  categorySearch = "";
+  readonly newsTypes = signal<RefItem[]>([]);
+  private readonly categorySearch = signal("");
+  readonly filteredNewsTypes = computed(() => {
+    const search = this.categorySearch();
+    return this.newsTypes().filter((x) => x.name.toLowerCase().includes(search));
+  });
 
   private loadNewsTypes(): void {
     this.refService.listNewsTypes().subscribe((newsTypes: RefItem[]) => {
-      this.newsTypes = newsTypes;
-      this.filteredNewsTypes = newsTypes;
+      this.newsTypes.set(newsTypes);
     });
   }
 
@@ -106,8 +108,8 @@ export default class NewsListComponent implements OnInit {
         pageSize: this.pageSize,
       })
       .subscribe((response) => {
-        this.items = response.items.map((item) => this.mapNewsItem(item));
-        this.total = response.total;
+        this.items.set(response.items.map((item) => this.mapNewsItem(item)));
+        this.total.set(response.total);
       });
   }
 
@@ -169,8 +171,7 @@ export default class NewsListComponent implements OnInit {
   }
 
   onCategorySearch(event: Event): void {
-    this.categorySearch = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.filteredNewsTypes = this.newsTypes.filter((x) => x.name.toLowerCase().includes(this.categorySearch));
+    this.categorySearch.set((event.target as HTMLInputElement).value.trim().toLowerCase());
   }
 
   addCategory(): void {

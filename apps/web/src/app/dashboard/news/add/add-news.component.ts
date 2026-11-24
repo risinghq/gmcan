@@ -27,7 +27,6 @@ import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
@@ -80,7 +79,6 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   private newsService = inject(NewsService);
   private snackBar = inject(MatSnackBar);
   lookup = inject(LookupService);
-  private memberService = inject(MemberService);
 
   url: string;
   noticia: News;
@@ -107,19 +105,11 @@ export default class AddNewsComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
-    this.getAuthors();
+    this.autores = this.route.snapshot.data["authors"] as AdminMemberListItem[];
   }
 
   isDirty(): boolean {
     return this.newsForm.dirty;
-  }
-
-  getAuthors(): void {
-    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
-      if (result) {
-        this.autores = result;
-      }
-    });
   }
 
   edit = false;

@@ -1,5 +1,6 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, HostListener, computed, inject, signal, ChangeDetectionStrategy } from "@angular/core";
+import { rxResource } from "@angular/core/rxjs-interop";
 import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
@@ -25,6 +26,20 @@ type PublicNewsCard = PublicNewsListItem & {
   authorNameLabel: string;
 };
 type NewsTypeFilter = { code: "general" | "research" | "event"; name: string };
+
+function toNewsCard(n: PublicNewsListItem): PublicNewsCard {
+  const d = new Date(n.publishedAt ?? "");
+  const valid = String(d) !== "Invalid Date";
+  if (valid) d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+  return {
+    ...n,
+    newsTypeNameLabel: n.newsKindName,
+    publishedAtLabel: valid
+      ? new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d)
+      : "",
+    authorNameLabel: n.authorName,
+  };
+}
 
 @Component({
   selector: "app-main-news",
@@ -54,10 +69,8 @@ export default class MainNewsComponent implements OnInit {
   private session = inject(SessionService);
   private titleService = inject(Title);
 
-  public newsItems: PublicNewsCard[] = [];
   public newsTypes: NewsTypeFilter[] = [];
   public screenWidth: number;
-  public total = 0;
   url: string;
 
   constructor() {
@@ -70,12 +83,32 @@ export default class MainNewsComponent implements OnInit {
     this.screenWidth = this.browser.innerWidth();
   }
 
-  public selectedCategoryCode: "general" | "research" | "event" | null = null;
+  private readonly query = signal<{ code: NewsTypeFilter["code"] | null; page: number }>({ code: null, page: 1 });
   public selectedCategoryName = "";
-  public page = 1;
-  public pageSize = 10;
+  public readonly pageSize = 10;
   language: any = {};
-  allCharged = false;
+
+  readonly news = rxResource({
+    params: () => this.query(),
+    stream: ({ params }) =>
+      this.newsService.listNews({
+        newsKindCode: params.code ?? undefined,
+        sortBy: "publishedAt",
+        sortOrder: "desc",
+        page: params.page,
+        pageSize: this.pageSize,
+      }),
+  });
+
+  readonly items = computed(() => (this.news.value()?.items ?? []).map(toNewsCard));
+
+  get selectedCategoryCode(): NewsTypeFilter["code"] | null {
+    return this.query().code;
+  }
+
+  get page(): number {
+    return this.query().page;
+  }
 
   ngOnInit(): void {
     this.language = this.session.language();
@@ -87,51 +120,15 @@ export default class MainNewsComponent implements OnInit {
         (item): item is NewsTypeFilter => item.code === "general" || item.code === "research" || item.code === "event",
       )
       .toSorted((a, b) => (a.name > b.name ? 1 : -1));
-    this.loadNews();
   }
 
-  loadNews(): void {
-    this.allCharged = false;
-    this.newsService
-      .listNews({
-        newsKindCode: this.selectedCategoryCode ?? undefined,
-        sortBy: "publishedAt",
-        sortOrder: "desc",
-        page: this.page,
-        pageSize: this.pageSize,
-      })
-      .subscribe((response) => {
-        this.newsItems = response.items.map((n): PublicNewsCard => {
-          const d = new Date(n.publishedAt ?? "");
-          if (String(d) !== "Invalid Date") {
-            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          }
-          const fechaFormateada =
-            String(d) === "Invalid Date"
-              ? ""
-              : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d) ?? "");
-
-          return Object.assign({} as PublicNewsCard, n, {
-            newsTypeNameLabel: n.newsKindName,
-            publishedAtLabel: fechaFormateada,
-            authorNameLabel: n.authorName,
-          });
-        });
-        this.total = response.total;
-        this.allCharged = true;
-      });
-  }
-
-  selectCategory(code: "general" | "research" | "event" | null, name: string): void {
-    this.selectedCategoryCode = code;
+  selectCategory(code: NewsTypeFilter["code"] | null, name: string): void {
     this.selectedCategoryName = name;
-    this.page = 1;
-    this.loadNews();
+    this.query.set({ code, page: 1 });
   }
 
   onPageChange(page: number): void {
-    this.page = page;
-    this.loadNews();
+    this.query.update((query) => ({ ...query, page }));
     this.scroll();
   }
 

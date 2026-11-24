@@ -1,14 +1,21 @@
 import { inject } from "@angular/core";
 import { ResolveFn } from "@angular/router";
+import type { AdminMemberListItem, AdminProjectMemberListItem } from "@app/shared/models/admin-list";
+import type { AuthorSearchResult } from "@app/shared/models/author";
 import type { MemberFull } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
+import type { ResearchLine } from "@app/shared/models/research-line";
+import type { Derive } from "@app/shared/routing/derived-data";
+import { EventService, type EventItem } from "@app/shared/services/event.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
+import { RefService, type JournalItem } from "@app/shared/services/ref.service";
+import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import type { RefDependenciesResponse } from "@gmcan/contracts/admin";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
-import { map, of } from "rxjs";
 
 export type ToolbarBadge = {
   label: string;
@@ -18,6 +25,29 @@ export type ToolbarBadge = {
 export const memberResolver: ResolveFn<MemberFull> = (route) => {
   const id = Number(route.paramMap.get("id") ?? 0);
   return inject(MemberService).getMemberFull(id);
+};
+
+export const adminMembersResolver: ResolveFn<AdminMemberListItem[]> = () => inject(MemberService).listAdminMembers();
+
+export const authorOptionsResolver: ResolveFn<AuthorSearchResult[]> = () => inject(MemberService).searchAuthors("");
+
+export const adminEventsResolver: ResolveFn<EventItem[]> = () => inject(EventService).listAdmin();
+
+export const adminResearchLinesResolver: ResolveFn<ResearchLine[]> = () => inject(ResearchLinesService).listAdmin();
+
+export const projectMembersResolver: ResolveFn<AdminProjectMemberListItem[]> = (route) => {
+  const id = Number(route.paramMap.get("id") ?? 0);
+  return inject(ProjectService).getProjectMembers(id);
+};
+
+export const journalResolver: ResolveFn<JournalItem> = (route) => {
+  const id = Number(route.paramMap.get("id") ?? 0);
+  return inject(RefService).getJournal(id);
+};
+
+export const journalDependenciesResolver: ResolveFn<RefDependenciesResponse> = (route) => {
+  const id = Number(route.paramMap.get("id") ?? 0);
+  return inject(RefService).getJournalDependencies(id);
 };
 
 export const projectResolver: ResolveFn<Project> = (route) => {
@@ -35,37 +65,21 @@ export const newsResolver: ResolveFn<News> = (route) => {
   return inject(NewsService).getAdminNews(id);
 };
 
-export const newsToolbarBadgeResolver: ResolveFn<ToolbarBadge | null> = (route) =>
-  of(route.data["news"] as News).pipe(
-    map((news) =>
-      news.statusCode === "published"
-        ? ({ label: "Noticia Publicada", tone: "published" } as ToolbarBadge)
-        : ({ label: "Borrador", tone: "draft" } as ToolbarBadge),
-    ),
-  );
+export const newsToolbarBadge: Derive<ToolbarBadge> = (data) =>
+  (data["news"] as News).statusCode === "published"
+    ? { label: "Noticia Publicada", tone: "published" }
+    : { label: "Borrador", tone: "draft" };
 
-export const memberEditTitleResolver: ResolveFn<string> = (route) =>
-  of(route.data["member"] as MemberFull).pipe(
-    map((member) => {
-      const isFormer = route.queryParamMap.get("returnTo") === "miembros-antiguos";
-      const section = isFormer ? "Miembros Antiguos" : "Miembros Activos";
-      const name = [member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
-      return `${section} - ${name}`;
-    }),
-  );
+export const memberEditTitle: Derive<string> = (data, route) => {
+  const member = data["member"] as MemberFull;
+  const isFormer = route.queryParamMap.get("returnTo") === "miembros-antiguos";
+  const section = isFormer ? "Miembros Antiguos" : "Miembros Activos";
+  const name = [member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
+  return `${section} - ${name}`;
+};
 
-export const projectEditTitleResolver: ResolveFn<string> = (route) =>
-  of(route.data["project"] as Project).pipe(map((project) => `Proyectos - ${project.title}`));
+export const projectEditTitle: Derive<string> = (data) => `Proyectos - ${(data["project"] as Project).title}`;
 
-export const publicationEditTitleResolver: ResolveFn<string> = (route) =>
-  of(route.data["publication"] as PublicPublicationWithAuthors).pipe(
-    map((publication) => {
-      const path = route.routeConfig?.path ?? "";
-      const entity = path.startsWith("edit-thesis")
-        ? "Tesis"
-        : path.startsWith("edit-resumen")
-          ? "Resúmenes"
-          : "Artículos";
-      return `${entity} - ${publication.title}`;
-    }),
-  );
+export function publicationEditTitle(section: string): Derive<string> {
+  return (data) => `${section} - ${(data["publication"] as PublicPublicationWithAuthors).title}`;
+}

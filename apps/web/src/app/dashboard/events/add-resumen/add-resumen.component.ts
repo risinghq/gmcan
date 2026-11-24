@@ -23,9 +23,7 @@ import type { AuthorSearchResult, SaveAuthorEntry } from "@app/shared/models/aut
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
-import { EventService } from "@app/shared/services/event.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService, type PublicationFields } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
@@ -70,10 +68,8 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private publicationService = inject(PublicationService);
-  private memberService = inject(MemberService);
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
-  private eventService = inject(EventService);
 
   publicacion: ResumenDraft;
   public publicacionForm: FormGroup;
@@ -111,27 +107,14 @@ export default class AddResumenComponent implements OnInit, HasUnsavedChanges {
   openEraser() {}
 
   ngOnInit(): void {
-    this.getEventos();
-  }
-
-  getEventos(): void {
-    this.eventService.listAdmin().subscribe((result: EventItem[]) => {
-      if (result) {
-        this.eventos = result;
-        this.loadAuthors();
-      }
-    });
-  }
-
-  loadAuthors(): void {
-    this.memberService.searchAuthors("").subscribe((authors) => {
-      this.options = authors as AuthorSearchResult[];
-      this.filteredOptions = this.myControl.valueChanges.pipe(
-        startWith(""),
-        map((value) => filterAuthors(this.options, value ?? "")),
-      );
-      this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
-    });
+    const data = this.route.snapshot.data;
+    this.eventos = data["events"] as EventItem[];
+    this.options = data["authorOptions"] as AuthorSearchResult[];
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(""),
+      map((value) => filterAuthors(this.options, value ?? "")),
+    );
+    this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
   }
 
   selectUser(author: AuthorSearchResult | { value: string }, value: number): void {

@@ -1,9 +1,9 @@
 <div class="member-detail-div">
-  @if (!cargado) {
+  @let usuario = member(); @let publicaciones = publications(); @if (loading()) {
   <div>
     <mat-spinner />
   </div>
-  } @if (cargado && usuario) {
+  } @if (!loading() && usuario) {
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="member-detail-links">
@@ -40,7 +40,7 @@
         } @if (publicaciones.length > 0) {
         <div>
           @for ( publicacion of publicaciones | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize; track
-          publicacion; let i = $index ) {
+          publicacion.id; let i = $index ) {
           <div class="publication">
             <div class="flex-news">
               @if (publicacion.kindCode !== 'thesis') {

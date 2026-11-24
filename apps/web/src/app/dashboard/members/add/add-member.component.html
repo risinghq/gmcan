@@ -8,9 +8,9 @@
         </div>
         <div class="right obligatory-text"><span class="red-text">(*) </span>Campos obligatorios</div>
       </div>
-      @if (edit && publishability) {
+      @if (edit && publishability(); as status) {
         <div class="mb-16">
-          @if (publishability.publishable) {
+          @if (status.publishable) {
             <span
               class="status-chip status-ready"
               [title]="publishabilityTooltip()"

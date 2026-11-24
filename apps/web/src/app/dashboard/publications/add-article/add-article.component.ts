@@ -24,7 +24,6 @@ import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { AutosizeModule } from "ngx-autosize";
@@ -69,7 +68,6 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private publicationService = inject(PublicationService);
-  private memberService = inject(MemberService);
   lookup = inject(LookupService);
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
@@ -118,14 +116,12 @@ export default class AddArticleComponent implements OnInit, HasUnsavedChanges {
   openEraser(): void {}
 
   ngOnInit(): void {
-    this.memberService.searchAuthors("").subscribe((authors) => {
-      this.options = authors;
-      this.filteredOptions = this.myControl.valueChanges.pipe(
-        startWith(""),
-        map((value) => filterAuthors(this.options, value)),
-      );
-      this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
-    });
+    this.options = this.route.snapshot.data["authorOptions"] as AuthorSearchResult[];
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(""),
+      map((value) => filterAuthors(this.options, value)),
+    );
+    this.otrosAutores = [attachFilter(newAuthorRow(1), this.options)];
   }
 
   selectUser(evento: AuthorSearchResult | { value: string }, value: number): void {

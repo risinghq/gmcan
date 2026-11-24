@@ -27,7 +27,6 @@ import type { News } from "@app/shared/models/news";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
@@ -81,7 +80,6 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   lookup = inject(LookupService);
-  private memberService = inject(MemberService);
 
   noticia: News;
   publishedAtObj?: Date;
@@ -110,7 +108,7 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.initFromResolver();
-    this.getAuthors();
+    this.autores = this.route.snapshot.data["authors"] as AdminMemberListItem[];
   }
 
   isDirty(): boolean {
@@ -131,14 +129,6 @@ export default class EditNewsComponent implements OnInit, HasUnsavedChanges {
     }
     this.button_text = "Actualizar noticia";
     this.button_text2 = "Dejar de publicar y guardar cambios";
-  }
-
-  getAuthors(): void {
-    this.memberService.listAdminMembers().subscribe((result: AdminMemberListItem[]) => {
-      if (result) {
-        this.autores = result;
-      }
-    });
   }
 
   return(): void {

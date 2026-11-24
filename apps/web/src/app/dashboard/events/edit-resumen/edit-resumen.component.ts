@@ -26,9 +26,7 @@ import { DialogData } from "@app/shared/models/dialogdata";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import type { EventItem } from "@app/shared/services/event.service";
-import { EventService } from "@app/shared/services/event.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { requireLocalDate } from "@app/shared/utils/date";
@@ -91,10 +89,8 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   route = inject(ActivatedRoute);
   router = inject(Router);
   private publicationService = inject(PublicationService);
-  private memberService = inject(MemberService);
   dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
-  private eventService = inject(EventService);
 
   publicacion: ResumenDraft;
   public publicacionForm: FormGroup;
@@ -135,6 +131,7 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
+    this.eventos = this.route.snapshot.data["events"] as EventItem[];
     this.bindResumen(this.route.snapshot.data["publication"] as PublicPublicationWithAuthors);
   }
 
@@ -147,55 +144,44 @@ export default class EditResumenComponent implements OnInit, HasUnsavedChanges {
       publishedAtDate: requireLocalDate(result.publishedAt, "publication.publishedAt"),
       eventId: result.subtype.kindCode === "conference_paper" ? result.subtype.conferencePaper.eventId : null,
     };
-    this.getEventos(result.authors);
+    this.loadAuthors(result.authors);
   }
 
-  getEventos(authors: AuthorEntry[]): void {
-    this.eventService.listAdmin().subscribe((result: EventItem[]) => {
-      if (result) {
-        this.eventos = result;
-        this.loadAuthors(authors);
-      }
-    });
-  }
+  private loadAuthors(existingAuthors: AuthorEntry[]): void {
+    this.options = this.route.snapshot.data["authorOptions"] as AuthorSearchResult[];
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(""),
+      map((value) => this.filterAuthors(value ?? "")),
+    );
 
-  loadAuthors(existingAuthors: AuthorEntry[]): void {
-    this.memberService.searchAuthors("").subscribe((allAuthors) => {
-      this.options = allAuthors as AuthorSearchResult[];
-      this.filteredOptions = this.myControl.valueChanges.pipe(
+    const principal = existingAuthors.find((a) => a.authorOrder === 0);
+    if (principal) {
+      this.selectedUser = principal.name;
+      this.principalMemberId = principal.kind === "registered" ? (principal.memberId ?? null) : null;
+      this.myControl.setValue(principal.name);
+    }
+
+    const coAuthors = existingAuthors
+      .filter((a) => a.authorOrder > 0)
+      .toSorted((a, b) => a.authorOrder - b.authorOrder);
+    this.otrosAutores = coAuthors.map((a, i) => {
+      const row: AuthorFormRow = {
+        id: i + 1,
+        name: a.name,
+        memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
+        myControl: new FormControl<string>(a.name, { nonNullable: true }),
+      };
+      row.filteredOptions = row.myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this.filterAuthors(value ?? "")),
+        map((v) => this.filterAuthors(v ?? "")),
       );
-
-      const principal = existingAuthors.find((a) => a.authorOrder === 0);
-      if (principal) {
-        this.selectedUser = principal.name;
-        this.principalMemberId = principal.kind === "registered" ? (principal.memberId ?? null) : null;
-        this.myControl.setValue(principal.name);
-      }
-
-      const coAuthors = existingAuthors
-        .filter((a) => a.authorOrder > 0)
-        .toSorted((a, b) => a.authorOrder - b.authorOrder);
-      this.otrosAutores = coAuthors.map((a, i) => {
-        const row: AuthorFormRow = {
-          id: i + 1,
-          name: a.name,
-          memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-          myControl: new FormControl<string>(a.name, { nonNullable: true }),
-        };
-        row.filteredOptions = row.myControl.valueChanges.pipe(
-          startWith(""),
-          map((v) => this.filterAuthors(v ?? "")),
-        );
-        return row;
-      });
-
-      if (this.otrosAutores.length === 0) {
-        this.otrosAutores = [this.newCoAuthorRow()];
-        this.setupCoAuthorFilters();
-      }
+      return row;
     });
+
+    if (this.otrosAutores.length === 0) {
+      this.otrosAutores = [this.newCoAuthorRow()];
+      this.setupCoAuthorFilters();
+    }
   }
 
   private filterAuthors(value: string): AuthorSearchResult[] {

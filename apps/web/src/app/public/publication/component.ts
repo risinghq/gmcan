@@ -1,5 +1,5 @@
 import { SlicePipe } from "@angular/common";
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
@@ -56,11 +56,16 @@ export default class PublicationComponent implements OnInit {
   cargado = false;
   allCharged: boolean | null = false;
   searchForm: FormGroup;
-  tabLabels: { label: string; search: string }[] = [
-    { label: "", search: "" },
-    { label: "", search: "" },
-    { label: "", search: "" },
-  ];
+  readonly tabLabels = computed(() => {
+    const text = this.session.language().publicationsText?.[0];
+    return text
+      ? [
+          { label: text.nameTab1, search: text.search1 },
+          { label: text.nameTab2, search: text.search2 },
+          { label: text.nameTab3, search: text.search3 },
+        ]
+      : [];
+  });
   url = GLOBAL.url;
   infoText = "";
   language: (typeof Languages)[number] = Languages[0];
@@ -86,12 +91,6 @@ export default class PublicationComponent implements OnInit {
     this.publicaciones = this.allArticulos;
     this.allCharged = true;
     this.cargado = true;
-
-    this.syncTabLabels();
-  }
-
-  ngDoCheck(): void {
-    this.syncTabLabels();
   }
 
   scroll(): void {
@@ -137,18 +136,5 @@ export default class PublicationComponent implements OnInit {
   profile(autor: { memberId?: number }): void {
     if (!autor.memberId) return;
     this.router.navigate(["/home/detail-member/" + autor.memberId], { queryParams: { from: "publications" } });
-  }
-
-  private syncTabLabels(): void {
-    const publicationsText = this.language.publicationsText?.[0];
-    if (!publicationsText) {
-      return;
-    }
-
-    this.tabLabels = [
-      { label: publicationsText.nameTab1, search: publicationsText.search1 },
-      { label: publicationsText.nameTab2, search: publicationsText.search2 },
-      { label: publicationsText.nameTab3, search: publicationsText.search3 },
-    ];
   }
 }

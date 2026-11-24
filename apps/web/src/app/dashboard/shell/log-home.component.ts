@@ -1,16 +1,16 @@
-import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
-import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { NavigationEnd } from "@angular/router";
 import type { ToolbarBadge } from "@app/dashboard/dashboard.resolvers";
 import { DialogIdle } from "@app/shared/modals/dialog-idle.component";
-import { createGroup, type Group } from "@app/shared/models/factories";
+import type { Group } from "@app/shared/models/factories";
 import type { Member } from "@app/shared/models/member";
+import { deepestChild, deriveFromRoute, routeTitle } from "@app/shared/routing/derived-data";
 import { AuthService } from "@app/shared/services/auth.service";
 import { AuthzService } from "@app/shared/services/authz.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -44,21 +44,24 @@ export default class LogHomeComponent implements OnInit {
   dialog = inject(MatDialog);
   private groupService = inject(GroupService);
   private uiState = inject(UiStateService);
-  private titleService = inject(Title);
 
-  user: Member | null = null;
+  readonly user = signal<Member | null>(null);
+  readonly userDisplayName = computed(() => {
+    const user = this.user();
+    if (!user) return "";
+    return [user.firstName, user.lastName, user.maternalName].filter(Boolean).join(" ");
+  });
   screenWidth: number;
   public url: string;
-  public grupoinfo: Group;
+  readonly grupoinfo = this.uiState.groupInfo;
 
-  dashboardTitle = "Dashboard";
-  toolbarBadge: ToolbarBadge | null = null;
+  readonly dashboardTitle = signal("Dashboard");
+  readonly toolbarBadge = signal<ToolbarBadge | null>(null);
 
   constructor() {
     this.screenWidth = window.innerWidth;
     this.enterAny = this.screenWidth < 960;
     this.url = GLOBAL.url;
-    this.grupoinfo = createGroup();
   }
 
   @HostListener("window:resize", ["$event"])
@@ -68,7 +71,6 @@ export default class LogHomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.titleService.setTitle("GMCAN | Administrador");
     this.getGrupoInfo();
     this.syncToolbarTitle();
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => this.syncToolbarTitle());
@@ -78,29 +80,21 @@ export default class LogHomeComponent implements OnInit {
     }
   }
 
-  getGrupoInfo(): void {
-    this.grupoinfo = this.uiState.groupInfo();
+  private getGrupoInfo(): void {
     this.groupService.getGroup().subscribe((group: Group) => {
-      this.grupoinfo = group;
       this.uiState.setGroupInfo(group);
       this.getUser();
     });
   }
 
-  getUser(): void {
+  private getUser(): void {
     this.authService.tryRestoreSession().subscribe((user) => {
       if (!user) {
         this.logout();
         return;
       }
-      this.user = user;
+      this.user.set(user);
     });
-  }
-
-  get userDisplayName(): string {
-    if (!this.user) return "";
-    const parts = [this.user.firstName, this.user.lastName, this.user.maternalName].filter(Boolean);
-    return parts.join(" ");
   }
 
   logout(): void {
@@ -144,9 +138,8 @@ export default class LogHomeComponent implements OnInit {
   }
 
   private syncToolbarTitle(): void {
-    let route = this.router.routerState.snapshot.root;
-    while (route.firstChild) route = route.firstChild;
-    this.dashboardTitle = (route.title as string) ?? "Dashboard";
-    this.toolbarBadge = (route.data["toolbarBadge"] as ToolbarBadge | undefined) ?? null;
+    const route = deepestChild(this.router.routerState.snapshot.root);
+    this.dashboardTitle.set(routeTitle(route) ?? "Dashboard");
+    this.toolbarBadge.set(deriveFromRoute<ToolbarBadge>(route, "toolbarBadge") ?? null);
   }
 }

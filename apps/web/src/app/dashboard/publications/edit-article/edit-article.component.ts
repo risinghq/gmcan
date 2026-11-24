@@ -26,7 +26,6 @@ import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { resolveReturnTo } from "@app/shared/routing/return-to";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { MemberService } from "@app/shared/services/member.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { SpaceValidator } from "@app/shared/services/spacevalidator";
 import { parseLocalDate } from "@app/shared/utils/date";
@@ -81,7 +80,6 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly publicationService = inject(PublicationService);
-  private readonly memberService = inject(MemberService);
   lookup = inject(LookupService);
   dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -139,48 +137,46 @@ export default class EditArticleComponent implements OnInit, HasUnsavedChanges {
       this.publishedAtObj = publishedAt;
     }
 
-    this.memberService.searchAuthors("").subscribe((allAuthors) => {
-      this.options = allAuthors;
-      this.filteredOptions = this.myControl.valueChanges.pipe(
+    this.options = this.route.snapshot.data["authorOptions"] as AuthorSearchResult[];
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(""),
+      map((value) => this.filterAuthors(value)),
+    );
+
+    const principal = pub.authors.find((a) => a.authorOrder === 0);
+    if (principal) {
+      this.selectedUser = principal.name;
+      this.principalAuthor =
+        principal.kind === "registered" && principal.memberId
+          ? {
+              id: principal.memberId,
+              name: principal.name,
+              photoUrl: principal.photoUrl,
+              photoAlt: principal.photoAlt,
+            }
+          : null;
+      this.myControl.setValue(principal.name);
+    }
+
+    const coAuthors = pub.authors.filter((a) => a.authorOrder > 0).toSorted((a, b) => a.authorOrder - b.authorOrder);
+    this.otrosAutores = coAuthors.map((a, i) => {
+      const row: AuthorFormRow = {
+        id: i + 1,
+        name: a.name,
+        memberId: a.kind === "registered" ? a.memberId : null,
+        myControl: new FormControl<string>(a.name, { nonNullable: true }),
+      };
+      row.filteredOptions = row.myControl.valueChanges.pipe(
         startWith(""),
-        map((value) => this.filterAuthors(value)),
+        map((v) => this.filterAuthors(v)),
       );
-
-      const principal = pub.authors.find((a) => a.authorOrder === 0);
-      if (principal) {
-        this.selectedUser = principal.name;
-        this.principalAuthor =
-          principal.kind === "registered" && principal.memberId
-            ? {
-                id: principal.memberId,
-                name: principal.name,
-                photoUrl: principal.photoUrl,
-                photoAlt: principal.photoAlt,
-              }
-            : null;
-        this.myControl.setValue(principal.name);
-      }
-
-      const coAuthors = pub.authors.filter((a) => a.authorOrder > 0).toSorted((a, b) => a.authorOrder - b.authorOrder);
-      this.otrosAutores = coAuthors.map((a, i) => {
-        const row: AuthorFormRow = {
-          id: i + 1,
-          name: a.name,
-          memberId: a.kind === "registered" ? a.memberId : null,
-          myControl: new FormControl<string>(a.name, { nonNullable: true }),
-        };
-        row.filteredOptions = row.myControl.valueChanges.pipe(
-          startWith(""),
-          map((v) => this.filterAuthors(v)),
-        );
-        return row;
-      });
-
-      if (this.otrosAutores.length === 0) {
-        this.otrosAutores = [this.newCoAuthorRow()];
-        this.setupCoAuthorFilters();
-      }
+      return row;
     });
+
+    if (this.otrosAutores.length === 0) {
+      this.otrosAutores = [this.newCoAuthorRow()];
+      this.setupCoAuthorFilters();
+    }
   }
 
   private filterAuthors(value: string): AuthorSearchResult[] {

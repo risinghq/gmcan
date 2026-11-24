@@ -1,12 +1,19 @@
 import { Routes } from "@angular/router";
 import {
-  memberEditTitleResolver,
+  adminEventsResolver,
+  adminMembersResolver,
+  adminResearchLinesResolver,
+  authorOptionsResolver,
+  journalDependenciesResolver,
+  journalResolver,
+  memberEditTitle,
   memberResolver,
   newsResolver,
-  newsToolbarBadgeResolver,
-  projectEditTitleResolver,
+  newsToolbarBadge,
+  projectEditTitle,
+  projectMembersResolver,
   projectResolver,
-  publicationEditTitleResolver,
+  publicationEditTitle,
   publicationResolver,
 } from "@app/dashboard/dashboard.resolvers";
 import { adminCanActivateChildGuard, adminCanMatchGuard } from "@app/shared/guards/admin-auth.guard";
@@ -41,7 +48,7 @@ export default [
         path: "edit-member/:id",
         loadComponent: () => import("./members/edit/edit-member.component"),
         resolve: { member: memberResolver },
-        title: memberEditTitleResolver,
+        data: { pageTitle: memberEditTitle },
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -62,14 +69,20 @@ export default [
       {
         path: "add-project",
         loadComponent: () => import("./projects/add/add-proyecto.component"),
+        resolve: { members: adminMembersResolver, researchLines: adminResearchLinesResolver },
         title: "Proyectos - Agregar proyecto",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-project/:id",
         loadComponent: () => import("./projects/edit/edit-proyecto.component"),
-        resolve: { project: projectResolver },
-        title: projectEditTitleResolver,
+        resolve: {
+          project: projectResolver,
+          projectMembers: projectMembersResolver,
+          members: adminMembersResolver,
+          researchLines: adminResearchLinesResolver,
+        },
+        data: { pageTitle: projectEditTitle },
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -88,13 +101,15 @@ export default [
       {
         path: "add-news",
         loadComponent: () => import("./news/add/add-news.component"),
+        resolve: { authors: adminMembersResolver },
         title: "Noticias - Agregar noticia",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-news/:id",
         loadComponent: () => import("./news/edit/edit-news.component"),
-        resolve: { news: newsResolver, toolbarBadge: newsToolbarBadgeResolver },
+        resolve: { news: newsResolver, authors: adminMembersResolver },
+        data: { toolbarBadge: newsToolbarBadge },
         title: "Noticias - Editar noticia",
         canDeactivate: [canDeactivateGuard],
       },
@@ -168,14 +183,15 @@ export default [
       {
         path: "add-article",
         loadComponent: () => import("./publications/add-article/add-article.component"),
+        resolve: { authorOptions: authorOptionsResolver },
         title: "Artículos - Agregar artículo",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-article/:id",
         loadComponent: () => import("./publications/edit-article/edit-article.component"),
-        resolve: { publication: publicationResolver },
-        title: publicationEditTitleResolver,
+        resolve: { publication: publicationResolver, authorOptions: authorOptionsResolver },
+        data: { pageTitle: publicationEditTitle("Artículos") },
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -187,6 +203,7 @@ export default [
       {
         path: "edit-revista/:id",
         loadComponent: () => import("./publications/edit-revista/edit-revista.component"),
+        resolve: { journal: journalResolver, dependencies: journalDependenciesResolver },
         title: "Artículos - Editar revista",
         canDeactivate: [canDeactivateGuard],
       },
@@ -194,14 +211,15 @@ export default [
       {
         path: "add-thesis",
         loadComponent: () => import("./publications/add-tesis/add-tesis.component"),
+        resolve: { authorOptions: authorOptionsResolver },
         title: "Tesis - Agregar tesis",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-thesis/:id",
         loadComponent: () => import("./publications/edit-tesis/edit-tesis.component"),
-        resolve: { publication: publicationResolver },
-        title: publicationEditTitleResolver,
+        resolve: { publication: publicationResolver, authorOptions: authorOptionsResolver },
+        data: { pageTitle: publicationEditTitle("Tesis") },
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -224,14 +242,19 @@ export default [
       {
         path: "add-resumen",
         loadComponent: () => import("./events/add-resumen/add-resumen.component"),
+        resolve: { events: adminEventsResolver, authorOptions: authorOptionsResolver },
         title: "Resúmenes - Agregar resumen",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-resumen/:id",
         loadComponent: () => import("./events/edit-resumen/edit-resumen.component"),
-        resolve: { publication: publicationResolver },
-        title: publicationEditTitleResolver,
+        resolve: {
+          publication: publicationResolver,
+          events: adminEventsResolver,
+          authorOptions: authorOptionsResolver,
+        },
+        data: { pageTitle: publicationEditTitle("Resúmenes") },
         canDeactivate: [canDeactivateGuard],
       },
       {

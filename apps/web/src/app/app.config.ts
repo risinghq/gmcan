@@ -30,6 +30,7 @@ import { toNavigationAppError } from "@app/shared/errors/app-error";
 import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { GLOBAL } from "@app/shared/services/global";
+import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
@@ -70,6 +71,7 @@ export const appConfig: ApplicationConfig = {
     DatePipe,
     TitleCasePipe,
     provideAppInitializer(() => inject(SessionService).init()),
+    provideAppInitializer(() => inject(LookupService).load()),
     {
       provide: LOCALE_ID,
       deps: [SessionService],
