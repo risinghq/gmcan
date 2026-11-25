@@ -9,7 +9,7 @@
       <div class="publication-links">
         <a class="publication-link-active" routerLink="/">{{ language.home }}</a>
         <mat-icon class="publication-icon"> arrow_right </mat-icon>
-        <a class="publication-link">{{ language.publications }}</a>
+        <span class="publication-link" aria-current="page">{{ language.publications }}</span>
       </div>
       <div class="card-publication">
         <div class="card-publication-title">{{ language.publicationsText[0].publicationsTitle }}</div>
@@ -100,7 +100,12 @@
                     <div class="member-img-round">
                       <img class="member-img" loading="lazy" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
                     </div>
-                    <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
+                    <a
+                      class="member-name plain-link"
+                      [routerLink]="['/detail-member', autor.memberId]"
+                      [queryParams]="{ from: 'publications' }"
+                      >{{ autor.name }}{{ !last ? "," : "" }}</a
+                    >
                   </div>
                   } @if (autor.kind === "external") {
                   <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>

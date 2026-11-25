@@ -4,10 +4,9 @@ import { MatButton } from "@angular/material/button";
 import { MatCard } from "@angular/material/card";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
-import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
-import { BrowserService } from "@app/shared/services/browser.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
@@ -20,10 +19,8 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   imports: [RouterLink, MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
-  private router = inject(Router);
   private route = inject(ActivatedRoute);
   private session = inject(SessionService);
-  private browser = inject(BrowserService);
 
   language: any = {};
   expandedKey: string | null = null;
@@ -60,10 +57,6 @@ export default class HomeComponent implements OnInit {
     this.resumenes = home.resumenes;
   }
 
-  navigate(route: string): void {
-    this.router.navigate([route]);
-  }
-
   toggleExpanded(section: string, index: number): void {
     const key = `${section}:${index}`;
     this.expandedKey = this.expandedKey === key ? null : key;
@@ -75,24 +68,5 @@ export default class HomeComponent implements OnInit {
 
   expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
     return this.isExpanded(section, index) ? seeLess : seeMore;
-  }
-
-  profile(user: { id?: number }): void {
-    if (!user.id) {
-      return;
-    }
-    this.router.navigate(["/detail-member/" + user.id], { queryParams: { from: "home" } });
-  }
-
-  openNewsDetail(newsItem: { id?: number }): void {
-    if (!newsItem.id) {
-      return;
-    }
-    this.router.navigate(["/detail-news/" + newsItem.id], { queryParams: { from: "home" } });
-    this.scroll();
-  }
-
-  scroll(): void {
-    this.browser.scrollIntoViewById("main-toolbar");
   }
 }

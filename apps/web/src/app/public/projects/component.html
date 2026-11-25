@@ -4,7 +4,7 @@
       <div class="project-links">
         <a class="project-link-active" routerLink="/">{{ language.home }}</a>
         <mat-icon class="project-icon"> arrow_right </mat-icon>
-        <a class="project-link">{{ language.projects }}</a>
+        <span class="project-link" aria-current="page">{{ language.projects }}</span>
       </div>
       <div class="project-card-div">
         <div class="project-header">{{ language.projectsText[0].projectsTitle }}</div>
@@ -64,7 +64,12 @@
                           alt="{{ member.photoAlt }}"
                         />
                       </div>
-                      <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
+                      <a
+                        class="member-name plain-link"
+                        [routerLink]="['/detail-member', member.memberId]"
+                        [queryParams]="{ from: 'projects' }"
+                        >{{ member.name }}</a
+                      >
                     </div>
                     }
                   </div>

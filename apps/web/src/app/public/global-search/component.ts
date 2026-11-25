@@ -116,16 +116,6 @@ export default class GlobalSearchComponent {
     this.browser.scrollIntoViewById("main-toolbar");
   }
 
-  profile(member: { id?: number; memberId?: number }): void {
-    const id = member.id ?? member.memberId;
-    if (!id) return;
-    this.router.navigate(["/detail-member/" + id], { queryParams: { from: "search" } });
-  }
-
-  detalleNoticia(noticia: { id: number }): void {
-    this.router.navigate(["/detail-news/" + noticia.id], { queryParams: { from: "search" } });
-  }
-
   return(): void {
     this.router.navigateByUrl(this.previouslink);
   }

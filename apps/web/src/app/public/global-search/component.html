@@ -2,7 +2,7 @@
   <div class="global-links">
     <a class="global-link-active" routerLink="/">{{ language().home }}</a>
     <mat-icon class="global-icon"> arrow_right </mat-icon>
-    <a class="global-link">{{ language().results }}</a>
+    <span class="global-link" aria-current="page">{{ language().results }}</span>
   </div>
   <div class="card-global">
     <div class="flex-news back-div" (click)="return()">
@@ -112,7 +112,12 @@
                   <div class="member-img-round">
                     <img class="member-img" loading="lazy" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
                   </div>
-                  <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
+                  <a
+                    class="member-name plain-link"
+                    [routerLink]="['/detail-member', autor.memberId]"
+                    [queryParams]="{ from: 'search' }"
+                    >{{ autor.name }}{{ !last ? "," : "" }}</a
+                  >
                 </div>
                 } @if (autor.kind === "external") {
                 <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>
@@ -215,7 +220,12 @@
                     <div class="member-img-round">
                       <img class="member-img" loading="lazy" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
                     </div>
-                    <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
+                    <a
+                      class="member-name plain-link"
+                      [routerLink]="['/detail-member', member.memberId]"
+                      [queryParams]="{ from: 'search' }"
+                      >{{ member.name }}</a
+                    >
                   </div>
                   }
                 </div>
@@ -320,10 +330,14 @@
                 <div class="miembro-name full-width">
                   {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                 </div>
-                <div class="miembro-profile" (click)="profile(miembro)">
+                <a
+                  class="miembro-profile plain-link"
+                  [routerLink]="['/detail-member', miembro.id]"
+                  [queryParams]="{ from: 'search' }"
+                >
                   {{ language().membersText[0].seeProfile }}
                   <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
-                </div>
+                </a>
               </div>
             </div>
             }
@@ -364,7 +378,12 @@
                   <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
                   <div class="other-news-date">{{ noticia.fechaFormateada }}</div>
                 </div>
-                <div class="other-news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.title }}</div>
+                <a
+                  class="other-news-text-2 plain-link"
+                  [routerLink]="['/detail-news', noticia.id]"
+                  [queryParams]="{ from: 'search' }"
+                  >{{ noticia.title }}</a
+                >
                 <div class="news-author">{{ language().newsText[0].by }} {{ noticia.authorName }}</div>
               </div>
             </div>

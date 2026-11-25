@@ -14,12 +14,12 @@
         } @if (previouslink !== "/") {
         <mat-icon class="detail-icon"> arrow_right </mat-icon>
         }
-        <a class="detail-link">{{ language.detailNews }}</a>
+        <span class="detail-link" aria-current="page">{{ language.detailNews }}</span>
       </div>
       <div class="card-detail">
         <div class="news-title-div">
           @if (newsItem.asset) {
-          <img class="detail-img" src="{{ newsItem.asset }}" />
+          <img class="detail-img" src="{{ newsItem.asset }}" alt="" />
           }
           <div class="news-title">{{ newsItem.title }}</div>
         </div>

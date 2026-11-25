@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angul
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -44,7 +44,6 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
 export default class ProjectsComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly browser = inject(BrowserService);
   private readonly session = inject(SessionService);
   private readonly seo = inject(SeoService);
@@ -144,10 +143,6 @@ export default class ProjectsComponent implements OnInit {
 
   expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
     return this.isExpanded(section, index) ? seeLess : seeMore;
-  }
-
-  profile(member: { memberId: number }): void {
-    this.router.navigate(["/detail-member/" + member.memberId], { queryParams: { from: "projects" } });
   }
 
   private syncLabels(): void {

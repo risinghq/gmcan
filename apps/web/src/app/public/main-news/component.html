@@ -5,7 +5,7 @@
       <div class="main-news-links">
         <a class="main-news-link-active" routerLink="/">{{ language.home }}</a>
         <mat-icon class="main-news-icon"> arrow_right </mat-icon>
-        <a class="main-news-link">{{ language.news }}</a>
+        <span class="main-news-link" aria-current="page">{{ language.news }}</span>
       </div>
       <div class="news-list-div">
         @if (!allCharged) {
@@ -45,7 +45,12 @@
                 <div class="news-type">{{ newsItem.newsTypeNameLabel }}</div>
                 <div class="news-date right">{{ newsItem.publishedAtLabel }}</div>
               </div>
-              <div class="news-text-2" (click)="openNewsDetail(newsItem)">{{ newsItem.title }}</div>
+              <a
+                class="news-text-2 plain-link"
+                [routerLink]="['/detail-news', newsItem.id]"
+                [queryParams]="{ from: 'news' }"
+                >{{ newsItem.title }}</a
+              >
               <div class="news-abstract">{{ newsItem.summary }}</div>
               <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
             </div>
