@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 
-import { GlobalSearchResultsSchema, PublicationCountsSchema, SitemapSchema } from "@gmcan/contracts/public";
+import { GlobalSearchResultsSchema, HOME_PUBLICATIONS, PublicHomeSchema, SitemapSchema } from "@gmcan/contracts/public";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
@@ -141,18 +141,60 @@ describe("sitemap", () => {
   });
 });
 
-describe("public publications", () => {
-  test("a limited list keeps the most recent, and counts cover every kind", async () => {
-    await insertArticle();
-    await insertArticle();
+async function insertProject(code: string, endDate: string | null) {
+  const group = await db
+    .insertInto("research_group")
+    .values({ slug: code, shortName: code, fullName: code, createdAt: "2026-01-01", updatedAt: "2026-01-01" })
+    .executeTakeFirstOrThrow();
+  const line = await db
+    .insertInto("research_line")
+    .values({ groupId: Number(group.insertId), createdAt: "2026-01-01", updatedAt: "2026-01-01" })
+    .executeTakeFirstOrThrow();
+  const project = await db
+    .insertInto("project")
+    .values({
+      code,
+      fundedAmountMinor: 0,
+      statusCode: "active",
+      startDate: "2099-01-01",
+      endDate,
+      researchLineId: Number(line.insertId),
+      currencyCode: "pen",
+      fundingSourceCode: "vrip",
+      createdAt: "2026-01-01",
+      updatedAt: "2026-01-01",
+    })
+    .executeTakeFirstOrThrow();
+  const projectId = Number(project.insertId);
+  await db
+    .insertInto("project_translation")
+    .values([
+      { projectId, locale: "es", title: code, description: "descripcion" },
+      { projectId, locale: "en", title: code, description: "description" },
+    ])
+    .execute();
+  return projectId;
+}
 
-    const { body: recent } = await getJson("/api/publications?limit=1");
-    expect(recent).toHaveLength(1);
-    expect(recent[0].authors).toHaveLength(1);
+describe("public home", () => {
+  test("carries counts, recent published items and ongoing projects only", async () => {
+    await insertMember({ dni: "20000003", email: "luis@example.test", isActive: 0 });
+    await Promise.all(Array.from({ length: HOME_PUBLICATIONS + 1 }, insertArticle));
+    const ongoing = await insertProject("HOME-ONGOING", null);
+    const ended = await insertProject("HOME-ENDED", "2099-06-01");
 
-    const { status, body } = await getJson("/api/publications/counts");
+    const { status, body } = await getJson("/api/home");
     expect(status).toBe(200);
-    expect(PublicationCountsSchema.parse(body)).toEqual({ journal_article: 2, conference_paper: 0, thesis: 0 });
+    const home = PublicHomeSchema.parse(body);
+
+    expect(home.memberCount).toBe(1);
+    expect(home.publicationCounts).toEqual({ journal_article: HOME_PUBLICATIONS + 1, conference_paper: 0, thesis: 0 });
+    expect(home.publications).toHaveLength(HOME_PUBLICATIONS);
+    expect(home.publications[0]!.authors).toMatchObject([{ kind: "registered", memberId }]);
+    expect(home.news.map((item) => item.id)).toEqual([newsIds.published]);
+    const projectIds = home.ongoingProjects.map((project) => project.id);
+    expect(projectIds).toContain(ongoing);
+    expect(projectIds).not.toContain(ended);
   });
 });
 

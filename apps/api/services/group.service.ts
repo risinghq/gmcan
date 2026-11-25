@@ -7,6 +7,7 @@ import {
   type GroupWrite,
   HomeTeaserSchema,
 } from "@gmcan/contracts/admin";
+import type { PublicGroupTopic } from "@gmcan/contracts/public";
 import type { z } from "zod";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
@@ -222,6 +223,29 @@ export async function listResearchLinesLocalized(locale: Locale, groupId?: numbe
     .where("research_line_translation.locale", "=", locale);
   if (groupId !== undefined) query = query.where("research_line.groupId", "=", groupId);
   return query.execute();
+}
+
+type TopicRow = Omit<PublicGroupTopic, "asset">;
+
+async function withPhotos(ownerType: "research_line" | "method", rows: TopicRow[]): Promise<PublicGroupTopic[]> {
+  const assets = await resolveAssetAccessUrls({ ownerType, ownerIds: rows.map((row) => row.id), slot: "photo" });
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    asset: assets.get(row.id) ?? null,
+    groupId: row.groupId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  }));
+}
+
+export async function listPublicResearchLines(locale: Locale) {
+  return withPhotos("research_line", await listResearchLinesLocalized(locale));
+}
+
+export async function listPublicMethods(locale: Locale) {
+  return withPhotos("method", await listMethodsLocalized(locale));
 }
 
 export async function getResearchLine(id: number) {

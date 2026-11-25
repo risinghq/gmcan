@@ -25,6 +25,7 @@ import PublicAssetsRoutes from "./routes/public/content/assets.js";
 import PublicEquipmentRoutes from "./routes/public/content/equipment.js";
 import PublicEventsRoutes from "./routes/public/content/events.js";
 import PublicGroupRoutes from "./routes/public/content/group.js";
+import PublicHomeRoutes from "./routes/public/content/home.js";
 import PublicLookupRoutes from "./routes/public/content/lookup.js";
 import PublicMembersRoutes from "./routes/public/content/members.js";
 import PublicMethodsRoutes from "./routes/public/content/methods.js";
@@ -57,6 +58,7 @@ app.use(
 
 publicContentApi.use("*", requireRequestLocale);
 publicContentApi.use("*", publicCache);
+publicContentApi.route("/home", PublicHomeRoutes);
 publicContentApi.route("/publications", PublicPublicationsRoutes);
 publicContentApi.route("/members", PublicMembersRoutes);
 publicContentApi.route("/projects", PublicProjectsRoutes);
