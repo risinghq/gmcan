@@ -21,6 +21,18 @@ jobs:
         with:
           persist-credentials: false
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      # Production applies each migration once by name, so an edit to an applied file never reaches it.
+      - name: Applied migrations are unchanged
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags --depth=1 origin "$BASE"
+          changed=$(git diff --name-only --diff-filter=MDR "$BASE" HEAD -- apps/api/migrations)
+          if [ -n "$changed" ]; then
+            echo "::error::Add a new migration instead of editing an applied one: $changed"
+            exit 1
+          fi
       - run: bun install --frozen-lockfile
       - run: bun run check
 
