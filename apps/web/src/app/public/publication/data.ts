@@ -1,9 +1,8 @@
-import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
-import { requireLocalDate } from "@app/shared/utils/date";
+import { dateLabel } from "@app/shared/utils/date";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
@@ -14,8 +13,6 @@ export class PublicationDataService {
   private readonly publicationService = inject(PublicationService);
   private readonly groupService = inject(GroupService);
   private readonly lookup = inject(LookupService);
-  private readonly datePipe = inject(DatePipe);
-  private readonly titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<PublicationViewModel> {
     const [publicationsRaw, group] = await Promise.all([
@@ -34,7 +31,6 @@ export class PublicationDataService {
     const sorted = publications.toSorted((a, b) => ((b.publishedAt ?? "") > (a.publishedAt ?? "") ? 1 : -1));
 
     const enrich = (pub: PublicPublicationWithAuthors): PublicationDisplay => {
-      const publishedAtDate = requireLocalDate(pub.publishedAt, "publication.publishedAt");
       const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
       const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
       const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
@@ -42,7 +38,7 @@ export class PublicationDataService {
       const evento = eventId ? eventosMap.get(eventId) : undefined;
       return {
         ...pub,
-        fecha: this.titlecasePipe.transform(this.datePipe.transform(publishedAtDate, "MMMM y", "es") ?? "") ?? "",
+        fecha: dateLabel(pub.publishedAt, "MMMM y"),
         tipoPublicacion: tiposMap.get(pub.kindCode)?.name,
         tipoTesis: thesisKindCode ? tiposTesisMap.get(thesisKindCode)?.name : undefined,
         revista: journalId ? revistasMap.get(journalId)?.name : undefined,

@@ -1,3 +1,3 @@
-import type { SearchResults } from "@app/shared/models/search-results";
+import type { GlobalSearchResults } from "@gmcan/contracts/public";
 
-export type GlobalSearchViewModel = SearchResults;
+export type GlobalSearchViewModel = GlobalSearchResults;

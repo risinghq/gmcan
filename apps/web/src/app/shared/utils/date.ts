@@ -1,16 +1,20 @@
-import { formatDate } from "@angular/common";
+import { formatDate, registerLocaleData } from "@angular/common";
+import localeEs from "@angular/common/locales/es";
+
+// Labels are Spanish whatever the app locale, so this module registers the data it formats with.
+registerLocaleData(localeEs);
 
 function isValidDate(value: Date): boolean {
   return !Number.isNaN(value.getTime());
 }
 
-export function parseDate(value: string | null | undefined): Date | undefined {
+function parseDate(value: string | null | undefined): Date | undefined {
   if (!value) return undefined;
   const date = new Date(value);
   return isValidDate(date) ? date : undefined;
 }
 
-export function toLocalDisplayDate(value: Date): Date {
+function toLocalDisplayDate(value: Date): Date {
   const normalized = new Date(value);
   normalized.setMinutes(normalized.getMinutes() + normalized.getTimezoneOffset());
   return normalized;
@@ -21,20 +25,16 @@ export function parseLocalDate(value: string | null | undefined): Date | undefin
   return parsed ? toLocalDisplayDate(parsed) : undefined;
 }
 
-/** A Spanish date label for a stored date, capitalized as the start of a line: "Junio, 2026". Empty for no date. */
-export function dateLabel(value: string | null | undefined, format: string): string {
+/** A stored date in Spanish, in the given format: "junio, 2026". Empty for no date or an invalid one. */
+export function dateText(value: string | null | undefined, format: string): string {
   const date = parseLocalDate(value);
-  if (!date) return "";
-  const label = formatDate(date, format, "es");
-  return label.charAt(0).toUpperCase() + label.slice(1);
+  return date ? formatDate(date, format, "es") : "";
 }
 
-export function requireLocalDate(value: string | null | undefined, field: string): Date {
-  const parsed = parseLocalDate(value);
-  if (!parsed) {
-    throw new Error(`Invalid required date field: ${field}`);
-  }
-  return parsed;
+/** {@link dateText} capitalized as the start of a line: "Junio, 2026". */
+export function dateLabel(value: string | null | undefined, format: string): string {
+  const text = dateText(value, format);
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export function toIsoDate(value: Date): string {

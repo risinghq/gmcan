@@ -1,6 +1,6 @@
-import { DatePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
 import { NewsService } from "@app/shared/services/news.service";
+import { dateText } from "@app/shared/utils/date";
 import { firstValueFrom } from "rxjs";
 
 import type { DetailNewsViewModel } from "./types";
@@ -8,7 +8,6 @@ import type { DetailNewsViewModel } from "./types";
 @Injectable({ providedIn: "root" })
 export class DetailNewsDataService {
   private readonly newsService = inject(NewsService);
-  private readonly datePipe = inject(DatePipe);
 
   async load(id: number): Promise<DetailNewsViewModel> {
     const newsItem = await firstValueFrom(this.newsService.getNews(id));
@@ -17,16 +16,9 @@ export class DetailNewsDataService {
       throw new Error(`News with ID ${id} not found`);
     }
 
-    const publishedAt = new Date(newsItem.publishedAt ?? "");
-    const publishedAtTime = publishedAt.getTime();
-    if (!Number.isNaN(publishedAtTime)) {
-      publishedAt.setMinutes(publishedAt.getMinutes() + publishedAt.getTimezoneOffset());
-    }
-
-    const isPublishedAtValid = !Number.isNaN(publishedAt.getTime());
-    const day = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "dd") ?? "") : "";
-    const month = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "MMMM", "es") ?? "") : "";
-    const year = isPublishedAtValid ? (this.datePipe.transform(publishedAt, "y") ?? "") : "";
+    const day = dateText(newsItem.publishedAt, "dd");
+    const month = dateText(newsItem.publishedAt, "MMMM");
+    const year = dateText(newsItem.publishedAt, "y");
 
     const newsTypeNameLabel = newsItem.newsKindName ?? "";
     const authorNameLabel = newsItem.authorName ?? "";

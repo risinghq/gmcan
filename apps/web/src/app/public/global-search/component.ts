@@ -5,7 +5,6 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
-import type { SearchResults } from "@app/shared/models/search-results";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -21,8 +20,8 @@ import { map } from "rxjs";
 
 import type { GlobalSearchViewModel } from "./types";
 
-type ProjectDisplay = SearchResults["projects"][number] & { fechaI: string; fechaF: string; moneda?: string };
-type PublicationDisplay = SearchResults["publications"][number] & {
+type ProjectDisplay = GlobalSearchViewModel["projects"][number] & { fechaI: string; fechaF: string; moneda?: string };
+type PublicationDisplay = GlobalSearchViewModel["publications"][number] & {
   fecha: string;
   tipoPublicacion?: string;
   tipoTesis?: string;
@@ -32,7 +31,7 @@ type PublicationDisplay = SearchResults["publications"][number] & {
   ciudad: string | null;
   pais: string | null;
 };
-type NewsDisplay = SearchResults["news"][number] & { nombreTipoNoticia?: string; fechaFormateada: string };
+type NewsDisplay = GlobalSearchViewModel["news"][number] & { nombreTipoNoticia?: string; fechaFormateada: string };
 
 const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], projects: [] };
 
@@ -135,7 +134,7 @@ export default class GlobalSearchComponent {
     section?.update((expanded) => !expanded);
   }
 
-  private toProject(project: SearchResults["projects"][number]): ProjectDisplay {
+  private toProject(project: GlobalSearchViewModel["projects"][number]): ProjectDisplay {
     return {
       ...project,
       moneda: this.lookup.currencies().find((currency) => currency.code === project.currencyCode)?.symbol,
@@ -144,7 +143,7 @@ export default class GlobalSearchComponent {
     };
   }
 
-  private toPublication(pub: SearchResults["publications"][number]): PublicationDisplay {
+  private toPublication(pub: GlobalSearchViewModel["publications"][number]): PublicationDisplay {
     const subtype = pub.subtype;
     const journalId = subtype.kindCode === "journal_article" ? subtype.journalArticle.journalId : undefined;
     const thesis = subtype.kindCode === "thesis" ? subtype.thesis : undefined;
@@ -163,7 +162,7 @@ export default class GlobalSearchComponent {
     };
   }
 
-  private toNews(news: SearchResults["news"][number]): NewsDisplay {
+  private toNews(news: GlobalSearchViewModel["news"][number]): NewsDisplay {
     return {
       ...news,
       nombreTipoNoticia: this.lookup.newsKinds().find((kind) => kind.code === news.newsKindCode)?.name,
