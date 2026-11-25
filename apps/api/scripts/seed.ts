@@ -23,11 +23,14 @@ function wrangler(...args: string[]) {
 }
 
 wrangler("d1", "migrations", "apply", "gmcan", "--local", "--persist-to", stateDir);
-await import("./cloudflare-bun.js");
-const { seed } = await import("../db/seed.js");
-await seed();
-
-if (remote) await pushToCloudflare();
+const platform = await import("./cloudflare-bun.js");
+try {
+  const { seed } = await import("../db/seed.js");
+  await seed();
+  if (remote) await pushToCloudflare();
+} finally {
+  await platform.dispose();
+}
 process.exit(0);
 
 function dumpData(): string {

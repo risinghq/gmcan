@@ -1,6 +1,6 @@
-// Preload for Bun processes that import the Worker code (tests, seeding): resolves
-// "cloudflare:workers" to wrangler's local D1 and R2 emulation. State lives in
-// GMCAN_STATE_DIR, or in .wrangler/state when unset.
+// The seed script imports this before the Worker code: it resolves "cloudflare:workers" to
+// wrangler's local D1 and R2 emulation. State lives in GMCAN_STATE_DIR, or in .wrangler/state
+// when unset. Tests use the in-process fakes in test/platform.ts instead.
 import { join } from "node:path";
 
 import { plugin } from "bun";
@@ -57,4 +57,7 @@ plugin({
   },
 });
 
-process.on("exit", () => void proxy.dispose());
+/** Stops the emulator. An exit handler cannot wait for it, so a caller that skips this leaves workerd running. */
+export function dispose(): Promise<void> {
+  return proxy.dispose();
+}

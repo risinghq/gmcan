@@ -4,8 +4,8 @@ import { ErrorEnvelopeSchema } from "@gmcan/contracts/error";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
-import { hashPassword } from "../lib/password.js";
 import { issueResetToken } from "../services/password-reset.service.js";
+import { storedPasswordHash } from "./fixtures.js";
 
 const PASSWORD = "correct horse battery";
 const NEW_PASSWORD = "a brand new password";
@@ -20,7 +20,7 @@ async function insertMember(dni: string, email: string, roleCode: "administrator
     .values({
       dni,
       email,
-      passwordHash: await hashPassword(PASSWORD),
+      passwordHash: await storedPasswordHash(PASSWORD),
       firstName: "Test",
       lastName: "Member",
       maternalName: null,

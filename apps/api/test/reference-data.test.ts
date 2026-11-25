@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, test } from "bun:test";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
-import { hashPassword } from "../lib/password.js";
+import { storedPasswordHash } from "./fixtures.js";
 
 const PASSWORD = "correct horse battery";
 const ADMIN = "refs.admin@example.test";
@@ -17,7 +17,7 @@ async function insertMember(dni: string, email: string, roleCode: "administrator
     .values({
       dni,
       email,
-      passwordHash: await hashPassword(PASSWORD),
+      passwordHash: await storedPasswordHash(PASSWORD),
       firstName: "Test",
       lastName: "Member",
       maternalName: null,

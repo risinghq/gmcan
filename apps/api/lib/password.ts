@@ -1,11 +1,17 @@
 import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 
+export interface ScryptCost {
+  N: number;
+  r: number;
+  p: number;
+}
+
 // OWASP's scrypt parameters for a 16 MiB working set.
-const COST = { N: 2 ** 14, r: 8, p: 5 };
+const COST: ScryptCost = { N: 2 ** 14, r: 8, p: 5 };
 const KEY_LENGTH = 32;
 const PREFIX = "scrypt";
 
-function derive(password: string, salt: Buffer, params: { N: number; r: number; p: number }): Promise<Buffer> {
+function derive(password: string, salt: Buffer, params: ScryptCost): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     scrypt(password, salt, KEY_LENGTH, { ...params, maxmem: 128 * params.N * params.r * 2 }, (error, key) =>
       error ? reject(error) : resolve(key),
@@ -13,11 +19,14 @@ function derive(password: string, salt: Buffer, params: { N: number; r: number; 
   });
 }
 
-/** Returns `scrypt$N$r$p$salt$key`, with the salt and key in base64url. */
-export async function hashPassword(password: string): Promise<string> {
+/**
+ * Returns `scrypt$N$r$p$salt$key`, with the salt and key in base64url. The hash records its own cost,
+ * so verifying never depends on the cost in force when it was made.
+ */
+export async function hashPassword(password: string, cost: ScryptCost = COST): Promise<string> {
   const salt = randomBytes(16);
-  const key = await derive(password, salt, COST);
-  return [PREFIX, COST.N, COST.r, COST.p, salt.toString("base64url"), key.toString("base64url")].join("$");
+  const key = await derive(password, salt, cost);
+  return [PREFIX, cost.N, cost.r, cost.p, salt.toString("base64url"), key.toString("base64url")].join("$");
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {

@@ -7,10 +7,10 @@ import { app } from "../app.js";
 import { db } from "../db/client.js";
 import { AppError } from "../lib/errors/app-error.js";
 import type { Mail, Mailer } from "../lib/mail.js";
-import { hashPassword } from "../lib/password.js";
 import { onError } from "../middleware/error.js";
 import { createEmailRouter } from "../routes/public/operational/email.js";
 import { findMemberByResetToken, issueResetToken, sweepExpiredResets } from "../services/password-reset.service.js";
+import { storedPasswordHash } from "./fixtures.js";
 
 const EMAIL = "ana.torres@example.test";
 const PASSWORD = "correct horse battery";
@@ -24,7 +24,7 @@ async function insertMember(dni: string, email: string) {
     .values({
       dni,
       email,
-      passwordHash: await hashPassword(PASSWORD),
+      passwordHash: await storedPasswordHash(PASSWORD),
       firstName: "Ana",
       lastName: "Torres",
       maternalName: null,
