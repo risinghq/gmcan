@@ -22,7 +22,7 @@
     "test:api": "cd apps/api && bun test --timeout 60000",
     "test:web": "cd apps/web && bunx ng test --watch=false --no-progress",
     "typecheck": "bun run typecheck:api && bun run typecheck:web",
-    "typecheck:api": "cd apps/api && bun run typegen &&bunx tsc -p tsconfig.json --noEmit",
+    "typecheck:api": "cd apps/api && bun run typegen && bunx tsc -p tsconfig.json --noEmit",
     "typecheck:web": "cd apps/web && bunx tsc -p tsconfig.app.json --noEmit"
   },
   "devDependencies": {
