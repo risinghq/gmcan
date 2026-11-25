@@ -2,7 +2,9 @@
   <mat-sidenav #sidenav mode="over" position="end">
     <div class="sidenav-header">
       <div class="close-div">
-        <mat-icon class="close-icon" (click)="sidenav.close()"> close </mat-icon>
+        <button type="button" class="icon-btn tap-target" [attr.aria-label]="language.close" (click)="sidenav.close()">
+          <mat-icon class="close-icon">close</mat-icon>
+        </button>
       </div>
       <div class="link2">
         <a
@@ -82,7 +84,7 @@
       </a>
     </div>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content class="page-column">
     <div class="search-top full-width hide-desktop-nav">
       @if (!inputExpand) {
       <div class="languages">
@@ -118,9 +120,15 @@
           (keyup.enter)="searchGlobal(nombre1.value)"
         />
       </div>
-      <div class="search-top-div center" (click)="expandInput()">
+      <button
+        type="button"
+        class="search-top-div icon-btn"
+        [attr.aria-label]="language.searchMobile"
+        [attr.aria-expanded]="inputExpand"
+        (click)="expandInput()"
+      >
         <mat-icon class="icon-search-top">search</mat-icon>
-      </div>
+      </button>
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
       <a id="logoHeader" class="logo-nav" routerLink="/">
@@ -129,7 +137,14 @@
       <div class="full-width ml-16 hide-mobile-nav">
         <div class="top-bar-div">
           <div role="search" class="input-search-toolbar full-width">
-            <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
+            <button
+              type="button"
+              class="icon-btn"
+              [attr.aria-label]="language.searchMobile"
+              (click)="searchGlobal(nombre.value)"
+            >
+              <mat-icon class="icon-search-toolbar">search</mat-icon>
+            </button>
             <input
               class="input-search-text"
               placeholder="{{ language.search }}"
@@ -252,10 +267,10 @@
           </div>
         </div>
       </div>
-      <div class="right menu-text hide-desktop-nav">Menú</div>
-      <div class="hide-desktop-nav">
-        <mat-icon class="center-vertical carousel-icon" (click)="sidenav.open()" style="color: black"> menu </mat-icon>
-      </div>
+      <button type="button" class="icon-btn tap-target right hide-desktop-nav" (click)="sidenav.open()">
+        <span class="menu-text">{{ language.menu }}</span>
+        <mat-icon class="menu-icon">menu</mat-icon>
+      </button>
     </mat-toolbar>
     <router-outlet />
     <footer class="footer-div text-white">
