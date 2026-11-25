@@ -4,8 +4,19 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthzService } from "@app/shared/services/authz.service";
 import { type DashboardCountItem, DashboardService } from "@app/shared/services/dashboard.service";
 import { GLOBAL } from "@app/shared/services/global";
-import type { ChartDataset, ChartOptions } from "chart.js";
-import { BaseChartDirective } from "ng2-charts";
+import {
+  ArcElement,
+  BarController,
+  BarElement,
+  CategoryScale,
+  type ChartDataset,
+  type ChartOptions,
+  Legend,
+  LinearScale,
+  PieController,
+  Tooltip,
+} from "chart.js";
+import { BaseChartDirective, provideCharts } from "ng2-charts";
 import { EMPTY } from "rxjs";
 
 const PALETTE = [
@@ -31,6 +42,20 @@ function chart(items: DashboardCountItem[], label: string, style: Partial<ChartD
   styleUrl: "./dashboard.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
+  providers: [
+    provideCharts({
+      registerables: [
+        PieController,
+        ArcElement,
+        BarController,
+        BarElement,
+        CategoryScale,
+        LinearScale,
+        Legend,
+        Tooltip,
+      ],
+    }),
+  ],
 })
 export default class DashboardComponent {
   authz = inject(AuthzService);

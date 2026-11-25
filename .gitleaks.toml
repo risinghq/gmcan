@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "generated build output and caches"
+paths = ['''(^|/)\.angular/''', '''(^|/)\.wrangler/''', '''(^|/)\.perf/''', '''(^|/)dist/''', '''(^|/)node_modules/''']

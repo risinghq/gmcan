@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const AppErrorCodeSchema = z.enum([
   "invalid_request",
@@ -29,8 +29,8 @@ export const ErrorEnvelopeSchema = z.object({
     code: AppErrorCodeSchema,
     status: ErrorHttpStatusSchema,
     message: z.string(),
-    details: z.unknown().optional(),
-    traceId: z.string().optional(),
+    details: z.optional(z.unknown()),
+    traceId: z.optional(z.string()),
   }),
 });
 
