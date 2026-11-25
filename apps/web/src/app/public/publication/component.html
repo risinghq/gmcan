@@ -44,7 +44,7 @@
             } @if (allCharged && publicaciones.length > 0) {
             <div>
               @for ( publicacion of publicaciones | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize;
-              track publicacion; let i = $index ) {
+              track publicacion.id; let i = $index ) {
               <div class="publication">
                 <div class="flex-news">
                   @if (publicacion.kindCode != 'thesis') {
@@ -94,8 +94,8 @@
                 </div>
                 }
                 <div class="flex-news publication-mt" style="flex-flow: wrap">
-                  @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered")
-                  {
+                  @for (autor of publicacion.authors; track autor.authorOrder; let last = $last) { @if (autor.kind ===
+                  "registered") {
                   <div class="publication-members">
                     <div class="member-img-round">
                       <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
