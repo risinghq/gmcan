@@ -13,7 +13,7 @@ import type {
 } from "@gmcan/contracts/admin";
 import { type Observable, map, of, switchMap } from "rxjs";
 
-/** The add route has no `:id`; its form starts empty. */
+/** Returns null on the add route, which has no `:id`. */
 export function byId<T>(route: ActivatedRouteSnapshot, load: (id: number) => Observable<T>): Observable<T | null> {
   const id = route.paramMap.get("id");
   return id === null ? of(null) : load(Number(id));
@@ -29,7 +29,6 @@ function onlyGroup(service: GroupService): Observable<AdminGroup> {
   return service.listGroups().pipe(map((groups) => first(groups, "No research group exists")));
 }
 
-/** The site has one research group; new content belongs to it. */
 export const contentGroupIdResolver: ResolveFn<number> = () =>
   onlyGroup(inject(GroupService)).pipe(map((group) => group.id));
 

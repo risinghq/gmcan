@@ -34,9 +34,8 @@ import { RecordSave } from "../content/forms/record-save";
 import { optionalText, requiredText } from "../content/forms/text-fields";
 
 interface KindCopy {
-  /** The noun in the delete button and its dialog. */
   noun: string;
-  /** The admin list, then the member's own list; an unknown `returnTo` goes to the second. */
+  /** The admin list, then the member's own list. An unknown `returnTo` goes to the member's list. */
   lists: [ReturnTarget, ReturnTarget];
 }
 
@@ -75,7 +74,6 @@ function publicationForm() {
 type PublicationForm = ReturnType<typeof publicationForm>;
 type PublicationFormValue = ReturnType<PublicationForm["getRawValue"]>;
 
-/** The subtype fields a kind requires. */
 function requireSubtype(form: PublicationForm, kind: PublicationKindCode): void {
   const { journalId, eventId, universityId, thesisKindCode } = form.controls;
   const required = {
@@ -113,8 +111,8 @@ function findMember(
 }
 
 /**
- * A row becomes a member author when the admin picked the member or typed a member's exact name;
- * any other name is stored as written. The byline starts at order 1.
+ * A row becomes a member author when the admin picked the member or typed a member's exact name.
+ * Any other name is stored as written. The byline starts at order 1.
  */
 function toAuthorWrite(
   row: PublicationFormValue["authors"][number],

@@ -1,12 +1,10 @@
 import { ListTable, byName } from "@app/shared/tables/list-table";
 
-/** One content list row: what the table shows, filters on and links from. */
 export interface ContentRow {
   id: number;
   name: string;
 }
 
-/** One searchable content list and the routes that add to it and edit its rows. */
 export class ContentTable extends ListTable<ContentRow> {
   constructor(
     readonly addRoute: string,

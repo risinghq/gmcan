@@ -20,7 +20,6 @@ export interface UniversityWrite {
   translations: Translations<{ name: string }>;
 }
 
-/** `GET /admin/ref/university/:id`. */
 export interface AdminUniversity extends UniversityWrite {
   id: number;
 }
@@ -53,7 +52,6 @@ export class RefService {
     return this.http.delete<{ status: number }>(ref(`journal/${id}`));
   }
 
-  /** Each university under the name an admin list shows. */
   listUniversities(): Observable<UniversityItem[]> {
     return this.http
       .get<AdminUniversity[]>(ref("university"))

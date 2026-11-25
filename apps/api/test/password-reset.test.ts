@@ -186,7 +186,6 @@ function recordingMailer(options: { fail?: boolean; gate?: Promise<void>; config
   return { mailer, sent };
 }
 
-/** Builds the email routes and captures work queued after the response. */
 function emailApp(mailer: Mailer) {
   const queued: Promise<unknown>[] = [];
   const host = new Hono();

@@ -89,7 +89,6 @@
       </div>
     </div>
     <table mat-table [dataSource]="table.dataSource" [hidden]="table.notFound()" matSort>
-      <!-- ID Column -->
       <ng-container matColumnDef="titulo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
         <td mat-cell *matCellDef="let row" (click)="editProject(row.id)">{{ row.title }}</td>

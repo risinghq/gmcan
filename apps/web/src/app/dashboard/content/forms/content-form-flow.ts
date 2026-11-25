@@ -7,7 +7,6 @@ import { confirmAction } from "@app/shared/forms/confirm-dialog.component";
 
 const CONTENT_LIST = "/dashboard/contenidos";
 
-/** The feedback and navigation every admin content form shares. */
 @Injectable({ providedIn: "root" })
 export class ContentFormFlow {
   private readonly router = inject(Router);
@@ -38,7 +37,6 @@ export class ContentFormFlow {
     }
   }
 
-  /** Reports a failed write; a conflict means related records still point at this one. */
   private failed(error: unknown, fallback: string): void {
     const { code } = toNavigationAppError(error);
     this.notify(code === "conflict" ? "No se puede eliminar: otros registros lo usan" : fallback);

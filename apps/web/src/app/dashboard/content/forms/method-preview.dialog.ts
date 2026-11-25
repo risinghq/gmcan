@@ -3,12 +3,10 @@ import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 
 export interface MethodPreview {
   name: string;
-  /** Editor HTML; Angular's sanitizer cleans it on binding, as on the public page. */
   description: string;
   image: string | null;
 }
 
-/** Shows a method as the public methods page lays it out, before it is saved. */
 @Component({
   selector: "app-method-preview-dialog",
   imports: [MatDialogClose],

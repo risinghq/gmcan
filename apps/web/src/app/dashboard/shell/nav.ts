@@ -12,7 +12,7 @@ export interface NavSection {
   links: NavLink[];
 }
 
-/** The dashboard sidebar. A link without a capability is shown to every signed-in member. */
+/** A link without a capability is shown to every signed-in member. */
 export const DASHBOARD_NAV: NavSection[] = [
   {
     links: [
@@ -66,7 +66,7 @@ export const DASHBOARD_NAV: NavSection[] = [
   },
 ];
 
-/** The sections with the links the member may open; a section left with none is dropped. */
+/** A section left with no link the member may open is dropped. */
 export function visibleNav(nav: NavSection[], can: (capability: Capability) => boolean): NavSection[] {
   return nav
     .map((section) => ({

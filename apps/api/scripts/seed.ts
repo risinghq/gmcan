@@ -13,7 +13,7 @@ const apiDir = resolve(import.meta.dir, "..");
 const remote = process.argv.includes("--remote");
 const stateDir = remote ? mkdtempSync(join(tmpdir(), "gmcan-seed-")) : join(apiDir, ".wrangler/state");
 process.env.GMCAN_STATE_DIR = stateDir;
-// wrangler.jsonc declares production; the seed runs against local emulation and never signs anything.
+// wrangler.jsonc declares production. The seed runs against local emulation and never signs anything.
 process.env.NODE_ENV = "development";
 process.env.ASSET_SIGNING_SECRET ??= "seed-only";
 

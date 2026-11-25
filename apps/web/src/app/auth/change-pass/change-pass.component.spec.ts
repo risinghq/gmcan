@@ -33,7 +33,6 @@ describe("ChangePassComponent", () => {
           provide: ActivatedRoute,
           useValue: { snapshot: { queryParams: query, queryParamMap: convertToParamMap(query) } },
         },
-        // The header logo has its own tests; this page only needs the default group.
         { provide: GroupService, useValue: { getGroup: () => NEVER } },
       ],
     });

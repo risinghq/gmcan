@@ -11,7 +11,6 @@ export const AboutSectionSchema = z.object({
 });
 export type AboutSection = z.infer<typeof AboutSectionSchema>;
 
-/** The services teaser on the home page. */
 export const HomeTeaserSchema = z.object({ paragraphs: z.array(line).min(1) });
 export type HomeTeaser = z.infer<typeof HomeTeaserSchema>;
 
@@ -39,17 +38,16 @@ export const AboutTranslationSchema = z.object({
 });
 export type AboutTranslation = z.infer<typeof AboutTranslationSchema>;
 
-/** `PUT /admin/group/:id` replaces every field and translation of the group. */
+/** A write replaces every field and translation of the group. */
 export interface GroupWrite extends GroupFields {
   translations: Translations<GroupTranslation>;
 }
 
-/** `PUT /admin/group/about/:id` replaces every translation of the about page. */
+/** A write replaces every translation of the about page. */
 export interface AboutWrite {
   translations: Translations<AboutTranslation>;
 }
 
-/** `GET /admin/group` items. */
 export interface AdminGroup extends GroupFields {
   id: number;
   shortName: string;
@@ -58,7 +56,6 @@ export interface AdminGroup extends GroupFields {
   translations: Translations<GroupTranslation>;
 }
 
-/** `GET /admin/group/:id/about` items. */
 export interface AdminAbout {
   id: number;
   groupId: number;

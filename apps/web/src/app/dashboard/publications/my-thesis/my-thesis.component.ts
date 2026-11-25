@@ -29,7 +29,6 @@ import {
   publicationSort,
 } from "../publication-row";
 
-/** The theses the signed-in member authored. */
 @Component({
   selector: "app-my-thesis",
   templateUrl: "./my-thesis.component.html",

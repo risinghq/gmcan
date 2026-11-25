@@ -29,7 +29,6 @@ import {
   publicationSort,
 } from "../publication-row";
 
-/** The journal articles the signed-in member authored. */
 @Component({
   selector: "app-my-article",
   templateUrl: "./my-article.component.html",

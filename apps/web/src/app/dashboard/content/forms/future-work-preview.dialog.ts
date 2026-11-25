@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 
-/** Editor HTML; Angular's sanitizer cleans it on binding, as on the public page. */
 export interface FutureWorkPreview {
   futureWork: string;
 }
 
-/** Shows the future work section as the public page lays it out, before it is saved. */
 @Component({
   selector: "app-future-work-preview-dialog",
   imports: [MatDialogClose],

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** The slots each asset owner accepts. An upload names one owner and one of its slots. */
+/** An upload names one owner and one of its slots. */
 export const ASSET_SLOTS = {
   member: ["photo"],
   news: ["photo"],
@@ -22,7 +22,7 @@ function ownerTarget<T extends AssetOwnerType>(ownerType: T) {
   });
 }
 
-/** The owner and slot of `PUT /admin/assets` (multipart fields) and `DELETE /admin/assets` (JSON). */
+/** An upload sends these as multipart fields. A delete sends them as JSON. */
 export const AssetTargetSchema = z.discriminatedUnion("ownerType", [
   ownerTarget("member"),
   ownerTarget("news"),

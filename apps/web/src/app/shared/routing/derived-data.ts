@@ -3,7 +3,7 @@ import type { ActivatedRouteSnapshot, Data } from "@angular/router";
 /**
  * A value computed from a route's resolved data once navigation has resolved it.
  * Angular runs a route's resolvers concurrently, so one resolver cannot read
- * another's result; a value that depends on resolved data is a Derive instead.
+ * another's result. A value that depends on resolved data is a Derive instead.
  */
 export type Derive<T> = (data: Data, route: ActivatedRouteSnapshot) => T;
 

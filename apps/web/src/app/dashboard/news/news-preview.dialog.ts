@@ -5,7 +5,6 @@ import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 export interface NewsPreview {
   title: string;
   summary: string;
-  /** Editor HTML; Angular's sanitizer cleans it on binding, as on the public page. */
   body: string;
   image: string | null;
   kindName: string | null;
@@ -13,7 +12,6 @@ export interface NewsPreview {
   publishedAt: Date | null;
 }
 
-/** Shows a news item as the public news page lays it out, before it is saved. */
 @Component({
   selector: "app-news-preview-dialog",
   imports: [DatePipe, MatDialogClose],

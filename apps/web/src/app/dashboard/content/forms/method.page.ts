@@ -69,7 +69,6 @@ export default class MethodPage implements OnInit, HasUnsavedChanges {
   readonly image = signal<File | null>(null);
   readonly saving = signal(false);
   private record = new RecordSave(null);
-  /** A blob URL of the picked image, so the preview can show it before upload. */
   private imageUrl: string | null = null;
 
   constructor() {

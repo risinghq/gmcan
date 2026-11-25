@@ -1,5 +1,4 @@
-// The publication list item, shared by the publications page and the home page.
-// The including stylesheet must define .plex-sans: the rules extend it.
+// The including stylesheet must define .plex-sans, because the rules extend it.
 
 @mixin base {
   .publication {

@@ -1,7 +1,5 @@
-// The project list item, shared by the projects page and the home page.
-// The including stylesheet must define .plex-sans: the rules extend it.
+// The including stylesheet must define .plex-sans, because the rules extend it.
 
-// The expandable summary under a project.
 @mixin summary {
   .abstract {
     font-weight: 300;

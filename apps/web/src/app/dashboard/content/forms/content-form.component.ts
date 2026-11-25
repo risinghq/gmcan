@@ -2,10 +2,6 @@ import { ChangeDetectionStrategy, Component, input, output } from "@angular/core
 import { MatIcon } from "@angular/material/icon";
 import { RouterLink } from "@angular/router";
 
-/**
- * The frame of an admin content form: the way back, the required-field note and the actions.
- * An element marked `formAction` is placed before the save button.
- */
 @Component({
   selector: "app-content-form",
   imports: [MatIcon, RouterLink],
@@ -47,7 +43,6 @@ export class ContentFormComponent {
   readonly backTo = input("/dashboard/contenidos");
   readonly note = input("Campos obligatorios");
   readonly saveLabel = input.required<string>();
-  /** Shown only when the record exists. */
   readonly deleteLabel = input<string | null>(null);
   readonly canSave = input.required<boolean>();
   readonly busy = input(false);

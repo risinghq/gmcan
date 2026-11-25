@@ -29,7 +29,6 @@ import {
   publicationSort,
 } from "../publication-row";
 
-/** The conference abstracts the signed-in member authored. */
 @Component({
   selector: "app-my-resumenes",
   templateUrl: "./my-resumenes.component.html",

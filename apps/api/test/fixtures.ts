@@ -1,7 +1,7 @@
 import { hashPassword } from "../lib/password.js";
 
-// Fixture members only need a hash that logs in. The production cost spends ~150ms per hash and per
-// login; verifying reads the cost from the hash, so a cheap one keeps login on the real code path.
+// The production cost spends ~150ms per hash and per login. Verifying reads the cost from the hash,
+// so a cheap fixture hash keeps login on the real code path.
 const FIXTURE_COST = { N: 2 ** 10, r: 8, p: 1 };
 const hashes = new Map<string, Promise<string>>();
 

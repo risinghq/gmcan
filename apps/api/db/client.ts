@@ -11,7 +11,7 @@ const IN_LIST_LIMIT = 90;
 
 /**
  * Runs `query` once per 90 ids, in parallel, and joins the rows. Use it for every `where ... in (ids)`
- * whose list grows with the data. Rows of one id stay together and in query order; the order between
+ * whose list grows with the data. Rows of one id stay together and in query order. The order between
  * chunks is the order of `ids`, so sort the result again when a global order matters.
  */
 export async function queryInChunks<Id, Row>(

@@ -22,7 +22,7 @@ export interface EventWrite {
   translations: Translations<EventTranslation>;
 }
 
-/** `GET /admin/events/:id`. A locale without a city or country omits the key. */
+/** A locale without a city or country omits the key. */
 export interface AdminEvent {
   id: number;
   translations: Translations<{ name: string; city?: string; country?: string }>;

@@ -7,15 +7,15 @@ import { MatTableDataSource } from "@angular/material/table";
 export type SortValues<T> = Record<string, (row: T) => string | number>;
 
 export interface ListTableOptions<T> {
-  /** The text a filter matches; without it the data source matches every field. */
+  /** Without it the data source filters on every field. */
   search?: (row: T) => (string | null | undefined)[];
   /** Columns whose name is not a row field, or whose shown text sorts wrong, such as a date label. */
   sort?: SortValues<T>;
 }
 
 /**
- * One searchable, sortable, paginated table. The data source lives as long as the table, so the
- * sort and paginator the view attaches stay connected when rows arrive.
+ * The data source lives as long as the table, so the sort and paginator the view attaches stay
+ * connected when rows arrive.
  */
 export class ListTable<T> {
   readonly dataSource = new MatTableDataSource<T>([]);
@@ -50,7 +50,6 @@ export class ListTable<T> {
     this.notFound.set(this.dataSource.filteredData.length === 0);
   }
 
-  /** Filters on the text of the input that raised `event`. */
   filterFrom(event: Event): void {
     this.filter((event.target as HTMLInputElement).value);
   }

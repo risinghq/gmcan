@@ -8,7 +8,6 @@ import { optionalText, requiredText } from "../content/forms/text-fields";
 
 export const BIO_MAX = 500;
 
-/** The fields a member edits on their own profile and an administrator edits on any member. */
 export function profileForm() {
   return new FormGroup({
     firstName: requiredText(),
@@ -26,7 +25,7 @@ export function profileForm() {
 export type ProfileForm = ReturnType<typeof profileForm>;
 type ProfileValue = ReturnType<ProfileForm["getRawValue"]>;
 
-/** The API keeps the given names in one field; the form shows the first one apart from the rest. */
+/** The API keeps the given names in one field. The form shows the first one apart from the rest. */
 export function profileValue(member: AdminMember): ProfileValue {
   const [firstName = "", ...rest] = member.firstName.trim().split(/\s+/);
   return {

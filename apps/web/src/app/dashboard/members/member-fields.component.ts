@@ -12,10 +12,7 @@ import { AutosizeModule } from "ngx-autosize";
 
 import { BIO_MAX, type ProfileForm } from "./member-form";
 
-/**
- * The profile fields, the photo and the bio in every locale. Fields only an administrator sets are
- * projected below the profile fields.
- */
+/** Fields only an administrator sets are projected below the profile fields. */
 @Component({
   selector: "app-member-fields",
   imports: [

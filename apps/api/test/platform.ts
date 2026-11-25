@@ -1,5 +1,5 @@
 // The Worker bindings the API uses, built on bun:sqlite and memory, so tests need no Cloudflare runtime.
-// Each fake covers only the calls the code makes; a new binding method needs a line here.
+// Each fake covers only the calls the code makes. A new binding method needs a line here.
 import { Database, type SQLQueryBindings } from "bun:sqlite";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -83,7 +83,6 @@ function objectOf(key: string, stored: Stored) {
   };
 }
 
-/** An R2 binding that keeps objects in memory. */
 export function memoryBucket(): R2Bucket {
   const objects = new Map<string, Stored>();
 

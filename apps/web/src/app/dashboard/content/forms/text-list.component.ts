@@ -3,7 +3,6 @@ import { type FormArray, type FormControl, ReactiveFormsModule } from "@angular/
 
 import { requiredText } from "./text-fields";
 
-/** Edits a list of lines in place: each row can be removed, and a new empty row added at the end. */
 @Component({
   selector: "app-text-list",
   imports: [ReactiveFormsModule],
