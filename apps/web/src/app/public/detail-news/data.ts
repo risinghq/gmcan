@@ -1,5 +1,6 @@
 import { Injectable, inject } from "@angular/core";
 import { NewsService } from "@app/shared/services/news.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { dateText } from "@app/shared/utils/date";
 import { firstValueFrom } from "rxjs";
 
@@ -8,6 +9,7 @@ import type { DetailNewsViewModel } from "./types";
 @Injectable({ providedIn: "root" })
 export class DetailNewsDataService {
   private readonly newsService = inject(NewsService);
+  private readonly session = inject(SessionService);
 
   async load(id: number): Promise<DetailNewsViewModel> {
     const newsItem = await firstValueFrom(this.newsService.getNews(id));
@@ -16,9 +18,8 @@ export class DetailNewsDataService {
       throw new Error(`News with ID ${id} not found`);
     }
 
-    const day = dateText(newsItem.publishedAt, "dd");
-    const month = dateText(newsItem.publishedAt, "MMMM");
-    const year = dateText(newsItem.publishedAt, "y");
+    const language = this.session.language();
+    const writtenOn = dateText(newsItem.publishedAt, language.detailNewsText[0].writtenOnFormat, language.locale);
 
     const newsTypeNameLabel = newsItem.newsKindName ?? "";
     const authorNameLabel = newsItem.authorName ?? "";
@@ -29,9 +30,7 @@ export class DetailNewsDataService {
       newsTypeNameLabel,
       authorNameLabel,
       authorId,
-      day,
-      month,
-      year,
+      writtenOn,
     };
   }
 }

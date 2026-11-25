@@ -141,9 +141,7 @@ export const Languages = [
     ],
     detailNewsText: [
       {
-        written1: "Escrito el",
-        written2: "de",
-        written3: "del",
+        writtenOnFormat: "'Escrito el' d 'de' MMMM 'del' y",
       },
     ],
     linesInvestigationText: [
@@ -337,9 +335,7 @@ export const Languages = [
     ],
     detailNewsText: [
       {
-        written1: "Written",
-        written2: "of",
-        written3: "",
+        writtenOnFormat: "'Written on' MMMM d, y",
       },
     ],
     linesInvestigationText: [

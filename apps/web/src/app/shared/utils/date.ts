@@ -1,7 +1,6 @@
 import { formatDate, registerLocaleData } from "@angular/common";
 import localeEs from "@angular/common/locales/es";
 
-// Labels are Spanish whatever the app locale, so this module registers the data it formats with.
 registerLocaleData(localeEs);
 
 function isValidDate(value: Date): boolean {
@@ -25,15 +24,15 @@ export function parseLocalDate(value: string | null | undefined): Date | undefin
   return parsed ? toLocalDisplayDate(parsed) : undefined;
 }
 
-/** A stored date in Spanish, in the given format: "junio, 2026". Empty for no date or an invalid one. */
-export function dateText(value: string | null | undefined, format: string): string {
+/** Empty for no date or an invalid one. */
+export function dateText(value: string | null | undefined, format: string, locale: string): string {
   const date = parseLocalDate(value);
-  return date ? formatDate(date, format, "es") : "";
+  return date ? formatDate(date, format, locale) : "";
 }
 
 /** {@link dateText} capitalized as the start of a line: "Junio, 2026". */
-export function dateLabel(value: string | null | undefined, format: string): string {
-  const text = dateText(value, format);
+export function dateLabel(value: string | null | undefined, format: string, locale: string): string {
+  const text = dateText(value, format, locale);
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 

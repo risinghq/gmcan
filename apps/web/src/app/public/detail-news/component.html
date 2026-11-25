@@ -32,10 +32,7 @@
             <div class="author-text">
               <div class="news-type">{{ newsTypeNameLabel }}</div>
               <div class="author-name">{{ authorNameLabel }}</div>
-              <div class="news-date">
-                {{ language.detailNewsText[0].written1 }} {{ day }} {{ language.detailNewsText[0].written2 }} {{ month
-                }} {{ language.detailNewsText[0].written3 }} {{ year }}
-              </div>
+              <div class="news-date">{{ writtenOn }}</div>
             </div>
           </div>
           <app-shared-share-buttons [url]="shareUrl" [title]="newsItem.title" />

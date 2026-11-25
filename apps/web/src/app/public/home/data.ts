@@ -12,6 +12,7 @@ import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel, dateText } from "@app/shared/utils/date";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
@@ -28,6 +29,7 @@ export class HomeDataService {
   private readonly methodsService = inject(MethodsService);
   private readonly memberService = inject(MemberService);
   private readonly lookup = inject(LookupService);
+  private readonly session = inject(SessionService);
 
   async load(): Promise<HomeViewModel> {
     const [group, publicacionesRaw, proyectosRaw, newsRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
@@ -131,7 +133,7 @@ export class HomeDataService {
 
       return {
         ...pub,
-        fecha: dateLabel(pub.publishedAt, "MMMM y"),
+        fecha: dateLabel(pub.publishedAt, "MMMM y", this.session.language().locale),
         tipoPublicacion: tiposMap.get(pub.kindCode)?.name,
         tipoTesis: thesisKindCode ? tiposTesisMap.get(thesisKindCode)?.name : undefined,
         revista: journalId ? revistasMap.get(journalId)?.name : undefined,
@@ -151,11 +153,12 @@ export class HomeDataService {
     const fuentesMap = new Map(fundingSources.map((f) => [f.code, f]));
     const monedasMap = new Map(monedas.map((m) => [m.code, m]));
 
+    const locale = this.session.language().locale;
     return proyectos.map((proyecto) => {
       return {
         ...proyecto,
-        fechaI: dateLabel(proyecto.startDate, "MMMM, y"),
-        fechaF: dateLabel(proyecto.endDate, "MMMM, y") || undefined,
+        fechaI: dateLabel(proyecto.startDate, "MMMM, y", locale),
+        fechaF: dateLabel(proyecto.endDate, "MMMM, y", locale) || undefined,
         lineasInvestigacion: lineasMap.get(proyecto.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(proyecto.fundingSourceCode)?.name,
         moneda: monedasMap.get(proyecto.currencyCode)?.symbol,
@@ -168,7 +171,7 @@ export class HomeDataService {
     return newsItems.map((newsItem) => {
       return {
         ...newsItem,
-        publishedAtLabel: dateText(newsItem.publishedAt, "MMMM dd, y"),
+        publishedAtLabel: dateText(newsItem.publishedAt, "MMMM dd, y", this.session.language().locale),
         newsTypeNameLabel: newsItem.newsKindName,
         authorNameLabel: newsItem.authorName,
       };

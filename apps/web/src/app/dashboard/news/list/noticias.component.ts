@@ -107,7 +107,7 @@ export default class NewsListComponent implements OnInit {
     return {
       id: news.id,
       title: news.title,
-      publishedAtLabel: dateLabel(news.publishedAt, "MMMM dd, y"),
+      publishedAtLabel: dateLabel(news.publishedAt, "MMMM dd, y", "es"),
       categoryName: news.categoryName,
       authorName: news.authorName,
       authorPhotoUrl: news.authorPhotoUrl,

@@ -2,6 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel } from "@app/shared/utils/date";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
@@ -13,6 +14,7 @@ export class PublicationDataService {
   private readonly publicationService = inject(PublicationService);
   private readonly groupService = inject(GroupService);
   private readonly lookup = inject(LookupService);
+  private readonly session = inject(SessionService);
 
   async load(): Promise<PublicationViewModel> {
     const [publicationsRaw, group] = await Promise.all([
@@ -28,6 +30,7 @@ export class PublicationDataService {
     const universidadesMap = new Map(this.lookup.universities().map((u) => [u.id, u]));
     const eventosMap = new Map(this.lookup.events().map((e) => [e.id, e]));
 
+    const locale = this.session.language().locale;
     const sorted = publications.toSorted((a, b) => ((b.publishedAt ?? "") > (a.publishedAt ?? "") ? 1 : -1));
 
     const enrich = (pub: PublicPublicationWithAuthors): PublicationDisplay => {
@@ -38,7 +41,7 @@ export class PublicationDataService {
       const evento = eventId ? eventosMap.get(eventId) : undefined;
       return {
         ...pub,
-        fecha: dateLabel(pub.publishedAt, "MMMM y"),
+        fecha: dateLabel(pub.publishedAt, "MMMM y", locale),
         tipoPublicacion: tiposMap.get(pub.kindCode)?.name,
         tipoTesis: thesisKindCode ? tiposTesisMap.get(thesisKindCode)?.name : undefined,
         revista: journalId ? revistasMap.get(journalId)?.name : undefined,
