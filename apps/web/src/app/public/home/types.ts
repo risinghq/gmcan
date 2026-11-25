@@ -1,10 +1,10 @@
 import type { Group } from "@app/shared/models/group";
-import type { Member } from "@app/shared/models/member";
-import type { Method } from "@app/shared/models/method";
-import type { PublicNewsListItem } from "@app/shared/models/news";
-import type { Project } from "@app/shared/models/project";
-import type { ResearchLine } from "@app/shared/models/research-line";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import type {
+  PublicGroupTopic,
+  PublicNewsListItem,
+  PublicProject,
+  PublicPublicationWithAuthors,
+} from "@gmcan/contracts/public";
 
 export type HomePublicacion = PublicPublicationWithAuthors & {
   fecha: string;
@@ -17,20 +17,12 @@ export type HomePublicacion = PublicPublicationWithAuthors & {
   pais?: string | null;
 };
 
-export type HomeProjectMember = {
-  memberId: number;
-  name: string;
-  photoUrl: string;
-  photoAlt: string;
-};
-
-export type HomeProyecto = Project & {
+export type HomeProyecto = PublicProject & {
   fechaI: string;
   fechaF?: string;
   lineasInvestigacion?: string;
   fuenteFinanciamiento?: string;
   moneda?: string;
-  members: HomeProjectMember[];
 };
 
 export type HomeNewsItem = PublicNewsListItem & {
@@ -45,10 +37,9 @@ export type HomeViewModel = {
   proyectos: HomeProyecto[];
   newsItems: HomeNewsItem[];
   featuredNews: HomeNewsItem | null;
-  lineasInvestigacion: ResearchLine[];
-  linesPreview: ResearchLine[];
-  metodos: Method[];
-  miembros: Member[];
+  linesPreview: PublicGroupTopic[];
+  metodos: PublicGroupTopic[];
+  memberCount: number;
   aboutUs: string[];
   articulos: number;
   tesis: number;

@@ -7,8 +7,6 @@ import { MatProgressBar } from "@angular/material/progress-bar";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
-import type { Member } from "@app/shared/models/member";
-import type { Method } from "@app/shared/models/method";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -32,16 +30,15 @@ export default class HomeComponent implements OnInit {
 
   progress = 100;
   info: Group = createGroup();
-  miembros: Member[] = [];
+  memberCount = 0;
   articulos = 0;
   tesis = 0;
   resumenes = 0;
-  lineasInvestigacion: HomeViewModel["lineasInvestigacion"] = [];
   linesPreview: HomeViewModel["linesPreview"] = [];
   newsItems: HomeNewsItem[] = [];
   featuredNews: HomeNewsItem = {} as HomeNewsItem;
   aboutUs: string[] = [];
-  metodos: Method[] = [];
+  metodos: HomeViewModel["metodos"] = [];
   publicaciones: HomePublicacion[] = [];
   proyectos: HomeProyecto[] = [];
 
@@ -54,17 +51,14 @@ export default class HomeComponent implements OnInit {
     this.proyectos = home.proyectos;
     this.newsItems = home.newsItems;
     this.featuredNews = home.featuredNews ?? ({} as HomeNewsItem);
-    this.lineasInvestigacion = home.lineasInvestigacion;
     this.linesPreview = home.linesPreview;
     this.metodos = home.metodos;
-    this.miembros = home.miembros;
+    this.memberCount = home.memberCount;
     this.aboutUs = home.aboutUs;
     this.articulos = home.articulos;
     this.tesis = home.tesis;
     this.resumenes = home.resumenes;
   }
-
-  publicationLink(_value: unknown): void {}
 
   navigate(route: string): void {
     this.router.navigate([route]);
