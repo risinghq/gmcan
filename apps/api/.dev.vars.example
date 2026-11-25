@@ -1,12 +1,11 @@
 # Copy to .dev.vars before running the API locally. These override the vars in wrangler.jsonc.
 NODE_ENV=development
-BACKEND_URL=http://localhost:3000
 FRONTEND_URL=http://localhost:4200
 
 # Generate real values with: openssl rand -hex 32
 ASSET_SIGNING_SECRET=dev-only-signing-secret
 
-# Email is off until RESEND_API_KEY and EMAIL_FROM are set (see docs/deployment.md#email).
+# Email is off until RESEND_API_KEY and EMAIL_FROM are set (see docs/email.md).
 # RESEND_API_KEY=re_...
 # EMAIL_FROM=onboarding@resend.dev
 # INSTITUTIONAL_EMAIL=you@example.com

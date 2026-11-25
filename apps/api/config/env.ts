@@ -6,7 +6,6 @@ const required = (what: string) => z.string(`${what} is required`).min(1, `${wha
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-    BACKEND_URL: z.url().optional(),
     FRONTEND_URL: z.url().optional(),
     ASSET_SIGNING_SECRET: required("ASSET_SIGNING_SECRET"),
     // Email is off until EMAIL_FROM and RESEND_API_KEY are both set.
@@ -17,9 +16,9 @@ const EnvSchema = z
     SUPPORTED_LOCALES: z.string().optional(),
     DEFAULT_LOCALE: z.string().optional(),
   })
-  .refine((env) => env.NODE_ENV !== "production" || env.BACKEND_URL !== undefined, {
-    path: ["BACKEND_URL"],
-    error: "BACKEND_URL is required in production",
+  .refine((env) => env.NODE_ENV !== "production" || env.FRONTEND_URL !== undefined, {
+    path: ["FRONTEND_URL"],
+    error: "FRONTEND_URL is required in production",
   });
 
 export function parseEnv(raw: unknown) {

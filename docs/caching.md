@@ -1,10 +1,14 @@
 # Caching
 
-The web Worker keeps public API reads in the Cache API (`caches.default`) of the
-data center that served the request, so a repeat read skips the hop to the API
-Worker and every query behind it. [`server.ts`](../apps/web/src/server.ts) sends
-every `/api/*` and `/admin/*` request through
-[`api-cache.ts`](../apps/web/src/api-cache.ts).
+The web Worker keeps rendered pages and public API reads in the Cache API
+(`caches.default`) of the data center that served the request.
+[`server.ts`](../apps/web/src/server.ts) sends every `/api/*` and `/admin/*`
+request, and every page request, through
+[`edge-cache.ts`](../apps/web/src/edge-cache.ts).
+
+## API reads
+
+A repeat read skips the hop to the API Worker and every query behind it.
 
 | Aspect            | Rule                                                                                                                                                                         |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -33,7 +37,7 @@ center has its own copy, so two visitors in different cities can see different
 versions during the same minute.
 
 The web Worker also keeps a `refreshing` set of cache keys, in the module scope
-of `api-cache.ts`. It stops a burst of requests for one stale entry from each
+of `edge-cache.ts`. It stops a burst of requests for one stale entry from each
 starting a refresh. It lives in the memory of one isolate, so it is not shared
 with other isolates or other data centers, and it holds no data a visitor sees.
 A key has two states:
@@ -71,9 +75,23 @@ After an admin write, a public page can show the old content from the edge until
 the first request after 60 seconds has refreshed the copy, and up to another 60
 seconds if the visitor's browser holds its own copy of the response
 (`max-age=60`). The browser that made the edit is no exception: its next read
-goes through the same browser and edge copies. Server-side rendering reaches the
-API through the service binding directly, so rendered HTML never comes from this
-cache.
+goes through the same browser and edge copies.
+
+A rendered page has its own entry, refreshed on the same schedule. Server-side
+rendering reaches the API through the service binding directly, not through the
+API cache, so a page and the API read behind it refresh independently.
+
+## Pages
+
+| Aspect         | Rule                                                                                                                                                                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What is cached | `GET` pages that answer `200` with `text/html` and set no cookie. For the dashboard, `/login` and `/reset-password`, which render in the browser ([`app.routes.server.ts`](../apps/web/src/app/app.routes.server.ts)), that is the empty shell. |
+| Key            | The page URL plus the deployed version (`CF_VERSION_METADATA`), so a deploy starts with an empty page cache.                                                                                                                                    |
+| Expiry         | Fresh for 60 seconds, then stale for an hour, with the same `HIT`, `STALE` and `MISS` states as API reads.                                                                                                                                      |
+| Browser        | Pages answer `Cache-Control: no-cache`, so a browser revalidates every visit and the edge copy keeps it fast.                                                                                                                                   |
+
+The language of a page is part of its URL (`/en/...`), so the key needs no
+`Accept-Language`.
 
 ## Build files
 

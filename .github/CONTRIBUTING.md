@@ -2,11 +2,7 @@
 
 ## Set up
 
-Follow [Run it](../README.md#run-it) in the README. Install the toolchain with
-`mise install`; you also need an `apps/api/.dev.vars` and a migrated, seeded
-local database. The Angular CLI and the API under `wrangler dev` both run from
-the repository root with `bun --filter './apps/*' start`.
-`bun --filter web start` and `bun --filter api start` start one of them.
+Follow [development](../docs/development.md).
 
 ## Check your change
 

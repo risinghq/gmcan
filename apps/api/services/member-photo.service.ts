@@ -2,8 +2,6 @@ import { getBackendUrl } from "../config.js";
 import type { Locale } from "../lib/public-locale.js";
 import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "./assets/service.js";
 
-const MEMBER_PHOTO_FALLBACK_URL = `${getBackendUrl()}/api/placeholders/member-photo`;
-
 export type MemberPhotoView = {
   photoUrl: string;
   photoAlt: string;
@@ -17,7 +15,7 @@ export function memberPhotoPlaceholderView(input: { fullName: string; locale: Lo
   const label = input.locale === "es" ? "Foto de perfil" : "Profile photo";
   const connector = input.locale === "es" ? "de" : "of";
   return {
-    photoUrl: MEMBER_PHOTO_FALLBACK_URL,
+    photoUrl: `${getBackendUrl()}/api/placeholders/member-photo`,
     photoAlt: input.fullName ? `${label} ${connector} ${input.fullName}` : label,
   };
 }

@@ -19,7 +19,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "preview": "ng build && wrangler dev --port 4200",
+    "preview": "ng build && wrangler dev -c wrangler.jsonc -c ../api/wrangler.jsonc --port 4200 --persist-to ../api/.wrangler/state",
     "deploy": "ng build && wrangler deploy"
   },
   "dependencies": {

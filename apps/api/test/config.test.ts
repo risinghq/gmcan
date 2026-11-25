@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { resolveBackendUrl, resolveFrontendUrl } from "../config.js";
+import { getBackendUrl, resolveFrontendUrl, withRequestOrigin } from "../config.js";
 import { parseEnv } from "../config/env.js";
 
 const validEnv = { ASSET_SIGNING_SECRET: "secret" };
@@ -27,23 +27,22 @@ describe("environment", () => {
     expect(() => parseEnv(raw)).toThrow(key);
   });
 
-  test("production requires BACKEND_URL", () => {
-    expect(() => parseEnv({ ...validEnv, NODE_ENV: "production" })).toThrow("BACKEND_URL");
-    expect(parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test" }).BACKEND_URL).toBe(
-      "https://api.example.test",
-    );
+  test("production requires the site URL", () => {
+    expect(() => parseEnv({ ...validEnv, NODE_ENV: "production" })).toThrow("FRONTEND_URL");
+    const site = { FRONTEND_URL: "https://site.example.test" };
+    expect(parseEnv({ ...validEnv, NODE_ENV: "production", ...site })).toMatchObject(site);
   });
 });
 
 describe("public URLs", () => {
-  test("the backend URL drops trailing slashes", () => {
-    const env = parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test/" });
-    expect(resolveBackendUrl(env)).toBe("https://api.example.test");
+  test("the backend URL is the request's origin, and the local API outside a request", async () => {
+    expect(await withRequestOrigin("http://localhost:4200/api/news", async () => getBackendUrl())).toBe(
+      "http://localhost:4200",
+    );
+    expect(getBackendUrl()).toBe("http://localhost:3000");
   });
 
-  test("the frontend URL is configurable and defaults per environment", () => {
-    const production = parseEnv({ ...validEnv, NODE_ENV: "production", BACKEND_URL: "https://api.example.test" });
-    expect(resolveFrontendUrl(production)).toBe("https://gmcan.unmsm.edu.pe");
+  test("the frontend URL is configurable and defaults to the local web app", () => {
     const configured = parseEnv({ ...validEnv, FRONTEND_URL: "https://web.example.test" });
     expect(resolveFrontendUrl(configured)).toBe("https://web.example.test");
     expect(resolveFrontendUrl(parseEnv(validEnv))).toBe("http://localhost:4200");

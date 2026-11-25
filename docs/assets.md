@@ -64,11 +64,12 @@ A soft-deleted asset is no longer served: its URL answers `404`. The API answers
 
 ## Serving files
 
-Responses carry file URLs built from `BACKEND_URL`
-([configuration](configuration.md)). A slot's file is returned as a URL string,
-or `null` when the slot is empty or soft-deleted. Publication files are returned
-as `{ "inline": ..., "download": ... }` instead. A member with no photo gets
-`/api/placeholders/member-photo`.
+Responses carry absolute file URLs on the origin the request reached: the site
+in production and under `bun run preview`, the API on port 3000 under
+`bun run dev` ([`config.ts`](../apps/api/config.ts)). A slot's file is returned
+as a URL string, or `null` when the slot is empty or soft-deleted. Publication
+files are returned as `{ "inline": ..., "download": ... }` instead. A member
+with no photo gets `/api/placeholders/member-photo`.
 
 | Endpoint                       | Response                                                            |
 | ------------------------------ | ------------------------------------------------------------------- |
