@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
@@ -59,11 +59,33 @@ beforeAll(async () => {
   researcher = await signIn(RESEARCHER);
 });
 
-beforeEach(async () => {
+/** An article that cites the journal, which holds a restrict reference to it. */
+async function citeJournal(journalId: number) {
+  const { id } = await db
+    .insertInto("publication")
+    .values({
+      kindCode: "journal_article",
+      publishedAt: "2026-01-01",
+      createdAt: "2026-01-01",
+      updatedAt: "2026-01-01",
+    })
+    .returning("id")
+    .executeTakeFirstOrThrow();
+  await db.insertInto("journal_article").values({ publicationId: id, journalId, issue: null }).execute();
+  cited.push(id);
+}
+
+const cited: number[] = [];
+
+async function clearReferenceData() {
+  if (cited.length) await db.deleteFrom("publication").where("id", "in", cited.splice(0)).execute();
   await db.deleteFrom("event").execute();
   await db.deleteFrom("university").execute();
   await db.deleteFrom("journal").execute();
-});
+}
+
+beforeEach(clearReferenceData);
+afterAll(clearReferenceData);
 
 describe("events", () => {
   const translations = {
@@ -152,11 +174,6 @@ describe("reference data", () => {
     expect(await (await send("GET", "/admin/ref/journal", undefined, admin)).json()).toEqual([
       expect.objectContaining({ id, name: "Revista" }),
     ]);
-    expect(await (await send("GET", `/admin/ref/journal/${id}/dependencies`, undefined, admin)).json()).toEqual({
-      total: 0,
-      byKind: { journalArticle: 0, conferencePaper: 0, thesis: 0 },
-      canDelete: true,
-    });
     expect((await send("DELETE", `/admin/ref/journal/${id}`, undefined, admin)).status).toBe(200);
     expect((await send("GET", `/admin/ref/journal/${id}`, undefined, admin)).status).toBe(404);
   });
@@ -180,6 +197,17 @@ describe("reference data", () => {
 
     expect((await send("DELETE", `/admin/ref/university/${id}`, undefined, admin)).status).toBe(200);
     expect((await send("GET", `/admin/ref/university/${id}`, undefined, admin)).status).toBe(404);
+  });
+
+  test("a journal an article cites cannot be deleted", async () => {
+    const { id } = (await (await send("POST", "/admin/ref/journal", { name: "Revista" }, admin)).json()) as {
+      id: number;
+    };
+    await citeJournal(id);
+
+    const res = await send("DELETE", `/admin/ref/journal/${id}`, undefined, admin);
+    expect(res.status).toBe(409);
+    expect((await send("GET", `/admin/ref/journal/${id}`, undefined, admin)).status).toBe(200);
   });
 
   test("a researcher cannot read or write reference data", async () => {

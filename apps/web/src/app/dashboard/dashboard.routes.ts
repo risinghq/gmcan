@@ -13,8 +13,8 @@ import {
   adminMembersResolver,
   adminResearchLinesResolver,
   authorCandidatesResolver,
-  journalDependenciesResolver,
-  journalResolver,
+  eventItemResolver,
+  journalItemResolver,
   memberEditTitle,
   memberResolver,
   newsItemResolver,
@@ -23,6 +23,7 @@ import {
   projectItemResolver,
   publicationEditTitle,
   publicationItemResolver,
+  universityItemResolver,
 } from "@app/dashboard/dashboard.resolvers";
 import { adminCanActivateChildGuard, adminCanMatchGuard } from "@app/shared/guards/admin-auth.guard";
 import { canDeactivateGuard } from "@app/shared/guards/deactivate.guard";
@@ -206,14 +207,15 @@ export default [
       },
       {
         path: "add-revista",
-        loadComponent: () => import("./publications/add-revista/add-revista.component"),
+        loadComponent: () => import("./publications/journal.page"),
+        resolve: { item: journalItemResolver },
         title: "Artículos - Agregar revista",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-revista/:id",
-        loadComponent: () => import("./publications/edit-revista/edit-revista.component"),
-        resolve: { journal: journalResolver, dependencies: journalDependenciesResolver },
+        loadComponent: () => import("./publications/journal.page"),
+        resolve: { item: journalItemResolver },
         title: "Artículos - Editar revista",
         canDeactivate: [canDeactivateGuard],
       },
@@ -235,13 +237,15 @@ export default [
       },
       {
         path: "add-universidad",
-        loadComponent: () => import("./publications/add-universidad/add-universidad.component"),
+        loadComponent: () => import("./publications/university.page"),
+        resolve: { item: universityItemResolver },
         title: "Tesis - Agregar universidad",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-universidad/:id",
-        loadComponent: () => import("./publications/edit-universidad/edit-universidad.component"),
+        loadComponent: () => import("./publications/university.page"),
+        resolve: { item: universityItemResolver },
         title: "Tesis - Editar universidad",
         canDeactivate: [canDeactivateGuard],
       },
@@ -275,13 +279,15 @@ export default [
       },
       {
         path: "add-evento",
-        loadComponent: () => import("./events/add/add-evento.component"),
+        loadComponent: () => import("./events/event.page"),
+        resolve: { item: eventItemResolver },
         title: "Resúmenes - Agregar evento",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-evento/:id",
-        loadComponent: () => import("./events/edit/edit-evento.component"),
+        loadComponent: () => import("./events/event.page"),
+        resolve: { item: eventItemResolver },
         title: "Resúmenes - Editar evento",
         canDeactivate: [canDeactivateGuard],
       },

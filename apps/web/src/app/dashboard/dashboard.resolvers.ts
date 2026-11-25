@@ -4,20 +4,14 @@ import { primaryName } from "@app/shared/forms/locale-form";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import type { MemberFull } from "@app/shared/models/member";
 import type { Derive } from "@app/shared/routing/derived-data";
-import { EventService, type EventItem } from "@app/shared/services/event.service";
+import { type AdminEvent, EventService, type EventItem } from "@app/shared/services/event.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
-import { RefService, type JournalItem } from "@app/shared/services/ref.service";
+import { type AdminUniversity, type JournalItem, RefService } from "@app/shared/services/ref.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
-import type {
-  AdminNews,
-  AdminProject,
-  AdminPublication,
-  AuthorCandidate,
-  RefDependenciesResponse,
-} from "@gmcan/contracts/admin";
+import type { AdminNews, AdminProject, AdminPublication, AuthorCandidate } from "@gmcan/contracts/admin";
 import { map } from "rxjs";
 
 import { byId } from "./content/forms/content.resolvers";
@@ -49,14 +43,19 @@ export const adminResearchLinesResolver: ResolveFn<ResearchLineOption[]> = () =>
     .listAdmin()
     .pipe(map((lines) => lines.map(({ id, translations }) => ({ id, name: primaryName(translations) }))));
 
-export const journalResolver: ResolveFn<JournalItem> = (route) => {
-  const id = Number(route.paramMap.get("id") ?? 0);
-  return inject(RefService).getJournal(id);
+export const journalItemResolver: ResolveFn<JournalItem | null> = (route) => {
+  const refs = inject(RefService);
+  return byId(route, (id) => refs.getJournal(id));
 };
 
-export const journalDependenciesResolver: ResolveFn<RefDependenciesResponse> = (route) => {
-  const id = Number(route.paramMap.get("id") ?? 0);
-  return inject(RefService).getJournalDependencies(id);
+export const universityItemResolver: ResolveFn<AdminUniversity | null> = (route) => {
+  const refs = inject(RefService);
+  return byId(route, (id) => refs.getUniversity(id));
+};
+
+export const eventItemResolver: ResolveFn<AdminEvent | null> = (route) => {
+  const events = inject(EventService);
+  return byId(route, (id) => events.get(id));
 };
 
 export const projectItemResolver: ResolveFn<AdminProject | null> = (route) => {

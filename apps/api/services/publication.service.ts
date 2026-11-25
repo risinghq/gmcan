@@ -549,30 +549,3 @@ export async function deletePublication(id: number) {
     db.deleteFrom("publication").where("id", "=", id),
   ]);
 }
-
-export async function getJournalPublicationDependencyCount(journalId: number) {
-  const row = await db
-    .selectFrom("journal_article")
-    .select((eb) => eb.fn.count<number>("publicationId").as("count"))
-    .where("journalId", "=", journalId)
-    .executeTakeFirstOrThrow();
-  return Number(row.count ?? 0);
-}
-
-export async function getUniversityPublicationDependencyCount(universityId: number) {
-  const row = await db
-    .selectFrom("thesis")
-    .select((eb) => eb.fn.count<number>("publicationId").as("count"))
-    .where("universityId", "=", universityId)
-    .executeTakeFirstOrThrow();
-  return Number(row.count ?? 0);
-}
-
-export async function getEventPublicationDependencyCount(eventId: number) {
-  const row = await db
-    .selectFrom("conference_paper")
-    .select((eb) => eb.fn.count<number>("publicationId").as("count"))
-    .where("eventId", "=", eventId)
-    .executeTakeFirstOrThrow();
-  return Number(row.count ?? 0);
-}

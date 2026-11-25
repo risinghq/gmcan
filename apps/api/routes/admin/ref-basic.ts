@@ -5,10 +5,6 @@ import { okStatus } from "../../lib/contracts.js";
 import { notFound } from "../../lib/errors/app-error.js";
 import { validate } from "../../lib/validate.js";
 import {
-  getEventPublicationDependencyCount,
-  getJournalPublicationDependencyCount,
-} from "../../services/publication.service.js";
-import {
   createJournal,
   deleteJournal,
   getJournal,
@@ -47,26 +43,6 @@ router.put("/journal/:id", validate("param", IdParam), validate("json", JournalB
 router.delete("/journal/:id", validate("param", IdParam), async (c) => {
   await deleteJournal(c.req.valid("param").id);
   return c.json(okStatus());
-});
-
-router.get("/journal/:id/dependencies", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const journalArticle = await getJournalPublicationDependencyCount(id);
-  return c.json({
-    total: journalArticle,
-    byKind: { journalArticle, conferencePaper: 0, thesis: 0 },
-    canDelete: journalArticle === 0,
-  });
-});
-
-router.get("/event/:id/dependencies", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const conferencePaper = await getEventPublicationDependencyCount(id);
-  return c.json({
-    total: conferencePaper,
-    byKind: { journalArticle: 0, conferencePaper, thesis: 0 },
-    canDelete: conferencePaper === 0,
-  });
 });
 
 export default router;

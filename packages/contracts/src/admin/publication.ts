@@ -122,17 +122,6 @@ export const AdminPublicationListQuerySchema = z.object({
   q: z.string().trim().min(1).optional(),
 });
 
-export const RefDependenciesResponseSchema = z.object({
-  total: z.number().int().nonnegative(),
-  byKind: z.object({
-    journalArticle: z.number().int().nonnegative(),
-    conferencePaper: z.number().int().nonnegative(),
-    thesis: z.number().int().nonnegative(),
-  }),
-  canDelete: z.boolean(),
-});
-
 export type AdminPublicationSubtype = z.infer<typeof AdminPublicationSubtypeSchema>;
 export type AdminPublicationListItem = z.infer<typeof AdminPublicationListItemSchema>;
 export type AdminPublicationListQuery = z.infer<typeof AdminPublicationListQuerySchema>;
-export type RefDependenciesResponse = z.infer<typeof RefDependenciesResponseSchema>;
