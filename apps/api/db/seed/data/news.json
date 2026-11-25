@@ -1,0 +1,122 @@
+[
+  {
+    "id": 55,
+    "statusCode": "published",
+    "publishedAt": "2020-12-29",
+    "authorEmail": "jrojast@unmsm.edu.pe",
+    "newsKindCode": "research",
+    "translations": {
+      "es": {
+        "title": "¿Cómo puede ayudar el grafeno en la lucha contra el Coronavirus?",
+        "summary": "A medida que los investigadores y las empresas de todo el mundo se dispusieron a luchar contra la pandemia del coronavirus, muchos están revisando el grafeno como un material con potencial para ayudar a ganar esta lucha. Las razones de tal potencial podrían encontrarse en las conocidas propiedades antibacterianas / antivirales del grafeno, sus rasgos beneficiosos para sensores y dispositivos médicos y más.",
+        "body": ""
+      },
+      "en": {
+        "title": "How can graphene assist in the war on Coronavirus?",
+        "summary": "As researchers and companies all over the world set out to battle the Coronavirus pandemic, many are revisiting graphene as a material with potential for helping to win this fight. The reasons for such potential could be found in graphene's known antibacterial/antiviral properties, its beneficial traits for medical sensors and devices and more.",
+        "body": ""
+      }
+    },
+    "photo": "news/news-55.jpg"
+  },
+  {
+    "id": 56,
+    "statusCode": "published",
+    "publishedAt": "2022-11-10",
+    "authorEmail": "jrojast@unmsm.edu.pe",
+    "newsKindCode": "research",
+    "translations": {
+      "es": {
+        "title": "Introducción al método de dinámica molecular DL_POLY",
+        "summary": "Darío Escriba, miembro activo del GMCAN, dará una charla acerca del programa de dinámica molecular DL_POLY. La charla, dirigida a los estudiantes y profesores, tendrá lugar el viernes 11 de noviembre a 19:00 en modo virtual.",
+        "body": "<p>Dario Escriba, estudiante de la Facultad de Ciencias Fisicas de la UNMSM</p>"
+      },
+      "en": {
+        "title": "Introduction to molecular dynamics program DL_POLY",
+        "summary": "Dario Escriba, active member of GMCAN, will give a talk about the molecular dynamics program DL_POLY. The talk, aimed at students and teachers, will take place on Friday, November 11 at 7:00 p.m. in virtual mode.",
+        "body": "<p>Dario Escriba, student of the Faculty of Physical Sciences of the UNMSM</p>"
+      }
+    },
+    "photo": "news/news-56.jpg"
+  },
+  {
+    "id": 57,
+    "statusCode": "published",
+    "publishedAt": "2022-10-17",
+    "authorEmail": "jrojast@unmsm.edu.pe",
+    "newsKindCode": "general",
+    "translations": {
+      "es": {
+        "title": "Primera Escuela de Computación Cuantica",
+        "summary": "Desde el 17 al 21 de octubre se lleva acabo en modo virtual la Primera Escuela de Computación Cuántica con GMCAN como uno de los organizadores de este importante evento. La escuela esta dirigida a Estudiantes universitarios, profesionales, profesores e investigadores y con interés en desarrollar habilidades profesionales en esta tecnología emergente.\nMayor información sobre el evento ver en el siguiente enlace: https://pythonclubforphysicists.notion.site/pythonclubforphysicists/Primera-Escuela",
+        "body": ""
+      },
+      "en": {
+        "title": "First school of quantum computing",
+        "summary": "From October 17 to 21, the First School of Quantum Computing will take place in virtual mode with GMCAN as one of the organizers of this important event. The school is aimed at university students, professionals, professors and researchers with an interest in developing professional skills in this emerging technology.\nMore information about the event see the following link https://pythonclubforphysicists.notion.site/pythonclubforphysicists/Primera-Escuela",
+        "body": ""
+      }
+    },
+    "photo": null
+  },
+  {
+    "id": 58,
+    "statusCode": "published",
+    "publishedAt": "2022-10-24",
+    "authorEmail": "jrojast@unmsm.edu.pe",
+    "newsKindCode": "event",
+    "translations": {
+      "es": {
+        "title": "Encuentro Científico Internacional de verano 2023",
+        "summary": "Entre los días 2 - 4 de enero de 2023 se realiza el Encuentro Científico Internacional 2023 (ECI2023) en modalidad presencial. La fecha limite para enviar los resúmenes es el 15 de noviembre de 2022.",
+        "body": "<p>Mayor información en el siguiente enlace: <a href=\"https://eciperu.net/2022/08/27/summer-international-scientific-meeting-2023-eci-2023v-january-2-4-2023/\">https://eciperu.net/2022/08/27/summer-international-scientific-meeting-2023-eci-2023v-january-2-4-2023/</a></p>"
+      },
+      "en": {
+        "title": "Summer International Scientific Meeting 2023",
+        "summary": "On January 2 - 4, 2023, the International Scientific Meeting 2023 (ECI2023) is held. The deadline to submit abstracts is November 15, 2022.",
+        "body": "<p>More information at: <a href=\"https://eciperu.net/2022/08/27/summer-international-scientific-meeting-2023-eci-2023v-january-2-4-2023/\">https://eciperu.net/2022/08/27/summer-international-scientific-meeting-2023-eci-2023v-january-2-4-2023/</a></p>"
+      }
+    },
+    "photo": null
+  },
+  {
+    "id": 59,
+    "statusCode": "published",
+    "publishedAt": "2024-06-03",
+    "authorEmail": "rguzmana@unmsm.edu.pe",
+    "newsKindCode": "research",
+    "translations": {
+      "es": {
+        "title": "Introducción a los métodos de modelado computacional en Ciencia de los Materiales.",
+        "summary": "En este curso se busca introducir a los estudiantes en los métodos computacionales de primeros principios basados en el teorema de la funcional densidad (DFT) y técnicas de simulación que se aplican actualmente para el modelado de diversos tipos de materiales, con especial énfasis en nanomateriales, dispositivos semiconductores, superficies y propiedades estructurales, electrónicas, magnéticas, termodinámicas, vibracionales e hiperfinas de los mismos.",
+        "body": "<p>Link de inscripcion: ( Organizers UNLP - Universidad Nacional de la Plara - Argentina.</p>\n\n<p>Professors: Dr. Leonardo Errico (responsable), Dr. Eitel Peltzer y Blancá, Dr. Arles Gil Rebaza, Dr. Ricardo<br />\nFaccio (Profesor Visitante), Dra. Susana Ramos (Profesor Visitante), Dra. Valeria Ferrari (Profesor<br />\nVisitante).</p>\n\n<p> </p>\n\n<p>Link of inscription:</p>\n\n<p><a href=\"https://forms.gle/PBhQcqfseQ6AsgRB7\">https://forms.gle/PBhQcqfseQ6AsgRB7</a></p>\n\n<p> </p>\n\n<p>This course seeks to introduce students to first-principles computational methods based on the density functional theorem (DFT) and simulation techniques that are currently applied for modeling various types of materials, with special emphasis on nanomaterials. semiconductor devices, surfaces and structural, electronic, magnetic, thermodynamic, vibrational and hyperfine properties thereof. The fundamental aspects of DFT, applied mainly to characterize the behavior and properties of solids, will be developed. It is expected to provide the necessary knowledge that allows students to know the potential and limitations of the methodology and to be able to carry out theoretical and experimental studies in systems of interest.</p>\n\n<div jscontroller=\"msAMEf\" jsname=\"yiB9Md\">"
+      },
+      "en": {
+        "title": "Introduction to numerical methods in Materials Science.",
+        "summary": "This course seeks to introduce students to first-principles computational methods based on the density functional theorem (DFT) and simulation techniques that are currently applied for modeling various types of materials, with special emphasis on nanomaterials. semiconductor devices, surfaces and structural, electronic, magnetic, thermodynamic, vibrational and hyperfine properties thereof.",
+        "body": "<p>Link de inscripcion: ( Organizers UNLP - Universidad Nacional de la Plara - Argentina.</p>\n\n<p>Professors: Dr. Leonardo Errico (responsable), Dr. Eitel Peltzer y Blancá, Dr. Arles Gil Rebaza, Dr. Ricardo<br />\nFaccio (Profesor Visitante), Dra. Susana Ramos (Profesor Visitante), Dra. Valeria Ferrari (Profesor<br />\nVisitante).</p>\n\n<p> </p>\n\n<p>Link of inscription:</p>\n\n<p><a href=\"https://forms.gle/PBhQcqfseQ6AsgRB7\">https://forms.gle/PBhQcqfseQ6AsgRB7</a></p>\n\n<p> </p>\n\n<p>This course seeks to introduce students to first-principles computational methods based on the density functional theorem (DFT) and simulation techniques that are currently applied for modeling various types of materials, with special emphasis on nanomaterials. semiconductor devices, surfaces and structural, electronic, magnetic, thermodynamic, vibrational and hyperfine properties thereof. The fundamental aspects of DFT, applied mainly to characterize the behavior and properties of solids, will be developed. It is expected to provide the necessary knowledge that allows students to know the potential and limitations of the methodology and to be able to carry out theoretical and experimental studies in systems of interest.</p>\n\n<div jscontroller=\"msAMEf\" jsname=\"yiB9Md\">"
+      }
+    },
+    "photo": null
+  },
+  {
+    "id": 60,
+    "statusCode": "published",
+    "publishedAt": "2024-06-11",
+    "authorEmail": "crojasa@unmsm.edu.pe",
+    "newsKindCode": "event",
+    "translations": {
+      "es": {
+        "title": "Integración de Dinámica Molecular y Machine Learning con Microscopia Electrónica",
+        "summary": "Mejorando la Integración de Dinámica Molecular, Simulación Multiescala y Aprendizaje Automático con Microscopia Electrónica",
+        "body": ""
+      },
+      "en": {
+        "title": "Integration of Molecular Dynamics and Machine Learning with Electron Microscopy",
+        "summary": "Improving the integration of molecular dynamics, multiscale simulation and machine learning with electron microscopy",
+        "body": ""
+      }
+    },
+    "photo": null
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 28,
+    "code": "B20130811",
+    "fundedAmountMinor": 6200000,
+    "statusCode": "active",
+    "startDate": "2020-06-01",
+    "endDate": null,
+    "researchLineId": 2,
+    "currencyCode": "pen",
+    "fundingSourceCode": "vrip",
+    "memberEmails": [
+      "crojasa@unmsm.edu.pe",
+      "jrojast@unmsm.edu.pe",
+      "melquicedec.martinez@unmsm.edu.pe",
+      "gcubas@unmsm.edu.pe"
+    ],
+    "translations": {
+      "es": {
+        "title": "Influencia de la concentración de carbono sobre las propiedades mecánicas y térmicas en el sistema híbrido y hexagonal de Boro-Nitrógeno-Carbono (h-BNC)",
+        "description": "Los materiales bi-dimensionales (2D) híbridos y hexagonales, compuestos por boro-nitrógeno-carbono (h-BNC), están siendo explorados en estos últimos años debido a que poseen propiedades interesantes y complementarias a las del grafeno (G) y nitruro de boro hexagonal (h-BN). Recientemente, este nuevo material 2D h-BNC fue sintetizado con éxito, donde se descubrió que el h-BCN posee una red hexagonal con una relación atómica de B/C/N = 1: 1: 1. En este escenario, algunos estudios previos sobre las propiedades mecánicas y térmicas del h-BNC son escasos y esto posibilita a realizar estudios de exploración en estos materiales de boro-nitrógeno-carbono con una estructura grafítica.\nEn el presente proyecto se propone investigar la influencia de la concentración de carbono sobre las propiedades mecánicas y térmicas en estos materiales 2D de h-BNC. Para lo cual, se empleará simulaciones numéricas mediante el método de dinámica molecular, para comprender la estabilidad mecánica y estructural en función de la concentración del carbono, el efecto de la razón de deformación, la conductividad térmica en función de la temperatura y concentración de carbono, entre otros.\nPor otra parte, para desarrollar dicho proyecto eficientemente, el Grupo de Métodos Computacionales Aplicados a Nanomateriales (GMCAN) cuenta con experiencia, infraestructura y equipamiento"
+      },
+      "en": {
+        "title": "Influence of carbon concentration on mechanical and thermal properties in the hybrid and hexagonal system of Boron-Nitrogen-Carbon (h-BNC)",
+        "description": "Two-dimensional (2D) hybrid and hexagonal materials, composed of boron-nitrogen-carbon (h-BNC), have been explored in recent years because they have interesting and complementary properties to those of graphene (G) and carbon nitride. hexagonal boron (h-BN). Recently, this new 2D h-BNC material was successfully synthesized, where h-BCN was found to possess a hexagonal lattice with an atomic ratio of B/C/N = 1:1:1. In this scenario, some previous studies on the mechanical and thermal properties of h-BNC are scarce and this makes it possible to carry out exploration studies on these boron-nitrogen-carbon materials with a graphitic structure.\nIn the present project it is proposed to investigate the influence of the carbon concentration on the mechanical and thermal properties in these 2D h-BNC materials. For which, numerical simulations will be used through the molecular dynamics method, to understand the mechanical and structural stability as a function of carbon concentration, the effect of the deformation ratio, thermal conductivity as a function of temperature and carbon concentration. , among others.\nOn the other hand, to develop said project efficiently, the Group of Computational Methods Applied to Nanomaterials (GMCAN) has the experience, infrastructure and equipment"
+      }
+    }
+  }
+]

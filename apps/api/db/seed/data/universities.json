@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": {
+      "es": "Universidad Nacional Mayor de San Marcos",
+      "en": "National University of San Marcos"
+    }
+  },
+  {
+    "id": 9,
+    "name": {
+      "es": "Universidad de Piura",
+      "en": "University of Piura"
+    }
+  }
+]

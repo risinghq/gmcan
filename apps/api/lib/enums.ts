@@ -44,19 +44,6 @@ export const NewsKind = {
   EVENT: "event",
 } as const;
 
-export const NewsStatus = {
-  DRAFT: "draft",
-  PUBLISHED: "published",
-  ARCHIVED: "archived",
-} as const;
-
-export const ProjectStatus = {
-  PLANNED: "planned",
-  ACTIVE: "active",
-  COMPLETED: "completed",
-  ARCHIVED: "archived",
-} as const;
-
 export const Currency = {
   PEN: "pen",
   USD: "usd",
@@ -65,30 +52,4 @@ export const Currency = {
 export const FundingSource = {
   VRIP: "vrip",
   NONE: "none",
-} as const;
-
-export const ResearchLine = {
-  NANOPARTICLES: 1,
-  HEXAGONAL: 2,
-  NANOMAGNETISM: 3,
-} as const;
-
-export const Event = {
-  SIMPOSIO_FISICA: 1,
-} as const;
-
-export const Journal = {
-  APPLIED_SURFACE_SCIENCE: 1,
-  RIF: 2,
-  PCCP: 3,
-  PHYSICA_B: 4,
-  JPA: 5,
-  PHYSICS_LETTERS_A: 6,
-  MOMENTO: 7,
-  RMF: 8,
-} as const;
-
-export const University = {
-  UNMSM: 1,
-  UDEP: 2,
 } as const;

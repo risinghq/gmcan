@@ -1,0 +1,130 @@
+[
+  {
+    "id": 1,
+    "name": "ThinkStation P500",
+    "cpu": "Xeon E5-2698, 18 cores/36 threads",
+    "gpu": "Quadro K6000, 384 bits, 12GB, 2880 cudas",
+    "ram": "256 GB ECC",
+    "storage": "512GB SSD + 4TB 7200 rpm"
+  },
+  {
+    "id": 2,
+    "name": "ThinkStation P700",
+    "cpu": "2 x Xeon E5-2690, 24 cores/48 threads",
+    "gpu": "Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "128 GB ECC",
+    "storage": "512GB SSD + 4TB 7200 rpm"
+  },
+  {
+    "id": 3,
+    "name": "WorkStation Z640",
+    "cpu": "Xeon E5-2690, 12 cores/24 threads",
+    "gpu": "Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "128 GB ECC",
+    "storage": "1TB SSD + 4TB 7200 rpm"
+  },
+  {
+    "id": 4,
+    "name": "WorkStation Precision 7920",
+    "cpu": "Xeon Silver 4114, 10 cores/20 threads",
+    "gpu": "Quadro P6000, 384 bits, 24GB, 3840 cudas",
+    "ram": "128 GB 2666 ECC",
+    "storage": "512GB SSD + 2TB 7200 rpm"
+  },
+  {
+    "id": 5,
+    "name": "WorkStation HP Z8",
+    "cpu": "1 x Xeon Silver 4114, 10 cores/20 threads",
+    "gpu": "NVIDIA Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "128 GB ECC",
+    "storage": "512GB SSD + 2TB 7200 rpm"
+  },
+  {
+    "id": 6,
+    "name": "ThinkStation P920 (Lenovo)",
+    "cpu": "2 x Xeon Gold 5118, 24 cores/48 threads",
+    "gpu": "NVIDIA Quadro P6000, 384 bits, 24GB, 3840 cudas",
+    "ram": "128 GB ECC",
+    "storage": "512GB SSD M2 + 477 GB"
+  },
+  {
+    "id": 7,
+    "name": "ThinkStation P920 (Lenovo)",
+    "cpu": "2 x Xeon Gold 5120, 28 cores/56 threads",
+    "gpu": "NVIDIA Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "96 GB ECC",
+    "storage": "512GB SSD + 476.9 GB"
+  },
+  {
+    "id": 8,
+    "name": "ThinkStation P920 (Lenovo)",
+    "cpu": "2 x Xeon Gold 5118, 24 cores/48 threads",
+    "gpu": "NVIDIA Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "32 GB ECC",
+    "storage": "512GB SSD + 2TB 7200 rpm"
+  },
+  {
+    "id": 9,
+    "name": "ThinkStation P920 (Lenovo)",
+    "cpu": "2 x Xeon Gold 5118, 24 cores/48 threads",
+    "gpu": "NVIDIA Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "64 GB ECC",
+    "storage": "512GB SSD + 2TB 7200 rpm"
+  },
+  {
+    "id": 10,
+    "name": "Servidor HP Proliant ML110",
+    "cpu": "Gen10 Xeon Bronze 3204, 1.90GHz",
+    "gpu": null,
+    "ram": "16 GB",
+    "storage": "4TB"
+  },
+  {
+    "id": 11,
+    "name": "Servidor Dell Poweredge T40",
+    "cpu": "Xeon 2224G, 3.50GHz",
+    "gpu": null,
+    "ram": "8 GB",
+    "storage": "1TB"
+  },
+  {
+    "id": 12,
+    "name": "Thinkstation P330 (Lenovo)",
+    "cpu": "Xeon E-2224G",
+    "gpu": null,
+    "ram": "16 GB",
+    "storage": "1TB"
+  },
+  {
+    "id": 13,
+    "name": "ThinkStation P920 (Lenovo)",
+    "cpu": "2 x Xeon Gold 6132, 28 cores/56 threads",
+    "gpu": "NVIDIA Quadro P5000, 256 bits, 16GB, 2560 cudas",
+    "ram": "64 GB ECC DDR4 2933MHz/2666MHz",
+    "storage": "512GB SSD + 476.9 GB"
+  },
+  {
+    "id": 14,
+    "name": "Servidor HP Proliant ML350",
+    "cpu": "Xeon Gold 5118, 2.30GHz, 12 cores/24 threads",
+    "gpu": null,
+    "ram": "32 GB ECC",
+    "storage": "960 GB SSD"
+  },
+  {
+    "id": 15,
+    "name": "PC DELL VOSTRO 3710",
+    "cpu": "Intel Core i7-12700, 3.6/4.9 GHz, 12 cores",
+    "gpu": null,
+    "ram": "16 GB DDR4-3200 MHz",
+    "storage": "512GB SSD M.2 PCIe"
+  },
+  {
+    "id": 16,
+    "name": "PC DELL PRECISION T7820",
+    "cpu": "2 x Intel Xeon Silver 4214R, 2.4/3.5 GHz, 24 cores",
+    "gpu": null,
+    "ram": "192 GB DDR4-2933 MHz ECC",
+    "storage": "512GB M.2 PCIe + 2TB HDD"
+  }
+]

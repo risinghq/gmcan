@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "translations": {
+      "es": {
+        "name": "Propiedades Estructurales de Nanopartículas",
+        "description": "Se estudian las diferentes propiedades físicas de las nanopartículas y nanomateriales tanto de sistemas monocomponentes como multicomponentes, prestando especial atención a las propiedades estructurales, térmicas, mecánicas, superficiales , así como las transiciones de fases. Asimismo, evaluamos la estabilidad térmica de estos nanosistemas variando factores como tamaño, composición y patrón de mezcla (orden químico). Además, este tipo de estudios los realizamos mediante el método de simulación de dinámica molecular. Vale mencionar que las aplicaciones de estos sistemas dependen de las propiedades obtenidas."
+      },
+      "en": {
+        "name": "Structural Properties of Nanoparticles",
+        "description": "The different physical properties of nanoparticles and nanomaterials of both monocomponent and multicomponent systems are studied, paying special attention to structural, thermal, mechanical and surface properties, as well as phase transitions. Likewise, we evaluate the thermal stability of these nanosystems by varying factors such as size, composition and mixing pattern (chemical order). In addition, we carry out this type of study using the molecular dynamics simulation method. It is worth mentioning that the applications of these systems depend on the properties obtained."
+      }
+    },
+    "photo": "research-lines/structural-nanoparticles.jpg"
+  },
+  {
+    "id": 2,
+    "translations": {
+      "es": {
+        "name": "Nanosistemas hexagonales tipo-grafeno y tipo-nanotubos de carbono",
+        "description": "En esta línea de investigación estudiamos las propiedades mecánicas y térmicas de nanosistemas hexagonales 2D tipo-grafeno y 1D tipo-nanotubos de carbono (como nitruro de boro, grafano, fosforeno negro, etc). Estos estudios realizamos, por ejemplo, variando la concentración de dopaje o generando defectos estructurales. Por un lado, este tipo de estudios se realizan empleando simulaciones de dinámica molecular. Por otro lado, para el cálculo de propiedades electrónicas y de transporte electrónico de estos nanosistemas hexagonales 2D y 1D realizamos mediante cálculos auto-consistentes DFT. Vale mencionar que las aplicaciones de estos sistemas dependen de las propiedades obtenidas."
+      },
+      "en": {
+        "name": "Hexagonal graphene-type and carbon nanotube-type nano-systems",
+        "description": "In this research line, we study the mechanical and thermal properties of 2D graphene-type hexagonal nanosystems and 1D carbon-nanotube type (such as boron nitride, graphane, black phosphorene, etc.). We carry out these studies, for example, by varying the doping concentration or generating structural defects. On the one hand, these types of studies are carried out using molecular dynamics simulations. On the other hand, for the calculation of electronic properties and electronic transport of these 2D and 1D hexagonal nanosystems we performed DFT through self-consistent calculations. It is worth mentioning that the applications of these systems depend on the properties obtained."
+      }
+    },
+    "photo": "research-lines/hexagonal-nanosystems.jpg"
+  },
+  {
+    "id": 3,
+    "translations": {
+      "es": {
+        "name": "Nanomagnetismo y aplicaciones de materiales magnéticos",
+        "description": "En esta línea estudiamos las propiedades magnéticas de nanoestructuras magnéticas basadas principalmente en Fe. Sistema de nanopartículas, tipo core-shell, multicapas y aleaciones son estudiadas en función de parámetros controlables como la temperatura y campo magnético aplicado."
+      },
+      "en": {
+        "name": "Nanomagnetism and applications of magnetic materials",
+        "description": "In this line, we study the magnetic properties of magnetic nanostructures based mainly on Fe. Nanoparticle system, core-shell type, multilayers and alloys are studied based on controllable parameters such as temperature and applied magnetic field."
+      }
+    },
+    "photo": "research-lines/nanomagnetism.jpg"
+  }
+]
