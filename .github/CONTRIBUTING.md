@@ -20,7 +20,7 @@ It runs these scripts and never writes tracked files:
 
 | Script      | What it covers                                                 |
 | ----------- | -------------------------------------------------------------- |
-| `lint`      | oxlint (warnings fail), oxfmt `--check` and a gitleaks scan    |
+| `lint`      | oxlint (warnings fail), oxfmt `--check`, icons, gitleaks scan  |
 | `typecheck` | `tsc --noEmit` for both apps, against regenerated Worker types |
 | `test`      | Web tests (vitest) and API tests (`bun test`)                  |
 | `build`     | The Angular build and a `wrangler deploy --dry-run` of the API |
@@ -76,6 +76,12 @@ changes:
   [`services/assets/types.ts`](../apps/api/services/assets/types.ts) and
   [`validators.ts`](../apps/api/services/assets/validators.ts)
   ([assets](../docs/assets.md)).
+- **A new icon.** The app serves its own subset of Material Symbols, holding
+  only the icons the source uses: a `<mat-icon>` name, or an `icon: "..."` field
+  read by a binding listed in [`scripts/icon-font.ts`](../scripts/icon-font.ts).
+  After adding one, run `bun scripts/icon-font.ts` to download the new subset
+  into [`apps/web/src/fonts`](../apps/web/src/fonts). `bun run lint` fails on an
+  icon the subset lacks, and on `<mat-icon>` content it cannot read as a name.
 
 ## Documentation
 
