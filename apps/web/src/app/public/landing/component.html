@@ -96,7 +96,7 @@
         </div>
       </div>
       }
-      <form [formGroup]="searchGlobalForm2" [class.full-width]="inputExpand">
+      <div role="search" [class.full-width]="inputExpand">
         <input
           class="search-top-input"
           [class.search-top-input-compressed]="!inputExpand"
@@ -104,11 +104,10 @@
           #nombre1
           autocomplete="off"
           name="nombre1"
-          formControlName="nombre1"
           placeholder="{{ language.searchMobile }}"
           (keyup.enter)="searchGlobal(nombre1.value)"
         />
-      </form>
+      </div>
       <div class="search-top-div center" (click)="expandInput()">
         <mat-icon class="icon-search-top">search</mat-icon>
       </div>
@@ -119,7 +118,7 @@
       </div>
       <div class="full-width ml-16" [style.display]="screenWidth < 1050 ? 'none' : 'block'">
         <div class="top-bar-div">
-          <form class="input-search-toolbar full-width" [formGroup]="searchGlobalForm">
+          <div role="search" class="input-search-toolbar full-width">
             <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
             <input
               class="input-search-text"
@@ -127,10 +126,9 @@
               #nombre
               autocomplete="off"
               name="nombre"
-              formControlName="nombre"
               (keyup.enter)="searchGlobal(nombre.value)"
             />
-          </form>
+          </div>
           <div class="languages mr-12">
             <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
               <div class="fitter">EN</div>

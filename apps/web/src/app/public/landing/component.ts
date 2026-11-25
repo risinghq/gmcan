@@ -1,6 +1,5 @@
 import { Component, HostListener, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/material/sidenav";
@@ -27,8 +26,6 @@ import { tap } from "rxjs";
     RouterLink,
     RouterLinkActive,
     MatSidenavContent,
-    FormsModule,
-    ReactiveFormsModule,
     MatToolbar,
     MatMenuTrigger,
     MatMenu,
@@ -42,7 +39,6 @@ export default class LandingComponent implements OnInit {
   private browser = inject(BrowserService);
   private session = inject(SessionService);
   private uiState = inject(UiStateService);
-  fb = inject(FormBuilder);
   private titleService = inject(Title);
 
   screenWidth: number;
@@ -59,16 +55,8 @@ export default class LandingComponent implements OnInit {
   isMatMenuOpen = false;
   prevButtonTrigger = false;
   language: any;
-  public searchGlobalForm: FormGroup;
-  public searchGlobalForm2: FormGroup;
 
   constructor() {
-    this.searchGlobalForm = this.fb.group({
-      nombre: [""],
-    });
-    this.searchGlobalForm2 = this.fb.group({
-      nombre1: [""],
-    });
     this.lanSelected = this.session.languageId();
     this.language = this.session.language();
     this.url = GLOBAL.url;
