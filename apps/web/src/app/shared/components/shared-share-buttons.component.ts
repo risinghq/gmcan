@@ -76,6 +76,6 @@ export class SharedShareButtonsComponent {
     const isActive = this.hoveredShare === platform;
     const iconName = platform === "facebook" ? "Facebook" : "twitter";
     const suffix = isActive ? "2" : "";
-    return `/img/${iconName}${suffix}.svg`;
+    return `/img/icons/${iconName}${suffix}.svg`;
   }
 }
