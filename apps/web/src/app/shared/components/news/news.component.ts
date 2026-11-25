@@ -8,7 +8,7 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { parseLocalDate } from "@app/shared/utils/date";
+import { dateText, parseLocalDate } from "@app/shared/utils/date";
 import { filter, map, startWith } from "rxjs";
 
 type NewsDisplay = PublicNewsListItem & {
@@ -32,7 +32,7 @@ export default class NewsComponent {
   private session = inject(SessionService);
 
   private readonly selectedNewsId = Number(this.route.snapshot.params["id"]) || 0;
-  readonly language = this.session.language();
+  readonly language = this.session.language;
   readonly isDetailNews = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -51,6 +51,7 @@ export default class NewsComponent {
   );
   readonly vm = computed(() => {
     const response = this.newsResponse();
+    const locale = this.language().locale;
     if (!response) {
       return { featuredNews: null as NewsDisplay | null, newsItems: [] as NewsDisplay[] };
     }
@@ -62,20 +63,13 @@ export default class NewsComponent {
         const right = parseLocalDate(b.publishedAt)?.getTime() ?? 0;
         return right - left;
       })
-      .map((n): NewsDisplay => {
-        const publishedAtDate = parseLocalDate(n.publishedAt);
-        const fechaFormateada = !publishedAtDate
-          ? ""
-          : (new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(
-              publishedAtDate,
-            ) ?? "");
-
-        return Object.assign({} as NewsDisplay, n, {
+      .map((n): NewsDisplay =>
+        Object.assign({}, n, {
           newsTypeNameLabel: n.newsKindName,
-          publishedAtLabel: fechaFormateada,
+          publishedAtLabel: dateText(n.publishedAt, "longDate", locale),
           authorNameLabel: n.authorName,
-        });
-      });
+        }),
+      );
 
     return {
       featuredNews: enriched[0] ?? null,
@@ -96,7 +90,7 @@ export default class NewsComponent {
     this.numberShown = this.browser.innerWidth() >= 1300 ? 10 : 5;
   }
 
-  readonly title = computed(() => (this.isDetailNews() ? this.language.moreNews : this.language.news));
+  readonly title = computed(() => (this.isDetailNews() ? this.language().moreNews : this.language().news));
 
   openNewsDetail(newsItem: NewsDisplay): void {
     const origin = parsePublicOrigin(this.route);

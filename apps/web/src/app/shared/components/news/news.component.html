@@ -21,7 +21,7 @@
       <div class="other-news-text-2" (click)="openNewsDetail(featuredNews)">
         {{ featuredNews.title }}
       </div>
-      <div class="news-author">{{ language.newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
+      <div class="news-author">{{ language().newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
     </div>
   }
   <div class="other-news-div">
@@ -39,7 +39,7 @@
           <div class="other-news-text-2" (click)="openNewsDetail(newsItem)">
             {{ newsItem.title }}
           </div>
-          <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
+          <div class="news-author">{{ language().newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
         </div>
         <div class="img-hover-zoom-2 img-div-zoom">
           @if (newsItem.asset) {

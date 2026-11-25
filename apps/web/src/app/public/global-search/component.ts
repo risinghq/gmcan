@@ -9,7 +9,7 @@ import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/publ
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { dateLabel } from "@app/shared/utils/date";
+import { dateLabel, dateText } from "@app/shared/utils/date";
 import {
   NgbPagination,
   NgbPaginationNext,
@@ -166,7 +166,7 @@ export default class GlobalSearchComponent {
     return {
       ...news,
       nombreTipoNoticia: this.lookup.newsKinds().find((kind) => kind.code === news.newsKindCode)?.name,
-      fechaFormateada: dateLabel(news.publishedAt, "MM/dd/y", this.language().locale),
+      fechaFormateada: dateText(news.publishedAt, "longDate", this.language().locale),
     };
   }
 }
