@@ -74,3 +74,19 @@ seconds if the visitor's browser holds its own copy of the response
 goes through the same browser and edge copies. Server-side rendering reaches the
 API through the service binding directly, so rendered HTML never comes from this
 cache.
+
+## Build files
+
+The Angular build names its scripts, styles and fonts by content hash
+(`chunk-*`, `main-*`, `polyfills-*`, `styles-*`, `media/*`), so a changed file
+always gets a new name. [`public/_headers`](../apps/web/public/_headers) serves
+them, at the root and under `/en`, with `public, max-age=31536000, immutable`,
+and a returning visitor loads them without a request. Other static files, such
+as `img/*` and `favicon.ico`, keep the Workers default
+`public, max-age=0, must-revalidate`, because their names do not change when
+their content does. Pages are rendered by the Worker and `_headers` does not
+apply to them.
+
+Angular copies `public/` into each locale's folder, so the build also holds
+`en/_headers`. [`public/.assetsignore`](../apps/web/public/.assetsignore) keeps
+that copy out of the upload; only the root `_headers` is read.
