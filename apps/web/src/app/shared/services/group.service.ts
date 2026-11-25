@@ -20,7 +20,6 @@ import type { Group } from "../models/group";
 import type { Software } from "../models/software";
 import { AssetService } from "./asset.service";
 import { GLOBAL } from "./global";
-import { SessionService } from "./session.service";
 
 export interface SoftwareWrite {
   translations: Translations<SoftwareTranslation>;
@@ -30,23 +29,17 @@ export interface SoftwareWrite {
 @Injectable({ providedIn: "root" })
 export class GroupService {
   private http = inject(HttpClient);
-  private session = inject(SessionService);
   private assets = inject(AssetService);
-  private groupByLanguage = new Map<string, Observable<Group>>();
+  private group?: Observable<Group>;
 
-  /** Every component asks for the group, so one request per language serves them all until an admin edit. */
+  /** Every component asks for the group, so one request serves them all until an admin edit. */
   getGroup(): Observable<Group> {
-    const language = this.session.language().locale === "en" ? "en" : "es";
-    let group = this.groupByLanguage.get(language);
-    if (!group) {
-      group = this.http.get<Group>(GLOBAL.api("group")).pipe(shareReplay({ bufferSize: 1, refCount: false }));
-      this.groupByLanguage.set(language, group);
-    }
-    return group;
+    this.group ??= this.http.get<Group>(GLOBAL.api("group")).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+    return this.group;
   }
 
   private dropsGroup<T>(): MonoTypeOperatorFunction<T> {
-    return tap(() => this.groupByLanguage.clear());
+    return tap(() => (this.group = undefined));
   }
 
   listPublicAbout(groupId: number): Observable<About[]> {

@@ -15,7 +15,7 @@ describe("sitemapResponse", () => {
 
     expect(response.headers.get("Content-Type")).toContain("application/xml");
     expect(xml).toContain(`<loc>${origin}/home/about-us/about</loc>`);
-    expect(xml).toContain(`<loc>${origin}/home/detail-news/4?lang=en</loc><lastmod>2026-03-01</lastmod>`);
+    expect(xml).toContain(`<loc>${origin}/en/home/detail-news/4</loc><lastmod>2026-03-01</lastmod>`);
     expect(xml).toContain(`hreflang="x-default" href="${origin}/home/detail-member/9"`);
     expect(xml).not.toContain("/dashboard");
   });

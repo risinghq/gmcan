@@ -7,7 +7,6 @@ import { Languages } from "@app/shared/models/languages";
 import { AuthService } from "@app/shared/services/auth.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GroupService } from "@app/shared/services/group.service";
-import { SessionService } from "@app/shared/services/session.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 
 @Component({
@@ -23,7 +22,6 @@ export default class LoginComponent implements OnInit {
   private router = inject(Router);
   private emailService = inject(EmailService);
   private authService = inject(AuthService);
-  private session = inject(SessionService);
   private uiState = inject(UiStateService);
   private titleService = inject(Title);
 
@@ -38,11 +36,9 @@ export default class LoginComponent implements OnInit {
   readonly emailForm: FormGroup = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
   });
-  language: (typeof Languages)[number] = Languages[0];
+  readonly language = Languages[0];
 
   ngOnInit(): void {
-    this.session.setLanguage(Languages[0], 0);
-    this.language = this.session.language();
     this.titleService.setTitle("GMCAN | " + this.language.login);
     this.groupService.getGroup().subscribe((group) => this.uiState.setGroupInfo(group));
   }

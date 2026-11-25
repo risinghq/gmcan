@@ -2,7 +2,7 @@ import { DOCUMENT } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
 import { Meta, Title } from "@angular/platform-browser";
 import type { Group } from "@app/shared/models/group";
-import { LANGUAGE_PARAM, type SiteLanguage } from "@app/shared/site-language";
+import { languagePath, type SiteLanguage } from "@app/shared/site-language";
 
 import { GLOBAL } from "./global";
 import { SessionService } from "./session.service";
@@ -11,13 +11,9 @@ type StructuredData = Record<string, unknown>;
 
 const OG_LOCALES: Record<SiteLanguage, string> = { es: "es_PE", en: "en_US" };
 
-/** Spanish is the default language and owns the bare URL; English adds `?lang=en`. */
-export function languageUrl(path: string, language: SiteLanguage): string {
-  const url = new URL(path, GLOBAL.appUrl);
-  url.search = "";
-  url.hash = "";
-  if (language === "en") url.searchParams.set(LANGUAGE_PARAM, "en");
-  return url.toString();
+function languageUrl(path: string, language: SiteLanguage): string {
+  const { pathname } = new URL(path, GLOBAL.appUrl);
+  return new URL(languagePath(pathname, language), GLOBAL.appUrl).toString();
 }
 
 /** Owns the head tags that describe the current page to crawlers and link previews. */
@@ -29,10 +25,6 @@ export class SeoService {
   private readonly session = inject(SessionService);
   private siteDescription = "";
   private pageDescribed = false;
-
-  private language(): SiteLanguage {
-    return this.session.language().locale === "en" ? "en" : "es";
-  }
 
   setPageTitle(title: string): void {
     this.title.setTitle(title);
@@ -83,9 +75,8 @@ export class SeoService {
 
   /** Resets the page-level tags for a new route; the page then overrides what it knows better. */
   startPage(path: string): void {
-    const language = this.language();
+    const language = this.session.siteLanguage;
     const canonical = languageUrl(path, language);
-    this.document.documentElement.lang = language;
     this.setLink("canonical", canonical);
     this.setLink("alternate", languageUrl(path, "es"), "es");
     this.setLink("alternate", languageUrl(path, "en"), "en");

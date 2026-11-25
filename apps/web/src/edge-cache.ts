@@ -81,9 +81,9 @@ async function serveCached(
   return miss;
 }
 
-function languageKey(url: string, language: string): Request {
+function variantKey(url: string, name: string, value: string): Request {
   const keyUrl = new URL(url);
-  keyUrl.searchParams.set("__language", language);
+  keyUrl.searchParams.set(name, value);
   return new Request(keyUrl, { method: "GET" });
 }
 
@@ -93,7 +93,7 @@ function isShareableApiResponse(response: Response): boolean {
   return response.status === 200 && /\bpublic\b/.test(cacheControl) && /\bmax-age=[1-9]/.test(cacheControl);
 }
 
-/** Public pages differ only by URL and language, so a rendered page is shared unless it sets a cookie. */
+/** Public pages differ only by URL, so a rendered page is shared unless it sets a cookie. */
 function isShareablePage(response: Response): boolean {
   return (
     response.status === 200 &&
@@ -116,7 +116,7 @@ export function cachedApiFetch(
     () => api.fetch(request),
     cache,
     {
-      key: languageKey(request.url, request.headers.get("Accept-Language") ?? ""),
+      key: variantKey(request.url, "__language", request.headers.get("Accept-Language") ?? ""),
       retainSeconds: pathname.startsWith("/api/assets/") ? FRESH_SECONDS : FRESH_SECONDS + STALE_SECONDS,
       isShareable: isShareableApiResponse,
     },
@@ -124,10 +124,13 @@ export function cachedApiFetch(
   );
 }
 
-/** Serves server-rendered pages from the colo's cache, one entry per URL and resolved language. */
+/**
+ * Serves server-rendered pages from the colo's cache, one entry per URL and deploy:
+ * a page cached before a deploy names script chunks the new deploy no longer serves.
+ */
 export function cachedPageFetch(
   request: Request,
-  language: string,
+  version: string,
   render: () => Promise<Response>,
   cache: Cache,
   ctx?: WorkerContext,
@@ -138,7 +141,7 @@ export function cachedPageFetch(
     render,
     cache,
     {
-      key: languageKey(request.url, language),
+      key: variantKey(request.url, "__version", version),
       retainSeconds: FRESH_SECONDS + STALE_SECONDS,
       isShareable: isShareablePage,
     },

@@ -4,7 +4,7 @@ import { MatButton } from "@angular/material/button";
 import { MatCard } from "@angular/material/card";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import type { Member } from "@app/shared/models/member";
@@ -19,7 +19,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
+  imports: [RouterLink, MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
   private router = inject(Router);

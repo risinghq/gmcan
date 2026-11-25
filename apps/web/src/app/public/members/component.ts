@@ -2,7 +2,7 @@ import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/c
 import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -18,7 +18,7 @@ type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIcon, MatProgressSpinner, NewsComponent],
+  imports: [RouterLink, MatIcon, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent {
   private router = inject(Router);

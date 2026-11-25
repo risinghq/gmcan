@@ -1,7 +1,6 @@
 import { provideHttpClient, withFetch, withInterceptors } from "@angular/common/http";
 import {
   ApplicationConfig,
-  LOCALE_ID,
   inject,
   provideBrowserGlobalErrorListeners,
   provideAppInitializer,
@@ -26,7 +25,6 @@ import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.s
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { SessionService } from "@app/shared/services/session.service";
 
 import { routes } from "./app.routes";
 import { authInterceptor } from "./token.interceptor";
@@ -56,13 +54,7 @@ export const appConfig: ApplicationConfig = {
         filter: (req) => GLOBAL.isPublicApiRequest(req.url),
       }),
     ),
-    provideAppInitializer(() => inject(SessionService).init()),
     provideAppInitializer(() => inject(LookupService).load()),
-    {
-      provide: LOCALE_ID,
-      deps: [SessionService],
-      useFactory: (session: SessionService) => session.locale,
-    },
     { provide: TitleStrategy, useClass: AppTitleStrategy },
   ],
 };

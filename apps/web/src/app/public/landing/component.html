@@ -88,7 +88,7 @@
       <div class="languages">
         <a
           class="language flex-news"
-          [class.active-language]="lanSelected == 1"
+          [class.active-language]="siteLanguage === 'en'"
           [href]="languageHref('en')"
           hreflang="en"
         >
@@ -97,7 +97,7 @@
         </a>
         <a
           class="language flex-news"
-          [class.active-language]="lanSelected == 0"
+          [class.active-language]="siteLanguage === 'es'"
           [href]="languageHref('es')"
           hreflang="es"
         >
@@ -142,7 +142,7 @@
           <div class="languages mr-12">
             <a
               class="language flex-news"
-              [class.active-language]="lanSelected == 1"
+              [class.active-language]="siteLanguage === 'en'"
               [href]="languageHref('en')"
               hreflang="en"
             >
@@ -151,7 +151,7 @@
             </a>
             <a
               class="language flex-news"
-              [class.active-language]="lanSelected == 0"
+              [class.active-language]="siteLanguage === 'es'"
               [href]="languageHref('es')"
               hreflang="es"
             >

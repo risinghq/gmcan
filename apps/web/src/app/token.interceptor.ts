@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isAdminRequest = req.url.includes("/admin/");
   const isPublicApiRequest = GLOBAL.isPublicApiRequest(req.url);
   // The dashboard is written in Spanish, so its content comes back in Spanish whatever the browser prefers.
-  const language = isAdminRequest ? "es" : session.language().locale === "en" ? "en" : "es";
+  const language = isAdminRequest ? "es" : session.siteLanguage;
   const request = req.clone({
     withCredentials: true,
     ...(isPublicApiRequest || isAdminRequest ? { setHeaders: { "Accept-Language": language } } : {}),
