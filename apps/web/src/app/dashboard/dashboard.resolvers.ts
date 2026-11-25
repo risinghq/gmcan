@@ -1,11 +1,11 @@
 import { inject } from "@angular/core";
 import { ResolveFn } from "@angular/router";
+import { primaryName } from "@app/shared/forms/locale-form";
 import type { AdminMemberListItem, AdminProjectMemberListItem } from "@app/shared/models/admin-list";
 import type { AuthorSearchResult } from "@app/shared/models/author";
 import type { MemberFull } from "@app/shared/models/member";
 import type { News } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
-import type { ResearchLine } from "@app/shared/models/research-line";
 import type { Derive } from "@app/shared/routing/derived-data";
 import { EventService, type EventItem } from "@app/shared/services/event.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -16,6 +16,7 @@ import { RefService, type JournalItem } from "@app/shared/services/ref.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import type { RefDependenciesResponse } from "@gmcan/contracts/admin";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import { map } from "rxjs";
 
 export type ToolbarBadge = {
   label: string;
@@ -33,7 +34,16 @@ export const authorOptionsResolver: ResolveFn<AuthorSearchResult[]> = () => inje
 
 export const adminEventsResolver: ResolveFn<EventItem[]> = () => inject(EventService).listAdmin();
 
-export const adminResearchLinesResolver: ResolveFn<ResearchLine[]> = () => inject(ResearchLinesService).listAdmin();
+/** A research line as a project form offers it: the id it stores and the name the admin picks by. */
+export interface ResearchLineOption {
+  id: number;
+  name: string;
+}
+
+export const adminResearchLinesResolver: ResolveFn<ResearchLineOption[]> = () =>
+  inject(ResearchLinesService)
+    .listAdmin()
+    .pipe(map((lines) => lines.map(({ id, translations }) => ({ id, name: primaryName(translations) }))));
 
 export const projectMembersResolver: ResolveFn<AdminProjectMemberListItem[]> = (route) => {
   const id = Number(route.paramMap.get("id") ?? 0);

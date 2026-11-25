@@ -1,10 +1,7 @@
 import type { EmailBody } from "./emailBody";
-import type { Equipment } from "./equipment";
 import { createGroup, type Group } from "./group";
 import type { MemberFull } from "./member";
 import type { News } from "./news";
-import type { ResearchLine } from "./research-line";
-import type { Software } from "./software";
 
 export { createGroup };
 export type { Group };
@@ -43,44 +40,6 @@ export function createNews(): News {
     newsKindCode: "general",
     updatedAt: null,
     createdAt: null,
-  };
-}
-
-export function createResearchLine(): ResearchLine {
-  return {
-    id: 0,
-    name: "",
-    description: "",
-    asset: null,
-    groupId: 1,
-    createdAt: null,
-    updatedAt: null,
-  };
-}
-
-export function createEquipment(): Equipment {
-  return {
-    id: 0,
-    name: "",
-    cpu: "",
-    gpu: "",
-    ram: "",
-    storage: "",
-    groupId: 1,
-    createdAt: null,
-    updatedAt: null,
-  };
-}
-
-export function createSoftware(): Software {
-  return {
-    id: 0,
-    name: "",
-    description: "",
-    moreInfo: "",
-    groupId: 1,
-    createdAt: null,
-    updatedAt: null,
   };
 }
 

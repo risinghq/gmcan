@@ -2,9 +2,14 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 
-export function makeDataSource<T>(items: T[], getName: (item: T) => string): MatTableDataSource<T> {
-  const sorted = items.toSorted((a, b) => getName(a).localeCompare(getName(b)));
-  return new MatTableDataSource(sorted);
+/** One content list row: what the table shows, filters on and links from. */
+export interface ContentRow {
+  id: number;
+  name: string;
+}
+
+export function makeDataSource(rows: ContentRow[]): MatTableDataSource<ContentRow> {
+  return new MatTableDataSource(rows.toSorted((a, b) => a.name.localeCompare(b.name)));
 }
 
 export function attachTable<T>(dataSource: MatTableDataSource<T>, sort: MatSort, paginator: MatPaginator): void {

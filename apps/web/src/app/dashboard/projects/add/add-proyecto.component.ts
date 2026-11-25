@@ -10,8 +10,8 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import type { ResearchLineOption } from "@app/dashboard/dashboard.resolvers";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
-import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
@@ -71,7 +71,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
   edit = false;
   button_text = "Guardar proyecto";
   memberOptions: MemberOption[] = [];
-  researchLines: ResearchLine[] = [];
+  researchLines: ResearchLineOption[] = [];
   proyectoForm: FormGroup;
   get monedas() {
     return this.lookup.currencies();
@@ -102,7 +102,7 @@ export default class AddProyectoComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;
-    this.researchLines = data["researchLines"] as ResearchLine[];
+    this.researchLines = data["researchLines"] as ResearchLineOption[];
     const members = (data["members"] as AdminMemberListItem[]).toSorted((a, b) =>
       a.firstName.localeCompare(b.firstName),
     );

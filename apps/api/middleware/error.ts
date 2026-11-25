@@ -23,6 +23,14 @@ function declaredStatus(status: number): ErrorHttpStatus | undefined {
   return parsed.success ? parsed.data : undefined;
 }
 
+/**
+ * D1 and bun:sqlite both surface SQLite's own message text, so a restricted delete or a duplicate
+ * key is recognisable without a driver-specific error class.
+ */
+function isConstraintViolation(err: unknown): boolean {
+  return err instanceof Error && /(FOREIGN KEY|UNIQUE) constraint failed/.test(err.message);
+}
+
 export function onError(err: unknown, c: Context) {
   if (err instanceof AppError) {
     return jsonError(c, err.status, err.code, err.message, err.details);
@@ -35,6 +43,10 @@ export function onError(err: unknown, c: Context) {
     // Add the status to the contract before throwing it.
     console.error(`HTTPException with undeclared status ${err.status}`, err);
     return jsonError(c, 500, "internal_error", "Internal server error");
+  }
+
+  if (isConstraintViolation(err)) {
+    return jsonError(c, 409, "conflict", "The change conflicts with related records");
   }
 
   console.error("Unhandled error in API route", err);

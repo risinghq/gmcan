@@ -6,6 +6,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Router } from "@angular/router";
+import { primaryName } from "@app/shared/forms/locale-form";
 import type {
   About,
   AboutSectionContent,
@@ -13,11 +14,7 @@ import type {
   LocalizedAboutSectionContent,
   LocalizedHomeServicesTeaserContent,
 } from "@app/shared/models/about";
-import type { Equipment } from "@app/shared/models/equipment";
 import { createGroup, type Group } from "@app/shared/models/factories";
-import type { Method } from "@app/shared/models/method";
-import type { ResearchLine } from "@app/shared/models/research-line";
-import type { Software } from "@app/shared/models/software";
 import { AssetService } from "@app/shared/services/asset.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
@@ -30,7 +27,7 @@ import { DialogAboutPreview } from "./dialogs/about";
 import { DialogFuturePreview } from "./dialogs/future";
 import { ContenidosFiles, type FileSlot } from "./files";
 import { type PreviewAboutData, type PreviewFutureData } from "./models";
-import { applyTableFilter, attachTable, makeDataSource } from "./table";
+import { type ContentRow, applyTableFilter, attachTable, makeDataSource } from "./table";
 
 @Injectable()
 export class ContenidosState {
@@ -100,10 +97,10 @@ export class ContenidosState {
     projectsSection: ["", Validators.required],
   });
 
-  dataSource = new MatTableDataSource<ResearchLine>([]);
-  dataSource2 = new MatTableDataSource<Method>([]);
-  dataSource3 = new MatTableDataSource<Equipment>([]);
-  dataSource4 = new MatTableDataSource<Software>([]);
+  dataSource = new MatTableDataSource<ContentRow>([]);
+  dataSource2 = new MatTableDataSource<ContentRow>([]);
+  dataSource3 = new MatTableDataSource<ContentRow>([]);
+  dataSource4 = new MatTableDataSource<ContentRow>([]);
 
   displayedNotFound = false;
   displayedNotFound2 = false;
@@ -145,7 +142,7 @@ export class ContenidosState {
   getLineasInvestigacion(): void {
     this.researchLinesService.listAdmin().subscribe((res) => {
       if (res.length > 0) {
-        this.dataSource = makeDataSource(res, (item) => item.name);
+        this.dataSource = makeDataSource(res.map(({ id, translations }) => ({ id, name: primaryName(translations) })));
       }
     });
   }
@@ -153,7 +150,7 @@ export class ContenidosState {
   getMetodos(): void {
     this.methodsService.listAdmin().subscribe((res) => {
       if (res.length > 0) {
-        this.dataSource2 = makeDataSource(res, (item) => item.name);
+        this.dataSource2 = makeDataSource(res.map(({ id, translations }) => ({ id, name: primaryName(translations) })));
       }
     });
   }
@@ -308,15 +305,15 @@ export class ContenidosState {
 
   getEquipos(): void {
     this.groupService.listEquipment(this.group.id).subscribe((res) => {
-      const items = res as Equipment[];
-      if (items.length > 0) this.dataSource3 = makeDataSource(items, (item) => item.name);
+      if (res.length > 0) this.dataSource3 = makeDataSource(res.map(({ id, name }) => ({ id, name })));
     });
   }
 
   getSoftware(): void {
     this.groupService.listSoftware(this.group.id).subscribe((res) => {
-      const items = res as Software[];
-      if (items.length > 0) this.dataSource4 = makeDataSource(items, (item) => item.name ?? "");
+      if (res.length > 0) {
+        this.dataSource4 = makeDataSource(res.map(({ id, translations }) => ({ id, name: primaryName(translations) })));
+      }
     });
   }
 
