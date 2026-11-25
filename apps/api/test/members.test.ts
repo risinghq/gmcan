@@ -12,6 +12,7 @@ const CREATED = "members.created@example.test";
 
 let admin = "";
 let researcher = "";
+let adminId = 0;
 let researcherId = 0;
 let otherId = 0;
 
@@ -68,7 +69,7 @@ const emails = [ADMIN, RESEARCHER, OTHER, CREATED];
 
 beforeAll(async () => {
   await db.deleteFrom("member").where("email", "in", emails).execute();
-  await insertMember("41000001", ADMIN, "administrator");
+  adminId = await insertMember("41000001", ADMIN, "administrator");
   researcherId = await insertMember("41000002", RESEARCHER, "researcher");
   otherId = await insertMember("41000003", OTHER, "researcher");
   admin = await signIn(ADMIN);
@@ -183,6 +184,18 @@ describe("own profile", () => {
     expect(await own.json()).toMatchObject({ publishable: expect.any(Boolean) });
 
     expect((await send("GET", `/admin/members/${otherId}/publishability`, undefined, researcher)).status).toBe(403);
+  });
+
+  test("an active member without a bio is public and the administrator never is", async () => {
+    const other = await send("GET", `/admin/members/${otherId}/publishability`, undefined, admin);
+    expect(await other.json()).toEqual({ publishable: true, missing: [] });
+
+    const own = await send("GET", "/admin/account/profile/publishability", undefined, admin);
+    expect(await own.json()).toEqual({ publishable: false, missing: ["roleCode"] });
+
+    const listed = (await (await send("GET", "/api/members")).json()) as Array<{ id: number; bio: string | null }>;
+    expect(listed.find((member) => member.id === otherId)).toMatchObject({ bio: null });
+    expect(listed.map((member) => member.id)).not.toContain(adminId);
   });
 
   test("a signed-out request cannot read or write a profile", async () => {

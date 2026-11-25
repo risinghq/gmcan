@@ -1,3 +1,5 @@
+import type { MemberPublishability } from "./member";
+
 export type { AdminPublicationListItem } from "@gmcan/contracts/admin";
 
 export interface AdminNewsListItem {
@@ -75,11 +77,5 @@ export interface AdminMemberListItem {
   prefixName: string | null;
   photoUrl: string;
   photoAlt: string;
-  publishability?: {
-    publishable: boolean;
-    missing: {
-      base: string[];
-      translations: Record<string, string[]>;
-    };
-  };
+  publishability: MemberPublishability;
 }

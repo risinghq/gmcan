@@ -42,7 +42,7 @@ import { countMissingRequirements, publishabilityTooltip } from "./utils";
         [title]="tooltip()"
         (click)="details()"
       >
-        {{ state.publishable ? "Ready" : "Draft · " + missing() }}
+        {{ state.publishable ? "Público" : "Borrador · " + missing() }}
       </button>
     }
   `,
