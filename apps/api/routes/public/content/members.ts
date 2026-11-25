@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { notFound } from "../../../lib/errors/app-error.js";
 import { validate } from "../../../lib/validate.js";
-import { resolveAssetAccessLinkMap } from "../../../services/assets/service.js";
 import {
   memberFullName,
   resolveMemberPhotoView,
@@ -39,22 +38,7 @@ router.get("/:id", validate("param", IdParam), async (c) => {
     })),
   };
 
-  const assets = await resolveAssetAccessLinkMap({
-    ownerType: "publication",
-    ownerIds: profile.publications.map((publication) => publication.id),
-    slot: "file",
-  });
-  const publications = profile.publications.map((publication) => ({
-    ...publication,
-    asset: assets.get(publication.id) ?? null,
-  }));
-
-  return c.json({
-    ...profile,
-    member,
-    projects: profile.projects,
-    publications,
-  });
+  return c.json({ ...profile, member });
 });
 
 export default router;

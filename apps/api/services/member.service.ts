@@ -2,13 +2,14 @@ import type { Compilable, Expression, SqlBool } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
-import { memberProjects, memberPublications } from "../db/views.js";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { memberFullName, resolveMemberPhotoViews } from "./member-photo.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
+import { listProjectsLocalized } from "./project.service.js";
+import { listPublications } from "./publication.service.js";
 
 export interface MemberPublishability {
   publishable: boolean;
@@ -174,8 +175,8 @@ export async function getMemberByEmail(email: string) {
 export async function getMemberProfileLocalized(id: number, locale: Locale) {
   const [member, projects, publications] = await Promise.all([
     publicLocalizedMemberSelectQuery(locale).where("member.id", "=", id).executeTakeFirst(),
-    memberProjects(id),
-    memberPublications(id),
+    listProjectsLocalized(locale, undefined, id),
+    listPublications(locale, { memberId: id }),
   ]);
   return { member, projects, publications };
 }
