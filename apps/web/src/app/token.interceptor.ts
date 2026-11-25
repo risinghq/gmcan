@@ -12,10 +12,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const session = inject(SessionService);
   const isAdminRequest = req.url.includes("/admin/");
   const isPublicApiRequest = GLOBAL.isPublicApiRequest(req.url);
-  const language = session.language().locale === "en" ? "en" : "es";
+  // The dashboard is written in Spanish, so its content comes back in Spanish whatever the browser prefers.
+  const language = isAdminRequest ? "es" : session.language().locale === "en" ? "en" : "es";
   const request = req.clone({
     withCredentials: true,
-    ...(isPublicApiRequest ? { setHeaders: { "Accept-Language": language } } : {}),
+    ...(isPublicApiRequest || isAdminRequest ? { setHeaders: { "Accept-Language": language } } : {}),
   });
 
   return next(request).pipe(
