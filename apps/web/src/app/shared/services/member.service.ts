@@ -1,42 +1,18 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import type { AuthorCandidate } from "@gmcan/contracts/admin";
-import type { PublicMember } from "@gmcan/contracts/public";
+import type {
+  AdminMember,
+  AuthorCandidate,
+  MemberCreate,
+  MemberProfileWrite,
+  MemberWrite,
+} from "@gmcan/contracts/admin";
+import type { MemberTypeCode, PublicMember } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminMemberListItem } from "../models/admin-list";
-import type { MemberFull, MemberGroup, MemberProfile, MemberPublishability } from "../models/member";
+import type { MemberGroup, MemberProfile, MemberPublishability } from "../models/member";
 import { GLOBAL } from "./global";
-
-export interface MemberCreateBody {
-  dni: string;
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  maternalName?: string;
-  birthDate?: string;
-  isActive: number;
-  roleCode: "administrator" | "researcher" | "visitor";
-  memberTypeCode: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
-  prefixCode?: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
-  genderCode?: "male" | "female" | null;
-  translation?: { locale: string; bio: string };
-}
-
-export interface MemberUpdateBody {
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  maternalName?: string;
-  birthDate?: string;
-  isActive?: number;
-  roleCode?: "administrator" | "researcher" | "visitor";
-  memberTypeCode?: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
-  prefixCode?: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
-  genderCode?: "male" | "female" | null;
-  translation?: { locale: string; bio: string };
-}
 
 @Injectable({ providedIn: "root" })
 export class MemberService {
@@ -50,33 +26,36 @@ export class MemberService {
     return this.http.get<MemberProfile>(GLOBAL.api(`members/${id}`));
   }
 
-  listAdminMembers(params?: {
-    isActive?: number;
-    memberTypeCode?: "researcher" | "phd_student" | "master_student" | "undergraduate_student" | "collaborator";
-  }): Observable<AdminMemberListItem[]> {
+  listAdminMembers(params?: { isActive?: number; memberTypeCode?: MemberTypeCode }): Observable<AdminMemberListItem[]> {
     return this.http.get<AdminMemberListItem[]>(GLOBAL.admin("members"), {
       params: params as Record<string, string | number>,
     });
   }
 
-  getMemberFull(id: number): Observable<MemberFull> {
-    return this.http.get<MemberFull>(GLOBAL.admin(`members/${id}`));
+  getAdminMember(id: number): Observable<AdminMember> {
+    return this.http.get<AdminMember>(GLOBAL.admin(`members/${id}`));
   }
 
-  createMember(body: MemberCreateBody): Observable<{ id: number }> {
+  createMember(body: MemberCreate): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(GLOBAL.admin("members"), body);
   }
 
-  updateMember(id: number, body: MemberUpdateBody): Observable<{ status: number }> {
-    return this.http.patch<{ status: number }>(GLOBAL.admin(`members/${id}`), body);
+  updateMember(id: number, body: MemberWrite): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(GLOBAL.admin(`members/${id}`), body);
   }
 
-  updateMemberTranslation(id: number, locale: string, bio: string): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`members/${id}/translations/${locale}`), { bio });
+  getOwnProfile(): Observable<AdminMember> {
+    return this.http.get<AdminMember>(GLOBAL.admin("account/profile"));
   }
 
-  getMemberTranslation(id: number, locale: string): Observable<{ bio: string }> {
-    return this.http.get<{ bio: string }>(GLOBAL.admin(`members/${id}/translations/${locale}`));
+  updateOwnProfile(body: MemberProfileWrite): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(GLOBAL.admin("account/profile"), body);
+  }
+
+  uploadOwnPhoto(file: File): Observable<{ status: number }> {
+    const form = new FormData();
+    form.set("file", file);
+    return this.http.put<{ status: number }>(GLOBAL.admin("account/profile/photo"), form);
   }
 
   deleteMember(id: number): Observable<{ status: number }> {
@@ -105,5 +84,9 @@ export class MemberService {
 
   getMemberPublishability(id: number): Observable<MemberPublishability> {
     return this.http.get<MemberPublishability>(GLOBAL.admin(`members/${id}/publishability`));
+  }
+
+  getOwnPublishability(): Observable<MemberPublishability> {
+    return this.http.get<MemberPublishability>(GLOBAL.admin("account/profile/publishability"));
   }
 }

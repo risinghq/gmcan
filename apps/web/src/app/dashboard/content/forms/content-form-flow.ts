@@ -48,7 +48,7 @@ export class ContentFormFlow {
     return confirmAction(this.dialog, { title, text, confirm: "Sí, eliminar", dismiss: "No, cancelar" });
   }
 
-  private notify(message: string): void {
+  notify(message: string): void {
     this.snackBar.open(message, undefined, { duration: 2000, horizontalPosition: "right", verticalPosition: "top" });
   }
 }

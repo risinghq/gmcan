@@ -179,11 +179,7 @@ describe("admin resources", () => {
   test("an invalid body is invalid_request", async () => {
     const cookie = await cookieFor("administrator");
     await expectError(await send("POST", "/admin/methods", { nope: true }, cookie), 400, "invalid_request");
-    await expectError(
-      await send("PATCH", `/admin/members/${memberId}`, { isActive: 3 }, cookie),
-      400,
-      "invalid_request",
-    );
+    await expectError(await send("PUT", `/admin/members/${memberId}`, { isActive: 3 }, cookie), 400, "invalid_request");
   });
 });
 

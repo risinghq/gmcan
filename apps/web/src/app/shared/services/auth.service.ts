@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import { Observable, of, tap } from "rxjs";
 import { catchError } from "rxjs/operators";
 
@@ -11,13 +11,15 @@ import { GLOBAL } from "./global";
 export class AuthService {
   private http = inject(HttpClient);
   private authz = inject(AuthzService);
-  private currentUser: Member | null = null;
+  private readonly current = signal<Member | null>(null);
+  /** The signed-in member as the last login or `account/me` read returned them. */
+  readonly user = this.current.asReadonly();
 
   login(credentials: { email: string; password: string }): Observable<{ user: Member }> {
     return this.http.post<{ user: Member }>(GLOBAL.admin("auth/login"), credentials).pipe(
       tap((res) => {
         if (res?.user) {
-          this.currentUser = res.user;
+          this.current.set(res.user);
           this.authz.setCapabilities(res.user.capabilities);
         }
       }),
@@ -29,13 +31,13 @@ export class AuthService {
   }
 
   getUser(): Member | null {
-    return this.currentUser;
+    return this.current();
   }
 
   fetchCurrentUser(): Observable<MemberFull> {
     return this.http.get<MemberFull>(GLOBAL.admin("account/me")).pipe(
       tap((user) => {
-        this.currentUser = user;
+        this.current.set(user);
         this.authz.setCapabilities(user.capabilities);
       }),
     );
@@ -48,12 +50,13 @@ export class AuthService {
   }
 
   tryRestoreSession(): Observable<MemberFull | null> {
-    if (this.currentUser) return of(this.currentUser as MemberFull);
+    const user = this.current();
+    if (user) return of(user as MemberFull);
     return this.fetchCurrentUser().pipe(catchError(() => of(null)));
   }
 
   clearSessionState(): void {
-    this.currentUser = null;
+    this.current.set(null);
     this.authz.setCapabilities([]);
   }
 }

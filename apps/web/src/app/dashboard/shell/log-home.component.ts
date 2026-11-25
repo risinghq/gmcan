@@ -17,7 +17,6 @@ import { NavigationEnd } from "@angular/router";
 import type { ToolbarBadge } from "@app/dashboard/dashboard.resolvers";
 import { DialogIdle } from "@app/shared/modals/dialog-idle.component";
 import type { Group } from "@app/shared/models/factories";
-import type { Member } from "@app/shared/models/member";
 import { deepestChild, deriveFromRoute, routeTitle } from "@app/shared/routing/derived-data";
 import { AuthService } from "@app/shared/services/auth.service";
 import { AuthzService } from "@app/shared/services/authz.service";
@@ -61,7 +60,7 @@ export default class LogHomeComponent implements OnInit {
   private groupService = inject(GroupService);
   private uiState = inject(UiStateService);
 
-  readonly user = signal<Member | null>(null);
+  readonly user = this.authService.user;
   readonly userDisplayName = computed(() => {
     const user = this.user();
     if (!user) return "";
@@ -91,26 +90,18 @@ export default class LogHomeComponent implements OnInit {
     this.getGrupoInfo();
     this.syncToolbarTitle();
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => this.syncToolbarTitle());
-    if (this.uiState.profileUpdated()) {
-      this.getUser();
-      this.uiState.setProfileUpdated(false);
-    }
   }
 
   private getGrupoInfo(): void {
     this.groupService.getGroup().subscribe((group: Group) => {
       this.uiState.setGroupInfo(group);
-      this.getUser();
+      this.restoreSession();
     });
   }
 
-  private getUser(): void {
+  private restoreSession(): void {
     this.authService.tryRestoreSession().subscribe((user) => {
-      if (!user) {
-        this.logout();
-        return;
-      }
-      this.user.set(user);
+      if (!user) this.logout();
     });
   }
 

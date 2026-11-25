@@ -1,13 +1,19 @@
-import type { AuthorCandidate } from "@gmcan/contracts/admin";
-import type { Compilable, Expression, SqlBool } from "kysely";
+import type {
+  AdminMember,
+  AuthorCandidate,
+  MemberCreate,
+  MemberProfileWrite,
+  MemberWrite,
+} from "@gmcan/contracts/admin";
+import type { Compilable, Expression, RawBuilder, SqlBool } from "kysely";
 
-import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
-import type { GenderCode, MemberTypeCode, PrefixCode, RoleCode } from "../db/schema.js";
+import { atomic, db, insertedId, lastInsertId, queryInChunks, readBatch } from "../db/client.js";
+import type { MemberTypeCode } from "../db/schema.js";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
-import { memberFullName, resolveMemberPhotoViews } from "./member-photo.service.js";
+import { memberFullName, resolveMemberPhotoView, resolveMemberPhotoViews } from "./member-photo.service.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 import { listProjectsLocalized } from "./project.service.js";
 import { listPublications } from "./publication.service.js";
@@ -217,116 +223,108 @@ export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCAL
   return [...registered, ...external];
 }
 
+export async function memberExists(id: number) {
+  return !!(await db.selectFrom("member").select("id").where("id", "=", id).executeTakeFirst());
+}
+
 export async function verifyEmailExists(email: string) {
   return db.selectFrom("member").select("id").where("email", "=", email).executeTakeFirst();
 }
 
-export async function createMember(data: {
-  dni: string;
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  maternalName?: string;
-  birthDate?: string;
-  isActive: number;
-  roleCode: RoleCode;
-  memberTypeCode: MemberTypeCode;
-  prefixCode?: PrefixCode | null;
-  genderCode?: GenderCode | null;
-  translation?: { locale: string; bio: string };
-}) {
-  const { password, translation, ...rest } = data;
+/** Every locale's bio, keyed by locale. An empty bio is stored as null. */
+function memberTranslationRows(memberId: number | RawBuilder<number>, translations: MemberWrite["translations"]) {
+  return db
+    .insertInto("member_translation")
+    .values(Object.entries(translations).map(([locale, tr]) => ({ memberId, locale, bio: tr.bio || null })));
+}
+
+function profileRow(data: MemberProfileWrite) {
+  return {
+    email: data.email,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    maternalName: data.maternalName || null,
+    birthDate: data.birthDate || null,
+    prefixCode: data.prefixCode,
+    genderCode: data.genderCode,
+  };
+}
+
+function adminRow(data: MemberWrite) {
+  return { ...profileRow(data), isActive: data.isActive, roleCode: data.roleCode, memberTypeCode: data.memberTypeCode };
+}
+
+export async function getAdminMember(id: number, locale: Locale): Promise<AdminMember | undefined> {
+  const [members, translations] = await readBatch([
+    db
+      .selectFrom("member")
+      .select([
+        "id",
+        "dni",
+        "email",
+        "firstName",
+        "lastName",
+        "maternalName",
+        "birthDate",
+        "isActive",
+        "roleCode",
+        "memberTypeCode",
+        "prefixCode",
+        "genderCode",
+      ])
+      .where("id", "=", id),
+    db.selectFrom("member_translation").select(["locale", "bio"]).where("memberId", "=", id),
+  ]);
+  const member = members[0];
+  if (!member) return undefined;
+
+  const bios = new Map(translations.map((tr) => [tr.locale, tr.bio ?? ""]));
+  const photo = await resolveMemberPhotoView({ memberId: id, fullName: memberFullName(member), locale });
+  return {
+    ...member,
+    isActive: member.isActive === 1 ? 1 : 0,
+    translations: Object.fromEntries(SUPPORTED_LOCALES.map((code) => [code, { bio: bios.get(code) ?? "" }])),
+    ...photo,
+  };
+}
+
+export async function createMember(data: MemberCreate) {
   const now = new Date().toISOString();
   const memberId = lastInsertId("member");
-  const queries: Compilable[] = [
+  const results = await atomic([
     db.insertInto("member").values({
-      ...rest,
-      passwordHash: await hashPassword(password),
+      ...adminRow(data),
+      dni: data.dni,
+      passwordHash: await hashPassword(data.password),
       createdAt: now,
       updatedAt: now,
     }),
-    db
-      .insertInto("member_translation")
-      .values(SUPPORTED_LOCALES.map((locale) => ({ memberId, locale, bio: null })))
-      .onConflict((oc) => oc.columns(["memberId", "locale"]).doNothing()),
-  ];
-
-  if (translation) {
-    queries.push(
-      db
-        .insertInto("member_translation")
-        .values({ memberId, locale: translation.locale, bio: translation.bio })
-        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
-    );
-  }
-
-  return insertedId(await atomic(queries), 0);
+    memberTranslationRows(memberId, data.translations),
+  ]);
+  return insertedId(results, 0);
 }
 
-export async function updateMember(
-  id: number,
-  data: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    maternalName?: string;
-    birthDate?: string;
-    isActive: number;
-    roleCode: RoleCode;
-    memberTypeCode: MemberTypeCode;
-    prefixCode?: PrefixCode | null;
-    genderCode?: GenderCode | null;
-    translation?: { locale: string; bio: string };
-  },
-) {
-  const now = new Date().toISOString();
-  const queries: Compilable[] = [
+export async function updateMember(id: number, data: MemberWrite) {
+  await atomic([
     db
       .updateTable("member")
-      .set({
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        maternalName: data.maternalName,
-        birthDate: data.birthDate,
-        isActive: data.isActive,
-        roleCode: data.roleCode,
-        memberTypeCode: data.memberTypeCode,
-        prefixCode: data.prefixCode,
-        genderCode: data.genderCode,
-        updatedAt: now,
-      })
+      .set({ ...adminRow(data), updatedAt: new Date().toISOString() })
       .where("id", "=", id),
-  ];
-
-  if (data.translation) {
-    queries.push(
-      db
-        .insertInto("member_translation")
-        .values({ memberId: id, locale: data.translation.locale, bio: data.translation.bio })
-        .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") }))),
-    );
-  }
-
-  await atomic(queries);
+    db.deleteFrom("member_translation").where("memberId", "=", id),
+    memberTranslationRows(id, data.translations),
+  ]);
 }
 
-export async function updateMemberTranslation(id: number, locale: string, bio: string) {
-  await db
-    .insertInto("member_translation")
-    .values({ memberId: id, locale, bio })
-    .onConflict((oc) => oc.columns(["memberId", "locale"]).doUpdateSet((eb) => ({ bio: eb.ref("excluded.bio") })))
-    .execute();
-}
-
-export async function getMemberTranslation(id: number, locale: string) {
-  return db
-    .selectFrom("member_translation")
-    .select(["memberId", "locale", "bio"])
-    .where("memberId", "=", id)
-    .where("locale", "=", locale)
-    .executeTakeFirst();
+/** A member's own write: it cannot reach the role, the active flag, the type or the DNI. */
+export async function updateMemberProfile(id: number, data: MemberProfileWrite) {
+  await atomic([
+    db
+      .updateTable("member")
+      .set({ ...profileRow(data), updatedAt: new Date().toISOString() })
+      .where("id", "=", id),
+    db.deleteFrom("member_translation").where("memberId", "=", id),
+    memberTranslationRows(id, data.translations),
+  ]);
 }
 
 export async function getMemberPublishability(id: number): Promise<MemberPublishability> {

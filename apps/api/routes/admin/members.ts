@@ -1,70 +1,41 @@
+import { MemberAdminFieldsSchema, MemberCreateFieldsSchema, MemberTranslationSchema } from "@gmcan/contracts/admin";
+import { MemberTypeCodeSchema } from "@gmcan/contracts/public";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { notFound } from "../../lib/errors/app-error.js";
-import { LocaleCodeSchema } from "../../lib/locales.js";
 import { validate } from "../../lib/validate.js";
-import { requirePermission, requireSelfOrPermission } from "../../middleware/authz.js";
-import { memberFullName, resolveMemberPhotoView } from "../../services/member-photo.service.js";
+import { requirePermission } from "../../middleware/authz.js";
 import {
   addMemberToGroup,
   createMember,
   deleteMember,
+  getAdminMember,
   getMemberPublishability,
-  getMemberTranslation,
-  getMemberFull,
   listAdminMembers,
   listMemberGroups,
+  memberExists,
   removeMemberFromGroup,
   searchAuthorPool,
   updateMember,
-  updateMemberTranslation,
   verifyEmailExists,
 } from "../../services/member.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const RoleCode = z.enum(["administrator", "researcher", "visitor"]);
-const MemberTypeCode = z.enum(["researcher", "phd_student", "master_student", "undergraduate_student", "collaborator"]);
-const PrefixCode = z.enum(["dr", "dra", "mg", "lic", "bach", "ing", "none"]);
-const GenderCode = z.enum(["male", "female"]);
-const IsActive = z.number().int().min(0).max(1);
-
-const CreateBody = z.object({
-  dni: z.string().min(1),
-  email: z.email(),
-  password: z.string().min(1),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  maternalName: z.string().optional(),
-  birthDate: z.string().optional(),
-  isActive: IsActive,
-  roleCode: RoleCode,
-  memberTypeCode: MemberTypeCode,
-  prefixCode: PrefixCode.nullish(),
-  genderCode: GenderCode.nullish(),
-  translation: z.object({ locale: LocaleCodeSchema, bio: z.string() }).optional(),
-});
-
-const UpdateBody = z.object({
-  email: z.email(),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
-  maternalName: z.string().optional(),
-  birthDate: z.string().optional(),
-  isActive: IsActive,
-  roleCode: RoleCode,
-  memberTypeCode: MemberTypeCode,
-  prefixCode: PrefixCode.nullish(),
-  genderCode: GenderCode.nullish(),
-  translation: z.object({ locale: LocaleCodeSchema, bio: z.string() }).optional(),
-});
+const translations = translationsSchema(MemberTranslationSchema.shape);
+const MemberBody = MemberAdminFieldsSchema.extend({ translations });
+const MemberCreateBody = MemberCreateFieldsSchema.extend({ translations });
 
 const FilterQuery = z.object({
   q: z.string().optional(),
-  isActive: z.coerce.number().pipe(IsActive).optional(),
-  memberTypeCode: MemberTypeCode.optional(),
+  isActive: z.coerce
+    .number()
+    .pipe(z.union([z.literal(0), z.literal(1)]))
+    .optional(),
+  memberTypeCode: MemberTypeCodeSchema.optional(),
 });
 
 router.get("/", requirePermission("members.read"), validate("query", FilterQuery), async (c) => {
@@ -96,14 +67,10 @@ router.get(
 );
 
 router.get("/:id", requirePermission("members.read"), validate("param", IdParam), async (c) => {
-  const locale = c.get("locale");
   const { id } = c.req.valid("param");
-  const member = await getMemberFull(id, locale);
+  const member = await getAdminMember(id, c.get("locale"));
   if (!member) throw notFound();
-  return c.json({
-    ...member,
-    ...(await resolveMemberPhotoView({ memberId: member.id, fullName: memberFullName(member), locale })),
-  });
+  return c.json(member);
 });
 
 router.get("/:id/publishability", requirePermission("members.read"), validate("param", IdParam), async (c) => {
@@ -112,69 +79,21 @@ router.get("/:id/publishability", requirePermission("members.read"), validate("p
   return c.json(publishability);
 });
 
-router.post("/", requirePermission("members.write"), validate("json", CreateBody), async (c) => {
-  const data = c.req.valid("json");
-  const id = await createMember(data);
+router.post("/", requirePermission("members.write"), validate("json", MemberCreateBody), async (c) => {
+  const id = await createMember(c.req.valid("json"));
   return c.json({ id }, 201);
 });
 
-router.patch(
+router.put(
   "/:id",
   requirePermission("members.write"),
   validate("param", IdParam),
-  validate("json", UpdateBody.partial()),
+  validate("json", MemberBody),
   async (c) => {
-    const locale = c.get("locale");
     const { id } = c.req.valid("param");
-    const patch = c.req.valid("json");
-    const current = await getMemberFull(id, locale);
-    if (!current) throw notFound();
-    await updateMember(id, {
-      email: patch.email ?? current.email,
-      firstName: patch.firstName ?? current.firstName,
-      lastName: patch.lastName ?? current.lastName,
-      maternalName: patch.maternalName !== undefined ? patch.maternalName : (current.maternalName ?? undefined),
-      birthDate: patch.birthDate !== undefined ? patch.birthDate : (current.birthDate ?? undefined),
-      isActive: patch.isActive ?? current.isActive,
-      roleCode: patch.roleCode ?? current.roleCode,
-      memberTypeCode: patch.memberTypeCode ?? current.memberTypeCode,
-      prefixCode: patch.prefixCode !== undefined ? patch.prefixCode : (current.prefixCode ?? undefined),
-      genderCode: patch.genderCode !== undefined ? patch.genderCode : (current.genderCode ?? undefined),
-      translation: patch.translation,
-    });
+    if (!(await memberExists(id))) throw notFound();
+    await updateMember(id, c.req.valid("json"));
     return c.json(okStatus());
-  },
-);
-
-router.put(
-  "/:id/translations/:locale",
-  requireSelfOrPermission({
-    resourceParam: "id",
-    selfPermission: "account.self.write",
-    elevatedPermission: "members.write",
-  }),
-  validate("param", IdParam.extend({ locale: LocaleCodeSchema })),
-  validate("json", z.object({ bio: z.string() })),
-  async (c) => {
-    const { id, locale } = c.req.valid("param");
-    const { bio } = c.req.valid("json");
-    await updateMemberTranslation(id, locale, bio);
-    return c.json(okStatus());
-  },
-);
-
-router.get(
-  "/:id/translations/:locale",
-  requireSelfOrPermission({
-    resourceParam: "id",
-    selfPermission: "account.self.read",
-    elevatedPermission: "members.read",
-  }),
-  validate("param", IdParam.extend({ locale: LocaleCodeSchema })),
-  async (c) => {
-    const { id, locale } = c.req.valid("param");
-    const row = await getMemberTranslation(id, locale);
-    return c.json({ bio: row?.bio ?? "" });
   },
 );
 
