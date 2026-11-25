@@ -1,10 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { AuthorCandidate } from "@gmcan/contracts/admin";
 import type { PublicMember } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminMemberListItem } from "../models/admin-list";
-import type { AuthorSearchResult } from "../models/author";
 import type { MemberFull, MemberGroup, MemberProfile, MemberPublishability } from "../models/member";
 import { GLOBAL } from "./global";
 
@@ -83,8 +83,8 @@ export class MemberService {
     return this.http.delete<{ status: number }>(GLOBAL.admin(`members/${id}`));
   }
 
-  searchAuthors(q: string): Observable<AuthorSearchResult[]> {
-    return this.http.get<AuthorSearchResult[]>(GLOBAL.admin("members/authors/search"), { params: { q } });
+  searchAuthors(q: string): Observable<AuthorCandidate[]> {
+    return this.http.get<AuthorCandidate[]>(GLOBAL.admin("members/authors/search"), { params: { q } });
   }
 
   getMemberGroups(id: number): Observable<MemberGroup[]> {

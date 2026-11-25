@@ -1,0 +1,36 @@
+.author-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-order {
+  min-width: 24px;
+  color: #939393;
+  text-align: right;
+}
+
+.author-name {
+  flex: 1;
+}
+
+.icon-button {
+  display: inline-flex;
+  padding: 4px;
+  border: none;
+  background: none;
+  color: var(--deep-green);
+  cursor: pointer;
+
+  &:disabled {
+    color: #c4c4c4;
+    cursor: default;
+  }
+}
+
+.img-user {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  vertical-align: middle;
+}

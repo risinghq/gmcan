@@ -1,34 +1,21 @@
-import type { AdminPublicationListItem, AdminPublicationSubtype } from "@gmcan/contracts/admin";
+import type {
+  AdminPublication,
+  AdminPublicationListItem,
+  AdminPublicationSubtype,
+  PublicationAuthorWrite,
+  PublicationSubtypeWrite,
+  PublicationWrite,
+} from "@gmcan/contracts/admin";
 import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { RawBuilder } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
-import type { PublicationKindCode, ThesisKindCode } from "../db/schema.js";
-import type { LocalizedTranslations } from "../lib/admin-translations.js";
+import type { PublicationKindCode } from "../db/schema.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
-import { resolveAssetAccessLinkMap } from "./assets/service.js";
+import { resolveAssetAccessLinkMap, resolveAssetAccessUrl } from "./assets/service.js";
 import { memberPhotoPlaceholderView, resolveMemberPhotoViews } from "./member-photo.service.js";
-
-export interface AuthorInput {
-  kind: "registered" | "external";
-  authorOrder: number;
-  memberId?: number;
-  externalName?: string;
-}
-
-export type PublicationSubtypeInput =
-  | { kindCode: "journal_article"; journalArticle: { journalId?: number; issue?: number } }
-  | { kindCode: "conference_paper"; conferencePaper: { eventId: number } }
-  | { kindCode: "thesis"; thesis: { universityId: number; thesisKindCode: ThesisKindCode } };
-
-export interface PublicationFields {
-  translations: LocalizedTranslations<{ title: string; abstract?: string }>;
-  doi?: string;
-  publishedAt: string;
-  subtype: PublicationSubtypeInput;
-}
 
 export interface PublicPublicationFilter {
   id?: number;
@@ -109,10 +96,6 @@ async function authorsByPublicationIds(
   return authors;
 }
 
-async function attachAuthors(publicationId: number, locale: Locale = DEFAULT_LOCALE): Promise<PublicationAuthor[]> {
-  return (await authorsByPublicationIds([publicationId], locale)).get(publicationId) ?? [];
-}
-
 async function subtypeByPublicationIds(publicationIds: number[]) {
   const [journalRows, conferenceRows, thesisRows] = await Promise.all([
     queryInChunks(publicationIds, (chunk) =>
@@ -126,7 +109,7 @@ async function subtypeByPublicationIds(publicationIds: number[]) {
     ),
   ]);
 
-  const subtypes = new Map<number, PublicationSubtypeInput>();
+  const subtypes = new Map<number, PublicationSubtypeWrite>();
   for (const row of journalRows) {
     subtypes.set(row.publicationId, {
       kindCode: "journal_article",
@@ -427,64 +410,85 @@ export async function getPublication(id: number, locale: Locale) {
   return (await listPublications(locale, { id }))[0] ?? null;
 }
 
-export async function getPublicationEditView(id: number, locale: Locale = DEFAULT_LOCALE) {
-  const publication = await db.selectFrom("publication").selectAll().where("id", "=", id).executeTakeFirst();
-  if (!publication) return { publication: null, authors: [] as PublicationAuthor[] };
+function toAuthorWrite(row: {
+  authorOrder: number;
+  memberId: number | null;
+  externalName: string | null;
+}): PublicationAuthorWrite {
+  return row.memberId !== null
+    ? { kind: "registered", memberId: row.memberId, authorOrder: row.authorOrder }
+    : { kind: "external", externalName: row.externalName ?? "", authorOrder: row.authorOrder };
+}
 
-  const [translations, subtypes, authors] = await Promise.all([
+export async function getAdminPublication(id: number): Promise<AdminPublication | null> {
+  const publication = await db.selectFrom("publication").selectAll().where("id", "=", id).executeTakeFirst();
+  if (!publication) return null;
+
+  const [translations, subtypes, authors, asset] = await Promise.all([
     db
       .selectFrom("publication_translation")
       .select(["locale", "title", "abstract"])
       .where("publicationId", "=", id)
       .execute(),
     subtypeByPublicationIds([id]),
-    attachAuthors(id, locale),
+    db
+      .selectFrom("publication_author")
+      .select(["authorOrder", "memberId", "externalName"])
+      .where("publicationId", "=", id)
+      .orderBy("authorOrder")
+      .execute(),
+    resolveAssetAccessUrl({ ownerType: "publication", ownerId: id, slot: "file" }),
   ]);
+  const subtype = subtypes.get(id);
+  if (!subtype) throw new Error(`Publication ${id} has no subtype row`);
 
   return {
-    publication: {
-      ...publication,
-      subtype: subtypes.get(id),
-      translations: Object.fromEntries(
-        translations.map((tr) => [tr.locale, { title: tr.title, abstract: tr.abstract ?? undefined }]),
-      ),
-    },
-    authors,
+    id: publication.id,
+    doi: publication.doi ?? undefined,
+    publishedAt: publication.publishedAt,
+    createdAt: publication.createdAt,
+    updatedAt: publication.updatedAt,
+    subtype,
+    authors: authors.map(toAuthorWrite),
+    translations: Object.fromEntries(
+      translations.map((tr) => [tr.locale, { title: tr.title, abstract: tr.abstract ?? undefined }]),
+    ),
+    asset,
   };
 }
 
-export async function createPublication(data: PublicationFields, authors: AuthorInput[]) {
+export async function createPublication(data: PublicationWrite) {
   const publicationId = lastInsertId("publication");
   const now = new Date().toISOString();
   const results = await atomic([
     db.insertInto("publication").values({
       kindCode: data.subtype.kindCode,
-      doi: data.doi ?? null,
+      doi: data.doi || null,
       publishedAt: data.publishedAt,
       createdAt: now,
       updatedAt: now,
     }),
     translationsInsert(publicationId, data.translations),
     subtypeInsert(publicationId, data.subtype),
-    ...authorsInsert(publicationId, authors),
+    authorsInsert(publicationId, data.authors),
   ]);
   return insertedId(results, 0);
 }
 
 type PublicationRef = number | RawBuilder<number>;
 
-function translationsInsert(publicationId: PublicationRef, translations: PublicationFields["translations"]) {
+function translationsInsert(publicationId: PublicationRef, translations: PublicationWrite["translations"]) {
   return db.insertInto("publication_translation").values(
     Object.entries(translations).map(([locale, tr]) => ({
       publicationId,
       locale,
       title: tr.title,
-      abstract: tr.abstract ?? null,
+      abstract: tr.abstract || null,
     })),
   );
 }
 
-function subtypeInsert(publicationId: PublicationRef, subtype: PublicationSubtypeInput) {
+function subtypeInsert(publicationId: PublicationRef, subtype: PublicationSubtypeWrite) {
   if (subtype.kindCode === "journal_article") {
     return db.insertInto("journal_article").values({
       publicationId,
@@ -502,27 +506,25 @@ function subtypeInsert(publicationId: PublicationRef, subtype: PublicationSubtyp
   });
 }
 
-function authorsInsert(publicationId: PublicationRef, authors: AuthorInput[]) {
-  if (authors.length === 0) return [];
-  return [
-    db.insertInto("publication_author").values(
-      authors.map((a) => ({
-        publicationId,
-        authorOrder: a.authorOrder,
-        externalName: a.kind === "external" ? (a.externalName ?? null) : null,
-        memberId: a.kind === "registered" ? (a.memberId ?? null) : null,
-      })),
-    ),
-  ];
+/** The write schema requires at least one author, so the insert is never empty. */
+function authorsInsert(publicationId: PublicationRef, authors: PublicationAuthorWrite[]) {
+  return db.insertInto("publication_author").values(
+    authors.map((author) => ({
+      publicationId,
+      authorOrder: author.authorOrder,
+      externalName: author.kind === "external" ? author.externalName : null,
+      memberId: author.kind === "registered" ? author.memberId : null,
+    })),
+  );
 }
 
-export async function updatePublication(id: number, data: PublicationFields, authors: AuthorInput[]) {
+export async function updatePublication(id: number, data: PublicationWrite) {
   await atomic([
     db
       .updateTable("publication")
       .set({
         kindCode: data.subtype.kindCode,
-        doi: data.doi ?? null,
+        doi: data.doi || null,
         publishedAt: data.publishedAt,
         updatedAt: new Date().toISOString(),
       })
@@ -534,7 +536,7 @@ export async function updatePublication(id: number, data: PublicationFields, aut
     db.deleteFrom("publication_translation").where("publicationId", "=", id),
     translationsInsert(id, data.translations),
     db.deleteFrom("publication_author").where("publicationId", "=", id),
-    ...authorsInsert(id, authors),
+    authorsInsert(id, data.authors),
   ]);
 }
 
@@ -545,13 +547,6 @@ export async function deletePublication(id: number) {
     db.deleteFrom("conference_paper").where("publicationId", "=", id),
     db.deleteFrom("thesis").where("publicationId", "=", id),
     db.deleteFrom("publication").where("id", "=", id),
-  ]);
-}
-
-export async function replaceAuthors(publicationId: number, authors: AuthorInput[]) {
-  await atomic([
-    db.deleteFrom("publication_author").where("publicationId", "=", publicationId),
-    ...authorsInsert(publicationId, authors),
   ]);
 }
 
