@@ -1,43 +1,96 @@
-import type { Compilable } from "kysely";
+import {
+  AboutSectionSchema,
+  type AboutTranslation,
+  type AboutWrite,
+  type AdminAbout,
+  type AdminGroup,
+  type GroupWrite,
+  HomeTeaserSchema,
+} from "@gmcan/contracts/admin";
+import type { z } from "zod";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
 import type { MethodRow, ResearchLineRow } from "../db/schema.js";
 import type { LocalizedTranslations } from "../lib/admin-translations.js";
+import { AppError } from "../lib/errors/app-error.js";
 import { type Locale } from "../lib/public-locale.js";
+import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "./assets/service.js";
 
-export type AboutSectionContent = { introParagraphs: string[]; items: string[] };
-
-async function replaceTranslations(table: TTable, ownerId: number, values: Record<string, Record<string, unknown>>) {
-  const rows = Object.entries(values).map(([locale, payload]) => ({ locale, payload }));
-  const ownerColumnByTable = {
-    research_group_translation: "groupId",
-    about_translation: "aboutId",
-    research_line_translation: "researchLineId",
-    method_translation: "methodId",
-    software_translation: "softwareId",
-  } as const;
-  const ownerColumn = ownerColumnByTable[table];
-
-  const queries: Compilable[] = [db.deleteFrom(table).where(ownerColumn, "=", ownerId)];
-  if (rows.length > 0) {
-    queries.push(
-      db
-        .insertInto(table)
-        .values(rows.map(({ locale, payload }) => Object.assign({ [ownerColumn]: ownerId, locale }, payload))),
-    );
+/** Stored JSON that is absent or malformed is a data fault, not a client error. */
+function parseStoredJson<T>(raw: string, schema: z.ZodType<T>, field: string): T {
+  try {
+    return schema.parse(JSON.parse(raw));
+  } catch {
+    throw new AppError("internal_error", "Malformed stored content", 500, { field });
   }
-  await atomic(queries);
 }
 
-type TTable =
-  | "research_group_translation"
-  | "about_translation"
-  | "research_line_translation"
-  | "method_translation"
-  | "software_translation";
+const emptyToNull = (value: string) => (value.trim() === "" ? null : value);
 
-export async function listGroups() {
-  return db.selectFrom("research_group").selectAll().execute();
+export async function resolveGroupAssets(groupId: number): Promise<AdminGroup["assets"]> {
+  const [facilities, header, footer] = await Promise.all(
+    (["facilities", "header", "footer"] as const).map((slot) =>
+      resolveAssetAccessUrl({ ownerType: "research_group", ownerId: groupId, slot }),
+    ),
+  );
+  return { facilities, header, footer };
+}
+
+export async function listAdminGroups(): Promise<AdminGroup[]> {
+  const rows = await db.selectFrom("research_group").selectAll().execute();
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) => db.selectFrom("research_group_translation").selectAll().where("groupId", "in", chunk).execute(),
+  );
+  return Promise.all(
+    rows.map(async (row) => ({
+      id: row.id,
+      shortName: row.shortName,
+      fullName: row.fullName,
+      email: row.email ?? "",
+      phone: row.phone ?? "",
+      assets: await resolveGroupAssets(row.id),
+      translations: Object.fromEntries(
+        translations
+          .filter((tr) => tr.groupId === row.id)
+          .map((tr) => [
+            tr.locale,
+            {
+              summary: tr.summary,
+              facilities: tr.facilities ?? "",
+              futureWork: tr.futureWork ?? "",
+              publicationsSection: tr.publicationsSection ?? "",
+              projectsSection: tr.projectsSection ?? "",
+            },
+          ]),
+      ),
+    })),
+  );
+}
+
+/** Replaces the group's fields and every translation together. Returns false when the group does not exist. */
+export async function updateGroup(id: number, data: GroupWrite): Promise<boolean> {
+  const exists = await db.selectFrom("research_group").select("id").where("id", "=", id).executeTakeFirst();
+  if (!exists) return false;
+  await atomic([
+    db
+      .updateTable("research_group")
+      .set({ email: emptyToNull(data.email), phone: emptyToNull(data.phone), updatedAt: new Date().toISOString() })
+      .where("id", "=", id),
+    db.deleteFrom("research_group_translation").where("groupId", "=", id),
+    db.insertInto("research_group_translation").values(
+      Object.entries(data.translations).map(([locale, tr]) => ({
+        groupId: id,
+        locale,
+        summary: tr.summary,
+        facilities: emptyToNull(tr.facilities),
+        futureWork: emptyToNull(tr.futureWork),
+        publicationsSection: emptyToNull(tr.publicationsSection),
+        projectsSection: emptyToNull(tr.projectsSection),
+      })),
+    ),
+  ]);
+  return true;
 }
 
 export async function listGroupsLocalized(locale: Locale) {
@@ -63,84 +116,28 @@ export async function listGroupsLocalized(locale: Locale) {
     .execute();
 }
 
-export async function updateGroupInfo(id: number, data: { email?: string; phone?: string }) {
-  await db
-    .updateTable("research_group")
-    .set({ ...data, updatedAt: new Date().toISOString() })
-    .where("id", "=", id)
-    .execute();
+interface StoredAboutTranslation {
+  description: string;
+  objectivesContent: string;
+  servicesContent: string;
+  homeServicesTeaserContent: string;
 }
 
-export async function updateGroupSummary(
-  id: number,
-  data: { translations: LocalizedTranslations<{ summary: string }> },
-) {
-  await replaceTranslations(
-    "research_group_translation",
-    id,
-    Object.fromEntries(Object.entries(data.translations).map(([locale, row]) => [locale, { summary: row.summary }])),
-  );
-}
-
-export async function updateGroupFacilities(
-  id: number,
-  data: { translations: LocalizedTranslations<{ facilities?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [locale, { facilities: row.facilities ?? null }]),
-  );
-  await replaceTranslations("research_group_translation", id, rows);
-}
-
-export async function updateGroupFutureWork(
-  id: number,
-  data: { translations: LocalizedTranslations<{ futureWork?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [locale, { futureWork: row.futureWork ?? null }]),
-  );
-  await replaceTranslations("research_group_translation", id, rows);
-}
-
-export async function updateGroupPublicationsSection(
-  id: number,
-  data: { translations: LocalizedTranslations<{ publicationsSection?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [
-      locale,
-      { publicationsSection: row.publicationsSection ?? null },
-    ]),
-  );
-  await replaceTranslations("research_group_translation", id, rows);
-}
-
-export async function updateGroupProjectsSection(
-  id: number,
-  data: { translations: LocalizedTranslations<{ projectsSection?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [
-      locale,
-      { projectsSection: row.projectsSection ?? null },
-    ]),
-  );
-  await replaceTranslations("research_group_translation", id, rows);
-}
-
-export async function listAbout(groupId: number) {
-  const rows = await db.selectFrom("about").selectAll().where("groupId", "=", groupId).execute();
-  const translations = await queryInChunks(
-    rows.map((row) => row.id),
-    (chunk) => db.selectFrom("about_translation").selectAll().where("aboutId", "in", chunk).execute(),
-  );
-  return rows.map((row) =>
-    Object.assign({}, row, { translations: translations.filter((tr) => tr.aboutId === row.id) }),
-  );
+function parseAboutTranslation(tr: StoredAboutTranslation, label: string): AboutTranslation {
+  return {
+    description: tr.description,
+    objectivesContent: parseStoredJson(tr.objectivesContent, AboutSectionSchema, `${label}:objectivesContent`),
+    servicesContent: parseStoredJson(tr.servicesContent, AboutSectionSchema, `${label}:servicesContent`),
+    homeServicesTeaserContent: parseStoredJson(
+      tr.homeServicesTeaserContent,
+      HomeTeaserSchema,
+      `${label}:homeServicesTeaserContent`,
+    ),
+  };
 }
 
 export async function listAboutLocalized(groupId: number, locale: Locale) {
-  return db
+  const rows = await db
     .selectFrom("about")
     .innerJoin("about_translation", "about_translation.aboutId", "about.id")
     .select([
@@ -156,55 +153,52 @@ export async function listAboutLocalized(groupId: number, locale: Locale) {
     .where("about.groupId", "=", groupId)
     .where("about_translation.locale", "=", locale)
     .execute();
+  return rows.map((row) =>
+    Object.assign(
+      { id: row.id, groupId: row.groupId, createdAt: row.createdAt, updatedAt: row.updatedAt },
+      parseAboutTranslation(row, `about:${row.id}:${locale}`),
+    ),
+  );
 }
 
-export async function updateAboutDescription(
-  id: number,
-  data: { translations: LocalizedTranslations<{ description: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [locale, { description: row.description }]),
+export async function listAdminAbout(groupId: number): Promise<AdminAbout[]> {
+  const rows = await db.selectFrom("about").selectAll().where("groupId", "=", groupId).execute();
+  const ids = rows.map((row) => row.id);
+  const translations = await queryInChunks(ids, (chunk) =>
+    db.selectFrom("about_translation").selectAll().where("aboutId", "in", chunk).execute(),
   );
-  await replaceTranslations("about_translation", id, rows);
+  const assets = await resolveAssetAccessUrls({ ownerType: "about", ownerIds: ids, slot: "photo" });
+  return rows.map((row) => ({
+    id: row.id,
+    groupId: row.groupId,
+    asset: assets.get(row.id) ?? null,
+    translations: Object.fromEntries(
+      translations
+        .filter((tr) => tr.aboutId === row.id)
+        .map((tr) => [tr.locale, parseAboutTranslation(tr, `about:${row.id}:${tr.locale}`)]),
+    ),
+  }));
 }
 
-export async function updateAboutObjectives(
-  id: number,
-  data: { translations: LocalizedTranslations<{ objectivesContent?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [
-      locale,
-      { objectivesContent: row.objectivesContent ?? null },
-    ]),
-  );
-  await replaceTranslations("about_translation", id, rows);
-}
-
-export async function updateAboutServices(
-  id: number,
-  data: { translations: LocalizedTranslations<{ servicesContent?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [
-      locale,
-      { servicesContent: row.servicesContent ?? null },
-    ]),
-  );
-  await replaceTranslations("about_translation", id, rows);
-}
-
-export async function updateAboutHomeServicesTeaser(
-  id: number,
-  data: { translations: LocalizedTranslations<{ homeServicesTeaserContent?: string }> },
-) {
-  const rows = Object.fromEntries(
-    Object.entries(data.translations).map(([locale, row]) => [
-      locale,
-      { homeServicesTeaserContent: row.homeServicesTeaserContent ?? null },
-    ]),
-  );
-  await replaceTranslations("about_translation", id, rows);
+/** Replaces every translation of the about page together. Returns false when it does not exist. */
+export async function updateAbout(id: number, data: AboutWrite): Promise<boolean> {
+  const exists = await db.selectFrom("about").select("id").where("id", "=", id).executeTakeFirst();
+  if (!exists) return false;
+  await atomic([
+    db.updateTable("about").set({ updatedAt: new Date().toISOString() }).where("id", "=", id),
+    db.deleteFrom("about_translation").where("aboutId", "=", id),
+    db.insertInto("about_translation").values(
+      Object.entries(data.translations).map(([locale, tr]) => ({
+        aboutId: id,
+        locale,
+        description: tr.description,
+        objectivesContent: JSON.stringify(tr.objectivesContent),
+        servicesContent: JSON.stringify(tr.servicesContent),
+        homeServicesTeaserContent: JSON.stringify(tr.homeServicesTeaserContent),
+      })),
+    ),
+  ]);
+  return true;
 }
 
 export async function listResearchLines(groupId?: number) {
@@ -297,16 +291,17 @@ export async function updateResearchLine(
   id: number,
   data: { translations: LocalizedTranslations<{ name: string; description?: string }> },
 ) {
-  await replaceTranslations(
-    "research_line_translation",
-    id,
-    Object.fromEntries(
-      Object.entries(data.translations).map(([locale, row]) => [
+  await atomic([
+    db.deleteFrom("research_line_translation").where("researchLineId", "=", id),
+    db.insertInto("research_line_translation").values(
+      Object.entries(data.translations).map(([locale, row]) => ({
+        researchLineId: id,
         locale,
-        { name: row.name, description: row.description ?? null },
-      ]),
+        name: row.name,
+        description: row.description ?? null,
+      })),
     ),
-  );
+  ]);
 }
 
 export async function deleteResearchLine(id: number) {
@@ -403,16 +398,17 @@ export async function updateMethod(
   id: number,
   data: { translations: LocalizedTranslations<{ name: string; description: string }> },
 ) {
-  await replaceTranslations(
-    "method_translation",
-    id,
-    Object.fromEntries(
-      Object.entries(data.translations).map(([locale, row]) => [
+  await atomic([
+    db.deleteFrom("method_translation").where("methodId", "=", id),
+    db.insertInto("method_translation").values(
+      Object.entries(data.translations).map(([locale, row]) => ({
+        methodId: id,
         locale,
-        { name: row.name, description: row.description },
-      ]),
+        name: row.name,
+        description: row.description,
+      })),
     ),
-  );
+  ]);
 }
 
 export async function deleteMethod(id: number) {

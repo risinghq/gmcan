@@ -1,5 +1,7 @@
 import { Routes } from "@angular/router";
 import {
+  adminAboutResolver,
+  adminGroupResolver,
   contentGroupIdResolver,
   equipmentItemResolver,
   methodItemResolver,
@@ -110,6 +112,20 @@ export default [
       },
       { path: "perfil", loadComponent: () => import("./profile/perfil.component"), title: "Mi Perfil" },
       { path: "contenidos", loadComponent: () => import("./content/list/contenidos/page"), title: "Contenidos" },
+      {
+        path: "edit-grupo",
+        loadComponent: () => import("./content/forms/group.page"),
+        resolve: { group: adminGroupResolver },
+        title: "Contenidos - Editar grupo",
+        canDeactivate: [canDeactivateGuard],
+      },
+      {
+        path: "edit-quienes-somos",
+        loadComponent: () => import("./content/forms/about.page"),
+        resolve: { about: adminAboutResolver },
+        title: "Contenidos - Editar ¿Quiénes Somos?",
+        canDeactivate: [canDeactivateGuard],
+      },
       {
         path: "add-linea",
         loadComponent: () => import("./content/forms/research-line.page"),

@@ -6,10 +6,10 @@ import { HTTPException } from "hono/http-exception";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
-import { hashPassword } from "../lib/password.js";
 import { putObject } from "../lib/upload.js";
 import { onError } from "../middleware/error.js";
 import { createNews } from "../services/news.service.js";
+import { storedPasswordHash } from "./fixtures.js";
 
 const EMAIL = "ana.torres@example.test";
 const PASSWORD = "correct horse battery";
@@ -26,7 +26,7 @@ async function insertMember(roleCode: "administrator" | "researcher") {
     .values({
       dni: "20000001",
       email: EMAIL,
-      passwordHash: await hashPassword(PASSWORD),
+      passwordHash: await storedPasswordHash(PASSWORD),
       firstName: "Ana",
       lastName: "Torres",
       maternalName: null,
@@ -188,7 +188,7 @@ describe("admin resources", () => {
 });
 
 describe("admin group content", () => {
-  test("stored content that is missing is an internal_error naming the field, not a client error", async () => {
+  test("malformed stored content is an internal_error naming the field, not a client error", async () => {
     const cookie = await cookieFor("administrator");
     const group = await db
       .insertInto("research_group")
@@ -222,9 +222,8 @@ describe("admin group content", () => {
       .execute();
 
     const res = await send("GET", `/admin/group/${groupId}/about`, undefined, cookie);
-    const body = (await res.clone().json()) as { error: { message: string; details: unknown } };
+    const body = (await res.clone().json()) as { error: { details: unknown } };
     await expectError(res, 500, "internal_error");
-    expect(body.error.message).toBe("Missing translation");
     expect(body.error.details).toEqual({ field: `about:${aboutId}:es:objectivesContent` });
 
     await db.deleteFrom("research_group").where("id", "=", groupId).execute();

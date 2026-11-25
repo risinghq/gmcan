@@ -1,16 +1,20 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import type {
+  AboutWrite,
+  AdminAbout,
   AdminEquipment,
+  AdminGroup,
   AdminSoftware,
   AssetSlot,
   EquipmentFields,
+  GroupWrite,
   SoftwareTranslation,
   Translations,
 } from "@gmcan/contracts/admin";
 import { Observable, MonoTypeOperatorFunction, shareReplay, tap } from "rxjs";
 
-import type { About, LocalizedAboutSectionContent, LocalizedHomeServicesTeaserContent } from "../models/about";
+import type { About } from "../models/about";
 import type { Equipment } from "../models/equipment";
 import type { Group } from "../models/group";
 import type { Software } from "../models/software";
@@ -57,69 +61,24 @@ export class GroupService {
     return this.http.get<Equipment[]>(GLOBAL.api(`group/${groupId}/equipment`));
   }
 
-  listGroups(): Observable<Group[]> {
-    return this.http.get<Group[]>(GLOBAL.admin("group"));
+  listGroups(): Observable<AdminGroup[]> {
+    return this.http.get<AdminGroup[]>(GLOBAL.admin("group"));
   }
 
-  updateInfo(id: number, data: { email?: string; phone?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/info`), data).pipe(this.dropsGroup());
-  }
-
-  updateSummary(id: number, data: { summary: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/summary`), data).pipe(this.dropsGroup());
-  }
-
-  updateFacilities(id: number, data: { facilities?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/facilities`), data).pipe(this.dropsGroup());
-  }
-
-  updateFutureWork(id: number, data: { futureWork?: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}/future-work`), data).pipe(this.dropsGroup());
-  }
-
-  updatePublicationsSection(id: number, data: { publicationsSection?: string }): Observable<{ status: number }> {
-    return this.http
-      .put<{ status: number }>(GLOBAL.admin(`group/${id}/publications-section`), data)
-      .pipe(this.dropsGroup());
-  }
-
-  updateProjectsSection(id: number, data: { projectsSection?: string }): Observable<{ status: number }> {
-    return this.http
-      .put<{ status: number }>(GLOBAL.admin(`group/${id}/projects-section`), data)
-      .pipe(this.dropsGroup());
+  updateGroup(id: number, data: GroupWrite): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/${id}`), data).pipe(this.dropsGroup());
   }
 
   uploadAsset(id: number, slot: AssetSlot<"research_group">, file: File): Observable<{ status: number }> {
     return this.assets.put({ ownerType: "research_group", ownerId: id, slot }, file).pipe(this.dropsGroup());
   }
 
-  listAdminAbout(groupId: number): Observable<About[]> {
-    return this.http.get<About[]>(GLOBAL.admin(`group/${groupId}/about`));
+  listAdminAbout(groupId: number): Observable<AdminAbout[]> {
+    return this.http.get<AdminAbout[]>(GLOBAL.admin(`group/${groupId}/about`));
   }
 
-  updateAboutDescription(id: number, data: { description: string }): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/description`), data);
-  }
-
-  updateAboutObjectives(
-    id: number,
-    data: { objectivesContent: LocalizedAboutSectionContent },
-  ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/objectives`), data);
-  }
-
-  updateAboutServices(
-    id: number,
-    data: { servicesContent: LocalizedAboutSectionContent },
-  ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/services`), data);
-  }
-
-  updateAboutHomeServicesTeaser(
-    id: number,
-    data: { homeServicesTeaserContent: LocalizedHomeServicesTeaserContent },
-  ): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/home-services-teaser`), data);
+  updateAbout(id: number, data: AboutWrite): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}`), data);
   }
 
   listSoftware(groupId: number): Observable<AdminSoftware[]> {
