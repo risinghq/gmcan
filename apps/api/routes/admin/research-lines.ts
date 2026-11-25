@@ -1,3 +1,4 @@
+import { ResearchLineTranslationSchema } from "@gmcan/contracts/admin";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -21,17 +22,11 @@ const IdParam = z.object({ id: z.coerce.number().int().positive() });
 
 const Body = z.object({
   groupId: z.number().int(),
-  translations: translationsSchema({
-    name: z.string().min(1),
-    description: z.string().optional(),
-  }),
+  translations: translationsSchema(ResearchLineTranslationSchema.shape),
 });
 
 const UpdateBody = z.object({
-  translations: translationsSchema({
-    name: z.string().min(1),
-    description: z.string().optional(),
-  }),
+  translations: translationsSchema(ResearchLineTranslationSchema.shape),
 });
 
 router.use("*", async (c, next) => {

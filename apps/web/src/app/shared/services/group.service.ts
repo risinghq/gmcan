@@ -1,6 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import type { AssetSlot } from "@gmcan/contracts/admin";
+import type {
+  AdminEquipment,
+  AdminSoftware,
+  AssetSlot,
+  EquipmentFields,
+  SoftwareTranslation,
+  Translations,
+} from "@gmcan/contracts/admin";
 import { Observable, MonoTypeOperatorFunction, shareReplay, tap } from "rxjs";
 
 import type { About, LocalizedAboutSectionContent, LocalizedHomeServicesTeaserContent } from "../models/about";
@@ -10,6 +17,11 @@ import type { Software } from "../models/software";
 import { AssetService } from "./asset.service";
 import { GLOBAL } from "./global";
 import { SessionService } from "./session.service";
+
+export interface SoftwareWrite {
+  translations: Translations<SoftwareTranslation>;
+  moreInfo?: string;
+}
 
 @Injectable({ providedIn: "root" })
 export class GroupService {
@@ -110,27 +122,19 @@ export class GroupService {
     return this.http.put<{ status: number }>(GLOBAL.admin(`group/about/${id}/home-services-teaser`), data);
   }
 
-  listSoftware(groupId: number): Observable<Software[]> {
-    return this.http.get<Software[]>(GLOBAL.admin(`group/${groupId}/software`));
+  listSoftware(groupId: number): Observable<AdminSoftware[]> {
+    return this.http.get<AdminSoftware[]>(GLOBAL.admin(`group/${groupId}/software`));
   }
 
-  getSoftwareItem(id: number): Observable<Software> {
-    return this.http.get<Software>(GLOBAL.admin(`group/software/${id}`));
+  getSoftwareItem(id: number): Observable<AdminSoftware> {
+    return this.http.get<AdminSoftware>(GLOBAL.admin(`group/software/${id}`));
   }
 
-  createSoftware(data: {
-    name?: string;
-    description?: string;
-    moreInfo?: string;
-    groupId: number;
-  }): Observable<{ id: number }> {
+  createSoftware(data: SoftwareWrite & { groupId: number }): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(GLOBAL.admin("group/software"), data);
   }
 
-  updateSoftware(
-    id: number,
-    data: { name?: string; description?: string; moreInfo?: string },
-  ): Observable<{ status: number }> {
+  updateSoftware(id: number, data: SoftwareWrite): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(GLOBAL.admin(`group/software/${id}`), data);
   }
 
@@ -138,29 +142,19 @@ export class GroupService {
     return this.http.delete<{ status: number }>(GLOBAL.admin(`group/software/${id}`));
   }
 
-  listEquipment(groupId: number): Observable<Equipment[]> {
-    return this.http.get<Equipment[]>(GLOBAL.admin(`group/${groupId}/equipment`));
+  listEquipment(groupId: number): Observable<AdminEquipment[]> {
+    return this.http.get<AdminEquipment[]>(GLOBAL.admin(`group/${groupId}/equipment`));
   }
 
-  getEquipment(id: number): Observable<Equipment> {
-    return this.http.get<Equipment>(GLOBAL.admin(`group/equipment/${id}`));
+  getEquipment(id: number): Observable<AdminEquipment> {
+    return this.http.get<AdminEquipment>(GLOBAL.admin(`group/equipment/${id}`));
   }
 
-  createEquipment(data: {
-    name: string;
-    cpu?: string;
-    gpu?: string;
-    ram?: string;
-    storage?: string;
-    groupId: number;
-  }): Observable<{ id: number }> {
+  createEquipment(data: EquipmentFields & { groupId: number }): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(GLOBAL.admin("group/equipment"), data);
   }
 
-  updateEquipment(
-    id: number,
-    data: { name?: string; cpu?: string; gpu?: string; ram?: string; storage?: string },
-  ): Observable<{ status: number }> {
+  updateEquipment(id: number, data: EquipmentFields): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(GLOBAL.admin(`group/equipment/${id}`), data);
   }
 

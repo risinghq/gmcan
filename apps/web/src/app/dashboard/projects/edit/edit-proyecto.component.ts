@@ -20,10 +20,10 @@ import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
+import type { ResearchLineOption } from "@app/dashboard/dashboard.resolvers";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { DialogData } from "@app/shared/models/dialogdata";
 import type { Project } from "@app/shared/models/project";
-import type { ResearchLine } from "@app/shared/models/research-line";
 import { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService, type ProjectBody } from "@app/shared/services/project.service";
@@ -86,7 +86,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
   button_text = "Actualizar información";
   button_text2 = "Concluir proyecto";
   memberOptions: MemberOption[] = [];
-  researchLines: ResearchLine[] = [];
+  researchLines: ResearchLineOption[] = [];
   proyectoForm: FormGroup;
   get monedas() {
     return this.lookup.currencies();
@@ -120,7 +120,7 @@ export default class EditProyectoComponent implements OnInit, HasUnsavedChanges 
     const resolved = this.route.snapshot.data["project"] as Project;
     this.bindProject(resolved);
     const data = this.route.snapshot.data;
-    this.researchLines = data["researchLines"] as ResearchLine[];
+    this.researchLines = data["researchLines"] as ResearchLineOption[];
     this.bindMemberOptions(data["members"] as AdminMemberListItem[]);
     this.bindProjectMembers(data["projectMembers"] as { memberId: number; name: string }[]);
   }

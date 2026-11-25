@@ -1,19 +1,13 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { AdminMethod, MethodTranslation, Translations } from "@gmcan/contracts/admin";
 import { Observable } from "rxjs";
 
 import type { Method } from "../models/method";
 import { GLOBAL } from "./global";
 
-export interface MethodBody {
-  name: string;
-  description: string;
-  groupId: number;
-}
-
-export interface MethodUpdateBody {
-  name: string;
-  description: string;
+export interface MethodWrite {
+  translations: Translations<MethodTranslation>;
 }
 
 @Injectable({ providedIn: "root" })
@@ -24,19 +18,19 @@ export class MethodsService {
     return this.http.get<Method[]>(GLOBAL.api("methods"));
   }
 
-  listAdmin(): Observable<Method[]> {
-    return this.http.get<Method[]>(GLOBAL.admin("methods"));
+  listAdmin(): Observable<AdminMethod[]> {
+    return this.http.get<AdminMethod[]>(GLOBAL.admin("methods"));
   }
 
-  get(id: number): Observable<Method> {
-    return this.http.get<Method>(GLOBAL.admin(`methods/${id}`));
+  get(id: number): Observable<AdminMethod> {
+    return this.http.get<AdminMethod>(GLOBAL.admin(`methods/${id}`));
   }
 
-  create(body: MethodBody): Observable<{ id: number }> {
+  create(body: MethodWrite & { groupId: number }): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(GLOBAL.admin("methods"), body);
   }
 
-  update(id: number, body: MethodUpdateBody): Observable<{ status: number }> {
+  update(id: number, body: MethodWrite): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(GLOBAL.admin(`methods/${id}`), body);
   }
 

@@ -1,10 +1,11 @@
+import { EquipmentFieldsSchema, SoftwareTranslationSchema } from "@gmcan/contracts/admin";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import type { LocalizedTranslations } from "../../lib/admin-translations.js";
 import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
-import { AppError } from "../../lib/errors/app-error.js";
+import { AppError, notFound } from "../../lib/errors/app-error.js";
 import { validate } from "../../lib/validate.js";
 import { requirePermission } from "../../middleware/authz.js";
 import {
@@ -12,10 +13,13 @@ import {
   createSoftware,
   deleteEquipment,
   deleteSoftware,
+  getEquipment,
+  getSoftware,
   listAbout,
   listEquipment,
   listGroups,
   listSoftware,
+  toAdminSoftwareViews,
   updateAboutDescription,
   updateAboutHomeServicesTeaser,
   updateAboutObjectives,
@@ -237,117 +241,62 @@ router.put(
   },
 );
 
-router.get(
-  "/:groupId/software",
-  validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
-  async (c) => {
-    const { groupId } = c.req.valid("param");
-    const rows = await listSoftware(groupId);
-    return c.json(rows);
-  },
-);
+const GroupIdParam = z.object({ groupId: z.coerce.number().int().positive() });
+const SoftwareBody = z.object({
+  translations: translationsSchema(SoftwareTranslationSchema.shape),
+  moreInfo: z.string().optional(),
+});
 
-router.post(
-  "/software",
-  validate(
-    "json",
-    z.object({
-      translations: translationsSchema({
-        name: z.string().min(1),
-        description: z.string().optional(),
-      }),
-      moreInfo: z.string().optional(),
-      groupId: z.number().int(),
-    }),
-  ),
-  async (c) => {
-    const data = c.req.valid("json");
-    const id = await createSoftware(data);
-    return c.json({ id }, 201);
-  },
-);
+router.get("/:groupId/software", validate("param", GroupIdParam), async (c) => {
+  const { groupId } = c.req.valid("param");
+  return c.json(await toAdminSoftwareViews(await listSoftware(groupId)));
+});
 
-router.put(
-  "/software/:id",
-  validate("param", IdParam),
-  validate(
-    "json",
-    z.object({
-      translations: translationsSchema({
-        name: z.string().min(1),
-        description: z.string().optional(),
-      }),
-      moreInfo: z.string().optional(),
-    }),
-  ),
-  async (c) => {
-    const { id } = c.req.valid("param");
-    const data = c.req.valid("json");
-    await updateSoftware(id, data);
-    return c.json(okStatus());
-  },
-);
+router.get("/software/:id", validate("param", IdParam), async (c) => {
+  const row = await getSoftware(c.req.valid("param").id);
+  if (!row) throw notFound();
+  const [view] = await toAdminSoftwareViews([row]);
+  return c.json(view);
+});
 
-router.delete("/software/:id", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  await deleteSoftware(id);
+router.post("/software", validate("json", SoftwareBody.extend({ groupId: z.number().int() })), async (c) => {
+  const id = await createSoftware(c.req.valid("json"));
+  return c.json({ id }, 201);
+});
+
+router.put("/software/:id", validate("param", IdParam), validate("json", SoftwareBody), async (c) => {
+  await updateSoftware(c.req.valid("param").id, c.req.valid("json"));
   return c.json(okStatus());
 });
 
-router.get(
-  "/:groupId/equipment",
-  validate("param", z.object({ groupId: z.coerce.number().int().positive() })),
-  async (c) => {
-    const { groupId } = c.req.valid("param");
-    const rows = await listEquipment(groupId);
-    return c.json(rows);
-  },
-);
+router.delete("/software/:id", validate("param", IdParam), async (c) => {
+  await deleteSoftware(c.req.valid("param").id);
+  return c.json(okStatus());
+});
 
-router.post(
-  "/equipment",
-  validate(
-    "json",
-    z.object({
-      name: z.string().min(1),
-      cpu: z.string().optional(),
-      gpu: z.string().optional(),
-      ram: z.string().optional(),
-      storage: z.string().optional(),
-      groupId: z.number().int(),
-    }),
-  ),
-  async (c) => {
-    const data = c.req.valid("json");
-    const id = await createEquipment(data);
-    return c.json({ id }, 201);
-  },
-);
+router.get("/:groupId/equipment", validate("param", GroupIdParam), async (c) => {
+  const { groupId } = c.req.valid("param");
+  return c.json(await listEquipment(groupId));
+});
 
-router.put(
-  "/equipment/:id",
-  validate("param", IdParam),
-  validate(
-    "json",
-    z.object({
-      name: z.string().min(1),
-      cpu: z.string().optional(),
-      gpu: z.string().optional(),
-      ram: z.string().optional(),
-      storage: z.string().optional(),
-    }),
-  ),
-  async (c) => {
-    const { id } = c.req.valid("param");
-    const data = c.req.valid("json");
-    await updateEquipment(id, data);
-    return c.json(okStatus());
-  },
-);
+router.get("/equipment/:id", validate("param", IdParam), async (c) => {
+  const row = await getEquipment(c.req.valid("param").id);
+  if (!row) throw notFound();
+  return c.json(row);
+});
+
+router.post("/equipment", validate("json", EquipmentFieldsSchema.extend({ groupId: z.number().int() })), async (c) => {
+  const id = await createEquipment(c.req.valid("json"));
+  return c.json({ id }, 201);
+});
+
+router.put("/equipment/:id", validate("param", IdParam), validate("json", EquipmentFieldsSchema), async (c) => {
+  await updateEquipment(c.req.valid("param").id, c.req.valid("json"));
+  return c.json(okStatus());
+});
 
 router.delete("/equipment/:id", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  await deleteEquipment(id);
+  await deleteEquipment(c.req.valid("param").id);
   return c.json(okStatus());
 });
 

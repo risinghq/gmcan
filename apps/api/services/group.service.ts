@@ -490,6 +490,38 @@ export async function deleteSoftware(id: number) {
   await db.deleteFrom("software").where("id", "=", id).execute();
 }
 
+export async function getSoftware(id: number) {
+  return db.selectFrom("software").selectAll().where("id", "=", id).executeTakeFirst();
+}
+
+export async function toAdminSoftwareViews(rows: Awaited<ReturnType<typeof listSoftware>>) {
+  const translations = await queryInChunks(
+    rows.map((row) => row.id),
+    (chunk) =>
+      db
+        .selectFrom("software_translation")
+        .select(["softwareId", "locale", "name", "description"])
+        .where("softwareId", "in", chunk)
+        .execute(),
+  );
+  return rows.map((row) => ({
+    id: row.id,
+    groupId: row.groupId,
+    moreInfo: row.moreInfo,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    translations: Object.fromEntries(
+      translations
+        .filter((tr) => tr.softwareId === row.id)
+        .map((tr) => [tr.locale, { name: tr.name, description: tr.description ?? "" }]),
+    ),
+  }));
+}
+
+export async function getEquipment(id: number) {
+  return db.selectFrom("equipment").selectAll().where("id", "=", id).executeTakeFirst();
+}
+
 export async function listEquipment(groupId?: number) {
   let query = db.selectFrom("equipment").selectAll();
   if (groupId !== undefined) query = query.where("groupId", "=", groupId);

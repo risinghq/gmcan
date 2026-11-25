@@ -136,8 +136,18 @@ describe("admin create", () => {
       }),
     );
 
-    const software = await read<Array<{ id: number; moreInfo: string }>>(`/admin/group/${groupId}/software`);
-    expect(software.find((s) => s.id === id)?.moreInfo).toBe("https://example.test/analyzer");
+    const listed = await read<Array<{ id: number }>>(`/admin/group/${groupId}/software`);
+    expect(listed.map((s) => s.id)).toContain(id);
+    const software = await read<{ moreInfo: string; translations: Record<string, { name: string }> }>(
+      `/admin/group/software/${id}`,
+    );
+    expect(software.moreInfo).toBe("https://example.test/analyzer");
+    expect(software.translations.en?.name).toBe("Analyzer");
+  });
+
+  test("an unknown software or equipment item is not_found", async () => {
+    expect((await send("GET", "/admin/group/software/999999")).status).toBe(404);
+    expect((await send("GET", "/admin/group/equipment/999999")).status).toBe(404);
   });
 
   test("rejects software without a name, which the database requires", async () => {
@@ -190,6 +200,35 @@ describe("admin create", () => {
   });
 });
 
+describe("admin delete", () => {
+  test("refuses to delete a research line a project still uses, and keeps the line", async () => {
+    const researchLineId = await created(await send("POST", "/admin/research-lines", researchLineBody(groupId)));
+    await created(
+      await send("POST", "/admin/projects", {
+        code: "PRJ-DELETE-1",
+        fundedAmountMinor: 0,
+        startDate: "2026-03-01",
+        researchLineId,
+        currencyCode: "pen",
+        fundingSourceCode: "vrip",
+        translations: { es: { title: "Proyecto", description: "D" }, en: { title: "Project", description: "D" } },
+      }),
+    );
+
+    const res = await send("DELETE", `/admin/research-lines/${researchLineId}`);
+    expect(res.status).toBe(409);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe("conflict");
+    expect((await send("GET", `/admin/research-lines/${researchLineId}`)).status).toBe(200);
+  });
+
+  test("deletes a research line no project uses", async () => {
+    const id = await created(await send("POST", "/admin/research-lines", researchLineBody(groupId)));
+
+    expect((await send("DELETE", `/admin/research-lines/${id}`)).status).toBe(200);
+    expect((await send("GET", `/admin/research-lines/${id}`)).status).toBe(404);
+  });
+});
+
 describe("admin update", () => {
   test("stores equipment edits and moves updatedAt", async () => {
     const id = await created(await send("POST", "/admin/group/equipment", { groupId, name: "Workstation" }));
@@ -198,12 +237,33 @@ describe("admin update", () => {
     const res = await send("PUT", `/admin/group/equipment/${id}`, { name: "Workstation 2", gpu: "RTX" });
     expect(res.status).toBe(200);
 
-    const rows = await read<Array<Stamped & { id: number; name: string; gpu: string }>>(
-      `/admin/group/${groupId}/equipment`,
-    );
-    const equipment = rows.find((e) => e.id === id);
+    const equipment = await read<Stamped & { name: string; gpu: string }>(`/admin/group/equipment/${id}`);
     expect(equipment).toMatchObject({ name: "Workstation 2", gpu: "RTX" });
-    expect(equipment!.updatedAt > SEEDED_AT).toBe(true);
+    expect(equipment.updatedAt > SEEDED_AT).toBe(true);
+  });
+
+  test("stores research line translations for every locale", async () => {
+    const id = await created(await send("POST", "/admin/research-lines", researchLineBody(groupId)));
+
+    const res = await send("PUT", `/admin/research-lines/${id}`, {
+      translations: { es: { name: "Robótica", description: "Brazos" }, en: { name: "Robotics", description: "Arms" } },
+    });
+    expect(res.status).toBe(200);
+
+    const line = await read<{ translations: Record<string, { name: string; description: string }> }>(
+      `/admin/research-lines/${id}`,
+    );
+    expect(line.translations).toEqual({
+      es: { name: "Robótica", description: "Brazos" },
+      en: { name: "Robotics", description: "Arms" },
+    });
+  });
+
+  test("rejects a translated write that leaves out a supported locale", async () => {
+    const id = await created(await send("POST", "/admin/research-lines", researchLineBody(groupId)));
+
+    const res = await send("PUT", `/admin/research-lines/${id}`, { translations: { es: { name: "Solo español" } } });
+    expect(res.status).toBe(400);
   });
 
   test("stores publication edits and moves updatedAt", async () => {

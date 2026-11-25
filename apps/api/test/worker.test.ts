@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterAll, beforeEach, describe, expect, test } from "bun:test";
 import { createHmac } from "node:crypto";
 
 import { app } from "../app.js";
@@ -15,6 +15,7 @@ async function newsCount() {
   return Number(row.n);
 }
 
+const AUTHOR = "author@example.test";
 let authorId = 0;
 
 beforeEach(async () => {
@@ -24,8 +25,8 @@ beforeEach(async () => {
   const author = await db
     .insertInto("member")
     .values({
-      dni: "40000001",
-      email: "author@example.test",
+      dni: "40000301",
+      email: AUTHOR,
       passwordHash: "x",
       firstName: "Autor",
       lastName: "Prueba",
@@ -41,6 +42,12 @@ beforeEach(async () => {
     })
     .executeTakeFirstOrThrow();
   authorId = Number(author.insertId);
+});
+
+// Every test file shares one database, so leave no member for a later file's fixed DNI to collide with.
+afterAll(async () => {
+  await db.deleteFrom("news").execute();
+  await db.deleteFrom("member").where("email", "=", AUTHOR).execute();
 });
 
 const insert = () => db.insertInto("locale").values({ code: "zz" });
