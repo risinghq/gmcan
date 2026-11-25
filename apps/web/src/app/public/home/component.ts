@@ -81,14 +81,14 @@ export default class HomeComponent implements OnInit {
     if (!user.id) {
       return;
     }
-    this.router.navigate(["/home/detail-member/" + user.id], { queryParams: { from: "home" } });
+    this.router.navigate(["/detail-member/" + user.id], { queryParams: { from: "home" } });
   }
 
   openNewsDetail(newsItem: { id?: number }): void {
     if (!newsItem.id) {
       return;
     }
-    this.router.navigate(["/home/detail-news/" + newsItem.id], { queryParams: { from: "home" } });
+    this.router.navigate(["/detail-news/" + newsItem.id], { queryParams: { from: "home" } });
     this.scroll();
   }
 

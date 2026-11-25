@@ -136,6 +136,6 @@ export default class PublicationComponent implements OnInit {
 
   profile(autor: { memberId?: number }): void {
     if (!autor.memberId) return;
-    this.router.navigate(["/home/detail-member/" + autor.memberId], { queryParams: { from: "publications" } });
+    this.router.navigate(["/detail-member/" + autor.memberId], { queryParams: { from: "publications" } });
   }
 }

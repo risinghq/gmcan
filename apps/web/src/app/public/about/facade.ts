@@ -30,16 +30,16 @@ export class AboutFacade {
   readonly selectedCategory = computed(() => {
     const language = this.language();
     switch (this.currentRoute()) {
-      case "/home/about-us/about":
-      case "/home/about-us":
+      case "/about-us/about":
+      case "/about-us":
         return language.who;
-      case "/home/about-us/lines-investigation":
+      case "/about-us/lines-investigation":
         return language.linesInvestigation;
-      case "/home/about-us/methods":
+      case "/about-us/methods":
         return language.methods;
-      case "/home/about-us/facilities-resources":
+      case "/about-us/facilities-resources":
         return language.resources;
-      case "/home/about-us/works":
+      case "/about-us/works":
         return language.futureWorks;
       default:
         return "";

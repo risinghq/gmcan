@@ -1,9 +1,9 @@
 import { AngularAppEngine, createRequestHandler } from "@angular/ssr";
 
-import { englishAppPath, languagePath, localeLanguage } from "./app/shared/site-language";
 import { cachedApiFetch, cachedPageFetch, type ServiceBinding, type WorkerContext } from "./edge-cache";
+import { movedLocation } from "./moved-url";
 import { applyRuntimeConfig, currentRuntimeConfig } from "./runtime-config";
-import { robotsTxt, sitemapResponse, SPANISH_ONLY_PATHS } from "./seo-files";
+import { robotsTxt, sitemapResponse } from "./seo-files";
 
 interface WebEnv {
   /** The API worker served under /api and /admin so the browser stays on one origin. */
@@ -13,8 +13,6 @@ interface WebEnv {
   APP_URL?: string;
   CF_VERSION_METADATA?: { id: string };
 }
-
-const LEGACY_LANGUAGE_PARAM = "lang";
 
 // Cloudflare reports the scheme after terminating TLS.
 // The host always comes from the request itself.
@@ -43,25 +41,6 @@ function routeApiCalls(env: WebEnv, origin: string): void {
     if (url.origin === origin && isApiPath(url.pathname)) return api.fetch(request);
     return nativeFetch(request);
   };
-}
-
-/**
- * Points old and unsupported URLs at the page that serves them: links shared as `?lang=en`
- * before English moved to `/en`, and English URLs of the Spanish-only dashboard.
- */
-function movedLocation(url: URL): string | undefined {
-  const legacyLanguage = url.searchParams.get(LEGACY_LANGUAGE_PARAM);
-  if (legacyLanguage !== null) {
-    const query = new URLSearchParams(url.search);
-    query.delete(LEGACY_LANGUAGE_PARAM);
-    const search = query.size ? `?${query}` : "";
-    const appPath = englishAppPath(url.pathname) ?? url.pathname;
-    return languagePath(appPath, localeLanguage(legacyLanguage)) + search;
-  }
-
-  const englishPath = englishAppPath(url.pathname);
-  const spanishOnly = SPANISH_ONLY_PATHS.some((path) => englishPath === path || englishPath?.startsWith(`${path}/`));
-  return spanishOnly ? englishPath + url.search : undefined;
 }
 
 /** Browsers revalidate pages on every visit; the colo's copy is what keeps them fast. */

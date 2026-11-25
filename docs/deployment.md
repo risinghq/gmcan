@@ -108,7 +108,7 @@ Subsequent releases: `bun run migrate:remote` if a migration was added, then
 ```sh
 curl -s https://<site>/config.json
 curl -s 'https://<site>/api/news?pageSize=1'
-curl -s -o /dev/null -w '%{http_code}\n' https://<site>/home
+curl -s -o /dev/null -w '%{http_code}\n' https://<site>/
 curl -si -X POST https://<site>/admin/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@gmcan.dev","password":"<seed password>"}'

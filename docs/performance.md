@@ -19,8 +19,8 @@ for these routes:
   so that sample times the session check that rejects the request, not the
   dashboard query. The other admin routes are not measured, because they need a
   signed-in session.
-- The site's own routes: `/config.json`, the `/home` page shell, and
-  `/api/lookup` through the web Worker's data center cache.
+- The site's own routes: `/config.json`, the home page, and `/api/lookup`
+  through the web Worker's data center cache.
 
 Each route is measured twice per sample:
 
@@ -110,7 +110,7 @@ both versions and on every route alike, and a version never gets the lucky slot
 every time. Never compare numbers from two separate runs hours apart.
 
 Cache: every API `GET` carries a fresh `cb` query string so no cache answers it.
-`POST` routes are never cached. The web Worker's `/config.json` and `/home` are
+`POST` routes are never cached. The web Worker's `/config.json` and `/` are
 requested without a query string, and `/api/lookup` through the web Worker is
 requested with the same URL every time, on purpose, to time the data center
 cache; it is requested once beforehand to fill it.

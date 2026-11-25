@@ -145,9 +145,9 @@ describe("cachedPageFetch", () => {
 
   it("renders a page once per deploy and tells the browser to revalidate", async () => {
     const site = setup(html);
-    expect((await site.page("/home/news", "v1")).cache).toBe("MISS");
-    expect((await site.page("/home/news", "v2")).cache).toBe("MISS");
-    const repeat = await site.page("/home/news", "v2");
+    expect((await site.page("/news", "v1")).cache).toBe("MISS");
+    expect((await site.page("/news", "v2")).cache).toBe("MISS");
+    const repeat = await site.page("/news", "v2");
     expect(repeat.cache).toBe("HIT");
     expect(repeat.headers.get("Cache-Control")).toBe("no-cache");
     expect(site.calls()).toBe(2);
@@ -155,25 +155,25 @@ describe("cachedPageFetch", () => {
 
   it("serves the previous render while a new one is made", async () => {
     const site = setup(html);
-    await site.page("/home");
+    await site.page("/");
     site.publish("v2");
     vi.advanceTimersByTime((FRESH_SECONDS + 1) * 1000);
-    expect(await site.page("/home")).toMatchObject({ cache: "STALE", text: "v1" });
-    expect(await site.page("/home")).toMatchObject({ cache: "HIT", text: "v2" });
+    expect(await site.page("/")).toMatchObject({ cache: "STALE", text: "v1" });
+    expect(await site.page("/")).toMatchObject({ cache: "HIT", text: "v2" });
   });
 
   it("does not share a missing page", async () => {
     const site = setup(html);
     site.respondWith(404);
-    await site.page("/home/detail-news/999");
-    expect((await site.page("/home/detail-news/999")).cache).toBeNull();
+    await site.page("/detail-news/999");
+    expect((await site.page("/detail-news/999")).cache).toBeNull();
     expect(site.calls()).toBe(2);
   });
 
   it("does not share a page that sets a cookie", async () => {
     const site = setup({ ...html, "Set-Cookie": "sid=1" });
-    await site.page("/home");
-    expect((await site.page("/home")).cache).toBeNull();
+    await site.page("/");
+    expect((await site.page("/")).cache).toBeNull();
     expect(site.calls()).toBe(2);
   });
 });

@@ -50,7 +50,7 @@ export default class JoinUsComponent implements OnInit {
 
   language: any = {};
 
-  public previouslink = "/home";
+  public previouslink = "/";
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.join);

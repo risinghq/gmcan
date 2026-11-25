@@ -96,7 +96,7 @@ export default class GlobalSearchComponent {
 
   searchGlobal(value: string): void {
     const origin = parsePublicOrigin(this.route);
-    this.router.navigate(["/home/search/" + value], { queryParams: { from: origin } });
+    this.router.navigate(["/search/" + value], { queryParams: { from: origin } });
   }
 
   toggleExpanded(section: string, index: number): void {
@@ -119,11 +119,11 @@ export default class GlobalSearchComponent {
   profile(member: { id?: number; memberId?: number }): void {
     const id = member.id ?? member.memberId;
     if (!id) return;
-    this.router.navigate(["/home/detail-member/" + id], { queryParams: { from: "search" } });
+    this.router.navigate(["/detail-member/" + id], { queryParams: { from: "search" } });
   }
 
   detalleNoticia(noticia: { id: number }): void {
-    this.router.navigate(["/home/detail-news/" + noticia.id], { queryParams: { from: "search" } });
+    this.router.navigate(["/detail-news/" + noticia.id], { queryParams: { from: "search" } });
   }
 
   return(): void {

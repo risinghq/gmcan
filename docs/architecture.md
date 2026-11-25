@@ -131,7 +131,7 @@ the `@app/*` path alias.
 
 | Directory                                                 | Owns                                                      |
 | --------------------------------------------------------- | --------------------------------------------------------- |
-| [`public/`](../apps/web/src/app/public)                   | Public pages, routed under `/home`                        |
+| [`public/`](../apps/web/src/app/public)                   | Public pages, routed at the root (`/`, `/news`, …)        |
 | [`dashboard/`](../apps/web/src/app/dashboard)             | Dashboard pages, routed under `/dashboard`                |
 | [`auth/`](../apps/web/src/app/auth)                       | Login and password reset pages                            |
 | [`shared/services/`](../apps/web/src/app/shared/services) | One HTTP service per API resource, plus session and authz |
@@ -172,4 +172,6 @@ user is on a dashboard page. API base URLs come from
 [`server.ts`](../apps/web/src/server.ts) is the web Worker's entry point. It
 serves `/config.json`, sends `/api/*` and `/admin/*` through the edge cache
 ([caching](caching.md)), and hands everything else to the Angular server
-renderer or the static assets.
+renderer or the static assets. Old URLs answer 301 with one hop
+([`moved-url.ts`](../apps/web/src/moved-url.ts)): public pages that sat under
+`/home`, `?lang=` links, and English URLs of the Spanish-only dashboard.

@@ -122,7 +122,7 @@ export default class MainNewsComponent implements OnInit {
   }
 
   openNewsDetail(newsItem: PublicNewsCard): void {
-    this.router.navigate(["/home/detail-news/" + newsItem.id], { queryParams: { from: "news" } });
+    this.router.navigate(["/detail-news/" + newsItem.id], { queryParams: { from: "news" } });
     this.scroll();
   }
 

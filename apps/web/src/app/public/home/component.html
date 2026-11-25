@@ -4,31 +4,29 @@
 <div class="home-div primer-box">
   <div class="center">
     <div class="description-info">{{ info.summary }}</div>
-    <button mat-flat-button class="white-btn" (click)="navigate('/home/about-us/about')">
-      {{ language.knowAboutUs }}
-    </button>
+    <button mat-flat-button class="white-btn" (click)="navigate('/about-us/about')">{{ language.knowAboutUs }}</button>
   </div>
   <div class="numbers-div">
-    <div class="box mb-box-8" (click)="navigate('/home/members')">
+    <div class="box mb-box-8" (click)="navigate('/members')">
       <span class="counter" id="users">{{ memberCount }}</span>
       <span class="counter-text">{{ language.members }}</span>
     </div>
-    <div class="box mb-box-8" (click)="navigate('/home/publications')">
+    <div class="box mb-box-8" (click)="navigate('/publications')">
       <span class="counter" id="articulos">{{ articulos }}</span>
       <span class="counter-text">{{ language.articles }}</span>
     </div>
-    <div class="box mb-box-8" (click)="navigate('/home/publications')">
+    <div class="box mb-box-8" (click)="navigate('/publications')">
       <span class="counter" id="tesis">{{ tesis }}</span>
       <span class="counter-text">{{ language.thesis }}</span>
     </div>
-    <div class="box flex-news" (click)="navigate('/home/publications')">
+    <div class="box flex-news" (click)="navigate('/publications')">
       <div class="counter ml-a" id="resumenes">{{ resumenes }}</div>
       <div class="counter-text auto">{{ language.resumenes }}</div>
     </div>
   </div>
   <div class="center know-more hide-mobile">
     {{ language.knowAbout }}
-    <span style="text-decoration: underline; cursor: pointer" (click)="navigate('/home/about-us/lines-investigation')"
+    <span style="text-decoration: underline; cursor: pointer" (click)="navigate('/about-us/lines-investigation')"
       >{{ language.linesminus }}</span
     >
   </div>
@@ -49,7 +47,7 @@
         </div>
         <div class="linea-title">{{ linea.name }}</div>
         <div class="linea-text">{{ linea.description }}</div>
-        <a class="linea-text-green" routerLink="/home/about-us/lines-investigation"> {{ language.seeMore }} </a>
+        <a class="linea-text-green" routerLink="/about-us/lines-investigation"> {{ language.seeMore }} </a>
       </mat-card>
     </div>
     }
@@ -57,7 +55,7 @@
   <div class="grey-title">{{ language.knowAbout }}</div>
   <div class="flex-news">
     <div class="black-title">{{ language.newsminus }}</div>
-    <div class="btn-black hide-mobile" (click)="navigate('/home/news')">
+    <div class="btn-black hide-mobile" (click)="navigate('/news')">
       <a class="btn-text2"> {{ language.seeNews }} </a>
     </div>
   </div>
@@ -109,7 +107,7 @@
       }
     </div>
   </div>
-  <div class="btn-black hide-desktop" (click)="navigate('/home/news')">
+  <div class="btn-black hide-desktop" (click)="navigate('/news')">
     <a class="btn-text2"> {{ language.seeNews }} </a>
   </div>
   <div class="services-card">
@@ -119,26 +117,26 @@
       <p>{{ paragraph }}</p>
       }
     </div>
-    <div class="btn-black align-center hide-mobile" (click)="navigate('/home/about-us/about')">
+    <div class="btn-black align-center hide-mobile" (click)="navigate('/about-us/about')">
       <a class="btn-text2"> {{ language.knowMore }} </a>
     </div>
   </div>
-  <div class="btn-black hide-desktop" (click)="navigate('/home/about-us/about')">
+  <div class="btn-black hide-desktop" (click)="navigate('/about-us/about')">
     <a class="btn-text2"> {{ language.knowMore }} </a>
   </div>
   <div class="future-work">
     <div class="interested-text">{{ language.interested }}</div>
     <div class="know-more-text">
       {{ language.knowWork }}
-      <span style="text-decoration: underline; cursor: pointer" (click)="navigate('/home/about-us/works')"
+      <span style="text-decoration: underline; cursor: pointer" (click)="navigate('/about-us/works')"
         >{{ language.knowWork2 }}</span
       >
     </div>
     <div class="flex-news btn-knowmore">
-      <div class="btn-black btn-nm" style="margin-right: 8px !important" (click)="navigate('/home/about-us/works')">
+      <div class="btn-black btn-nm" style="margin-right: 8px !important" (click)="navigate('/about-us/works')">
         <a class="btn-text2"> {{ language.goTo }} </a>
       </div>
-      <div class="btn-black btn-nm" style="margin-left: 8px !important" (click)="navigate('/home/join-us')">
+      <div class="btn-black btn-nm" style="margin-left: 8px !important" (click)="navigate('/join-us')">
         <a class="btn-text2"> {{ language.join }} </a>
       </div>
     </div>
@@ -153,7 +151,7 @@
           <div class="method-title">{{ metodo.name }}</div>
         </div>
         <div class="linea-text method-text" [innerHTML]="metodo.description"></div>
-        <a class="linea-text-green method-green" routerLink="/home/about-us/methods"> {{ language.seeMore }} </a>
+        <a class="linea-text-green method-green" routerLink="/about-us/methods"> {{ language.seeMore }} </a>
       </mat-card>
     </div>
     }
@@ -161,7 +159,7 @@
   <div class="grey-title mt-publications">{{ language.knowAbout }}</div>
   <div class="flex-news">
     <div class="black-title">{{ language.publicationsminus }}</div>
-    <div class="btn-black hide-mobile" (click)="navigate('/home/publications')">
+    <div class="btn-black hide-mobile" (click)="navigate('/publications')">
       <a class="btn-text2"> {{ language.seePublications }} </a>
     </div>
   </div>
@@ -320,13 +318,13 @@
     </div>
     }
   </div>
-  <div class="btn-black hide-desktop" (click)="navigate('/home/publications')">
+  <div class="btn-black hide-desktop" (click)="navigate('/publications')">
     <a class="btn-text2"> {{ language.seePublications }} </a>
   </div>
   <div class="grey-title mt-publications">{{ language.knowAbout2 }}</div>
   <div class="flex-news">
     <div class="black-title">{{ language.projectsminus }}</div>
-    <div class="btn-black hide-mobile" (click)="navigate('/home/projects')">
+    <div class="btn-black hide-mobile" (click)="navigate('/projects')">
       <a class="btn-text2"> {{ language.seeProjects }} </a>
     </div>
   </div>
@@ -427,7 +425,7 @@
     </div>
     }
   </div>
-  <button mat-flat-button class="btn-black hide-desktop" (click)="navigate('/home/projects')">
+  <button mat-flat-button class="btn-black hide-desktop" (click)="navigate('/projects')">
     {{ language.seeProjects }}
   </button>
 </div>

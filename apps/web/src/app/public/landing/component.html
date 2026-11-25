@@ -7,7 +7,7 @@
       <div class="link2">
         <a
           class="link full-width"
-          routerLink="/home"
+          routerLink="/"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="sidenav.close()"
@@ -77,7 +77,7 @@
         <div class="login">{{ language.login }}</div>
         <img class="login-icon" src="/img/icons/login.svg" />
       </div>
-      <a class="link-box" routerLink="/home/join-us" routerLinkActive="active" (click)="sidenav.close()">
+      <a class="link-box" routerLink="/join-us" routerLinkActive="active" (click)="sidenav.close()">
         {{ language.join }}
       </a>
     </div>
@@ -123,7 +123,7 @@
       </div>
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
-      <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/home">
+      <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
         <img class="logo-nav" src="{{ groupInfo().assets.header }}" alt="logo" />
       </div>
       <div class="full-width ml-16 hide-mobile-nav">
@@ -166,7 +166,7 @@
         </div>
         <div class="down-bar-div text-right">
           <div class="center right">
-            <a class="link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <a class="link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
               {{ language.home }}
             </a>
           </div>
@@ -261,7 +261,7 @@
     <footer class="footer-div text-white">
       <div class="footer-flex">
         <div class="flex-news">
-          <div class="link-logo-div" (click)="scroll()" routerLink="/home">
+          <div class="link-logo-div" (click)="scroll()" routerLink="/">
             <img class="img-logo-white" src="{{ groupInfo().assets.footer }}" />
           </div>
           <div class="link-logo-div">
@@ -272,7 +272,7 @@
           <div class="center max-con flex-news">
             <a
               class="link3"
-              routerLink="/home"
+              routerLink="/"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="scroll()"

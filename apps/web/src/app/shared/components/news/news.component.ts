@@ -94,7 +94,7 @@ export default class NewsComponent {
 
   openNewsDetail(newsItem: NewsDisplay): void {
     const origin = parsePublicOrigin(this.route);
-    this.router.navigate(["/home/detail-news/" + newsItem.id], { queryParams: { from: origin } });
+    this.router.navigate(["/detail-news/" + newsItem.id], { queryParams: { from: origin } });
     this.scroll();
   }
 

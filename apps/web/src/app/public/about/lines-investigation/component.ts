@@ -71,6 +71,6 @@ export default class LinesInvestigationComponent {
   }
 
   profile(member: { memberId: number }): void {
-    this.router.navigate(["/home/detail-member/" + member.memberId], { queryParams: { from: "about" } });
+    this.router.navigate(["/detail-member/" + member.memberId], { queryParams: { from: "about" } });
   }
 }
