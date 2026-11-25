@@ -36,6 +36,7 @@ export interface PublicPublicationFilter {
   eventId?: number;
   journalId?: number;
   universityId?: number;
+  memberId?: number;
 }
 
 export interface AdminPublicationFilter {
@@ -269,6 +270,11 @@ export async function listPublications(
   if (filter.eventId) query = query.where("conference_paper.eventId", "=", filter.eventId);
   if (filter.journalId) query = query.where("journal_article.journalId", "=", filter.journalId);
   if (filter.universityId) query = query.where("thesis.universityId", "=", filter.universityId);
+  if (filter.memberId) {
+    query = query
+      .innerJoin("publication_author", "publication_author.publicationId", "publication.id")
+      .where("publication_author.memberId", "=", filter.memberId);
+  }
 
   const publications = await query.orderBy("publication.publishedAt", "desc").execute();
 

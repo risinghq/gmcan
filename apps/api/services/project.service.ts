@@ -48,7 +48,7 @@ function removeAbsentProjectMembers(projectId: number, memberIds: number[]) {
   return memberIds.length === 0 ? query : query.where("memberId", "not in", memberIds);
 }
 
-async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectStatusCode) {
+async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectStatusCode, memberId?: number) {
   let query = db
     .selectFrom("project")
     .innerJoin("project_translation", (join) =>
@@ -80,6 +80,11 @@ async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectSta
       "currency.symbol as currencySymbol",
     ]);
   if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
+  if (memberId !== undefined) {
+    query = query
+      .innerJoin("project_member", "project_member.projectId", "project.id")
+      .where("project_member.memberId", "=", memberId);
+  }
   return query.execute();
 }
 
@@ -217,8 +222,8 @@ function memberDisplayName(row: { firstName: string; lastName: string; maternalN
   return [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" ");
 }
 
-export async function listProjectsLocalized(locale: Locale, statusCode?: ProjectStatusCode) {
-  const projects = await listProjectsLocalizedRows(locale, statusCode);
+export async function listProjectsLocalized(locale: Locale, statusCode?: ProjectStatusCode, memberId?: number) {
+  const projects = await listProjectsLocalizedRows(locale, statusCode, memberId);
   if (projects.length === 0) return [];
 
   const projectIds = projects.map((p) => p.id);
