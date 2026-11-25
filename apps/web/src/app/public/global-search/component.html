@@ -110,7 +110,7 @@
                 {
                 <div class="publication-members">
                   <div class="member-img-round">
-                    <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
+                    <img class="member-img" loading="lazy" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
                   </div>
                   <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
                 </div>
@@ -213,7 +213,7 @@
                   @for (member of proyecto.members; track member.memberId) {
                   <div class="project-members">
                     <div class="member-img-round">
-                      <img class="member-img" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
+                      <img class="member-img" loading="lazy" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
                     </div>
                     <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
                   </div>
@@ -314,7 +314,7 @@
             } @for (miembro of miembros(); track miembro.id; let i = $index) {
             <div class="flex-news" [class.mb-24]="i + 1 != miembros().length">
               <div class="miembro-img-div">
-                <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
+                <img class="member-img" loading="lazy" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
               </div>
               <div class="miembro-text">
                 <div class="miembro-name full-width">
@@ -354,9 +354,9 @@
             <div class="news-div-list">
               <div class="img-hover-zoom">
                 @if (!noticia.asset) {
-                <img class="card-img-div" src="/img/grupal.jpg" />
+                <img class="card-img-div" loading="lazy" src="/img/grupal.avif" alt="" />
                 } @if (noticia.asset) {
-                <img class="card-img-div" src="{{ noticia.asset }}" />
+                <img class="card-img-div" loading="lazy" src="{{ noticia.asset }}" alt="" />
                 }
               </div>
               <div class="card-text-div card-text-div-3">

@@ -40,9 +40,9 @@
       <mat-card class="line-card center">
         <div class="line-img-div">
           @if (linea.asset) {
-          <img class="line-img" src="{{ linea.asset }}" />
+          <img class="line-img" loading="lazy" src="{{ linea.asset }}" />
           } @if (!linea.asset) {
-          <img class="line-img" src="/img/prop_estruc.jpg" />
+          <img class="line-img" loading="lazy" src="/img/prop_estruc.avif" />
           }
         </div>
         <div class="linea-title">{{ linea.name }}</div>
@@ -64,9 +64,9 @@
       <div class="news-box display-sub-flex">
         <div class="img-hover-zoom img-hover-zoom-s">
           @if (!featuredNews.asset) {
-          <img class="main-img-news" src="/img/grupal.jpg" alt="nada" />
+          <img class="main-img-news" loading="lazy" src="/img/grupal.avif" alt="" />
           } @if (featuredNews.asset) {
-          <img class="main-img-news" src="{{ featuredNews.asset }}" alt="imagen" />
+          <img class="main-img-news" loading="lazy" src="{{ featuredNews.asset }}" alt="" />
           }
         </div>
         <div class="news-div mt-main" style="height: 100%">
@@ -85,7 +85,7 @@
       <div class="news-box" [class.mb-other]="i == 0">
         <div class="img-hover-zoom hide-mobile">
           @if (newsItem.asset) {
-          <img class="other-img-news" src="{{ newsItem.asset }}" />
+          <img class="other-img-news" loading="lazy" src="{{ newsItem.asset }}" alt="" />
           }
         </div>
         <div class="flex-news">
@@ -99,7 +99,7 @@
           </div>
           <div class="img-hover-zoom ml-16 other-img-news-div hide-desktop">
             @if (newsItem.asset) {
-            <img class="other-img-news" src="{{ newsItem.asset }}" />
+            <img class="other-img-news" loading="lazy" src="{{ newsItem.asset }}" alt="" />
             }
           </div>
         </div>
@@ -111,7 +111,7 @@
     <a class="btn-text2"> {{ language.seeNews }} </a>
   </div>
   <div class="services-card">
-    <img class="services-icon" src="/img/icons/bulb.svg" />
+    <img class="services-icon" loading="lazy" src="/img/icons/bulb.svg" alt="" />
     <div class="mt-services about-text">
       @for (paragraph of aboutUs; track paragraph) {
       <p>{{ paragraph }}</p>
@@ -268,7 +268,7 @@
             @for (author of publicacion.authors; track author; let last = $last) { @if (author.kind === "registered") {
             <div class="publication-members">
               <div class="member-img-round">
-                <img class="member-img" src="{{ author.photoUrl }}" alt="{{ author.photoAlt }}" />
+                <img class="member-img" loading="lazy" src="{{ author.photoUrl }}" alt="{{ author.photoAlt }}" />
               </div>
               <div class="member-name" (click)="profile({ id: author.memberId })">
                 {{ author.name }}{{ !last ? "," : "" }}
@@ -365,7 +365,7 @@
             @for (member of proyecto.members; track member) {
             <div class="project-members">
               <div class="member-img-round">
-                <img class="member-img" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
+                <img class="member-img" loading="lazy" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
               </div>
               <div class="member-name" (click)="profile({ id: member.memberId })">{{ member.name }}</div>
             </div>

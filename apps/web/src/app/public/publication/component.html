@@ -98,7 +98,7 @@
                   "registered") {
                   <div class="publication-members">
                     <div class="member-img-round">
-                      <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
+                      <img class="member-img" loading="lazy" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
                     </div>
                     <div class="member-name" (click)="profile(autor)">{{ autor.name }}{{ !last ? "," : "" }}</div>
                   </div>

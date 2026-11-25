@@ -262,10 +262,10 @@
       <div class="footer-flex">
         <div class="flex-news">
           <div class="link-logo-div" (click)="scroll()" routerLink="/">
-            <img class="img-logo-white" src="{{ groupInfo().assets.footer }}" />
+            <img class="img-logo-white" loading="lazy" src="{{ groupInfo().assets.footer }}" />
           </div>
           <div class="link-logo-div">
-            <img class="img-logo-white" src="/img/logoUNMSM.png" />
+            <img class="img-logo-white" loading="lazy" src="/img/logoUNMSM.avif" alt="UNMSM" />
           </div>
         </div>
         <div class="footer-down-bar">
@@ -349,6 +349,8 @@
           <div class="col-12 col-sm-6 google-maps">
             <iframe
               class="google-html"
+              title="Google Maps: Facultad de Ciencias Físicas, UNMSM"
+              loading="lazy"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d975.4432492025269!2d-77.0818349707683!3d-12.059133899466177!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c94730ddd147%3A0x458926002761c75c!2sInstituto%20de%20Investigaci%C3%B3n%20Facultad%20de%20Ciencias%20F%C3%ADsicas%20-%20UNMSM!5e0!3m2!1ses-419!2spe!4v1579747938555!5m2!1ses-419!2spe"
               frameborder="0"
               style="border: 0"
