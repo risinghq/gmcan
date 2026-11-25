@@ -12,11 +12,12 @@ import { listPublicNews } from "./news.service.js";
 import { listProjectsLocalized } from "./project.service.js";
 import { countPublicationsByKind, listPublications } from "./publication.service.js";
 
-async function servicesTeaser(locale: Locale): Promise<string[]> {
+async function services(locale: Locale): Promise<string[]> {
   const [group] = await listGroupsLocalized(locale);
   if (!group) return [];
   const [about] = await listAboutLocalized(group.id, locale);
-  return about?.homeServicesTeaserContent.paragraphs ?? [];
+  if (!about) return [];
+  return [...about.servicesContent.introParagraphs, ...about.servicesContent.items];
 }
 
 async function ongoingProjects(locale: Locale) {
@@ -28,16 +29,17 @@ async function ongoingProjects(locale: Locale) {
 }
 
 export async function getHome(locale: Locale): Promise<PublicHome> {
-  const [members, publicationCounts, publications, projects, news, researchLines, methods, teaser] = await Promise.all([
-    listMembersLocalized(locale),
-    countPublicationsByKind(),
-    listPublications(locale, { limit: HOME_PUBLICATIONS }),
-    ongoingProjects(locale),
-    listPublicNews(locale, { sortBy: "publishedAt", sortOrder: "desc", page: 1, pageSize: HOME_NEWS }),
-    listPublicResearchLines(locale),
-    listPublicMethods(locale),
-    servicesTeaser(locale),
-  ]);
+  const [members, publicationCounts, publications, projects, news, researchLines, methods, serviceLines] =
+    await Promise.all([
+      listMembersLocalized(locale),
+      countPublicationsByKind(),
+      listPublications(locale, { limit: HOME_PUBLICATIONS }),
+      ongoingProjects(locale),
+      listPublicNews(locale, { sortBy: "publishedAt", sortOrder: "desc", page: 1, pageSize: HOME_NEWS }),
+      listPublicResearchLines(locale),
+      listPublicMethods(locale),
+      services(locale),
+    ]);
 
   return {
     memberCount: members.length,
@@ -47,6 +49,6 @@ export async function getHome(locale: Locale): Promise<PublicHome> {
     news: news.items,
     researchLines,
     methods,
-    servicesTeaser: teaser,
+    services: serviceLines,
   };
 }

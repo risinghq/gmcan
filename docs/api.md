@@ -17,7 +17,7 @@ These endpoints require no sign-in. All paths start with `/api`.
 
 | Endpoint                                      | Returns                                                                           |
 | --------------------------------------------- | --------------------------------------------------------------------------------- |
-| `GET /home`                                   | What the home page shows: recent items, counts, lines, methods, services teaser   |
+| `GET /home`                                   | What the home page shows: recent items, counts, lines, methods, services          |
 | `GET /publications`                           | Publications. Filters: `kindCode`, `event`, `journal`, `university`               |
 | `GET /publications/:id`                       | One publication with its authors and file links                                   |
 | `GET /members`, `GET /members/:id`            | Members, and one profile with projects and publications                           |

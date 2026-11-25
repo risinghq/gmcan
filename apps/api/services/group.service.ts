@@ -5,7 +5,6 @@ import {
   type AdminAbout,
   type AdminGroup,
   type GroupWrite,
-  HomeTeaserSchema,
 } from "@gmcan/contracts/admin";
 import type { PublicGroupTopic } from "@gmcan/contracts/public";
 import type { z } from "zod";
@@ -121,7 +120,6 @@ interface StoredAboutTranslation {
   description: string;
   objectivesContent: string;
   servicesContent: string;
-  homeServicesTeaserContent: string;
 }
 
 function parseAboutTranslation(tr: StoredAboutTranslation, label: string): AboutTranslation {
@@ -129,11 +127,6 @@ function parseAboutTranslation(tr: StoredAboutTranslation, label: string): About
     description: tr.description,
     objectivesContent: parseStoredJson(tr.objectivesContent, AboutSectionSchema, `${label}:objectivesContent`),
     servicesContent: parseStoredJson(tr.servicesContent, AboutSectionSchema, `${label}:servicesContent`),
-    homeServicesTeaserContent: parseStoredJson(
-      tr.homeServicesTeaserContent,
-      HomeTeaserSchema,
-      `${label}:homeServicesTeaserContent`,
-    ),
   };
 }
 
@@ -149,7 +142,6 @@ export async function listAboutLocalized(groupId: number, locale: Locale) {
       "about_translation.description as description",
       "about_translation.objectivesContent as objectivesContent",
       "about_translation.servicesContent as servicesContent",
-      "about_translation.homeServicesTeaserContent as homeServicesTeaserContent",
     ])
     .where("about.groupId", "=", groupId)
     .where("about_translation.locale", "=", locale)
@@ -195,7 +187,6 @@ export async function updateAbout(id: number, data: AboutWrite): Promise<boolean
         description: tr.description,
         objectivesContent: JSON.stringify(tr.objectivesContent),
         servicesContent: JSON.stringify(tr.servicesContent),
-        homeServicesTeaserContent: JSON.stringify(tr.homeServicesTeaserContent),
       })),
     ),
   ]);

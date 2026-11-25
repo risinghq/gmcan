@@ -55,7 +55,6 @@ export async function seedAbout() {
         description: text.description,
         objectivesContent: JSON.stringify(text.objectives),
         servicesContent: JSON.stringify(text.services),
-        homeServicesTeaserContent: JSON.stringify(text.homeServicesTeaser),
       })),
     )
     .onConflict((oc) => oc.doNothing())

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, type OnInit, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { ImageFieldComponent } from "@app/shared/components/image-field/image-field.component";
 import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
@@ -21,7 +21,6 @@ const EMPTY_ABOUT: AboutTranslation = {
   description: "",
   objectivesContent: { introParagraphs: [], items: [] },
   servicesContent: { introParagraphs: [], items: [] },
-  homeServicesTeaserContent: { paragraphs: [] },
 };
 
 function sectionForm(section: AboutSection) {
@@ -34,9 +33,6 @@ function aboutForm(about: AboutTranslation) {
     description: requiredText(about.description),
     objectivesContent: sectionForm(about.objectivesContent),
     servicesContent: sectionForm(about.servicesContent),
-    homeServicesTeaserContent: new FormGroup({
-      paragraphs: textList(about.homeServicesTeaserContent.paragraphs, [Validators.minLength(1)]),
-    }),
   });
 }
 
@@ -80,8 +76,6 @@ type AboutForm = ReturnType<typeof aboutForm>;
               [list]="group.controls.servicesContent.controls.introParagraphs"
             />
             <app-text-list label="Servicios" [list]="group.controls.servicesContent.controls.items" />
-            <div class="text-category mt-24">Servicios en la página de inicio <span class="red-text">*</span></div>
-            <app-text-list label="Párrafos" [list]="group.controls.homeServicesTeaserContent.controls.paragraphs" />
           </div>
         }
       </form>
