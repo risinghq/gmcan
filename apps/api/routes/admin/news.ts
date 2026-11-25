@@ -1,10 +1,5 @@
-import {
-  type AdminNews,
-  NewsKindCodeSchema,
-  NewsStatusCodeSchema,
-  NewsTranslationSchema,
-  NewsWriteFieldsSchema,
-} from "@gmcan/contracts/admin";
+import { type AdminNews, NewsTranslationSchema, NewsWriteFieldsSchema } from "@gmcan/contracts/admin";
+import { NewsKindCodeSchema, NewsStatusCodeSchema } from "@gmcan/contracts/public";
 import { Hono } from "hono";
 import { z } from "zod";
 

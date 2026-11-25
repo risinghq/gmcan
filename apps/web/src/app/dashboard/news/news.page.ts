@@ -26,7 +26,8 @@ import { AssetService } from "@app/shared/services/asset.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
-import type { AdminNews, NewsKindCode, NewsStatusCode, NewsWrite } from "@gmcan/contracts/admin";
+import type { AdminNews, NewsWrite } from "@gmcan/contracts/admin";
+import type { NewsKindCode, NewsStatusCode } from "@gmcan/contracts/public";
 import { AutosizeModule } from "ngx-autosize";
 import { firstValueFrom, map } from "rxjs";
 
