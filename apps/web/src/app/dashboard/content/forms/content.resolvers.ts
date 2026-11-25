@@ -3,8 +3,15 @@ import type { ActivatedRouteSnapshot, ResolveFn } from "@angular/router";
 import { GroupService } from "@app/shared/services/group.service";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
-import type { AdminEquipment, AdminMethod, AdminResearchLine, AdminSoftware } from "@gmcan/contracts/admin";
-import { type Observable, map, of } from "rxjs";
+import type {
+  AdminAbout,
+  AdminEquipment,
+  AdminGroup,
+  AdminMethod,
+  AdminResearchLine,
+  AdminSoftware,
+} from "@gmcan/contracts/admin";
+import { type Observable, map, of, switchMap } from "rxjs";
 
 /** The add route has no `:id`; its form starts empty. */
 function byId<T>(route: ActivatedRouteSnapshot, load: (id: number) => Observable<T>): Observable<T | null> {
@@ -12,17 +19,29 @@ function byId<T>(route: ActivatedRouteSnapshot, load: (id: number) => Observable
   return id === null ? of(null) : load(Number(id));
 }
 
+function first<T>(rows: readonly T[], missing: string): T {
+  const row = rows[0];
+  if (row === undefined) throw new Error(missing);
+  return row;
+}
+
+function onlyGroup(service: GroupService): Observable<AdminGroup> {
+  return service.listGroups().pipe(map((groups) => first(groups, "No research group exists")));
+}
+
 /** The site has one research group; new content belongs to it. */
 export const contentGroupIdResolver: ResolveFn<number> = () =>
-  inject(GroupService)
-    .listGroups()
-    .pipe(
-      map((groups) => {
-        const group = groups[0];
-        if (!group) throw new Error("No research group exists");
-        return group.id;
-      }),
-    );
+  onlyGroup(inject(GroupService)).pipe(map((group) => group.id));
+
+export const adminGroupResolver: ResolveFn<AdminGroup> = () => onlyGroup(inject(GroupService));
+
+export const adminAboutResolver: ResolveFn<AdminAbout> = () => {
+  const service = inject(GroupService);
+  return onlyGroup(service).pipe(
+    switchMap((group) => service.listAdminAbout(group.id)),
+    map((pages) => first(pages, "The research group has no about page")),
+  );
+};
 
 export const researchLineItemResolver: ResolveFn<AdminResearchLine | null> = (route) => {
   const service = inject(ResearchLinesService);

@@ -8,18 +8,29 @@ export interface ContentRow {
   name: string;
 }
 
-export function makeDataSource(rows: ContentRow[]): MatTableDataSource<ContentRow> {
-  return new MatTableDataSource(rows.toSorted((a, b) => a.name.localeCompare(b.name)));
-}
+/** One searchable content list and the routes that add to it and edit its rows. */
+export class ContentTable {
+  readonly dataSource = new MatTableDataSource<ContentRow>([]);
+  notFound = false;
 
-export function attachTable<T>(dataSource: MatTableDataSource<T>, sort: MatSort, paginator: MatPaginator): void {
-  dataSource.sort = sort;
-  dataSource.paginator = paginator;
-}
+  constructor(
+    readonly addRoute: string,
+    readonly editRoute: string,
+  ) {}
 
-export function applyTableFilter<T>(event: Event, dataSource: MatTableDataSource<T>): boolean {
-  const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-  dataSource.filter = filterValue;
-  dataSource.paginator?.firstPage();
-  return dataSource.filteredData.length === 0;
+  /** Fills the table in place, so the sort and paginator attached by the view stay connected. */
+  show(rows: ContentRow[]): void {
+    this.dataSource.data = rows.toSorted((a, b) => a.name.localeCompare(b.name));
+  }
+
+  attach(sort: MatSort, paginator: MatPaginator): void {
+    this.dataSource.sort = sort;
+    this.dataSource.paginator = paginator;
+  }
+
+  filter(text: string): void {
+    this.dataSource.filter = text.trim().toLowerCase();
+    this.dataSource.paginator?.firstPage();
+    this.notFound = this.dataSource.filteredData.length === 0;
+  }
 }

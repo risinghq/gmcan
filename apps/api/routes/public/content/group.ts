@@ -3,32 +3,23 @@ import { z } from "zod";
 
 import { notFound } from "../../../lib/errors/app-error.js";
 import { validate } from "../../../lib/validate.js";
-import { resolveAssetAccessUrl, resolveAssetAccessUrls } from "../../../services/assets/service.js";
+import { resolveAssetAccessUrls } from "../../../services/assets/service.js";
 import {
   listAboutLocalized,
   listEquipment,
   listGroupsLocalized,
   listSoftwareLocalized,
+  resolveGroupAssets,
 } from "../../../services/group.service.js";
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const AboutSectionSchema = z.object({
-  introParagraphs: z.array(z.string()),
-  items: z.array(z.string()),
-});
-const HomeTeaserSchema = z.object({ paragraphs: z.array(z.string()) });
 
 router.get("/", async (c) => {
   const locale = c.get("locale");
   const groups = await listGroupsLocalized(locale);
   const row = groups[0];
   if (!row) throw notFound();
-  const [facilities, header, footer] = await Promise.all(
-    (["facilities", "header", "footer"] as const).map((slot) =>
-      resolveAssetAccessUrl({ ownerType: "research_group", ownerId: row.id, slot }),
-    ),
-  );
   return c.json({
     id: row.id,
     summary: row.summary,
@@ -37,7 +28,7 @@ router.get("/", async (c) => {
     phone: row.phone,
     name: row.name,
     fullName: row.fullName,
-    assets: { facilities, header, footer },
+    assets: await resolveGroupAssets(row.id),
     facilities: row.facilities,
     futureWork: row.futureWork,
     publicationsSection: row.publicationsSection,
@@ -60,9 +51,9 @@ router.get("/:id/about", validate("param", IdParam), async (c) => {
     rows.map((row) => ({
       id: row.id,
       description: row.description,
-      objectivesContent: AboutSectionSchema.parse(JSON.parse(row.objectivesContent)),
-      servicesContent: AboutSectionSchema.parse(JSON.parse(row.servicesContent)),
-      homeServicesTeaserContent: HomeTeaserSchema.parse(JSON.parse(row.homeServicesTeaserContent)),
+      objectivesContent: row.objectivesContent,
+      servicesContent: row.servicesContent,
+      homeServicesTeaserContent: row.homeServicesTeaserContent,
       asset: assets.get(row.id) ?? null,
       groupId: row.groupId,
       createdAt: row.createdAt,

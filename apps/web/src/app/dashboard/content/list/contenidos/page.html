@@ -1,32 +1,26 @@
 <mat-tab-group class="noticias-div" [(selectedIndex)]="state.selectedTab" (selectedIndexChange)="state.setTab($event)">
-  <mat-tab label="¿Quiénes Somos?">
-    @if (state.selectedTab === 0) {
-    <app-contenidos-about-tab [state]="state" />
-    }
+  <mat-tab label="Grupo">
+    <div class="title mb-16">Información del grupo</div>
+    <p class="plex-sans mb-16">Logos, contacto, presentación, facilidades, trabajos futuros y secciones del sitio.</p>
+    <div class="black-btn mb-24"><a class="link link-set" routerLink="/dashboard/edit-grupo">Editar grupo</a></div>
+    <div class="title mb-16">¿Quiénes Somos?</div>
+    <p class="plex-sans mb-16">
+      Imagen del equipo, descripción, objetivos, servicios y el resumen de la página de inicio.
+    </p>
+    <div class="black-btn mb-24">
+      <a class="link link-set" routerLink="/dashboard/edit-quienes-somos">Editar ¿Quiénes Somos?</a>
+    </div>
   </mat-tab>
   <mat-tab label="Líneas de investigación">
-    @if (state.selectedTab === 1) {
-    <app-contenidos-lines-tab [state]="state" mode="line" />
-    }
+    <app-content-table [table]="state.lines" searchLabel="Buscar línea por nombre" addLabel="Agregar línea" />
   </mat-tab>
   <mat-tab label="Métodos">
-    @if (state.selectedTab === 2) {
-    <app-contenidos-lines-tab [state]="state" mode="method" />
-    }
+    <app-content-table [table]="state.methods" searchLabel="Buscar método por nombre" addLabel="Agregar método" />
   </mat-tab>
   <mat-tab label="Facilidades y recursos">
-    @if (state.selectedTab === 3) {
-    <app-contenidos-resources-tab [state]="state" />
-    }
-  </mat-tab>
-  <mat-tab label="Trabajos futuros">
-    @if (state.selectedTab === 4) {
-    <app-contenidos-future-tab [state]="state" />
-    }
-  </mat-tab>
-  <mat-tab label="Otros">
-    @if (state.selectedTab === 5) {
-    <app-contenidos-other-tab [state]="state" />
-    }
+    <div class="title mb-16">Equipos instalados</div>
+    <app-content-table [table]="state.equipment" searchLabel="Buscar equipo" addLabel="Agregar equipo" />
+    <div class="title mb-16">Software</div>
+    <app-content-table [table]="state.software" searchLabel="Buscar software" addLabel="Agregar software" />
   </mat-tab>
 </mat-tab-group>

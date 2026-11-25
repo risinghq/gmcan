@@ -52,8 +52,8 @@ describe("GroupService", () => {
     group.getGroup().subscribe();
     http.expectOne(groupUrl).flush({ id: 1 });
 
-    group.updateSummary(1, { summary: "new" }).subscribe();
-    http.expectOne("https://api.example.test/admin/group/1/summary").flush({ status: 200 });
+    group.updateGroup(1, { email: "", phone: "", translations: {} }).subscribe();
+    http.expectOne("https://api.example.test/admin/group/1").flush({ status: 200 });
 
     group.getGroup().subscribe();
     http.expectOne(groupUrl).flush({ id: 1 });
