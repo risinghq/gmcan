@@ -42,7 +42,6 @@ function chart(items: DashboardCountItem[], label: string, style: Partial<ChartD
   styleUrl: "./dashboard.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink, RouterLinkActive, BaseChartDirective],
-  // Only the chart types this page draws, so the rest of chart.js stays out of the bundle.
   providers: [
     provideCharts({
       registerables: [

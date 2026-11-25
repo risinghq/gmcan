@@ -1,4 +1,3 @@
-// zod/mini tree-shakes; the web parses this envelope on every page, and classic zod would add ~480 kB to its first load.
 import * as z from "zod/mini";
 
 export const AppErrorCodeSchema = z.enum([

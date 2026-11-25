@@ -1,5 +1,3 @@
-// Bootstrap 5's partials share globals, so they load only through Sass @import, not @use. angular.json silences the
-// `import` deprecation for that reason.
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
