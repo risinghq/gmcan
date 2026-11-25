@@ -6,7 +6,7 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
-import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
+import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -141,9 +141,9 @@ export default class DetailMemberComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    const originInfo = getPublicOriginInfo(parsePublicOrigin(this.route));
-    this.previouslink = originInfo.route;
-    this.previouspage = originInfo.label;
+    const origin = parsePublicOrigin(this.route.snapshot.queryParamMap.get("from"));
+    this.previouslink = originRoute(origin);
+    this.previouspage = originLabel(origin, this.language);
   }
 
   toggleExpanded(section: string, index: number): void {

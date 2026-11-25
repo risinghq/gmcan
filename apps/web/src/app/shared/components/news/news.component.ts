@@ -34,7 +34,7 @@ export default class NewsComponent {
   private readonly selectedNewsId = toSignal(this.route.paramMap.pipe(map((params) => Number(params.get("id")) || 0)), {
     initialValue: Number(this.route.snapshot.params["id"]) || 0,
   });
-  readonly origin = parsePublicOrigin(this.route);
+  readonly origin = parsePublicOrigin(this.route.snapshot.queryParamMap.get("from"));
   readonly language = this.session.language;
   readonly isDetailNews = toSignal(
     this.router.events.pipe(

@@ -1,49 +1,50 @@
+@let newsItem = item();
 <div class="detail-div">
-  @if (!cargado) {
-  <div>
-    <mat-spinner />
-  </div>
-  } @if (cargado) {
   <div class="row">
-    <div class="col-lg-8 col-sm-6 col-12">
+    <div class="col-lg-8 col-12">
       <div class="detail-links">
-        <a class="detail-link-active" routerLink="/">{{ language.home }}</a>
-        <mat-icon class="detail-icon"> arrow_right </mat-icon>
-        @if (previouslink !== "/") {
-        <a class="detail-link-active" [routerLink]="previouslink">{{ previouspage }}</a>
-        } @if (previouslink !== "/") {
-        <mat-icon class="detail-icon"> arrow_right </mat-icon>
+        <a class="detail-link-active" routerLink="/">{{ language().home }}</a>
+        <mat-icon class="detail-icon">arrow_right</mat-icon>
+        @if (originRoute() !== "/") {
+        <a class="detail-link-active" [routerLink]="originRoute()">{{ originLabel() }}</a>
+        <mat-icon class="detail-icon">arrow_right</mat-icon>
         }
-        <span class="detail-link" aria-current="page">{{ language.detailNews }}</span>
+        <span class="detail-link" aria-current="page">{{ language().detailNews }}</span>
       </div>
-      <div class="card-detail">
-        <div class="news-title-div">
+      <article class="card-detail">
+        <header class="news-header" [class.news-header-img]="newsItem.asset">
           @if (newsItem.asset) {
-          <img class="detail-img" src="{{ newsItem.asset }}" alt="" />
+          <img class="detail-img" [src]="newsItem.asset" alt="" fetchpriority="high" />
           }
-          <div class="news-title">{{ newsItem.title }}</div>
-        </div>
+          <h1 class="news-title">{{ newsItem.title }}</h1>
+        </header>
         <div class="detail-text-div">
-          <div class="news-abstract">{{ newsItem.summary }}</div>
+          @if (newsItem.summary) {
+          <p class="news-abstract">{{ newsItem.summary }}</p>
+          }
           <div class="author-div">
-            <div class="author-img-div">
-              <img class="author-img" src="{{ newsItem.authorPhotoUrl }}" alt="{{ newsItem.authorPhotoAlt }}" />
-            </div>
+            @if (newsItem.authorPhotoUrl) {
+            <img class="author-img" [src]="newsItem.authorPhotoUrl" [alt]="newsItem.authorPhotoAlt" />
+            }
             <div class="author-text">
-              <div class="news-type">{{ newsTypeNameLabel }}</div>
-              <div class="author-name">{{ authorNameLabel }}</div>
-              <div class="news-date">{{ writtenOn }}</div>
+              <div class="news-type">{{ newsItem.newsKindName }}</div>
+              @if (newsItem.authorId) {
+              <a class="author-name" [routerLink]="['/detail-member', newsItem.authorId]">{{ newsItem.authorName }}</a>
+              } @else {
+              <div class="author-name">{{ newsItem.authorName }}</div>
+              }
+              <time class="news-date" [attr.datetime]="newsItem.publishedAt">{{ news().writtenOn }}</time>
             </div>
           </div>
-          <app-shared-share-buttons [url]="shareUrl" [title]="newsItem.title" />
-
-          <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="newsItem.body"></div>
+          <app-shared-share-buttons class="share" [url]="shareUrl()" [title]="newsItem.title" />
+          @if (newsItem.body) {
+          <div class="detail-text" [innerHTML]="newsItem.body"></div>
+          }
         </div>
-      </div>
+      </article>
     </div>
-    <div class="col-lg-4 col-sm-6 col-12">
+    <div class="col-lg-4 col-12">
       <app-news />
     </div>
   </div>
-  }
 </div>

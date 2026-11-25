@@ -426,9 +426,6 @@ mat-sidenav {
     margin-left: auto;
     margin-right: auto;
   }
-  .google-html {
-    height: 128px;
-  }
   .language {
     font-size: 13px;
   }
@@ -594,8 +591,8 @@ mat-sidenav {
   }
   .google-html {
     margin-top: 24px;
-    height: 128px;
-    width: 100%;
+    min-height: 0;
+    height: 180px;
   }
   .footer-text-title,
   .footer-direction {
