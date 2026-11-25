@@ -27,10 +27,7 @@ export interface MemberFull extends Member {
 
 export interface MemberPublishability {
   publishable: boolean;
-  missing: {
-    base: string[];
-    translations: Record<string, string[]>;
-  };
+  missing: string[];
 }
 
 export interface MemberProfile {

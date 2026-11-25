@@ -7,24 +7,20 @@ import type {
 } from "@gmcan/contracts/admin";
 import type { Compilable, Expression, RawBuilder, SqlBool } from "kysely";
 
-import { atomic, db, insertedId, lastInsertId, queryInChunks, readBatch } from "../db/client.js";
+import { atomic, db, insertedId, lastInsertId, readBatch } from "../db/client.js";
 import type { MemberTypeCode } from "../db/schema.js";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "../lib/locales.js";
 import { hashPassword } from "../lib/password.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminMemberListItem } from "./admin-list.types.js";
 import { memberFullName, resolveMemberPhotoView, resolveMemberPhotoViews } from "./member-photo.service.js";
-import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
+import {
+  memberPublishability,
+  type MemberPublishability,
+  publicLocalizedMemberSelectQuery,
+} from "./member-read-model.js";
 import { listProjectsLocalized } from "./project.service.js";
 import { listPublications } from "./publication.service.js";
-
-export interface MemberPublishability {
-  publishable: boolean;
-  missing: {
-    base: string[];
-    translations: Record<string, string[]>;
-  };
-}
 
 export async function listMembersLocalized(locale: Locale) {
   return publicLocalizedMemberSelectQuery(locale).execute();
@@ -82,67 +78,30 @@ export async function listAdminMembers(
   }
 
   const rows = await query.orderBy("member.lastName", "asc").execute();
-  const memberIds = rows.map((row) => row.id);
-  const translationRows = await queryInChunks(memberIds, (chunk) =>
-    db
-      .selectFrom("member_translation")
-      .select(["memberId", "locale", "bio"])
-      .where("memberId", "in", chunk)
-      .where("locale", "in", SUPPORTED_LOCALES)
-      .execute(),
-  );
-
-  const translationsByMember = new Map<number, Map<string, string | null>>();
-  for (const tr of translationRows) {
-    if (!translationsByMember.has(tr.memberId)) translationsByMember.set(tr.memberId, new Map());
-    translationsByMember.get(tr.memberId)!.set(tr.locale, tr.bio);
-  }
-
   const photos = await resolveMemberPhotoViews(
     rows.map((row) => ({ memberId: row.id, fullName: memberFullName(row) })),
     locale,
   );
 
-  return rows.map((row) => {
-    const missingBase: string[] = [];
-    if (!row.dni) missingBase.push("dni");
-    if (!row.email) missingBase.push("email");
-    if (!row.firstName) missingBase.push("firstName");
-    if (!row.lastName) missingBase.push("lastName");
-    if (row.isActive !== 1) missingBase.push("isActive");
-
-    const memberTranslations = translationsByMember.get(row.id) ?? new Map<string, string | null>();
-    const missingTranslations: Record<string, string[]> = {};
-    for (const supportedLocale of SUPPORTED_LOCALES) {
-      const missing: string[] = [];
-      const bio = memberTranslations.get(supportedLocale);
-      if (!bio || bio.trim().length === 0) missing.push("bio");
-      if (missing.length > 0) missingTranslations[supportedLocale] = missing;
-    }
-
-    return {
-      id: row.id,
-      dni: row.dni,
-      email: row.email,
-      firstName: row.firstName,
-      lastName: row.lastName,
-      maternalName: row.maternalName,
-      birthDate: row.birthDate,
-      bio: row.bio,
-      isActive: row.isActive,
-      roleCode: row.roleCode,
-      memberTypeCode: row.memberTypeCode,
-      memberTypeName: row.memberTypeName ?? "",
-      prefixCode: row.prefixCode,
-      prefixName: row.prefixName,
-      photoUrl: photos.get(row.id)!.photoUrl,
-      photoAlt: photos.get(row.id)!.photoAlt,
-      publishability: {
-        publishable: missingBase.length === 0 && Object.keys(missingTranslations).length === 0,
-        missing: { base: missingBase, translations: missingTranslations },
-      },
-    };
-  });
+  return rows.map((row) => ({
+    id: row.id,
+    dni: row.dni,
+    email: row.email,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    maternalName: row.maternalName,
+    birthDate: row.birthDate,
+    bio: row.bio,
+    isActive: row.isActive,
+    roleCode: row.roleCode,
+    memberTypeCode: row.memberTypeCode,
+    memberTypeName: row.memberTypeName ?? "",
+    prefixCode: row.prefixCode,
+    prefixName: row.prefixName,
+    photoUrl: photos.get(row.id)!.photoUrl,
+    photoAlt: photos.get(row.id)!.photoAlt,
+    publishability: memberPublishability(row),
+  }));
 }
 
 export async function getMemberFull(id: number, locale: Locale = DEFAULT_LOCALE) {
@@ -330,38 +289,12 @@ export async function updateMemberProfile(id: number, data: MemberProfileWrite) 
 export async function getMemberPublishability(id: number): Promise<MemberPublishability> {
   const member = await db
     .selectFrom("member")
-    .select(["id", "dni", "email", "firstName", "lastName", "isActive"])
+    .select(["dni", "email", "firstName", "lastName", "isActive", "roleCode"])
     .where("id", "=", id)
     .executeTakeFirst();
 
-  if (!member) {
-    return { publishable: false, missing: { base: ["member"], translations: {} as Record<string, string[]> } };
-  }
-
-  const missingBase: string[] = [];
-  if (!member.dni) missingBase.push("dni");
-  if (!member.email) missingBase.push("email");
-  if (!member.firstName) missingBase.push("firstName");
-  if (!member.lastName) missingBase.push("lastName");
-  if (member.isActive !== 1) missingBase.push("isActive");
-
-  const rows = await db
-    .selectFrom("member_translation")
-    .select(["locale", "bio"])
-    .where("memberId", "=", id)
-    .where("locale", "in", SUPPORTED_LOCALES)
-    .execute();
-  const map = new Map(rows.map((r) => [r.locale, r.bio]));
-  const missingTranslations: Record<string, string[]> = {};
-  for (const locale of SUPPORTED_LOCALES) {
-    const bio = map.get(locale);
-    const missing: string[] = [];
-    if (!bio || bio.trim().length === 0) missing.push("bio");
-    if (missing.length > 0) missingTranslations[locale] = missing;
-  }
-
-  const publishable = missingBase.length === 0 && Object.keys(missingTranslations).length === 0;
-  return { publishable, missing: { base: missingBase, translations: missingTranslations } };
+  if (!member) return { publishable: false, missing: ["member"] };
+  return memberPublishability(member);
 }
 
 export async function deleteMember(id: number) {

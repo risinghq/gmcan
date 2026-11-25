@@ -1,0 +1,30 @@
+{
+  "id": 1,
+  "slug": "gmcan",
+  "shortName": "GMCAN",
+  "fullName": "Grupo de Investigación de Métodos Computacionales Aplicado a Nanomateriales",
+  "address": "Germán Amézaga N° 375 - Edificio Jorge Basadre, Ciudad Universitaria, Lima, Perú",
+  "email": "gmcan@unmsm.edu.pe",
+  "phone": "+51 989994607",
+  "translations": {
+    "es": {
+      "summary": "El GMCAN aplica y desarrolla modernas herramientas computacionales para entender, predecir y controlar los procesos físicos y químicos en el rango de tamaños moleculares hasta la mesoescala.",
+      "facilities": "El GMCAN se ubica en el tercer piso del edificio del Instituto de Investigación de Física. Cuenta con un ambiente multiuso con espacio para investigadores, tesistas y estudiantes. Contamos con equipo computacional para el trabajo de las actividades de investigación, tanto de proyectos como de tesis de pre y postgrado. Asimismo, forma parte del grupo el Laboratorio de Modelamiento y Simulación Computacional (LMSC). En el que contamos con recurso computacional, equipados con estaciones de trabajo de alto desempeño. Lo que nos permite garantizar los estudios mediante simulaciones de sistemas complejos.",
+      "futureWork": "<p>● Estudiar la influencia de dopantes sobre las propiedades mecánicas y electrónicas de las GNR.</p>\n\n<p>● Estudiar las propiedades mecánicas de las nanohojas de grafeno monocapa con nanoporos funcionalizadas de igual tamaño distribuidos aleatoriamente y de forma ordenada.</p>\n\n<p>● Estudiar las propiedades mecánicas de las nanohojas de grafeno multicapa con nanoporos funcionalizadas.</p>\n\n<p>● Estudiar procesos de transporte del agua por la membrana de grafeno multicapa nanoporoso.</p>\n\n<p>● Estudiar las condiciones más óptimas de generación de nanoporos mediante el bombardeo con átomos y iones energéticos mediante la simulación con DM</p>\n\n<p>● Estudiar el efecto del tamaño y forma de las NPs sobre las propiedades magnéticas (Tc, Hc).</p>\n\n<p>● Efecto de la anisotropía superficial sobre las propiedades magnéticas .</p>\n\n<p>● Procesos de relajación en sistemas SPM.</p>\n\n<p>● Estudio de nanopartículas magnéticas inmersa en metales no-magnéticas.</p>\n\n<p>● Estudiar las propiedades de multicapas metal magnético/tierra rara.</p>\n\n<p>● Estudio de las propiedades superferromagnéticas de sistemas bidimensionales.</p>\n\n<p>● Estudio de la formación de skyrmions magnéticos, mediante simulación atomística</p>",
+      "publicationsSection": "Los resultados de nuestras investigaciones son publicadas en revistas indexadas de alto impacto.",
+      "projectsSection": "Nuestro grupo desarrolla proyectos de investigación regularmente con fondos concursables locales y externos. Fondos que también incluyen para el desarrollo de tesis de estudiantes de pre y posgrado."
+    },
+    "en": {
+      "summary": "GMCAN applies and develops modern computational tools to understand, predict and control physical and chemical processes in the range of molecular sizes up to the mesoscale.",
+      "facilities": "The GMCAN is located on the third floor of the Physics Research Institute building. It has a multipurpose environment with space for researchers, thesis students and students. We have computer equipment for the work of research activities, both undergraduate and graduate projects and theses. Likewise, the Computational Modeling and Simulation Laboratory (LMSC) is part of the group. In which we have computational resources, equipped with high-performance workstations. This allows us to guarantee studies through simulations of complex systems.",
+      "futureWork": "<p>● Study the influence of dopants on the mechanical and electronic properties of GNR.</p>\n\n<p>● Study the mechanical properties of monolayer graphene nanosheets with functionalized nanopores of the same size randomly distributed in an orderly manner.</p>\n\n<p>● Study the mechanical properties of multilayer graphene nanosheets with functionalized nanopores.</p>\n\n<p>● Study water transport processes through the nanoporous multilayer graphene membrane.</p>\n\n<p>● Study the most optimal conditions for the generation of nanopores through bombardment with energetic atoms and ions through simulation with DM</p>\n\n<p>● Study the effect of the size and shape of NPs on the magnetic properties (Tc, Hc).</p>\n\n<p>● Effect of surface anisotropy on magnetic properties.</p>\n\n<p>● Relaxation processes in SPM systems.</p>\n\n<p>● Study of magnetic nanoparticles immersed in non-magnetic metals.</p>\n\n<p>● Study the properties of magnetic metal / rare earth multilayers.</p>\n\n<p>● Study of the superferromagnetic properties of two-dimensional systems.</p>\n\n<p>● Study of the formation of magnetic skyrmions, through atomistic simulation</p>",
+      "publicationsSection": "The results of our research are published in high impact indexed journals",
+      "projectsSection": "Our group develops research projects regularly with local and external competitive funds. Funds that also include for the development of theses of undergraduate and graduate students."
+    }
+  },
+  "assets": {
+    "facilities": "group/facilities.png",
+    "header": "group/header.png",
+    "footer": "group/footer.png"
+  }
+}

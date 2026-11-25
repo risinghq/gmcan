@@ -1,13 +1,37 @@
 import { db } from "../db/client.js";
-import { SUPPORTED_LOCALES } from "../lib/locales.js";
+import type { RoleCode } from "../db/schema.js";
 import type { Locale } from "../lib/public-locale.js";
 
-const REQUIRED_TRANSLATED_FIELDS = ["bio"] as const;
+export interface MemberPublishability {
+  publishable: boolean;
+  missing: string[];
+}
+
+interface PublishFields {
+  dni: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isActive: number;
+  roleCode: RoleCode;
+}
+
+/** The public site lists active members with a name; the administrator account is never one of them. */
+export function memberPublishability(member: PublishFields): MemberPublishability {
+  const missing: string[] = [];
+  if (!member.dni) missing.push("dni");
+  if (!member.email) missing.push("email");
+  if (!member.firstName) missing.push("firstName");
+  if (!member.lastName) missing.push("lastName");
+  if (member.isActive !== 1) missing.push("isActive");
+  if (member.roleCode === "administrator") missing.push("roleCode");
+  return { publishable: missing.length === 0, missing };
+}
 
 export function publicLocalizedMemberSelectQuery(locale: Locale) {
-  let query = db
+  return db
     .selectFrom("member")
-    .innerJoin("member_translation", (join) =>
+    .leftJoin("member_translation", (join) =>
       join.onRef("member_translation.memberId", "=", "member.id").on("member_translation.locale", "=", locale),
     )
     .select([
@@ -21,34 +45,9 @@ export function publicLocalizedMemberSelectQuery(locale: Locale) {
       "member.prefixCode as prefixCode",
     ])
     .where("member.isActive", "=", 1)
+    .where("member.roleCode", "!=", "administrator")
     .where("member.dni", "!=", "")
     .where("member.email", "!=", "")
     .where("member.firstName", "!=", "")
     .where("member.lastName", "!=", "");
-
-  for (const field of REQUIRED_TRANSLATED_FIELDS) {
-    query = query
-      .where(`member_translation.${field}` as "member_translation.bio", "is not", null)
-      .where(`member_translation.${field}` as "member_translation.bio", "!=", "");
-  }
-
-  for (const requiredLocale of SUPPORTED_LOCALES) {
-    query = query.where((eb) =>
-      eb.exists(
-        REQUIRED_TRANSLATED_FIELDS.reduce(
-          (inner, field) =>
-            inner
-              .where(`required_translation.${field}` as "required_translation.bio", "is not", null)
-              .where(`required_translation.${field}` as "required_translation.bio", "!=", ""),
-          eb
-            .selectFrom("member_translation as required_translation")
-            .select("required_translation.memberId")
-            .whereRef("required_translation.memberId", "=", "member.id")
-            .where("required_translation.locale", "=", requiredLocale),
-        ),
-      ),
-    );
-  }
-
-  return query;
 }

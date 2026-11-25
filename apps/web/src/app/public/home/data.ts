@@ -171,7 +171,7 @@ export class HomeDataService {
     return newsItems.map((newsItem) => {
       return {
         ...newsItem,
-        publishedAtLabel: dateText(newsItem.publishedAt, "MMMM dd, y", this.session.language().locale),
+        publishedAtLabel: dateText(newsItem.publishedAt, "longDate", this.session.language().locale),
         newsTypeNameLabel: newsItem.newsKindName,
         authorNameLabel: newsItem.authorName,
       };

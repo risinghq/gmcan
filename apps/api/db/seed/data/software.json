@@ -1,0 +1,128 @@
+[
+  {
+    "id": 1,
+    "moreInfo": "https://lammps.sandia.gov/",
+    "translations": {
+      "es": {
+        "name": "LAMMPS",
+        "description": "Potente programa de simulación atomística/molecular con dinámica molecular a gran escala de Sandia National Laboratories. LAMMPS utiliza la interfaz MPI para la comunicación en paralelo y es un software gratuito y de código abierto, distribuido según los términos de la licencia pública general GNU."
+      },
+      "en": {
+        "name": "LAMMPS",
+        "description": "Powerful atomistic / molecular simulation program with large-scale molecular dynamics from Sandia National Laboratories. LAMMPS uses the MPI interface for parallel communication and is free and open source software, distributed under the terms of the GNU General Public License."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "moreInfo": "http://xmd.sourceforge.net/",
+    "translations": {
+      "es": {
+        "name": "XMD",
+        "description": "Programa computacional para realizar la simulación con el método de dinámica molecular, especialmente útil para estudiar metales y cerámicas. XMD fue desarrollado por Jon Rifkin de University of Connecticut."
+      },
+      "en": {
+        "name": "XMD",
+        "description": "Computer program to perform simulation with the molecular dynamics method, especially useful for studying metals and ceramics. XMD was developed by Jon Rifkin of the University of Connecticut."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "moreInfo": "http://www.quantum-espresso.org/",
+    "translations": {
+      "es": {
+        "name": "Quantum-Espresso",
+        "description": "Es un conjunto integrado de códigos informáticos de código abierto para cálculos de estructuras electrónicas y modelado de materiales a nanoescala. Se basa en la teoría funcional de la densidad, ondas planas y pseudopotenciales."
+      },
+      "en": {
+        "name": "Quantum-Espresso",
+        "description": "It is an integrated set of open source computer codes for calculations of electronic structures and modeling of materials at the nanoscale. It is based on the functional theory of density, plane waves and pseudopotentials."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "moreInfo": "https://departments.icmab.es/leem/siesta/",
+    "translations": {
+      "es": {
+        "name": "SIESTA",
+        "description": "Es un método original y una implementación de software para efectuar cálculos de estructura electrónica y simulaciones de dinámica molecular ab initio para moléculas y sólidos. Usa un código de teoría funcional de la densidad que predice las propiedades de una agrupación de átomos."
+      },
+      "en": {
+        "name": "SIESTA",
+        "description": "It is an original method and software implementation to perform ab initio electronic structure calculations and molecular dynamics simulations for molecules and solids. Use a code of density functional theory that predicts the properties of a grouping of atoms."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "moreInfo": "https://vampire.york.ac.uk/",
+    "translations": {
+      "es": {
+        "name": "VAMPIRE",
+        "description": "Software de código abierto para simulación atomística de materiales magnéticos"
+      },
+      "en": {
+        "name": "VAMPIRE",
+        "description": "Open source software for atomistic simulation of magnetic materials"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "moreInfo": "http://jleliaert.github.io/vinamax/",
+    "translations": {
+      "es": {
+        "name": "Vinamax",
+        "description": "Herramienta para simulación para nanopartículas basado en macroespín, Herramienta escrito el golang."
+      },
+      "en": {
+        "name": "Vinamax",
+        "description": "Tool for simulation for nanoparticles based on macrospin, Tool written in golang."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "moreInfo": "https://mumax.github.io/",
+    "translations": {
+      "es": {
+        "name": "mumax3",
+        "description": "Es un programa de simulación micro magnética desarrollado por DyNaMats"
+      },
+      "en": {
+        "name": "mumax3",
+        "description": "It is a micro magnetic simulation program developed by DyNaMats"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "moreInfo": "https://www.ovito.org/docs/current/",
+    "translations": {
+      "es": {
+        "name": "OVITO",
+        "description": "Software de análisis y visualización científica de datos. Datos generalmente obtenidos por simulación numérica en ciencia de materiales, física y química."
+      },
+      "en": {
+        "name": "OVITO",
+        "description": "Scientific data analysis and visualization software. Data generally obtained by numerical simulation in materials science, physics, and chemistry."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "moreInfo": null,
+    "translations": {
+      "es": {
+        "name": "MCANP",
+        "description": "Programas propios que fueron desarrollados en el grupo."
+      },
+      "en": {
+        "name": "MCANP",
+        "description": "Own programs that were developed in the group."
+      }
+    }
+  }
+]

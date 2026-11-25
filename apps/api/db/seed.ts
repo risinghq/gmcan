@@ -1,5 +1,12 @@
 import { seedAssetsAndBindings } from "./seed/assets.js";
-import { seedNews, seedJournals, seedUniversities, seedEvents, seedProject, seedPublications } from "./seed/content.js";
+import {
+  seedNews,
+  seedJournals,
+  seedUniversities,
+  seedEvents,
+  seedProjects,
+  seedPublications,
+} from "./seed/content.js";
 import { seedEquipment, seedSoftware, seedAbout } from "./seed/infrastructure.js";
 import { seedLocales, seedLookups } from "./seed/lookups.js";
 import { seedMembers } from "./seed/members.js";
@@ -19,7 +26,7 @@ export async function seed() {
   await seedJournals();
   await seedUniversities();
   await seedEvents();
-  await seedProject();
+  await seedProjects();
   await seedPublications();
   await seedAssetsAndBindings();
 }

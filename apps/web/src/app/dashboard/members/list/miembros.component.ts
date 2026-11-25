@@ -89,13 +89,11 @@ export default class MiembrosComponent implements AfterViewInit {
   }
 
   missingCount(row: AdminMemberListItem): number {
-    if (!row.publishability) return 0;
     return countMissingRequirements(row.publishability);
   }
 
   openPublishability(row: AdminMemberListItem, event: Event): void {
     event.stopPropagation();
-    if (!row.publishability) return;
     this.dialog.open(PublishabilityDialogComponent, {
       width: "560px",
       data: {

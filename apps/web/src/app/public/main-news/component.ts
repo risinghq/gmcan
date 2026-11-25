@@ -13,6 +13,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { dateText } from "@app/shared/utils/date";
 import {
   NgbPagination,
   NgbPaginationPrevious,
@@ -27,16 +28,11 @@ type PublicNewsCard = PublicNewsListItem & {
 };
 type NewsTypeFilter = { code: "general" | "research" | "event"; name: string };
 
-function toNewsCard(n: PublicNewsListItem): PublicNewsCard {
-  const d = new Date(n.publishedAt ?? "");
-  const valid = String(d) !== "Invalid Date";
-  if (valid) d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+function toNewsCard(n: PublicNewsListItem, locale: string): PublicNewsCard {
   return {
     ...n,
     newsTypeNameLabel: n.newsKindName,
-    publishedAtLabel: valid
-      ? new Intl.DateTimeFormat("es", { month: "long", day: "2-digit", year: "numeric" }).format(d)
-      : "",
+    publishedAtLabel: dateText(n.publishedAt, "longDate", locale),
     authorNameLabel: n.authorName,
   };
 }
@@ -100,7 +96,10 @@ export default class MainNewsComponent implements OnInit {
       }),
   });
 
-  readonly items = computed(() => (this.news.value()?.items ?? []).map(toNewsCard));
+  readonly items = computed(() => {
+    const locale = this.session.language().locale;
+    return (this.news.value()?.items ?? []).map((item) => toNewsCard(item, locale));
+  });
 
   get selectedCategoryCode(): NewsTypeFilter["code"] | null {
     return this.query().code;

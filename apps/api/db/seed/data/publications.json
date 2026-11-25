@@ -1,0 +1,640 @@
+[
+  {
+    "id": 39,
+    "kindCode": "conference_paper",
+    "doi": null,
+    "publishedAt": "2019-11-18",
+    "translations": {
+      "es": {
+        "title": "Simulación de curvas M(H) mediante la implementación del algoritmo Metropolis-Hastings basado en el método de cadena de Markov Monte Carlo",
+        "abstract": "Se expone la aplicación directa de los métodos computacionales de simulación Monte Carlo mediante la implementación del algoritmo Metrópolis-Hastings para la simulación del proceso de generación de curvas M(H) para un material ferromagnético. Se presenta un esquema de un sistema de nanopartículas magnéticas idénticas no interactuantes con distribución aleatoria del momento magnético. Se presenta un estudio sistemático de las curvas de magnetización, la cual varía con el tiempo al verse expuesto a campos magnéticos externos como una función del grado de libertad del momento magnético por paso Monte Carlo. Adicionalmente, el efecto de la temperatura sobre el ángulo de prueba es estudiado. El desarrollo de la implementación fue realizado en Python utilizando código Fortran embebido gracias a la herramienta F2PY."
+      },
+      "en": {
+        "title": "Simulación de curvas M(H) mediante la implementación del algoritmo Metropolis-Hastings basado en el método de cadena de Markov Monte Carlo",
+        "abstract": "The direct application of the computational Monte Carlo simulation methods through the implementation of the Metropolis-Hastings algorithm for the simulation of the M (H) curve generation process for a ferromagnetic material is exposed. A diagram of a system of non-interacting identical magnetic nanoparticles with random distribution of the magnetic moment is presented. A systematic study of magnetization curves is presented, which varies with time when exposed to external magnetic fields as a function of the degree of freedom of the magnetic moment per Monte Carlo step. Additionally, the effect of temperature on the test angle is studied. The development of the implementation was done in Python using embedded Fortran code thanks to the F2PY tool."
+      }
+    },
+    "authors": [
+      {
+        "email": "rvizarreta14@gmail.com"
+      },
+      {
+        "email": "t2y001@gmail.com"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      }
+    ],
+    "eventId": 1,
+    "file": null
+  },
+  {
+    "id": 41,
+    "kindCode": "journal_article",
+    "doi": "10.1016/j.apsusc.2019.04.001",
+    "publishedAt": "2019-01-18",
+    "translations": {
+      "es": {
+        "title": "Formaldehyde trapping by radical initiated reaction on hydrogenated boron nitride",
+        "abstract": "Using density functional theory, we have studied the trapping of formaldehyde on hydrogenated boron nitride nanosheets. On the nitrogen terminated side, the formaldehyde molecule is physisorbed at a distance of ~3.1 Å on top of a N atom. A calculation of the adsorption energy, as function of vertical separation between the molecule and the substrate, shows that closer to the surface, there is a strong repulsion due to the electronegativity of the N and O atoms. On the other hand, the trapping of formaldehyde by the substrate on the boron terminated surface is very favorable. The reaction of a single molecule is described by calculating the minimum energy pathway. It begins with the formaldehyde molecule and the boron nitride substrate far away from each other. In the following state of the reaction, the molecule attaches to the boron side of the substrate, gaining a large amount of energy. Through this interaction, the double bond of the oxygen atom breaks down, turning the molecule into a highly reactive carbon centered radical. In the final state of the reaction, a neighbor hydrogen atom is abstracted. In this state, there is an additional energy gain of 0.06 eV. Once the stable molecule is formed by the abstraction of the hydrogen atom, a new dangling bond is created at a neighbor boron atom, which it may serve as a new site for the following molecule to attach. In this way, a chain reaction is possible. This self-propagating reaction is more viable for hydrogenated boron nitride than for graphane, opening an avenue to use hydrogenated h-BN in the indoor air pollution control. When there are two or more neighboring hydrogen vacancies in the substrate, the formaldehyde molecule prefers to attach forming Osingle bondB and Csingle bondB bonds with the substrate."
+      },
+      "en": {
+        "title": "Formaldehyde trapping by radical initiated reaction on hydrogenated boron nitride",
+        "abstract": "Using density functional theory, we have studied the trapping of formaldehyde on hydrogenated boron nitride nanosheets. On the nitrogen terminated side, the formaldehyde molecule is physisorbed at a distance of ~3.1 Å on top of a N atom. A calculation of the adsorption energy, as function of vertical separation between the molecule and the substrate, shows that closer to the surface, there is a strong repulsion due to the electronegativity of the N and O atoms. On the other hand, the trapping of formaldehyde by the substrate on the boron terminated surface is very favorable. The reaction of a single molecule is described by calculating the minimum energy pathway. It begins with the formaldehyde molecule and the boron nitride substrate far away from each other. In the following state of the reaction, the molecule attaches to the boron side of the substrate, gaining a large amount of energy. Through this interaction, the double bond of the oxygen atom breaks down, turning the molecule into a highly reactive carbon centered radical. In the final state of the reaction, a neighbor hydrogen atom is abstracted. In this state, there is an additional energy gain of 0.06 eV. Once the stable molecule is formed by the abstraction of the hydrogen atom, a new dangling bond is created at a neighbor boron atom, which it may serve as a new site for the following molecule to attach. In this way, a chain reaction is possible. This self-propagating reaction is more viable for hydrogenated boron nitride than for graphane, opening an avenue to use hydrogenated h-BN in the indoor air pollution control. When there are two or more neighboring hydrogen vacancies in the substrate, the formaldehyde molecule prefers to attach forming Osingle bondB and Csingle bondB bonds with the substrate."
+      }
+    },
+    "authors": [
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "name": "J Guerrero-Sanchez"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "C.V. Landauro"
+      },
+      {
+        "name": "Noboru Takeuchi"
+      }
+    ],
+    "journalId": 1,
+    "issue": 484,
+    "file": "publications/publication-41.pdf"
+  },
+  {
+    "id": 42,
+    "kindCode": "journal_article",
+    "doi": "10.1039/C8CP05592K",
+    "publishedAt": "2018-01-18",
+    "translations": {
+      "es": {
+        "title": "Doping engineering of thermoelectric transport in BNC heteronanotubes",
+        "abstract": "BNC heteronanotubes are promising materials for the design of nanoscale thermoelectric devices. In particular, the structural BN doping pattern can be exploited to control the electrical and thermal transport properties of BNC nanostructures. We here address the thermoelectric transport properties of (6,6)-BNC heteronanotubes with helical and horizontal BN doping patterns. For this, we use a density functional tight-binding method combined with the Green's function technique. Our results show that the electron transmission is reduced and the electronic bandgap increased as a function of the BN concentration for different doping distribution patterns, so that (6,6)-BNC heteronanotubes become semiconducting with a tunable bandgap. The thermal conductance of helical (6,6)-BNC heteronanotubes, which is dominated by phonons, is weakly dependent on BN concentration in the range of 30–80%. Also, the Seebeck coefficient is enhanced by increasing the concentration of helical BN strips. In particular, helical (6,6)-BNC heteronanotubes with a high BN concentration (>20%) display a larger figure of merit compared to other doping distributions and, for a concentration of 50%, reach values up to 2.3 times and 3.4 times the corresponding values of a CNT at 300 K and 800 K, respectively. Our study yields new insights into the parameters tuning the thermoelectric efficiency and thus provides a starting point for designing thermoelectric devices based on BNC nanostructures."
+      },
+      "en": {
+        "title": "Doping engineering of thermoelectric transport in BNC heteronanotubes",
+        "abstract": "BNC heteronanotubes are promising materials for the design of nanoscale thermoelectric devices. In particular, the structural BN doping pattern can be exploited to control the electrical and thermal transport properties of BNC nanostructures. We here address the thermoelectric transport properties of (6,6)-BNC heteronanotubes with helical and horizontal BN doping patterns. For this, we use a density functional tight-binding method combined with the Green's function technique. Our results show that the electron transmission is reduced and the electronic bandgap increased as a function of the BN concentration for different doping distribution patterns, so that (6,6)-BNC heteronanotubes become semiconducting with a tunable bandgap. The thermal conductance of helical (6,6)-BNC heteronanotubes, which is dominated by phonons, is weakly dependent on BN concentration in the range of 30–80%. Also, the Seebeck coefficient is enhanced by increasing the concentration of helical BN strips. In particular, helical (6,6)-BNC heteronanotubes with a high BN concentration (>20%) display a larger figure of merit compared to other doping distributions and, for a concentration of 50%, reach values up to 2.3 times and 3.4 times the corresponding values of a CNT at 300 K and 800 K, respectively. Our study yields new insights into the parameters tuning the thermoelectric efficiency and thus provides a starting point for designing thermoelectric devices based on BNC nanostructures."
+      }
+    },
+    "authors": [
+      {
+        "name": "Leonardo Medrano Sandonas"
+      },
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "name": "Rafael Gutierrez"
+      },
+      {
+        "name": "C.V. Landauro"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "Gianaurelio Cuniberti"
+      }
+    ],
+    "journalId": 12,
+    "issue": 21,
+    "file": "publications/publication-42.pdf"
+  },
+  {
+    "id": 53,
+    "kindCode": "journal_article",
+    "doi": "10.15446/mo.n58.72149",
+    "publishedAt": "2019-01-01",
+    "translations": {
+      "es": {
+        "title": "ANÁLISIS DE LAS PROPIEDADES ÓPTICAS DE TiO2 ANATASE DOPADO CON N y F EN BASE A CÁLCULOS DE PRIMEROS PRINCIPIOS",
+        "abstract": "El uso de TiO 2 en la construcción de celdas solares tiene una severa limitación: su band gap amplio de aproximadamente 3.2 eV solo le permite absorber radiación en la región ultravioleta (UV) λ< 380 nm. Esto reduce gravemente la eficiencia de la energía solar al 5%. En la presente investigation se usó el potencial de intercambio-correlación de Perdew-Burke-Ernzerhof (PBE) en el marco de la teoría funcional de la densidad (DFT) implementada en el código WIEN2k que usa las ondas planas aumentadas linearizadas (FP-LAPW) como aproximación de la base para los orbitales de Kohn-Sham, para calcular las propiedades ópticas y estructura electronica de TiO 2 anatasa dopado con N y/o F. Se ha observado que la fase anatasa de TiO 2 dopada con F, N o el codopado FN exhibe una disminución en el band gap hasta en un 17% para el dopado con N a una concentración de 10.4%, y que esta reducción del gap está asociada a la mejor absorción en la zona visible del espectro de los sistemas estudiados. Los resultados indican que TiO 2 anatasa dopado en distintas concentraciones puede aumentar la eficiencia de celdas fotovoltaicas y que este aumento en la eficiencia es proporcional a la concentración del elemento dopante para los sistemas monodopados. El codopado, que continuamente es reportado como mejor, en cuanto a la reducción del gap y la absorción de radiación, en comparación con el monodopado, no ha mostrado serlo en el sistema de codopado por sustitución con N y F"
+      },
+      "en": {
+        "title": "ANÁLISIS DE LAS PROPIEDADES ÓPTICAS DE TiO2 ANATASE DOPADO CON N y F EN BASE A CÁLCULOS DE PRIMEROS PRINCIPIOS",
+        "abstract": "The use of TiO 2 in the construction of solar cells has a severe limitation: its wide band gap of approximately 3.2 eV only allows it to absorb radiation in the ultraviolet (UV) region λ< 380 nm. This severely reduces the efficiency of solar energy to 5%. In the present investigation, the Perdew-Burke-Ernzerhof (PBE) exchange-correlation potential was used in the framework of the density functional theory (DFT) implemented in the WIEN2k code that uses linearized augmented plane waves (FP-LAPW). ) as a basis approximation for the Kohn-Sham orbitals, to calculate the optical properties and electronic structure of TiO 2 anatase doped with N and/or F. It has been observed that the anatase phase of TiO 2 doped with F, N or FN codoping exhibits a decrease in the band gap of up to 17% for doping with N at a concentration of 10.4%, and that this gap reduction is associated with the best absorption in the visible part of the spectrum of the studied systems. The results indicate that TiO 2 anatase doped at different concentrations can increase the efficiency of photovoltaic cells and that this increase in efficiency is proportional to the concentration of the doping element for monodoped systems. Codoping, which is continually reported to be better in terms of gap reduction and radiation absorption, compared to monodoping, has not been shown to be better in the N and F substitution codoping system."
+      }
+    },
+    "authors": [
+      {
+        "name": "M. Mendoza"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      }
+    ],
+    "journalId": 16,
+    "issue": 58,
+    "file": null
+  },
+  {
+    "id": 54,
+    "kindCode": "journal_article",
+    "doi": "10.1016/j.physleta.2018.09.004",
+    "publishedAt": "2018-04-02",
+    "translations": {
+      "es": {
+        "title": "Ferromagnetic phases due to competing short- and long-range interactions in the spin-5/2 and spin-2 Blume–Capel model",
+        "abstract": "Ampliamos el estudio de la física estadística del modelo spin-S Blume-Capel con interacciones de campo medio ferromagnético J en competencia con interacciones antiferromagnéticas de corto alcance K en una cadena lineal en el límite termodinámico. Este trabajo está dedicado al caso cuando S toma el valor semientero S=5/2 y cuando S asume el valor entero S=2. En ambos casos los diagramas de fase exhiben nuevas fases ferromagnéticas (para ciertos valores de K) encerradas por ramas que emergen de las fronteras de primer orden del modelo ferromagnético puro. Para temperaturas finitas, las topologías complejas se obtuvieron mediante la minimización numérica de la energía libre y algunos resultados se confirmaron mediante simulaciones de Monte Carlo."
+      },
+      "en": {
+        "title": "Ferromagnetic phases due to competing short- and long-range interactions in the spin-5/2 and spin-2 Blume–Capel model",
+        "abstract": "We broaden the study of the statistical physics of the spin-S Blume–Capel model with ferromagnetic mean-field interactions J in competition with short-range antiferromagnetic interactions K in a linear chain in the thermodynamic limit. This work is dedicated to the case when S takes the half-integer spin S=5/2 and when S assumes the integer value S=2. In both cases the phase diagrams exhibit new ferromagnetic phases (for certain values of K) enclosed by branches emerging from the first-order frontiers of the pure ferromagnetic model. For finite temperatures the complex topologies were obtained by numerical minimization of the free energy and some results were confirmed by Monte Carlo simulations"
+      }
+    },
+    "authors": [
+      {
+        "email": "octaviors@gmail.com"
+      },
+      {
+        "name": "Neto M."
+      },
+      {
+        "name": "Dinola Neto F."
+      },
+      {
+        "email": "americomurillo@gmail.com"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      }
+    ],
+    "journalId": 15,
+    "issue": 382,
+    "file": null
+  },
+  {
+    "id": 55,
+    "kindCode": "journal_article",
+    "doi": "10.1039/d0nr03815f",
+    "publishedAt": "2020-04-01",
+    "translations": {
+      "es": {
+        "title": "Structural properties and thermal stability of multi-walled black phosphorene nanotubes and their operation as temperature driven nanorotors",
+        "abstract": "In this paper, we explore the influence of structural properties, thermal stability, and temperature on the rotational frequency of (0,n) armchair multi-walled black phosphorene nanotubes (MWβPNTs). Using Density Functional Theory (DFT) calculations, we first determine the influence of the outer wall rotation on the structural stability of (0,12)@(0,19) DWβPNTs, and (0,12)@(0,19)@(0,26) TWβPNTs. The results indicate that the relative energies of the DW-and the TWβPNTs do not change with the rotation angle. Therefore, the outer wall rotation is not important for the structural formation of the MWβPNTs. Then, using molecular dynamics (MD) simulations, we study the structural properties, thermal stability, and rotational frequency of (0,12)@(0,19) DWβPNTs, (0,12)@(0,19)@(0,26) TWβPNTs, and (0,12)@(0,19)@(0,26)@(0,33) QWβPNTs from 1 K to 400 K. The calorific curve, the mean-squared displacement, and the radial distribution function are analyzed to characterize the temperature behavior of the MWβPNTs. In all cases, the nanotubes are rotating: they act as thermal-driven rotors as the temperature increases, with a maximum rotational frequency of 16.7 GHz (clockwise direction) at 5 K for the DWβPNTs. Our results suggest that MWβPNTs could be used to construct room temperature nanomotors."
+      },
+      "en": {
+        "title": "Structural properties and thermal stability of multi-walled black phosphorene nanotubes and their operation as temperature driven nanorotors",
+        "abstract": "In this paper, we explore the influence of structural properties, thermal stability, and temperature on the rotational frequency of (0,n) armchair multi-walled black phosphorene nanotubes (MWβPNTs). Using Density Functional Theory (DFT) calculations, we first determine the influence of the outer wall rotation on the structural stability of (0,12)@(0,19) DWβPNTs, and (0,12)@(0,19)@(0,26) TWβPNTs. The results indicate that the relative energies of the DW-and the TWβPNTs do not change with the rotation angle. Therefore, the outer wall rotation is not important for the structural formation of the MWβPNTs. Then, using molecular dynamics (MD) simulations, we study the structural properties, thermal stability, and rotational frequency of (0,12)@(0,19) DWβPNTs, (0,12)@(0,19)@(0,26) TWβPNTs, and (0,12)@(0,19)@(0,26)@(0,33) QWβPNTs from 1 K to 400 K. The calorific curve, the mean-squared displacement, and the radial distribution function are analyzed to characterize the temperature behavior of the MWβPNTs. In all cases, the nanotubes are rotating: they act as thermal-driven rotors as the temperature increases, with a maximum rotational frequency of 16.7 GHz (clockwise direction) at 5 K for the DWβPNTs. Our results suggest that MWβPNTs could be used to construct room temperature nanomotors."
+      }
+    },
+    "authors": [
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "name": "Fernandez-Escamilla H."
+      },
+      {
+        "name": "J Guerrero-Sanchez"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "Noboru Takeuchi"
+      }
+    ],
+    "journalId": 22,
+    "issue": 12,
+    "file": null
+  },
+  {
+    "id": 56,
+    "kindCode": "journal_article",
+    "doi": "10.1016/j.matchemphys.2022.125936",
+    "publishedAt": "2022-01-15",
+    "translations": {
+      "es": {
+        "title": "An atomistic study on the structural and thermodynamic properties of Al–Fe bimetallic nanoparticles during melting and solidification: The role of size and composition",
+        "abstract": "Multimetallic nanoparticles (NPs) are emerging as critical nanomaterials in different fields, due to their unique physicochemical properties. In particular, bimetallic NPs provide a precise platform for controlling thermophysical properties with high sensitivity and broad versatility. In this work, the importance of size and composition in the structural and thermodynamic properties of Al–Fe bimetallic NPs are studied using molecular dynamics simulations. Relevant quantities are used to describe their melting and solidification behavior. Our results indicate a linear character of the melting temperature as a function of the inverse nanoparticle size for Al, Fe, and Al50Fe50 NPs. These values were estimated using the calorific curve and heat capacity. Furthermore, body-centered cubic, hexagonal close-packed, and local icosahedral structures are observed at room temperature in cooled Al50Fe50 NPs for sizes greater than a thousand atoms. Moreover, the cohesive energy, nanoparticle radius, and surface effect of Al50Fe50 NPs roughly reproduce the scaling law. Composition effects reveal that structural identification and atomic mobility of Al and Fe atoms strongly depend on the composition x in (Al100−xFex)N NPs. Also, it is found that the melting temperature can be tuned with the size and composition. On the other hand, the liquid-to-crystalline phase transition is extensively influenced by the Fe composition for cooled Al100−xFex NPs. Additionally, the cohesive energy and the nanoparticle radius show a quadratic dependence with composition. Finally, we have found several Al100−xFex NPs, which are stable at room temperature. The possibility to control the concentration in these NPs opens up potential applications in catalysis, magnetism, for hydrogen storage, or as an additive for aircraft coatings."
+      },
+      "en": {
+        "title": "An atomistic study on the structural and thermodynamic properties of Al–Fe bimetallic nanoparticles during melting and solidification: The role of size and composition",
+        "abstract": "Multimetallic nanoparticles (NPs) are emerging as critical nanomaterials in different fields, due to their unique physicochemical properties. In particular, bimetallic NPs provide a precise platform for controlling thermophysical properties with high sensitivity and broad versatility. In this work, the importance of size and composition in the structural and thermodynamic properties of Al–Fe bimetallic NPs are studied using molecular dynamics simulations. Relevant quantities are used to describe their melting and solidification behavior. Our results indicate a linear character of the melting temperature as a function of the inverse nanoparticle size for Al, Fe, and Al50Fe50 NPs. These values were estimated using the calorific curve and heat capacity. Furthermore, body-centered cubic, hexagonal close-packed, and local icosahedral structures are observed at room temperature in cooled Al50Fe50 NPs for sizes greater than a thousand atoms. Moreover, the cohesive energy, nanoparticle radius, and surface effect of Al50Fe50 NPs roughly reproduce the scaling law. Composition effects reveal that structural identification and atomic mobility of Al and Fe atoms strongly depend on the composition x in (Al100−xFex)N NPs. Also, it is found that the melting temperature can be tuned with the size and composition. On the other hand, the liquid-to-crystalline phase transition is extensively influenced by the Fe composition for cooled Al100−xFex NPs. Additionally, the cohesive energy and the nanoparticle radius show a quadratic dependence with composition. Finally, we have found several Al100−xFex NPs, which are stable at room temperature. The possibility to control the concentration in these NPs opens up potential applications in catalysis, magnetism, for hydrogen storage, or as an additive for aircraft coatings."
+      }
+    },
+    "authors": [
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "name": "J Guerrero-Sanchez"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "C.V. Landauro"
+      },
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      },
+      {
+        "name": "Noboru Takeuchi"
+      }
+    ],
+    "journalId": 20,
+    "issue": 282,
+    "file": null
+  },
+  {
+    "id": 57,
+    "kindCode": "journal_article",
+    "doi": "10.1007/s10751-021-01758-y",
+    "publishedAt": "2021-01-10",
+    "translations": {
+      "es": {
+        "title": "Nanostructured FeNiZrB powders synthesized by high-energy ball milling: structural and hyperfine characterizations",
+        "abstract": "Nanostructured (Fe0.5Ni0.5)92Zr5B3 alloy was prepared by milling a blend of pre-alloyed Fe50Ni50 precursor and high purity chemical elemental powders of Zr and B in a high-energy ball mill setup. Rietveld refinement of the X-ray diffraction pattern of the final sample (30 h of milling) revealed presence of two Fe–Ni rich phases [disordered fcc γ–(Fe,Ni) alloy with Zr and B and the atomically ordered FeNi] with grain sizes in nanometer scale. Fe and Ni atoms were locally probed using extended X-ray absorption fine structure EXAFS and 57Fe Mössbauer spectroscopy. Whilst EXAFS analysis of milled samples suggested structural properties similar to the pre-alloyed precursor, Mössbauer data have shown the Fe2B phase formation after 3 h of milling, suggesting that the final material consists of nanograins of ordered FeNi (8%) and Fe2B (6%) phases dispersed in solid solution of γ–(Fe,Ni) alloy rich in nickel (86%) with Zr and B atoms impregnated in grain boundary defects."
+      },
+      "en": {
+        "title": "Nanostructured FeNiZrB powders synthesized by high-energy ball milling: structural and hyperfine characterizations",
+        "abstract": "Nanostructured (Fe0.5Ni0.5)92Zr5B3 alloy was prepared by milling a blend of pre-alloyed Fe50Ni50 precursor and high purity chemical elemental powders of Zr and B in a high-energy ball mill setup. Rietveld refinement of the X-ray diffraction pattern of the final sample (30 h of milling) revealed presence of two Fe–Ni rich phases [disordered fcc γ–(Fe,Ni) alloy with Zr and B and the atomically ordered FeNi] with grain sizes in nanometer scale. Fe and Ni atoms were locally probed using extended X-ray absorption fine structure EXAFS and 57Fe Mössbauer spectroscopy. Whilst EXAFS analysis of milled samples suggested structural properties similar to the pre-alloyed precursor, Mössbauer data have shown the Fe2B phase formation after 3 h of milling, suggesting that the final material consists of nanograins of ordered FeNi (8%) and Fe2B (6%) phases dispersed in solid solution of γ–(Fe,Ni) alloy rich in nickel (86%) with Zr and B atoms impregnated in grain boundary defects."
+      }
+    },
+    "authors": [
+      {
+        "name": "V. A. Peña Rodríguez"
+      },
+      {
+        "name": "J. Medina Medina"
+      },
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      },
+      {
+        "name": "P. Paucar Cabrera"
+      },
+      {
+        "name": "C.V. Landauro"
+      },
+      {
+        "name": "J. Quispe-Marcatoma"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "E. M. Baggio-Saitovitch"
+      },
+      {
+        "name": "E. C. Passamani"
+      }
+    ],
+    "journalId": 21,
+    "issue": 242,
+    "file": null
+  },
+  {
+    "id": 58,
+    "kindCode": "journal_article",
+    "doi": "10.15446/mo.n62.88422",
+    "publishedAt": "2021-01-20",
+    "translations": {
+      "es": {
+        "title": "Shape and size effects of the pore on the mechanical properties of nanoporous graphene membranes",
+        "abstract": "En el presente trabajo se estudiaron los efectos de forma y tamaño de los poros sobre las propiedades mecánicas de membranas de grafeno nanoporosas (GNP). Las simulaciones de dinámica molecular fueron ejecutadas para estudiar las respuestas mecánicas y estructurales bajo una tracción uniaxial. Los resultados de las curvas tensión-deformación de las membranas de GNP muestran un comportamiento lineal elástico para razones de deformacion pequeñas (<0.03) independiente de la dirección quiral. La anisotropía quiral (dirección armchair y zigzag) es notoria conforme se incrementa la deformación hasta el punto de fractura. Las membranas de GNP con poro hexagonal y rectangular presentan una mayor tensión de fractura (65 GPa y 81 GPa, respectivamente). Además, el módulo elástico de Young disminuye conforme se incrementa el tamaño del poro. Se espera que este estudio brinde aplicación práctica como filtros de membranas de alto rendimiento."
+      },
+      "en": {
+        "title": "Shape and size effects of the pore on the mechanical properties of nanoporous graphene membranes",
+        "abstract": "In this work, effects of shape and size of the pores on the mechanical properties of nanoporous graphene (NPG) membranes are studied. Molecular dynamics simulations were performed to study the mechanical and structural responses under uniaxial traction. The results of the stress-strain curves of NPG membranes show an elastic linear behavior for small strain (<0.03) independent of the chiral direction. The chiral anisotropy (armchair and zigzag direction) is notable as deformation increases to the point of fracture. The NPG membranes with hexagonal and rectangular pores present a higher fracture stress (65 GPa and 81 GPa, respectively). Furthermore, Young's elastic modulus decreases as pore size increases (porosity). This study is expected to provide practical application as high performance membrane filters."
+      }
+    },
+    "authors": [
+      {
+        "email": "cristopher.cabanillas@unmsm.edu.pe"
+      },
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      }
+    ],
+    "journalId": 16,
+    "issue": 62,
+    "file": null
+  },
+  {
+    "id": 59,
+    "kindCode": "journal_article",
+    "doi": "10.15381/iigeo.v23i45.18060",
+    "publishedAt": "2020-01-20",
+    "translations": {
+      "es": {
+        "title": "Efectos de la transformación de fases con respecto a la orientación y velocidad en el nanocable de cobre deformados por tracción",
+        "abstract": "Los NCs tienen muchos comportamientos únicos que no se ven en los materiales a nivel volumen. El objetivo del estudio es conocer los efectos de la trasformación de fases con respecto a la orientación y velocidad en el nanocable de cobre deformados por tracción. Debido la necesidad de comprender mejor los mecanismos de deformación mediante simulaciones y el método de dinámica molecular con los potenciales del tipo EAM evaluamos la transformación de fases en la correlación directa entre la curva tensión-deformación, y el porcentaje de la abundancia de pares. En la región elástica en un rango de 60% a 80% de átomos se encuentran formando estructuras FCC, unos 10% a 20% la estructura HCp, la formación de la estructura BCC es mínima y el porcentaje de otras formaciones están en un rango de 20% a 40%, afectadas por la velocidad y orientación como resultado el mayor módulo de elasticidad es de 100 GPa y límite de fluencia de 9.0 GPa con una orientación de (111) este fenómeno único permite el diseño de nanosistemas."
+      },
+      "en": {
+        "title": "Efectos de la transformación de fases con respecto a la orientación y velocidad en el nanocable de cobre deformados por tracción",
+        "abstract": "Los NCs tienen muchos comportamientos únicos que no se ven en los materiales a nivel volumen. El objetivo del estudio es conocer los efectos de la trasformación de fases con respecto a la orientación y velocidad en el nanocable de cobre deformados por tracción. Debido la necesidad de comprender mejor los mecanismos de deformación mediante simulaciones y el método de dinámica molecular con los potenciales del tipo EAM evaluamos la transformación de fases en la correlación directa entre la curva tensión-deformación, y el porcentaje de la abundancia de pares. En la región elástica en un rango de 60% a 80% de átomos se encuentran formando estructuras FCC, unos 10% a 20% la estructura HCp, la formación de la estructura BCC es mínima y el porcentaje de otras formaciones están en un rango de 20% a 40%, afectadas por la velocidad y orientación como resultado el mayor módulo de elasticidad es de 100 GPa y límite de fluencia de 9.0 GPa con una orientación de (111) este fenómeno único permite el diseño de nanosistemas."
+      }
+    },
+    "authors": [
+      {
+        "name": "Víctor Augusto Vega Guillén"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      }
+    ],
+    "journalId": 26,
+    "issue": 23,
+    "file": null
+  },
+  {
+    "id": 60,
+    "kindCode": "journal_article",
+    "doi": "10.1016/j.matchar.2019.01.036",
+    "publishedAt": "2019-01-20",
+    "translations": {
+      "es": {
+        "title": "Fe50Ni50 synthesized by high energy ball milling: A systematic study using X-ray diffraction, EXAFS and Mössbauer methods",
+        "abstract": "Fe50Ni50 alloy powder was prepared by milling the 1:1 stoichiometric mixture of Fe and Ni high purity elements using high energy vibrational ball-mill. Final powdered material was obtained directly after 30 h of milling process and the Rietveld analysis of the X-ray diffraction pattern of the sample reveals the presence of two Fesingle bondNi phases: the disordered γ–(Fe45Ni55) alloy, with 91% of total fraction of the material (Fesingle bondNi solid solution plus grain boundary regions) and the chemically-ordered FeNi phase (9%), with L10 tetragonal structure. Average grain sizes of these Fesingle bondNi phases are respectively 60 nm and 20 nm. Results of extended X-ray absorption fine structure of Ni and Fe as well as 57Fe Mössbauer spectroscopy also suggest the presence of atomically ordered FeNi phase. Mössbauer data have also shown that both Fesingle bondNi phases are magnetically ordered at room temperature. Our results indicate that high energy milling method can simulate extreme conditions of sample preparation required for the formation of the T-FeNi phase."
+      },
+      "en": {
+        "title": "Fe50Ni50 synthesized by high energy ball milling: A systematic study using X-ray diffraction, EXAFS and Mössbauer methods",
+        "abstract": "Fe50Ni50 alloy powder was prepared by milling the 1:1 stoichiometric mixture of Fe and Ni high purity elements using high energy vibrational ball-mill. Final powdered material was obtained directly after 30 h of milling process and the Rietveld analysis of the X-ray diffraction pattern of the sample reveals the presence of two Fesingle bondNi phases: the disordered γ–(Fe45Ni55) alloy, with 91% of total fraction of the material (Fesingle bondNi solid solution plus grain boundary regions) and the chemically-ordered FeNi phase (9%), with L10 tetragonal structure. Average grain sizes of these Fesingle bondNi phases are respectively 60 nm and 20 nm. Results of extended X-ray absorption fine structure of Ni and Fe as well as 57Fe Mössbauer spectroscopy also suggest the presence of atomically ordered FeNi phase. Mössbauer data have also shown that both Fesingle bondNi phases are magnetically ordered at room temperature. Our results indicate that high energy milling method can simulate extreme conditions of sample preparation required for the formation of the T-FeNi phase."
+      }
+    },
+    "authors": [
+      {
+        "name": "V. A. Peña Rodríguez"
+      },
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      },
+      {
+        "name": "J. Medina Medina"
+      },
+      {
+        "name": "P. Paucar Cabrera"
+      },
+      {
+        "name": "J. Quispe-Marcatoma"
+      },
+      {
+        "name": "C.V. Landauro"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "E. M. Baggio-Saitovitch"
+      },
+      {
+        "name": "E. C. Passamani"
+      }
+    ],
+    "journalId": 24,
+    "issue": 149,
+    "file": null
+  },
+  {
+    "id": 61,
+    "kindCode": "journal_article",
+    "doi": "10.1016/j.jmmm.2020.167654",
+    "publishedAt": "2021-01-01",
+    "translations": {
+      "es": {
+        "title": "Weakly interacting ultra-fine Fe nanoparticles embedded in Yb metallic matrix",
+        "abstract": "Magnetic interactions in iron nanoparticles embedded in an ytterbium metallic matrix have been systematically studied using several DC magnetic protocols (zero-field cooling ZFC and field-cooling FC). A transition from a superparamagnetic to a magnetically blocked regime was observed at 4.4 K associated with ultrafine (1.8 nm3) iron particles. These iron nanoparticles have shown an enhanced effective anisotropy, = 8.1(5) 105 J m−3, however, no spin canting at their surfaces was observed, as suggested by the absence of exchange bias effect measured under FC protocol. Different magnetization experiments (temperature dependence of the thermo-remnant moment difference, ZFC-FC magnetic aging/memory protocols, Arrott plots) and phenomenological models applied to the magnetization data have shown that the iron nanoparticles have a narrow size distribution. Likewise, our results show that the ultra-fine iron nanoparticles are weakly interacting via the metallic ytterbium matrix by a magnetic exchange mechanism. This magnetic interaction leads the ensemble of iron nanoparticles to a cluster-glass-like state for temperatures below 5 K."
+      },
+      "en": {
+        "title": "Weakly interacting ultra-fine Fe nanoparticles embedded in Yb metallic matrix",
+        "abstract": "Magnetic interactions in iron nanoparticles embedded in an ytterbium metallic matrix have been systematically studied using several DC magnetic protocols (zero-field cooling ZFC and field-cooling FC). A transition from a superparamagnetic to a magnetically blocked regime was observed at 4.4 K associated with ultrafine (1.8 nm3) iron particles. These iron nanoparticles have shown an enhanced effective anisotropy, = 8.1(5) 105 J m−3, however, no spin canting at their surfaces was observed, as suggested by the absence of exchange bias effect measured under FC protocol. Different magnetization experiments (temperature dependence of the thermo-remnant moment difference, ZFC-FC magnetic aging/memory protocols, Arrott plots) and phenomenological models applied to the magnetization data have shown that the iron nanoparticles have a narrow size distribution. Likewise, our results show that the ultra-fine iron nanoparticles are weakly interacting via the metallic ytterbium matrix by a magnetic exchange mechanism. This magnetic interaction leads the ensemble of iron nanoparticles to a cluster-glass-like state for temperatures below 5 K."
+      }
+    },
+    "authors": [
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      },
+      {
+        "name": "E. C. Passamani"
+      },
+      {
+        "name": "F. J. Litterst"
+      }
+    ],
+    "journalId": 25,
+    "issue": 525,
+    "file": null
+  },
+  {
+    "id": 62,
+    "kindCode": "journal_article",
+    "doi": "10.1016/j.jmmm.2018.08.072",
+    "publishedAt": "2019-01-01",
+    "translations": {
+      "es": {
+        "title": "Aperiodic exchange modulation effect on the specific heat in the Kondo necklace model",
+        "abstract": "In the present work we study the effect of the aperiodic exchange modulation on the spin gap at finite temperature as well as the specific heat of the Kondo necklace model in two and three dimensions. For this purpose, we use a representation for the localized and conduction electrons in terms of local Kondo singlet and triplet operators. A decoupling scheme on the double time Green’s functions is also used to find the dispersion relation for the excitations of the system. The influence of the aperiodic exchange modulation on the spin gap at low temperatures is discussed in the paramagnetic phase. Moreover, we investigate the specific heat as a function of the aperiodic exchange modulation at low temperatures in two cases: above the quantum critical point i.e., along the so-called non-Fermi liquid trajectory and in the Kondo spin liquid state. We have also compared our results with previous bond operator mean-field calculations."
+      },
+      "en": {
+        "title": "Aperiodic exchange modulation effect on the specific heat in the Kondo necklace model",
+        "abstract": "In the present work we study the effect of the aperiodic exchange modulation on the spin gap at finite temperature as well as the specific heat of the Kondo necklace model in two and three dimensions. For this purpose, we use a representation for the localized and conduction electrons in terms of local Kondo singlet and triplet operators. A decoupling scheme on the double time Green’s functions is also used to find the dispersion relation for the excitations of the system. The influence of the aperiodic exchange modulation on the spin gap at low temperatures is discussed in the paramagnetic phase. Moreover, we investigate the specific heat as a function of the aperiodic exchange modulation at low temperatures in two cases: above the quantum critical point i.e., along the so-called non-Fermi liquid trajectory and in the Kondo spin liquid state. We have also compared our results with previous bond operator mean-field calculations."
+      }
+    },
+    "authors": [
+      {
+        "name": "Daniel Reyes"
+      },
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "email": "t2y001@gmail.com"
+      },
+      {
+        "name": "C.V. Landauro"
+      },
+      {
+        "email": "respinozabe@unmsm.edu.pe"
+      }
+    ],
+    "journalId": 25,
+    "issue": 469,
+    "file": null
+  },
+  {
+    "id": 64,
+    "kindCode": "thesis",
+    "doi": null,
+    "publishedAt": "2019-07-19",
+    "translations": {
+      "es": {
+        "title": "Análisis de las propiedades ópticas del TiO2 anatase dopado con N y F, por medio de cálculos DFT",
+        "abstract": "El TiO2 es usado para foto generación de hidrogeno a partir del agua, degradación de contaminantes bajo irradiación de luz visible y para celdas solares. Sin embargo, una\nlimitación es que TiO2 anatase tiene un band gap amplio de aproximadamente 3.2 eV y puede absorber solo en la región ultravioleta (UV) λ <380nm. Esto reduce gravemente la utilidad de la energía solar al 5 %. Por medio de la simulaci´on computacional en el marco de la Teoría Funcional de la Densidad (DFT) implementada en el código WIEN2k, usando la aproximación GGA-PBE, se ha observado que la fase\nanatase de TiO2 dopada con F, N o el codopado F-N exhibe una disminución en el band gap hasta en un 17 % para el dopado con N a una concentración de 10.4 %, y que esta reducción del gap está asociada a la mejor absorción en la zona visible del espectro de los sistemas estudiados. Los resultados indican que TiO2 anatase dopado en distintas concentraciones puede aumentar la eficiencia de celdas fotovoltaicas y que este aumento en la eficiencia es proporcional a la concentración del elemento dopante para los sistemas monodopados. El codopado, que continuamente es reportado como mejor, en cuanto a la reducción del gap y la absorción de radiación, en comparación con el monodopado, no ha mostrado serlo en el sistema de codopado por sustitución con N y F, en la región comprendida entre 1.70-2.79 eV. El efecto sinérgico del codopado solo es verificado en la región azul-violeta del espectro visible. La absorción de los sistemas en la parte visible del espectro, predomina en regiones\npor debajo del gap, esto se ha asociado al acoplamiento vibronico y a transiciones entre niveles de excitones"
+      },
+      "en": {
+        "title": "Análisis de las propiedades ópticas del TiO2 anatase dopado con N y F, por medio de cálculos DFT",
+        "abstract": "TiO2 is used for fotogeneration of hydrogen from water, degradation of contaminants under irradation of visible light and for solar cells. However, one limitation is\nthat; TiO2 anatase has a large band gap of approximately 3.2 eV and can absorb in ultraviolet (UV) region only (λ <380nm). This reduces dramatically the usefulness\nof the solar energy by 5 %. By means of computer simulation in the framework of the Functional Theory of Density (DFT) implemented in the WIEN2k code, using\nthe GGA-PBE approach, it has been observed that the phase anatase of TiO2 doped with F, N or the FN codoping exhibits a decrease in the band gap up to 17 % for\ndoping with N at a concentration of 10.4 %, and that this reduction of the gap is associated with the best absorption in the visible area of the spectrum of the systems\nstudied. The results indicate that TiO2 anatase doped in different concentrations can increase the efficiency of photovoltaic cells and that this increase in efficiency is\nproportional to the concentration of the doping element for monodopated systems. The codoped system, which is continuously reported as better, in terms of reduction\nof the gap and the absorption of radiation, compared with the monodoped systems, has not shown to be in the codoped system by substitution with N and F in the\nregion between 1.70-2.79 eV. The synergetic effect of codoping is only verified in the blue-violet region of the visible spectrum. The absorption of the systems in the\nvisible part of the spectrum predominates in regions below the gap, this has been associated with vibronic coupling and transitions between levels of excitons."
+      }
+    },
+    "authors": [
+      {
+        "name": "Mendoza Flores Miguel"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      }
+    ],
+    "universityId": 1,
+    "thesisKindCode": "masters",
+    "file": null
+  },
+  {
+    "id": 65,
+    "kindCode": "journal_article",
+    "doi": "10.1088/1361-648X/acd31a",
+    "publishedAt": "2023-05-15",
+    "translations": {
+      "es": {
+        "title": "Influence of shell thickness on the thermal stability and melting-like behavior of Al@ Fe core–shell nanoparticles from atomistic simulations: a structural and dynamic description",
+        "abstract": "Core–shell nanoparticles (CSNPs) are a class of functional materials that have received important attention nowadays due to their adjustable properties by a controlled tuning of the core or shell. Understanding the thermal response and structural properties of these CSNPs is relevant to carrying out an analysis regarding their synthesis and application at the nanoscale. The present work is aimed to investigate the shell thickness effect on thermal stability and melting behavior of Al@Fe CSNPs by using molecular dynamics simulations. The results are discussed considering the influence of the Fe shell on the Al nanoparticle and analyzing the effect of different shell thicknesses in Al@Fe CSNPs. In general, calorific curves show a smooth energy decline for temperatures greater than room temperature for different shell thicknesses and sizes, corresponding to the inward and outward atomic movement of Al and Fe atoms, respectively, that produce a mixed Al–Fe nanoalloy. Here, the thermal stability of the Al@Fe nanoparticle is gradually lost passing to a liquid-Al@solid-Fe configuration and reaching a mixed Al–Fe state by an exothermic mechanism. Combining quantities of the atomic diffusion and structural identification, a stepped structural transition of the system is subsequently observed, where the melting-like point was estimated. Furthermore, it is observed that the Al@Fe CSNPs with greater stability are obtained with a thick shell and a large size. The ability to control shell thickness and vary the size opens up attractive opportunities to synthesize a broad range of new materials with tunable catalytic properties."
+      },
+      "en": {
+        "title": "Influence of shell thickness on the thermal stability and melting-like behavior of Al@ Fe core–shell nanoparticles from atomistic simulations: a structural and dynamic description",
+        "abstract": "Core–shell nanoparticles (CSNPs) are a class of functional materials that have received important attention nowadays due to their adjustable properties by a controlled tuning of the core or shell. Understanding the thermal response and structural properties of these CSNPs is relevant to carrying out an analysis regarding their synthesis and application at the nanoscale. The present work is aimed to investigate the shell thickness effect on thermal stability and melting behavior of Al@Fe CSNPs by using molecular dynamics simulations. The results are discussed considering the influence of the Fe shell on the Al nanoparticle and analyzing the effect of different shell thicknesses in Al@Fe CSNPs. In general, calorific curves show a smooth energy decline for temperatures greater than room temperature for different shell thicknesses and sizes, corresponding to the inward and outward atomic movement of Al and Fe atoms, respectively, that produce a mixed Al–Fe nanoalloy. Here, the thermal stability of the Al@Fe nanoparticle is gradually lost passing to a liquid-Al@solid-Fe configuration and reaching a mixed Al–Fe state by an exothermic mechanism. Combining quantities of the atomic diffusion and structural identification, a stepped structural transition of the system is subsequently observed, where the melting-like point was estimated. Furthermore, it is observed that the Al@Fe CSNPs with greater stability are obtained with a thick shell and a large size. The ability to control shell thickness and vary the size opens up attractive opportunities to synthesize a broad range of new materials with tunable catalytic properties."
+      }
+    },
+    "authors": [
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "name": "E Huaman Morales"
+      },
+      {
+        "name": "M H Romero Peña"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "email": "milida.pinto@unmsm.edu.pe"
+      }
+    ],
+    "journalId": 27,
+    "issue": 35,
+    "file": null
+  },
+  {
+    "id": 66,
+    "kindCode": "journal_article",
+    "doi": "10.1007/s13538-023-01365-y",
+    "publishedAt": "2023-10-02",
+    "translations": {
+      "es": {
+        "title": "Monte Carlo Study of the Influence of Dipole Interaction and Magnetic Anisotropy in Monodisperse and Nanochains Systems to Improve the Effects of Magnetic Hyperthermia",
+        "abstract": "Magnetic nanoparticles are being widely investigated for their great potential applications in drug transport, magnetic resonance imaging, and the treatment of magnetic hyperthermia. Magnetic hyperthermia consists of the destruction of cancer cells by heat, which is dissipated by nanoparticles. The assembly in the form of chains can increase the heating capacity of the nanoparticles, due to the effect of the dipole inter- actions and magnetic anisotropy. The heat dissipation power of the NPs can be studied through the hysteresis area of a system of nanoparticles whose diameter is greater than a critical diameter (D > Dc), outside the superparamagnetic regime. In this work, the Monte Carlo-Metropolis method is used to calculate the hysteresis area of various systems of nanochains, at low temperature (T = 5K), composed of spherical and cubic magnetite nanoparticles whit 20 nm of diameter. Monodisperse systems of spherical and cubic nanoparticles were also considered. Different concentrations and distribution of the anisotropy axes are considered randomly and constrained in a solid cone of δ = 200. Negative effects of inter-particle interactions on hysteresis area were observed. On the other hand, the increase in effective magnetic anisotropy has a positive effect on the hysteresis area, observing a competition between the dipole interactions and the magnetic anisotropy of the system. The sphere and cubic nanochains with random anisotropy show an increase in heating, for the entire range of applied magnetic field. The anisotropy restricted for sphere and cubic nanochains show the maximum heating capacity, but only for high magnetic field values. Furthermore, the system of cubic nanochains shows a resistance to the negative effects of concentration, where it is also observed increases in the hysteresis area in the region of low magnetic field. Finally, these results show the potential of sphere and cubic magnetic nanochains to improve the treatment of magnetic hyperthermia, and the importance role of the dipolar interactions and magnetic anisotropy for this magnetic systems."
+      },
+      "en": {
+        "title": "Monte Carlo Study of the Influence of Dipole Interaction and Magnetic Anisotropy in Monodisperse and Nanochains Systems to Improve the Effects of Magnetic Hyperthermia",
+        "abstract": "Magnetic nanoparticles are being widely investigated for their great potential applications in drug transport, magnetic resonance imaging, and the treatment of magnetic hyperthermia. Magnetic hyperthermia consists of the destruction of cancer cells by heat, which is dissipated by nanoparticles. The assembly in the form of chains can increase the heating capacity of the nanoparticles, due to the effect of the dipole inter- actions and magnetic anisotropy. The heat dissipation power of the NPs can be studied through the hysteresis area of a system of nanoparticles whose diameter is greater than a critical diameter (D > Dc), outside the superparamagnetic regime. In this work, the Monte Carlo-Metropolis method is used to calculate the hysteresis area of various systems of nanochains, at low temperature (T = 5K), composed of spherical and cubic magnetite nanoparticles whit 20 nm of diameter. Monodisperse systems of spherical and cubic nanoparticles were also considered. Different concentrations and distribution of the anisotropy axes are considered randomly and constrained in a solid cone of δ = 200. Negative effects of inter-particle interactions on hysteresis area were observed. On the other hand, the increase in effective magnetic anisotropy has a positive effect on the hysteresis area, observing a competition between the dipole interactions and the magnetic anisotropy of the system. The sphere and cubic nanochains with random anisotropy show an increase in heating, for the entire range of applied magnetic field. The anisotropy restricted for sphere and cubic nanochains show the maximum heating capacity, but only for high magnetic field values. Furthermore, the system of cubic nanochains shows a resistance to the negative effects of concentration, where it is also observed increases in the hysteresis area in the region of low magnetic field. Finally, these results show the potential of sphere and cubic magnetic nanochains to improve the treatment of magnetic hyperthermia, and the importance role of the dipolar interactions and magnetic anisotropy for this magnetic systems."
+      }
+    },
+    "authors": [
+      {
+        "email": "juan.gomez10@unmsm.edu.pe"
+      },
+      {
+        "email": "crojasa@unmsm.edu.pe"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "Michel Mendoza"
+      },
+      {
+        "name": "JC Rojas-Sanchez"
+      }
+    ],
+    "journalId": 28,
+    "issue": 53,
+    "file": null
+  },
+  {
+    "id": 67,
+    "kindCode": "thesis",
+    "doi": null,
+    "publishedAt": "2020-06-23",
+    "translations": {
+      "es": {
+        "title": "Efectos del dopaje y la temperatura sobre las propiedades térmicas de hetero-estructuras de C/BN y su potencial uso como sensor ambiental del formaldehído",
+        "abstract": "Se estudia la influencia del dopaje y de la temperatura sobre las propiedades físicas de hetero-estructuras hexagonales principalmente basadas en carbono y nitruro de boro tanto uni- y bi-dimensionales, este estudio se divide en tres partes. Por un lado, se estudia el efecto del dopaje de nitruro de boro en nanotubos de carbono armchair (6, 6) (hetero-nanotubos de nitruro de boro y carbono) sobre las propiedades del transporte cuántico de fonones y electrones, variando patrones de distribución y concentración de dopaje. Por otro lado, se estudia la forma como afecta la temperatura del sustrato sobre las propiedades del transporte térmico clásico en hetero-nanocintas de grafeno/nitruro de boro hexagonal y nitruro de boro hexagonal/grafeno, e influenciados por la asimetría estructural. Análogamente, también se estudia el efecto de la temperatura media y bias en hetero-nanocintas de grafeno/X (X=nitruro de boro hexagonal, carburo de silicio hexagonal, y grafeno hidrogenado), afectados por dos tipos de interfaces (zigzag y armchair). Por último, se estudia las propiedades electrónicas del proceso de adsorción de la molécula del Formaldehído (CH2O) sobre el sustrato de nitruro de boro hexagonal hidrogenado. Para ello, la metodología empleada en estos trabajos consistió en el uso de tres métodos computacionales; las funciones de Green fuera del equilibrio (NEGF) en combinación con el método de la teoría del funcional de la densidad basado en tight-binding (DFTB), dinámica molecular fuera del equilibrio (NEMD), y cálculos de la teoría del funcional de la densidad, respectivamente. Por un lado, los resultados respecto al efecto del dopaje sobre el transporte cuántico muestran que al aumentar la concentración del dopaje en los hetero-nanotubos de nitruro de boro y carbono armchair (6, 6), los coeficiente de transmisión fonónico y electrónico se reducen, este comportamiento ocurre a frecuencias altas y cerca de los bordes de la banda de valencia y conducción, respectivamente. Los patrones de distribución de dopaje helicoidal y horizontal permiten un transporte de fonones adecuados cuantificados en una alta conductancia de fonones a 300K. Todos los hetero-nanotubos de nitruro de boro y carbono armchair (6, 6) poseen un comportamiento semiconductor a diferencia del nanotubo de carbono armchair (6, 6) con un bandgap modulable respecto a la concentración de dopaje de nitruro de boro. Por otra parte, los resultados del efecto de la temperatura del sustrato sobre el transporte térmico clásico en las hetero-nanocintas muestran que existe una influencia que incrementa la rectificación térmica (>30 %) a temperaturas bajas (>300K) para el sustrato de Si(100), esto debido al acople fuerte tipo Van der waals entre el sustrato y la hetero-nanocinta de nitruro de boro hexagonal/grafeno. Además, la asimetría estructural tipo-T genera una rectificación térmica en sistemas puros y hetero-nanocintas de grafeno/nitruro de boro hexagonal y nitruro de boro hexagonal/grafeno, este efecto está relacionado con los cambios en el grado de localización de los modos vibracionales de frecuencias altas . Sin embargo, la resistencia térmica interfacial y la rectificación térmica se reducen con la temperatura media en las XIV hetero-nanocintas de grafeno/X, independientemente de la interface armchair o zigzag, debido a que el flujo térmico en direcciones opuestas llegan a ser similares a altas temperaturas. El efecto de la temperatura bias, en la curva J − α, determina que el fujo térmico tiene una preferencia marcada en la dirección de X al grafeno, observando el fenomeno de la resistencia térmica diferencial negativa en los sistemas de grafeno/nitruro de boro hexagonal y grafeno/grafano. Por último, la trayectoria de mínima energía, la densidad de estados total y la densidad de estados proyectada del proceso de adsorción muestran que la molécula formaldehído, CH2O, se quimisorbe sobre el sustrato de hBN hidrogenado con una energía de adsorción de 1.42eV mediante vacancias de hidrógeno en el átomo de B, donde también la distribución de densidad de espín y la transferencia de carga presentan evidencias de la existencia de una reacción en cadena de moléculas CH2O sobre el sustrato de nitruro de boro hexagonal."
+      },
+      "en": {
+        "title": "Efectos del dopaje y la temperatura sobre las propiedades térmicas de hetero-estructuras de C/BN y su potencial uso como sensor ambiental del formaldehído",
+        "abstract": "In the present thesis we have studied the influence of doping and temperature on the physical properties of hexagonal heterostructures mainly based on carbon and boron nitride in both uni- and bi-dimensional systems, this work is divided into three parts. On the one hand, the effect of boron nitride doping in armchair (6, 6) carbon nanotubes on the properties of quantum transport is studied, varying patterns of distribution and concentration of doping. On the other hand, the way in which the substrate temperature and the structural asymmetry affect the properties of thermal transport in graphene/hexagonal boron nitride heteronanoribbons and viceversa, is studied. Similarly, the influence of the mean and bias temperatures on graphene/X (X = hexagonal boron nitride, hexagonal silicon carbide, and graphane) heteronanoribbons, affected by two types of interfaces (zigzag and armchair), is also studied. In the last part, the electronic properties of the adsorption process of the Formaldehyde molecule on the hydrogenated substrate of hexagonal boron nitride are studied.\nThe results regarding the effect of doping on quantum transport show that the phonon and electron transmission coefficients are reduced (this behavior occurs at high frequencies and near the edges of the valence and conduction band, respectively) as the concentration of doping increases in (6, 6) boron-nitrogen-carbon heteronanotubes. The helical and horizontal doping distribution patterns allow transport of quantified phonons represented in a high thermal conductance with contribution of phonons at 300K. All heteronanotubes have a semiconductor behavior unlike the (6, 6) carbon nanotubes with a tunable bandgap with respect to the doping concentration. On the other hand, the results of the effect of substrate temperature on thermal transport in heteronanoribbons show that there is an influence that increases thermal rectification (>30 %) at low temperatures (< 300K) for the Si(100) substrate, this due to the strong van der waals type coupling between the substrate and heteronanoribon. However, the interfacial thermal resistance and thermal rectification are reduced with the mean temperature in the GE/X heteronanoribbons, regardless of the armchair or zigzag interface, because the thermal flux in opposite directions becomes similar to high temperatures. The effect of the bias temperature, in the J − α curve, determines that the thermal flux has a marked preference from X to graphene, observing the negative differential thermal resistance (NDTR). Finally, the minimum energy path and the projected\ndensity of state of the adsorption process show that the formaldehyde molecule, CH2O, is chemically absorbed on the hydrogenated substrate of hexagonal boron nitride with an adsorption energy of 1.42eV by generating the hydrogen vacancies in the atom of boron, where also the spin density distribution and charge transfer present evidence of the existence of a chain reaction of CH2O molecules on the hydrogenated substrate."
+      }
+    },
+    "authors": [
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      }
+    ],
+    "universityId": 1,
+    "thesisKindCode": "phd",
+    "file": null
+  },
+  {
+    "id": 68,
+    "kindCode": "journal_article",
+    "doi": "10.1088/1361-651X/ad332f",
+    "publishedAt": "2024-03-04",
+    "translations": {
+      "es": {
+        "title": "The composition effect on the structural and thermodynamic properties of Cu–Ag–Au ternary nanoalloys: a study via molecular dynamics approach",
+        "abstract": "Metal ternary nanoalloys or trimetallic nanoparticles have emerged, in recent years, as novel and relevant materials in different fields due to the synergy of three metals in a single system that leads to unique physicochemical properties as compared to mono- and bimetallic nanoparticles. In this study, the influence of composition on the structural and thermodynamic properties of Cu–Ag–Au nanoalloys with 5083 atoms is analyzed using molecular dynamics simulations. Relevant thermodynamic quantities are used to describe the melting and solidification behaviors of three models of Cu–Ag–Au nanoalloys. Our results indicate that the melting temperature presents linear and quadratic dependencies with the composition, i.e. for Cu33AgAux, Ag33CuAux, and Au33AgCux are , , and , respectively. In addition, most Ag atoms segregate to the surface and the Au and Cu atoms are localized in the center of the nanoalloy during the heating process, and this trend is maintained in the cooling process. The solidification temperature does not have an explicit correlation with the composition. Furthermore, the structural analysis of cooled nanoalloys exhibits local FCC and HCP symmetries, and the excess energy shows that Cu33Ag27Au40, Au33Ag17Cu50, and Ag33Cu37Au30 are relatively more stable to form nanoalloys. Finally, the possibility of controlling the composition in these metal nanoalloys opens up potential applications in plasmonic, catalysis, and bactericidal (by Ag surface segregation) fields."
+      },
+      "en": {
+        "title": "The composition effect on the structural and thermodynamic properties of Cu–Ag–Au ternary nanoalloys: a study via molecular dynamics approach",
+        "abstract": "Metal ternary nanoalloys or trimetallic nanoparticles have emerged, in recent years, as novel and relevant materials in different fields due to the synergy of three metals in a single system that leads to unique physicochemical properties as compared to mono- and bimetallic nanoparticles. In this study, the influence of composition on the structural and thermodynamic properties of Cu–Ag–Au nanoalloys with 5083 atoms is analyzed using molecular dynamics simulations. Relevant thermodynamic quantities are used to describe the melting and solidification behaviors of three models of Cu–Ag–Au nanoalloys. Our results indicate that the melting temperature presents linear and quadratic dependencies with the composition, i.e. for Cu33AgAux, Ag33CuAux, and Au33AgCux are , , and , respectively. In addition, most Ag atoms segregate to the surface and the Au and Cu atoms are localized in the center of the nanoalloy during the heating process, and this trend is maintained in the cooling process. The solidification temperature does not have an explicit correlation with the composition. Furthermore, the structural analysis of cooled nanoalloys exhibits local FCC and HCP symmetries, and the excess energy shows that Cu33Ag27Au40, Au33Ag17Cu50, and Ag33Cu37Au30 are relatively more stable to form nanoalloys. Finally, the possibility of controlling the composition in these metal nanoalloys opens up potential applications in plasmonic, catalysis, and bactericidal (by Ag surface segregation) fields."
+      }
+    },
+    "authors": [
+      {
+        "email": "gcubas@unmsm.edu.pe"
+      },
+      {
+        "email": "jrojast@unmsm.edu.pe"
+      },
+      {
+        "name": "P. Amao"
+      },
+      {
+        "name": "F Quispe-Huaynasi"
+      },
+      {
+        "email": "milida.pinto@unmsm.edu.pe"
+      },
+      {
+        "name": "Elluz Pacheco"
+      },
+      {
+        "name": "C Soncco"
+      },
+      {
+        "name": "V Loaiza-Tacuri"
+      }
+    ],
+    "journalId": 29,
+    "issue": 32,
+    "file": null
+  }
+]

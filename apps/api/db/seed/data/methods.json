@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "translations": {
+      "es": {
+        "name": "Dinámica Molecular",
+        "description": "<p>Dinámica molecular (MD del inglés <em>molecular dynamics</em>) clásica es un potente método determinístico de simulación computacional que consiste en la integración numérica de las ecuaciones diferenciales de movimiento de Newton de N partículas que interactúan mediante cierto potencial de interacción. Permite determinar las coordenadas y velocidades de todas las partículas en cada instante de tiempo discretizado. A partir de las coordenadas y velocidades se calculan las magnitudes de interés como la temperatura, presión, función de distribución radial, funciones de correlación de velocidades, curvas caloríficas, calor específico, etc. Este método es ampliamente utilizado en diversas disciplinas como física, química, ciencia de materiales, biología, geología, entre otras. Además, MD es útil para estudiar sistemas orgánicos e inorgánicos de gran tamaño, incluyendo otros estados en que se encuentre el sistema en estudio, es decir, se puede determinar las propiedades energéticas, estructurales, mecánicas y térmicas de un sistemas de partículas en equilibrio y fuera de este.</p>"
+      },
+      "en": {
+        "name": "Molecular Dynamics",
+        "description": "<p>Classical molecular dynamics (MD) is a powerful deterministic method of computational simulation that consists of the numerical integration of Newton's differential equations of motion of N particles that interact through a certain interaction potential. It allows determining the coordinates and velocities of all the particles at each discretized instant of time. From the coordinates and speeds, the quantities of interest are calculated such as temperature, pressure, radial distribution function, speed correlation functions, heat curves, specific heat, etc. This method is widely used in various disciplines such as physics, chemistry, materials science, biology, geology, among others. In addition, MD is useful to study large organic and inorganic systems, including other states in which the system under study is found, that is, it is possible to determine the energetic, structural, mechanical and thermal properties of a systems of particles in equilibrium and out of this.</p>"
+      }
+    },
+    "photo": "methods/molecular-dynamics.jpg"
+  },
+  {
+    "id": 2,
+    "translations": {
+      "es": {
+        "name": "Teoría del Funcional de la Densidad (DFT)",
+        "description": "<p>La teoría del funcional de la densidad (DFT, del inglés density functional theory) es una de las teorías más populares y exitosas en la comunidad de la Física, Química, y Ciencia de materiales y que hoy en día se utiliza ampliamente. Esta teoría se refiere a que cualquier propiedad de un sistema de partículas que interactúan en un potencial externo puede describirse mediante una funcional de la densidad electrónica del estado fundamental. P. Hohenberg y W. Kohn dieron en 1964 la prueba de la existencia de tales funcionales, pero sin ninguna sugerencia sobre la metodología a seguir para su implementación. Luego, W. Kohn y L.-J. Sham produjeron un marco interesante en 1965, donde el problema intratable de muchos cuerpos de los electrones que interactúan en un potencial externo estático se reduce a un problema manejable de electrones que no interactúan que se mueven en un potencial efectivo. Actualmente, la simplicidad del método ha hecho posible estudiar la estructura electrónica de diversos sistemas cuánticos multi-partícula convirtiéndose en una potente metodología de cálculo.</p>"
+      },
+      "en": {
+        "name": "Density Functional Theory",
+        "description": "<p>Density Functional Theory (DFT) is one of the most popular and successful theories in the Physics, Chemistry, and Materials Science community and is widely used today. This theory refers to the fact that any property of a system of particles that interact in an external potential can be described by a functional of the electron density of the ground state. P. Hohenberg and W. Kohn gave proof of the existence of such functionalities in 1964, but without any suggestion about the methodology to be followed for their implementation. Later, W. Kohn and L.-J. Sham produced an interesting framework in 1965, where the intractable problem of many bodies of electrons interacting at a static external potential boils down to a manageable problem of non-interacting electrons moving at an effective potential. Currently, the simplicity of the method has made it possible to study the electronic structure of various multi-particle quantum systems, becoming a powerful calculation methodology.</p>"
+      }
+    },
+    "photo": "methods/dft.jpg"
+  },
+  {
+    "id": 3,
+    "translations": {
+      "es": {
+        "name": "Método Monte Carlo",
+        "description": "<p>El método de Monte Carlo (MC) ha tenido gran relevancia en la física de los últimos tiempos en magnetismo, ya que provee una forma natural para simular los efectos de la temperatura sin usar métodos dinámicos debido a que converge rápidamente al equilibrio. La técnica requiere generar grandes cantidades de números aleatorios y contar la fracción de ellos obedeciendo ciertas condiciones. La manera de contar y las condiciones impuestas definen la implementación del algoritmo numérico.</p>"
+      },
+      "en": {
+        "name": "Monte Carlo Method",
+        "description": "<p>The Monte Carlo (MC) method has had great relevance in recent times in magnetism physics, as it provides a natural way to simulate the effects of temperature without using dynamic methods because it quickly converges to equilibrium. The technique requires generating large amounts of random numbers and counting the fraction of them obeying certain conditions. The way of counting and the conditions imposed define the implementation of the numerical algorithm.</p>"
+      }
+    },
+    "photo": "methods/monte-carlo.jpeg"
+  },
+  {
+    "id": 4,
+    "translations": {
+      "es": {
+        "name": "Dinámica del spin",
+        "description": "<p>La dinámica de espín (SD, del inglés <em>spin dynamics</em>) es un método computacional usado para modelar la evolución en el tiempo de un sistema magnético. En este método se incluyen efectos como precesión, procesos ultrarrápidos, ciclos de histéresis dinámico. En la simulación se utiliza la ecuación de movimiento de Landau-Lifshitz-Gilbert (LLG) junto con la dinámica de Langevin para realizar simulaciones a temperatura finita.</p>"
+      },
+      "en": {
+        "name": "Spin dynamics",
+        "description": "<p>Spin dynamics (SD) is a computational method used to model the evolution in time of a magnetic system. Effects such as precession, ultra-fast processes, dynamic hysteresis loops are included in this method. In the simulation, the Landau-Lifshitz-Gilbert (LLG) equation of motion is used together with Langevin dynamics to perform simulations at finite temperature.</p>"
+      }
+    },
+    "photo": "methods/spin-dynamics.jpg"
+  }
+]
