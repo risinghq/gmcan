@@ -1,19 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import type { AdminNews, NewsWrite } from "@gmcan/contracts/admin";
 import { Observable } from "rxjs";
 
 import type { AdminNewsListQuery, AdminNewsListResponse } from "../models/admin-list";
-import type { News, PublicNewsDetail, PublicNewsListQuery, PublicNewsListResponse } from "../models/news";
+import type { PublicNewsDetail, PublicNewsListQuery, PublicNewsListResponse } from "../models/news";
 import { GLOBAL } from "./global";
-
-export interface NewsUpsertBody {
-  statusCode: "draft" | "published" | "archived";
-  publishedAt?: string;
-  authorId: number;
-  newsKindCode: "general" | "research" | "event";
-  priority?: number;
-  translations: Record<string, { title: string; summary: string; body: string }>;
-}
 
 /** Query parameters without the unset ones: HttpClient would send an undefined value as the text "undefined". */
 function definedParams(query: object): Record<string, string | number | boolean> {
@@ -36,15 +28,15 @@ export class NewsService {
     return this.http.get<AdminNewsListResponse>(GLOBAL.admin("news"), { params: definedParams(query) });
   }
 
-  getAdminNews(id: number): Observable<News> {
-    return this.http.get<News>(GLOBAL.admin(`news/${id}`));
+  getAdminNews(id: number): Observable<AdminNews> {
+    return this.http.get<AdminNews>(GLOBAL.admin(`news/${id}`));
   }
 
-  createNews(data: NewsUpsertBody): Observable<{ id: number }> {
+  createNews(data: NewsWrite): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(GLOBAL.admin("news"), data);
   }
 
-  updateNews(id: number, data: NewsUpsertBody): Observable<{ status: number }> {
+  updateNews(id: number, data: NewsWrite): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(GLOBAL.admin(`news/${id}`), data);
   }
 

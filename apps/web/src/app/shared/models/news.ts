@@ -1,18 +1,3 @@
-export interface News {
-  id: number;
-  title: string;
-  summary: string;
-  body: string;
-  statusCode: "draft" | "published" | "archived";
-  publishedAt: string;
-  asset: string | null;
-  priority: number | null;
-  authorId: number;
-  newsKindCode: "general" | "research" | "event";
-  updatedAt: string | null;
-  createdAt: string | null;
-}
-
 export interface PublicNewsListItem {
   id: number;
   title: string;

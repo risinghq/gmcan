@@ -4,7 +4,6 @@ import { primaryName } from "@app/shared/forms/locale-form";
 import type { AdminMemberListItem, AdminProjectMemberListItem } from "@app/shared/models/admin-list";
 import type { AuthorSearchResult } from "@app/shared/models/author";
 import type { MemberFull } from "@app/shared/models/member";
-import type { News } from "@app/shared/models/news";
 import type { Project } from "@app/shared/models/project";
 import type { Derive } from "@app/shared/routing/derived-data";
 import { EventService, type EventItem } from "@app/shared/services/event.service";
@@ -14,9 +13,11 @@ import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { RefService, type JournalItem } from "@app/shared/services/ref.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
-import type { RefDependenciesResponse } from "@gmcan/contracts/admin";
+import type { AdminNews, RefDependenciesResponse } from "@gmcan/contracts/admin";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { map } from "rxjs";
+
+import { byId } from "./content/forms/content.resolvers";
 
 export type ToolbarBadge = {
   label: string;
@@ -70,13 +71,13 @@ export const publicationResolver: ResolveFn<PublicPublicationWithAuthors> = (rou
   return inject(PublicationService).getPublication(id);
 };
 
-export const newsResolver: ResolveFn<News> = (route) => {
-  const id = Number(route.paramMap.get("id") ?? 0);
-  return inject(NewsService).getAdminNews(id);
+export const newsItemResolver: ResolveFn<AdminNews | null> = (route) => {
+  const news = inject(NewsService);
+  return byId(route, (id) => news.getAdminNews(id));
 };
 
 export const newsToolbarBadge: Derive<ToolbarBadge> = (data) =>
-  (data["news"] as News).statusCode === "published"
+  (data["item"] as AdminNews).statusCode === "published"
     ? { label: "Noticia Publicada", tone: "published" }
     : { label: "Borrador", tone: "draft" };
 
