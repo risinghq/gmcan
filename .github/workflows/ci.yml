@@ -7,7 +7,8 @@ on:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # A master run may be deploying; stopping it halfway could leave migrations applied without the code that uses them.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -22,3 +23,27 @@ jobs:
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       - run: bun install --frozen-lockfile
       - run: bun run check
+
+  deploy:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    environment:
+      name: production
+      url: https://gmcan-web.caefisica.workers.dev
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
+      - run: bun install --frozen-lockfile
+      # The schema changes before the API, and the API before the web, which binds the gmcan-api service.
+      - run: bun run migrate:remote
+        working-directory: apps/api
+      - run: bun run deploy
+        working-directory: apps/api
+      - run: bun run deploy
+        working-directory: apps/web
