@@ -35,9 +35,9 @@
           <div class="news flex-news">
             <div class="img-hover-zoom-2 img-div-zoom right pl-24 hide-desktop">
               @if (!newsItem.asset) {
-              <img class="news-img" src="/img/grupal.jpg" />
+              <img class="news-img" loading="lazy" src="/img/grupal.avif" alt="" />
               } @if (newsItem.asset) {
-              <img class="news-img" src="{{ newsItem.asset }}" />
+              <img class="news-img" loading="lazy" src="{{ newsItem.asset }}" alt="" />
               }
             </div>
             <div class="news-text-div">
@@ -51,9 +51,9 @@
             </div>
             <div class="img-hover-zoom-2 img-div-zoom pl-24 hide-mobile">
               @if (!newsItem.asset) {
-              <img class="news-img" src="/img/grupal.jpg" />
+              <img class="news-img" loading="lazy" src="/img/grupal.avif" alt="" />
               } @if (newsItem.asset) {
-              <img class="news-img" src="{{ newsItem.asset }}" />
+              <img class="news-img" loading="lazy" src="{{ newsItem.asset }}" alt="" />
               }
             </div>
           </div>
