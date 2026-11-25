@@ -4,7 +4,7 @@ import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angul
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -26,6 +26,7 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    RouterLink,
     MatProgressSpinner,
     MatIcon,
     MatTabGroup,

@@ -5,7 +5,7 @@ import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -43,6 +43,7 @@ function toNewsCard(n: PublicNewsListItem, locale: string): PublicNewsCard {
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    RouterLink,
     MatIcon,
     MatProgressSpinner,
     MatButton,

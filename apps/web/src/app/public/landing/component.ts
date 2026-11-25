@@ -11,7 +11,7 @@ import { GroupService } from "@app/shared/services/group.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
-import { languageSwitchHref, type SiteLanguage } from "@app/shared/site-language";
+import { languagePath, type SiteLanguage } from "@app/shared/site-language";
 import { tap } from "rxjs";
 
 @Component({
@@ -55,10 +55,10 @@ export default class LandingComponent {
   isMatMenuOpen = false;
   prevButtonTrigger = false;
   language = this.session.language();
-  lanSelected = this.session.languageId();
+  siteLanguage = this.session.siteLanguage;
 
   languageHref(language: SiteLanguage): string {
-    return languageSwitchHref(this.router.url, language);
+    return languagePath(this.router.url, language);
   }
 
   inputExpand = false;

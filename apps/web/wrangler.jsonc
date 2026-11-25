@@ -9,6 +9,7 @@
   "observability": { "enabled": true },
   "alias": { "xhr2": "./cloudflare/xhr2.js" },
   "assets": { "binding": "ASSETS", "directory": "dist/tesisFront/browser" },
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
   // The browser reaches the API only through this site, so its session cookie stays same-site.
   "services": [{ "binding": "API", "service": "gmcan-api" }],
 }

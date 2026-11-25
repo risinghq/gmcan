@@ -49,9 +49,9 @@ function setup(headers: Record<string, string> = { "Cache-Control": "public, max
       await Promise.all(pending.splice(0));
       return { cache: response.headers.get("X-Cache"), text: await response.text(), headers: response.headers };
     },
-    async page(path: string, language = "es") {
+    async page(path: string, version = "v1") {
       const request = new Request(`https://site.test${path}`);
-      const response = await cachedPageFetch(request, language, () => api.fetch(request), cache, ctx);
+      const response = await cachedPageFetch(request, version, () => api.fetch(request), cache, ctx);
       await Promise.all(pending.splice(0));
       return { cache: response.headers.get("X-Cache"), text: await response.text(), headers: response.headers };
     },
@@ -143,11 +143,11 @@ describe("cachedPageFetch", () => {
     vi.useRealTimers();
   });
 
-  it("renders a page once per language and tells the browser to revalidate", async () => {
+  it("renders a page once per deploy and tells the browser to revalidate", async () => {
     const site = setup(html);
-    expect((await site.page("/home/news", "es")).cache).toBe("MISS");
-    expect((await site.page("/home/news", "en")).cache).toBe("MISS");
-    const repeat = await site.page("/home/news", "es");
+    expect((await site.page("/home/news", "v1")).cache).toBe("MISS");
+    expect((await site.page("/home/news", "v2")).cache).toBe("MISS");
+    const repeat = await site.page("/home/news", "v2");
     expect(repeat.cache).toBe("HIT");
     expect(repeat.headers.get("Cache-Control")).toBe("no-cache");
     expect(site.calls()).toBe(2);

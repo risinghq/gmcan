@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, sig
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -41,6 +41,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    RouterLink,
     MatIcon,
     FormsModule,
     ReactiveFormsModule,

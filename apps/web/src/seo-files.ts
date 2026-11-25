@@ -1,6 +1,6 @@
 import { SitemapSchema, type Sitemap } from "@gmcan/contracts/public";
 
-import { LANGUAGE_PARAM } from "./app/shared/site-language";
+import { languagePath } from "./app/shared/site-language";
 
 const STATIC_PATHS = [
   "/home",
@@ -16,12 +16,13 @@ const STATIC_PATHS = [
   "/home/join-us",
 ];
 
-const PRIVATE_PATHS = ["/dashboard", "/login", "/reset-password"];
+/** The dashboard and its sign-in pages exist only in Spanish; the server sends their English URLs there. */
+export const SPANISH_ONLY_PATHS = ["/dashboard", "/login", "/reset-password"];
 
 export function robotsTxt(origin: string): Response {
   const body = [
     "User-agent: *",
-    ...PRIVATE_PATHS.map((path) => `Disallow: ${path}`),
+    ...SPANISH_ONLY_PATHS.map((path) => `Disallow: ${path}`),
     "",
     `Sitemap: ${origin}/sitemap.xml`,
     "",
@@ -37,7 +38,7 @@ function escapeXml(value: string): string {
 
 function urlEntry(origin: string, path: string, updatedAt?: string): string {
   const es = `${origin}${path}`;
-  const en = `${origin}${path}?${LANGUAGE_PARAM}=en`;
+  const en = `${origin}${languagePath(path, "en")}`;
   const lastmod = updatedAt ? `<lastmod>${escapeXml(updatedAt.slice(0, 10))}</lastmod>` : "";
   const alternates = [
     `<xhtml:link rel="alternate" hreflang="es" href="${escapeXml(es)}"/>`,

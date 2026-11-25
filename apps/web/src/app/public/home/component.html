@@ -49,7 +49,7 @@
         </div>
         <div class="linea-title">{{ linea.name }}</div>
         <div class="linea-text">{{ linea.description }}</div>
-        <a class="linea-text-green" href="/home/about-us/lines-investigation"> {{ language.seeMore }} </a>
+        <a class="linea-text-green" routerLink="/home/about-us/lines-investigation"> {{ language.seeMore }} </a>
       </mat-card>
     </div>
     }
@@ -153,7 +153,7 @@
           <div class="method-title">{{ metodo.name }}</div>
         </div>
         <div class="linea-text method-text" [innerHTML]="metodo.description"></div>
-        <a class="linea-text-green method-green" href="/home/about-us/methods"> {{ language.seeMore }} </a>
+        <a class="linea-text-green method-green" routerLink="/home/about-us/methods"> {{ language.seeMore }} </a>
       </mat-card>
     </div>
     }
