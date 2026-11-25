@@ -33,9 +33,7 @@ export default class DetailNewsComponent implements OnInit {
   previouspage = "Inicio";
   previouslink = "/home";
   cargado = false;
-  day = "";
-  month = "";
-  year = "";
+  writtenOn = "";
   shareUrl = "";
   language: (typeof Languages)[number] = Languages[0];
 
@@ -47,9 +45,7 @@ export default class DetailNewsComponent implements OnInit {
     this.newsTypeNameLabel = newsData.newsTypeNameLabel;
     this.authorNameLabel = newsData.authorNameLabel;
     this.authorId = newsData.authorId;
-    this.day = newsData.day;
-    this.month = newsData.month;
-    this.year = newsData.year;
+    this.writtenOn = newsData.writtenOn;
 
     this.meta.updateTag({ name: "title", content: String(this.newsItem.title) });
     this.meta.updateTag({ property: "og:title", content: String(this.newsItem.title) });

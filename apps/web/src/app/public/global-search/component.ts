@@ -138,8 +138,8 @@ export default class GlobalSearchComponent {
     return {
       ...project,
       moneda: this.lookup.currencies().find((currency) => currency.code === project.currencyCode)?.symbol,
-      fechaI: dateLabel(project.startDate, "MMMM, y"),
-      fechaF: dateLabel(project.endDate, "MMMM, y"),
+      fechaI: dateLabel(project.startDate, "MMMM, y", this.language().locale),
+      fechaF: dateLabel(project.endDate, "MMMM, y", this.language().locale),
     };
   }
 
@@ -158,7 +158,7 @@ export default class GlobalSearchComponent {
       evento: event?.name,
       ciudad: event?.city ?? null,
       pais: event?.country ?? null,
-      fecha: dateLabel(pub.publishedAt, "MMMM y"),
+      fecha: dateLabel(pub.publishedAt, "MMMM y", this.language().locale),
     };
   }
 
@@ -166,7 +166,7 @@ export default class GlobalSearchComponent {
     return {
       ...news,
       nombreTipoNoticia: this.lookup.newsKinds().find((kind) => kind.code === news.newsKindCode)?.name,
-      fechaFormateada: dateLabel(news.publishedAt, "MM/dd/y"),
+      fechaFormateada: dateLabel(news.publishedAt, "MM/dd/y", this.language().locale),
     };
   }
 }

@@ -88,7 +88,7 @@ export default class DetailMemberComponent implements OnInit {
 
     // oxlint-disable-next-line oxc/no-map-spread -- the publications come from a resource signal, so each needs a copy
     return (this.profile.value()?.publications ?? []).map((pub): PublicationDisplay => {
-      const fecha = dateLabel(pub.publishedAt, "MMMM y");
+      const fecha = dateLabel(pub.publishedAt, "MMMM y", this.session.language().locale);
 
       const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
       const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;

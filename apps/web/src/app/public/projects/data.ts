@@ -4,6 +4,7 @@ import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel } from "@app/shared/utils/date";
 import { firstValueFrom } from "rxjs";
 
@@ -15,6 +16,7 @@ export class ProjectsDataService {
   private readonly researchLinesService = inject(ResearchLinesService);
   private readonly groupService = inject(GroupService);
   private readonly lookup = inject(LookupService);
+  private readonly session = inject(SessionService);
 
   async load(): Promise<ProjectsViewModel> {
     const [projectsRaw, lineasRaw, group] = await Promise.all([
@@ -30,11 +32,12 @@ export class ProjectsDataService {
     const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.code, f]));
     const monedasMap = new Map(this.lookup.currencies().map((m) => [m.code, m]));
 
+    const locale = this.session.language().locale;
     const enrich = (p: ProjectWithMembers): ProjectDisplay => {
       return {
         ...p,
-        fechaI: dateLabel(p.startDate, "MMMM, y"),
-        fechaF: dateLabel(p.endDate, "MMMM, y") || undefined,
+        fechaI: dateLabel(p.startDate, "MMMM, y", locale),
+        fechaF: dateLabel(p.endDate, "MMMM, y", locale) || undefined,
         lineasInvestigacion: lineasMap.get(p.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(p.fundingSourceCode)?.name,
         moneda: monedasMap.get(p.currencyCode)?.symbol,

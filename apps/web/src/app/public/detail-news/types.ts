@@ -5,7 +5,5 @@ export type DetailNewsViewModel = {
   newsTypeNameLabel: string;
   authorNameLabel: string;
   authorId: number | null;
-  day: string;
-  month: string;
-  year: string;
+  writtenOn: string;
 };

@@ -15,7 +15,7 @@ function toRow(pub: PublicPublicationWithAuthors, lookup: LookupService): Public
   const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
   return {
     ...pub,
-    fecha: dateLabel(pub.publishedAt, "MMMM, y"),
+    fecha: dateLabel(pub.publishedAt, "MMMM, y", "es"),
     thesisTypeName: lookup.thesisKinds().find((kind) => kind.code === thesis?.thesisKindCode)?.name ?? "",
     universityName: lookup.universities().find((university) => university.id === thesis?.universityId)?.name ?? "",
     eventName: lookup.events().find((event) => event.id === eventId)?.name ?? "",
