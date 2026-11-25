@@ -57,6 +57,7 @@ function newsInput(statusCode: "published" | "draft" | "archived", title: string
 
 beforeEach(async () => {
   await db.deleteFrom("session").execute();
+  await db.deleteFrom("publication").execute();
   await db.deleteFrom("news").execute();
   await db.deleteFrom("member").execute();
 
@@ -98,6 +99,40 @@ describe("public news", () => {
 
 describe("public members", () => {
   const personal = [DNI, EMAIL, BIRTH_DATE];
+
+  test("the profile carries the member's publications with subtype and authors", async () => {
+    const { insertId } = await db
+      .insertInto("publication")
+      .values({
+        kindCode: "journal_article",
+        doi: null,
+        publishedAt: "2026-02-01",
+        createdAt: "2026-01-01",
+        updatedAt: "2026-01-01",
+      })
+      .executeTakeFirstOrThrow();
+    const publicationId = Number(insertId);
+    await db
+      .insertInto("publication_translation")
+      .values([
+        { publicationId, locale: "es", title: "Artículo", abstract: "resumen" },
+        { publicationId, locale: "en", title: "Paper", abstract: "abstract" },
+      ])
+      .execute();
+    await db.insertInto("journal_article").values({ publicationId, journalId: null, issue: null }).execute();
+    await db
+      .insertInto("publication_author")
+      .values({ publicationId, authorOrder: 1, memberId, externalName: null })
+      .execute();
+
+    const profile = await getJson(`/api/members/${memberId}`);
+    expect(profile.status).toBe(200);
+    expect(profile.body.publications).toHaveLength(1);
+    const publication = profile.body.publications[0];
+    expect(publication.title).toBe("Artículo");
+    expect(publication.subtype).toEqual({ kindCode: "journal_article", journalArticle: {} });
+    expect(publication.authors.map((a: { memberId?: number }) => a.memberId)).toEqual([memberId]);
+  });
 
   test("the list and the profile carry no personal data", async () => {
     const list = await getJson("/api/members");
