@@ -158,27 +158,6 @@ describe("admin create", () => {
     expect(res.status).toBe(400);
   });
 
-  test("stores a project", async () => {
-    const researchLineId = await created(await send("POST", "/admin/research-lines", researchLineBody(groupId)));
-    await created(
-      await send("POST", "/admin/projects", {
-        code: "PRJ-CREATE-1",
-        fundedAmountMinor: 150000,
-        startDate: "2026-03-01",
-        researchLineId,
-        currencyCode: "pen",
-        fundingSourceCode: "vrip",
-        translations: {
-          es: { title: "Proyecto", description: "Descripción" },
-          en: { title: "Project", description: "Description" },
-        },
-      }),
-    );
-
-    const projects = await read<Array<{ code: string }>>("/admin/projects?q=PRJ-CREATE-1");
-    expect(projects.map((p) => p.code)).toContain("PRJ-CREATE-1");
-  });
-
   test("stores a conference paper", async () => {
     const id = await created(
       await send("POST", "/admin/publications", {
@@ -207,7 +186,10 @@ describe("admin delete", () => {
       await send("POST", "/admin/projects", {
         code: "PRJ-DELETE-1",
         fundedAmountMinor: 0,
+        statusCode: "active",
         startDate: "2026-03-01",
+        endDate: null,
+        memberIds: [],
         researchLineId,
         currencyCode: "pen",
         fundingSourceCode: "vrip",

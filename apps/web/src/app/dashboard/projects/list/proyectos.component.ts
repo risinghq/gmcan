@@ -22,6 +22,8 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
 
+import { isOngoing } from "../project-status";
+
 @Component({
   selector: "app-proyectos",
   templateUrl: "./proyectos.component.html",
@@ -81,9 +83,7 @@ export default class ProyectosComponent implements OnInit {
 
   loadList(activeMode: boolean): void {
     this.projectService.listAdminProjects().subscribe((rows) => {
-      this.items = activeMode
-        ? rows.filter((item) => item.statusCode === "active")
-        : rows.filter((item) => item.statusCode !== "active");
+      this.items = rows.filter((item) => isOngoing(item.statusCode) === activeMode);
       this.dataSource = new MatTableDataSource(this.items);
       this.dataSource.filterPredicate = (row, filter) => {
         const normalized = filter.trim().toLowerCase();

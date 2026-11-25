@@ -1,31 +1,18 @@
-import type { RawBuilder } from "kysely";
+import type { AdminProject, ProjectWrite } from "@gmcan/contracts/admin";
+import type { Compilable, RawBuilder } from "kysely";
 
-import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
-import { MEMBER_NAME } from "../db/projections.js";
+import { atomic, db, insertedId, lastInsertId, queryInChunks, readBatch } from "../db/client.js";
 import type { ProjectStatusCode } from "../db/schema.js";
-import type { LocalizedTranslations } from "../lib/admin-translations.js";
 import { monthYearEs } from "../lib/date-label.js";
 import { type Locale } from "../lib/public-locale.js";
 import type { AdminProjectListItem, AdminProjectMemberListItem } from "./admin-list.types.js";
 import { resolveMemberPhotoViews } from "./member-photo.service.js";
 
-export interface ProjectAdminInput {
-  code: string;
-  fundedAmountMinor: number;
-  statusCode?: ProjectStatusCode;
-  startDate: string;
-  endDate?: string;
-  researchLineId: number;
-  currencyCode: "pen" | "usd";
-  fundingSourceCode: "vrip" | "none";
-  translations: LocalizedTranslations<{ title: string; description: string }>;
-}
-
-function toProjectRow(data: ProjectAdminInput) {
+function toProjectRow(data: ProjectWrite) {
   return {
     code: data.code,
     fundedAmountMinor: data.fundedAmountMinor,
-    statusCode: data.statusCode ?? "planned",
+    statusCode: data.statusCode,
     startDate: data.startDate,
     endDate: data.endDate,
     researchLineId: data.researchLineId,
@@ -34,20 +21,7 @@ function toProjectRow(data: ProjectAdminInput) {
   };
 }
 
-async function replaceProjectTranslations(
-  projectId: number,
-  translations: Record<string, { title: string; description: string }>,
-) {
-  await atomic([
-    db.deleteFrom("project_translation").where("projectId", "=", projectId),
-    insertProjectTranslations(projectId, translations),
-  ]);
-}
-
-function insertProjectTranslations(
-  projectId: number | RawBuilder<number>,
-  translations: Record<string, { title: string; description: string }>,
-) {
+function insertProjectTranslations(projectId: number | RawBuilder<number>, translations: ProjectWrite["translations"]) {
   return db.insertInto("project_translation").values(
     Object.entries(translations).map(([locale, tr]) => ({
       projectId,
@@ -56,6 +30,22 @@ function insertProjectTranslations(
       description: tr.description,
     })),
   );
+}
+
+/** Kysely refuses an empty insert, so a project without members inserts nothing. */
+function insertProjectMembers(projectId: number | RawBuilder<number>, memberIds: number[], now: string): Compilable[] {
+  if (memberIds.length === 0) return [];
+  return [
+    db
+      .insertInto("project_member")
+      .values(memberIds.map((memberId) => ({ projectId, memberId, createdAt: now, updatedAt: now })))
+      .onConflict((oc) => oc.columns(["projectId", "memberId"]).doNothing()),
+  ];
+}
+
+function removeAbsentProjectMembers(projectId: number, memberIds: number[]) {
+  const query = db.deleteFrom("project_member").where("projectId", "=", projectId);
+  return memberIds.length === 0 ? query : query.where("memberId", "not in", memberIds);
 }
 
 async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectStatusCode) {
@@ -149,43 +139,51 @@ export async function getProjectLocalized(id: number, locale: Locale) {
     .executeTakeFirst();
 }
 
-export async function createProject(data: ProjectAdminInput) {
+export async function getAdminProject(id: number): Promise<AdminProject | undefined> {
+  const [projects, translations, members] = await readBatch([
+    db.selectFrom("project").selectAll().where("id", "=", id),
+    db.selectFrom("project_translation").select(["locale", "title", "description"]).where("projectId", "=", id),
+    db.selectFrom("project_member").select("memberId").where("projectId", "=", id).orderBy("createdAt"),
+  ]);
+  const project = projects[0];
+  if (!project) return undefined;
+
+  return {
+    ...project,
+    translations: Object.fromEntries(
+      translations.map((tr) => [tr.locale, { title: tr.title, description: tr.description }]),
+    ),
+    memberIds: members.map((row) => row.memberId),
+  };
+}
+
+export async function createProject(data: ProjectWrite) {
   const now = new Date().toISOString();
+  const projectId = lastInsertId("project");
   const results = await atomic([
     db.insertInto("project").values({ ...toProjectRow(data), createdAt: now, updatedAt: now }),
-    insertProjectTranslations(lastInsertId("project"), data.translations),
+    insertProjectTranslations(projectId, data.translations),
+    ...insertProjectMembers(projectId, data.memberIds, now),
   ]);
   return insertedId(results, 0);
 }
 
-export async function updateProject(id: number, data: ProjectAdminInput) {
-  await db
-    .updateTable("project")
-    .set({ ...toProjectRow(data), updatedAt: new Date().toISOString() })
-    .where("id", "=", id)
-    .execute();
-  await replaceProjectTranslations(id, data.translations);
+export async function updateProject(id: number, data: ProjectWrite) {
+  const now = new Date().toISOString();
+  await atomic([
+    db
+      .updateTable("project")
+      .set({ ...toProjectRow(data), updatedAt: now })
+      .where("id", "=", id),
+    db.deleteFrom("project_translation").where("projectId", "=", id),
+    insertProjectTranslations(id, data.translations),
+    removeAbsentProjectMembers(id, data.memberIds),
+    ...insertProjectMembers(id, data.memberIds, now),
+  ]);
 }
 
 export async function deleteProject(id: number) {
   await db.deleteFrom("project").where("id", "=", id).execute();
-}
-
-export async function endProject(id: number) {
-  const now = new Date().toISOString();
-  await db
-    .updateTable("project")
-    .set({ endDate: now.slice(0, 10), statusCode: "completed", updatedAt: now })
-    .where("id", "=", id)
-    .execute();
-}
-
-export async function restartProject(id: number) {
-  await db
-    .updateTable("project")
-    .set({ endDate: null, statusCode: "active", updatedAt: new Date().toISOString() })
-    .where("id", "=", id)
-    .execute();
 }
 
 interface ProjectMemberRow {
@@ -213,24 +211,6 @@ async function listProjectMemberRowsByProjectIds(projectIds: number[], orderByPr
     if (orderByProject) query = query.orderBy("project_member.projectId", "asc");
     return query.execute() as Promise<ProjectMemberRow[]>;
   });
-}
-
-export async function listProjectMembers(projectId: number) {
-  return db
-    .selectFrom("member")
-    .innerJoin("project_member", "project_member.memberId", "member.id")
-    .select([...MEMBER_NAME, "member.email as email"])
-    .where("project_member.projectId", "=", projectId)
-    .execute();
-}
-
-export async function addMemberToProject(projectId: number, memberId: number) {
-  const now = new Date().toISOString();
-  await db.insertInto("project_member").values({ projectId, memberId, createdAt: now, updatedAt: now }).execute();
-}
-
-export async function removeMemberFromProject(projectId: number, memberId: number) {
-  await db.deleteFrom("project_member").where("projectId", "=", projectId).where("memberId", "=", memberId).execute();
 }
 
 function memberDisplayName(row: { firstName: string; lastName: string; maternalName: string | null }): string {

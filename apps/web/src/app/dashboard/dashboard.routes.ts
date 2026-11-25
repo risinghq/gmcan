@@ -20,8 +20,7 @@ import {
   newsItemResolver,
   newsToolbarBadge,
   projectEditTitle,
-  projectMembersResolver,
-  projectResolver,
+  projectItemResolver,
   publicationEditTitle,
   publicationResolver,
 } from "@app/dashboard/dashboard.resolvers";
@@ -77,17 +76,20 @@ export default [
       },
       {
         path: "add-project",
-        loadComponent: () => import("./projects/add/add-proyecto.component"),
-        resolve: { members: adminMembersResolver, researchLines: adminResearchLinesResolver },
+        loadComponent: () => import("./projects/project.page"),
+        resolve: {
+          item: projectItemResolver,
+          members: adminMembersResolver,
+          researchLines: adminResearchLinesResolver,
+        },
         title: "Proyectos - Agregar proyecto",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-project/:id",
-        loadComponent: () => import("./projects/edit/edit-proyecto.component"),
+        loadComponent: () => import("./projects/project.page"),
         resolve: {
-          project: projectResolver,
-          projectMembers: projectMembersResolver,
+          item: projectItemResolver,
           members: adminMembersResolver,
           researchLines: adminResearchLinesResolver,
         },
