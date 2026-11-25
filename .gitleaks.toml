@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+# `gitleaks dir` scans gitignored files. Build caches and output hold hashes and copies of test fixtures that look
+# like keys, so a local check failed whenever they existed while CI's fresh checkout passed.
+[[allowlists]]
+description = "generated build output and caches"
+paths = ['''(^|/)\.angular/''', '''(^|/)\.wrangler/''', '''(^|/)\.perf/''', '''(^|/)dist/''', '''(^|/)node_modules/''']
