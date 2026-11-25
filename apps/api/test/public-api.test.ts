@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 
+import { GlobalSearchResultsSchema } from "@gmcan/contracts/public";
+
 import { app } from "../app.js";
 import { db } from "../db/client.js";
 import { createNews } from "../services/news.service.js";
@@ -40,6 +42,33 @@ async function insertMember(values: { dni: string; email: string; isActive: numb
     ])
     .execute();
   return id;
+}
+
+/** A journal article titled "Artículo" in Spanish, authored by the seeded member. */
+async function insertArticle() {
+  const { insertId } = await db
+    .insertInto("publication")
+    .values({
+      kindCode: "journal_article",
+      doi: null,
+      publishedAt: "2026-02-01",
+      createdAt: "2026-01-01",
+      updatedAt: "2026-01-01",
+    })
+    .executeTakeFirstOrThrow();
+  const publicationId = Number(insertId);
+  await db
+    .insertInto("publication_translation")
+    .values([
+      { publicationId, locale: "es", title: "Artículo", abstract: "resumen" },
+      { publicationId, locale: "en", title: "Paper", abstract: "abstract" },
+    ])
+    .execute();
+  await db.insertInto("journal_article").values({ publicationId, journalId: null, issue: null }).execute();
+  await db
+    .insertInto("publication_author")
+    .values({ publicationId, authorOrder: 1, memberId, externalName: null })
+    .execute();
 }
 
 function newsInput(statusCode: "published" | "draft" | "archived", title: string) {
@@ -97,33 +126,24 @@ describe("public news", () => {
   });
 });
 
+describe("global search", () => {
+  test("the results match the public search contract", async () => {
+    await insertArticle();
+    const { status, body } = await getJson("/api/search?q=a");
+    expect(status).toBe(200);
+    expect(body).toEqual({ publications: [], members: [], news: [], projects: [] });
+
+    const results = GlobalSearchResultsSchema.parse((await getJson("/api/search?q=Art")).body);
+    expect(results.publications.map((p) => p.subtype)).toEqual([{ kindCode: "journal_article", journalArticle: {} }]);
+    expect(GlobalSearchResultsSchema.parse((await getJson("/api/search?q=Torres")).body).members).toHaveLength(1);
+  });
+});
+
 describe("public members", () => {
   const personal = [DNI, EMAIL, BIRTH_DATE];
 
   test("the profile carries the member's publications with subtype and authors", async () => {
-    const { insertId } = await db
-      .insertInto("publication")
-      .values({
-        kindCode: "journal_article",
-        doi: null,
-        publishedAt: "2026-02-01",
-        createdAt: "2026-01-01",
-        updatedAt: "2026-01-01",
-      })
-      .executeTakeFirstOrThrow();
-    const publicationId = Number(insertId);
-    await db
-      .insertInto("publication_translation")
-      .values([
-        { publicationId, locale: "es", title: "Artículo", abstract: "resumen" },
-        { publicationId, locale: "en", title: "Paper", abstract: "abstract" },
-      ])
-      .execute();
-    await db.insertInto("journal_article").values({ publicationId, journalId: null, issue: null }).execute();
-    await db
-      .insertInto("publication_author")
-      .values({ publicationId, authorOrder: 1, memberId, externalName: null })
-      .execute();
+    await insertArticle();
 
     const profile = await getJson(`/api/members/${memberId}`);
     expect(profile.status).toBe(200);

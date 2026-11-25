@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { validate } from "../../../lib/validate.js";
-import { resolveAssetAccessLinkMap, resolveAssetAccessUrls } from "../../../services/assets/service.js";
+import { resolveAssetAccessUrls } from "../../../services/assets/service.js";
 import { memberFullName, resolveMemberPhotoViews } from "../../../services/member-photo.service.js";
 import { globalSearch } from "../../../services/search.service.js";
 
@@ -25,21 +25,10 @@ router.get("/", validate("query", SearchQuery), async (c) => {
   const requested = new Set(types.split(",").map((t) => t.trim()));
   const result = await globalSearch(term, requested, locale);
 
-  const registeredAuthors = result.publications.flatMap((row) =>
-    row.authors.flatMap((author) =>
-      author.kind === "registered" ? [{ memberId: author.memberId, fullName: author.name }] : [],
-    ),
-  );
-  const [publicationAssets, newsAssets, photos] = await Promise.all([
-    resolveAssetAccessLinkMap({
-      ownerType: "publication",
-      ownerIds: result.publications.map((row) => row.id),
-      slot: "file",
-    }),
+  const [newsAssets, photos] = await Promise.all([
     resolveAssetAccessUrls({ ownerType: "news", ownerIds: result.news.map((row) => row.id), slot: "photo" }),
     resolveMemberPhotoViews(
       [
-        ...registeredAuthors,
         ...result.members.map((row) => ({ memberId: row.id, fullName: memberFullName(row) })),
         ...result.projects.flatMap((row) =>
           row.members.map((member) => ({ memberId: member.memberId, fullName: member.name })),
@@ -49,18 +38,7 @@ router.get("/", validate("query", SearchQuery), async (c) => {
     ),
   ]);
 
-  const publications = result.publications.map((row) => ({
-    id: row.id,
-    title: row.title,
-    abstract: row.abstract,
-    asset: publicationAssets.get(row.id) ?? null,
-    doi: row.doi,
-    publishedAt: row.publishedAt,
-    kindCode: row.kindCode,
-    authors: row.authors.map((author) =>
-      author.kind === "registered" ? Object.assign({}, author, photos.get(author.memberId)) : author,
-    ),
-  }));
+  const publications = result.publications.map(({ createdAt: _c, updatedAt: _u, ...row }) => row);
 
   const members = result.members.map((row) => Object.assign({}, row, photos.get(row.id)));
 

@@ -24,6 +24,8 @@ export interface PublicPublicationFilter {
   journalId?: number;
   universityId?: number;
   memberId?: number;
+  /** Matches the title or abstract in the requested locale. */
+  q?: string;
 }
 
 export interface AdminPublicationFilter {
@@ -253,6 +255,12 @@ export async function listPublications(
   if (filter.eventId) query = query.where("conference_paper.eventId", "=", filter.eventId);
   if (filter.journalId) query = query.where("journal_article.journalId", "=", filter.journalId);
   if (filter.universityId) query = query.where("thesis.universityId", "=", filter.universityId);
+  if (filter.q) {
+    const like = `%${filter.q}%`;
+    query = query.where((eb) =>
+      eb.or([eb("publication_translation.title", "like", like), eb("publication_translation.abstract", "like", like)]),
+    );
+  }
   if (filter.memberId) {
     query = query
       .innerJoin("publication_author", "publication_author.publicationId", "publication.id")
