@@ -1,4 +1,6 @@
-@use "bootstrap/scss/bootstrap";
+// The templates use Bootstrap's grid, utilities, `.collapse` and the pagination ng-bootstrap renders. The buttons,
+// cards and other components are the app's own classes, so Bootstrap's component styles stay out.
+@use "bootstrap-parts";
 
 :root {
   --true-green: #039300;

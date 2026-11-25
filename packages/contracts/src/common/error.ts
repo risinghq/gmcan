@@ -1,4 +1,5 @@
-import { z } from "zod";
+// zod/mini tree-shakes; the web parses this envelope on every page, and classic zod would add ~480 kB to its first load.
+import * as z from "zod/mini";
 
 export const AppErrorCodeSchema = z.enum([
   "invalid_request",
@@ -29,8 +30,8 @@ export const ErrorEnvelopeSchema = z.object({
     code: AppErrorCodeSchema,
     status: ErrorHttpStatusSchema,
     message: z.string(),
-    details: z.unknown().optional(),
-    traceId: z.string().optional(),
+    details: z.optional(z.unknown()),
+    traceId: z.optional(z.string()),
   }),
 });
 

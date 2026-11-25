@@ -27,7 +27,6 @@ import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
 import { routes } from "./app.routes";
 import { authInterceptor } from "./token.interceptor";
@@ -57,7 +56,6 @@ export const appConfig: ApplicationConfig = {
         filter: (req) => GLOBAL.isPublicApiRequest(req.url),
       }),
     ),
-    provideCharts(withDefaultRegisterables()),
     provideAppInitializer(() => inject(SessionService).init()),
     provideAppInitializer(() => inject(LookupService).load()),
     {
