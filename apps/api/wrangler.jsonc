@@ -13,8 +13,8 @@
   "vars": {
     "NODE_ENV": "production",
     // The public site: the web worker serves the API under /api and /admin.
-    "BACKEND_URL": "https://gmcan-web.caefisica.workers.dev",
-    "FRONTEND_URL": "https://gmcan-web.caefisica.workers.dev",
+    "BACKEND_URL": "https://gmcan-web.empirical.workers.dev",
+    "FRONTEND_URL": "https://gmcan-web.empirical.workers.dev",
     "SUPPORTED_LOCALES": "es,en",
     "DEFAULT_LOCALE": "es",
     // Resend's shared test sender. It delivers only to the Resend account owner's address.
