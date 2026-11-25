@@ -1,7 +1,15 @@
 import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDivider } from "@angular/material/divider";
 import { MatIcon } from "@angular/material/icon";
+import {
+  MatListItem,
+  MatListItemIcon,
+  MatListItemTitle,
+  MatListSubheaderCssMatStyler,
+  MatNavList,
+} from "@angular/material/list";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
@@ -18,6 +26,8 @@ import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { filter } from "rxjs";
 
+import { DASHBOARD_NAV, visibleNav } from "./nav";
+
 @Component({
   selector: "app-log-home",
   templateUrl: "./log-home.component.html",
@@ -33,6 +43,12 @@ import { filter } from "rxjs";
     MatMenuTrigger,
     MatMenu,
     MatMenuItem,
+    MatNavList,
+    MatListItem,
+    MatListItemIcon,
+    MatListItemTitle,
+    MatListSubheaderCssMatStyler,
+    MatDivider,
     RouterOutlet,
   ],
 })
@@ -54,6 +70,7 @@ export default class LogHomeComponent implements OnInit {
   screenWidth: number;
   public url: string;
   readonly grupoinfo = this.uiState.groupInfo;
+  readonly nav = computed(() => visibleNav(DASHBOARD_NAV, (capability) => this.authz.can(capability)));
 
   readonly dashboardTitle = signal("Dashboard");
   readonly toolbarBadge = signal<ToolbarBadge | null>(null);
