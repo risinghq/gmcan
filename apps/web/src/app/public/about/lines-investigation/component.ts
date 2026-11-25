@@ -1,7 +1,7 @@
 import { DatePipe, SlicePipe } from "@angular/common";
 import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { Router } from "@angular/router";
+import { RouterLink } from "@angular/router";
 import type { ResearchLineDisplay } from "@app/public/about/data";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -17,10 +17,18 @@ import {
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIcon, NgbPagination, NgbPaginationPrevious, NgbPaginationNumber, NgbPaginationNext, SlicePipe, DatePipe],
+  imports: [
+    MatIcon,
+    RouterLink,
+    NgbPagination,
+    NgbPaginationPrevious,
+    NgbPaginationNumber,
+    NgbPaginationNext,
+    SlicePipe,
+    DatePipe,
+  ],
 })
 export default class LinesInvestigationComponent {
-  router = inject(Router);
   private seo = inject(SeoService);
   private session = inject(SessionService);
 
@@ -68,9 +76,5 @@ export default class LinesInvestigationComponent {
 
   expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
     return this.isExpanded(section, index) ? seeLess : seeMore;
-  }
-
-  profile(member: { memberId: number }): void {
-    this.router.navigate(["/detail-member/" + member.memberId], { queryParams: { from: "about" } });
   }
 }

@@ -1,14 +1,14 @@
 <div class="not-found-div">
-  <img class="not-icon" src="/img/404.svg" />
+  <img class="not-icon" src="/img/404.svg" alt="" />
   <div class="not-title">
     {{ language.notFound }}
   </div>
   <div class="not-text">
     {{ language.notFound2 }}
   </div>
-  <div class="center not-btn" (click)="navigate()">
-    <a class="btn-text2">
+  <a class="center not-btn" [routerLink]="dashboard ? '/dashboard' : '/'">
+    <span class="btn-text2">
       {{ button_text }}
-    </a>
-  </div>
+    </span>
+  </a>
 </div>

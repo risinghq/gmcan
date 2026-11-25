@@ -5,7 +5,7 @@ import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -61,7 +61,6 @@ export default class MainNewsComponent implements OnInit {
   newsService = inject(NewsService);
   route = inject(ActivatedRoute);
   lookup = inject(LookupService);
-  router = inject(Router);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
   private seo = inject(SeoService);
@@ -118,11 +117,6 @@ export default class MainNewsComponent implements OnInit {
 
   onPageChange(page: number): void {
     this.query.update((query) => ({ ...query, page }));
-    this.scroll();
-  }
-
-  openNewsDetail(newsItem: PublicNewsCard): void {
-    this.router.navigate(["/detail-news/" + newsItem.id], { queryParams: { from: "news" } });
     this.scroll();
   }
 

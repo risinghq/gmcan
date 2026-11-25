@@ -2,7 +2,7 @@ import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/c
 import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Router, RouterLink } from "@angular/router";
+import { RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -21,7 +21,6 @@ type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
   imports: [RouterLink, MatIcon, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent {
-  private router = inject(Router);
   private memberService = inject(MemberService);
   lookup = inject(LookupService);
   private session = inject(SessionService);
@@ -55,9 +54,5 @@ export default class MembersComponent {
 
   constructor() {
     this.seo.setPageTitle("GMCAN | " + this.language.members);
-  }
-
-  profile(member: MemberDisplay): void {
-    this.router.navigate(["/detail-member/" + member.id], { queryParams: { from: "members" } });
   }
 }

@@ -590,6 +590,12 @@ svg {
 .flex-news {
   display: flex;
 }
+.plain-link,
+.plain-link:hover {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
 .other-news-date {
   line-height: 1;
   font-size: 13px;

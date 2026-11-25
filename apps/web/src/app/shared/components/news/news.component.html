@@ -6,7 +6,7 @@
   @if (view.featuredNews; as featuredNews) {
     <div class="img-hover-zoom">
       @if (featuredNews.asset) {
-        <img class="card-img-div" src="{{ featuredNews.asset }}" />
+        <img class="card-img-div" src="{{ featuredNews.asset }}" alt="" />
       }
     </div>
     <div class="card-text-div card-text-div-3">
@@ -18,9 +18,13 @@
           {{ featuredNews.publishedAtLabel }}
         </div>
       </div>
-      <div class="other-news-text-2" (click)="openNewsDetail(featuredNews)">
+      <a
+        class="other-news-text-2 plain-link"
+        [routerLink]="['/detail-news', featuredNews.id]"
+        [queryParams]="{ from: origin }"
+      >
         {{ featuredNews.title }}
-      </div>
+      </a>
       <div class="news-author">{{ language().newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
     </div>
   }
@@ -36,14 +40,18 @@
               {{ newsItem.publishedAtLabel }}
             </div>
           </div>
-          <div class="other-news-text-2" (click)="openNewsDetail(newsItem)">
+          <a
+            class="other-news-text-2 plain-link"
+            [routerLink]="['/detail-news', newsItem.id]"
+            [queryParams]="{ from: origin }"
+          >
             {{ newsItem.title }}
-          </div>
+          </a>
           <div class="news-author">{{ language().newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
         </div>
         <div class="img-hover-zoom-2 img-div-zoom">
           @if (newsItem.asset) {
-            <img class="other-news-img" src="{{ newsItem.asset }}" alt="nada" />
+            <img class="other-news-img" loading="lazy" src="{{ newsItem.asset }}" alt="" />
           }
         </div>
       </div>

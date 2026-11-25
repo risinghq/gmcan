@@ -6,7 +6,7 @@
         <div class="line-toggle-header">
           <div class="line-img-div">
             @if (linea.asset) {
-            <img class="line-img" src="{{ linea.asset }}" />
+            <img class="line-img" src="{{ linea.asset }}" alt="" />
             } @else {
             <img class="line-img" src="/img/prop_estruc.avif" alt="" />
             }
@@ -50,7 +50,12 @@
                 <div class="member-img-round">
                   <img class="member-img" loading="lazy" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
                 </div>
-                <div class="member-name" (click)="profile(member)">{{ member.name }}</div>
+                <a
+                  class="member-name plain-link"
+                  [routerLink]="['/detail-member', member.memberId]"
+                  [queryParams]="{ from: 'about' }"
+                  >{{ member.name }}</a
+                >
               </div>
               }
             </div>

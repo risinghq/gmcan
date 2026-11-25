@@ -1,7 +1,7 @@
 import { SlicePipe } from "@angular/common";
 import { Component, HostListener, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
+import { Router, ActivatedRoute, NavigationEnd, RouterLink } from "@angular/router";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -22,7 +22,7 @@ type NewsDisplay = PublicNewsListItem & {
   templateUrl: "./news.component.html",
   styleUrl: "./news.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [SlicePipe],
+  imports: [SlicePipe, RouterLink],
 })
 export default class NewsComponent {
   newsService = inject(NewsService);
@@ -31,7 +31,10 @@ export default class NewsComponent {
   private browser = inject(BrowserService);
   private session = inject(SessionService);
 
-  private readonly selectedNewsId = Number(this.route.snapshot.params["id"]) || 0;
+  private readonly selectedNewsId = toSignal(this.route.paramMap.pipe(map((params) => Number(params.get("id")) || 0)), {
+    initialValue: Number(this.route.snapshot.params["id"]) || 0,
+  });
+  readonly origin = parsePublicOrigin(this.route);
   readonly language = this.session.language;
   readonly isDetailNews = toSignal(
     this.router.events.pipe(
@@ -57,7 +60,7 @@ export default class NewsComponent {
     }
 
     const enriched = response.items
-      .filter((n) => n.id !== this.selectedNewsId)
+      .filter((n) => n.id !== this.selectedNewsId())
       .toSorted((a, b) => {
         const left = parseLocalDate(a.publishedAt)?.getTime() ?? 0;
         const right = parseLocalDate(b.publishedAt)?.getTime() ?? 0;
@@ -91,14 +94,4 @@ export default class NewsComponent {
   }
 
   readonly title = computed(() => (this.isDetailNews() ? this.language().moreNews : this.language().news));
-
-  openNewsDetail(newsItem: NewsDisplay): void {
-    const origin = parsePublicOrigin(this.route);
-    this.router.navigate(["/detail-news/" + newsItem.id], { queryParams: { from: origin } });
-    this.scroll();
-  }
-
-  scroll(): void {
-    this.browser.scrollIntoViewById("main-toolbar");
-  }
 }

@@ -4,7 +4,7 @@
       <div class="member-links">
         <a class="member-link-active" routerLink="/">{{ language.home }}</a>
         <mat-icon class="member-icon"> arrow_right </mat-icon>
-        <a class="member-link">{{ language.members }}</a>
+        <span class="member-link" aria-current="page">{{ language.members }}</span>
       </div>
       <div class="member-card">
         @let view = vm();
@@ -32,10 +32,14 @@
                     <div class="member-name full-width">
                       {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                     </div>
-                    <div class="member-profile" (click)="profile(miembro)">
+                    <a
+                      class="member-profile plain-link"
+                      [routerLink]="['/detail-member', miembro.id]"
+                      [queryParams]="{ from: 'members' }"
+                    >
                       {{ language.membersText[0].seeProfile }}
                       <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
-                    </div>
+                    </a>
                   </div>
                 </div>
               </div>

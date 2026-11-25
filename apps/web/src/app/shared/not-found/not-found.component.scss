@@ -33,7 +33,8 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 }
 
 .not-btn {
-  cursor: pointer;
+  display: block;
+  text-decoration: none;
   margin-left: auto;
   margin-right: auto;
   width: max-content;

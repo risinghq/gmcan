@@ -5,8 +5,8 @@
 $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 
 .logo-nav {
+  display: block;
   cursor: pointer;
-  outline: none;
 }
 
 .search-top-div {
@@ -115,6 +115,8 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
 }
 .login-div {
   display: inline-flex;
+  color: inherit;
+  text-decoration: none;
   margin-top: auto;
   margin-bottom: auto;
 }
@@ -242,9 +244,7 @@ mat-sidenav {
 }
 
 .link-logo-div {
-  cursor: pointer;
   display: flex;
-  outline: none;
 }
 
 .footer-flex {

@@ -1,5 +1,5 @@
 import { Component, OnInit, RESPONSE_INIT, inject, ChangeDetectionStrategy } from "@angular/core";
-import { Router } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { Languages } from "@app/shared/models/languages";
 import { SessionService } from "@app/shared/services/session.service";
 
@@ -7,6 +7,7 @@ import { SessionService } from "@app/shared/services/session.service";
   selector: "app-not-found",
   templateUrl: "./not-found.component.html",
   changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [RouterLink],
   styleUrl: "./not-found.component.scss",
 })
 export default class NotFoundComponent implements OnInit {
@@ -30,14 +31,6 @@ export default class NotFoundComponent implements OnInit {
       this.dashboard = true;
     } else {
       this.button_text = this.language.notFoundBtn;
-    }
-  }
-
-  navigate(): void {
-    if (this.dashboard) {
-      this.router.navigate(["/dashboard"]);
-    } else {
-      this.router.navigate(["/"]);
     }
   }
 }

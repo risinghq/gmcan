@@ -16,7 +16,7 @@
         </a>
       </div>
       <div class="link4">
-        <a class="link mb-16"> {{ language.aboutUs }} </a>
+        <span class="link mb-16"> {{ language.aboutUs }} </span>
         <a
           class="link fs-13 mb-8 ml-16"
           routerLink="./about-us/about"
@@ -73,10 +73,10 @@
           {{ language.news }}
         </a>
       </div>
-      <div class="login-div" (click)="sidenav.close(); loginLink()">
-        <div class="login">{{ language.login }}</div>
-        <img class="login-icon" src="/img/icons/login.svg" />
-      </div>
+      <a class="login-div" routerLink="/login" (click)="sidenav.close()">
+        <span class="login">{{ language.login }}</span>
+        <img class="login-icon" src="/img/icons/login.svg" alt="" />
+      </a>
       <a class="link-box" routerLink="/join-us" routerLinkActive="active" (click)="sidenav.close()">
         {{ language.join }}
       </a>
@@ -123,9 +123,9 @@
       </div>
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
-      <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
-        <img class="logo-nav" src="{{ groupInfo().assets.header }}" alt="logo" />
-      </div>
+      <a id="logoHeader" class="logo-nav" routerLink="/">
+        <img class="logo-nav" src="{{ groupInfo().assets.header }}" alt="GMCAN" />
+      </a>
       <div class="full-width ml-16 hide-mobile-nav">
         <div class="top-bar-div">
           <div role="search" class="input-search-toolbar full-width">
@@ -159,10 +159,10 @@
               <img class="flag" src="/img/flags/spain.png" alt="" />
             </a>
           </div>
-          <div class="login-div" (click)="sidenav.close(); loginLink()">
-            <div class="login link">{{ language.login }}</div>
-            <img class="login-icon" src="/img/icons/login.svg" />
-          </div>
+          <a class="login-div" routerLink="/login">
+            <span class="login link">{{ language.login }}</span>
+            <img class="login-icon" src="/img/icons/login.svg" alt="" />
+          </a>
         </div>
         <div class="down-bar-div text-right">
           <div class="center right">
@@ -177,7 +177,7 @@
               #menuTrigger="matMenuTrigger"
               (mouseover)="menuTrigger.openMenu()"
             >
-              <a class="link-3"> {{ language.aboutUs }} </a>
+              <span class="link-3"> {{ language.aboutUs }} </span>
               <mat-icon class="middle">arrow_drop_down</mat-icon>
             </div>
             <mat-menu #menu="matMenu" [overlapTrigger]="false">
@@ -261,52 +261,36 @@
     <footer class="footer-div text-white">
       <div class="footer-flex">
         <div class="flex-news">
-          <div class="link-logo-div" (click)="scroll()" routerLink="/">
-            <img class="img-logo-white" loading="lazy" src="{{ groupInfo().assets.footer }}" />
-          </div>
+          <a class="link-logo-div" routerLink="/">
+            <img class="img-logo-white" loading="lazy" src="{{ groupInfo().assets.footer }}" alt="GMCAN" />
+          </a>
           <div class="link-logo-div">
             <img class="img-logo-white" loading="lazy" src="/img/logoUNMSM.avif" alt="UNMSM" />
           </div>
         </div>
         <div class="footer-down-bar">
           <div class="center max-con flex-news">
-            <a
-              class="link3"
-              routerLink="/"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              (click)="scroll()"
-            >
+            <a class="link3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
               {{ language.home }}
             </a>
           </div>
           <div class="center max-con flex-news">
-            <a class="link3" routerLink="./about-us" routerLinkActive="active" (click)="scroll()">
-              {{ language.aboutUs }}
-            </a>
+            <a class="link3" routerLink="./about-us" routerLinkActive="active"> {{ language.aboutUs }} </a>
           </div>
           <div class="center max-con flex-news">
-            <a class="link3" routerLink="./members" routerLinkActive="active" (click)="scroll()">
-              {{ language.members }}
-            </a>
+            <a class="link3" routerLink="./members" routerLinkActive="active"> {{ language.members }} </a>
           </div>
           <div class="center max-con flex-news">
-            <a class="link3" routerLink="./projects" routerLinkActive="active" (click)="scroll()">
-              {{ language.projects }}
-            </a>
+            <a class="link3" routerLink="./projects" routerLinkActive="active"> {{ language.projects }} </a>
           </div>
           <div class="center max-con flex-news">
-            <a class="link3" routerLink="./publications" routerLinkActive="active" (click)="scroll()">
-              {{ language.publications }}
-            </a>
+            <a class="link3" routerLink="./publications" routerLinkActive="active"> {{ language.publications }} </a>
           </div>
           <div class="center max-con flex-news">
-            <a class="link3" routerLink="./news" routerLinkActive="active" (click)="scroll()"> {{ language.news }} </a>
+            <a class="link3" routerLink="./news" routerLinkActive="active"> {{ language.news }} </a>
           </div>
           <div class="center link-box2">
-            <a class="link3 link-box-text" routerLink="./join-us" routerLinkActive="active" (click)="scroll()">
-              {{ language.join }}
-            </a>
+            <a class="link3 link-box-text" routerLink="./join-us" routerLinkActive="active"> {{ language.join }} </a>
           </div>
         </div>
       </div>
@@ -316,7 +300,7 @@
             <div class="footer-title">{{ language.contactUs }}</div>
             <div class="footer-info">
               <div class="footer-icon-div">
-                <img class="footer-icon" src="/img/icons/location.svg" />
+                <img class="footer-icon" src="/img/icons/location.svg" alt="" />
               </div>
               <div class="footer-text">
                 <div class="footer-text-title">
@@ -328,7 +312,7 @@
             <div class="footer-info footer-info-2 footerdiflex">
               <div class="flex-news">
                 <div class="footer-icon-div">
-                  <img class="footer-icon" src="/img/icons/mail.svg" />
+                  <img class="footer-icon" src="/img/icons/mail.svg" alt="" />
                 </div>
                 <div class="footer-text" style="display: flex">
                   <div class="footer-direction footer-email">{{ groupInfo().email }}</div>
@@ -337,7 +321,7 @@
               <div class="flex-news">
                 @if (groupInfo().phone && groupInfo().phone != "") {
                 <div class="footer-icon-div ml-footer">
-                  <img class="footer-icon" src="/img/icons/phone.svg" />
+                  <img class="footer-icon" src="/img/icons/phone.svg" alt="" />
                 </div>
                 }
                 <div class="footer-text" style="display: flex">
