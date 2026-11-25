@@ -21,7 +21,7 @@ import { ContentTable } from "./table";
 @Component({
   selector: "app-content-table",
   styleUrl: "./content-table.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIcon,
     MatTable,
@@ -50,7 +50,7 @@ import { ContentTable } from "./table";
         <a class="link" [routerLink]="list.addRoute">{{ addLabel() }}</a>
       </div>
     </div>
-    <table mat-table [dataSource]="list.dataSource" [hidden]="list.notFound" matSort>
+    <table mat-table [dataSource]="list.dataSource" [hidden]="list.notFound()" matSort>
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
         <td mat-cell *matCellDef="let row" (click)="edit(row.id)">{{ row.name }}</td>
@@ -58,8 +58,8 @@ import { ContentTable } from "./table";
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
       <tr mat-row *matRowDef="let row; columns: columns"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="list.notFound" />
-    @if (list.notFound) {
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="list.notFound()" />
+    @if (list.notFound()) {
       <span class="plex-sans">No se encontraron resultados</span>
     }
   `,

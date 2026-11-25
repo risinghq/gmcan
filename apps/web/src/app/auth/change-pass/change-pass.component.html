@@ -4,15 +4,15 @@
     <div class="back-text">Volver a la página principal</div>
   </div>
   <div class="login-card">
-    <img class="logo-icon" src="{{ grupoInfo.assets.header }}" alt="logo" />
+    <img class="logo-icon" src="{{ grupoInfo().assets.header }}" alt="logo" />
 
-    @if (loading) {
+    @if (loading()) {
       <div class="loading-spinner" style="text-align: center; margin-top: 20px">
         <p>Verificando...</p>
       </div>
     }
 
-    @if (tokenValid && !success && !loading) {
+    @if (tokenValid() && !success() && !loading()) {
       <form [formGroup]="passwordForm" (ngSubmit)="resetPassword()">
         <div class="login-title recover-title">Establecer nueva contraseña</div>
         <div class="login-subtitle">Tu nueva contraseña debe tener como mínimo 8 caracteres.</div>
@@ -50,7 +50,7 @@
       </form>
     }
 
-    @if (success) {
+    @if (success()) {
       <div>
         <div class="login-title succesful-title">¡Contraseña cambiada exitosamente!</div>
         <div (click)="returnToLogin()" class="btn-black">
@@ -59,9 +59,9 @@
       </div>
     }
 
-    @if (error) {
+    @if (error()) {
       <div class="error">
-        {{ error }}
+        {{ error() }}
       </div>
     }
   </div>

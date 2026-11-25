@@ -1,21 +1,21 @@
 <div class="global-search-div">
   <div class="global-links">
-    <a class="global-link-active" href="/">{{ language.home }}</a>
+    <a class="global-link-active" href="/">{{ language().home }}</a>
     <mat-icon class="global-icon"> arrow_right </mat-icon>
-    <a class="global-link">{{ language.results }}</a>
+    <a class="global-link">{{ language().results }}</a>
   </div>
   <div class="card-global">
     <div class="flex-news back-div" (click)="return()">
       <mat-icon class="back-icon"> arrow_back </mat-icon>
-      <div class="back-text">{{ language.detailMemberText[0].back }}</div>
+      <div class="back-text">{{ language().detailMemberText[0].back }}</div>
     </div>
-    <div class="global-results-title">{{ language.results }}</div>
+    <div class="global-results-title">{{ language().results }}</div>
     <div class="flex-news">
       <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
         <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
         <input
           class="input-search-text"
-          placeholder="{{ language.search }}"
+          placeholder="{{ language().search }}"
           #nombre
           name="nombre"
           formControlName="nombre"
@@ -23,18 +23,18 @@
         />
       </form>
       <div (click)="searchGlobal(nombre.value)" class="btn-black">
-        <div class="link">{{ language.searchMobile }}</div>
+        <div class="link">{{ language().searchMobile }}</div>
       </div>
     </div>
-    @if (proyectos.length == 0 && publicaciones.length == 0 && miembros.length == 0 && noticias.length == 0) {
-    <div class="not-found-2">{{ language.noResults }}</div>
-    } @if (proyectos.length > 0 || publicaciones.length > 0 || miembros.length > 0 || noticias.length > 0) {
+    @if (proyectos().length == 0 && publicaciones().length == 0 && miembros().length == 0 && noticias().length == 0) {
+    <div class="not-found-2">{{ language().noResults }}</div>
+    } @if (proyectos().length > 0 || publicaciones().length > 0 || miembros().length > 0 || noticias().length > 0) {
     <div class="row">
       <div class="col-lg-8 col-sm-6 col-12">
         <div id="publications-list">
           <div class="publications-title">
-            {{ language.publications }} @if (publicaciones.length >= 0) {
-            <span class="length-text">({{ publicaciones.length }})</span>
+            {{ language().publications }} @if (publicaciones().length >= 0) {
+            <span class="length-text">({{ publicaciones().length }})</span>
             }
             <mat-icon
               class="publication-abs-icon-2"
@@ -45,18 +45,18 @@
               aria-controls="collapsePublication"
               (click)="toggleRotation(1)"
               [class]="{
-                  'abs-active': publicationExpanded,
-                  'abs-not-active': !publicationExpanded,
+                  'abs-active': publicationExpanded(),
+                  'abs-not-active': !publicationExpanded(),
                 }"
             >
               keyboard_arrow_down
             </mat-icon>
           </div>
           <div class="collapse show" id="collapsePublication">
-            @if (publicaciones.length == 0) {
-            <div class="not-found-1">{{ language.noResultsPublication }}</div>
-            } @for ( publicacion of publicaciones | slice: (page1 - 1) * pageSize : (page1 - 1) * pageSize + pageSize;
-            track publicacion; let i = $index ) {
+            @if (publicaciones().length == 0) {
+            <div class="not-found-1">{{ language().noResultsPublication }}</div>
+            } @for ( publicacion of publicaciones() | slice: (page1() - 1) * pageSize : (page1() - 1) * pageSize +
+            pageSize; track publicacion.id; let i = $index ) {
             <div class="publication">
               <div class="flex-news">
                 @if (publicacion.kindCode != 'thesis') {
@@ -106,7 +106,8 @@
               </div>
               }
               <div class="flex-news publication-mt" style="flex-flow: wrap">
-                @for (autor of publicacion.authors; track autor; let last = $last) { @if (autor.kind === "registered") {
+                @for (autor of publicacion.authors; track $index; let last = $last) { @if (autor.kind === "registered")
+                {
                 <div class="publication-members">
                   <div class="member-img-round">
                     <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
@@ -120,11 +121,11 @@
               <div class="flex-news mt-16">
                 @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
                 <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
-                  {{ this.language.publicationsText[0].preview }}
+                  {{ language().publicationsText[0].preview }}
                 </a>
                 } @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
                 <a class="publication-green" href="{{ publicacion.asset.download }}">
-                  {{ this.language.publicationsText[0].download }}
+                  {{ language().publicationsText[0].download }}
                 </a>
                 }
                 <a
@@ -137,8 +138,8 @@
                   aria-expanded="false"
                   aria-controls="publication"
                 >
-                  {{ expandLabel( "search-pub", i, this.language.publicationsText[0].seeMore,
-                  this.language.publicationsText[0].seeLess ) }}
+                  {{ expandLabel( "search-pub", i, language().publicationsText[0].seeMore,
+                  language().publicationsText[0].seeLess ) }}
                 </a>
                 <mat-icon
                   class="publication-abs-icon"
@@ -151,12 +152,12 @@
                 </mat-icon>
               </div>
               <div class="collapse collapsed-resumen" id="publication{{ i }}">
-                <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
+                <div class="abstract-title">{{ language().publicationsText[0].abstract }}:</div>
                 <div class="abstract">{{ publicacion.abstract }}</div>
               </div>
             </div>
-            } @if (publicaciones.length > 5) {
-            <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="publicaciones.length">
+            } @if (publicaciones().length > 5) {
+            <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="publicaciones().length">
               <ng-template class="unique-left" ngbPaginationPrevious>
                 <div (click)="scroll()" class="h-ih">
                   <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -176,8 +177,8 @@
         </div>
         <div id="projects-list">
           <div class="publications-title">
-            {{ language.projects }} @if (proyectos.length >= 0) {
-            <span class="length-text">({{ proyectos.length }})</span>
+            {{ language().projects }} @if (proyectos().length >= 0) {
+            <span class="length-text">({{ proyectos().length }})</span>
             }
             <mat-icon
               class="publication-abs-icon-2"
@@ -187,29 +188,29 @@
               aria-expanded="true"
               aria-controls="collapseProjects"
               (click)="toggleRotation(2)"
-              [class]="{ 'abs-active': projectExpanded, 'abs-not-active': !projectExpanded }"
+              [class]="{ 'abs-active': projectExpanded(), 'abs-not-active': !projectExpanded() }"
             >
               keyboard_arrow_down
             </mat-icon>
           </div>
           <div class="collapse show" id="collapseProjects">
-            @if (proyectos.length == 0) {
-            <div class="not-found-1">{{ language.noResultsProjects }}</div>
-            } @for ( proyecto of proyectos | slice: (page2 - 1) * pageSize : (page2 - 1) * pageSize + pageSize; track
-            proyecto; let i = $index ) {
+            @if (proyectos().length == 0) {
+            <div class="not-found-1">{{ language().noResultsProjects }}</div>
+            } @for ( proyecto of proyectos() | slice: (page2() - 1) * pageSize : (page2() - 1) * pageSize + pageSize;
+            track proyecto.id; let i = $index ) {
             <div class="project">
               <div class="project-code">{{ proyecto.code }}</div>
               <div class="flex-news project-mt">
                 <div class="project-title">{{ proyecto.title }}</div>
               </div>
               <div class="project-rev">
-                <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
+                <strong class="resp-title">{{ language().projectsText[0].linesInvestigation }}: </strong>{{
                 proyecto.researchLine }}
               </div>
               <div class="project-pt">
                 <div class="flex-news flex-flow">
-                  <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
-                  @for (member of proyecto.members; track member) {
+                  <strong class="resp-title">{{ language().projectsText[0].responsable }}:</strong>
+                  @for (member of proyecto.members; track member.memberId) {
                   <div class="project-members">
                     <div class="member-img-round">
                       <img class="member-img" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
@@ -229,8 +230,8 @@
                     aria-expanded="false"
                     aria-controls="project"
                   >
-                    {{ expandLabel( "search-proj", i, this.language.projectsText[0].seeMore,
-                    this.language.projectsText[0].seeLess ) }}
+                    {{ expandLabel( "search-proj", i, language().projectsText[0].seeMore,
+                    language().projectsText[0].seeLess ) }}
                   </a>
                   <mat-icon
                     class="project-abs-icon"
@@ -245,31 +246,31 @@
               </div>
               <div class="collapse collapsed-resumen project-mt" id="project{{ i }}">
                 <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
+                  <strong class="abstract-title"> {{ language().projectsText[0].description }}: </strong>
                   {{ proyecto.description }}
                 </div>
                 <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
+                  <strong class="abstract-title"> {{ language().projectsText[0].source }}: </strong>
                   {{ proyecto.fundingSource }}
                 </div>
                 <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
+                  <strong class="abstract-title"> {{ language().projectsText[0].amount }}: </strong>
                   {{ proyecto.moneda }}{{ proyecto.fundedAmountMinor }}
                 </div>
                 <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ this.language.projectsText[0].dateStart }}: </strong>
+                  <strong class="abstract-title"> {{ language().projectsText[0].dateStart }}: </strong>
                   {{ proyecto.fechaI }}
                 </div>
                 @if (proyecto.fechaF) {
                 <div class="abstract">
-                  <strong class="abstract-title"> {{ this.language.projectsText[0].dateEnd }}: </strong>
+                  <strong class="abstract-title"> {{ language().projectsText[0].dateEnd }}: </strong>
                   {{ proyecto.fechaF }}
                 </div>
                 }
               </div>
             </div>
-            } @if (proyectos.length > 5) {
-            <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="proyectos.length">
+            } @if (proyectos().length > 5) {
+            <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="proyectos().length">
               <ng-template class="unique-left" ngbPaginationPrevious>
                 <div (click)="scroll()" class="h-ih">
                   <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
@@ -291,8 +292,8 @@
       <div class="col-lg-4 col-sm-6 col-12">
         <div id="members-list">
           <div class="publications-title">
-            {{ language.members }} @if (miembros.length >= 0) {
-            <span class="length-text">({{ miembros.length }})</span>
+            {{ language().members }} @if (miembros().length >= 0) {
+            <span class="length-text">({{ miembros().length }})</span>
             }
             <mat-icon
               class="publication-abs-icon-2"
@@ -302,16 +303,16 @@
               aria-expanded="true"
               aria-controls="collapseMembers"
               (click)="toggleRotation(3)"
-              [class]="{ 'abs-active': memberExpanded, 'abs-not-active': !memberExpanded }"
+              [class]="{ 'abs-active': memberExpanded(), 'abs-not-active': !memberExpanded() }"
             >
               keyboard_arrow_down
             </mat-icon>
           </div>
           <div class="collapse show miembro-mt" id="collapseMembers">
-            @if (miembros.length == 0) {
-            <div class="not-found-1">{{ language.noResultsMembers }}</div>
-            } @for (miembro of miembros; track miembro; let i = $index) {
-            <div class="flex-news" [class.mb-24]="i + 1 != miembros.length">
+            @if (miembros().length == 0) {
+            <div class="not-found-1">{{ language().noResultsMembers }}</div>
+            } @for (miembro of miembros(); track miembro.id; let i = $index) {
+            <div class="flex-news" [class.mb-24]="i + 1 != miembros().length">
               <div class="miembro-img-div">
                 <img class="member-img" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
               </div>
@@ -320,7 +321,7 @@
                   {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
                 </div>
                 <div class="miembro-profile" (click)="profile(miembro)">
-                  {{ language.membersText[0].seeProfile }}
+                  {{ language().membersText[0].seeProfile }}
                   <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
                 </div>
               </div>
@@ -330,8 +331,8 @@
         </div>
         <div id="news-list">
           <div class="publications-title">
-            {{ language.news }} @if (noticias.length >= 0) {
-            <span class="length-text">({{ noticias.length }})</span>
+            {{ language().news }} @if (noticias().length >= 0) {
+            <span class="length-text">({{ noticias().length }})</span>
             }
             <mat-icon
               class="publication-abs-icon-2"
@@ -341,15 +342,15 @@
               aria-expanded="true"
               aria-controls="collapseNews"
               (click)="toggleRotation(4)"
-              [class]="{ 'abs-active': newsExpanded, 'abs-not-active': !newsExpanded }"
+              [class]="{ 'abs-active': newsExpanded(), 'abs-not-active': !newsExpanded() }"
             >
               keyboard_arrow_down
             </mat-icon>
           </div>
           <div class="collapse show" id="collapseNews">
-            @if (noticias.length == 0) {
-            <div class="not-found-1">{{ language.noResultsNews }}</div>
-            } @for (noticia of noticias; track noticia) {
+            @if (noticias().length == 0) {
+            <div class="not-found-1">{{ language().noResultsNews }}</div>
+            } @for (noticia of noticias(); track noticia.id) {
             <div class="news-div-list">
               <div class="img-hover-zoom">
                 @if (!noticia.asset) {
@@ -364,7 +365,7 @@
                   <div class="other-news-date">{{ noticia.fechaFormateada }}</div>
                 </div>
                 <div class="other-news-text-2" (click)="detalleNoticia(noticia)">{{ noticia.title }}</div>
-                <div class="news-author">{{ language.newsText[0].by }} {{ noticia.authorName }}</div>
+                <div class="news-author">{{ language().newsText[0].by }} {{ noticia.authorName }}</div>
               </div>
             </div>
             }

@@ -1,44 +1,46 @@
-import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
-import { Component, DestroyRef, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { SlicePipe } from "@angular/common";
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, signal } from "@angular/core";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
+import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Params, Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { SearchResults } from "@app/shared/models/search-results";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { dateLabel } from "@app/shared/utils/date";
 import {
   NgbPagination,
   NgbPaginationNext,
   NgbPaginationNumber,
   NgbPaginationPrevious,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
+import { map } from "rxjs";
 
 import type { GlobalSearchViewModel } from "./types";
 
-type ProjectDisplay = SearchResults["projects"][number] & { fechaI?: string; fechaF?: string; moneda?: string };
+type ProjectDisplay = SearchResults["projects"][number] & { fechaI: string; fechaF: string; moneda?: string };
 type PublicationDisplay = SearchResults["publications"][number] & {
-  fecha?: string;
+  fecha: string;
   tipoPublicacion?: string;
   tipoTesis?: string;
   revista?: string;
   universidad?: string;
   evento?: string;
-  ciudad?: string | null;
-  pais?: string | null;
+  ciudad: string | null;
+  pais: string | null;
 };
-type NewsDisplay = SearchResults["news"][number] & { nombreTipoNoticia?: string; fechaFormateada?: string };
-type MemberDisplay = SearchResults["members"][number];
+type NewsDisplay = SearchResults["news"][number] & { nombreTipoNoticia?: string; fechaFormateada: string };
+
+const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], projects: [] };
 
 @Component({
   selector: "app-global-search",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIcon,
     FormsModule,
@@ -50,73 +52,46 @@ type MemberDisplay = SearchResults["members"][number];
     SlicePipe,
   ],
 })
-export default class GlobalSearchComponent implements OnInit {
-  private readonly titlecasePipe = inject(TitleCasePipe);
-  private readonly datePipe = inject(DatePipe);
+export default class GlobalSearchComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly lookup = inject(LookupService);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly session = inject(SessionService);
   private readonly browser = inject(BrowserService);
   private readonly titleService = inject(Title);
-  private readonly destroyRef = inject(DestroyRef);
 
-  proyectos: ProjectDisplay[] = [];
-  publicaciones: PublicationDisplay[] = [];
-  miembros: MemberDisplay[] = [];
-  noticias: NewsDisplay[] = [];
-  language: any = {};
-  searchGlobalForm: FormGroup;
-  page1 = 1;
-  page2 = 1;
-  pageSize = 5;
-  url = GLOBAL.url;
-  previouslink = "/home";
-  searchId = "";
-  expandedKey: string | null = null;
-  publicationExpanded = true;
-  projectExpanded = true;
-  memberExpanded = true;
-  newsExpanded = true;
+  protected readonly language = inject(SessionService).language;
+  protected readonly searchGlobalForm = inject(FormBuilder).group({ nombre: [""] });
+  protected readonly pageSize = 5;
+  protected readonly previouslink = getPublicOriginInfo(parsePublicOrigin(this.route)).route;
 
-  private publicationTypeByCode = new Map<string, string>();
-  private thesisTypeByCode = new Map<string, string>();
-  private journalById = new Map<number, string>();
-  private universityById = new Map<number, string>();
-  private eventById = new Map<number, { name: string; city: string | null; country: string | null }>();
-  private currencyByCode = new Map<string, string>();
-  private newsTypeByCode = new Map<string, string>();
+  /** The resolver's results for the current search; the route reuses this component for the next one. */
+  private readonly results = toSignal(this.route.data.pipe(map((data) => data["search"] as GlobalSearchViewModel)), {
+    initialValue: EMPTY,
+  });
+
+  protected readonly publicaciones = computed(() => this.results().publications.map((pub) => this.toPublication(pub)));
+  protected readonly proyectos = computed(() => this.results().projects.map((project) => this.toProject(project)));
+  protected readonly miembros = computed(() => this.results().members);
+  protected readonly noticias = computed(() => this.results().news.map((news) => this.toNews(news)));
+
+  protected readonly page1 = linkedSignal({ source: this.results, computation: () => 1 });
+  protected readonly page2 = linkedSignal({ source: this.results, computation: () => 1 });
+  private readonly expandedKey = linkedSignal<GlobalSearchViewModel, string | null>({
+    source: this.results,
+    computation: () => null,
+  });
+
+  protected readonly publicationExpanded = signal(true);
+  protected readonly projectExpanded = signal(true);
+  protected readonly memberExpanded = signal(true);
+  protected readonly newsExpanded = signal(true);
 
   constructor() {
-    this.searchGlobalForm = this.formBuilder.group({
-      nombre: [""],
-    });
-  }
-
-  ngOnInit(): void {
-    this.language = this.session.language();
-    this.buildLookupMaps();
-
-    const searchData = this.route.snapshot.data["search"] as GlobalSearchViewModel;
-    this.proyectos = [...searchData.projects];
-    this.publicaciones = [...searchData.publications];
-    this.miembros = [...searchData.members];
-    this.noticias = [...searchData.news];
-
-    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params: Params) => {
-      const nombre = params["id"];
-      this.searchId = nombre;
+    this.route.params.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const nombre = params["id"] as string;
       this.titleService.setTitle("GMCAN | " + nombre);
-      this.searchGlobalForm.controls["nombre"].setValue(nombre);
+      this.searchGlobalForm.controls.nombre.setValue(nombre);
     });
-
-    for (const proyecto of this.proyectos) this.fillProyecto(proyecto);
-    for (const publicacion of this.publicaciones) this.fillPublicacion(publicacion);
-    for (const noticia of this.noticias) this.fillNoticia(noticia);
-
-    const origin = parsePublicOrigin(this.route);
-    this.previouslink = getPublicOriginInfo(origin).route;
   }
 
   searchGlobal(value: string): void {
@@ -124,52 +99,13 @@ export default class GlobalSearchComponent implements OnInit {
     this.router.navigate(["/home/search/" + value], { queryParams: { from: origin } });
   }
 
-  fillProyecto(proyecto: ProjectDisplay): void {
-    proyecto.moneda = this.currencyByCode.get(proyecto.currencyCode ?? "");
-
-    const start = this.normalizedDate(proyecto.startDate);
-    if (start) {
-      proyecto.fechaI = this.titlecasePipe.transform(this.datePipe.transform(start, "MMMM, y", "es") ?? "");
-    }
-
-    if (proyecto.endDate) {
-      const end = this.normalizedDate(proyecto.endDate);
-      if (end) proyecto.fechaF = this.titlecasePipe.transform(this.datePipe.transform(end, "MMMM, y", "es") ?? "");
-    }
-  }
-
-  fillPublicacion(pub: PublicationDisplay): void {
-    pub.tipoPublicacion = this.publicationTypeByCode.get(pub.kindCode ?? "");
-    const journalId = pub.subtype.kindCode === "journal_article" ? (pub.subtype.journalArticle.journalId ?? -1) : -1;
-    const universityId = pub.subtype.kindCode === "thesis" ? (pub.subtype.thesis.universityId ?? -1) : -1;
-    const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
-    const eventId = pub.subtype.kindCode === "conference_paper" ? (pub.subtype.conferencePaper.eventId ?? -1) : -1;
-    pub.revista = this.journalById.get(journalId);
-    pub.universidad = this.universityById.get(universityId) ?? undefined;
-    pub.tipoTesis = thesisKindCode ? this.thesisTypeByCode.get(thesisKindCode) : undefined;
-    const evento = this.eventById.get(eventId);
-    pub.evento = evento?.name;
-    pub.ciudad = evento?.city ?? null;
-    pub.pais = evento?.country ?? null;
-    const publishedAt = this.normalizedDate(pub.publishedAt);
-    pub.fecha = publishedAt
-      ? this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM y", "es") ?? "")
-      : "";
-  }
-
-  fillNoticia(noticia: NewsDisplay): void {
-    noticia.nombreTipoNoticia = this.newsTypeByCode.get(noticia.newsKindCode ?? "");
-    const publishedAt = this.normalizedDate(noticia.publishedAt);
-    if (publishedAt) noticia.fechaFormateada = this.datePipe.transform(publishedAt, "MM/dd/y", "es") ?? undefined;
-  }
-
   toggleExpanded(section: string, index: number): void {
     const key = `${section}:${index}`;
-    this.expandedKey = this.expandedKey === key ? null : key;
+    this.expandedKey.update((current) => (current === key ? null : key));
   }
 
   isExpanded(section: string, index: number): boolean {
-    return this.expandedKey === `${section}:${index}`;
+    return this.expandedKey() === `${section}:${index}`;
   }
 
   expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
@@ -195,42 +131,43 @@ export default class GlobalSearchComponent implements OnInit {
   }
 
   toggleRotation(caso: number): void {
-    switch (caso) {
-      case 1:
-        this.publicationExpanded = !this.publicationExpanded;
-        break;
-      case 2:
-        this.projectExpanded = !this.projectExpanded;
-        break;
-      case 3:
-        this.memberExpanded = !this.memberExpanded;
-        break;
-      case 4:
-        this.newsExpanded = !this.newsExpanded;
-        break;
-      default:
-        break;
-    }
+    const section = [this.publicationExpanded, this.projectExpanded, this.memberExpanded, this.newsExpanded][caso - 1];
+    section?.update((expanded) => !expanded);
   }
 
-  private buildLookupMaps(): void {
-    this.publicationTypeByCode = new Map(this.lookup.publicationKinds().map((item) => [item.code, item.name]));
-    this.thesisTypeByCode = new Map(this.lookup.thesisKinds().map((item) => [item.code, item.name]));
-    this.journalById = new Map(this.lookup.journals().map((item) => [item.id, item.name]));
-    this.universityById = new Map(this.lookup.universities().map((item) => [item.id, item.name]));
-    this.eventById = new Map(
-      this.lookup
-        .events()
-        .map((item) => [item.id, { name: item.name, city: item.city ?? null, country: item.country ?? null }]),
-    );
-    this.currencyByCode = new Map(this.lookup.currencies().map((item) => [item.code, item.symbol]));
-    this.newsTypeByCode = new Map(this.lookup.newsKinds().map((item) => [item.code, item.name]));
+  private toProject(project: SearchResults["projects"][number]): ProjectDisplay {
+    return {
+      ...project,
+      moneda: this.lookup.currencies().find((currency) => currency.code === project.currencyCode)?.symbol,
+      fechaI: dateLabel(project.startDate, "MMMM, y"),
+      fechaF: dateLabel(project.endDate, "MMMM, y"),
+    };
   }
 
-  private normalizedDate(value: string | null | undefined): Date | null {
-    const date = new Date(value ?? "");
-    if (Number.isNaN(date.getTime())) return null;
-    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
-    return date;
+  private toPublication(pub: SearchResults["publications"][number]): PublicationDisplay {
+    const subtype = pub.subtype;
+    const journalId = subtype.kindCode === "journal_article" ? subtype.journalArticle.journalId : undefined;
+    const thesis = subtype.kindCode === "thesis" ? subtype.thesis : undefined;
+    const eventId = subtype.kindCode === "conference_paper" ? subtype.conferencePaper.eventId : undefined;
+    const event = this.lookup.events().find((item) => item.id === eventId);
+    return {
+      ...pub,
+      tipoPublicacion: this.lookup.publicationKinds().find((kind) => kind.code === pub.kindCode)?.name,
+      revista: this.lookup.journals().find((journal) => journal.id === journalId)?.name,
+      universidad: this.lookup.universities().find((university) => university.id === thesis?.universityId)?.name,
+      tipoTesis: this.lookup.thesisKinds().find((kind) => kind.code === thesis?.thesisKindCode)?.name,
+      evento: event?.name,
+      ciudad: event?.city ?? null,
+      pais: event?.country ?? null,
+      fecha: dateLabel(pub.publishedAt, "MMMM y"),
+    };
+  }
+
+  private toNews(news: SearchResults["news"][number]): NewsDisplay {
+    return {
+      ...news,
+      nombreTipoNoticia: this.lookup.newsKinds().find((kind) => kind.code === news.newsKindCode)?.name,
+      fechaFormateada: dateLabel(news.publishedAt, "MM/dd/y"),
+    };
   }
 }

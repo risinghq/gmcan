@@ -1,10 +1,9 @@
-import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
+import { type AfterViewInit, ChangeDetectionStrategy, Component, inject, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
-  MatTableDataSource,
   MatTable,
   MatColumnDef,
   MatHeaderCellDef,
@@ -21,12 +20,13 @@ import { PublishabilityDialogComponent } from "@app/shared/member-publishability
 import { countMissingRequirements } from "@app/shared/member-publishability/utils";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { MemberService } from "@app/shared/services/member.service";
+import { ListTable } from "@app/shared/tables/list-table";
 
 @Component({
   selector: "app-miembros",
   templateUrl: "./miembros.component.html",
   styleUrl: "./miembros.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIcon,
     MatTable,
@@ -44,13 +44,16 @@ import { MemberService } from "@app/shared/services/member.service";
     MatPaginator,
   ],
 })
-export default class MiembrosComponent implements OnInit {
-  private memberService = inject(MemberService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private dialog = inject(MatDialog);
+export default class MiembrosComponent implements AfterViewInit {
+  private readonly memberService = inject(MemberService);
+  private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
-  displayedColumns: string[] = [
+  /** The active list holds current members; the other route lists former members. */
+  private readonly active = (inject(ActivatedRoute).snapshot.routeConfig?.path ?? "").includes("activos");
+  readonly canAdd = this.active;
+
+  readonly displayedColumns = [
     "firstName",
     "lastName",
     "maternalName",
@@ -59,52 +62,21 @@ export default class MiembrosComponent implements OnInit {
     "email",
     "publishability",
   ];
-  items: AdminMemberListItem[] = [];
-  dataSource = new MatTableDataSource<AdminMemberListItem>([]);
+  readonly table = new ListTable<AdminMemberListItem>({
+    search: (row) => [row.firstName, row.lastName, row.maternalName, row.memberTypeName, row.prefixName, row.email],
+  });
+  private readonly paginator = viewChild.required(MatPaginator);
+  private readonly matSort = viewChild.required(MatSort);
 
-  ngOnInit(): void {
-    this.loadListByMode();
-  }
-  canAdd = false;
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly matSort = viewChild.required(MatSort);
-
-  loadListByMode(): void {
-    const isActiveMode = (this.route.snapshot.routeConfig?.path ?? "").includes("activos");
-    this.canAdd = isActiveMode;
-    this.loadList(isActiveMode);
+  constructor() {
+    const isActive = this.active ? 1 : 0;
+    this.memberService
+      .listAdminMembers()
+      .subscribe((rows) => this.table.show(rows.filter((member) => member.isActive === isActive)));
   }
 
-  loadList(isActiveMode: boolean): void {
-    this.memberService.listAdminMembers().subscribe((rows) => {
-      this.items = isActiveMode
-        ? rows.filter((member) => member.isActive === 1)
-        : rows.filter((member) => member.isActive === 0);
-      this.dataSource = new MatTableDataSource(this.items);
-      this.dataSource.filterPredicate = (row, filter) => {
-        const normalized = filter.trim().toLowerCase();
-        return (
-          row.firstName.toLowerCase().includes(normalized) ||
-          row.lastName.toLowerCase().includes(normalized) ||
-          (row.maternalName ?? "").toLowerCase().includes(normalized) ||
-          (row.memberTypeName ?? "").toLowerCase().includes(normalized) ||
-          (row.prefixName ?? "").toLowerCase().includes(normalized) ||
-          row.email.toLowerCase().includes(normalized)
-        );
-      };
-      this.dataSource.paginator = this.paginator();
-      this.dataSource.sort = this.matSort();
-    });
-  }
-
-  displayedNotFound = false;
-  applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-    this.displayedNotFound = this.dataSource.filteredData.length === 0;
+  ngAfterViewInit(): void {
+    this.table.attach(this.matSort(), this.paginator());
   }
 
   addMember(): void {
@@ -112,9 +84,7 @@ export default class MiembrosComponent implements OnInit {
   }
 
   editMember(id: number): void {
-    const returnTo = (this.route.snapshot.routeConfig?.path ?? "").includes("activos")
-      ? "miembros-activos"
-      : "miembros-antiguos";
+    const returnTo = this.active ? "miembros-activos" : "miembros-antiguos";
     this.router.navigate(["dashboard/edit-member/" + id], { queryParams: { returnTo } });
   }
 

@@ -1,10 +1,9 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
+import { type AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, viewChild } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
-  MatTableDataSource,
   MatTable,
   MatColumnDef,
   MatHeaderCellDef,
@@ -18,21 +17,24 @@ import {
 } from "@angular/material/table";
 import { Router } from "@angular/router";
 import { AuthService } from "@app/shared/services/auth.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import { ListTable } from "@app/shared/tables/list-table";
 
-interface PublicationRow extends PublicPublicationWithAuthors {
-  fecha?: string;
-  eventName?: string;
-}
+import {
+  type PublicationRow,
+  authoredBy,
+  publicationRows,
+  publicationSearchText,
+  publicationSort,
+} from "../publication-row";
 
+/** The conference abstracts the signed-in member authored. */
 @Component({
   selector: "app-my-resumenes",
   templateUrl: "./my-resumenes.component.html",
   styleUrl: "./my-resumenes.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIcon,
     MatTable,
@@ -50,70 +52,36 @@ interface PublicationRow extends PublicPublicationWithAuthors {
     MatPaginator,
   ],
 })
-export default class MyResumenesComponent implements OnInit {
-  private router = inject(Router);
-  private publicationService = inject(PublicationService);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  private auth = inject(AuthService);
-  lookup = inject(LookupService);
+export default class MyResumenesComponent implements AfterViewInit {
+  private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
+  private readonly lookup = inject(LookupService);
 
-  displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "evento"];
-  dataSource: MatTableDataSource<PublicationRow> = new MatTableDataSource<PublicationRow>([]);
+  readonly displayedColumns = ["titulo", "primerAutor", "publicacion", "evento"];
+  readonly table = new ListTable<PublicationRow>({ search: publicationSearchText, sort: publicationSort });
+  private readonly publications = toSignal(
+    inject(PublicationService).listPublications({ kindCode: "conference_paper" }),
+    {
+      initialValue: [],
+    },
+  );
 
-  articulos: PublicationRow[] = [];
-  url: string;
+  private readonly paginator = viewChild.required(MatPaginator);
+  private readonly matSort = viewChild.required(MatSort);
 
   constructor() {
-    this.url = GLOBAL.url;
-  }
-
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly matSort = viewChild.required(MatSort);
-
-  ngOnInit(): void {
-    this.getUserResumenes();
-  }
-
-  getUserResumenes(): void {
-    const user = this.auth.getUser();
-    if (!user) return;
-    this.publicationService.listPublications({ kindCode: "conference_paper" }).subscribe((res) => {
-      if (res) {
-        const mine = res.filter((pub) => pub.authors.some((a) => a.kind === "registered" && a.memberId === user.id));
-        const sorted = mine.toSorted((a, b) =>
-          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
-        );
-        this.articulos = sorted.map((pub) => {
-          const row: PublicationRow = Object.assign({} as PublicationRow, pub);
-          const d = new Date(pub.publishedAt);
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
-          const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
-          const event = this.lookup.events().find((e) => e.id === eventId);
-          row.eventName = event?.name ?? "";
-          return row;
-        });
-        this.dataSource = new MatTableDataSource(this.articulos);
-        this.dataSource.sort = this.matSort();
-        this.dataSource.paginator = this.paginator();
-      }
+    effect(() => {
+      const user = this.auth.user();
+      this.table.show(user ? publicationRows(authoredBy(this.publications(), user.id), this.lookup) : []);
     });
   }
 
-  displayedNotFound = false;
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-    this.displayedNotFound = this.dataSource.filteredData.length === 0;
+  ngAfterViewInit(): void {
+    this.table.attach(this.matSort(), this.paginator());
   }
 
   addResumen(): void {
-    this.router.navigate(["dashboard/add-resumen/"], { queryParams: { returnTo: "my-abstracts" } });
+    this.router.navigate(["dashboard/add-resumen"], { queryParams: { returnTo: "my-abstracts" } });
   }
 
   editResumen(id: number): void {
