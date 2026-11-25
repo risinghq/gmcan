@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dir, "..");
 const PERF = join(ROOT, ".perf");
-const ACCOUNT_HOST = "caefisica.workers.dev";
+const ACCOUNT_HOST = "empirical.workers.dev";
 const SETTLE_MS = 3000;
 
 type Worker = "api" | "web";
