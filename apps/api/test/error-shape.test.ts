@@ -213,7 +213,6 @@ describe("admin group content", () => {
         description: "d",
         objectivesContent: "{}",
         servicesContent: "{}",
-        homeServicesTeaserContent: "{}",
       })
       .execute();
 

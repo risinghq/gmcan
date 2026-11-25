@@ -39,7 +39,7 @@ export class HomeDataService {
       linesPreview: home.researchLines.slice(0, 3),
       metodos: home.methods,
       memberCount: home.memberCount,
-      aboutUs: home.servicesTeaser,
+      aboutUs: home.services,
       articulos: home.publicationCounts.journal_article,
       tesis: home.publicationCounts.thesis,
       resumenes: home.publicationCounts.conference_paper,

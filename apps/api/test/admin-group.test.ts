@@ -52,7 +52,6 @@ function aboutText(description: string): AboutTranslation {
     description,
     objectivesContent: { introParagraphs: [`${description} aims`], items: ["one", "two"] },
     servicesContent: { introParagraphs: [], items: [`${description} service`] },
-    homeServicesTeaserContent: { paragraphs: [`${description} teaser`] },
   };
 }
 

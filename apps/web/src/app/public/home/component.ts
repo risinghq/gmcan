@@ -1,6 +1,5 @@
 import { SlicePipe } from "@angular/common";
 import { Component, inject, OnInit, ChangeDetectionStrategy } from "@angular/core";
-import { MatButton } from "@angular/material/button";
 import { MatCard } from "@angular/material/card";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
@@ -16,7 +15,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [RouterLink, MatProgressBar, MatButton, MatCard, MatIcon, SlicePipe],
+  imports: [RouterLink, MatProgressBar, MatCard, MatIcon, SlicePipe],
 })
 export default class HomeComponent implements OnInit {
   private route = inject(ActivatedRoute);

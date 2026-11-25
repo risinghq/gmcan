@@ -204,7 +204,6 @@ export interface AboutTranslationTable {
   description: string;
   objectivesContent: string;
   servicesContent: string;
-  homeServicesTeaserContent: string;
 }
 
 export interface NewsTable {

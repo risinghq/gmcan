@@ -11,9 +11,6 @@ export const AboutSectionSchema = z.object({
 });
 export type AboutSection = z.infer<typeof AboutSectionSchema>;
 
-export const HomeTeaserSchema = z.object({ paragraphs: z.array(line).min(1) });
-export type HomeTeaser = z.infer<typeof HomeTeaserSchema>;
-
 /** An empty optional section is stored as absent, so the public site hides it. */
 export const GroupTranslationSchema = z.object({
   summary: line,
@@ -34,7 +31,6 @@ export const AboutTranslationSchema = z.object({
   description: line,
   objectivesContent: AboutSectionSchema,
   servicesContent: AboutSectionSchema,
-  homeServicesTeaserContent: HomeTeaserSchema,
 });
 export type AboutTranslation = z.infer<typeof AboutTranslationSchema>;
 

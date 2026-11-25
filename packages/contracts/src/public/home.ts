@@ -27,7 +27,7 @@ export const PublicHomeSchema = z.object({
   news: z.array(PublicNewsListItemSchema).max(HOME_NEWS),
   researchLines: z.array(PublicGroupTopicSchema),
   methods: z.array(PublicGroupTopicSchema),
-  servicesTeaser: z.array(z.string()),
+  services: z.array(z.string()),
 });
 
 export type PublicGroupTopic = z.infer<typeof PublicGroupTopicSchema>;

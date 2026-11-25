@@ -53,7 +53,6 @@ router.get("/:id/about", validate("param", IdParam), async (c) => {
       description: row.description,
       objectivesContent: row.objectivesContent,
       servicesContent: row.servicesContent,
-      homeServicesTeaserContent: row.homeServicesTeaserContent,
       asset: assets.get(row.id) ?? null,
       groupId: row.groupId,
       createdAt: row.createdAt,

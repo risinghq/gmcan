@@ -63,7 +63,6 @@ export interface SeedAbout {
     description: string;
     objectives: { introParagraphs: string[]; items: string[] };
     services: { introParagraphs: string[]; items: string[] };
-    homeServicesTeaser: { paragraphs: string[] };
   }>;
   photo: string | null;
 }

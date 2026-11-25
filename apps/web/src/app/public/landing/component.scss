@@ -108,6 +108,16 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   display: flex;
 }
 
+.down-bar-div {
+  align-items: center;
+
+  > .center {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+  }
+}
+
 .languages {
   margin-top: auto;
   margin-bottom: auto;
@@ -213,6 +223,15 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   display: inline-flex;
   height: 31px;
   background-color: #30393a;
+}
+
+mat-sidenav-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-div {
+  margin-top: auto;
 }
 
 mat-sidenav {
