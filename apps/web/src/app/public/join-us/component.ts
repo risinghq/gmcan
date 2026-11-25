@@ -7,7 +7,7 @@ import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import type { EmailBody } from "@app/shared/models/emailBody";
 import { createEmailBody } from "@app/shared/models/factories";
-import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
+import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -54,8 +54,7 @@ export default class JoinUsComponent implements OnInit {
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.join);
-    const origin = parsePublicOrigin(this.route);
-    this.previouslink = getPublicOriginInfo(origin).route;
+    this.previouslink = originRoute(parsePublicOrigin(this.route.snapshot.queryParamMap.get("from")));
   }
 
   return(): void {

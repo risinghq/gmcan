@@ -1,12 +1,10 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
-import { Languages } from "@app/shared/models/languages";
 import type { PublicNewsDetail } from "@app/shared/models/news";
-import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
+import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { GLOBAL } from "@app/shared/services/global";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
@@ -17,61 +15,47 @@ import type { DetailNewsViewModel } from "./types";
   selector: "app-detail-news",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatProgressSpinner, MatIcon, RouterLink, NewsComponent, SharedShareButtonsComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MatIcon, RouterLink, NewsComponent, SharedShareButtonsComponent],
 })
-export default class DetailNewsComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly session = inject(SessionService);
+export default class DetailNewsComponent {
   private readonly seo = inject(SeoService);
 
-  newsItem: PublicNewsDetail = {} as PublicNewsDetail;
-  newsTypeNameLabel = "";
-  authorNameLabel = "";
-  authorId: number | null = null;
-  previouspage = "Inicio";
-  previouslink = "/";
-  cargado = false;
-  writtenOn = "";
-  shareUrl = "";
-  language: (typeof Languages)[number] = Languages[0];
+  readonly news = input.required<DetailNewsViewModel>();
+  readonly from = input<string>();
 
-  ngOnInit(): void {
-    this.language = this.session.language();
-    const newsData = this.route.snapshot.data["news"] as DetailNewsViewModel;
+  protected readonly language = inject(SessionService).language;
+  protected readonly item = computed(() => this.news().newsItem);
+  protected readonly origin = computed(() => parsePublicOrigin(this.from()));
+  protected readonly originRoute = computed(() => originRoute(this.origin()));
+  protected readonly originLabel = computed(() => originLabel(this.origin(), this.language()));
+  protected readonly shareUrl = computed(() => GLOBAL.app(`detail-news/${this.item().id}`));
 
-    this.newsItem = newsData.newsItem;
-    this.newsTypeNameLabel = newsData.newsTypeNameLabel;
-    this.authorNameLabel = newsData.authorNameLabel;
-    this.authorId = newsData.authorId;
-    this.writtenOn = newsData.writtenOn;
+  constructor() {
+    effect(() => this.describe(this.item(), this.shareUrl()));
+  }
 
-    this.shareUrl = GLOBAL.app(`detail-news/${this.newsItem.id}`);
-    this.seo.setPageTitle(this.newsItem.title);
-    this.seo.setDescription(this.newsItem.summary ?? "");
-    this.seo.setImage(this.newsItem.asset);
+  private describe(item: PublicNewsDetail, url: string): void {
+    this.seo.setPageTitle(item.title);
+    this.seo.setDescription(item.summary ?? "");
+    this.seo.setImage(item.asset);
     this.seo.setStructuredData({
       "@context": "https://schema.org",
       "@type": "NewsArticle",
-      headline: this.newsItem.title,
-      description: this.newsItem.summary || undefined,
-      image: this.newsItem.asset ? [this.newsItem.asset] : undefined,
-      datePublished: this.newsItem.publishedAt,
-      dateModified: this.newsItem.updatedAt ?? this.newsItem.publishedAt,
-      author: this.newsItem.authorName
+      headline: item.title,
+      description: item.summary || undefined,
+      image: item.asset ? [item.asset] : undefined,
+      datePublished: item.publishedAt,
+      dateModified: item.updatedAt ?? item.publishedAt,
+      author: item.authorName
         ? {
             "@type": "Person",
-            name: this.newsItem.authorName,
-            url: this.newsItem.authorId ? GLOBAL.app(`detail-member/${this.newsItem.authorId}`) : undefined,
+            name: item.authorName,
+            url: item.authorId ? GLOBAL.app(`detail-member/${item.authorId}`) : undefined,
           }
         : undefined,
       publisher: { "@type": "ResearchOrganization", name: "GMCAN", logo: GLOBAL.app("img/gmcan.jpg") },
-      mainEntityOfPage: this.shareUrl,
+      mainEntityOfPage: url,
     });
-    const origin = parsePublicOrigin(this.route);
-    const originInfo = getPublicOriginInfo(origin);
-    this.previouslink = originInfo.route;
-    this.previouspage = originInfo.label;
-    this.cargado = true;
   }
 }

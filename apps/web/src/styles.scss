@@ -196,8 +196,11 @@ app-root {
 }
 
 .google-html {
+  display: block;
+  width: 100%;
+  min-height: 220px;
+  border: 0;
   border-radius: 4px;
-  width: inherit;
 }
 
 .plex-sans {

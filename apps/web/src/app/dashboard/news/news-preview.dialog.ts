@@ -18,31 +18,32 @@ export interface NewsPreview {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "../../public/detail-news/component.scss",
   template: `
-    <div class="card-detail scroll">
-      <div class="news-title-div">
+    <article class="card-detail scroll">
+      <header class="news-header" [class.news-header-img]="data.image">
         @if (data.image; as image) {
           <img class="detail-img" [src]="image" alt="" />
         }
-        <div class="news-title">{{ data.title }}</div>
-      </div>
+        <h1 class="news-title">{{ data.title }}</h1>
+      </header>
       <div class="detail-text-div">
-        <div class="news-abstract">{{ data.summary }}</div>
-        <div class="flex-news other-div"></div>
+        @if (data.summary) {
+          <p class="news-abstract">{{ data.summary }}</p>
+        }
         <div class="author-div">
-          <div class="author-img-div">
-            @if (data.author; as author) {
-              <img class="author-img" [src]="author.photoUrl" [alt]="author.photoAlt" />
-            }
-          </div>
+          @if (data.author?.photoUrl) {
+            <img class="author-img" [src]="data.author?.photoUrl" [alt]="data.author?.photoAlt" />
+          }
           <div class="author-text">
             <div class="news-type">{{ data.kindName }}</div>
             <div class="author-name">{{ data.author?.name }}</div>
             <div class="news-date">{{ data.publishedAt | date: "d MMMM y" }}</div>
           </div>
         </div>
-        <div class="detail-text" style="white-space: pre-wrap" [innerHTML]="data.body"></div>
+        @if (data.body) {
+          <div class="detail-text" [innerHTML]="data.body"></div>
+        }
       </div>
-    </div>
+    </article>
     <div class="outside" [mat-dialog-close]="false">X</div>
   `,
 })

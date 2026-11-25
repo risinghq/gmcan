@@ -4,7 +4,7 @@ import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
+import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SeoService } from "@app/shared/services/seo.service";
@@ -62,7 +62,7 @@ export default class GlobalSearchComponent {
   protected readonly language = inject(SessionService).language;
   protected readonly searchGlobalForm = inject(FormBuilder).group({ nombre: [""] });
   protected readonly pageSize = 5;
-  protected readonly previouslink = getPublicOriginInfo(parsePublicOrigin(this.route)).route;
+  protected readonly previouslink = originRoute(parsePublicOrigin(this.route.snapshot.queryParamMap.get("from")));
 
   /** The route reuses this component for the next search, so results come from the resolver each time. */
   private readonly results = toSignal(this.route.data.pipe(map((data) => data["search"] as GlobalSearchViewModel)), {
@@ -95,7 +95,7 @@ export default class GlobalSearchComponent {
   }
 
   searchGlobal(value: string): void {
-    const origin = parsePublicOrigin(this.route);
+    const origin = parsePublicOrigin(this.route.snapshot.queryParamMap.get("from"));
     this.router.navigate(["/search/" + value], { queryParams: { from: origin } });
   }
 

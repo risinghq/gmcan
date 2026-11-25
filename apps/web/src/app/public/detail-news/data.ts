@@ -21,16 +21,6 @@ export class DetailNewsDataService {
     const language = this.session.language();
     const writtenOn = dateText(newsItem.publishedAt, language.detailNewsText[0].writtenOnFormat, language.locale);
 
-    const newsTypeNameLabel = newsItem.newsKindName ?? "";
-    const authorNameLabel = newsItem.authorName ?? "";
-    const authorId = newsItem.authorId ?? null;
-
-    return {
-      newsItem,
-      newsTypeNameLabel,
-      authorNameLabel,
-      authorId,
-      writtenOn,
-    };
+    return { newsItem, writtenOn };
   }
 }
