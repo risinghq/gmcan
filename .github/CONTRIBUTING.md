@@ -21,7 +21,7 @@ It runs these scripts and never writes tracked files:
 | Script      | What it covers                                                 |
 | ----------- | -------------------------------------------------------------- |
 | `lint`      | oxlint (warnings fail), oxfmt `--check` and a gitleaks scan    |
-| `typecheck` | `tsc --noEmit` for `apps/web` and `apps/api`                   |
+| `typecheck` | `tsc --noEmit` for both apps; fails if the Worker types drift  |
 | `test`      | Web tests (vitest) and API tests (`bun test`)                  |
 | `build`     | The Angular build and a `wrangler deploy --dry-run` of the API |
 
@@ -34,11 +34,18 @@ groups. Lint rules are in [`.oxlintrc.json`](../.oxlintrc.json).
 
 API tests live in [`apps/api/test`](../apps/api/test) and run with
 `bun run test:api`. [`test/setup.ts`](../apps/api/test/setup.ts), preloaded by
-[`bunfig.toml`](../apps/api/bunfig.toml), gives them a fresh local D1 and R2
-emulation in the system temp directory, applies the migrations and seeds the
-lookup tables, so tests run against a real database and never touch
-`.wrangler/state`. Write new API tests the same way: call the service or the
-route, and assert on the stored result.
+[`bunfig.toml`](../apps/api/bunfig.toml), binds `DB` to an in-memory SQLite
+database with the migrations applied and the lookup tables seeded, and `STORAGE`
+to an in-memory bucket. Both are fakes in
+[`test/platform.ts`](../apps/api/test/platform.ts) that cover only the binding
+calls the code makes, so tests need no Cloudflare runtime. The D1 fake runs a
+batch in one transaction and refuses more than 100 bound parameters, as D1 does.
+Write new API tests the same way: call the service or the route, and assert on
+the stored result.
+
+Store fixture passwords with `storedPasswordHash` from
+[`test/fixtures.ts`](../apps/api/test/fixtures.ts). A production-cost scrypt
+hash takes about 150ms to make and again to verify on each login.
 
 Web tests are `*.spec.ts` files next to the code and run by `ng test` (vitest).
 `bun run test:web` runs them once with `--watch=false`.

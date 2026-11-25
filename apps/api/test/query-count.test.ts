@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 
 import { app } from "../app.js";
 import { db, queryInChunks } from "../db/client.js";
@@ -40,7 +40,7 @@ async function insertAsset(owner: { table: "member_asset" | "news_asset"; column
 
 /* oxlint-disable no-await-in-loop -- foreign-key order and generated IDs require serial writes */
 async function clear() {
-  for (const table of ["news_asset", "member_asset", "news", "asset", "member"] as const) {
+  for (const table of ["session", "news_asset", "member_asset", "news", "asset", "member"] as const) {
     await db.deleteFrom(table).execute();
   }
 }
@@ -102,19 +102,28 @@ const listings: Record<string, () => Promise<unknown>> = {
   "/api/search": async () => (await app.request("/api/search?q=Torres&types=members,news")).json(),
 };
 
+/* oxlint-disable no-await-in-loop -- counting needs one listing running at a time */
+async function countEach(): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  for (const [name, run] of Object.entries(listings)) counts.set(name, await countQueries(run));
+  return counts;
+}
+/* oxlint-enable no-await-in-loop */
+
 describe("listings do not query once per row", () => {
-  beforeEach(async () => {
-    await db.deleteFrom("session").execute();
+  // Seeding is the slow part, so every listing is counted against the same two seeds.
+  let few = new Map<string, number>();
+  let many = new Map<string, number>();
+  beforeAll(async () => {
+    await seed(3);
+    few = await countEach();
+    await seed(25);
+    many = await countEach();
   });
 
-  for (const [name, run] of Object.entries(listings)) {
-    test(`${name} uses the same number of queries for 3 rows and for 25`, async () => {
-      await seed(3);
-      const few = await countQueries(run);
-      await seed(25);
-      const many = await countQueries(run);
-      console.log(`${name}: ${few} queries for 3 rows, ${many} for 25`);
-      expect(many).toBe(few);
+  for (const name of Object.keys(listings)) {
+    test(`${name} uses the same number of queries for 3 rows and for 25`, () => {
+      expect(many.get(name)).toBe(few.get(name)!);
     });
   }
 
@@ -142,7 +151,14 @@ describe("id lists stay under the D1 bound-parameter limit", () => {
     expect(rows.toSorted((a, b) => a - b)).toEqual(Array.from({ length: 250 }, (_, i) => i + 1));
   });
 
-  test("a photo lookup for 250 members runs against the real database", async () => {
+  test("an unchunked list of 101 ids is refused, as on D1", async () => {
+    const ids = Array.from({ length: 101 }, (_, i) => i + 1);
+    await expect(db.selectFrom("member").select("id").where("id", "in", ids).execute()).rejects.toThrow(
+      /too many SQL variables/,
+    );
+  });
+
+  test("a photo lookup for 250 members stays under the limit", async () => {
     const members = Array.from({ length: 250 }, (_, i) => ({ memberId: 900000 + i, fullName: `Member ${i}` }));
     const photos = await resolveMemberPhotoViews(members, "en");
     expect(photos.size).toBe(250);

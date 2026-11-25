@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
-import { hashPassword } from "../lib/password.js";
+import { storedPasswordHash } from "./fixtures.js";
 
 const PASSWORD = "correct horse battery";
 const ADMIN = "create.admin@example.test";
@@ -58,7 +58,7 @@ beforeAll(async () => {
     .values({
       dni: "40000101",
       email: ADMIN,
-      passwordHash: await hashPassword(PASSWORD),
+      passwordHash: await storedPasswordHash(PASSWORD),
       firstName: "Create",
       lastName: "Admin",
       maternalName: null,

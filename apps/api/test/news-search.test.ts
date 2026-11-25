@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { beforeAll, beforeEach, describe, expect, test } from "bun:test";
 
 import { sql } from "kysely";
 
@@ -48,7 +48,7 @@ function nanoInput(): NewsInput {
   };
 }
 
-beforeEach(async () => {
+async function seedNews() {
   await db.deleteFrom("news").execute();
   await db.deleteFrom("member").execute();
   await db
@@ -83,7 +83,7 @@ beforeEach(async () => {
       en: { title: "Annual congress", summary: "Registration open", body: "body" },
     },
   });
-});
+}
 
 async function publicIds(q: string | undefined, locale = "es") {
   const res = await listPublicNews(locale, {
@@ -112,7 +112,10 @@ async function countFtsRows(newsId?: number) {
   return Number(rows[0].n);
 }
 
+// The search blocks only read, so they share one seed; the write blocks reseed for every test.
 describe("news list search", () => {
+  beforeAll(seedNews);
+
   test("matches each typed word as a prefix, all words required", async () => {
     expect(await publicIds("sint")).toEqual([ids.nano]);
     expect(await publicIds("rob")).toEqual([ids.nano]);
@@ -214,6 +217,8 @@ describe("news list search", () => {
 });
 
 describe("global news search", () => {
+  beforeAll(seedNews);
+
   test("matches title and summary only, in the requested locale", async () => {
     expect(await globalIds("nanomat")).toEqual([ids.nano]);
     expect(await globalIds("sintesis")).toEqual([ids.nano]);
@@ -235,6 +240,8 @@ describe("global news search", () => {
 });
 
 describe("index stays in sync with writes", () => {
+  beforeEach(seedNews);
+
   test("updating a news item reindexes its text, author, and kind", async () => {
     const input = nanoInput();
     input.translations.es.title = "Grafeno";
@@ -304,6 +311,8 @@ const row = (id: string, expiresAt: string, lastActiveAt: string) => ({
 });
 
 describe("session sweep", () => {
+  beforeAll(seedNews);
+
   test("deletes expired and idle sessions and keeps live ones", async () => {
     const hour = 3_600_000;
     await db

@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, test } from "bun:test";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
-import { hashPassword } from "../lib/password.js";
 import { createNews } from "../services/news.service.js";
+import { storedPasswordHash } from "./fixtures.js";
 
 const DNI = "20000001";
 const EMAIL = "ana.torres@example.test";
@@ -18,7 +18,7 @@ async function insertMember(values: { dni: string; email: string; isActive: numb
     .insertInto("member")
     .values({
       ...values,
-      passwordHash: await hashPassword(PASSWORD),
+      passwordHash: await storedPasswordHash(PASSWORD),
       firstName: "Ana",
       lastName: "Torres",
       maternalName: null,
