@@ -1,4 +1,4 @@
-import { DatePipe, SlicePipe, TitleCasePipe } from "@angular/common";
+import { SlicePipe } from "@angular/common";
 import { Component, OnInit, computed, effect, inject, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
@@ -12,7 +12,7 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { parseLocalDate } from "@app/shared/utils/date";
+import { dateLabel } from "@app/shared/utils/date";
 import type { PublicMember, PublicPublication } from "@gmcan/contracts/public";
 import {
   NgbPagination,
@@ -55,8 +55,6 @@ type PublicationDisplay = PublicPublication & {
 export default class DetailMemberComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly titlecasePipe = inject(TitleCasePipe);
-  private readonly datePipe = inject(DatePipe);
   private readonly memberService = inject(MemberService);
   private readonly lookup = inject(LookupService);
   private readonly session = inject(SessionService);
@@ -90,8 +88,7 @@ export default class DetailMemberComponent implements OnInit {
 
     // oxlint-disable-next-line oxc/no-map-spread -- the publications come from a resource signal, so each needs a copy
     return (this.profile.value()?.publications ?? []).map((pub): PublicationDisplay => {
-      const d = parseLocalDate(pub.publishedAt);
-      const fecha = d ? (this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM y", "es") ?? "") ?? "") : "";
+      const fecha = dateLabel(pub.publishedAt, "MMMM y");
 
       const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
       const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;

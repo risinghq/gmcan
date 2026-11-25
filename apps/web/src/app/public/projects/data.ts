@@ -1,11 +1,10 @@
-import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
 import type { ProjectWithMembers } from "@app/shared/models/project";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
-import { parseLocalDate, requireLocalDate } from "@app/shared/utils/date";
+import { dateLabel } from "@app/shared/utils/date";
 import { firstValueFrom } from "rxjs";
 
 import type { ProjectDisplay, ProjectsViewModel } from "./types";
@@ -16,8 +15,6 @@ export class ProjectsDataService {
   private readonly researchLinesService = inject(ResearchLinesService);
   private readonly groupService = inject(GroupService);
   private readonly lookup = inject(LookupService);
-  private readonly datePipe = inject(DatePipe);
-  private readonly titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<ProjectsViewModel> {
     const [projectsRaw, lineasRaw, group] = await Promise.all([
@@ -34,18 +31,10 @@ export class ProjectsDataService {
     const monedasMap = new Map(this.lookup.currencies().map((m) => [m.code, m]));
 
     const enrich = (p: ProjectWithMembers): ProjectDisplay => {
-      const startDate = requireLocalDate(p.startDate, "project.startDate");
-      let fechaF: string | undefined;
-      if (p.endDate) {
-        const endDate = parseLocalDate(p.endDate);
-        fechaF = endDate
-          ? (this.titlecasePipe.transform(this.datePipe.transform(endDate, "MMMM, y", "es") ?? "") ?? undefined)
-          : undefined;
-      }
       return {
         ...p,
-        fechaI: this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? "",
-        fechaF,
+        fechaI: dateLabel(p.startDate, "MMMM, y"),
+        fechaF: dateLabel(p.endDate, "MMMM, y") || undefined,
         lineasInvestigacion: lineasMap.get(p.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(p.fundingSourceCode)?.name,
         moneda: monedasMap.get(p.currencyCode)?.symbol,

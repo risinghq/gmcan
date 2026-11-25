@@ -1,4 +1,3 @@
-import { DatePipe, TitleCasePipe } from "@angular/common";
 import { Injectable, inject } from "@angular/core";
 import type { Member } from "@app/shared/models/member";
 import type { Method } from "@app/shared/models/method";
@@ -13,6 +12,7 @@ import { NewsService } from "@app/shared/services/news.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import { dateLabel, dateText } from "@app/shared/utils/date";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
@@ -28,8 +28,6 @@ export class HomeDataService {
   private readonly methodsService = inject(MethodsService);
   private readonly memberService = inject(MemberService);
   private readonly lookup = inject(LookupService);
-  private readonly datePipe = inject(DatePipe);
-  private readonly titlecasePipe = inject(TitleCasePipe);
 
   async load(): Promise<HomeViewModel> {
     const [group, publicacionesRaw, proyectosRaw, newsRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
@@ -125,7 +123,6 @@ export class HomeDataService {
     const eventosMap = new Map(events.map((e) => [e.id, e]));
 
     return publicaciones.map((pub) => {
-      const publishedAt = this.normalizedDate(pub.publishedAt);
       const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
       const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
       const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
@@ -134,9 +131,7 @@ export class HomeDataService {
 
       return {
         ...pub,
-        fecha: !publishedAt
-          ? ""
-          : (this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM y", "es") ?? "") ?? ""),
+        fecha: dateLabel(pub.publishedAt, "MMMM y"),
         tipoPublicacion: tiposMap.get(pub.kindCode)?.name,
         tipoTesis: thesisKindCode ? tiposTesisMap.get(thesisKindCode)?.name : undefined,
         revista: journalId ? revistasMap.get(journalId)?.name : undefined,
@@ -157,22 +152,10 @@ export class HomeDataService {
     const monedasMap = new Map(monedas.map((m) => [m.code, m]));
 
     return proyectos.map((proyecto) => {
-      const startDate = this.normalizedDate(proyecto.startDate);
-
-      let fechaF: string | undefined;
-      if (proyecto.endDate) {
-        const endDate = this.normalizedDate(proyecto.endDate);
-        if (endDate) {
-          fechaF = this.titlecasePipe.transform(this.datePipe.transform(endDate, "MMMM, y", "es") ?? "") ?? undefined;
-        }
-      }
-
       return {
         ...proyecto,
-        fechaI: !startDate
-          ? ""
-          : (this.titlecasePipe.transform(this.datePipe.transform(startDate, "MMMM, y", "es") ?? "") ?? ""),
-        fechaF,
+        fechaI: dateLabel(proyecto.startDate, "MMMM, y"),
+        fechaF: dateLabel(proyecto.endDate, "MMMM, y") || undefined,
         lineasInvestigacion: lineasMap.get(proyecto.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(proyecto.fundingSourceCode)?.name,
         moneda: monedasMap.get(proyecto.currencyCode)?.symbol,
@@ -183,21 +166,12 @@ export class HomeDataService {
 
   private enrichNews(newsItems: PublicNewsListItem[]): HomeNewsItem[] {
     return newsItems.map((newsItem) => {
-      const publishedAt = this.normalizedDate(newsItem.publishedAt);
-
       return {
         ...newsItem,
-        publishedAtLabel: !publishedAt ? "" : (this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? ""),
+        publishedAtLabel: dateText(newsItem.publishedAt, "MMMM dd, y"),
         newsTypeNameLabel: newsItem.newsKindName,
         authorNameLabel: newsItem.authorName,
       };
     });
-  }
-
-  private normalizedDate(value: string | null | undefined): Date | null {
-    const date = new Date(value ?? "");
-    if (Number.isNaN(date.getTime())) return null;
-    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
-    return date;
   }
 }

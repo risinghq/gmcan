@@ -25,6 +25,20 @@ class RichTextEditorHostComponent {
   });
 }
 
+type Tree = string | { [tag: string]: Tree[] };
+
+/** The element tree of an HTML value: elements by tag name, text as strings. Attributes and formatting are ignored. */
+function tree(html: string): Tree[] {
+  const template = document.createElement("template");
+  template.innerHTML = html;
+  const walk = (node: Node): Tree => {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+    const element = node as Element;
+    return { [element.tagName.toLowerCase()]: [...element.childNodes].map(walk) };
+  };
+  return [...template.content.childNodes].map(walk);
+}
+
 function clickToolbar(fixture: ComponentFixture<RichTextEditorHostComponent>, action: string): void {
   (fixture.nativeElement as HTMLElement)
     .querySelector(`[data-action="${action}"]`)
@@ -51,8 +65,8 @@ describe("RichTextEditorComponent", () => {
   it("loads existing HTML into the real editor and keeps the form value", () => {
     const editor = (fixture.nativeElement as HTMLElement).querySelector(".ProseMirror");
 
-    expect(editor?.innerHTML).toBe("<p>Existing content</p>");
-    expect(fixture.componentInstance.form.controls.content.value).toBe("<p>Existing content</p>");
+    expect(tree(editor?.innerHTML ?? "")).toEqual([{ p: ["Existing content"] }]);
+    expect(tree(fixture.componentInstance.form.controls.content.value)).toEqual([{ p: ["Existing content"] }]);
   });
 
   it("types and formats content through the toolbar before reading its HTML value", () => {
@@ -65,8 +79,13 @@ describe("RichTextEditorComponent", () => {
       ?.dispatchEvent(new MouseEvent("click"));
     fixture.detectChanges();
 
-    expect(fixture.componentInstance.form.controls.content.value).toBe("<p><strong>Typed</strong> content</p>");
+    expect(tree(fixture.componentInstance.form.controls.content.value)).toEqual([
+      { p: [{ strong: ["Typed"] }, " content"] },
+    ]);
   });
+
+  // StarterKit keeps an empty paragraph after a closing heading or list so the writer can type below it.
+  const typeBelow = { p: [] };
 
   it("applies headings, italic, underline, and both list formats through the toolbar", () => {
     const editorComponent = fixture.componentInstance.editorComponent;
@@ -77,29 +96,27 @@ describe("RichTextEditorComponent", () => {
     const heading = (fixture.nativeElement as HTMLElement).querySelector("select") as HTMLSelectElement;
     heading.value = "heading-2";
     heading.dispatchEvent(new Event("change", { bubbles: true }));
-    expect(content.value).toContain("<h2>Heading</h2>");
+    expect(tree(content.value)).toEqual([{ h2: ["Heading"] }, typeBelow]);
 
     editorComponent.editor.commands.setContent("<p>Italic</p>", { emitUpdate: false });
     selectText(editorComponent, 1, 7);
     clickToolbar(fixture, "italic");
-    expect(content.value).toContain("<em>Italic</em>");
+    expect(tree(content.value)).toEqual([{ p: [{ em: ["Italic"] }] }]);
 
     editorComponent.editor.commands.setContent("<p>Underline</p>", { emitUpdate: false });
     selectText(editorComponent, 1, 10);
     clickToolbar(fixture, "underline");
-    expect(content.value).toContain("<u>Underline</u>");
+    expect(tree(content.value)).toEqual([{ p: [{ u: ["Underline"] }] }]);
 
     editorComponent.editor.commands.setContent("<p>Bullet</p>", { emitUpdate: false });
     selectText(editorComponent, 1, 7);
     clickToolbar(fixture, "bullet-list");
-    expect(content.value).toContain("<ul>");
-    expect(content.value).toContain("<li><p>Bullet</p></li>");
+    expect(tree(content.value)).toEqual([{ ul: [{ li: [{ p: ["Bullet"] }] }] }, typeBelow]);
 
     editorComponent.editor.commands.setContent("<p>Ordered</p>", { emitUpdate: false });
     selectText(editorComponent, 1, 8);
     clickToolbar(fixture, "ordered-list");
-    expect(content.value).toContain("<ol>");
-    expect(content.value).toContain("<li><p>Ordered</p></li>");
+    expect(tree(content.value)).toEqual([{ ol: [{ li: [{ p: ["Ordered"] }] }] }, typeBelow]);
   });
 
   it("adds a link through the toolbar", () => {
@@ -110,8 +127,10 @@ describe("RichTextEditorComponent", () => {
 
     clickToolbar(fixture, "link");
 
-    expect(fixture.componentInstance.form.controls.content.value).toContain('href="https://example.com"');
-    expect(fixture.componentInstance.form.controls.content.value).toContain(">Link</a>");
+    const value = fixture.componentInstance.form.controls.content.value;
+    expect(tree(value)).toEqual([{ p: [{ a: ["Link"] }] }]);
+    const link = document.createRange().createContextualFragment(value).querySelector("a");
+    expect(link?.getAttribute("href")).toBe("https://example.com");
     vi.restoreAllMocks();
   });
 
@@ -142,6 +161,6 @@ describe("RichTextEditorComponent", () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(fixture.componentInstance.form.controls.content.value).toBe("<p>K</p>");
+    expect(tree(fixture.componentInstance.form.controls.content.value)).toEqual([{ p: ["K"] }]);
   });
 });

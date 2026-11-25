@@ -1,9 +1,4 @@
-import { DatePipe, TitleCasePipe, registerLocaleData } from "@angular/common";
 import { provideHttpClient, withFetch, withInterceptors } from "@angular/common/http";
-import localeEn from "@angular/common/locales/en";
-import localeEsAr from "@angular/common/locales/es-AR";
-import localePy from "@angular/common/locales/es-PY";
-import localePt from "@angular/common/locales/pt";
 import {
   ApplicationConfig,
   LOCALE_ID,
@@ -37,11 +32,6 @@ import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 import { routes } from "./app.routes";
 import { authInterceptor } from "./token.interceptor";
 
-registerLocaleData(localePy, "es");
-registerLocaleData(localePt, "pt");
-registerLocaleData(localeEn, "en");
-registerLocaleData(localeEsAr, "es-Ar");
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -68,8 +58,6 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideCharts(withDefaultRegisterables()),
-    DatePipe,
-    TitleCasePipe,
     provideAppInitializer(() => inject(SessionService).init()),
     provideAppInitializer(() => inject(LookupService).load()),
     {
