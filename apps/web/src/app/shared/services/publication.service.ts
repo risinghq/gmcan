@@ -1,21 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import type { AdminPublicationListItem, AdminPublicationListQuery } from "@gmcan/contracts/admin";
-import type { PublicationKindCode, PublicPublicationWithAuthors, ThesisKindCode } from "@gmcan/contracts/public";
+import type {
+  AdminPublication,
+  AdminPublicationListItem,
+  AdminPublicationListQuery,
+  PublicationWrite,
+} from "@gmcan/contracts/admin";
+import type { PublicationKindCode, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
-import type { SaveAuthorEntry } from "../models/author";
 import { GLOBAL } from "./global";
-
-export interface PublicationFields {
-  doi?: string;
-  publishedAt: string;
-  subtype:
-    | { kindCode: "journal_article"; journalArticle: { journalId?: number; issue?: number } }
-    | { kindCode: "conference_paper"; conferencePaper: { eventId: number } }
-    | { kindCode: "thesis"; thesis: { universityId: number; thesisKindCode: ThesisKindCode } };
-  translations: Record<string, { title: string; abstract?: string }>;
-}
 
 export interface PublicationFilters {
   kindCode?: PublicationKindCode;
@@ -34,30 +28,22 @@ export class PublicationService {
     });
   }
 
-  getPublication(id: number): Observable<PublicPublicationWithAuthors> {
-    return this.http.get<PublicPublicationWithAuthors>(GLOBAL.api(`publications/${id}`));
-  }
-
-  getAsset(assetId: number): Observable<Blob> {
-    return this.http.get(GLOBAL.api(`assets/${assetId}`), { responseType: "blob" });
-  }
-
-  downloadAsset(assetId: number): Observable<Blob> {
-    return this.http.get(GLOBAL.api(`assets/${assetId}/download`), { responseType: "blob" });
-  }
-
   listAdminPublications(filters?: AdminPublicationListQuery): Observable<AdminPublicationListItem[]> {
     return this.http.get<AdminPublicationListItem[]>(GLOBAL.admin("publications"), {
       params: filters as Record<string, string | number> | undefined,
     });
   }
 
-  createPublication(data: PublicationFields, authors: SaveAuthorEntry[]): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(GLOBAL.admin("publications"), { data, authors });
+  getAdminPublication(id: number): Observable<AdminPublication> {
+    return this.http.get<AdminPublication>(GLOBAL.admin(`publications/${id}`));
   }
 
-  updatePublication(id: number, data: PublicationFields, authors: SaveAuthorEntry[]): Observable<{ status: number }> {
-    return this.http.put<{ status: number }>(GLOBAL.admin(`publications/${id}`), { data, authors });
+  createPublication(body: PublicationWrite): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(GLOBAL.admin("publications"), body);
+  }
+
+  updatePublication(id: number, body: PublicationWrite): Observable<{ status: number }> {
+    return this.http.put<{ status: number }>(GLOBAL.admin(`publications/${id}`), body);
   }
 
   deletePublication(id: number): Observable<{ status: number }> {

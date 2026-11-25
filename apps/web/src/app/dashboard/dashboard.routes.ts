@@ -12,7 +12,7 @@ import {
   adminEventsResolver,
   adminMembersResolver,
   adminResearchLinesResolver,
-  authorOptionsResolver,
+  authorCandidatesResolver,
   journalDependenciesResolver,
   journalResolver,
   memberEditTitle,
@@ -22,7 +22,7 @@ import {
   projectEditTitle,
   projectItemResolver,
   publicationEditTitle,
-  publicationResolver,
+  publicationItemResolver,
 } from "@app/dashboard/dashboard.resolvers";
 import { adminCanActivateChildGuard, adminCanMatchGuard } from "@app/shared/guards/admin-auth.guard";
 import { canDeactivateGuard } from "@app/shared/guards/deactivate.guard";
@@ -191,16 +191,17 @@ export default [
       },
       {
         path: "add-article",
-        loadComponent: () => import("./publications/add-article/add-article.component"),
-        resolve: { authorOptions: authorOptionsResolver },
+        loadComponent: () => import("./publications/publication.page"),
+        resolve: { item: publicationItemResolver, authorCandidates: authorCandidatesResolver },
+        data: { kind: "journal_article" },
         title: "Artículos - Agregar artículo",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-article/:id",
-        loadComponent: () => import("./publications/edit-article/edit-article.component"),
-        resolve: { publication: publicationResolver, authorOptions: authorOptionsResolver },
-        data: { pageTitle: publicationEditTitle("Artículos") },
+        loadComponent: () => import("./publications/publication.page"),
+        resolve: { item: publicationItemResolver, authorCandidates: authorCandidatesResolver },
+        data: { kind: "journal_article", pageTitle: publicationEditTitle("Artículos") },
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -219,16 +220,17 @@ export default [
       { path: "tesis", loadComponent: () => import("./publications/tesis-list/tesis.component"), title: "Tesis" },
       {
         path: "add-thesis",
-        loadComponent: () => import("./publications/add-tesis/add-tesis.component"),
-        resolve: { authorOptions: authorOptionsResolver },
+        loadComponent: () => import("./publications/publication.page"),
+        resolve: { item: publicationItemResolver, authorCandidates: authorCandidatesResolver },
+        data: { kind: "thesis" },
         title: "Tesis - Agregar tesis",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-thesis/:id",
-        loadComponent: () => import("./publications/edit-tesis/edit-tesis.component"),
-        resolve: { publication: publicationResolver, authorOptions: authorOptionsResolver },
-        data: { pageTitle: publicationEditTitle("Tesis") },
+        loadComponent: () => import("./publications/publication.page"),
+        resolve: { item: publicationItemResolver, authorCandidates: authorCandidatesResolver },
+        data: { kind: "thesis", pageTitle: publicationEditTitle("Tesis") },
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -250,20 +252,25 @@ export default [
       },
       {
         path: "add-resumen",
-        loadComponent: () => import("./events/add-resumen/add-resumen.component"),
-        resolve: { events: adminEventsResolver, authorOptions: authorOptionsResolver },
+        loadComponent: () => import("./publications/publication.page"),
+        resolve: {
+          item: publicationItemResolver,
+          events: adminEventsResolver,
+          authorCandidates: authorCandidatesResolver,
+        },
+        data: { kind: "conference_paper" },
         title: "Resúmenes - Agregar resumen",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-resumen/:id",
-        loadComponent: () => import("./events/edit-resumen/edit-resumen.component"),
+        loadComponent: () => import("./publications/publication.page"),
         resolve: {
-          publication: publicationResolver,
+          item: publicationItemResolver,
           events: adminEventsResolver,
-          authorOptions: authorOptionsResolver,
+          authorCandidates: authorCandidatesResolver,
         },
-        data: { pageTitle: publicationEditTitle("Resúmenes") },
+        data: { kind: "conference_paper", pageTitle: publicationEditTitle("Resúmenes") },
         canDeactivate: [canDeactivateGuard],
       },
       {

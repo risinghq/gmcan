@@ -1,6 +1,74 @@
 import { z } from "zod";
 
 import { PublicationKindCodeSchema, ThesisKindCodeSchema } from "../public/common.js";
+import type { Translations } from "./content.js";
+
+export const PublicationTranslationSchema = z.object({
+  title: z.string().trim().min(1),
+  abstract: z.string().trim().optional(),
+});
+export type PublicationTranslation = z.infer<typeof PublicationTranslationSchema>;
+
+/** An author in byline order: the first author has order 1. */
+export const PublicationAuthorWriteSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("registered"), memberId: z.number().int(), authorOrder: z.number().int().min(1) }),
+  z.object({
+    kind: z.literal("external"),
+    externalName: z.string().trim().min(1),
+    authorOrder: z.number().int().min(1),
+  }),
+]);
+export type PublicationAuthorWrite = z.infer<typeof PublicationAuthorWriteSchema>;
+
+/**
+ * `GET /admin/members/authors/search`: a name an admin can put in a byline. A registered candidate
+ * is a member; an external one is a name an earlier byline already used.
+ */
+export type AuthorCandidate =
+  | { kind: "registered"; memberId: number; name: string; photoUrl: string; photoAlt: string }
+  | { kind: "external"; name: string };
+
+export const PublicationSubtypeWriteSchema = z.discriminatedUnion("kindCode", [
+  z.object({
+    kindCode: z.literal("journal_article"),
+    journalArticle: z.object({
+      journalId: z.number().int().positive().optional(),
+      issue: z.number().int().positive().optional(),
+    }),
+  }),
+  z.object({
+    kindCode: z.literal("conference_paper"),
+    conferencePaper: z.object({ eventId: z.number().int().positive() }),
+  }),
+  z.object({
+    kindCode: z.literal("thesis"),
+    thesis: z.object({ universityId: z.number().int().positive(), thesisKindCode: ThesisKindCodeSchema }),
+  }),
+]);
+export type PublicationSubtypeWrite = z.infer<typeof PublicationSubtypeWriteSchema>;
+
+/** The fields of a publication write besides its translations. */
+export const PublicationWriteFieldsSchema = z.object({
+  doi: z.string().trim().optional(),
+  /** A `YYYY-MM-DD` date. */
+  publishedAt: z.string(),
+  subtype: PublicationSubtypeWriteSchema,
+  /** The whole byline: a write replaces the stored authors. */
+  authors: z.array(PublicationAuthorWriteSchema).min(1),
+});
+
+/** `POST /admin/publications` and `PUT /admin/publications/:id`. */
+export interface PublicationWrite extends z.infer<typeof PublicationWriteFieldsSchema> {
+  translations: Translations<PublicationTranslation>;
+}
+
+/** `GET /admin/publications/:id`. `asset` is the link to the attached PDF. */
+export interface AdminPublication extends PublicationWrite {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  asset: string | null;
+}
 
 export const AdminPublicationSubtypeSchema = z.discriminatedUnion("kindCode", [
   z.object({
