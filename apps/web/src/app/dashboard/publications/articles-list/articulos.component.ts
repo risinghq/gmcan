@@ -1,10 +1,9 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
-import { Component, OnInit, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
+import { type AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, viewChild } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
-  MatTableDataSource,
   MatTable,
   MatColumnDef,
   MatHeaderCellDef,
@@ -18,22 +17,20 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import type { JournalItem } from "@app/shared/services/ref.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import { ListTable, byName } from "@app/shared/tables/list-table";
 
-interface PublicationRow extends PublicPublicationWithAuthors {
-  fecha?: string;
-}
+import { type PublicationRow, publicationRows, publicationSearchText, publicationSort } from "../publication-row";
 
+/** Every journal article, and the journals an article cites. */
 @Component({
   selector: "app-articulos",
   templateUrl: "./articulos.component.html",
   styleUrl: "./articulos.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatTabGroup,
     MatTab,
@@ -53,89 +50,43 @@ interface PublicationRow extends PublicPublicationWithAuthors {
     MatPaginator,
   ],
 })
-export default class ArticulosComponent implements OnInit {
-  router = inject(Router);
-  lookup = inject(LookupService);
-  private publicationService = inject(PublicationService);
-  titlecasePipe = inject(TitleCasePipe);
-  datePipe = inject(DatePipe);
-  private tabState = inject(TabStateService);
+export default class ArticulosComponent implements AfterViewInit {
+  private readonly router = inject(Router);
+  private readonly lookup = inject(LookupService);
+  private readonly tabState = inject(TabStateService);
 
-  displayedColumns: string[] = ["titulo", "primerAutor", "publicacion", "DOI"];
-  displayedColumns2: string[] = ["nombre"];
-  dataSource = new MatTableDataSource<PublicationRow>([]);
-  dataSource2 = new MatTableDataSource<JournalItem>([]);
+  readonly displayedColumns = ["titulo", "primerAutor", "publicacion", "DOI"];
+  readonly displayedColumns2 = ["nombre"];
+  readonly articles = new ListTable<PublicationRow>({ search: publicationSearchText, sort: publicationSort });
+  readonly journals = new ListTable<JournalItem>({ sort: byName });
+  selectedTab = this.tabState.articleTab();
+  private readonly publications = toSignal(
+    inject(PublicationService).listPublications({ kindCode: "journal_article" }),
+    {
+      initialValue: [],
+    },
+  );
 
-  articulos: PublicationRow[] = [];
-  url: string;
+  private readonly articlesSort = viewChild.required("articlesSort", { read: MatSort });
+  private readonly articlesPaginator = viewChild.required("articlesPaginator", { read: MatPaginator });
+  private readonly journalsSort = viewChild.required("journalsSort", { read: MatSort });
+  private readonly journalsPaginator = viewChild.required("journalsPaginator", { read: MatPaginator });
 
   constructor() {
-    this.url = GLOBAL.url;
+    effect(() => this.articles.show(publicationRows(this.publications(), this.lookup)));
+    effect(() => this.journals.show(this.lookup.journals()));
   }
 
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly matSort = viewChild.required(MatSort);
-
-  readonly paginator2 = viewChild.required(MatPaginator);
-  readonly sort2 = viewChild.required(MatSort);
-
-  selectedTab = 0;
-  ngOnInit(): void {
-    this.selectedTab = this.tabState.articleTab();
-    const journals = this.lookup.journals();
-    this.dataSource2 = new MatTableDataSource(journals);
-    this.dataSource2.sort = this.sort2();
-    this.dataSource2.paginator = this.paginator2();
-    this.getArticles();
-  }
-
-  getArticles(): void {
-    this.publicationService.listPublications({ kindCode: "journal_article" }).subscribe((res) => {
-      if (res) {
-        const sorted = res.toSorted((a, b) =>
-          (a.publishedAt ?? "") < (b.publishedAt ?? "") ? 1 : (b.publishedAt ?? "") < (a.publishedAt ?? "") ? -1 : 0,
-        );
-        this.articulos = sorted.map((pub) => {
-          const row: PublicationRow = Object.assign({} as PublicationRow, pub);
-          const d = new Date(pub.publishedAt);
-          d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-          row.fecha = this.titlecasePipe.transform(this.datePipe.transform(d, "MMMM, y", "es") ?? "");
-          return row;
-        });
-        this.dataSource = new MatTableDataSource(this.articulos);
-        this.dataSource.sort = this.matSort();
-        this.dataSource.paginator = this.paginator();
-      }
-    });
-  }
-
-  displayedNotFound = false;
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-    this.displayedNotFound = this.dataSource.filteredData.length === 0;
-  }
-
-  displayedNotFound2 = false;
-
-  applyFilter2(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource2.paginator) {
-      this.dataSource2.paginator.firstPage();
-    }
-    this.displayedNotFound2 = this.dataSource2.filteredData.length === 0;
+  ngAfterViewInit(): void {
+    this.articles.attach(this.articlesSort(), this.articlesPaginator());
+    this.journals.attach(this.journalsSort(), this.journalsPaginator());
   }
 
   changedTab(event: number): void {
     this.tabState.articleTab.set(event);
   }
 
-  addRevista() {
+  addRevista(): void {
     this.router.navigate(["dashboard/add-revista"]);
   }
 
@@ -143,7 +94,7 @@ export default class ArticulosComponent implements OnInit {
     this.router.navigate(["dashboard/edit-revista/" + id]);
   }
 
-  addArticle() {
+  addArticle(): void {
     this.router.navigate(["dashboard/add-article/"], { queryParams: { returnTo: "articulos" } });
   }
 

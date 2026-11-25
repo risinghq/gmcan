@@ -1,9 +1,16 @@
-import { Component, OnInit, computed, inject, signal, viewChild, ChangeDetectionStrategy } from "@angular/core";
+import {
+  type AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
-  MatTableDataSource,
   MatTable,
   MatColumnDef,
   MatHeaderCellDef,
@@ -16,11 +23,12 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import type { AdminProjectListItem } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import { ListTable } from "@app/shared/tables/list-table";
 
 import { isOngoing } from "../project-status";
 
@@ -28,7 +36,7 @@ import { isOngoing } from "../project-status";
   selector: "app-proyectos",
   templateUrl: "./proyectos.component.html",
   styleUrl: "./proyectos.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatTabGroup,
     MatTab,
@@ -48,20 +56,30 @@ import { isOngoing } from "../project-status";
     MatPaginator,
   ],
 })
-export default class ProyectosComponent implements OnInit {
-  router = inject(Router);
-  projectService = inject(ProjectService);
-  lookup = inject(LookupService);
-  private tabState = inject(TabStateService);
+export default class ProyectosComponent implements AfterViewInit {
+  private readonly router = inject(Router);
+  private readonly projectService = inject(ProjectService);
+  private readonly lookup = inject(LookupService);
+  private readonly tabState = inject(TabStateService);
 
-  displayedColumns: string[] = ["titulo", "primerAutor", "fechaInicio", "codigo"];
-  displayedColumns2: string[] = ["nombre"];
-  dataSource = new MatTableDataSource<AdminProjectListItem>([]);
-  items: AdminProjectListItem[] = [];
-  selectedTab = 0;
+  /** The ongoing list also edits funding sources; the other route lists concluded projects. */
+  readonly ongoing = (inject(ActivatedRoute).snapshot.routeConfig?.path ?? "").includes("ejecucion");
 
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly matSort = viewChild.required(MatSort);
+  readonly displayedColumns = ["titulo", "primerAutor", "fechaInicio", "codigo"];
+  readonly displayedColumns2 = ["nombre"];
+  readonly table = new ListTable<AdminProjectListItem>({
+    search: (row) => [row.title, row.startDateLabel, row.code, ...row.members.map((member) => member.name)],
+    sort: {
+      titulo: (row) => row.title,
+      primerAutor: (row) => row.members[0]?.name ?? "",
+      fechaInicio: (row) => row.startDate,
+      codigo: (row) => row.code,
+    },
+  });
+  selectedTab = this.tabState.projectTab();
+
+  private readonly paginator = viewChild.required(MatPaginator);
+  private readonly matSort = viewChild.required(MatSort);
 
   private readonly fundingSearch = signal("");
   readonly filteredFundingSources = computed(() => {
@@ -69,45 +87,14 @@ export default class ProyectosComponent implements OnInit {
     return this.lookup.fundingSources().filter((source) => source.name.toLowerCase().includes(search));
   });
 
-  ejecucion = false;
-
-  ngOnInit(): void {
-    this.selectedTab = this.tabState.projectTab();
-    if (window.location.href.includes("ejecucion")) {
-      this.ejecucion = true;
-      this.loadList(true);
-    } else {
-      this.loadList(false);
-    }
+  constructor() {
+    this.projectService
+      .listAdminProjects()
+      .subscribe((rows) => this.table.show(rows.filter((item) => isOngoing(item.statusCode) === this.ongoing)));
   }
 
-  loadList(activeMode: boolean): void {
-    this.projectService.listAdminProjects().subscribe((rows) => {
-      this.items = rows.filter((item) => isOngoing(item.statusCode) === activeMode);
-      this.dataSource = new MatTableDataSource(this.items);
-      this.dataSource.filterPredicate = (row, filter) => {
-        const normalized = filter.trim().toLowerCase();
-        return (
-          row.title.toLowerCase().includes(normalized) ||
-          row.startDateLabel.toLowerCase().includes(normalized) ||
-          row.code.toLowerCase().includes(normalized) ||
-          row.members.some((member) => member.name.toLowerCase().includes(normalized))
-        );
-      };
-      this.dataSource.sort = this.matSort();
-      this.dataSource.paginator = this.paginator();
-    });
-  }
-
-  displayedNotFound = false;
-
-  applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-    this.displayedNotFound = this.dataSource.filteredData.length === 0;
+  ngAfterViewInit(): void {
+    this.table.attach(this.matSort(), this.paginator());
   }
 
   onFundingSearch(event: Event): void {

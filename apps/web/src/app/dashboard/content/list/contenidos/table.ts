@@ -1,6 +1,4 @@
-import { MatPaginator } from "@angular/material/paginator";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { ListTable, byName } from "@app/shared/tables/list-table";
 
 /** One content list row: what the table shows, filters on and links from. */
 export interface ContentRow {
@@ -9,28 +7,15 @@ export interface ContentRow {
 }
 
 /** One searchable content list and the routes that add to it and edit its rows. */
-export class ContentTable {
-  readonly dataSource = new MatTableDataSource<ContentRow>([]);
-  notFound = false;
-
+export class ContentTable extends ListTable<ContentRow> {
   constructor(
     readonly addRoute: string,
     readonly editRoute: string,
-  ) {}
-
-  /** Fills the table in place, so the sort and paginator attached by the view stay connected. */
-  show(rows: ContentRow[]): void {
-    this.dataSource.data = rows.toSorted((a, b) => a.name.localeCompare(b.name));
+  ) {
+    super({ sort: byName });
   }
 
-  attach(sort: MatSort, paginator: MatPaginator): void {
-    this.dataSource.sort = sort;
-    this.dataSource.paginator = paginator;
-  }
-
-  filter(text: string): void {
-    this.dataSource.filter = text.trim().toLowerCase();
-    this.dataSource.paginator?.firstPage();
-    this.notFound = this.dataSource.filteredData.length === 0;
+  override show(rows: ContentRow[]): void {
+    super.show(rows.toSorted((a, b) => a.name.localeCompare(b.name)));
   }
 }

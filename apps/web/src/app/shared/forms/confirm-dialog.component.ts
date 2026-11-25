@@ -41,6 +41,7 @@ export class ConfirmDialogComponent {
 export async function confirmAction(dialog: MatDialog, data: ConfirmDialogData): Promise<boolean> {
   const ref = dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
     width: "530px",
+    panelClass: "confirm-dialog",
     data,
   });
   return (await firstValueFrom(ref.afterClosed())) === true;

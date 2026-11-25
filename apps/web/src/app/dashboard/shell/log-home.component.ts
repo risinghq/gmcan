@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
 import { MatIconButton } from "@angular/material/button";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { MatDivider } from "@angular/material/divider";
 import { MatIcon } from "@angular/material/icon";
 import {
@@ -15,7 +15,7 @@ import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { NavigationEnd } from "@angular/router";
 import type { ToolbarBadge } from "@app/dashboard/dashboard.resolvers";
-import { DialogIdle } from "@app/shared/modals/dialog-idle.component";
+import { confirmAction } from "@app/shared/forms/confirm-dialog.component";
 import type { Group } from "@app/shared/models/factories";
 import { deepestChild, deriveFromRoute, routeTitle } from "@app/shared/routing/derived-data";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -124,25 +124,14 @@ export default class LogHomeComponent implements OnInit {
     this.enterAny = false;
   }
 
-  private dialogRef?: MatDialogRef<DialogIdle>;
-
-  openDialogLogOff(): void {
-    this.dialogRef = this.dialog.open(DialogIdle, {
-      width: "530px",
-      id: "idleTimer",
-      data: {
-        title: "¿Estás seguro de que deseas cerrar la sesión?",
-        text: "Los cambios sin guardar se perderán.",
-        cancel: "Sí, cerrar sesión",
-        yes: "No, cancelar",
-      },
+  async openDialogLogOff(): Promise<void> {
+    const confirmed = await confirmAction(this.dialog, {
+      title: "¿Estás seguro de que deseas cerrar la sesión?",
+      text: "Los cambios sin guardar se perderán.",
+      confirm: "Sí, cerrar sesión",
+      dismiss: "No, cancelar",
     });
-
-    this.dialogRef.afterClosed().subscribe((result: boolean) => {
-      if (result) {
-        this.logout();
-      }
-    });
+    if (confirmed) this.logout();
   }
 
   private syncToolbarTitle(): void {

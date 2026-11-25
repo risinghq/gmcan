@@ -1,4 +1,3 @@
-import { TitleCasePipe, DatePipe } from "@angular/common";
 import { Component, OnInit, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
@@ -21,7 +20,7 @@ import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admi
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { parseLocalDate } from "@app/shared/utils/date";
+import { dateLabel } from "@app/shared/utils/date";
 
 interface NewsListItem {
   id: number;
@@ -39,7 +38,7 @@ interface NewsListItem {
   selector: "app-news-list",
   templateUrl: "./noticias.component.html",
   styleUrl: "./noticias.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatTabGroup,
     MatTab,
@@ -62,8 +61,6 @@ interface NewsListItem {
 export default class NewsListComponent implements OnInit {
   private readonly newsService = inject(NewsService);
   private readonly lookup = inject(LookupService);
-  private readonly titlecasePipe = inject(TitleCasePipe);
-  private readonly datePipe = inject(DatePipe);
   private readonly router = inject(Router);
   private readonly tabState = inject(TabStateService);
 
@@ -107,14 +104,10 @@ export default class NewsListComponent implements OnInit {
   }
 
   private mapNewsItem(news: AdminNewsListItem): NewsListItem {
-    const publishedAt = parseLocalDate(news.publishedAt);
-    const publishedAtLabel = publishedAt
-      ? (this.titlecasePipe.transform(this.datePipe.transform(publishedAt, "MMMM dd, y", "es") ?? "") ?? "")
-      : "";
     return {
       id: news.id,
       title: news.title,
-      publishedAtLabel,
+      publishedAtLabel: dateLabel(news.publishedAt, "MMMM dd, y"),
       categoryName: news.categoryName,
       authorName: news.authorName,
       authorPhotoUrl: news.authorPhotoUrl,

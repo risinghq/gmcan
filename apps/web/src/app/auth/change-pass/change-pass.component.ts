@@ -1,164 +1,96 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
-import { FormGroup, FormBuilder, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from "@angular/core";
+import { AbstractControl, FormBuilder, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
-import { Router, ActivatedRoute } from "@angular/router";
-import { createGroup } from "@app/shared/models/factories";
-import type { Group } from "@app/shared/models/group";
+import { ActivatedRoute, Router } from "@angular/router";
 import { EmailService } from "@app/shared/services/email.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
-import { SessionService } from "@app/shared/services/session.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
+import { finalize } from "rxjs";
+
+function passwordsMatch(control: AbstractControl): { passwordMismatch: true } | null {
+  return control.get("password")?.value === control.get("confirmPassword")?.value ? null : { passwordMismatch: true };
+}
 
 @Component({
   selector: "app-change-pass",
   templateUrl: "./change-pass.component.html",
   styleUrl: "./change-pass.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatIcon, FormsModule, ReactiveFormsModule],
 })
 export default class ChangePassComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private emailService = inject(EmailService);
-  private groupService = inject(GroupService);
-  private session = inject(SessionService);
-  private uiState = inject(UiStateService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly emailService = inject(EmailService);
+  private readonly groupService = inject(GroupService);
+  private readonly uiState = inject(UiStateService);
 
-  public passwordForm: FormGroup;
-  public grupoInfo: Group;
-  public url: string;
-  public loading = false;
-  public success = false;
-  public error: string | null = null;
-  public language = this.session.language();
+  protected readonly grupoInfo = this.uiState.groupInfo;
+  protected readonly loading = signal(false);
+  protected readonly success = signal(false);
+  protected readonly error = signal<string | null>(null);
+  protected readonly tokenValid = signal(false);
 
-  private resetToken: string | null = null;
-  public tokenValid = false;
+  protected readonly passwordForm = inject(FormBuilder).nonNullable.group(
+    {
+      password: ["", [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ["", [Validators.required, Validators.minLength(8)]],
+    },
+    { validators: passwordsMatch },
+  );
 
-  constructor() {
-    this.url = GLOBAL.url;
-    this.grupoInfo = createGroup();
-
-    this.passwordForm = this.fb.group(
-      {
-        password: ["", [Validators.required, Validators.minLength(8)]],
-        confirmPassword: ["", [Validators.required, Validators.minLength(8)]],
-      },
-      {
-        validators: this.passwordMatchValidator,
-      },
-    );
-  }
+  private readonly resetToken = this.route.snapshot.queryParams["token"] as string | undefined;
 
   ngOnInit(): void {
-    this.initializeLanguage();
-    this.loadGroupInfo();
-    this.extractAndVerifyToken();
-  }
+    this.groupService.getGroup().subscribe((group) => this.uiState.setGroupInfo(group));
 
-  private initializeLanguage(): void {
-    this.language = this.session.language();
-  }
-
-  private loadGroupInfo(): void {
-    this.groupService.getGroup().subscribe({
-      next: (group: Group) => {
-        this.grupoInfo = group;
-        this.uiState.setGroupInfo(this.grupoInfo);
-      },
-    });
-  }
-
-  private extractAndVerifyToken(): void {
-    const token = this.route.snapshot.queryParams["token"] as string | undefined;
-
-    if (!token) {
-      this.error = "Token de recuperación no válido o no encontrado en la URL.";
+    if (!this.resetToken) {
+      this.error.set("Token de recuperación no válido o no encontrado en la URL.");
       return;
     }
 
-    this.resetToken = token;
-    this.verifyToken(token);
+    this.loading.set(true);
+    this.emailService
+      .verifyResetToken(this.resetToken)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => this.tokenValid.set(true),
+        error: () => this.error.set("Token inválido o expirado. Por favor, solicita un nuevo enlace."),
+      });
   }
 
-  private verifyToken(token: string): void {
-    this.loading = true;
-    this.error = null;
-
-    this.emailService.verifyResetToken(token).subscribe({
-      next: () => {
-        this.tokenValid = true;
-      },
-      error: () => {
-        this.error = "Token inválido o expirado. Por favor, solicita un nuevo enlace.";
-        this.tokenValid = false;
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+  protected get confirmPasswordControl(): AbstractControl {
+    return this.passwordForm.controls.confirmPassword;
   }
 
-  private passwordMatchValidator(control: AbstractControl): { [key: string]: any } | null {
-    const password = control.get("password");
-    const confirmPassword = control.get("confirmPassword");
-
-    if (!password || !confirmPassword) {
-      return null;
-    }
-
-    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
+  protected get isFormValid(): boolean {
+    return this.passwordForm.valid && this.tokenValid();
   }
 
-  public get passwordsMatch(): boolean {
-    return !this.passwordForm.hasError("passwordMismatch");
+  protected resetPassword(): void {
+    if (!this.isFormValid || !this.resetToken) return;
+
+    this.loading.set(true);
+    this.error.set(null);
+    this.emailService
+      .resetPassword(this.resetToken, this.passwordForm.controls.password.value)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.success.set(true);
+          this.passwordForm.reset();
+          setTimeout(() => this.router.navigate(["/login"]), 3000);
+        },
+        error: () => this.error.set("Error al cambiar la contraseña. Por favor intenta nuevamente."),
+      });
   }
 
-  public get isFormValid(): boolean {
-    return this.passwordForm.valid && this.tokenValid;
-  }
-
-  public resetPassword(): void {
-    if (!this.isFormValid || !this.resetToken) {
-      return;
-    }
-
-    this.loading = true;
-    this.error = null;
-
-    this.emailService.resetPassword(this.resetToken, this.passwordForm.value.password as string).subscribe({
-      next: () => {
-        this.success = true;
-        this.passwordForm.reset();
-        setTimeout(() => {
-          this.router.navigate(["/login"]);
-        }, 3000);
-      },
-      error: () => {
-        this.error = "Error al cambiar la contraseña. Por favor intenta nuevamente.";
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
-  }
-
-  public returnToLogin(): void {
+  protected returnToLogin(): void {
     this.router.navigate(["/login"]);
   }
 
-  public get passwordControl(): AbstractControl {
-    return this.passwordForm.get("password")!;
-  }
-
-  public get confirmPasswordControl(): AbstractControl {
-    return this.passwordForm.get("confirmPassword")!;
-  }
-
-  public hasError(controlName: string, errorType: string): boolean {
-    const control = this.passwordForm.get(controlName);
-    return control ? control.hasError(errorType) && control.touched : false;
+  protected hasError(controlName: "password" | "confirmPassword", errorType: string): boolean {
+    const control = this.passwordForm.controls[controlName];
+    return control.hasError(errorType) && control.touched;
   }
 }

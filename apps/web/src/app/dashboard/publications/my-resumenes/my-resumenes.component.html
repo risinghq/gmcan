@@ -3,7 +3,7 @@
     <div class="search-news">
       <input
         class="input-search-text"
-        (keyup)="applyFilter($event)"
+        (keyup)="table.filterFrom($event)"
         placeholder="Buscar resúmen por título, fecha de publicación o evento"
       />
       <mat-icon class="icon-search-toolbar">search</mat-icon>
@@ -12,7 +12,7 @@
       <a class="link"> Agregar resumen </a>
     </div>
   </div>
-  <table mat-table [dataSource]="dataSource" [hidden]="displayedNotFound" matSort>
+  <table mat-table [dataSource]="table.dataSource" [hidden]="table.notFound()" matSort #tableSort="matSort">
     <ng-container matColumnDef="titulo">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
       <td mat-cell *matCellDef="let row" (click)="editResumen(row.id)">
@@ -55,8 +55,8 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
 
-  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="displayedNotFound" />
-  @if (displayedNotFound) {
+  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" #tablePaginator />
+  @if (table.notFound()) {
     <span class="plex-sans">No se encontraron resultados</span>
   }
 </div>

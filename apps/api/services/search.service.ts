@@ -2,49 +2,7 @@ import { db, queryInChunks } from "../db/client.js";
 import { type Locale } from "../lib/public-locale.js";
 import { publicLocalizedMemberSelectQuery } from "./member-read-model.js";
 import { newsSearchFilter } from "./news.service.js";
-
-async function searchPublicationRows(locale: Locale, like: string) {
-  return db
-    .selectFrom("publication")
-    .innerJoin("publication_translation", (join) =>
-      join
-        .onRef("publication_translation.publicationId", "=", "publication.id")
-        .on("publication_translation.locale", "=", locale),
-    )
-    .select([
-      "publication.id",
-      "publication.kindCode",
-      "publication.doi",
-      "publication.publishedAt",
-      "publication_translation.title as title",
-      "publication_translation.abstract as abstract",
-    ])
-    .where((eb) =>
-      eb.or([eb("publication_translation.title", "like", like), eb("publication_translation.abstract", "like", like)]),
-    )
-    .execute();
-}
-
-async function listPublicationAuthorRowsByPublicationIds(publicationIds: number[]) {
-  return queryInChunks(publicationIds, (chunk) =>
-    db
-      .selectFrom("publication_author")
-      .leftJoin("member", "member.id", "publication_author.memberId")
-      .select([
-        "publication_author.publicationId",
-        "publication_author.authorOrder",
-        "publication_author.externalName",
-        "publication_author.memberId",
-        "member.firstName as memberFirstName",
-        "member.lastName as memberLastName",
-        "member.maternalName as memberMaternalName",
-      ])
-      .where("publication_author.publicationId", "in", chunk)
-      .orderBy("publication_author.publicationId", "asc")
-      .orderBy("publication_author.authorOrder", "asc")
-      .execute(),
-  );
-}
+import { listPublications } from "./publication.service.js";
 
 async function searchNewsRows(locale: Locale, q: string) {
   const filter = newsSearchFilter(locale, q, ["title", "summary"]);
@@ -130,10 +88,6 @@ async function listProjectSearchMemberRowsByProjectIds(projectIds: number[]) {
   );
 }
 
-type PublicationAuthorEntry =
-  | { kind: "registered"; memberId: number; authorOrder: number; name: string }
-  | { kind: "external"; name: string; authorOrder: number };
-
 type ProjectMemberEntry = { memberId: number; name: string };
 
 function toShortMemberName(firstName: string, lastName: string): string {
@@ -143,8 +97,8 @@ function toShortMemberName(firstName: string, lastName: string): string {
 export async function globalSearch(q: string, types: Set<string>, locale: Locale) {
   const like = `%${q}%`;
 
-  const [publicationRows, members, newsRows, projectRows] = await Promise.all([
-    types.has("publications") ? searchPublicationRows(locale, like) : Promise.resolve([]),
+  const [publications, members, newsRows, projectRows] = await Promise.all([
+    types.has("publications") ? listPublications(locale, { q }) : Promise.resolve([]),
     types.has("members")
       ? publicLocalizedMemberSelectQuery(locale)
           .where((eb) =>
@@ -155,32 +109,6 @@ export async function globalSearch(q: string, types: Set<string>, locale: Locale
     types.has("news") ? searchNewsRows(locale, q) : Promise.resolve([]),
     types.has("projects") ? searchActiveProjectRows(locale, like) : Promise.resolve([]),
   ]);
-
-  const publicationIds = publicationRows.map((r) => r.id);
-  const publicationAuthors =
-    publicationIds.length > 0 ? await listPublicationAuthorRowsByPublicationIds(publicationIds) : [];
-
-  const authorsByPublication = new Map<number, PublicationAuthorEntry[]>();
-  for (const row of publicationAuthors) {
-    const entry: PublicationAuthorEntry = row.memberId
-      ? {
-          kind: "registered",
-          memberId: row.memberId,
-          authorOrder: row.authorOrder,
-          name: [row.memberFirstName, row.memberLastName, row.memberMaternalName].filter(Boolean).join(" "),
-        }
-      : {
-          kind: "external",
-          name: row.externalName ?? "",
-          authorOrder: row.authorOrder,
-        };
-
-    const current = authorsByPublication.get(row.publicationId) ?? [];
-    current.push(entry);
-    authorsByPublication.set(row.publicationId, current);
-  }
-
-  const publications = publicationRows.map((p) => Object.assign(p, { authors: authorsByPublication.get(p.id) ?? [] }));
 
   const projectIds = projectRows.map((r) => r.id);
   const projectMembers = projectIds.length > 0 ? await listProjectSearchMemberRowsByProjectIds(projectIds) : [];
