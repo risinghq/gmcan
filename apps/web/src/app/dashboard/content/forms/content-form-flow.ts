@@ -15,19 +15,22 @@ export class ContentFormFlow {
   private readonly dialog = inject(MatDialog);
 
   /**
-   * Runs one write with `busy` raised, then reports and leaves on success or reports and stays on
-   * failure. `work` must leave the form pristine, or the unsaved-changes guard stops the navigation.
+   * Runs one write with `busy` raised, then reports and goes to `returnTo` on success or reports and
+   * stays on failure. `work` must leave the form pristine, or the unsaved-changes guard stops the
+   * navigation.
    */
   async run(
     busy: WritableSignal<boolean>,
     work: () => Promise<unknown>,
     success: string,
     failure: string,
+    returnTo = CONTENT_LIST,
   ): Promise<void> {
     busy.set(true);
     try {
       await work();
-      await this.done(success);
+      this.notify(success);
+      await this.router.navigateByUrl(returnTo);
     } catch (error) {
       this.failed(error, failure);
     } finally {
@@ -35,14 +38,8 @@ export class ContentFormFlow {
     }
   }
 
-  /** Reports success and returns to the content list. */
-  async done(message: string): Promise<void> {
-    this.notify(message);
-    await this.router.navigateByUrl(CONTENT_LIST);
-  }
-
   /** Reports a failed write; a conflict means related records still point at this one. */
-  failed(error: unknown, fallback: string): void {
+  private failed(error: unknown, fallback: string): void {
     const { code } = toNavigationAppError(error);
     this.notify(code === "conflict" ? "No se puede eliminar: otros registros lo usan" : fallback);
   }

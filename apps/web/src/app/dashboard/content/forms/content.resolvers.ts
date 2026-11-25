@@ -14,7 +14,7 @@ import type {
 import { type Observable, map, of, switchMap } from "rxjs";
 
 /** The add route has no `:id`; its form starts empty. */
-function byId<T>(route: ActivatedRouteSnapshot, load: (id: number) => Observable<T>): Observable<T | null> {
+export function byId<T>(route: ActivatedRouteSnapshot, load: (id: number) => Observable<T>): Observable<T | null> {
   const id = route.paramMap.get("id");
   return id === null ? of(null) : load(Number(id));
 }

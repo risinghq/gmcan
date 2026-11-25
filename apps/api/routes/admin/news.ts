@@ -1,3 +1,10 @@
+import {
+  type AdminNews,
+  NewsKindCodeSchema,
+  NewsStatusCodeSchema,
+  NewsTranslationSchema,
+  NewsWriteFieldsSchema,
+} from "@gmcan/contracts/admin";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -19,13 +26,10 @@ import {
 
 const router = new Hono();
 const IdParam = z.object({ id: z.coerce.number().int().positive() });
-const StatusCode = z.enum(["draft", "published", "archived"]);
-const NewsKindCode = z.enum(["general", "research", "event"]);
-
 const ListQuery = z.object({
   q: z.string().trim().optional(),
-  statusCode: StatusCode.optional(),
-  newsKindCode: NewsKindCode.optional(),
+  statusCode: NewsStatusCodeSchema.optional(),
+  newsKindCode: NewsKindCodeSchema.optional(),
   authorId: z.coerce.number().int().optional(),
   sortBy: z.enum(["publishedAt", "title", "statusCode", "authorName", "categoryName"]).default("publishedAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
@@ -33,18 +37,7 @@ const ListQuery = z.object({
   pageSize: z.coerce.number().int().positive().default(10),
 });
 
-const NewsBody = z.object({
-  statusCode: StatusCode,
-  publishedAt: z.string().optional(),
-  authorId: z.number().int(),
-  newsKindCode: NewsKindCode,
-  priority: z.number().int().optional(),
-  translations: translationsSchema({
-    title: z.string().trim().min(1),
-    summary: z.string().trim().min(1),
-    body: z.string().trim().min(1),
-  }),
-});
+const NewsBody = NewsWriteFieldsSchema.extend({ translations: translationsSchema(NewsTranslationSchema.shape) });
 
 router.use("*", async (c, next) => {
   if (c.req.method === "GET") return requirePermission("news.read")(c, next);
@@ -65,7 +58,7 @@ router.get("/:id", validate("param", IdParam), async (c) => {
   return c.json({
     ...view,
     asset: await resolveAssetAccessUrl({ ownerType: "news", ownerId: view.id, slot: "photo" }),
-  });
+  } satisfies AdminNews);
 });
 
 router.post("/", validate("json", NewsBody), async (c) => {
