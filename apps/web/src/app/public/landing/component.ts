@@ -68,7 +68,7 @@ export default class LandingComponent {
   }
 
   searchGlobal(value: string): void {
-    this.router.navigate(["/home/search/" + value], { queryParams: { from: "home" } });
+    this.router.navigate(["/search/" + value], { queryParams: { from: "home" } });
   }
 
   loginLink(): void {

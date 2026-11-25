@@ -29,13 +29,13 @@ export function getPublicOriginInfo(origin: PublicOrigin): PublicOriginInfo {
   };
 
   const routes: Record<PublicOrigin, string> = {
-    home: "/home",
-    news: "/home/news",
-    members: "/home/members",
-    projects: "/home/projects",
-    publications: "/home/publications",
-    search: "/home",
-    about: "/home/about-us/about",
+    home: "/",
+    news: "/news",
+    members: "/members",
+    projects: "/projects",
+    publications: "/publications",
+    search: "/",
+    about: "/about-us/about",
   };
 
   return { route: routes[origin], label: labels[origin] };

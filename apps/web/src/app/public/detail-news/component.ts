@@ -30,7 +30,7 @@ export default class DetailNewsComponent implements OnInit {
   authorNameLabel = "";
   authorId: number | null = null;
   previouspage = "Inicio";
-  previouslink = "/home";
+  previouslink = "/";
   cargado = false;
   writtenOn = "";
   shareUrl = "";
@@ -46,7 +46,7 @@ export default class DetailNewsComponent implements OnInit {
     this.authorId = newsData.authorId;
     this.writtenOn = newsData.writtenOn;
 
-    this.shareUrl = GLOBAL.app(`home/detail-news/${this.newsItem.id}`);
+    this.shareUrl = GLOBAL.app(`detail-news/${this.newsItem.id}`);
     this.seo.setPageTitle(this.newsItem.title);
     this.seo.setDescription(this.newsItem.summary ?? "");
     this.seo.setImage(this.newsItem.asset);
@@ -62,7 +62,7 @@ export default class DetailNewsComponent implements OnInit {
         ? {
             "@type": "Person",
             name: this.newsItem.authorName,
-            url: this.newsItem.authorId ? GLOBAL.app(`home/detail-member/${this.newsItem.authorId}`) : undefined,
+            url: this.newsItem.authorId ? GLOBAL.app(`detail-member/${this.newsItem.authorId}`) : undefined,
           }
         : undefined,
       publisher: { "@type": "ResearchOrganization", name: "GMCAN", logo: GLOBAL.app("img/gmcan.jpg") },

@@ -3,17 +3,17 @@ import { SitemapSchema, type Sitemap } from "@gmcan/contracts/public";
 import { languagePath } from "./app/shared/site-language";
 
 const STATIC_PATHS = [
-  "/home",
-  "/home/publications",
-  "/home/news",
-  "/home/members",
-  "/home/projects",
-  "/home/about-us/about",
-  "/home/about-us/lines-investigation",
-  "/home/about-us/methods",
-  "/home/about-us/facilities-resources",
-  "/home/about-us/works",
-  "/home/join-us",
+  "/",
+  "/publications",
+  "/news",
+  "/members",
+  "/projects",
+  "/about-us/about",
+  "/about-us/lines-investigation",
+  "/about-us/methods",
+  "/about-us/facilities-resources",
+  "/about-us/works",
+  "/join-us",
 ];
 
 /** The dashboard and its sign-in pages exist only in Spanish; the server sends their English URLs there. */
@@ -52,8 +52,8 @@ function urlEntry(origin: string, path: string, updatedAt?: string): string {
 export function sitemapXml(origin: string, entries: Sitemap): string {
   const urls = [
     ...STATIC_PATHS.map((path) => urlEntry(origin, path)),
-    ...entries.news.map((item) => urlEntry(origin, `/home/detail-news/${item.id}`, item.updatedAt)),
-    ...entries.members.map((item) => urlEntry(origin, `/home/detail-member/${item.id}`, item.updatedAt)),
+    ...entries.news.map((item) => urlEntry(origin, `/detail-news/${item.id}`, item.updatedAt)),
+    ...entries.members.map((item) => urlEntry(origin, `/detail-member/${item.id}`, item.updatedAt)),
   ];
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',

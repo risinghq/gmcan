@@ -227,7 +227,7 @@ async function publicApiRoutes(origin: string): Promise<Route[]> {
 async function discoverRoutes(origin: string): Promise<Route[]> {
   return [
     { name: "web /config.json", worker: "web", method: "GET", path: "/config.json", status: 200 },
-    { name: "web /home (page shell)", worker: "web", method: "GET", path: "/home", status: 200 },
+    { name: "web / (home page)", worker: "web", method: "GET", path: "/", status: 200 },
     {
       name: "web /api/lookup (data center cache)",
       worker: "web",

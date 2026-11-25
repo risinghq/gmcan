@@ -11,13 +11,13 @@ describe("localeLanguage", () => {
 
 describe("languagePath", () => {
   it("keeps Spanish paths and moves English under /en", () => {
-    expect(languagePath("/home/news?page=2#top", "es")).toBe("/home/news?page=2#top");
-    expect(languagePath("/home/news?page=2#top", "en")).toBe("/en/home/news?page=2#top");
+    expect(languagePath("/news?page=2#top", "es")).toBe("/news?page=2#top");
+    expect(languagePath("/news?page=2#top", "en")).toBe("/en/news?page=2#top");
     expect(languagePath("/", "en")).toBe("/en/");
   });
 
   it("round-trips with englishAppPath", () => {
-    for (const path of ["/", "/home/news"]) {
+    for (const path of ["/", "/news"]) {
       expect(englishAppPath(languagePath(path, "en"))).toBe(path);
       expect(englishAppPath(languagePath(path, "es"))).toBeUndefined();
     }

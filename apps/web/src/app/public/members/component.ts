@@ -58,6 +58,6 @@ export default class MembersComponent {
   }
 
   profile(member: MemberDisplay): void {
-    this.router.navigate(["/home/detail-member/" + member.id], { queryParams: { from: "members" } });
+    this.router.navigate(["/detail-member/" + member.id], { queryParams: { from: "members" } });
   }
 }

@@ -112,7 +112,7 @@ export default class DetailMemberComponent implements OnInit {
   });
 
   public previouspage = "Inicio";
-  public previouslink = "/home";
+  public previouslink = "/";
   page = 1;
   pageSize = 5;
   expandedKey: string | null = null;
