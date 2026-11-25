@@ -2,7 +2,6 @@ import { inject } from "@angular/core";
 import { ResolveFn } from "@angular/router";
 import { primaryName } from "@app/shared/forms/locale-form";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
-import type { AuthorSearchResult } from "@app/shared/models/author";
 import type { MemberFull } from "@app/shared/models/member";
 import type { Derive } from "@app/shared/routing/derived-data";
 import { EventService, type EventItem } from "@app/shared/services/event.service";
@@ -12,8 +11,13 @@ import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { RefService, type JournalItem } from "@app/shared/services/ref.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
-import type { AdminNews, AdminProject, RefDependenciesResponse } from "@gmcan/contracts/admin";
-import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import type {
+  AdminNews,
+  AdminProject,
+  AdminPublication,
+  AuthorCandidate,
+  RefDependenciesResponse,
+} from "@gmcan/contracts/admin";
 import { map } from "rxjs";
 
 import { byId } from "./content/forms/content.resolvers";
@@ -30,7 +34,7 @@ export const memberResolver: ResolveFn<MemberFull> = (route) => {
 
 export const adminMembersResolver: ResolveFn<AdminMemberListItem[]> = () => inject(MemberService).listAdminMembers();
 
-export const authorOptionsResolver: ResolveFn<AuthorSearchResult[]> = () => inject(MemberService).searchAuthors("");
+export const authorCandidatesResolver: ResolveFn<AuthorCandidate[]> = () => inject(MemberService).searchAuthors("");
 
 export const adminEventsResolver: ResolveFn<EventItem[]> = () => inject(EventService).listAdmin();
 
@@ -60,9 +64,9 @@ export const projectItemResolver: ResolveFn<AdminProject | null> = (route) => {
   return byId(route, (id) => projects.getAdminProject(id));
 };
 
-export const publicationResolver: ResolveFn<PublicPublicationWithAuthors> = (route) => {
-  const id = Number(route.paramMap.get("id") ?? 0);
-  return inject(PublicationService).getPublication(id);
+export const publicationItemResolver: ResolveFn<AdminPublication | null> = (route) => {
+  const publications = inject(PublicationService);
+  return byId(route, (id) => publications.getAdminPublication(id));
 };
 
 export const newsItemResolver: ResolveFn<AdminNews | null> = (route) => {
@@ -87,5 +91,5 @@ export const projectEditTitle: Derive<string> = (data) =>
   `Proyectos - ${(data["item"] as AdminProject).translations["es"]?.title ?? ""}`;
 
 export function publicationEditTitle(section: string): Derive<string> {
-  return (data) => `${section} - ${(data["publication"] as PublicPublicationWithAuthors).title}`;
+  return (data) => `${section} - ${(data["item"] as AdminPublication).translations["es"]?.title ?? ""}`;
 }

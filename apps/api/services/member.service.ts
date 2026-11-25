@@ -1,3 +1,4 @@
+import type { AuthorCandidate } from "@gmcan/contracts/admin";
 import type { Compilable, Expression, SqlBool } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
@@ -181,7 +182,7 @@ export async function getMemberProfileLocalized(id: number, locale: Locale) {
   return { member, projects, publications };
 }
 
-export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCALE) {
+export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCALE): Promise<AuthorCandidate[]> {
   const like = `%${q}%`;
   const [members, externals] = await Promise.all([
     db
@@ -206,24 +207,14 @@ export async function searchAuthorPool(q: string, locale: Locale = DEFAULT_LOCAL
     members.map((m) => ({ memberId: m.id, fullName: memberFullName(m) })),
     locale,
   );
-  const resolvedMembers = members.map((m) =>
-    Object.assign(
-      {
-        kind: "registered" as const,
-        memberId: m.id,
-        name: `${m.firstName} ${m.lastName}${m.maternalName ? " " + m.maternalName : ""}`.trim(),
-        photo: null,
-      },
-      photos.get(m.id)!,
-    ),
+  const registered = members.map((m): AuthorCandidate => {
+    const { photoUrl, photoAlt } = photos.get(m.id)!;
+    return { kind: "registered", memberId: m.id, name: memberFullName(m), photoUrl, photoAlt };
+  });
+  const external = externals.flatMap(({ externalName }): AuthorCandidate[] =>
+    externalName === null ? [] : [{ kind: "external", name: externalName }],
   );
-
-  return [
-    ...resolvedMembers,
-    ...externals
-      .filter((e) => e.externalName != null)
-      .map((e) => ({ kind: "external" as const, name: e.externalName! })),
-  ];
+  return [...registered, ...external];
 }
 
 export async function verifyEmailExists(email: string) {

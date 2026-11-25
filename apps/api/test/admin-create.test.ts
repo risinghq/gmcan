@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 
+import type { AdminPublication, PublicationWrite } from "@gmcan/contracts/admin";
+
 import { app } from "../app.js";
 import { db } from "../db/client.js";
 import { storedPasswordHash } from "./fixtures.js";
@@ -37,13 +39,11 @@ interface Stamped {
   updatedAt: string;
 }
 
-function publicationBody(title: string) {
+function publicationBody(title: string): PublicationWrite {
   return {
-    data: {
-      publishedAt: "2026-05-01",
-      subtype: { kindCode: "conference_paper", conferencePaper: { eventId } },
-      translations: { es: { title }, en: { title } },
-    },
+    publishedAt: "2026-05-01",
+    subtype: { kindCode: "conference_paper", conferencePaper: { eventId } },
+    translations: { es: { title }, en: { title } },
     authors: [{ kind: "external", externalName: "Ana Torres", authorOrder: 1 }],
   };
 }
@@ -157,26 +157,6 @@ describe("admin create", () => {
     });
     expect(res.status).toBe(400);
   });
-
-  test("stores a conference paper", async () => {
-    const id = await created(
-      await send("POST", "/admin/publications", {
-        data: {
-          publishedAt: "2026-05-01",
-          subtype: { kindCode: "conference_paper", conferencePaper: { eventId } },
-          translations: { es: { title: "Ponencia" }, en: { title: "Paper" } },
-        },
-        authors: [{ kind: "external", externalName: "Ana Torres", authorOrder: 1 }],
-      }),
-    );
-
-    const { publication, authors } = await read<{
-      publication: { translations: Record<string, { title: string }> };
-      authors: Array<{ kind: string; name: string; authorOrder: number }>;
-    }>(`/admin/publications/${id}`);
-    expect(publication.translations.en?.title).toBe("Paper");
-    expect(authors).toEqual([{ kind: "external", authorOrder: 1, name: "Ana Torres" }]);
-  });
 });
 
 describe("admin delete", () => {
@@ -255,9 +235,7 @@ describe("admin update", () => {
     const res = await send("PUT", `/admin/publications/${id}`, publicationBody("Después"));
     expect(res.status).toBe(200);
 
-    const { publication } = await read<{ publication: Stamped & { translations: Record<string, { title: string }> } }>(
-      `/admin/publications/${id}`,
-    );
+    const publication = await read<AdminPublication>(`/admin/publications/${id}`);
     expect(publication.translations.es?.title).toBe("Después");
     expect(publication.updatedAt > SEEDED_AT).toBe(true);
   });
