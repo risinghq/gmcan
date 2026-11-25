@@ -9,6 +9,9 @@
     "perf": "warn",
     "nursery": "off"
   },
+  "rules": {
+    "typescript/no-extraneous-class": ["warn", { "allowWithDecorator": true }]
+  },
   "overrides": [
     {
       "files": ["apps/api/routes/**"],

@@ -26,6 +26,7 @@ import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.s
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 import { routes } from "./app.routes";
@@ -58,6 +59,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAppInitializer(() => inject(SessionService).init()),
     provideAppInitializer(() => inject(LookupService).load()),
+    provideAppInitializer(() => inject(SeoService).setOpenGraphLocation(GLOBAL.appUrl, GLOBAL.app("img/gmcan.jpg"))),
     {
       provide: LOCALE_ID,
       deps: [SessionService],
