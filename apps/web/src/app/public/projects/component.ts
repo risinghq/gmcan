@@ -4,12 +4,12 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angul
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,
@@ -46,7 +46,7 @@ export default class ProjectsComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly browser = inject(BrowserService);
   private readonly session = inject(SessionService);
-  private readonly titleService = inject(Title);
+  private readonly seo = inject(SeoService);
 
   private allActive: ProjectDisplay[] = [];
   private allFinished: ProjectDisplay[] = [];
@@ -78,7 +78,7 @@ export default class ProjectsComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    this.titleService.setTitle("GMCAN | " + this.language.projects);
+    this.seo.setPageTitle("GMCAN | " + this.language.projects);
     this.screenWidth = this.browser.innerWidth();
     this.page = 1;
     this.pageSize = 5;

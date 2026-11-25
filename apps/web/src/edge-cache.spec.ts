@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { cachedApiFetch, FRESH_SECONDS, STALE_SECONDS, type ServiceBinding } from "./api-cache";
+import { cachedApiFetch, cachedPageFetch, FRESH_SECONDS, STALE_SECONDS, type ServiceBinding } from "./edge-cache";
 
 /** A Cache that keeps entries until their max-age passes, as a colo's cache does. */
 class MemoryCache {
@@ -22,14 +22,14 @@ class MemoryCache {
   }
 }
 
-function setup() {
+function setup(headers: Record<string, string> = { "Cache-Control": "public, max-age=60" }) {
   let body = "v1";
   let status = 200;
   let calls = 0;
   const api: ServiceBinding = {
     async fetch() {
       calls += 1;
-      return new Response(body, { status, headers: { "Cache-Control": "public, max-age=60" } });
+      return new Response(body, { status, headers });
     },
   };
   const pending: Promise<unknown>[] = [];
@@ -46,6 +46,12 @@ function setup() {
     async get(path: string, language = "es") {
       const request = new Request(`https://site.test${path}`, { headers: { "Accept-Language": language } });
       const response = await cachedApiFetch(request, api, cache, ctx);
+      await Promise.all(pending.splice(0));
+      return { cache: response.headers.get("X-Cache"), text: await response.text(), headers: response.headers };
+    },
+    async page(path: string, language = "es") {
+      const request = new Request(`https://site.test${path}`);
+      const response = await cachedPageFetch(request, language, () => api.fetch(request), cache, ctx);
       await Promise.all(pending.splice(0));
       return { cache: response.headers.get("X-Cache"), text: await response.text(), headers: response.headers };
     },
@@ -123,6 +129,51 @@ describe("cachedApiFetch", () => {
     const site = setup();
     await site.get("/api/email/contact");
     expect((await site.get("/api/email/contact")).cache).toBeNull();
+    expect(site.calls()).toBe(2);
+  });
+});
+
+describe("cachedPageFetch", () => {
+  const html = { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("renders a page once per language and tells the browser to revalidate", async () => {
+    const site = setup(html);
+    expect((await site.page("/home/news", "es")).cache).toBe("MISS");
+    expect((await site.page("/home/news", "en")).cache).toBe("MISS");
+    const repeat = await site.page("/home/news", "es");
+    expect(repeat.cache).toBe("HIT");
+    expect(repeat.headers.get("Cache-Control")).toBe("no-cache");
+    expect(site.calls()).toBe(2);
+  });
+
+  it("serves the previous render while a new one is made", async () => {
+    const site = setup(html);
+    await site.page("/home");
+    site.publish("v2");
+    vi.advanceTimersByTime((FRESH_SECONDS + 1) * 1000);
+    expect(await site.page("/home")).toMatchObject({ cache: "STALE", text: "v1" });
+    expect(await site.page("/home")).toMatchObject({ cache: "HIT", text: "v2" });
+  });
+
+  it("does not share a missing page", async () => {
+    const site = setup(html);
+    site.respondWith(404);
+    await site.page("/home/detail-news/999");
+    expect((await site.page("/home/detail-news/999")).cache).toBeNull();
+    expect(site.calls()).toBe(2);
+  });
+
+  it("does not share a page that sets a cookie", async () => {
+    const site = setup({ ...html, "Set-Cookie": "sid=1" });
+    await site.page("/home");
+    expect((await site.page("/home")).cache).toBeNull();
     expect(site.calls()).toBe(2);
   });
 });

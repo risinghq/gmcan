@@ -26,7 +26,7 @@
       <div class="counter-text auto">{{ language.resumenes }}</div>
     </div>
   </div>
-  <div class="center know-more" [style.display]="screenWidth < 960 ? 'none' : 'block'">
+  <div class="center know-more hide-mobile">
     {{ language.knowAbout }}
     <span style="text-decoration: underline; cursor: pointer" (click)="navigate('/home/about-us/lines-investigation')"
       >{{ language.linesminus }}</span
@@ -34,8 +34,8 @@
   </div>
 </div>
 <div class="home-div segundo-box">
-  <div class="grey-title" [style.display]="screenWidth > 960 ? 'none' : 'block'">{{ language.knowAbout }}</div>
-  <div class="black-title" [style.display]="screenWidth > 960 ? 'none' : 'block'">{{ language.linesminus }}</div>
+  <div class="grey-title hide-desktop">{{ language.knowAbout }}</div>
+  <div class="black-title hide-desktop">{{ language.linesminus }}</div>
   <div class="row lines-investigation">
     @for (linea of linesPreview; track linea.id) {
     <div class="col-lg-4 col-md-6 col-sm-12">
@@ -57,7 +57,7 @@
   <div class="grey-title">{{ language.knowAbout }}</div>
   <div class="flex-news">
     <div class="black-title">{{ language.newsminus }}</div>
-    <div class="btn-black" [style.display]="screenWidth < 960 ? 'none' : 'block'" (click)="navigate('/home/news')">
+    <div class="btn-black hide-mobile" (click)="navigate('/home/news')">
       <a class="btn-text2"> {{ language.seeNews }} </a>
     </div>
   </div>
@@ -77,9 +77,7 @@
             <div class="news-date">{{ featuredNews.publishedAtLabel }}</div>
           </div>
           <div class="main-news-title" (click)="openNewsDetail(featuredNews)">{{ featuredNews.title }}</div>
-          <div class="main-news-res" [style.display]="screenWidth < 960 ? 'none' : 'block'">
-            {{ featuredNews.summary }}
-          </div>
+          <div class="main-news-res hide-mobile">{{ featuredNews.summary }}</div>
           <div class="news-author main-author">{{ language.newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
         </div>
       </div>
@@ -87,7 +85,7 @@
     <div class="col-lg-4">
       @for (newsItem of newsItems | slice: 1 : 3; track newsItem; let i = $index) {
       <div class="news-box" [class.mb-other]="i == 0">
-        <div class="img-hover-zoom" [style.display]="screenWidth < 960 ? 'none' : 'block'">
+        <div class="img-hover-zoom hide-mobile">
           @if (newsItem.asset) {
           <img class="other-img-news" src="{{ newsItem.asset }}" />
           }
@@ -101,7 +99,7 @@
             <div class="other-news-title" (click)="openNewsDetail(newsItem)">{{ newsItem.title }}</div>
             <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
           </div>
-          <div class="img-hover-zoom ml-16 other-img-news-div" [style.display]="screenWidth > 960 ? 'none' : 'block'">
+          <div class="img-hover-zoom ml-16 other-img-news-div hide-desktop">
             @if (newsItem.asset) {
             <img class="other-img-news" src="{{ newsItem.asset }}" />
             }
@@ -111,7 +109,7 @@
       }
     </div>
   </div>
-  <div class="btn-black" [style.display]="screenWidth > 960 ? 'none' : 'block'" (click)="navigate('/home/news')">
+  <div class="btn-black hide-desktop" (click)="navigate('/home/news')">
     <a class="btn-text2"> {{ language.seeNews }} </a>
   </div>
   <div class="services-card">
@@ -121,19 +119,11 @@
       <p>{{ paragraph }}</p>
       }
     </div>
-    <div
-      class="btn-black align-center"
-      [style.display]="screenWidth < 960 ? 'none' : 'block'"
-      (click)="navigate('/home/about-us/about')"
-    >
+    <div class="btn-black align-center hide-mobile" (click)="navigate('/home/about-us/about')">
       <a class="btn-text2"> {{ language.knowMore }} </a>
     </div>
   </div>
-  <div
-    class="btn-black"
-    [style.display]="screenWidth > 960 ? 'none' : 'block'"
-    (click)="navigate('/home/about-us/about')"
-  >
+  <div class="btn-black hide-desktop" (click)="navigate('/home/about-us/about')">
     <a class="btn-text2"> {{ language.knowMore }} </a>
   </div>
   <div class="future-work">
@@ -171,18 +161,14 @@
   <div class="grey-title mt-publications">{{ language.knowAbout }}</div>
   <div class="flex-news">
     <div class="black-title">{{ language.publicationsminus }}</div>
-    <div
-      class="btn-black"
-      [style.display]="screenWidth < 960 ? 'none' : 'block'"
-      (click)="navigate('/home/publications')"
-    >
+    <div class="btn-black hide-mobile" (click)="navigate('/home/publications')">
       <a class="btn-text2"> {{ language.seePublications }} </a>
     </div>
   </div>
   <div class="publication-list">
     @for (publicacion of publicaciones | slice: 0 : 5; track publicacion; let i = $index) {
     <div class="publication flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == publicaciones.length }">
-      <div class="col-lg-4 col-md-12 nopd" [style.display]="screenWidth < 960 ? 'none' : 'block'">
+      <div class="col-lg-4 col-md-12 nopd hide-mobile">
         @if (publicacion.kindCode !== 'thesis') {
         <div
           class="publication-type"
@@ -233,7 +219,7 @@
       </div>
       <div class="col-lg-8 col-md-12 nopd">
         <div>
-          <div class="flex-news" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
+          <div class="flex-news hide-desktop">
             @if (publicacion.kindCode !== 'thesis') {
             <div
               class="publication-type"
@@ -254,7 +240,7 @@
           <div class="flex-news">
             <div class="publication-title">{{ publicacion.title }}</div>
           </div>
-          <div class="flex-news publication-mt" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
+          <div class="flex-news publication-mt hide-desktop">
             <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
             <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
             @if (publicacion.revista != null && publicacion.revista != "") {
@@ -273,7 +259,7 @@
             }
           </div>
           @if (publicacion.doi != null) {
-          <div class="publication-rev line-1" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
+          <div class="publication-rev line-1 d-flex hide-desktop">
             DOI:
             <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
               >{{ publicacion.doi }}</a
@@ -294,8 +280,8 @@
             <div class="publication-authors">{{ author.name }}{{ !last ? "," : "" }}</div>
             } }
           </div>
-          <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'flex'">{{ publicacion.abstract }}</div>
-          <div class="flex-news mt-16" [style.display]="screenWidth > 960 ? 'none' : 'flex'">
+          <div class="abstract d-flex hide-mobile">{{ publicacion.abstract }}</div>
+          <div class="flex-news mt-16 hide-desktop">
             @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
             <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
               {{ this.language.publicationsText[0].preview }}
@@ -334,24 +320,20 @@
     </div>
     }
   </div>
-  <div
-    class="btn-black"
-    [style.display]="screenWidth > 960 ? 'none' : 'block'"
-    (click)="navigate('/home/publications')"
-  >
+  <div class="btn-black hide-desktop" (click)="navigate('/home/publications')">
     <a class="btn-text2"> {{ language.seePublications }} </a>
   </div>
   <div class="grey-title mt-publications">{{ language.knowAbout2 }}</div>
   <div class="flex-news">
     <div class="black-title">{{ language.projectsminus }}</div>
-    <div class="btn-black" [style.display]="screenWidth < 960 ? 'none' : 'block'" (click)="navigate('/home/projects')">
+    <div class="btn-black hide-mobile" (click)="navigate('/home/projects')">
       <a class="btn-text2"> {{ language.seeProjects }} </a>
     </div>
   </div>
   <div class="publication-list">
     @for (proyecto of proyectos | slice: 0 : 5; track proyecto; let i = $index) {
     <div class="project flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == proyectos.length }">
-      <div class="col-lg-4 col-md-12 nopd" [style.display]="screenWidth < 960 ? 'none' : 'block'">
+      <div class="col-lg-4 col-md-12 nopd hide-mobile">
         <div class="project-code">{{ proyecto.code }}</div>
         <div class="project-rev mt-8">
           <strong class="abstract-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
@@ -371,11 +353,11 @@
         </div>
       </div>
       <div class="col-lg-8 col-md-12 nopd">
-        <div class="project-code" [style.display]="screenWidth > 960 ? 'none' : 'block'">{{ proyecto.code }}</div>
+        <div class="project-code hide-desktop">{{ proyecto.code }}</div>
         <div class="flex-news">
           <div class="project-title">{{ proyecto.title }}</div>
         </div>
-        <div class="project-rev" [style.display]="screenWidth > 960 ? 'none' : 'block'">
+        <div class="project-rev hide-desktop">
           <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
           proyecto.lineasInvestigacion }}
         </div>
@@ -391,8 +373,8 @@
             </div>
             }
           </div>
-          <div class="abstract" [style.display]="screenWidth < 960 ? 'none' : 'block'">{{ proyecto.description }}</div>
-          <div class="flex-news" [style.display]="screenWidth > 960 ? 'none' : 'block'">
+          <div class="abstract hide-mobile">{{ proyecto.description }}</div>
+          <div class="flex-news d-block hide-desktop">
             <a
               [class.abstract-active]="isExpanded('home-proj', i)"
               (click)="toggleExpanded('home-proj', i)"
@@ -445,12 +427,7 @@
     </div>
     }
   </div>
-  <button
-    mat-flat-button
-    class="btn-black"
-    [style.display]="screenWidth > 960 ? 'none' : 'block'"
-    (click)="navigate('/home/projects')"
-  >
+  <button mat-flat-button class="btn-black hide-desktop" (click)="navigate('/home/projects')">
     {{ language.seeProjects }}
   </button>
 </div>

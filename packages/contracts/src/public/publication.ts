@@ -50,7 +50,10 @@ export const PublicPublicationWithAuthorsSchema = PublicPublicationSchema.extend
   authors: z.array(PublicationAuthorSchema),
 });
 
+export const PublicationCountsSchema = z.record(PublicationKindCodeSchema, z.number().int().nonnegative());
+
 export type PublicationAuthor = z.infer<typeof PublicationAuthorSchema>;
 export type PublicationSubtype = z.infer<typeof PublicationSubtypeSchema>;
 export type PublicPublication = z.infer<typeof PublicPublicationSchema>;
 export type PublicPublicationWithAuthors = z.infer<typeof PublicPublicationWithAuthorsSchema>;
+export type PublicationCounts = z.infer<typeof PublicationCountsSchema>;

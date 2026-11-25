@@ -1,9 +1,9 @@
 import { DatePipe, SlicePipe } from "@angular/common";
 import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
-import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 import type { ResearchLineDisplay } from "@app/public/about/data";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,
@@ -21,7 +21,7 @@ import {
 })
 export default class LinesInvestigationComponent {
   router = inject(Router);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
   private session = inject(SessionService);
 
   readonly language = this.session.language;
@@ -34,7 +34,7 @@ export default class LinesInvestigationComponent {
   expandedKey: string | null = null;
 
   constructor() {
-    this.titleService.setTitle("GMCAN | " + this.language().linesInvestigation);
+    this.seo.setPageTitle("GMCAN | " + this.language().linesInvestigation);
   }
 
   toggleLine(lineId: number): void {

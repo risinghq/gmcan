@@ -2,11 +2,11 @@ import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/c
 import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import type { PublicMember } from "@gmcan/contracts/public";
 
@@ -25,7 +25,7 @@ export default class MembersComponent {
   private memberService = inject(MemberService);
   lookup = inject(LookupService);
   private session = inject(SessionService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
 
   readonly language = this.session.language();
   private readonly memberTypes = this.lookup.memberTypes();
@@ -54,7 +54,7 @@ export default class MembersComponent {
   });
 
   constructor() {
-    this.titleService.setTitle("GMCAN | " + this.language.members);
+    this.seo.setPageTitle("GMCAN | " + this.language.members);
   }
 
   profile(member: MemberDisplay): void {

@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } 
 import { MatButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatIcon } from "@angular/material/icon";
-import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import type { EmailBody } from "@app/shared/models/emailBody";
@@ -12,6 +11,7 @@ import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/publ
 import { BrowserService } from "@app/shared/services/browser.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GLOBAL } from "@app/shared/services/global";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
 import { AutosizeModule } from "ngx-autosize";
@@ -32,7 +32,7 @@ export default class JoinUsComponent implements OnInit {
   private browser = inject(BrowserService);
   private session = inject(SessionService);
   private uiState = inject(UiStateService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
 
   public user: FormGroup;
   public validation = true;
@@ -53,7 +53,7 @@ export default class JoinUsComponent implements OnInit {
   public previouslink = "/home";
   ngOnInit(): void {
     this.language = this.session.language();
-    this.titleService.setTitle("GMCAN | " + this.language.join);
+    this.seo.setPageTitle("GMCAN | " + this.language.join);
     const origin = parsePublicOrigin(this.route);
     this.previouslink = getPublicOriginInfo(origin).route;
   }
@@ -116,20 +116,12 @@ export class EmailExitoso {
   dialogRef = inject<MatDialogRef<EmailExitoso>>(MatDialogRef);
   route = inject(ActivatedRoute);
   router = inject(Router);
-  private browser = inject(BrowserService);
   private session = inject(SessionService);
   private uiState = inject(UiStateService);
 
-  public url: string;
-  grupoInfo: any = {};
-  screenWidth: number;
-  language: any = {};
-  constructor() {
-    this.language = this.session.language();
-    this.screenWidth = this.browser.innerWidth();
-    this.url = GLOBAL.url;
-    this.grupoInfo = this.uiState.groupInfo();
-  }
+  url = GLOBAL.url;
+  grupoInfo: any = this.uiState.groupInfo();
+  language: any = this.session.language();
 
   onNoClick(): void {
     this.router.navigate(["/"]);

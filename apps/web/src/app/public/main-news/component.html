@@ -16,12 +16,7 @@
         } @if (allCharged) {
         <div class="columna">
           <div class="main-news-title">{{ language.newsText[0].newsTitle }}</div>
-          <button
-            mat-button
-            class="right"
-            [matMenuTriggerFor]="menu"
-            [style.display]="screenWidth < 960 ? 'block' : 'none'"
-          >
+          <button mat-button class="right hide-desktop" [matMenuTriggerFor]="menu">
             {{ selectedCategoryName }}
             <mat-icon> keyboard_arrow_down </mat-icon>
           </button>
@@ -38,10 +33,7 @@
         <div>
           @for (newsItem of newsItems; track newsItem.id) {
           <div class="news flex-news">
-            <div
-              class="img-hover-zoom-2 img-div-zoom right pl-24"
-              [style.display]="screenWidth < 960 ? 'block' : 'none'"
-            >
+            <div class="img-hover-zoom-2 img-div-zoom right pl-24 hide-desktop">
               @if (!newsItem.asset) {
               <img class="news-img" src="/img/grupal.jpg" />
               } @if (newsItem.asset) {
@@ -57,7 +49,7 @@
               <div class="news-abstract">{{ newsItem.summary }}</div>
               <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
             </div>
-            <div class="img-hover-zoom-2 img-div-zoom pl-24" [style.display]="screenWidth < 960 ? 'none' : 'block'">
+            <div class="img-hover-zoom-2 img-div-zoom pl-24 hide-mobile">
               @if (!newsItem.asset) {
               <img class="news-img" src="/img/grupal.jpg" />
               } @if (newsItem.asset) {
@@ -91,7 +83,7 @@
         }
       </div>
     </div>
-    <div class="col-lg-4 col-sm-6 col-12" [style.display]="screenWidth > 960 ? 'block' : 'none'">
+    <div class="col-lg-4 col-sm-6 col-12 hide-mobile">
       <div class="category-title">{{ language.newsText[0].categoryTitle }}</div>
       <div
         class="category"

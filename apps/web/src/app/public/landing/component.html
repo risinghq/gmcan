@@ -7,7 +7,7 @@
       <div class="link2">
         <a
           class="link full-width"
-          routerLink="/"
+          routerLink="/home"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="sidenav.close()"
@@ -77,23 +77,33 @@
         <div class="login">{{ language.login }}</div>
         <img class="login-icon" src="/img/icons/login.svg" />
       </div>
-      <a class="link-box" routerLink="/join-us" routerLinkActive="active" (click)="sidenav.close()">
+      <a class="link-box" routerLink="/home/join-us" routerLinkActive="active" (click)="sidenav.close()">
         {{ language.join }}
       </a>
     </div>
   </mat-sidenav>
   <mat-sidenav-content>
-    <div class="search-top full-width" [style.display]="screenWidth > 1050 ? 'none' : 'inline-flex'">
+    <div class="search-top full-width hide-desktop-nav">
       @if (!inputExpand) {
       <div class="languages">
-        <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
+        <a
+          class="language flex-news"
+          [class.active-language]="lanSelected == 1"
+          [href]="languageHref('en')"
+          hreflang="en"
+        >
           <div class="fitter">EN</div>
-          <img class="flag" src="/img/flags/usa.jpg" />
-        </div>
-        <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
+          <img class="flag" src="/img/flags/usa.jpg" alt="" />
+        </a>
+        <a
+          class="language flex-news"
+          [class.active-language]="lanSelected == 0"
+          [href]="languageHref('es')"
+          hreflang="es"
+        >
           <div class="fitter">ES</div>
-          <img class="flag" src="/img/flags/spain.png" />
-        </div>
+          <img class="flag" src="/img/flags/spain.png" alt="" />
+        </a>
       </div>
       }
       <div role="search" [class.full-width]="inputExpand">
@@ -113,10 +123,10 @@
       </div>
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
-      <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/">
+      <div id="logoHeader" class="logo-nav" innerHTML (click)="scroll()" routerLink="/home">
         <img class="logo-nav" src="{{ groupInfo().assets.header }}" alt="logo" />
       </div>
-      <div class="full-width ml-16" [style.display]="screenWidth < 1050 ? 'none' : 'block'">
+      <div class="full-width ml-16 hide-mobile-nav">
         <div class="top-bar-div">
           <div role="search" class="input-search-toolbar full-width">
             <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
@@ -130,14 +140,24 @@
             />
           </div>
           <div class="languages mr-12">
-            <div class="language flex-news" [class.active-language]="lanSelected == 1" (click)="lanSelect(1)">
+            <a
+              class="language flex-news"
+              [class.active-language]="lanSelected == 1"
+              [href]="languageHref('en')"
+              hreflang="en"
+            >
               <div class="fitter">EN</div>
-              <img class="flag" src="/img/flags/usa.jpg" />
-            </div>
-            <div class="language flex-news" [class.active-language]="lanSelected == 0" (click)="lanSelect(0)">
+              <img class="flag" src="/img/flags/usa.jpg" alt="" />
+            </a>
+            <a
+              class="language flex-news"
+              [class.active-language]="lanSelected == 0"
+              [href]="languageHref('es')"
+              hreflang="es"
+            >
               <div class="fitter">ES</div>
-              <img class="flag" src="/img/flags/spain.png" />
-            </div>
+              <img class="flag" src="/img/flags/spain.png" alt="" />
+            </a>
           </div>
           <div class="login-div" (click)="sidenav.close(); loginLink()">
             <div class="login link">{{ language.login }}</div>
@@ -146,7 +166,7 @@
         </div>
         <div class="down-bar-div text-right">
           <div class="center right">
-            <a class="link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <a class="link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
               {{ language.home }}
             </a>
           </div>
@@ -232,8 +252,8 @@
           </div>
         </div>
       </div>
-      <div class="right menu-text" [style.display]="screenWidth > 1050 ? 'none' : 'block'">Menú</div>
-      <div [style.display]="screenWidth > 1024 ? 'none' : 'block'">
+      <div class="right menu-text hide-desktop-nav">Menú</div>
+      <div class="hide-desktop-nav">
         <mat-icon class="center-vertical carousel-icon" (click)="sidenav.open()" style="color: black"> menu </mat-icon>
       </div>
     </mat-toolbar>
@@ -241,7 +261,7 @@
     <footer class="footer-div text-white">
       <div class="footer-flex">
         <div class="flex-news">
-          <div class="link-logo-div" (click)="scroll()" routerLink="/">
+          <div class="link-logo-div" (click)="scroll()" routerLink="/home">
             <img class="img-logo-white" src="{{ groupInfo().assets.footer }}" />
           </div>
           <div class="link-logo-div">
@@ -252,7 +272,7 @@
           <div class="center max-con flex-news">
             <a
               class="link3"
-              routerLink="/"
+              routerLink="/home"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="scroll()"

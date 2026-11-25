@@ -1,8 +1,9 @@
-import { isPlatformBrowser, registerLocaleData } from "@angular/common";
+import { DOCUMENT, isPlatformBrowser, registerLocaleData } from "@angular/common";
 import localeEnglish from "@angular/common/locales/en";
 import localeSpanish from "@angular/common/locales/es";
-import { Injectable, PLATFORM_ID, inject, signal } from "@angular/core";
+import { Injectable, PLATFORM_ID, REQUEST, inject, signal } from "@angular/core";
 import { Languages } from "@app/shared/models/languages";
+import { languageCookie, resolveSiteLanguage } from "@app/shared/site-language";
 
 @Injectable({ providedIn: "root" })
 export class SessionService {
@@ -11,6 +12,8 @@ export class SessionService {
 
   private readonly platformId = inject(PLATFORM_ID);
   private readonly browser = isPlatformBrowser(this.platformId);
+  private readonly document = inject(DOCUMENT);
+  private readonly request = inject(REQUEST, { optional: true });
 
   private readonly appLocaleState = signal(SessionService.DEFAULT_APP_LOCALE);
   private readonly languageIdState = signal(0);
@@ -28,9 +31,18 @@ export class SessionService {
   }
 
   init(): void {
-    const storedLocale = this.browser ? localStorage.getItem("locale") : null;
-    const locale = this.resolveAppLocale(storedLocale ?? this.detectBrowserLocale());
-    this.setAppLocale(locale, false);
+    const language = this.browser
+      ? resolveSiteLanguage({
+          url: this.document.location.href,
+          cookie: this.document.cookie,
+          acceptLanguage: navigator.languages.join(","),
+        })
+      : resolveSiteLanguage({
+          url: this.request?.url ?? "/",
+          cookie: this.request?.headers.get("cookie"),
+          acceptLanguage: this.request?.headers.get("accept-language"),
+        });
+    this.setAppLocale(language);
   }
 
   registerCulture(culture: string): void {
@@ -57,7 +69,7 @@ export class SessionService {
     this.languageIdState.set(resolvedLanguageId >= 0 ? resolvedLanguageId : 0);
 
     if (persist && this.browser) {
-      localStorage.setItem("locale", appLocale);
+      this.document.cookie = languageCookie(language.locale === "en" ? "en" : "es");
     }
 
     if (appLocale === SessionService.ENGLISH_APP_LOCALE) {
@@ -73,13 +85,5 @@ export class SessionService {
 
   private resolveAppLocale(locale: string): string {
     return locale.startsWith("en") ? SessionService.ENGLISH_APP_LOCALE : SessionService.DEFAULT_APP_LOCALE;
-  }
-
-  private detectBrowserLocale(): string {
-    if (!this.browser) {
-      return SessionService.DEFAULT_APP_LOCALE;
-    }
-
-    return navigator.language || SessionService.DEFAULT_APP_LOCALE;
   }
 }

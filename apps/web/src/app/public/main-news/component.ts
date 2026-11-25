@@ -1,17 +1,17 @@
 import { NgClass } from "@angular/common";
-import { Component, OnInit, HostListener, computed, inject, signal, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource } from "@angular/core/rxjs-interop";
 import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute } from "@angular/router";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateText } from "@app/shared/utils/date";
 import {
@@ -63,21 +63,10 @@ export default class MainNewsComponent implements OnInit {
   router = inject(Router);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
-  private titleService = inject(Title);
+  private seo = inject(SeoService);
 
   public newsTypes: NewsTypeFilter[] = [];
-  public screenWidth: number;
-  url: string;
-
-  constructor() {
-    this.screenWidth = this.browser.innerWidth();
-    this.url = GLOBAL.url;
-  }
-
-  @HostListener("window:resize", ["$event"])
-  onResize(_event: Event): void {
-    this.screenWidth = this.browser.innerWidth();
-  }
+  url = GLOBAL.url;
 
   private readonly query = signal<{ code: NewsTypeFilter["code"] | null; page: number }>({ code: null, page: 1 });
   public selectedCategoryName = "";
@@ -111,7 +100,7 @@ export default class MainNewsComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    this.titleService.setTitle("GMCAN | " + this.language.news);
+    this.seo.setPageTitle("GMCAN | " + this.language.news);
     this.selectedCategoryName = this.language.newsText[0].categoryTitle;
     this.newsTypes = this.lookup
       .newsKinds()

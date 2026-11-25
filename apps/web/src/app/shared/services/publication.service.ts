@@ -6,7 +6,7 @@ import type {
   AdminPublicationListQuery,
   PublicationWrite,
 } from "@gmcan/contracts/admin";
-import type { PublicationKindCode, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import type { PublicationCounts, PublicationKindCode, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import { GLOBAL } from "./global";
@@ -16,6 +16,7 @@ export interface PublicationFilters {
   event?: number;
   journal?: number;
   university?: number;
+  limit?: number;
 }
 
 @Injectable({ providedIn: "root" })
@@ -26,6 +27,10 @@ export class PublicationService {
     return this.http.get<PublicPublicationWithAuthors[]>(GLOBAL.api("publications"), {
       params: filters as Record<string, string | number> | undefined,
     });
+  }
+
+  countPublications(): Observable<PublicationCounts> {
+    return this.http.get<PublicationCounts>(GLOBAL.api("publications/counts"));
   }
 
   listAdminPublications(filters?: AdminPublicationListQuery): Observable<AdminPublicationListItem[]> {

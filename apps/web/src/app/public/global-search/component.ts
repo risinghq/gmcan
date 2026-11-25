@@ -3,11 +3,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, sig
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
-import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router } from "@angular/router";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel, dateText } from "@app/shared/utils/date";
 import {
@@ -56,7 +56,7 @@ export default class GlobalSearchComponent {
   private readonly router = inject(Router);
   private readonly lookup = inject(LookupService);
   private readonly browser = inject(BrowserService);
-  private readonly titleService = inject(Title);
+  private readonly seo = inject(SeoService);
 
   protected readonly language = inject(SessionService).language;
   protected readonly searchGlobalForm = inject(FormBuilder).group({ nombre: [""] });
@@ -88,7 +88,7 @@ export default class GlobalSearchComponent {
   constructor() {
     this.route.params.pipe(takeUntilDestroyed()).subscribe((params) => {
       const nombre = params["id"] as string;
-      this.titleService.setTitle("GMCAN | " + nombre);
+      this.seo.setPageTitle("GMCAN | " + nombre);
       this.searchGlobalForm.controls.nombre.setValue(nombre);
     });
   }
