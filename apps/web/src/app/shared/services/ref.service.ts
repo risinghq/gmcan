@@ -1,8 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import type { RefDependenciesResponse } from "@gmcan/contracts/admin";
-import { Observable } from "rxjs";
+import type { Translations } from "@gmcan/contracts/admin";
+import { Observable, map } from "rxjs";
 
+import { primaryName } from "../forms/locale-form";
 import { GLOBAL } from "./global";
 
 export interface JournalItem {
@@ -13,6 +14,15 @@ export interface JournalItem {
 export interface UniversityItem {
   id: number;
   name: string;
+}
+
+export interface UniversityWrite {
+  translations: Translations<{ name: string }>;
+}
+
+/** `GET /admin/ref/university/:id`. */
+export interface AdminUniversity extends UniversityWrite {
+  id: number;
 }
 
 function ref(path: string): string {
@@ -43,31 +53,26 @@ export class RefService {
     return this.http.delete<{ status: number }>(ref(`journal/${id}`));
   }
 
-  getJournalDependencies(id: number): Observable<RefDependenciesResponse> {
-    return this.http.get<RefDependenciesResponse>(ref(`journal/${id}/dependencies`));
-  }
-
+  /** Each university under the name an admin list shows. */
   listUniversities(): Observable<UniversityItem[]> {
-    return this.http.get<UniversityItem[]>(ref("university"));
+    return this.http
+      .get<AdminUniversity[]>(ref("university"))
+      .pipe(map((rows) => rows.map(({ id, translations }) => ({ id, name: primaryName(translations) }))));
   }
 
-  createUniversity(body: { name: string }): Observable<{ id: number }> {
+  getUniversity(id: number): Observable<AdminUniversity> {
+    return this.http.get<AdminUniversity>(ref(`university/${id}`));
+  }
+
+  createUniversity(body: UniversityWrite): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(ref("university"), body);
   }
 
-  updateUniversity(id: number, body: { name: string }): Observable<{ status: number }> {
+  updateUniversity(id: number, body: UniversityWrite): Observable<{ status: number }> {
     return this.http.put<{ status: number }>(ref(`university/${id}`), body);
   }
 
   deleteUniversity(id: number): Observable<{ status: number }> {
     return this.http.delete<{ status: number }>(ref(`university/${id}`));
-  }
-
-  getUniversityDependencies(id: number): Observable<RefDependenciesResponse> {
-    return this.http.get<RefDependenciesResponse>(ref(`university/${id}/dependencies`));
-  }
-
-  getEventDependencies(id: number): Observable<RefDependenciesResponse> {
-    return this.http.get<RefDependenciesResponse>(ref(`event/${id}/dependencies`));
   }
 }

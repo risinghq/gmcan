@@ -5,7 +5,6 @@ import { translationsSchema } from "../../lib/admin-translations.js";
 import { okStatus } from "../../lib/contracts.js";
 import { notFound } from "../../lib/errors/app-error.js";
 import { validate } from "../../lib/validate.js";
-import { getUniversityPublicationDependencyCount } from "../../services/publication.service.js";
 import {
   createUniversity,
   deleteUniversity,
@@ -49,16 +48,6 @@ router.put("/university/:id", validate("param", IdParam), validate("json", Named
 router.delete("/university/:id", validate("param", IdParam), async (c) => {
   await deleteUniversity(c.req.valid("param").id);
   return c.json(okStatus());
-});
-
-router.get("/university/:id/dependencies", validate("param", IdParam), async (c) => {
-  const { id } = c.req.valid("param");
-  const thesis = await getUniversityPublicationDependencyCount(id);
-  return c.json({
-    total: thesis,
-    byKind: { journalArticle: 0, conferencePaper: 0, thesis },
-    canDelete: thesis === 0,
-  });
 });
 
 export default router;
