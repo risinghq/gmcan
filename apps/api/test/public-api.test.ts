@@ -222,6 +222,11 @@ function newMember(isActive: number) {
     isActive,
     roleCode: "researcher",
     memberTypeCode: "researcher",
+    maternalName: null,
+    birthDate: null,
+    prefixCode: null,
+    genderCode: null,
+    translations: { es: { bio: "" }, en: { bio: "" } },
   };
 }
 
@@ -239,7 +244,8 @@ describe("member status", () => {
 
   test("updating a member to a status other than 0 or 1 is a validation error", async () => {
     const cookie = await adminCookie();
-    const res = await sendMember("PATCH", `/admin/members/${memberId}`, cookie, { isActive: 3 });
+    const { dni: _dni, password: _password, ...fields } = newMember(3);
+    const res = await sendMember("PUT", `/admin/members/${memberId}`, cookie, fields);
     expect(res.status).toBe(400);
   });
 });

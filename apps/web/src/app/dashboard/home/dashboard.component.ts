@@ -6,6 +6,7 @@ import { type DashboardCountItem, DashboardService } from "@app/shared/services/
 import { GLOBAL } from "@app/shared/services/global";
 import type { ChartDataset, ChartOptions } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
+import { EMPTY } from "rxjs";
 
 const PALETTE = [
   "rgba(13,56,0,1)",
@@ -33,7 +34,8 @@ function chart(items: DashboardCountItem[], label: string, style: Partial<ChartD
 })
 export default class DashboardComponent {
   authz = inject(AuthzService);
-  private readonly summary = toSignal(inject(DashboardService).getSummary());
+  /** Only an analytics reader sees the charts, so nobody else asks for the summary. */
+  private readonly summary = toSignal(this.authz.can("analytics.read") ? inject(DashboardService).getSummary() : EMPTY);
 
   readonly manualUrl = GLOBAL.app("grupo/get-manual");
 

@@ -21,6 +21,7 @@ export const MemberTypeCodeSchema = z.enum([
   "collaborator",
 ]);
 export const PrefixCodeSchema = z.enum(["dr", "dra", "mg", "lic", "bach", "ing", "none"]);
+export const GenderCodeSchema = z.enum(["male", "female"]);
 
 export type AssetLinks = z.infer<typeof AssetLinksSchema>;
 export type NewsKindCode = z.infer<typeof NewsKindCodeSchema>;
@@ -33,3 +34,4 @@ export type FundingSourceCode = z.infer<typeof FundingSourceCodeSchema>;
 export type RoleCode = z.infer<typeof RoleCodeSchema>;
 export type MemberTypeCode = z.infer<typeof MemberTypeCodeSchema>;
 export type PrefixCode = z.infer<typeof PrefixCodeSchema>;
+export type GenderCode = z.infer<typeof GenderCodeSchema>;

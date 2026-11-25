@@ -2,7 +2,6 @@ import { inject } from "@angular/core";
 import { ResolveFn } from "@angular/router";
 import { primaryName } from "@app/shared/forms/locale-form";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
-import type { MemberFull } from "@app/shared/models/member";
 import type { Derive } from "@app/shared/routing/derived-data";
 import { type AdminEvent, EventService, type EventItem } from "@app/shared/services/event.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -11,7 +10,7 @@ import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { type AdminUniversity, type JournalItem, RefService } from "@app/shared/services/ref.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
-import type { AdminNews, AdminProject, AdminPublication, AuthorCandidate } from "@gmcan/contracts/admin";
+import type { AdminMember, AdminNews, AdminProject, AdminPublication, AuthorCandidate } from "@gmcan/contracts/admin";
 import { map } from "rxjs";
 
 import { byId } from "./content/forms/content.resolvers";
@@ -21,10 +20,10 @@ export type ToolbarBadge = {
   tone: "published" | "draft";
 };
 
-export const memberResolver: ResolveFn<MemberFull> = (route) => {
-  const id = Number(route.paramMap.get("id") ?? 0);
-  return inject(MemberService).getMemberFull(id);
-};
+export const memberResolver: ResolveFn<AdminMember> = (route) =>
+  inject(MemberService).getAdminMember(Number(route.paramMap.get("id")));
+
+export const ownProfileResolver: ResolveFn<AdminMember> = () => inject(MemberService).getOwnProfile();
 
 export const adminMembersResolver: ResolveFn<AdminMemberListItem[]> = () => inject(MemberService).listAdminMembers();
 
@@ -79,7 +78,7 @@ export const newsToolbarBadge: Derive<ToolbarBadge> = (data) =>
     : { label: "Borrador", tone: "draft" };
 
 export const memberEditTitle: Derive<string> = (data, route) => {
-  const member = data["member"] as MemberFull;
+  const member = data["item"] as AdminMember;
   const isFormer = route.queryParamMap.get("returnTo") === "miembros-antiguos";
   const section = isFormer ? "Miembros Antiguos" : "Miembros Activos";
   const name = [member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
