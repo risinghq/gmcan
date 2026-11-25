@@ -12,8 +12,6 @@
   "placement": { "mode": "targeted", "region": "aws:us-east-1" },
   "vars": {
     "NODE_ENV": "production",
-    // The public site: the web worker serves the API under /api and /admin.
-    "BACKEND_URL": "https://gmcan-web.empirical.workers.dev",
     "FRONTEND_URL": "https://gmcan-web.empirical.workers.dev",
     "SUPPORTED_LOCALES": "es,en",
     "DEFAULT_LOCALE": "es",

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { getFrontendUrl } from "./config.js";
+import { getFrontendUrl, withRequestOrigin } from "./config.js";
 import { loadActor } from "./middleware/authz.js";
 import { onError, onNotFound } from "./middleware/error.js";
 import { publicCache } from "./middleware/public-cache.js";
@@ -45,6 +45,7 @@ const adminApi = new Hono({ strict: false });
 
 app.onError(onError);
 app.notFound(onNotFound);
+app.use("*", (c, next) => withRequestOrigin(c.req.url, next));
 
 app.use(
   "*",

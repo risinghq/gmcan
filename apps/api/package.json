@@ -20,6 +20,7 @@
   "type": "module",
   "main": "worker.ts",
   "scripts": {
+    "setup": "test -f .dev.vars || cp .dev.vars.example .dev.vars; bun run migrate && bun run seed",
     "start": "wrangler dev --port 3000",
     "deploy": "wrangler deploy",
     "typegen": "wrangler types --strict-vars=false",

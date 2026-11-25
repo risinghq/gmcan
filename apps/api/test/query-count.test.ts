@@ -127,15 +127,18 @@ describe("listings do not query once per row", () => {
     });
   }
 
-  test("a listing shows the photo of the rows that have one", async () => {
+  test("a listing shows the photo of the rows that have one, on the origin the request reached", async () => {
     await seed(4);
-    const news = (await (await app.request("/api/news?pageSize=50")).json()) as {
+    const site = "https://site.example.test";
+    const news = (await (await app.request(`${site}/api/news?pageSize=50`)).json()) as {
       items: Array<{ asset: string | null; authorPhotoUrl: string }>;
     };
     expect(news.items).toHaveLength(4);
-    expect(news.items.every((item) => /\/api\/assets\/\d+$/.test(item.asset ?? ""))).toBe(true);
-    expect(news.items.filter((item) => /\/api\/assets\/\d+$/.test(item.authorPhotoUrl))).toHaveLength(2);
-    expect(news.items.filter((item) => item.authorPhotoUrl.endsWith("/api/placeholders/member-photo"))).toHaveLength(2);
+    expect(news.items.every((item) => item.asset?.match(/^(.+)\/api\/assets\/\d+$/)?.[1] === site)).toBe(true);
+    expect(news.items.filter((item) => item.authorPhotoUrl.startsWith(`${site}/api/assets/`))).toHaveLength(2);
+    expect(news.items.filter((item) => item.authorPhotoUrl === `${site}/api/placeholders/member-photo`)).toHaveLength(
+      2,
+    );
   });
 });
 

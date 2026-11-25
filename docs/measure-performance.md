@@ -1,4 +1,4 @@
-# Performance
+# Measure performance
 
 How to measure the time a visitor waits for the first byte, and how to decide
 whether a change made it shorter. Run the measurement before and after the

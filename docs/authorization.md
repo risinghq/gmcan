@@ -118,8 +118,8 @@ own password while signed in: the session that made the change stays. That
 covers an administrator who sets their own password through
 `PUT /admin/email/member-password`.
 
-Without email configured ([configuration](configuration.md#email)) the request
-endpoint answers `503` and stores no token.
+Without email configured ([email](email.md)) the request endpoint answers `503`
+and stores no token.
 
 A signed-in member changes their own password with
 `PUT /admin/account/password`. An administrator sets any member's password with

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /* oxlint-disable no-await-in-loop -- each sample redeploys once, then sends two ordered requests */
-// Measures time to first byte on throwaway copies of the deployed Workers. See docs/performance.md for commands and flags.
+// Measures time to first byte on throwaway copies of the deployed Workers. See docs/measure-performance.md for commands and flags.
 import { cp, mkdir, rm } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
@@ -60,7 +60,7 @@ async function writeArmConfigs(arm: string, code: string) {
     name: apiName(arm),
     main: join(codeDir(code, "api"), "worker.js"),
     triggers: { crons: [] },
-    vars: { ...(api.vars as object), BACKEND_URL: originOf(arm), FRONTEND_URL: originOf(arm) },
+    vars: { ...(api.vars as object), FRONTEND_URL: originOf(arm) },
   };
   const web = await readConfig("web");
   const webConfig = {

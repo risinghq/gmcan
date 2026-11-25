@@ -56,22 +56,22 @@ All paths start with `/admin`. Every path except `/auth/login` and
 `/auth/logout` needs the `sid` cookie ([authorization](authorization.md)).
 Writes use JSON bodies, except file uploads.
 
-| Path              | Permission (read / write)                  | Resource                                                                                                                                                  |
-| ----------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/auth`           | none                                       | `POST /login`, `POST /logout`                                                                                                                             |
-| `/account`        | `account.self.read` / `account.self.write` | `GET /me`, `PUT /password`                                                                                                                                |
-| `/dashboard`      | `analytics.read`                           | `GET /summary`: counts of members and publications by type                                                                                                |
-| `/news`           | `news.read` / `news.write`                 | Paged list with filters, get, create, update, delete                                                                                                      |
-| `/publications`   | `publications.read` / `publications.write` | List, get, create, update, delete, `PUT /:id/authors`                                                                                                     |
-| `/projects`       | `projects.read` / `projects.write`         | List, create, update, delete, `PUT /:id/end`, `PUT /:id/restart`, `GET` and `POST /:id/members`, `DELETE /:id/members/:memberId`                          |
-| `/members`        | `members.read` / `members.write`           | List, get, create, update, delete, groups, publishability, email check, author search. Bios at `/:id/translations/:locale` also allow the member themself |
-| `/research-lines` | `content.read` / `content.write`           | List, get, create, update, delete                                                                                                                         |
-| `/methods`        | `content.read` / `content.write`           | List, get, create, update, delete                                                                                                                         |
-| `/group`          | `content.read` / `content.write`           | Group page text, about section, software, equipment                                                                                                       |
-| `/assets`         | `content.read` / `content.write`           | `PUT`, `DELETE`, `POST /restore` ([assets](assets.md))                                                                                                    |
-| `/email`          | `content.write`                            | `PUT /member-password`: set any member's password                                                                                                         |
-| `/events`         | `refs.read` / `refs.write`                 | List, get, create, update, delete                                                                                                                         |
-| `/ref/*`          | `refs.read` / `refs.write`                 | Reference data: genders, prefixes, roles, member, publication, thesis and news kinds, journals, universities, funding sources, currencies                 |
+| Path              | Permission (read / write)                  | Resource                                                                                                                                  |
+| ----------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `/auth`           | none                                       | `POST /login`, `POST /logout`                                                                                                             |
+| `/account`        | `account.self.read` / `account.self.write` | `GET /me`, `GET` and `PUT /profile`, `PUT /profile/photo`, `GET /profile/publishability`, `PUT /password`                                 |
+| `/dashboard`      | `analytics.read`                           | `GET /summary`: counts of members and publications by type                                                                                |
+| `/news`           | `news.read` / `news.write`                 | Paged list with filters, get, create, update, delete                                                                                      |
+| `/publications`   | `publications.read` / `publications.write` | List, get, create, update, delete, `PUT /:id/authors`                                                                                     |
+| `/projects`       | `projects.read` / `projects.write`         | List, create, update, delete, `PUT /:id/end`, `PUT /:id/restart`, `GET` and `POST /:id/members`, `DELETE /:id/members/:memberId`          |
+| `/members`        | `members.read` / `members.write`           | List, get, create, update, delete, groups, publishability, email check, author search                                                     |
+| `/research-lines` | `content.read` / `content.write`           | List, get, create, update, delete                                                                                                         |
+| `/methods`        | `content.read` / `content.write`           | List, get, create, update, delete                                                                                                         |
+| `/group`          | `content.read` / `content.write`           | Group page text, about section, software, equipment                                                                                       |
+| `/assets`         | `content.read` / `content.write`           | `PUT`, `DELETE`, `POST /restore` ([assets](assets.md))                                                                                    |
+| `/email`          | `content.write`                            | `PUT /member-password`: set any member's password                                                                                         |
+| `/events`         | `refs.read` / `refs.write`                 | List, get, create, update, delete                                                                                                         |
+| `/ref/*`          | `refs.read` / `refs.write`                 | Reference data: genders, prefixes, roles, member, publication, thesis and news kinds, journals, universities, funding sources, currencies |
 
 Create endpoints answer `201 { "id": <number> }`. Update and delete answer
 `{ "status": 1 }`.

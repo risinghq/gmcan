@@ -21,8 +21,8 @@ locale, or whose dni, email, first name or last name is empty
 | --------------- | -------------------------- | ---------------------------------------------------------------------------------------------- |
 | none to `1`/`0` | holders of `members.write` | `POST /admin/members`, `createMember`. The caller picks the value.                             |
 | none to `1`     | the seed script            | `seedMembers`                                                                                  |
-| `1` to `0`      | holders of `members.write` | `PATCH /admin/members/:id`, `updateMember`                                                     |
-| `0` to `1`      | holders of `members.write` | `PATCH /admin/members/:id`, `updateMember`                                                     |
+| `1` to `0`      | holders of `members.write` | `PUT /admin/members/:id`, `updateMember`                                                       |
+| `0` to `1`      | holders of `members.write` | `PUT /admin/members/:id`, `updateMember`                                                       |
 | any to deleted  | holders of `members.write` | `DELETE /admin/members/:id`, `deleteMember`. Sessions of the member end on their next request. |
 
 Nothing else writes `isActive`, and no job does.

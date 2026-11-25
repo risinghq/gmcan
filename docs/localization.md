@@ -49,9 +49,6 @@ key, or the request fails validation with `Missing translations.<locale>` or
 }
 ```
 
-Routes that take a locale in the URL, such as
-`PUT /admin/members/:id/translations/:locale`, accept only supported codes.
-
 ## Add a locale
 
 1. Add its code to `SUPPORTED_LOCALES`.

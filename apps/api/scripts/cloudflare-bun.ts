@@ -8,7 +8,6 @@ import { getPlatformProxy } from "wrangler";
 
 const OVERRIDABLE = [
   "NODE_ENV",
-  "BACKEND_URL",
   "FRONTEND_URL",
   "ASSET_SIGNING_SECRET",
   "EMAIL_FROM",

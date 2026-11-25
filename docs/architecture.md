@@ -11,11 +11,30 @@ browser ──► apps/web (Angular app on a Worker)
                                            └──► Resend (when configured)
 ```
 
-In production the browser talks only to the web Worker, which serves pages and
-static files and proxies `/api` and `/admin` to the API Worker
-([deployment](deployment.md)). In development the browser calls the API on
-`:3000` directly from the app on `:4200`. [Deployment](deployment.md#rendering)
-says where pages render.
+## A request
+
+A visitor opens `/en/projects`:
+
+1. [`server.ts`](../apps/web/src/server.ts), the web Worker, answers
+   `/config.json`, `/robots.txt` and `/sitemap.xml` itself, and old URLs with a
+   301 ([`moved-url.ts`](../apps/web/src/moved-url.ts)).
+2. It looks the page up in the edge cache
+   ([`edge-cache.ts`](../apps/web/src/edge-cache.ts), [caching](caching.md)).
+3. On a miss, Angular renders the page on the server
+   ([`app.routes.server.ts`](../apps/web/src/app/app.routes.server.ts)). The
+   page's route resolver
+   ([`projects/resolver.ts`](../apps/web/src/app/public/projects/resolver.ts))
+   calls `GET /api/projects`, which `server.ts` sends straight to the API Worker
+   through the `API` service binding.
+4. In the API, [`app.ts`](../apps/api/app.ts) picks the locale, the route
+   validates the query, and the projects service reads D1 and returns JSON with
+   file URLs on the site's origin.
+5. The browser receives the HTML, then loads the app, which reads further data
+   from `/api` and `/admin` on the same origin. `server.ts` proxies those calls
+   to the API Worker, through the edge cache for public reads.
+
+Under `bun run dev` the app runs under `ng serve` on `:4200` and calls the API
+on `:3000` directly ([development](development.md)).
 
 ## `packages/contracts`
 
@@ -89,8 +108,6 @@ so multi-statement writes run as one `atomic()` batch
 
 [`db/projections.ts`](../apps/api/db/projections.ts) holds the column list of
 the `member` table that keeps `passwordHash` out of responses (`MEMBER_NAME`).
-[`db/views.ts`](../apps/api/db/views.ts) holds the joined reads for the projects
-and publications of a member.
 
 News search is an FTS5 table with triggers, created by the first migration and
 queried from [`services/news.service.ts`](../apps/api/services/news.service.ts).
@@ -120,8 +137,9 @@ join the matching `*_translation` rows. See [localization](localization.md).
 
 [`config/env.ts`](../apps/api/config/env.ts) parses the Worker's bindings and
 variables with zod when the Worker loads and throws on invalid input.
-[`config.ts`](../apps/api/config.ts) derives the frontend and backend URLs.
-Variables are listed in [configuration](configuration.md).
+[`config.ts`](../apps/api/config.ts) gives the site URL and the origin of the
+current request, the base of every file URL the API returns. Variables are
+listed in [configuration](configuration.md).
 
 ## `apps/web`
 
