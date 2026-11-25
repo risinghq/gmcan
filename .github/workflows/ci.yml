@@ -20,15 +20,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 2
       - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       # Production applies each migration once by name, so an edit to an applied file never reaches it.
+      # A pull request checks out its merge commit, whose first parent is the base branch.
       - name: Applied migrations are unchanged
         if: github.event_name == 'pull_request'
-        env:
-          BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          git fetch --no-tags --depth=1 origin "$BASE"
-          changed=$(git diff --name-only --diff-filter=MDR "$BASE" HEAD -- apps/api/migrations)
+          changed=$(git diff --name-only --diff-filter=MDR HEAD^1 HEAD -- apps/api/migrations)
           if [ -n "$changed" ]; then
             echo "::error::Add a new migration instead of editing an applied one: $changed"
             exit 1
