@@ -1,32 +1,9 @@
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
 .plex-sans {
   font-family: "IBM Plex Sans", serif;
 }
 
 .main-content {
   @extend .plex-sans;
-}
-
-.middle {
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.btn-sidemenu {
-  margin-left: 24px;
-  margin-right: 8px;
-}
-
-.mdc-top-app-bar {
-  background-color: white;
-  color: black;
-}
-
-.mdc-top-app-bar .mdc-top-app-bar__navigation-icon {
-  color: black;
 }
 
 .dashboard-card {
@@ -84,29 +61,8 @@
   color: #30393a;
 }
 
-.dashboard-tool {
-  height: 64px;
-  box-shadow: 0 2px 5px 0 #e8e8e8;
-  background-color: #ffffff;
-}
-
-.tool-text {
-  max-width: 700px;
-  font-size: 25px;
-  font-weight: bold;
-  letter-spacing: 0.3px;
-  color: #30393a;
-  white-space: nowrap;
-  overflow: hidden !important;
-  text-overflow: ellipsis;
-}
 .last-item {
   border-bottom: unset;
-}
-
-.dashboard-icon {
-  margin: 12px 12px 24px 16px;
-  width: 210px;
 }
 
 .main-content {

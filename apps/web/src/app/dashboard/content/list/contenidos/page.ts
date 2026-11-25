@@ -8,6 +8,7 @@ import { ContenidosState } from "./state";
 @Component({
   selector: "app-contenidos-page",
   templateUrl: "./page.html",
+  styleUrl: "./page.scss",
   providers: [ContenidosState],
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatTabGroup, MatTab, RouterLink, ContentTableComponent],

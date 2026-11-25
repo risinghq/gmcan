@@ -6,8 +6,34 @@
   font-family: "IBM Plex Sans", serif;
 }
 
-::ng-deep .mat-drawer-inner-container {
-  overflow: hidden !important;
+.dashboard-container {
+  height: 100%;
+}
+
+// The logo stays put and only the link list scrolls.
+.dashboard-drawer ::ng-deep .mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 0;
+}
+
+.dashboard-nav .active {
+  background-color: rgba(3, 147, 0, 0.12);
+}
+
+// The prebuilt indigo-pink theme paints activated list text in its primary color
+// with a selector the list tokens cannot override.
+.dashboard-nav .active.mdc-list-item--activated {
+  .mdc-list-item__primary-text,
+  .mdc-list-item__start {
+    color: var(--deep-green);
+  }
 }
 
 .middle {
@@ -18,19 +44,6 @@
 .btn-sidemenu {
   margin-left: 24px;
   margin-right: 8px;
-}
-
-.mdc-top-app-bar {
-  background-color: white;
-  color: black;
-}
-
-.mdc-top-app-bar .mdc-top-app-bar__navigation-icon {
-  color: black;
-}
-
-.mr-16 {
-  margin-right: 16px;
 }
 
 .dashboard-tool {
@@ -54,10 +67,6 @@
 .dashboard-icon {
   margin: 12px 12px 24px 16px;
   width: 210px;
-}
-
-.example-sidenav {
-  overflow-y: auto;
 }
 
 .user-div {
@@ -119,21 +128,6 @@
 .mat-menu-item:hover,
 .mat-menu-item:focus {
   background-color: unset;
-}
-
-.active {
-  color: var(--deep-green);
-  background-color: rgba(3, 147, 0, 0.25);
-}
-
-.mdc-list {
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.active > .mdc-list-item__graphic {
-  color: var(--deep-green);
 }
 
 .publish-news {

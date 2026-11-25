@@ -20,6 +20,7 @@ import { ContentTable } from "./table";
 
 @Component({
   selector: "app-content-table",
+  styleUrl: "./content-table.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIcon,

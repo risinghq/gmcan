@@ -1,175 +1,29 @@
-<mat-drawer-container class="example-container" style="height: 100%" [hidden]="enterAny">
-  <mat-drawer #drawer class="example-sidenav mdc-drawer" mode="side" [opened]="!enterAny">
-    <nav class="mdc-list">
-      <img class="dashboard-icon" [src]="grupoinfo().assets.header" alt="logo" />
-      <a
-        class="mdc-list-item"
-        routerLink="/dashboard"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dashboard</i>
-        <span class="mdc-list-item__text">Dashboard</span>
-      </a>
-      @if (authz.can("news.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/news"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">chrome_reader_mode</i>
-          <span class="mdc-list-item__text">Noticias</span>
-        </a>
+<mat-drawer-container class="dashboard-container" [hidden]="enterAny">
+  <mat-drawer #drawer class="dashboard-drawer" mode="side" [opened]="!enterAny">
+    <img class="dashboard-icon" [src]="grupoinfo().assets.header" alt="logo" />
+    <mat-nav-list class="dashboard-nav">
+      @for (section of nav(); track $index) {
+        @if (!$first) {
+          <mat-divider />
+        }
+        @if (section.title) {
+          <h3 matSubheader>{{ section.title }}</h3>
+        }
+        @for (link of section.links; track link.path) {
+          <a
+            mat-list-item
+            [routerLink]="link.path"
+            routerLinkActive="active"
+            #active="routerLinkActive"
+            [routerLinkActiveOptions]="{ exact: true }"
+            [activated]="active.isActive"
+          >
+            <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+            <span matListItemTitle>{{ link.label }}</span>
+          </a>
+        }
       }
-      @if (authz.can("members.read")) {
-        <hr class="mdc-list-divider" />
-      }
-      @if (authz.can("members.read")) {
-        <h6 class="mdc-list-group__subheader">Miembros</h6>
-      }
-      @if (authz.can("members.read")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/miembros-activos"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Miembros Activos</span>
-        </a>
-      }
-      @if (authz.can("members.read")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/miembros-antiguos"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Miembros antiguos</span>
-        </a>
-      }
-      @if (authz.can("publications.write")) {
-        <hr class="mdc-list-divider" />
-      }
-      @if (authz.can("publications.write")) {
-        <h6 class="mdc-list-group__subheader">Publicaciones</h6>
-      }
-      @if (authz.can("publications.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/articulos"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Artículos</span>
-        </a>
-      }
-      @if (authz.can("publications.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/tesis"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Tesis</span>
-        </a>
-      }
-      @if (authz.can("publications.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/eventos"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Resumen en eventos</span>
-        </a>
-      }
-      @if (authz.can("projects.write")) {
-        <hr class="mdc-list-divider" />
-      }
-      @if (authz.can("projects.write")) {
-        <h6 class="mdc-list-group__subheader">Proyectos</h6>
-      }
-      @if (authz.can("projects.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/proyectos-ejecucion"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Proyectos en ejecución</span>
-        </a>
-      }
-      @if (authz.can("projects.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/proyectos-concluidos"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-          <span class="mdc-list-item__text">Proyectos concluidos</span>
-        </a>
-      }
-      <hr class="mdc-list-divider" />
-      <h6 class="mdc-list-group__subheader">Mi perfil</h6>
-      <a
-        class="mdc-list-item"
-        routerLink="/dashboard/perfil"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-        <span class="mdc-list-item__text">Mi información personal</span>
-      </a>
-      <a
-        class="mdc-list-item"
-        routerLink="/dashboard/my-articles"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-        <span class="mdc-list-item__text">Mis artículos</span>
-      </a>
-      <a
-        class="mdc-list-item"
-        routerLink="/dashboard/my-thesis"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-        <span class="mdc-list-item__text">Mis tesis</span>
-      </a>
-      <a
-        class="mdc-list-item"
-        routerLink="/dashboard/my-abstracts"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">bookmark</i>
-        <span class="mdc-list-item__text">Mis resúmenes en eventos</span>
-      </a>
-      @if (authz.can("content.write")) {
-        <hr class="mdc-list-divider" />
-      }
-      @if (authz.can("content.write")) {
-        <a
-          class="mdc-list-item"
-          routerLink="/dashboard/contenidos"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          <i class="material-icons mdc-list-item__graphic" aria-hidden="true">description</i>
-          <span class="mdc-list-item__text">Contenidos</span>
-        </a>
-      }
-    </nav>
+    </mat-nav-list>
   </mat-drawer>
   <div class="example-sidenav-content">
     <div class="flex-news dashboard-tool">
