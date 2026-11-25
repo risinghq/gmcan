@@ -6,7 +6,9 @@
   font-family: "IBM Plex Sans", serif;
 }
 
-$thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
+$thetransition:
+  transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+  visibility 0.25s;
 
 .not-found-div {
   @extend .plex-sans;
@@ -116,14 +118,12 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
     left: 0;
     background-color: #30393a;
     visibility: hidden;
-    -webkit-transform: scaleX(0);
     transform: scaleX(0);
-    -webkit-transition: $thetransition;
     transition: $thetransition;
   }
-  &:hover:before {
+  &:hover:before,
+  &:focus-visible:before {
     visibility: visible;
-    -webkit-transform: scaleX(1);
     transform: scaleX(1);
   }
 }

@@ -2,7 +2,9 @@
 @use "../../shared/styles/project-list";
 @use "../../shared/components/news/news.component.scss";
 
-$thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
+$thetransition:
+  transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+  visibility 0.25s;
 
 .plex-serif {
   font-family: "IBM Plex Serif", serif;
@@ -145,8 +147,9 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 5; /* number of lines to show */
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
+  height: calc(1.33em * 5);
 }
 
 .linea-text-green {
@@ -154,9 +157,14 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   line-height: 1.54;
   letter-spacing: 0.3px;
   color: var(--deep-green);
+  text-decoration: none;
   cursor: pointer;
   margin-left: auto;
   margin-right: auto;
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
 }
 
 .grey-title {
@@ -244,6 +252,9 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   letter-spacing: 0.3px;
   color: #30393a;
   white-space: pre-wrap;
+  p {
+    margin: 0 0 1.2em;
+  }
 }
 
 .main-news-title:hover,
@@ -431,6 +442,7 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   .mt-services {
     font-size: 30px;
     margin-top: 56px;
+    margin-bottom: 64px;
   }
   .services-icon {
     height: 84px;
@@ -448,9 +460,6 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   }
   .mt-48 {
     margin-top: 48px;
-  }
-  .linea-text {
-    height: 95px;
   }
   .methods-card {
     display: grid;
@@ -601,9 +610,6 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
   .methods-card {
     padding: 24px 24px 16px 24px;
   }
-  .linea-text {
-    height: 88px;
-  }
   .method-title {
     font-size: 15px;
     margin-bottom: 16px;
@@ -700,14 +706,12 @@ $thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
     left: 0;
     background-color: #30393a;
     visibility: hidden;
-    -webkit-transform: scaleX(0);
     transform: scaleX(0);
-    -webkit-transition: $thetransition;
     transition: $thetransition;
   }
-  &:hover:before {
+  &:hover:before,
+  &:focus-visible:before {
     visibility: visible;
-    -webkit-transform: scaleX(1);
     transform: scaleX(1);
   }
 }

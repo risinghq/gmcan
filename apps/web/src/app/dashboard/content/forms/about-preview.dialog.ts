@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
+import { EmphasisPipe } from "@app/shared/utils/emphasis";
 import type { AboutTranslation } from "@gmcan/contracts/admin";
 
 export interface AboutPreview {
@@ -9,7 +10,7 @@ export interface AboutPreview {
 
 @Component({
   selector: "app-about-preview-dialog",
-  imports: [MatDialogClose],
+  imports: [MatDialogClose, EmphasisPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "../../../public/about/about-us/component.scss",
   template: `
@@ -29,7 +30,15 @@ export interface AboutPreview {
             }
             <ul>
               @for (item of data.about[section.key].items; track $index) {
-                <li>{{ item }}</li>
+                <li>
+                  @for (part of item | emphasis; track $index) {
+                    @if (part.strong) {
+                      <strong>{{ part.text }}</strong>
+                    } @else {
+                      {{ part.text }}
+                    }
+                  }
+                </li>
               }
             </ul>
           </div>

@@ -122,7 +122,10 @@
     <img class="services-icon" loading="lazy" src="/img/icons/bulb.svg" alt="" />
     <div class="mt-services about-text">
       @for (paragraph of aboutUs; track paragraph) {
-      <p>{{ paragraph }}</p>
+      <p>
+        @for (part of paragraph | emphasis; track $index) {@if (part.strong) {<strong>{{ part.text }}</strong>} @else
+        {{{ part.text }}}}
+      </p>
       }
     </div>
     <a class="btn-black align-center hide-mobile" routerLink="/about-us/about">

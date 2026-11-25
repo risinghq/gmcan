@@ -7,6 +7,7 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { SessionService } from "@app/shared/services/session.service";
+import { EmphasisPipe } from "@app/shared/utils/emphasis";
 
 import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
@@ -15,7 +16,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [RouterLink, MatProgressBar, MatCard, MatIcon, SlicePipe],
+  imports: [RouterLink, MatProgressBar, MatCard, MatIcon, SlicePipe, EmphasisPipe],
 })
 export default class HomeComponent implements OnInit {
   private route = inject(ActivatedRoute);

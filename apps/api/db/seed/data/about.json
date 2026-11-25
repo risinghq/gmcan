@@ -15,10 +15,10 @@
       "services": {
         "introParagraphs": [],
         "items": [
-          "Brindar servicios a los grupos experimentales de la Universidad Nacional Mayor de San Marcos y otras instituciones académicas.",
-          "Brindar servicios y asesoría a la comunidad académica y empresarial.",
-          "Brindar el servicio de diseño e implementación de programas especializados.",
-          "Promover los métodos computacionales de investigación de los nanomateriales en los diferentes niveles de enseñanza secundaria y universitaria."
+          "Brindar servicios a los **grupos experimentales** de la Universidad Nacional Mayor de San Marcos y otras instituciones académicas.",
+          "Brindar servicios y asesoría a la **comunidad académica y empresarial**.",
+          "Brindar el servicio de **diseño e implementación de programas especializados**.",
+          "Promover los métodos computacionales de investigación de los nanomateriales en los diferentes **niveles de enseñanza secundaria y universitaria**."
         ]
       }
     },
@@ -36,10 +36,10 @@
       "services": {
         "introParagraphs": [],
         "items": [
-          "Provide services to the experimental groups of the National University of San Marcos and other academic institutions.",
-          "Provide services and advice to the academic and business community.",
-          "Provide the design and implementation service of specialized programs.",
-          "Promote computational research methods for nanomaterials at different levels of secondary and university education."
+          "Provide services to the **experimental groups** of the National University of San Marcos and other academic institutions.",
+          "Provide services and advice to the **academic and business community**.",
+          "Provide the **design and implementation service of specialized programs**.",
+          "Promote computational research methods for nanomaterials at different **levels of secondary and university education**."
         ]
       }
     }

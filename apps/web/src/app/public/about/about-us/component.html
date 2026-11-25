@@ -13,7 +13,10 @@
       }
       <ul>
         @for (item of aboutus().objectivesContent.items; track item) {
-        <li>{{ item }}</li>
+        <li>
+          @for (part of item | emphasis; track $index) {@if (part.strong) {<strong>{{ part.text }}</strong>} @else {{{
+          part.text }}}}
+        </li>
         }
       </ul>
     </div>
@@ -26,7 +29,10 @@
       }
       <ul>
         @for (item of aboutus().servicesContent.items; track item) {
-        <li>{{ item }}</li>
+        <li>
+          @for (part of item | emphasis; track $index) {@if (part.strong) {<strong>{{ part.text }}</strong>} @else {{{
+          part.text }}}}
+        </li>
         }
       </ul>
     </div>

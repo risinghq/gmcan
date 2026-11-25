@@ -83,7 +83,20 @@ html {
   --dark-forest-green: #003000;
 }
 
-$thetransition: all 0.5s cubic-bezier(0.75, 0.25, 0, 0.75) 0s;
+$thetransition:
+  transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+  visibility 0.25s;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 mat-progress-bar .mat-progress-bar-buffer {
   background: #e4e8eb;
@@ -210,6 +223,17 @@ mat-sidenav-container {
   height: 100%;
 }
 
+mat-sidenav-content.page-column {
+  display: flex;
+  flex-direction: column;
+  > * {
+    flex-shrink: 0;
+  }
+  > footer {
+    margin-top: auto;
+  }
+}
+
 .main-toolbar {
   display: flex;
   background-color: #ffffff;
@@ -261,14 +285,12 @@ mat-sidenav-container {
     left: 0;
     background-color: #30393a;
     visibility: hidden;
-    -webkit-transform: scaleX(0);
     transform: scaleX(0);
-    -webkit-transition: $thetransition;
     transition: $thetransition;
   }
-  &:hover:before {
+  &:hover:before,
+  &:focus-visible:before {
     visibility: visible;
-    -webkit-transform: scaleX(1);
     transform: scaleX(1);
   }
 }
@@ -292,14 +314,12 @@ mat-sidenav-container {
     left: 0;
     background-color: #30393a;
     visibility: hidden;
-    -webkit-transform: scaleX(0);
     transform: scaleX(0);
-    -webkit-transition: $thetransition;
     transition: $thetransition;
   }
-  &:hover:before {
+  &:hover:before,
+  &:focus-visible:before {
     visibility: visible;
-    -webkit-transform: scaleX(1);
     transform: scaleX(1);
   }
 }
@@ -312,9 +332,32 @@ mat-sidenav-container {
   color: #000000;
 }
 
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tap-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.menu-icon {
+  color: #000000;
+  font-size: 20px;
+}
+
 .menu-text {
   @extend .plex-sans;
   font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.3px;
   color: #30393a;
   margin-right: 8px;
