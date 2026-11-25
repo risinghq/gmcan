@@ -6,7 +6,6 @@ import { MemberService } from "../services/member.service";
 import { PublishabilityDialogComponent } from "./dialog.component";
 import { countMissingRequirements, publishabilityTooltip } from "./utils";
 
-/** Whether a member's profile is complete enough to show in public; a click lists what is missing. */
 @Component({
   selector: "app-publishability-chip",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,7 +68,6 @@ export class PublishabilityChipComponent {
     return state ? countMissingRequirements(state) : 0;
   });
 
-  /** Reads the state again after a save changed the profile. */
   refresh(): void {
     this.status.reload();
   }

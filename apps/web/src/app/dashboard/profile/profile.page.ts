@@ -50,10 +50,6 @@ function passwordForm() {
   );
 }
 
-/**
- * A signed-in member edits their own profile and password. The role, the member type, the active
- * flag and the DNI belong to an administrator, so they are shown and not edited.
- */
 @Component({
   selector: "app-profile-page",
   imports: [ReactiveFormsModule, MemberFieldsComponent, PublishabilityChipComponent],

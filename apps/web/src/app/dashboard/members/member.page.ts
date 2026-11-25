@@ -70,7 +70,6 @@ function listPath(isActive: 0 | 1): string {
   return isActive ? "/dashboard/miembros-activos" : "/dashboard/miembros-antiguos";
 }
 
-/** An administrator adds a member or edits any member, including their role and whether they are active. */
 @Component({
   selector: "app-member-page",
   imports: [
@@ -170,7 +169,6 @@ function listPath(isActive: 0 | 1): string {
 })
 export default class MemberPage implements OnInit, HasUnsavedChanges {
   readonly item = input<AdminMember | null>(null);
-  /** The list the edit was opened from, bound from the query string. */
   readonly returnTo = input<string>();
 
   private readonly members = inject(MemberService);
@@ -249,7 +247,7 @@ export default class MemberPage implements OnInit, HasUnsavedChanges {
     );
   }
 
-  /** A new email must not belong to another member; the member's own email is free. */
+  /** The member's own email does not count as taken. */
   private async emailFree(email: string): Promise<boolean> {
     if (email === this.item()?.email) return true;
     let exists: boolean;

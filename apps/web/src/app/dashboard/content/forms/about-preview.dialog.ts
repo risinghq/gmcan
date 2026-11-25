@@ -3,12 +3,10 @@ import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import type { AboutTranslation } from "@gmcan/contracts/admin";
 
 export interface AboutPreview {
-  /** `description` is editor HTML; Angular's sanitizer cleans it on binding, as on the public page. */
   about: AboutTranslation;
   image: string | null;
 }
 
-/** Shows the about page as the public site lays it out, before it is saved. */
 @Component({
   selector: "app-about-preview-dialog",
   imports: [MatDialogClose],

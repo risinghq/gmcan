@@ -21,8 +21,8 @@ export const PublicationAuthorWriteSchema = z.discriminatedUnion("kind", [
 export type PublicationAuthorWrite = z.infer<typeof PublicationAuthorWriteSchema>;
 
 /**
- * `GET /admin/members/authors/search`: a name an admin can put in a byline. A registered candidate
- * is a member; an external one is a name an earlier byline already used.
+ * A registered candidate is a member. An external candidate is a name an earlier byline already
+ * used.
  */
 export type AuthorCandidate =
   | { kind: "registered"; memberId: number; name: string; photoUrl: string; photoAlt: string }
@@ -47,22 +47,20 @@ export const PublicationSubtypeWriteSchema = z.discriminatedUnion("kindCode", [
 ]);
 export type PublicationSubtypeWrite = z.infer<typeof PublicationSubtypeWriteSchema>;
 
-/** The fields of a publication write besides its translations. */
 export const PublicationWriteFieldsSchema = z.object({
   doi: z.string().trim().optional(),
   /** A `YYYY-MM-DD` date. */
   publishedAt: z.string(),
   subtype: PublicationSubtypeWriteSchema,
-  /** The whole byline: a write replaces the stored authors. */
+  /** The whole byline. A write replaces the stored authors. */
   authors: z.array(PublicationAuthorWriteSchema).min(1),
 });
 
-/** `POST /admin/publications` and `PUT /admin/publications/:id`. */
 export interface PublicationWrite extends z.infer<typeof PublicationWriteFieldsSchema> {
   translations: Translations<PublicationTranslation>;
 }
 
-/** `GET /admin/publications/:id`. `asset` is the link to the attached PDF. */
+/** `asset` is the link to the attached PDF. */
 export interface AdminPublication extends PublicationWrite {
   id: number;
   createdAt: string;

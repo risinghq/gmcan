@@ -37,7 +37,7 @@ export class ConfirmDialogComponent {
   readonly data = inject<ConfirmDialogData>(MAT_DIALOG_DATA);
 }
 
-/** Resolves true only when the admin picks the confirm action; closing the dialog any other way is a no. */
+/** Closing the dialog any way other than the confirm action resolves false. */
 export async function confirmAction(dialog: MatDialog, data: ConfirmDialogData): Promise<boolean> {
   const ref = dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
     width: "530px",

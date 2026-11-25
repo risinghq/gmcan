@@ -31,7 +31,6 @@ export const authorCandidatesResolver: ResolveFn<AuthorCandidate[]> = () => inje
 
 export const adminEventsResolver: ResolveFn<EventItem[]> = () => inject(EventService).listAdmin();
 
-/** A research line as a project form offers it: the id it stores and the name the admin picks by. */
 export interface ResearchLineOption {
   id: number;
   name: string;

@@ -62,7 +62,7 @@ export default class ProyectosComponent implements AfterViewInit {
   private readonly lookup = inject(LookupService);
   private readonly tabState = inject(TabStateService);
 
-  /** The ongoing list also edits funding sources; the other route lists concluded projects. */
+  /** Only the ongoing list edits funding sources. The other route lists concluded projects. */
   readonly ongoing = (inject(ActivatedRoute).snapshot.routeConfig?.path ?? "").includes("ejecucion");
 
   readonly displayedColumns = ["titulo", "primerAutor", "fechaInicio", "codigo"];

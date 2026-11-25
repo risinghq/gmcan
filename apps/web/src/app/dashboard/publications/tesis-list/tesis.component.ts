@@ -25,7 +25,6 @@ import { ListTable, byName } from "@app/shared/tables/list-table";
 
 import { type PublicationRow, publicationRows, publicationSearchText, publicationSort } from "../publication-row";
 
-/** Every thesis, and the universities a thesis names. */
 @Component({
   selector: "app-tesis",
   templateUrl: "./tesis.component.html",

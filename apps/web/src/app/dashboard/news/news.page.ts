@@ -54,7 +54,7 @@ function newsForm() {
 
 type NewsFormValue = ReturnType<ReturnType<typeof newsForm>["getRawValue"]>;
 
-/** The request body for a valid form; the required validators guarantee the shared fields. */
+/** The required validators guarantee the shared fields. */
 function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrite {
   const { publishedAt, authorId, newsKindCode, translations } = value;
   if (!publishedAt || authorId === null || !newsKindCode) throw new Error("The news form is incomplete");
@@ -188,7 +188,6 @@ export default class NewsPage implements OnInit, HasUnsavedChanges {
   readonly published = computed(() => this.item()?.statusCode === "published");
   readonly saving = signal(false);
   private record = new RecordSave(null);
-  /** A blob URL of the picked image, so the preview can show it before upload. */
   private imageUrl: string | null = null;
 
   constructor() {

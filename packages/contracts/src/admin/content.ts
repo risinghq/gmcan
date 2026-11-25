@@ -41,22 +41,18 @@ interface AdminContentView<T> {
   translations: Translations<T>;
 }
 
-/** `GET /admin/research-lines` items and `GET /admin/research-lines/:id`. */
 export interface AdminResearchLine extends AdminContentView<Required<ResearchLineTranslation>> {
   asset: string | null;
 }
 
-/** `GET /admin/methods` items and `GET /admin/methods/:id`. */
 export interface AdminMethod extends AdminContentView<MethodTranslation> {
   asset: string | null;
 }
 
-/** `GET /admin/group/:groupId/software` items and `GET /admin/group/software/:id`. */
 export interface AdminSoftware extends AdminContentView<Required<SoftwareTranslation>> {
   moreInfo: string | null;
 }
 
-/** `GET /admin/group/:groupId/equipment` items and `GET /admin/group/equipment/:id`. */
 export interface AdminEquipment {
   id: number;
   groupId: number;

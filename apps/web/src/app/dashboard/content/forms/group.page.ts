@@ -17,7 +17,6 @@ import { optionalText, requiredText } from "./text-fields";
 
 type GroupSlot = AssetSlot<"research_group">;
 
-/** Edits the research group: contact details, logos, the facilities image and its text sections. */
 @Component({
   selector: "app-group-page",
   imports: [ReactiveFormsModule, ContentFormComponent, ImageFieldComponent, RichTextEditorComponent],

@@ -25,7 +25,6 @@ import { ListTable, byName } from "@app/shared/tables/list-table";
 
 import { type PublicationRow, publicationRows, publicationSearchText, publicationSort } from "../publication-row";
 
-/** Every journal article, and the journals an article cites. */
 @Component({
   selector: "app-articulos",
   templateUrl: "./articulos.component.html",

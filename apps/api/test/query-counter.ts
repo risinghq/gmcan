@@ -36,7 +36,7 @@ export function installQueryCounter(): void {
   } as D1Database;
 }
 
-/** Counts D1 calls made by `run`; a batch counts once regardless of its statement count. */
+/** A batch counts once regardless of its statement count. */
 export async function countRoundTrips(run: () => Promise<unknown>): Promise<number> {
   const before = roundTrips;
   await run();

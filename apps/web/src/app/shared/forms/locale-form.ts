@@ -14,7 +14,6 @@ export function localeLabel(locale: string): string {
 
 export type LocaleForm<C extends Record<string, AbstractControl>> = FormGroup<Record<string, FormGroup<C>>>;
 
-/** One group per content locale, each built fresh by `build`. */
 export function localeForm<C extends Record<string, AbstractControl>>(build: () => C): LocaleForm<C> {
   return new FormGroup(Object.fromEntries(CONTENT_LOCALES.map((locale) => [locale, new FormGroup(build())])));
 }

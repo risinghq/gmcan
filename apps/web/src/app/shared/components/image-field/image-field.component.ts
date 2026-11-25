@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, output, signal } from "@angular/core";
 
-/** Lets an admin pick an image, shows it in place of the current one, and emits the picked file. */
 @Component({
   selector: "app-image-field",
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -49,7 +49,7 @@ export default class MiembrosComponent implements AfterViewInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
 
-  /** The active list holds current members; the other route lists former members. */
+  /** The same component lists former members on the other route. */
   private readonly active = (inject(ActivatedRoute).snapshot.routeConfig?.path ?? "").includes("activos");
   readonly canAdd = this.active;
 

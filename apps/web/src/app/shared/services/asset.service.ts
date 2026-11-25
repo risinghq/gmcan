@@ -9,7 +9,7 @@ import { GLOBAL } from "./global";
 export class AssetService {
   private http = inject(HttpClient);
 
-  /** Stores `file` as the current asset of the target's slot; the previous one stays as an older version. */
+  /** The previous asset in the slot stays as an older version. */
   put(target: AssetTarget, file: File): Observable<{ status: number }> {
     const form = new FormData();
     form.append("ownerType", target.ownerType);

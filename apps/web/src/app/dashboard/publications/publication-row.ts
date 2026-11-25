@@ -3,7 +3,6 @@ import type { SortValues } from "@app/shared/tables/list-table";
 import { dateLabel } from "@app/shared/utils/date";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
-/** A publication as the dashboard lists it, with its date and lookup names spelled out. */
 export interface PublicationRow extends PublicPublicationWithAuthors {
   fecha: string;
   thesisTypeName: string;
@@ -46,7 +45,6 @@ export const publicationSort: SortValues<PublicationRow> = {
   evento: (row) => row.eventName,
 };
 
-/** The text a publication search matches: the title, the date, the lookup names and every author. */
 export function publicationSearchText(row: PublicationRow): string[] {
   return [
     row.title,

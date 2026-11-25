@@ -47,8 +47,8 @@ function projectForm() {
 type ProjectFormValue = ReturnType<ReturnType<typeof projectForm>["getRawValue"]>;
 
 /**
- * The request body for a valid form; the required validators guarantee the shared fields.
- * A concluded project without an end date ends today; an ongoing one has none.
+ * The required validators guarantee the shared fields. A concluded project without an end date
+ * ends today. An ongoing project has none.
  */
 function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode): ProjectWrite {
   const { code, researchLineId, memberIds, fundingSourceCode, currencyCode, fundedAmountMinor, startDate, endDate } =

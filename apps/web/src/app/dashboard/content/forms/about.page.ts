@@ -42,7 +42,6 @@ function aboutForm(about: AboutTranslation) {
 
 type AboutForm = ReturnType<typeof aboutForm>;
 
-/** Edits the about page: the team photo, the description, objectives, services and the home teaser. */
 @Component({
   selector: "app-about-page",
   imports: [ReactiveFormsModule, ContentFormComponent, ImageFieldComponent, RichTextEditorComponent, TextListComponent],
@@ -107,7 +106,6 @@ export default class AboutPage implements OnInit, HasUnsavedChanges {
   });
   readonly image = signal<File | null>(null);
   readonly saving = signal(false);
-  /** A blob URL of the picked image, so the preview can show it before upload. */
   private imageUrl: string | null = null;
 
   constructor() {

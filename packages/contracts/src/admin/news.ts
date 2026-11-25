@@ -10,22 +10,19 @@ export const NewsTranslationSchema = z.object({
 });
 export type NewsTranslation = z.infer<typeof NewsTranslationSchema>;
 
-/** The fields of a news write besides its translations. */
 export const NewsWriteFieldsSchema = z.object({
   statusCode: NewsStatusCodeSchema,
-  /** A `YYYY-MM-DD` date; a create without one is published today. */
+  /** A `YYYY-MM-DD` date. A create without one is published today. */
   publishedAt: z.string().optional(),
   authorId: z.number().int(),
   newsKindCode: NewsKindCodeSchema,
   priority: z.number().int().optional(),
 });
 
-/** `POST /admin/news` and `PUT /admin/news/:id`. */
 export interface NewsWrite extends z.infer<typeof NewsWriteFieldsSchema> {
   translations: Translations<NewsTranslation>;
 }
 
-/** `GET /admin/news/:id`. */
 export interface AdminNews {
   id: number;
   statusCode: NewsStatusCode;

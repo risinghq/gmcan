@@ -39,8 +39,6 @@ describe("JoinUsComponent", () => {
       imports: [JoinUsComponent],
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     })
-      // The news sidebar has its own data and tests.
-      // This test isolates the form.
       .overrideComponent(JoinUsComponent, {
         remove: { imports: [NewsComponent] },
         add: { schemas: [CUSTOM_ELEMENTS_SCHEMA] },

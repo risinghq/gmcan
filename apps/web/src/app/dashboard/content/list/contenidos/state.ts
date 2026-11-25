@@ -7,7 +7,7 @@ import { TabStateService } from "@app/shared/services/tab-state.service";
 
 import { ContentTable } from "./table";
 
-/** The last tab index; a stored index from an older layout falls back to it. */
+/** A stored tab index past this one falls back to it. */
 const LAST_TAB = 3;
 
 @Injectable()

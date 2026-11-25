@@ -112,7 +112,7 @@ async function countFtsRows(newsId?: number) {
   return Number(rows[0].n);
 }
 
-// The search blocks only read, so they share one seed; the write blocks reseed for every test.
+// The search blocks only read, so they share one seed. The write blocks reseed for every test.
 describe("news list search", () => {
   beforeAll(seedNews);
 

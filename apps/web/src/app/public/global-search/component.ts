@@ -63,7 +63,7 @@ export default class GlobalSearchComponent {
   protected readonly pageSize = 5;
   protected readonly previouslink = getPublicOriginInfo(parsePublicOrigin(this.route)).route;
 
-  /** The resolver's results for the current search; the route reuses this component for the next one. */
+  /** The route reuses this component for the next search, so results come from the resolver each time. */
   private readonly results = toSignal(this.route.data.pipe(map((data) => data["search"] as GlobalSearchViewModel)), {
     initialValue: EMPTY,
   });

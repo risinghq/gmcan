@@ -47,7 +47,6 @@ describe("GlobalSearchComponent", () => {
   const texts = (selector: string) =>
     [...page().querySelectorAll(selector)].map((element) => element.textContent?.trim());
 
-  /** The resolver hands the component a new result set on each search; the router reuses the component. */
   async function search(term: string, results: GlobalSearchResults) {
     params.next({ id: term });
     data.next({ search: results });
