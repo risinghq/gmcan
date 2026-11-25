@@ -21,7 +21,7 @@ It runs these scripts and never writes tracked files:
 | Script      | What it covers                                                 |
 | ----------- | -------------------------------------------------------------- |
 | `lint`      | oxlint (warnings fail), oxfmt `--check` and a gitleaks scan    |
-| `typecheck` | `tsc --noEmit` for both apps; fails if the Worker types drift  |
+| `typecheck` | `tsc --noEmit` for both apps, against regenerated Worker types |
 | `test`      | Web tests (vitest) and API tests (`bun test`)                  |
 | `build`     | The Angular build and a `wrangler deploy --dry-run` of the API |
 
