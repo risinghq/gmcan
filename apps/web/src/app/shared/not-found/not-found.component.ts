@@ -1,7 +1,6 @@
-import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, RESPONSE_INIT, inject, ChangeDetectionStrategy } from "@angular/core";
 import { Router } from "@angular/router";
 import { Languages } from "@app/shared/models/languages";
-import { BrowserService } from "@app/shared/services/browser.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
@@ -12,20 +11,21 @@ import { SessionService } from "@app/shared/services/session.service";
 })
 export default class NotFoundComponent implements OnInit {
   private router = inject(Router);
-  private browser = inject(BrowserService);
   private session = inject(SessionService);
+  private response = inject(RESPONSE_INIT, { optional: true });
 
   button_text = "";
   dashboard = false;
 
   language: (typeof Languages)[number] = this.session.language();
   ngOnInit(): void {
+    if (this.response) this.response.status = 404;
     this.language = this.session.language();
     this.setTexts();
   }
 
   setTexts(): void {
-    if (this.browser.locationHref().includes("dashboard")) {
+    if (this.router.url.startsWith("/dashboard")) {
       this.button_text = "Volver al dashboard";
       this.dashboard = true;
     } else {

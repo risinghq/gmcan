@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Meta, Title } from "@angular/platform-browser";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
@@ -9,6 +8,7 @@ import { Languages } from "@app/shared/models/languages";
 import type { PublicNewsDetail } from "@app/shared/models/news";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { GLOBAL } from "@app/shared/services/global";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 import type { DetailNewsViewModel } from "./types";
@@ -23,8 +23,7 @@ import type { DetailNewsViewModel } from "./types";
 export default class DetailNewsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(SessionService);
-  private readonly meta = inject(Meta);
-  private readonly titleService = inject(Title);
+  private readonly seo = inject(SeoService);
 
   newsItem: PublicNewsDetail = {} as PublicNewsDetail;
   newsTypeNameLabel = "";
@@ -47,10 +46,28 @@ export default class DetailNewsComponent implements OnInit {
     this.authorId = newsData.authorId;
     this.writtenOn = newsData.writtenOn;
 
-    this.meta.updateTag({ name: "title", content: String(this.newsItem.title) });
-    this.meta.updateTag({ property: "og:title", content: String(this.newsItem.title) });
-    this.titleService.setTitle(String(this.newsItem.title));
-    this.shareUrl = GLOBAL.app(`detail-news/${this.newsItem.id}`);
+    this.shareUrl = GLOBAL.app(`home/detail-news/${this.newsItem.id}`);
+    this.seo.setPageTitle(this.newsItem.title);
+    this.seo.setDescription(this.newsItem.summary ?? "");
+    this.seo.setImage(this.newsItem.asset);
+    this.seo.setStructuredData({
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      headline: this.newsItem.title,
+      description: this.newsItem.summary || undefined,
+      image: this.newsItem.asset ? [this.newsItem.asset] : undefined,
+      datePublished: this.newsItem.publishedAt,
+      dateModified: this.newsItem.updatedAt ?? this.newsItem.publishedAt,
+      author: this.newsItem.authorName
+        ? {
+            "@type": "Person",
+            name: this.newsItem.authorName,
+            url: this.newsItem.authorId ? GLOBAL.app(`home/detail-member/${this.newsItem.authorId}`) : undefined,
+          }
+        : undefined,
+      publisher: { "@type": "ResearchOrganization", name: "GMCAN", logo: GLOBAL.app("img/gmcan.jpg") },
+      mainEntityOfPage: this.shareUrl,
+    });
     const origin = parsePublicOrigin(this.route);
     const originInfo = getPublicOriginInfo(origin);
     this.previouslink = originInfo.route;

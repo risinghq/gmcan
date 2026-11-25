@@ -19,6 +19,8 @@ import { firstValueFrom } from "rxjs";
 
 import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
+const HOME_PUBLICATIONS = 5;
+
 @Injectable({ providedIn: "root" })
 export class HomeDataService {
   private readonly groupService = inject(GroupService);
@@ -32,22 +34,24 @@ export class HomeDataService {
   private readonly session = inject(SessionService);
 
   async load(): Promise<HomeViewModel> {
-    const [group, publicacionesRaw, proyectosRaw, newsRaw, lineasRaw, metodosRaw, miembrosRaw] = await Promise.all([
-      firstValueFrom(this.groupService.getGroup()),
-      firstValueFrom(this.publicationService.listPublications()),
-      firstValueFrom(this.projectService.listProjects()),
-      firstValueFrom(
-        this.newsService.listNews({
-          sortBy: "publishedAt",
-          sortOrder: "desc",
-          page: 1,
-          pageSize: 6,
-        }),
-      ),
-      firstValueFrom(this.researchLinesService.list()),
-      firstValueFrom(this.methodsService.list()),
-      firstValueFrom(this.memberService.listMembers()),
-    ]);
+    const [{ group, aboutUs }, publicacionesRaw, counts, proyectosRaw, newsRaw, lineasRaw, metodosRaw, miembrosRaw] =
+      await Promise.all([
+        this.loadGroup(),
+        firstValueFrom(this.publicationService.listPublications({ limit: HOME_PUBLICATIONS })),
+        firstValueFrom(this.publicationService.countPublications()),
+        firstValueFrom(this.projectService.listProjects()),
+        firstValueFrom(
+          this.newsService.listNews({
+            sortBy: "publishedAt",
+            sortOrder: "desc",
+            page: 1,
+            pageSize: 6,
+          }),
+        ),
+        firstValueFrom(this.researchLinesService.list()),
+        firstValueFrom(this.methodsService.list()),
+        firstValueFrom(this.memberService.listMembers()),
+      ]);
 
     const lineasInvestigacion = Array.isArray(lineasRaw) ? (lineasRaw as ResearchLine[]) : [];
     const metodos = Array.isArray(metodosRaw) ? (metodosRaw as Method[]) : [];
@@ -58,20 +62,12 @@ export class HomeDataService {
     const proyectosSafe = Array.isArray(proyectosRaw) ? (proyectosRaw as ProjectWithMembers[]) : [];
     const newsSafe = Array.isArray(newsRaw?.items) ? (newsRaw.items as PublicNewsListItem[]) : [];
 
-    const aboutUs = group?.id ? await this.loadAboutUs(group.id) : [];
-
     const publicaciones = this.enrichPublicaciones(publicacionesSafe);
     const proyectos = this.enrichProyectos(
       proyectosSafe.filter((p) => !p.endDate),
       lineasInvestigacion,
     );
     const newsItems = this.enrichNews(newsSafe);
-
-    const orderedPublicaciones = publicaciones.toSorted((a, b) => {
-      const left = new Date(a.publishedAt ?? "").getTime();
-      const right = new Date(b.publishedAt ?? "").getTime();
-      return right - left;
-    });
 
     const orderedProyectos = proyectos.toSorted((a, b) => {
       const left = new Date(a.startDate ?? "").getTime();
@@ -87,7 +83,7 @@ export class HomeDataService {
 
     return {
       info: group,
-      publicaciones: orderedPublicaciones,
+      publicaciones,
       proyectos: orderedProyectos,
       newsItems: orderedNews,
       featuredNews: orderedNews[0] ?? null,
@@ -96,10 +92,15 @@ export class HomeDataService {
       metodos,
       miembros,
       aboutUs,
-      articulos: orderedPublicaciones.filter((p) => p.kindCode === "journal_article").length,
-      tesis: orderedPublicaciones.filter((p) => p.kindCode === "thesis").length,
-      resumenes: orderedPublicaciones.filter((p) => p.kindCode === "conference_paper").length,
+      articulos: counts.journal_article,
+      tesis: counts.thesis,
+      resumenes: counts.conference_paper,
     };
+  }
+
+  private async loadGroup() {
+    const group = await firstValueFrom(this.groupService.getGroup());
+    return { group, aboutUs: group?.id ? await this.loadAboutUs(group.id) : [] };
   }
 
   private async loadAboutUs(groupId: number): Promise<string[]> {

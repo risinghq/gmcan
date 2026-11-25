@@ -34,6 +34,7 @@ import PublicProjectsRoutes from "./routes/public/content/projects.js";
 import PublicPublicationsRoutes from "./routes/public/content/publications.js";
 import PublicResearchLinesRoutes from "./routes/public/content/research-lines.js";
 import PublicSearchRoutes from "./routes/public/content/search.js";
+import PublicSitemapRoutes from "./routes/public/content/sitemap.js";
 import PublicSoftwareRoutes from "./routes/public/content/software.js";
 import { createEmailRouter } from "./routes/public/operational/email.js";
 
@@ -68,6 +69,7 @@ publicContentApi.route("/equipment", PublicEquipmentRoutes);
 publicContentApi.route("/group", PublicGroupRoutes);
 publicContentApi.route("/lookup", PublicLookupRoutes);
 publicContentApi.route("/search", PublicSearchRoutes);
+publicContentApi.route("/sitemap", PublicSitemapRoutes);
 publicContentApi.route("/assets", PublicAssetsRoutes);
 
 // The session middleware exempts only login and logout under /admin/*.

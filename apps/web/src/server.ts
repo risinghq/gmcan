@@ -1,7 +1,9 @@
 import { AngularAppEngine, createRequestHandler } from "@angular/ssr";
 
-import { cachedApiFetch, type ServiceBinding, type WorkerContext } from "./api-cache";
+import { resolveSiteLanguage } from "./app/shared/site-language";
+import { cachedApiFetch, cachedPageFetch, type ServiceBinding, type WorkerContext } from "./edge-cache";
 import { applyRuntimeConfig, currentRuntimeConfig } from "./runtime-config";
+import { robotsTxt, sitemapResponse } from "./seo-files";
 
 interface WebEnv {
   /** The API worker served under /api and /admin so the browser stays on one origin. */
@@ -21,6 +23,10 @@ function isApiPath(pathname: string): boolean {
   return pathname.startsWith("/api/") || pathname.startsWith("/admin/");
 }
 
+function edgeCache(): Cache {
+  return (caches as unknown as { default: Cache }).default;
+}
+
 /** Routes SSR calls for the site's origin to the API worker's service binding. */
 function routeApiCalls(env: WebEnv, origin: string): void {
   const api = env.API;
@@ -36,6 +42,16 @@ function routeApiCalls(env: WebEnv, origin: string): void {
   };
 }
 
+/** Browsers revalidate pages on every visit; the colo's copy is what keeps them fast. */
+async function renderPage(request: Request, env: WebEnv): Promise<Response> {
+  const rendered = await engine.handle(request);
+  if (!rendered) return env.ASSETS ? env.ASSETS.fetch(request) : new Response("Not found", { status: 404 });
+  if (rendered.headers.has("Cache-Control")) return rendered;
+  const response = new Response(rendered.body, rendered);
+  response.headers.set("Cache-Control", "no-cache");
+  return response;
+}
+
 async function handle(request: Request, env: WebEnv = {}, ctx?: WorkerContext): Promise<Response> {
   const url = new URL(request.url);
   const origin = env.APP_URL ?? url.origin;
@@ -44,14 +60,24 @@ async function handle(request: Request, env: WebEnv = {}, ctx?: WorkerContext): 
   if (url.pathname === "/config.json") {
     return Response.json(currentRuntimeConfig(), { headers: { "Cache-Control": "no-store" } });
   }
-  if (env.API && isApiPath(url.pathname)) {
-    return cachedApiFetch(request, env.API, (caches as unknown as { default: Cache }).default, ctx);
+  if (url.pathname === "/robots.txt") return robotsTxt(origin);
+
+  const api = env.API;
+  if (api && url.pathname === "/sitemap.xml") {
+    return sitemapResponse(origin, () =>
+      cachedApiFetch(new Request(`${url.origin}/api/sitemap`), api, edgeCache(), ctx),
+    );
   }
+  if (api && isApiPath(url.pathname)) return cachedApiFetch(request, api, edgeCache(), ctx);
 
   routeApiCalls(env, origin);
-  const response = await engine.handle(request);
-  if (response) return response;
-  return env.ASSETS ? env.ASSETS.fetch(request) : new Response("Not found", { status: 404 });
+  const language = resolveSiteLanguage({
+    url: request.url,
+    cookie: request.headers.get("Cookie"),
+    acceptLanguage: request.headers.get("Accept-Language"),
+  });
+  if (!api) return renderPage(request, env);
+  return cachedPageFetch(request, language, () => renderPage(request, env), edgeCache(), ctx);
 }
 
 export const reqHandler = createRequestHandler((request) => handle(request));

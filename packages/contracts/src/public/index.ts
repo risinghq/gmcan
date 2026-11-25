@@ -5,3 +5,4 @@ export * from "./news.js";
 export * from "./project.js";
 export * from "./publication.js";
 export * from "./search.js";
+export * from "./sitemap.js";

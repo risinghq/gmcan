@@ -1038,3 +1038,24 @@ circle {
 .mid-width {
   width: 49%;
 }
+
+@media (max-width: 959.98px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+@media (min-width: 960px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+@media (max-width: 1049.98px) {
+  .hide-mobile-nav {
+    display: none !important;
+  }
+}
+@media (min-width: 1050px) {
+  .hide-desktop-nav {
+    display: none !important;
+  }
+}

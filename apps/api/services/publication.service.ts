@@ -6,7 +6,7 @@ import type {
   PublicationSubtypeWrite,
   PublicationWrite,
 } from "@gmcan/contracts/admin";
-import type { PublicationAuthor, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
+import type { PublicationAuthor, PublicationCounts, PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 import type { RawBuilder } from "kysely";
 
 import { atomic, db, insertedId, lastInsertId, queryInChunks } from "../db/client.js";
@@ -26,6 +26,8 @@ export interface PublicPublicationFilter {
   memberId?: number;
   /** Matches the title or abstract in the requested locale. */
   q?: string;
+  /** Keeps only the most recent publications. */
+  limit?: number;
 }
 
 export interface AdminPublicationFilter {
@@ -267,7 +269,9 @@ export async function listPublications(
       .where("publication_author.memberId", "=", filter.memberId);
   }
 
-  const publications = await query.orderBy("publication.publishedAt", "desc").execute();
+  query = query.orderBy("publication.publishedAt", "desc").orderBy("publication.id", "desc");
+  if (filter.limit) query = query.limit(filter.limit);
+  const publications = await query.execute();
 
   if (publications.length === 0) return [];
   const ids = publications.map((p) => p.id);
@@ -295,6 +299,17 @@ export async function listPublications(
       authors: authorsById.get(row.id) ?? [],
     } satisfies PublicPublicationWithAuthors;
   });
+}
+
+export async function countPublicationsByKind(): Promise<PublicationCounts> {
+  const rows = await db
+    .selectFrom("publication")
+    .select(["kindCode", (eb) => eb.fn.countAll<number>().as("count")])
+    .groupBy("kindCode")
+    .execute();
+  const counts: PublicationCounts = { journal_article: 0, conference_paper: 0, thesis: 0 };
+  for (const row of rows) counts[row.kindCode] = Number(row.count);
+  return counts;
 }
 
 export async function listAdminPublications(

@@ -3,14 +3,15 @@ import { Component, OnInit, computed, effect, inject, ChangeDetectionStrategy } 
 import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Title } from "@angular/platform-browser";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { getPublicOriginInfo, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
+import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
+import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel } from "@app/shared/utils/date";
 import type { PublicMember, PublicPublication } from "@gmcan/contracts/public";
@@ -59,7 +60,7 @@ export default class DetailMemberComponent implements OnInit {
   private readonly lookup = inject(LookupService);
   private readonly session = inject(SessionService);
   private readonly browser = inject(BrowserService);
-  private readonly titleService = inject(Title);
+  private readonly seo = inject(SeoService);
 
   private readonly memberId = toSignal(this.route.paramMap.pipe(map((params) => Number(params.get("id")))));
 
@@ -121,7 +122,20 @@ export default class DetailMemberComponent implements OnInit {
   constructor() {
     effect(() => {
       const m = this.member();
-      if (m) this.titleService.setTitle("GMCAN | " + m.firstName + " " + m.lastName);
+      if (!m) return;
+      const name = [m.firstName, m.lastName, m.maternalName].filter(Boolean).join(" ");
+      this.seo.setPageTitle("GMCAN | " + name);
+      if (m.bio) this.seo.setDescription(m.bio);
+      this.seo.setImage(m.photoUrl);
+      this.seo.setStructuredData({
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name,
+        image: m.photoUrl || undefined,
+        jobTitle: m.tipoMiembro || undefined,
+        description: m.bio || undefined,
+        affiliation: { "@type": "ResearchOrganization", name: "GMCAN", url: GLOBAL.appUrl },
+      });
     });
   }
 

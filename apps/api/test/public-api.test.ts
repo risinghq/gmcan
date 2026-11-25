@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 
-import { GlobalSearchResultsSchema } from "@gmcan/contracts/public";
+import { GlobalSearchResultsSchema, PublicationCountsSchema, SitemapSchema } from "@gmcan/contracts/public";
 
 import { app } from "../app.js";
 import { db } from "../db/client.js";
@@ -123,6 +123,36 @@ describe("public news", () => {
   test("global search does not find unpublished items", async () => {
     const { body } = await getJson("/api/search?q=Noticia&types=news");
     expect(body.news.map((item: { id: number }) => item.id)).toEqual([newsIds.published]);
+  });
+});
+
+describe("sitemap", () => {
+  test("lists published news and public members only", async () => {
+    await insertMember({ dni: "20000002", email: "", isActive: 1 });
+    await insertMember({ dni: "20000003", email: "luis@example.test", isActive: 0 });
+
+    const { status, body } = await getJson("/api/sitemap");
+
+    expect(status).toBe(200);
+    expect(SitemapSchema.parse(body)).toEqual({
+      news: [{ id: newsIds.published, updatedAt: expect.any(String) }],
+      members: [{ id: memberId, updatedAt: "2026-01-01" }],
+    });
+  });
+});
+
+describe("public publications", () => {
+  test("a limited list keeps the most recent, and counts cover every kind", async () => {
+    await insertArticle();
+    await insertArticle();
+
+    const { body: recent } = await getJson("/api/publications?limit=1");
+    expect(recent).toHaveLength(1);
+    expect(recent[0].authors).toHaveLength(1);
+
+    const { status, body } = await getJson("/api/publications/counts");
+    expect(status).toBe(200);
+    expect(PublicationCountsSchema.parse(body)).toEqual({ journal_article: 2, conference_paper: 0, thesis: 0 });
   });
 });
 
