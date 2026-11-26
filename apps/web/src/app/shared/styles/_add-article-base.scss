@@ -40,11 +40,6 @@
   margin-right: 32px;
 }
 
-::ng-deep .mat-snack-bar-container {
-  margin-top: 65px !important;
-  margin-right: 32px !important;
-}
-
 .green-text {
   cursor: pointer;
   font-size: 15px;
@@ -72,19 +67,6 @@
   right: 0;
   width: 100%;
   height: 100;
-}
-
-::ng-deep .mat-form-field-underline {
-  display: none;
-}
-
-::ng-deep .mat-form-field-infix {
-  border-top: none;
-}
-
-::ng-deep .mat-select-value {
-  min-width: 100% !important;
-  width: 100% !important;
 }
 
 .news-img {
@@ -137,13 +119,6 @@
 
 ::ng-deep .mat-calendar-body-selected {
   background-color: var(--deep-green);
-}
-
-::ng-deep .mat-select-value,
-.mat-select {
-  min-width: 100% !important;
-  width: 100% !important;
-  color: unset !important;
 }
 
 .text-subtitle {
@@ -230,15 +205,6 @@
 
 .mr-12 {
   margin-right: 12px;
-}
-
-::ng-deep .mat-form-field-label {
-  @extend .plex-sans;
-  font-size: 15px !important;
-  top: unset !important;
-  margin-top: 2px !important;
-  color: var(--muted-text);
-  opacity: 0.4 !important;
 }
 
 ::ng-deep .custom-place {

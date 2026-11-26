@@ -67,8 +67,8 @@
   border-radius: 4px;
   border: solid 2px #000000;
   cursor: pointer;
-  background-color: unset !important;
-  color: black !important;
+  background-color: unset;
+  color: black;
 }
 
 .btn-grey {
@@ -76,16 +76,16 @@
   width: 100%;
   border-radius: 4px;
   border: solid 2px var(--muted-accent);
-  color: var(--muted-accent) !important;
-  background-color: white !important;
+  color: var(--muted-accent);
+  background-color: white;
 }
 
 .btn-grey > .link {
-  color: var(--muted-accent) !important;
+  color: var(--muted-accent);
 }
 
 .btn-grey > .link::before {
-  width: unset !important;
+  width: unset;
 }
 
 .link {

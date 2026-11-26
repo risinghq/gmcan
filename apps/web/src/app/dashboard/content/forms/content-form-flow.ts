@@ -47,6 +47,11 @@ export class ContentFormFlow {
   }
 
   notify(message: string): void {
-    this.snackBar.open(message, undefined, { duration: 2000, horizontalPosition: "right", verticalPosition: "top" });
+    this.snackBar.open(message, undefined, {
+      duration: 2000,
+      horizontalPosition: "right",
+      verticalPosition: "top",
+      panelClass: "below-toolbar",
+    });
   }
 }
