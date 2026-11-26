@@ -14,7 +14,9 @@
       <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
         <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
         <input
+          type="search"
           class="input-search-text"
+          [attr.aria-label]="language().search"
           placeholder="{{ language().search }}"
           #nombre
           name="nombre"

@@ -127,7 +127,7 @@
         [attr.aria-expanded]="inputExpand"
         (click)="expandInput()"
       >
-        <mat-icon class="icon-search-top">search</mat-icon>
+        <mat-icon class="icon-search-top" aria-hidden="true">search</mat-icon>
       </button>
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
@@ -143,10 +143,12 @@
               [attr.aria-label]="language.searchMobile"
               (click)="searchGlobal(nombre.value)"
             >
-              <mat-icon class="icon-search-toolbar">search</mat-icon>
+              <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
             </button>
             <input
+              type="search"
               class="input-search-text"
+              [attr.aria-label]="language.search"
               placeholder="{{ language.search }}"
               #nombre
               autocomplete="off"

@@ -3,11 +3,13 @@
     <div class="flex-news mb-16">
       <div class="search-news">
         <input
+          type="search"
           class="input-search-text"
+          aria-label="Buscar resúmen por título, fecha de publicación o evento"
           (keyup)="abstracts.filterFrom($event)"
           placeholder="Buscar resúmen por título, fecha de publicación o evento"
         />
-        <mat-icon class="icon-search-toolbar">search</mat-icon>
+        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
       </div>
       <button type="button" class="center btn-black" (click)="addResumen()">
         <span class="link">Agregar resumen</span>
@@ -71,11 +73,13 @@
     <div class="flex-news mb-16">
       <div class="search-news">
         <input
+          type="search"
           class="input-search-text"
+          aria-label="Buscar evento por nombre, país o ciudad"
           (keyup)="events.filterFrom($event)"
           placeholder="Buscar evento por nombre, país o ciudad"
         />
-        <mat-icon class="icon-search-toolbar">search</mat-icon>
+        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
       </div>
       <button type="button" class="center btn-black" (click)="addEvento()">
         <span class="link">Agregar evento</span>

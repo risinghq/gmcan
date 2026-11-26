@@ -4,11 +4,13 @@
       <div class="flex-news mb-16">
         <div class="search-news">
           <input
+            type="search"
             class="input-search-text"
+            aria-label="Buscar proyecto por título, fecha, código"
             (keyup)="table.filterFrom($event)"
             placeholder="Buscar proyecto por título, fecha, código"
           />
-          <mat-icon class="icon-search-toolbar">search</mat-icon>
+          <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
         </div>
         <button type="button" class="center btn-black" (click)="addProject()">
           <span class="link">Agregar proyecto</span>
@@ -62,8 +64,14 @@
     <mat-tab label="Fuentes de financiamiento">
       <div class="flex-news mb-16">
         <div class="search-news">
-          <input class="input-search-text" (keyup)="onFundingSearch($event)" placeholder="Buscar fuente por nombre" />
-          <mat-icon class="icon-search-toolbar">search</mat-icon>
+          <input
+            type="search"
+            class="input-search-text"
+            aria-label="Buscar fuente por nombre"
+            (keyup)="onFundingSearch($event)"
+            placeholder="Buscar fuente por nombre"
+          />
+          <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
         </div>
       </div>
       @if (filteredFundingSources().length > 0) {
@@ -86,11 +94,13 @@
     <div class="flex-news mb-16">
       <div class="search-news">
         <input
+          type="search"
           class="input-search-text"
+          aria-label="Buscar proyecto por título, fecha, código"
           (keyup)="table.filterFrom($event)"
           placeholder="Buscar proyecto por título, fecha, código"
         />
-        <mat-icon class="icon-search-toolbar">search</mat-icon>
+        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
       </div>
     </div>
     <table mat-table [dataSource]="table.dataSource" [hidden]="table.notFound()" matSort>
