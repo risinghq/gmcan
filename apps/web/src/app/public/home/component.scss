@@ -242,9 +242,9 @@ $thetransition:
   color: black;
 }
 
-.align-center {
-  margin-left: auto !important;
-  margin-right: auto !important;
+.btn-black.align-center {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .mt-services {
@@ -288,6 +288,14 @@ $thetransition:
 .publication-list {
   border-radius: 4px;
   background-color: #ffffff;
+
+  > :first-child {
+    padding-top: unset;
+  }
+
+  > :last-child {
+    border-bottom: none;
+  }
 }
 
 .mt-8 {
@@ -307,7 +315,7 @@ $thetransition:
   line-height: 1;
   text-align: center;
   letter-spacing: 0.3px;
-  color: #006400 !important;
+  color: #006400;
 }
 
 .know-more-text {
@@ -325,14 +333,15 @@ $thetransition:
 
 .btn-knowmore {
   justify-content: center;
+  gap: 16px;
+
+  > .btn-black {
+    margin-inline: 0;
+  }
   margin-top: 12px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
-}
-.btn-nm {
-  margin-left: 0px !important;
-  margin-right: 0px !important;
 }
 
 @media (min-width: 961px) {
@@ -380,10 +389,10 @@ $thetransition:
     margin-bottom: 32px;
   }
   .primer-box {
-    padding-bottom: 120px !important;
+    padding-bottom: 120px;
   }
   .segundo-box {
-    padding-top: unset !important;
+    padding-top: unset;
   }
   .lines-investigation {
     margin-bottom: 48px;
@@ -484,8 +493,8 @@ $thetransition:
     padding-top: 16px;
   }
   .nopd {
-    padding-top: unset !important;
-    padding-bottom: unset !important;
+    padding-top: unset;
+    padding-bottom: unset;
   }
   .mb-news {
     margin-bottom: 48px;
@@ -507,7 +516,7 @@ $thetransition:
     padding-bottom: 2px;
   }
   .segundo-box {
-    padding-top: 24px !important;
+    padding-top: 24px;
   }
   .numbers-div {
     display: block;
@@ -623,8 +632,8 @@ $thetransition:
     margin-top: 8px;
   }
   .nopd {
-    padding-left: unset !important;
-    padding-right: unset !important;
+    padding-left: unset;
+    padding-right: unset;
   }
 }
 
@@ -660,10 +669,6 @@ $thetransition:
   transform: scale(1.05);
 }
 
-.notoppd {
-  padding-top: unset !important;
-}
-
 .btn-text2 {
   line-height: 1px;
   font-size: 15px;
@@ -672,7 +677,7 @@ $thetransition:
   color: #000000;
   @extend .plex-sans;
   font-weight: bold;
-  text-decoration: unset !important;
+  text-decoration: unset;
   position: relative;
   &:before {
     content: "";

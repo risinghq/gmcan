@@ -18,7 +18,7 @@
   font-weight: 500;
   line-height: 1.54;
   letter-spacing: 0.3px;
-  color: var(--muted-accent) !important;
+  color: var(--muted-accent);
 }
 .member-detail-link-active:hover {
   text-decoration: underline;
@@ -54,8 +54,8 @@
 
 .back-icon {
   margin-right: 8px;
-  width: max-content !important;
-  height: max-content !important;
+  width: max-content;
+  height: max-content;
   color: var(--muted-accent);
 }
 
@@ -237,49 +237,6 @@
   }
   .flex-detail {
     text-align: center;
-    display: block !important;
+    display: block;
   }
-}
-
-::ng-deep .pagination {
-  margin-top: 22px;
-}
-::ng-deep .page-item {
-  height: max-content;
-  border-radius: 2px;
-  margin-left: 8px;
-  @extend .plex-sans;
-  letter-spacing: 0.3px;
-  border: solid 1px #e5e5e5;
-  background-color: #ffffff;
-  color: var(--muted-text);
-}
-::ng-deep .page-link {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-  color: var(--muted-text);
-  font-size: 20px;
-  line-height: 1.6;
-  padding-left: unset !important;
-  padding-bottom: unset !important;
-  padding-top: unset !important;
-  padding-right: unset !important;
-  height: 35px;
-  width: 35px;
-  text-align: center;
-}
-.pag-arrow {
-  color: var(--muted-text);
-  font-size: 32px;
-  height: inherit;
-  width: inherit;
-}
-::ng-deep .page-item.active .page-link {
-  color: #ffffff !important;
-  background-color: #000000 !important;
-  border: solid 1px #e5e5e5 !important;
-}
-
-::ng-deep .page-link:hover {
-  color: black !important;
 }

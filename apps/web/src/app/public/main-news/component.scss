@@ -1,5 +1,5 @@
 ::placeholder {
-  color: #30393a !important;
+  color: #30393a;
 }
 
 .plex-serif {
@@ -29,7 +29,7 @@
   font-weight: 500;
   line-height: 1.54;
   letter-spacing: 0.3px;
-  color: var(--muted-accent) !important;
+  color: var(--muted-accent);
 }
 .main-news-link-active:hover {
   text-decoration: underline;
@@ -91,9 +91,9 @@
 
 .img-div-zoom {
   min-width: 132px;
-  max-width: 132px !important;
-  max-height: 116px !important;
-  height: 116px !important;
+  max-width: 132px;
+  max-height: 116px;
+  height: 116px;
 }
 
 .img-hover-zoom,
@@ -171,15 +171,15 @@
     font-size: 30px;
   }
   .news {
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
   .news-img {
-    width: 132px !important;
+    width: 132px;
     height: 116px;
   }
   .news-text-2 {
-    font-size: 20px !important;
+    font-size: 20px;
   }
   ::ng-deep .pagination {
     justify-content: right;
@@ -197,7 +197,7 @@
     font-size: 25px;
   }
   .news-type {
-    font-size: 15px !important;
+    font-size: 15px;
   }
 }
 
@@ -232,7 +232,7 @@
     display: block;
   }
   .pl-24 {
-    padding: unset !important;
+    padding: unset;
   }
   ::ng-deep .pagination {
     justify-content: center;
@@ -253,47 +253,4 @@
   letter-spacing: 0.3px;
   color: #000000;
   padding: unset;
-}
-
-::ng-deep .pagination {
-  margin-top: 22px;
-}
-::ng-deep .page-item {
-  height: max-content;
-  border-radius: 2px;
-  margin-left: 8px;
-  @extend .plex-sans;
-  letter-spacing: 0.3px;
-  border: solid 1px #e5e5e5;
-  background-color: #ffffff;
-  color: var(--muted-text);
-}
-::ng-deep .page-link {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-  color: var(--muted-text);
-  font-size: 20px;
-  line-height: 1.6;
-  padding-left: unset !important;
-  padding-bottom: unset !important;
-  padding-top: unset !important;
-  padding-right: unset !important;
-  height: 35px;
-  width: 35px;
-  text-align: center;
-}
-.pag-arrow {
-  color: var(--muted-text);
-  font-size: 32px;
-  height: inherit;
-  width: inherit;
-}
-::ng-deep .page-item.active .page-link {
-  color: #ffffff !important;
-  background-color: #000000 !important;
-  border: solid 1px #e5e5e5 !important;
-}
-
-::ng-deep .page-link:hover {
-  color: black !important;
 }

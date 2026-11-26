@@ -101,7 +101,7 @@ figure:hover::before {
   margin-bottom: 16px;
 }
 .other-news-text-2 {
-  font-size: 15px !important;
+  font-size: 15px;
 }
 
 .news-author {
@@ -111,25 +111,25 @@ figure:hover::before {
 
 @media (min-width: 961px) {
   .news-title {
-    margin-top: unset !important;
+    margin-top: unset;
   }
   .img-div-zoom {
     min-width: 70px;
   }
   .card-text-div-3 {
-    padding-bottom: 20px !important;
+    padding-bottom: 20px;
   }
   .news-title {
-    font-size: 25px !important;
+    font-size: 25px;
   }
 
   .other-news {
-    padding-top: 16px !important;
-    padding-bottom: 16px !important;
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
   .other-news-img {
-    width: 70px !important;
-    height: 70px !important;
+    width: 70px;
+    height: 70px;
   }
 
   .card-img-div {

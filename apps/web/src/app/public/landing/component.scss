@@ -28,11 +28,6 @@ $thetransition:
   width: 42px;
   background-color: #000000;
 }
-.search-top-input-compressed {
-  padding: unset !important;
-  width: 0%;
-  display: none;
-}
 .search-top-input-decompressed {
   margin-left: auto;
   width: inherit;
@@ -45,6 +40,11 @@ $thetransition:
   padding-left: 24px;
   padding-right: 8px;
   transition: width 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.search-top-input-compressed {
+  padding: unset;
+  width: 0%;
+  display: none;
 }
 
 .icon-search-top {
@@ -165,7 +165,7 @@ $thetransition:
   line-height: 1;
   letter-spacing: 0.3px;
   color: #000000;
-  margin-right: unset !important;
+  margin-right: unset;
 }
 
 .login-icon {
@@ -228,7 +228,7 @@ $thetransition:
 }
 
 .link5.active {
-  border-bottom: unset !important;
+  border-bottom: unset;
 }
 
 .search-top {
@@ -239,8 +239,7 @@ $thetransition:
 
 mat-sidenav {
   background-color: rgba(255, 255, 255, 0.98);
-  border-top-left-radius: 4px !important;
-  border-bottom-left-radius: 4px !important;
+  --mat-sidenav-container-shape: 4px;
 }
 
 .link-box,
@@ -258,7 +257,6 @@ mat-sidenav {
   letter-spacing: 0.3px;
   color: #000000;
   margin-right: 0;
-  padding-bottom: 0px !important;
 }
 
 .footer-icon-div {
@@ -281,7 +279,7 @@ mat-sidenav {
   color: white;
   @extend .plex-sans;
   font-weight: normal;
-  text-decoration: unset !important;
+  text-decoration: unset;
   position: relative;
   align-self: self-end;
   &:before {
@@ -315,76 +313,76 @@ mat-sidenav {
 }
 
 @media (min-width: 1025px) {
-  .active-language {
-    color: var(--deep-green) !important;
-    background-color: unset !important;
-    border: 1px solid #006400 !important;
-  }
   .link {
     padding-bottom: 2px;
   }
   .link-box-text {
-    padding-bottom: unset !important;
+    padding-bottom: 0;
   }
   .logo-nav {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    height: max-content !important;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    height: max-content;
   }
   .green-text,
   .language {
-    font-size: 18px !important;
+    font-size: 18px;
   }
   .footer-title {
-    font-size: 25px !important;
+    font-size: 25px;
   }
   .footer-text {
-    margin-left: 16px !important;
+    margin-left: 16px;
   }
   .footer-title {
-    margin-bottom: 32px !important;
+    margin-bottom: 32px;
   }
   .footer-icon-div {
-    height: 40px !important;
-    width: 40px !important;
-    padding: 8px !important;
+    height: 40px;
+    width: 40px;
+    padding: 8px;
   }
   .footer-icon {
-    vertical-align: unset !important;
-    height: 24px !important;
+    vertical-align: unset;
+    height: 24px;
   }
   .logo-footer {
-    height: 88px !important;
+    height: 88px;
   }
   .logo-footer-2 {
-    margin-left: 52px !important;
+    margin-left: 52px;
   }
   .footer-logo {
-    margin-left: unset !important;
-    margin-right: unset !important;
+    margin-left: unset;
+    margin-right: unset;
   }
   .active {
-    border-bottom: 1px solid #30393a !important;
+    border-bottom: 1px solid #30393a;
   }
   .login-div {
-    margin-top: unset !important;
-    padding-bottom: unset !important;
-    border-bottom: unset !important;
-    margin-bottom: unset !important;
+    margin-top: unset;
+    padding-bottom: unset;
+    border-bottom: unset;
+    margin-bottom: unset;
   }
   .link-box,
   .link-box2 {
-    padding: 4px 6px !important;
+    padding: 4px 6px;
   }
   .languages {
-    margin-left: 16px !important;
+    margin-left: 16px;
   }
   .language {
-    font-size: 15px !important;
+    font-size: 15px;
     border: 1px solid #b5b5b5;
     margin-right: 4px;
     color: var(--muted-text);
-    padding: 4px !important;
+    padding: 4px;
+  }
+  .active-language {
+    color: var(--deep-green);
+    background-color: unset;
+    border: 1px solid #006400;
   }
   .img-logo-white {
     height: 40px;
@@ -402,6 +400,9 @@ mat-sidenav {
   }
   .link {
     padding-bottom: 1px;
+  }
+  .link-box-text {
+    padding-bottom: 0;
   }
   .logo-nav {
     padding-top: 0px;
@@ -557,7 +558,7 @@ mat-sidenav {
     height: 14px;
   }
   .link-logo-div {
-    padding-right: unset !important;
+    padding-right: unset;
   }
 }
 
@@ -606,7 +607,7 @@ mat-sidenav {
     padding-inline: var(--page-gutter);
   }
   .logo-modal {
-    height: 26px !important;
+    height: 26px;
   }
   .footerdiflex {
     display: block;
@@ -619,6 +620,6 @@ mat-sidenav {
     height: 14px;
   }
   .link-logo-div {
-    padding-right: unset !important;
+    padding-right: unset;
   }
 }

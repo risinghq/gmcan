@@ -94,7 +94,7 @@ $thetransition:
   color: #000000;
   @extend .plex-sans;
   font-weight: bold;
-  text-decoration: unset !important;
+  text-decoration: unset;
   position: relative;
   &:before {
     content: "";

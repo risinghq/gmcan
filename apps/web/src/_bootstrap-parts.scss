@@ -1,4 +1,12 @@
 @import "bootstrap/scss/functions";
+$pagination-padding-y: 0;
+$pagination-padding-x: 0;
+$pagination-font-size: 20px;
+$pagination-color: var(--muted-text);
+$pagination-hover-color: #000000;
+$pagination-active-color: #ffffff;
+$pagination-active-bg: #000000;
+$pagination-active-border-color: #e5e5e5;
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
 @import "bootstrap/scss/maps";

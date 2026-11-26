@@ -20,7 +20,7 @@
   font-weight: 500;
   line-height: 1.54;
   letter-spacing: 0.3px;
-  color: var(--muted-accent) !important;
+  color: var(--muted-accent);
 }
 .global-link-active:hover {
   text-decoration: underline;
@@ -47,8 +47,8 @@
 
 .back-icon {
   margin-right: 8px;
-  width: max-content !important;
-  height: max-content !important;
+  width: max-content;
+  height: max-content;
   color: var(--muted-accent);
 }
 
