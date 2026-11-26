@@ -301,22 +301,3 @@
 ::ng-deep .page-link:hover {
   color: black !important;
 }
-
-::ng-deep .mat-tab-label {
-  width: 100% !important;
-  height: 32px !important;
-}
-
-::ng-deep .mat-ink-bar {
-  background-color: #000000 !important;
-}
-
-::ng-deep .mat-tab-body-content {
-  overflow: hidden !important;
-}
-
-::ng-deep .mat-tab-label-active .-label-content,
-::ng-deep .mat-tab-label-active {
-  color: black;
-  opacity: 1 !important;
-}

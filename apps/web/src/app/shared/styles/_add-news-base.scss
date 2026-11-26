@@ -61,19 +61,6 @@
   height: 100;
 }
 
-::ng-deep .mat-form-field-underline {
-  display: none;
-}
-
-::ng-deep .mat-form-field-infix {
-  border-top: none;
-}
-
-::ng-deep .mat-select-value {
-  min-width: 100% !important;
-  width: 100% !important;
-}
-
 .news-img {
   min-width: 316px;
   height: 198px;
@@ -132,16 +119,4 @@
 
 ::ng-deep .mat-calendar-body-selected {
   background-color: var(--deep-green);
-}
-
-::ng-deep .mat-select-value,
-.mat-select {
-  min-width: 100% !important;
-  width: 100% !important;
-  color: unset !important;
-}
-
-::ng-deep .mat-snack-bar-container {
-  margin-top: 65px !important;
-  margin-right: 32px !important;
 }

@@ -27,8 +27,14 @@
   </mat-drawer>
   <div class="example-sidenav-content">
     <div class="flex-news dashboard-tool">
-      <button mat-icon-button class="middle btn-sidemenu" (click)="drawer.toggle()">
-        <mat-icon>menu</mat-icon>
+      <button
+        mat-icon-button
+        class="middle btn-sidemenu"
+        aria-label="Menú lateral"
+        [attr.aria-expanded]="drawer.opened"
+        (click)="drawer.toggle()"
+      >
+        <mat-icon aria-hidden="true">menu</mat-icon>
       </button>
       <div class="flex-news">
         <div class="tool-text middle">{{ dashboardTitle() }}</div>
