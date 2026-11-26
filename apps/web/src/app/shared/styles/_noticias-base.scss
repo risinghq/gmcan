@@ -1,50 +1,27 @@
-::ng-deep .mat-tab-header {
-  width: max-content;
-}
-
-::ng-deep .mat-tab-body {
-  border-radius: 4px;
+.noticias-div,
+.miembros-card,
+.tab-mat {
+  display: block;
+  margin: 32px;
   padding: 24px;
+  overflow-x: auto;
+  border-radius: 4px;
   background-color: #ffffff;
 }
 
-.noticias-div {
-  padding: 24px 32px;
-  min-width: 1038px;
+.mat-mdc-cell {
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
-::ng-deep .mat-tab-label {
-  height: 26px !important;
-}
-
-::ng-deep .mat-ink-bar {
-  background-color: #000000 !important;
-}
-
-::ng-deep .mat-tab-label-active .mat-tab-label-content,
-::ng-deep .mat-tab-label-active {
-  color: black;
-  opacity: 1 !important;
-}
-
-.mat-table {
-  width: 100%;
-  border-radius: 4px;
-  border: solid 1px #e3e3e3;
-}
-
-tr.mat-header-row,
-tr.mat-row {
-  height: 39.5px;
+.clickable-row:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .titulo-list {
   width: 50%;
   letter-spacing: 0.3px;
   color: #000000;
-  padding-right: 8px;
-  padding-top: 8px;
-  padding-bottom: 8px;
 }
 
 .member-img-round {
@@ -56,6 +33,7 @@ tr.mat-row {
   border-radius: 40.5px;
   background-color: #c4c4c4;
 }
+
 .member-img {
   vertical-align: unset;
   background-color: #c4c4c4;
@@ -81,32 +59,6 @@ th {
   color: #a00000;
 }
 
-::ng-deep .mat-form-field-underline {
-  display: none;
-}
-
-::ng-deep .mat-select-value {
-  min-width: 16px;
-  width: unset !important;
-  color: var(--muted-text);
-}
-
-::ng-deep .mat-select {
-  width: max-content;
-}
-
-::ng-deep .mat-paginator-range-label {
-  margin: unset !important;
-}
-
-::ng-deep .mat-paginator-page-size-select {
-  width: 32px !important;
-}
-
-tr:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
 .search-news {
   flex-grow: 1;
   display: inline-flex;
@@ -126,6 +78,7 @@ tr:hover {
   letter-spacing: 0.3px;
   color: var(--muted-text);
 }
+
 .icon-search-toolbar {
   color: var(--deep-green);
   margin-top: auto;
@@ -133,29 +86,12 @@ tr:hover {
 }
 
 .btn-black {
-  cursor: pointer;
-  border-radius: 4px;
   margin-left: 16px;
-  border: solid 2px #000000;
-  padding: 8px;
   line-height: 1;
-  width: max-content;
-  background-color: unset !important;
-  color: black !important;
 }
 
 .link {
   font-size: 15px;
   margin-right: 0;
   font-weight: 600;
-}
-
-.mat-row {
-  cursor: pointer;
-}
-
-.mat-cell {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  padding-right: 14px;
 }
