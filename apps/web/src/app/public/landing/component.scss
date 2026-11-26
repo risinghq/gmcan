@@ -62,7 +62,7 @@ $thetransition:
   border: unset;
   background-color: inherit;
   @extend .plex-sans;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1;
   letter-spacing: 0.3px;
   margin-left: 16px;
@@ -354,7 +354,6 @@ mat-sidenav {
   }
   .active {
     border-bottom: 1px solid #30393a !important;
-    font-weight: bold !important;
   }
   .login-div {
     margin-top: unset !important;
@@ -386,7 +385,6 @@ mat-sidenav {
 @media (max-width: 1025px) {
   .active {
     border-bottom: 2px solid #30393a;
-    font-weight: bold;
   }
   .green-text {
     font-size: 16px;

@@ -74,6 +74,7 @@ $thetransition:
 .counter {
   cursor: pointer;
   font-weight: bold;
+  font-variant-numeric: tabular-nums;
   line-height: 1.25;
   letter-spacing: 0.3px;
 }

@@ -185,7 +185,10 @@
   padding: 8px;
   line-height: 1;
   border: solid 1px #e8e8e8;
-  transition: all 0.3s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
   font-size: 15px;
   letter-spacing: 0.3px;
   color: #000000;
