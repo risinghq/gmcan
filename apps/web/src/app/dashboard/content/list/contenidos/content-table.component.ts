@@ -53,10 +53,12 @@ import { ContentTable } from "./table";
     <table mat-table [dataSource]="list.dataSource" [hidden]="list.notFound()" matSort>
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-        <td mat-cell *matCellDef="let row" (click)="edit(row.id)">{{ row.name }}</td>
+        <td mat-cell *matCellDef="let row">
+          <button type="button" class="row-action">{{ row.name }}</button>
+        </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
-      <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      <tr mat-row class="clickable-row" *matRowDef="let row; columns: columns" (click)="edit(row.id)"></tr>
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="list.notFound()" />
     @if (list.notFound()) {
