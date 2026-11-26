@@ -99,6 +99,16 @@ $thetransition:
   }
 }
 
+:where(input:not(.input-search-text), textarea, .ProseMirror):focus-visible,
+:where(:has(> .input-search-text:focus-visible)) {
+  outline: 2px solid var(--deep-green);
+  outline-offset: 1px;
+}
+
+.input-search-text:focus-visible {
+  outline: none;
+}
+
 mat-progress-bar .mat-progress-bar-buffer {
   background: #e4e8eb;
 }
@@ -126,10 +136,6 @@ mat-progress-bar .mat-progress-bar-fill::after {
 
 .publication-green {
   text-decoration: none !important;
-}
-
-input {
-  outline: unset !important;
 }
 
 .middle {
@@ -1058,7 +1064,6 @@ circle {
 .input-category {
   width: 100%;
   padding: 11px 16px;
-  outline: none;
   border: none;
   line-height: 1;
   background-color: #f4f5f4;
