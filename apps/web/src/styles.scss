@@ -377,6 +377,20 @@ button.forgot {
   text-align: left;
 }
 
+.clickable-row {
+  cursor: pointer;
+}
+
+.row-action {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .tap-target {
   min-width: 44px;
   min-height: 44px;

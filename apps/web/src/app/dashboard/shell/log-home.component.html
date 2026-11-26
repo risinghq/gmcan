@@ -53,28 +53,23 @@
           </div>
         </div>
         <div class="ml-24">
-          <mat-icon
+          <button
+            mat-icon-button
+            type="button"
             class="middle"
+            aria-label="Menú de usuario"
             [matMenuTriggerFor]="menu"
             #menuTrigger="matMenuTrigger"
             (mouseover)="menuTrigger.openMenu()"
-            >arrow_drop_down</mat-icon
           >
+            <mat-icon aria-hidden="true">arrow_drop_down</mat-icon>
+          </button>
           <mat-menu #menu="matMenu" [overlapTrigger]="false">
             <span (mouseleave)="menuTrigger.closeMenu()">
-              <div mat-menu-item [disableRipple]="true">
-                <a class="link" routerLink="/dashboard/perfil"> Mi información </a>
-              </div>
-              <div mat-menu-item [disableRipple]="true">
-                <a
-                  class="link"
-                  (click)="openDialogLogOff()"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                >
-                  Cerrar Sesión
-                </a>
-              </div>
+              <a mat-menu-item class="link" [disableRipple]="true" routerLink="/dashboard/perfil">Mi información</a>
+              <button mat-menu-item type="button" class="link" [disableRipple]="true" (click)="openDialogLogOff()">
+                Cerrar Sesión
+              </button>
             </span>
           </mat-menu>
         </div>
@@ -89,8 +84,8 @@
     Para brindarte una mejor experiencia, recomendamos acceder al administrador desde una computadora de escritorio o
     laptop
   </div>
-  <div (click)="backToTop()" class="auto btn-black-true mb-16">
-    <div class="btn-text">Volver a la página principal</div>
-  </div>
-  <div class="anyway" (click)="enterAnyway()">Ingresar de todos modos</div>
+  <button type="button" class="auto btn-black-true mb-16" (click)="backToTop()">
+    <span class="btn-text">Volver a la página principal</span>
+  </button>
+  <button type="button" class="anyway" (click)="enterAnyway()">Ingresar de todos modos</button>
 </div>

@@ -9,28 +9,28 @@
         />
         <mat-icon class="icon-search-toolbar">search</mat-icon>
       </div>
-      <div class="center btn-black" (click)="addThesis()">
-        <a class="link"> Agregar tesis </a>
-      </div>
+      <button type="button" class="center btn-black" (click)="addThesis()">
+        <span class="link">Agregar tesis</span>
+      </button>
     </div>
     <table mat-table [dataSource]="theses.dataSource" [hidden]="theses.notFound()" matSort #thesesSort="matSort">
       <ng-container matColumnDef="titulo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
-        <td mat-cell *matCellDef="let row" (click)="editThesis(row.id)">
-          {{ row.title }}
+        <td mat-cell *matCellDef="let row">
+          <button type="button" class="row-action">{{ row.title }}</button>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="tipo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
-        <td mat-cell *matCellDef="let row" (click)="editThesis(row.id)">
+        <td mat-cell *matCellDef="let row">
           {{ row.thesisTypeName }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="autores">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor(es)</th>
-        <td mat-cell *matCellDef="let row" (click)="editThesis(row.id)">
+        <td mat-cell *matCellDef="let row">
           @for (autor of row.authors; track autor) {
             <div class="flex-news">
               @if (autor.memberId) {
@@ -46,20 +46,25 @@
 
       <ng-container matColumnDef="universidad">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Universidad</th>
-        <td mat-cell *matCellDef="let row" (click)="editThesis(row.id)">
+        <td mat-cell *matCellDef="let row">
           {{ row.universityName }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="publicacion">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Publicación</th>
-        <td mat-cell *matCellDef="let row" (click)="editThesis(row.id)">
+        <td mat-cell *matCellDef="let row">
           {{ row.fecha }}
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr
+        mat-row
+        class="clickable-row"
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="editThesis(row.id)"
+      ></tr>
     </table>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="theses.notFound()" #thesesPaginator />
@@ -77,9 +82,9 @@
         />
         <mat-icon class="icon-search-toolbar">search</mat-icon>
       </div>
-      <div class="center btn-black" (click)="addUniversidad()">
-        <a class="link"> Agregar universidad </a>
-      </div>
+      <button type="button" class="center btn-black" (click)="addUniversidad()">
+        <span class="link">Agregar universidad</span>
+      </button>
     </div>
     <table
       mat-table
@@ -90,13 +95,18 @@
     >
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
-        <td mat-cell *matCellDef="let row" (click)="editUniversidad(row.id)">
-          {{ row.name }}
+        <td mat-cell *matCellDef="let row">
+          <button type="button" class="row-action">{{ row.name }}</button>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
+      <tr
+        mat-row
+        class="clickable-row"
+        *matRowDef="let row; columns: displayedColumns2"
+        (click)="editUniversidad(row.id)"
+      ></tr>
     </table>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="universities.notFound()" #universitiesPaginator />

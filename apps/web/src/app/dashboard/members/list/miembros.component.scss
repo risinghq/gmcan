@@ -8,6 +8,9 @@
 }
 
 .status-chip {
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
   border-radius: 999px;
   display: inline-block;
   font-size: 12px;
