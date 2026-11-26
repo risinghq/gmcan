@@ -4,6 +4,7 @@ import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
@@ -42,6 +43,7 @@ type PublicationDisplay = PublicPublication & {
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    AvatarComponent,
     MatProgressSpinner,
     MatIcon,
     NgbPagination,

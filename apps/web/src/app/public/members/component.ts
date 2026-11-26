@@ -3,6 +3,7 @@ import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { RouterLink } from "@angular/router";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -18,7 +19,7 @@ type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [RouterLink, MatIcon, MatProgressSpinner, NewsComponent],
+  imports: [AvatarComponent, RouterLink, MatIcon, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent {
   private memberService = inject(MemberService);

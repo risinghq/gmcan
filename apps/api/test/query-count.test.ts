@@ -131,14 +131,12 @@ describe("listings do not query once per row", () => {
     await seed(4);
     const site = "https://site.example.test";
     const news = (await (await app.request(`${site}/api/news?pageSize=50`)).json()) as {
-      items: Array<{ asset: string | null; authorPhotoUrl: string }>;
+      items: Array<{ asset: string | null; authorPhotoUrl: string | null }>;
     };
     expect(news.items).toHaveLength(4);
     expect(news.items.every((item) => item.asset?.match(/^(.+)\/api\/assets\/\d+$/)?.[1] === site)).toBe(true);
-    expect(news.items.filter((item) => item.authorPhotoUrl.startsWith(`${site}/api/assets/`))).toHaveLength(2);
-    expect(news.items.filter((item) => item.authorPhotoUrl === `${site}/api/placeholders/member-photo`)).toHaveLength(
-      2,
-    );
+    expect(news.items.filter((item) => item.authorPhotoUrl?.startsWith(`${site}/api/assets/`))).toHaveLength(2);
+    expect(news.items.filter((item) => item.authorPhotoUrl === null)).toHaveLength(2);
   });
 });
 
@@ -165,6 +163,6 @@ describe("id lists stay under the D1 bound-parameter limit", () => {
     const members = Array.from({ length: 250 }, (_, i) => ({ memberId: 900000 + i, fullName: `Member ${i}` }));
     const photos = await resolveMemberPhotoViews(members, "en");
     expect(photos.size).toBe(250);
-    expect(photos.get(900000)?.photoUrl.endsWith("/api/placeholders/member-photo")).toBe(true);
+    expect(photos.get(900000)?.photoUrl).toBeNull();
   });
 });

@@ -36,9 +36,7 @@
           @for (autor of row.authors; track autor) {
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                @if (autor.memberId) {
-                  <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
-                }
+                <app-avatar class="member-img" [src]="autor.photoUrl" [alt]="autor.photoAlt" [name]="autor.name" />
               </div>
               <div>{{ autor.name }}</div>
             </div>

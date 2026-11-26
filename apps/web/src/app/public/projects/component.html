@@ -57,11 +57,11 @@
                     @for (member of proyecto.members; track member) {
                     <div class="project-members">
                       <div class="member-img-round">
-                        <img
+                        <app-avatar
                           class="member-img"
-                          loading="lazy"
-                          src="{{ member.photoUrl }}"
-                          alt="{{ member.photoAlt }}"
+                          [src]="member.photoUrl"
+                          [alt]="member.photoAlt"
+                          [name]="member.name"
                         />
                       </div>
                       <a

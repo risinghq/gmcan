@@ -10,7 +10,7 @@ export const PublicMemberSchema = z.object({
   lastName: z.string(),
   maternalName: z.string().nullable(),
   bio: z.string().nullable(),
-  photoUrl: z.string(),
+  photoUrl: z.string().nullable(),
   photoAlt: z.string(),
   roleCode: RoleCodeSchema,
   memberTypeCode: MemberTypeCodeSchema,

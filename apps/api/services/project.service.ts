@@ -233,14 +233,17 @@ export async function listProjectsLocalized(locale: Locale, statusCode?: Project
     locale,
   );
 
-  const membersByProject = new Map<number, { memberId: number; name: string; photoUrl: string; photoAlt: string }[]>();
+  const membersByProject = new Map<
+    number,
+    { memberId: number; name: string; photoUrl: string | null; photoAlt: string }[]
+  >();
   for (const row of memberRows) {
     const current = membersByProject.get(row.projectId) ?? [];
     const photo = photoByMemberId.get(row.memberId);
     current.push({
       memberId: row.memberId,
       name: memberDisplayName(row),
-      photoUrl: photo?.photoUrl ?? "",
+      photoUrl: photo?.photoUrl ?? null,
       photoAlt: photo?.photoAlt ?? "",
     });
     membersByProject.set(row.projectId, current);
@@ -271,7 +274,7 @@ export async function listAdminProjects(
     current.push({
       memberId: row.memberId,
       name: memberDisplayName(row),
-      photoUrl: photo?.photoUrl ?? "",
+      photoUrl: photo?.photoUrl ?? null,
       photoAlt: photo?.photoAlt ?? "",
     });
     membersByProject.set(row.projectId, current);

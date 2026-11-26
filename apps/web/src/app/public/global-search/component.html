@@ -107,7 +107,7 @@
                 {
                 <div class="publication-members">
                   <div class="member-img-round">
-                    <img class="member-img" loading="lazy" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
+                    <app-avatar class="member-img" [src]="autor.photoUrl" [alt]="autor.photoAlt" [name]="autor.name" />
                   </div>
                   <a
                     class="member-name plain-link"
@@ -212,7 +212,12 @@
                   @for (member of proyecto.members; track member.memberId) {
                   <div class="project-members">
                     <div class="member-img-round">
-                      <img class="member-img" loading="lazy" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
+                      <app-avatar
+                        class="member-img"
+                        [src]="member.photoUrl"
+                        [alt]="member.photoAlt"
+                        [name]="member.name"
+                      />
                     </div>
                     <a
                       class="member-name plain-link"
@@ -315,7 +320,12 @@
             } @for (miembro of miembros(); track miembro.id; let i = $index) {
             <div class="flex-news" [class.mb-24]="i + 1 != miembros().length">
               <div class="miembro-img-div">
-                <img class="member-img" loading="lazy" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
+                <app-avatar
+                  class="member-img"
+                  [src]="miembro.photoUrl"
+                  [alt]="miembro.photoAlt"
+                  [name]="miembro.firstName + ' ' + miembro.lastName"
+                />
               </div>
               <div class="miembro-text">
                 <div class="miembro-name full-width">

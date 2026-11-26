@@ -30,9 +30,12 @@
             @let principal = row.authors[0];
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                @if (principal.memberId) {
-                  <img class="member-img" src="{{ principal.photoUrl }}" alt="{{ principal.photoAlt }}" />
-                }
+                <app-avatar
+                  class="member-img"
+                  [src]="principal.photoUrl"
+                  [alt]="principal.photoAlt"
+                  [name]="principal.name"
+                />
               </div>
               {{ principal.name }}
             </div>

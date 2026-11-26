@@ -16,6 +16,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatFormField, MatSuffix } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatSelect } from "@angular/material/select";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { ImageFieldComponent } from "@app/shared/components/image-field/image-field.component";
 import { RichTextEditorComponent } from "@app/shared/components/rich-text-editor/rich-text-editor.component";
 import { confirmAction } from "@app/shared/forms/confirm-dialog.component";
@@ -64,6 +65,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
 @Component({
   selector: "app-news-page",
   imports: [
+    AvatarComponent,
     ReactiveFormsModule,
     AutosizeModule,
     ContentFormComponent,
@@ -124,7 +126,12 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
                 <mat-select formControlName="authorId">
                   @for (author of authors(); track author.id) {
                     <mat-option [value]="author.id">
-                      <img class="img-user" [src]="author.photoUrl" [alt]="author.photoAlt" />
+                      <app-avatar
+                        class="img-user"
+                        [src]="author.photoUrl"
+                        [alt]="author.photoAlt"
+                        [name]="name(author)"
+                      />
                       {{ name(author) }}
                     </mat-option>
                   }

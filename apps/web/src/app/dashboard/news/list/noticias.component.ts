@@ -16,6 +16,7 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
@@ -28,7 +29,7 @@ interface NewsListItem {
   publishedAtLabel: string;
   categoryName: string;
   authorName: string;
-  authorPhotoUrl: string;
+  authorPhotoUrl: string | null;
   authorPhotoAlt: string;
   statusCode: "draft" | "published" | "archived";
   statusLabel: string;
@@ -40,6 +41,7 @@ interface NewsListItem {
   styleUrl: "./noticias.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AvatarComponent,
     MatTabGroup,
     MatTab,
     MatIcon,

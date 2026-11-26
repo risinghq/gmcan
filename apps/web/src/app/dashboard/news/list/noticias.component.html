@@ -52,7 +52,12 @@
           <td mat-cell *matCellDef="let row">
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                <img class="member-img" src="{{ row.authorPhotoUrl }}" alt="{{ row.authorPhotoAlt }}" />
+                <app-avatar
+                  class="member-img"
+                  [src]="row.authorPhotoUrl"
+                  [alt]="row.authorPhotoAlt"
+                  [name]="row.authorName"
+                />
               </div>
               {{ row.authorName }}
             </div>

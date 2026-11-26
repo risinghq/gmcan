@@ -15,7 +15,7 @@ export interface Project {
 }
 
 export interface ProjectWithMembers extends Project {
-  members: { memberId: number; name: string; photoUrl: string; photoAlt: string }[];
+  members: { memberId: number; name: string; photoUrl: string | null; photoAlt: string }[];
   researchLine: string;
   fundingSource: string;
   currencySymbol: string;

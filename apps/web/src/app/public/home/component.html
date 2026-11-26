@@ -277,7 +277,7 @@
             @for (author of publicacion.authors; track author; let last = $last) { @if (author.kind === "registered") {
             <div class="publication-members">
               <div class="member-img-round">
-                <img class="member-img" loading="lazy" src="{{ author.photoUrl }}" alt="{{ author.photoAlt }}" />
+                <app-avatar class="member-img" [src]="author.photoUrl" [alt]="author.photoAlt" [name]="author.name" />
               </div>
               <a
                 class="member-name plain-link"
@@ -375,7 +375,7 @@
             @for (member of proyecto.members; track member) {
             <div class="project-members">
               <div class="member-img-round">
-                <img class="member-img" loading="lazy" src="{{ member.photoUrl }}" alt="{{ member.photoAlt }}" />
+                <app-avatar class="member-img" [src]="member.photoUrl" [alt]="member.photoAlt" [name]="member.name" />
               </div>
               <a
                 class="member-name plain-link"

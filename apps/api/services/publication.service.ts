@@ -15,7 +15,7 @@ import { monthYearEs } from "../lib/date-label.js";
 import { DEFAULT_LOCALE } from "../lib/locales.js";
 import { type Locale } from "../lib/public-locale.js";
 import { resolveAssetAccessLinkMap, resolveAssetAccessUrl } from "./assets/service.js";
-import { memberPhotoPlaceholderView, resolveMemberPhotoViews } from "./member-photo.service.js";
+import { noPhotoView, resolveMemberPhotoViews } from "./member-photo.service.js";
 
 export interface PublicPublicationFilter {
   id?: number;
@@ -391,7 +391,7 @@ export async function listAdminPublications(
     [...firstAuthorRowsByPublication].map(([publicationId, row]) => {
       if (!row.memberId) {
         const name = row.externalName ?? "";
-        return [publicationId, { name, ...memberPhotoPlaceholderView({ fullName: name, locale }) }] as const;
+        return [publicationId, { name, ...noPhotoView({ fullName: name, locale }) }] as const;
       }
       return [
         publicationId,
@@ -408,7 +408,7 @@ export async function listAdminPublications(
     const universityName = subtype.kindCode === "thesis" ? subtype.thesis.universityName : "";
     const thesisKindName = subtype.kindCode === "thesis" ? subtype.thesis.thesisKindName : "";
     const firstAuthor = firstAuthorByPublication.get(publication.id);
-    const placeholder = memberPhotoPlaceholderView({ fullName: "", locale });
+    const placeholder = noPhotoView({ fullName: "", locale });
 
     return {
       id: publication.id,

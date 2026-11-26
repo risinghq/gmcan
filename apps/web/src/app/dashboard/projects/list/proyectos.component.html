@@ -29,7 +29,12 @@
             @for (usuario of row.members; track usuario.memberId) {
               <div class="flex-news">
                 <div class="member-img-round mr-8">
-                  <img class="member-img" src="{{ usuario.photoUrl }}" alt="{{ usuario.photoAlt }}" />
+                  <app-avatar
+                    class="member-img"
+                    [src]="usuario.photoUrl"
+                    [alt]="usuario.photoAlt"
+                    [name]="usuario.name"
+                  />
                 </div>
                 {{ usuario.name }}
               </div>
@@ -116,7 +121,12 @@
           @for (usuario of row.members; track usuario.memberId) {
             <div class="flex-news">
               <div class="member-img-round mr-8">
-                <img class="member-img" src="{{ usuario.photoUrl }}" alt="{{ usuario.photoAlt }}" />
+                <app-avatar
+                  class="member-img"
+                  [src]="usuario.photoUrl"
+                  [alt]="usuario.photoAlt"
+                  [name]="usuario.name"
+                />
               </div>
               {{ usuario.name }}
             </div>

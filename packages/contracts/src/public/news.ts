@@ -21,7 +21,7 @@ export const PublicNewsListItemSchema = z.object({
   authorId: z.number(),
   newsKindCode: NewsKindCodeSchema,
   authorName: z.string(),
-  authorPhotoUrl: z.string(),
+  authorPhotoUrl: z.string().nullable(),
   authorPhotoAlt: z.string(),
   newsKindName: z.string(),
 });

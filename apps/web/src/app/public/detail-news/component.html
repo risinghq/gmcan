@@ -23,9 +23,13 @@
           <p class="news-abstract">{{ newsItem.summary }}</p>
           }
           <div class="author-div">
-            @if (newsItem.authorPhotoUrl) {
-            <img class="author-img" [src]="newsItem.authorPhotoUrl" [alt]="newsItem.authorPhotoAlt" />
-            }
+            <app-avatar
+              class="author-img"
+              [src]="newsItem.authorPhotoUrl"
+              [alt]="newsItem.authorPhotoAlt"
+              [name]="newsItem.authorName"
+              loading="eager"
+            />
             <div class="author-text">
               <div class="news-type">{{ newsItem.newsKindName }}</div>
               @if (newsItem.authorId) {

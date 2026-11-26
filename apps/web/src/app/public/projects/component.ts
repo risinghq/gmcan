@@ -5,6 +5,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, RouterLink } from "@angular/router";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -26,6 +27,7 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    AvatarComponent,
     RouterLink,
     MatIcon,
     MatTabGroup,

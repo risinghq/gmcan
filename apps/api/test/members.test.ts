@@ -104,7 +104,7 @@ describe("admin member writes", () => {
       id,
       dni: "41000004",
       ...member,
-      photoUrl: expect.any(String),
+      photoUrl: null,
     });
 
     const update = { ...member, isActive: 0, translations: { es: { bio: "" }, en: { bio: "PhD student." } } };
@@ -153,8 +153,9 @@ describe("own profile", () => {
 
   test("a researcher uploads their own photo", async () => {
     const before = (await (await send("GET", "/admin/account/profile", undefined, researcher)).json()) as {
-      photoUrl: string;
+      photoUrl: string | null;
     };
+    expect(before.photoUrl).toBeNull();
     const form = new FormData();
     form.set("file", new File([new Uint8Array([1, 2, 3])], "photo.png", { type: "image/png" }));
 
@@ -168,7 +169,7 @@ describe("own profile", () => {
     const after = (await (await send("GET", "/admin/account/profile", undefined, researcher)).json()) as {
       photoUrl: string;
     };
-    expect(after.photoUrl).not.toBe(before.photoUrl);
+    expect(after.photoUrl).toContain("/api/assets/");
     const binding = await db
       .selectFrom("member_asset")
       .select("memberId")

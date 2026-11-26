@@ -15,6 +15,7 @@ import { MatDrawerContainer, MatDrawer } from "@angular/material/sidenav";
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { NavigationEnd } from "@angular/router";
 import type { ToolbarBadge } from "@app/dashboard/dashboard.resolvers";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { confirmAction } from "@app/shared/forms/confirm-dialog.component";
 import type { Group } from "@app/shared/models/factories";
 import { deepestChild, deriveFromRoute, routeTitle } from "@app/shared/routing/derived-data";
@@ -33,6 +34,7 @@ import { DASHBOARD_NAV, visibleNav } from "./nav";
   styleUrl: "./log-home.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    AvatarComponent,
     MatDrawerContainer,
     MatDrawer,
     RouterLink,

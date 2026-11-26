@@ -3,7 +3,6 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { assetExists, putObject, sha256Buffer } from "../../lib/upload.js";
-import { MEMBER_PHOTO_PLACEHOLDER_KEY } from "../../routes/public/content/placeholders.js";
 import { db } from "../client.js";
 import type { Database } from "../schema.js";
 import { seedData } from "./data.js";
@@ -121,11 +120,6 @@ async function insertTypedBinding(binding: SeedBinding, assetId: number, now: st
 
 export async function seedAssetsAndBindings() {
   const now = new Date().toISOString();
-  await putObject(
-    MEMBER_PHOTO_PLACEHOLDER_KEY,
-    fs.readFileSync(path.resolve(process.cwd(), "assets/member-photo-placeholder.png")),
-  );
-
   for (const binding of await seedBindings()) {
     const filePath = resolveSeedPath(binding.source);
     const buffer = fs.readFileSync(filePath);

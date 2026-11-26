@@ -45,6 +45,6 @@ export interface MemberCreate extends z.infer<typeof MemberCreateFieldsSchema> {
 export interface AdminMember extends MemberWrite {
   id: number;
   dni: string;
-  photoUrl: string;
+  photoUrl: string | null;
   photoAlt: string;
 }
