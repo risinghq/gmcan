@@ -33,11 +33,11 @@
         <td mat-cell *matCellDef="let row">
           @for (autor of row.authors; track autor) {
             <div class="flex-news">
-              @if (autor.memberId) {
-                <div class="member-img-round mr-8">
+              <div class="member-img-round mr-8">
+                @if (autor.memberId) {
                   <img class="member-img" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
-                </div>
-              }
+                }
+              </div>
               <div>{{ autor.name }}</div>
             </div>
           }
