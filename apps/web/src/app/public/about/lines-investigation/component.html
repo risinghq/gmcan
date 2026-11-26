@@ -60,28 +60,22 @@
               }
             </div>
             <div class="flex-news">
-              <a
+              <button
+                type="button"
+                class="expand-toggle project-abstract"
                 [class.abstract-active]="isExpanded(projectKey(linea.id, i), i)"
+                [attr.aria-expanded]="isExpanded(projectKey(linea.id, i), i)"
+                [attr.aria-controls]="'line-' + linea.id + '-project-' + i"
                 (click)="toggleExpanded(projectKey(linea.id, i), i)"
-                class="project-abstract"
-                role="button"
               >
                 {{ expandLabel( projectKey(linea.id, i), i, language().linesInvestigationText[0].seeMore,
                 language().linesInvestigationText[0].seeLess ) }}
-              </a>
-              <mat-icon
-                class="project-abs-icon"
-                [class]="{
-                  'abs-active': isExpanded(projectKey(linea.id, i), i),
-                  'abs-not-active': !isExpanded(projectKey(linea.id, i), i),
-                }"
-              >
-                keyboard_arrow_down
-              </mat-icon>
+                <mat-icon class="project-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+              </button>
             </div>
           </div>
           @if (isExpanded(projectKey(linea.id, i), i)) {
-          <div class="collapsed-resumen mt-16">
+          <div class="collapsed-resumen mt-16" [id]="'line-' + linea.id + '-project-' + i">
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
               {{ proyecto.description }}

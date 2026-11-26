@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource } from "@angular/core/rxjs-interop";
 import { MatButton } from "@angular/material/button";
@@ -54,7 +53,6 @@ function toNewsCard(n: PublicNewsListItem, locale: string): PublicNewsCard {
     NgbPaginationPrevious,
     NgbPaginationNumber,
     NgbPaginationNext,
-    NgClass,
   ],
 })
 export default class MainNewsComponent implements OnInit {

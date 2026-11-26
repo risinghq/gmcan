@@ -302,27 +302,24 @@
               {{ this.language.publicationsText[0].download }}
             </a>
             }
-            <a
+            <button
+              type="button"
+              class="expand-toggle publication-abstract"
               [class.abstract-active]="isExpanded('home-pub', i)"
+              [attr.aria-expanded]="isExpanded('home-pub', i)"
+              [attr.aria-controls]="'home-publication-' + i"
               (click)="toggleExpanded('home-pub', i)"
-              class="publication-abstract"
-              data-toggle="collapse"
-              href="#publication{{ i }}"
-              role="button"
-              aria-expanded="false"
-              aria-controls="publication"
             >
               {{ expandLabel( "home-pub", i, this.language.publicationsText[0].seeMore,
               this.language.publicationsText[0].seeLess ) }}
-            </a>
-            <mat-icon
-              class="publication-abs-icon"
-              [class]="{ 'abs-active': isExpanded('home-pub', i), 'abs-not-active': !isExpanded('home-pub', i) }"
-            >
-              keyboard_arrow_down
-            </mat-icon>
+              <mat-icon class="publication-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+            </button>
           </div>
-          <div class="collapse collapsed-resumen" id="publication{{ i }}">
+          <div
+            class="collapse collapsed-resumen"
+            [class.show]="isExpanded('home-pub', i)"
+            [id]="'home-publication-' + i"
+          >
             <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
             <div class="abstract">{{ publicacion.abstract }}</div>
           </div>
@@ -391,31 +388,25 @@
           </div>
           <div class="abstract hide-mobile">{{ proyecto.description }}</div>
           <div class="flex-news d-block hide-desktop">
-            <a
+            <button
+              type="button"
+              class="expand-toggle project-abstract"
               [class.abstract-active]="isExpanded('home-proj', i)"
+              [attr.aria-expanded]="isExpanded('home-proj', i)"
+              [attr.aria-controls]="'home-project-' + i"
               (click)="toggleExpanded('home-proj', i)"
-              class="project-abstract"
-              data-toggle="collapse"
-              href="#project{{ i }}"
-              role="button"
-              aria-expanded="false"
-              aria-controls="project"
             >
               {{ expandLabel( "home-proj", i, this.language.projectsText[0].seeMore,
               this.language.projectsText[0].seeLess ) }}
-            </a>
-            <mat-icon
-              class="project-abs-icon"
-              [class]="{
-                  'abs-active': isExpanded('home-proj', i),
-                  'abs-not-active': !isExpanded('home-proj', i),
-                }"
-            >
-              keyboard_arrow_down
-            </mat-icon>
+              <mat-icon class="project-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+            </button>
           </div>
         </div>
-        <div class="collapse collapsed-resumen project-mt" id="project{{ i }}">
+        <div
+          class="collapse collapsed-resumen project-mt"
+          [class.show]="isExpanded('home-proj', i)"
+          [id]="'home-project-' + i"
+        >
           <div class="abstract mb-8">
             <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
             {{ proyecto.description }}

@@ -30,9 +30,9 @@
                   autocomplete="off"
                 />
               </div>
-              <div (click)="search(titulo.value)" class="btn-black">
-                <div class="link">{{ language.searchMobile }}</div>
-              </div>
+              <button type="button" (click)="search(titulo.value)" class="btn-black">
+                <span class="link">{{ language.searchMobile }}</span>
+              </button>
             </form>
             @if (!allCharged) {
             <div class="spinner-pad">
@@ -121,46 +121,41 @@
                     {{ this.language.publicationsText[0].download }}
                   </a>
                   }
-                  <a
+                  <button
+                    type="button"
+                    class="expand-toggle publication-abstract"
                     [class.abstract-active]="isExpanded('pub', i)"
+                    [attr.aria-expanded]="isExpanded('pub', i)"
+                    [attr.aria-controls]="'publication-' + i"
                     (click)="toggleExpanded('pub', i)"
-                    class="publication-abstract"
-                    data-toggle="collapse"
-                    href="#collapseExample{{ i }}"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="collapseExample"
                   >
                     {{ expandLabel( "pub", i, this.language.publicationsText[0].seeMore,
                     this.language.publicationsText[0].seeLess ) }}
-                  </a>
-                  <mat-icon
-                    class="publication-abs-icon"
-                    [class]="{
-                              'abs-active': isExpanded('pub', i),
-                              'abs-not-active': !isExpanded('pub', i),
-                            }"
-                  >
-                    keyboard_arrow_down
-                  </mat-icon>
+                    <mat-icon class="publication-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                  </button>
                 </div>
-                <div class="collapse collapsed-resumen" id="collapseExample{{ i }}">
+                <div class="collapse collapsed-resumen" [class.show]="isExpanded('pub', i)" [id]="'publication-' + i">
                   <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
                   <div class="abstract">{{ publicacion.abstract }}</div>
                 </div>
               </div>
               } @if (publicaciones.length > 5) {
-              <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="publicaciones.length">
+              <ngb-pagination
+                [(page)]="page"
+                (pageChange)="scroll()"
+                [pageSize]="pageSize"
+                [collectionSize]="publicaciones.length"
+              >
                 <ng-template class="unique-left" ngbPaginationPrevious>
-                  <div (click)="scroll()" class="h-ih">
+                  <div class="h-ih">
                     <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
                   </div>
                 </ng-template>
                 <ng-template ngbPaginationNumber let-page>
-                  <div (click)="scroll()" class="h-ih">{{ page }}</div>
+                  <div class="h-ih">{{ page }}</div>
                 </ng-template>
                 <ng-template ngbPaginationNext>
-                  <div (click)="scroll()" class="h-ih">
+                  <div class="h-ih">
                     <mat-icon class="pag-arrow" style="padding-bottom: 20px !important">
                       keyboard_arrow_right
                     </mat-icon>

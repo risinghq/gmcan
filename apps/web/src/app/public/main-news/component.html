@@ -70,15 +70,15 @@
             (pageChange)="onPageChange($event)"
           >
             <ng-template class="unique-left" ngbPaginationPrevious>
-              <div (click)="scroll()" class="h-ih">
+              <div class="h-ih">
                 <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
               </div>
             </ng-template>
             <ng-template ngbPaginationNumber let-page>
-              <div (click)="scroll()" class="h-ih">{{ page }}</div>
+              <div class="h-ih">{{ page }}</div>
             </ng-template>
             <ng-template ngbPaginationNext>
-              <div (click)="scroll()" class="h-ih">
+              <div class="h-ih">
                 <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
               </div>
             </ng-template>
@@ -90,21 +90,25 @@
     </div>
     <div class="col-lg-4 col-sm-6 col-12 hide-mobile">
       <div class="category-title">{{ language.newsText[0].categoryTitle }}</div>
-      <div
+      <button
+        type="button"
         class="category"
-        [ngClass]="selectedCategoryCode === null ? 'active' : 'category'"
+        [class.active]="selectedCategoryCode === null"
+        [attr.aria-pressed]="selectedCategoryCode === null"
         (click)="selectCategory(null, language.newsText[0].allNews)"
       >
         {{ language.newsText[0].allNews }}
-      </div>
+      </button>
       @for (newsType of newsTypes; track newsType) {
-      <div
+      <button
+        type="button"
         class="category"
-        [ngClass]="selectedCategoryCode === newsType.code ? 'active' : 'category'"
+        [class.active]="selectedCategoryCode === newsType.code"
+        [attr.aria-pressed]="selectedCategoryCode === newsType.code"
         (click)="selectCategory(newsType.code, newsType.name)"
       >
         {{ newsType.name }}
-      </div>
+      </button>
       }
     </div>
   </div>

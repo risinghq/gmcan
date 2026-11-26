@@ -5,14 +5,14 @@
     <span class="global-link" aria-current="page">{{ language().results }}</span>
   </div>
   <div class="card-global">
-    <div class="flex-news back-div" (click)="return()">
-      <mat-icon class="back-icon"> arrow_back </mat-icon>
-      <div class="back-text">{{ language().detailMemberText[0].back }}</div>
-    </div>
+    <button type="button" class="flex-news back-div" (click)="return()">
+      <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+      <span class="back-text">{{ language().detailMemberText[0].back }}</span>
+    </button>
     <div class="global-results-title">{{ language().results }}</div>
     <div class="flex-news">
       <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
-        <mat-icon class="icon-search-toolbar" (click)="searchGlobal(nombre.value)">search</mat-icon>
+        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
         <input
           class="input-search-text"
           placeholder="{{ language().search }}"
@@ -22,9 +22,9 @@
           (keyup.enter)="searchGlobal(nombre.value)"
         />
       </form>
-      <div (click)="searchGlobal(nombre.value)" class="btn-black">
-        <div class="link">{{ language().searchMobile }}</div>
-      </div>
+      <button type="button" (click)="searchGlobal(nombre.value)" class="btn-black">
+        <span class="link">{{ language().searchMobile }}</span>
+      </button>
     </div>
     @if (proyectos().length == 0 && publicaciones().length == 0 && miembros().length == 0 && noticias().length == 0) {
     <div class="not-found-2">{{ language().noResults }}</div>
@@ -36,23 +36,18 @@
             {{ language().publications }} @if (publicaciones().length >= 0) {
             <span class="length-text">({{ publicaciones().length }})</span>
             }
-            <mat-icon
-              class="publication-abs-icon-2"
-              data-toggle="collapse"
-              href="#collapsePublication"
-              role="button"
-              aria-expanded="true"
+            <button
+              type="button"
+              class="expand-toggle section-toggle"
+              [attr.aria-label]="language().publications"
+              [attr.aria-expanded]="publicationExpanded()"
               aria-controls="collapsePublication"
-              (click)="toggleRotation(1)"
-              [class]="{
-                  'abs-active': publicationExpanded(),
-                  'abs-not-active': !publicationExpanded(),
-                }"
+              (click)="toggleSection(publicationExpanded)"
             >
-              keyboard_arrow_down
-            </mat-icon>
+              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+            </button>
           </div>
-          <div class="collapse show" id="collapsePublication">
+          <div class="collapse" [class.show]="publicationExpanded()" id="collapsePublication">
             @if (publicaciones().length == 0) {
             <div class="not-found-1">{{ language().noResultsPublication }}</div>
             } @for ( publicacion of publicaciones() | slice: (page1() - 1) * pageSize : (page1() - 1) * pageSize +
@@ -133,46 +128,45 @@
                   {{ language().publicationsText[0].download }}
                 </a>
                 }
-                <a
+                <button
+                  type="button"
+                  class="expand-toggle publication-abstract"
                   [class.abstract-active]="isExpanded('search-pub', i)"
+                  [attr.aria-expanded]="isExpanded('search-pub', i)"
+                  [attr.aria-controls]="'search-publication-' + i"
                   (click)="toggleExpanded('search-pub', i)"
-                  class="publication-abstract"
-                  data-toggle="collapse"
-                  href="#publication{{ i }}"
-                  role="button"
-                  aria-expanded="false"
-                  aria-controls="publication"
                 >
                   {{ expandLabel( "search-pub", i, language().publicationsText[0].seeMore,
                   language().publicationsText[0].seeLess ) }}
-                </a>
-                <mat-icon
-                  class="publication-abs-icon"
-                  [class]="{
-                        'abs-active': isExpanded('search-pub', i),
-                        'abs-not-active': !isExpanded('search-pub', i),
-                      }"
-                >
-                  keyboard_arrow_down
-                </mat-icon>
+                  <mat-icon class="publication-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                </button>
               </div>
-              <div class="collapse collapsed-resumen" id="publication{{ i }}">
+              <div
+                class="collapse collapsed-resumen"
+                [class.show]="isExpanded('search-pub', i)"
+                [id]="'search-publication-' + i"
+              >
                 <div class="abstract-title">{{ language().publicationsText[0].abstract }}:</div>
                 <div class="abstract">{{ publicacion.abstract }}</div>
               </div>
             </div>
             } @if (publicaciones().length > 5) {
-            <ngb-pagination [(page)]="page1" [pageSize]="pageSize" [collectionSize]="publicaciones().length">
+            <ngb-pagination
+              [(page)]="page1"
+              (pageChange)="scroll()"
+              [pageSize]="pageSize"
+              [collectionSize]="publicaciones().length"
+            >
               <ng-template class="unique-left" ngbPaginationPrevious>
-                <div (click)="scroll()" class="h-ih">
+                <div class="h-ih">
                   <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
                 </div>
               </ng-template>
               <ng-template ngbPaginationNumber let-page>
-                <div (click)="scroll()" class="h-ih">{{ page }}</div>
+                <div class="h-ih">{{ page }}</div>
               </ng-template>
               <ng-template ngbPaginationNext>
-                <div (click)="scroll()" class="h-ih">
+                <div class="h-ih">
                   <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
                 </div>
               </ng-template>
@@ -185,20 +179,18 @@
             {{ language().projects }} @if (proyectos().length >= 0) {
             <span class="length-text">({{ proyectos().length }})</span>
             }
-            <mat-icon
-              class="publication-abs-icon-2"
-              data-toggle="collapse"
-              href="#collapseProjects"
-              role="button"
-              aria-expanded="true"
+            <button
+              type="button"
+              class="expand-toggle section-toggle"
+              [attr.aria-label]="language().projects"
+              [attr.aria-expanded]="projectExpanded()"
               aria-controls="collapseProjects"
-              (click)="toggleRotation(2)"
-              [class]="{ 'abs-active': projectExpanded(), 'abs-not-active': !projectExpanded() }"
+              (click)="toggleSection(projectExpanded)"
             >
-              keyboard_arrow_down
-            </mat-icon>
+              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+            </button>
           </div>
-          <div class="collapse show" id="collapseProjects">
+          <div class="collapse" [class.show]="projectExpanded()" id="collapseProjects">
             @if (proyectos().length == 0) {
             <div class="not-found-1">{{ language().noResultsProjects }}</div>
             } @for ( proyecto of proyectos() | slice: (page2() - 1) * pageSize : (page2() - 1) * pageSize + pageSize;
@@ -230,31 +222,25 @@
                   }
                 </div>
                 <div class="flex-news">
-                  <a
+                  <button
+                    type="button"
+                    class="expand-toggle project-abstract"
                     [class.abstract-active]="isExpanded('search-proj', i)"
+                    [attr.aria-expanded]="isExpanded('search-proj', i)"
+                    [attr.aria-controls]="'search-project-' + i"
                     (click)="toggleExpanded('search-proj', i)"
-                    class="project-abstract"
-                    data-toggle="collapse"
-                    href="#project{{ i }}"
-                    role="button"
-                    aria-expanded="false"
-                    aria-controls="project"
                   >
                     {{ expandLabel( "search-proj", i, language().projectsText[0].seeMore,
                     language().projectsText[0].seeLess ) }}
-                  </a>
-                  <mat-icon
-                    class="project-abs-icon"
-                    [class]="{
-                          'abs-active': isExpanded('search-proj', i),
-                          'abs-not-active': !isExpanded('search-proj', i),
-                        }"
-                  >
-                    keyboard_arrow_down
-                  </mat-icon>
+                    <mat-icon class="project-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                  </button>
                 </div>
               </div>
-              <div class="collapse collapsed-resumen project-mt" id="project{{ i }}">
+              <div
+                class="collapse collapsed-resumen project-mt"
+                [class.show]="isExpanded('search-proj', i)"
+                [id]="'search-project-' + i"
+              >
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ language().projectsText[0].description }}: </strong>
                   {{ proyecto.description }}
@@ -280,17 +266,22 @@
               </div>
             </div>
             } @if (proyectos().length > 5) {
-            <ngb-pagination [(page)]="page2" [pageSize]="pageSize" [collectionSize]="proyectos().length">
+            <ngb-pagination
+              [(page)]="page2"
+              (pageChange)="scroll()"
+              [pageSize]="pageSize"
+              [collectionSize]="proyectos().length"
+            >
               <ng-template class="unique-left" ngbPaginationPrevious>
-                <div (click)="scroll()" class="h-ih">
+                <div class="h-ih">
                   <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
                 </div>
               </ng-template>
               <ng-template ngbPaginationNumber let-page>
-                <div (click)="scroll()" class="h-ih">{{ page }}</div>
+                <div class="h-ih">{{ page }}</div>
               </ng-template>
               <ng-template ngbPaginationNext>
-                <div (click)="scroll()" class="h-ih">
+                <div class="h-ih">
                   <mat-icon class="pag-arrow" style="padding-bottom: 20px !important"> keyboard_arrow_right </mat-icon>
                 </div>
               </ng-template>
@@ -305,20 +296,18 @@
             {{ language().members }} @if (miembros().length >= 0) {
             <span class="length-text">({{ miembros().length }})</span>
             }
-            <mat-icon
-              class="publication-abs-icon-2"
-              data-toggle="collapse"
-              href="#collapseMembers"
-              role="button"
-              aria-expanded="true"
+            <button
+              type="button"
+              class="expand-toggle section-toggle"
+              [attr.aria-label]="language().members"
+              [attr.aria-expanded]="memberExpanded()"
               aria-controls="collapseMembers"
-              (click)="toggleRotation(3)"
-              [class]="{ 'abs-active': memberExpanded(), 'abs-not-active': !memberExpanded() }"
+              (click)="toggleSection(memberExpanded)"
             >
-              keyboard_arrow_down
-            </mat-icon>
+              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+            </button>
           </div>
-          <div class="collapse show miembro-mt" id="collapseMembers">
+          <div class="collapse miembro-mt" [class.show]="memberExpanded()" id="collapseMembers">
             @if (miembros().length == 0) {
             <div class="not-found-1">{{ language().noResultsMembers }}</div>
             } @for (miembro of miembros(); track miembro.id; let i = $index) {
@@ -348,20 +337,18 @@
             {{ language().news }} @if (noticias().length >= 0) {
             <span class="length-text">({{ noticias().length }})</span>
             }
-            <mat-icon
-              class="publication-abs-icon-2"
-              data-toggle="collapse"
-              href="#collapseNews"
-              role="button"
-              aria-expanded="true"
+            <button
+              type="button"
+              class="expand-toggle section-toggle"
+              [attr.aria-label]="language().news"
+              [attr.aria-expanded]="newsExpanded()"
               aria-controls="collapseNews"
-              (click)="toggleRotation(4)"
-              [class]="{ 'abs-active': newsExpanded(), 'abs-not-active': !newsExpanded() }"
+              (click)="toggleSection(newsExpanded)"
             >
-              keyboard_arrow_down
-            </mat-icon>
+              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+            </button>
           </div>
-          <div class="collapse show" id="collapseNews">
+          <div class="collapse" [class.show]="newsExpanded()" id="collapseNews">
             @if (noticias().length == 0) {
             <div class="not-found-1">{{ language().noResultsNews }}</div>
             } @for (noticia of noticias(); track noticia.id) {

@@ -185,15 +185,14 @@
   color: var(--dark-forest-green);
 }
 
-.publication-abs-icon-2 {
+.section-toggle {
   margin-top: auto;
   margin-left: auto;
+}
+
+.publication-abs-icon-2 {
   height: 32px;
   width: auto;
-  vertical-align: middle;
-  -webkit-transition: -webkit-transform 0.8s ease-in-out;
-  -ms-transition: -ms-transform 0.8s ease-in-out;
-  transition: transform 0.8s ease-in-out;
 }
 
 .not-found-1 {

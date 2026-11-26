@@ -7,10 +7,10 @@
         <span class="join-link" aria-current="page">{{ language.join }}</span>
       </div>
       <div class="email-div">
-        <div class="flex-news back-div" (click)="return()">
-          <mat-icon class="back-icon"> arrow_back </mat-icon>
-          <div class="back-text">{{ language.joinUsText[0].back }}</div>
-        </div>
+        <button type="button" class="flex-news back-div" (click)="return()">
+          <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+          <span class="back-text">{{ language.joinUsText[0].back }}</span>
+        </button>
         <div class="email-title">{{ language.joinUsText[0].title }}</div>
         <div class="email-subtitle mb-16">{{ language.joinUsText[0].talkabout }}</div>
         <form [formGroup]="user">
