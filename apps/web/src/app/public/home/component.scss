@@ -172,7 +172,7 @@ $thetransition:
   font-weight: 300;
   line-height: 1;
   letter-spacing: 0.3px;
-  color: #939393;
+  color: var(--muted-text);
 }
 
 .black-title {
@@ -215,7 +215,7 @@ $thetransition:
 .news-author {
   line-height: 2.67;
   letter-spacing: 0.3px;
-  color: #939393;
+  color: var(--muted-text);
 }
 
 .news-box {

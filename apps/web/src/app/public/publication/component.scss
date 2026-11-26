@@ -17,7 +17,7 @@
   font-weight: 500;
   line-height: 1.54;
   letter-spacing: 0.3px;
-  color: #9595b2 !important;
+  color: var(--muted-accent) !important;
 }
 .publication-link-active:hover {
   text-decoration: underline;
@@ -118,7 +118,7 @@
 ::placeholder {
   @extend .plex-sans;
   letter-spacing: 0.3px;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 @include publication-list.base;
@@ -266,12 +266,12 @@
   letter-spacing: 0.3px;
   border: solid 1px #e5e5e5;
   background-color: #ffffff;
-  color: #b5b5b5;
+  color: var(--muted-text);
 }
 ::ng-deep .page-link {
   padding-left: 12px !important;
   padding-right: 12px !important;
-  color: #b5b5b5;
+  color: var(--muted-text);
   font-size: 20px;
   line-height: 1.6;
   padding-left: unset !important;
@@ -283,7 +283,7 @@
   text-align: center;
 }
 .pag-arrow {
-  color: #b5b5b5;
+  color: var(--muted-text);
   font-size: 32px;
   height: inherit;
   width: inherit;

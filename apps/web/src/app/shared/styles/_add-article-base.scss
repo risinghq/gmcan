@@ -10,7 +10,7 @@
   margin-right: 8px;
   width: max-content !important;
   height: max-content !important;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .back-text {
@@ -19,7 +19,7 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .back-div {
@@ -175,7 +175,7 @@
 .gray-pdf {
   font-size: 14px;
   letter-spacing: 0.3px;
-  color: #939393;
+  color: var(--muted-text);
   margin-top: auto;
   margin-bottom: 11px;
 }
@@ -237,7 +237,7 @@
   font-size: 15px !important;
   top: unset !important;
   margin-top: 2px !important;
-  color: #939393;
+  color: var(--muted-text);
   opacity: 0.4 !important;
 }
 
