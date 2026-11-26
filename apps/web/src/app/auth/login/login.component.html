@@ -1,10 +1,8 @@
 <div class="login-div">
-  <div class="flex-news back-div" (click)="return()">
-    <mat-icon class="back-icon"> arrow_back </mat-icon>
-    <div class="back-text">
-      {{ language.backAll }}
-    </div>
-  </div>
+  <button type="button" class="flex-news back-div" (click)="return()">
+    <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+    <span class="back-text">{{ language.backAll }}</span>
+  </button>
   <div class="login-card">
     <img class="logo-icon" [src]="grupoinfo().assets.header" alt="logo" />
     @if (!recoverValue()) {
@@ -35,18 +33,16 @@
             {{ language.loginText[0].login }}
           </div>
         </button>
-        <div class="forgot link" (click)="change()">
+        <button type="button" class="forgot link" (click)="change()">
           {{ language.loginText[0].forgot }}
-        </div>
+        </button>
       </form>
     } @else {
       <form [formGroup]="emailForm" (ngSubmit)="recover()">
-        <div class="flex-news back-div recover-back" (click)="change()">
-          <mat-icon class="back-icon"> arrow_back </mat-icon>
-          <div class="back-text">
-            {{ language.detailMemberText[0].back }}
-          </div>
-        </div>
+        <button type="button" class="flex-news back-div recover-back" (click)="change()">
+          <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+          <span class="back-text">{{ language.detailMemberText[0].back }}</span>
+        </button>
         <div class="login-title recover-title">Recuperar contraseña</div>
         <div class="login-subtitle">
           Ingresa tu correo electrónico y te enviaremos un link para que puedas restaurar tu contraseña.

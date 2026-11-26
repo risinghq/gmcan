@@ -1,5 +1,13 @@
 import { SlicePipe } from "@angular/common";
-import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+  type WritableSignal,
+} from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIcon } from "@angular/material/icon";
@@ -120,9 +128,8 @@ export default class GlobalSearchComponent {
     this.router.navigateByUrl(this.previouslink);
   }
 
-  toggleRotation(caso: number): void {
-    const section = [this.publicationExpanded, this.projectExpanded, this.memberExpanded, this.newsExpanded][caso - 1];
-    section?.update((expanded) => !expanded);
+  toggleSection(section: WritableSignal<boolean>): void {
+    section.update((expanded) => !expanded);
   }
 
   private toProject(project: GlobalSearchViewModel["projects"][number]): ProjectDisplay {

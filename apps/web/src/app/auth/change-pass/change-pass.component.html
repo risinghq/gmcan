@@ -1,8 +1,8 @@
 <div class="login-div">
-  <div class="flex-news back-div" (click)="returnToLogin()">
-    <mat-icon class="back-icon"> arrow_back </mat-icon>
-    <div class="back-text">Volver a la página principal</div>
-  </div>
+  <button type="button" class="flex-news back-div" (click)="returnToLogin()">
+    <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+    <span class="back-text">Volver a la página principal</span>
+  </button>
   <div class="login-card">
     <img class="logo-icon" src="{{ grupoInfo().assets.header }}" alt="logo" />
 
@@ -53,9 +53,9 @@
     @if (success()) {
       <div>
         <div class="login-title succesful-title">¡Contraseña cambiada exitosamente!</div>
-        <div (click)="returnToLogin()" class="btn-black">
-          <div class="link">Ir al inicio de sesión</div>
-        </div>
+        <button type="button" (click)="returnToLogin()" class="btn-black">
+          <span class="link">Ir al inicio de sesión</span>
+        </button>
       </div>
     }
 

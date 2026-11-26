@@ -146,9 +146,14 @@
 }
 
 .category {
+  display: block;
+  width: 100%;
+  border: 0;
   border-top: solid 1px #d7d7e1;
   padding: 17px;
   border-bottom: solid 1px #d7d7e1;
+  background: none;
+  text-align: left;
   font-weight: 500;
   line-height: 1.33;
   color: #30393a;

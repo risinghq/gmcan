@@ -26,9 +26,9 @@
                     autocomplete="off"
                   />
                 </div>
-                <div (click)="search(titulo.value)" class="btn-black">
-                  <div class="link">{{ language.searchMobile }}</div>
-                </div>
+                <button type="button" (click)="search(titulo.value)" class="btn-black">
+                  <span class="link">{{ language.searchMobile }}</span>
+                </button>
               </div>
             </form>
             @if (!allCharged) {
@@ -74,31 +74,25 @@
                     }
                   </div>
                   <div class="flex-news">
-                    <a
+                    <button
+                      type="button"
+                      class="expand-toggle project-abstract"
                       [class.abstract-active]="isExpanded('proj', i)"
+                      [attr.aria-expanded]="isExpanded('proj', i)"
+                      [attr.aria-controls]="'project-' + i"
                       (click)="toggleExpanded('proj', i)"
-                      class="project-abstract"
-                      data-toggle="collapse"
-                      href="#collapseExample{{ i }}"
-                      role="button"
-                      aria-expanded="false"
-                      aria-controls="collapseExample"
                     >
                       {{ expandLabel( "proj", i, this.language.projectsText[0].seeMore,
                       this.language.projectsText[0].seeLess ) }}
-                    </a>
-                    <mat-icon
-                      class="project-abs-icon"
-                      [class]="{
-                              'abs-active': isExpanded('proj', i),
-                              'abs-not-active': !isExpanded('proj', i),
-                            }"
-                    >
-                      keyboard_arrow_down
-                    </mat-icon>
+                      <mat-icon class="project-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                    </button>
                   </div>
                 </div>
-                <div class="collapse collapsed-resumen mt-16" id="collapseExample{{ i }}">
+                <div
+                  class="collapse collapsed-resumen mt-16"
+                  [class.show]="isExpanded('proj', i)"
+                  [id]="'project-' + i"
+                >
                   <div class="abstract mb-8">
                     <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
                     {{ proyecto.description }}
@@ -124,17 +118,22 @@
                 </div>
               </div>
               } @if (currentProjects.length > 5) {
-              <ngb-pagination [(page)]="page" [pageSize]="pageSize" [collectionSize]="currentProjects.length">
+              <ngb-pagination
+                [(page)]="page"
+                (pageChange)="scroll()"
+                [pageSize]="pageSize"
+                [collectionSize]="currentProjects.length"
+              >
                 <ng-template class="unique-left" ngbPaginationPrevious>
-                  <div (click)="scroll()" class="h-ih">
+                  <div class="h-ih">
                     <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
                   </div>
                 </ng-template>
                 <ng-template ngbPaginationNumber let-page>
-                  <div (click)="scroll()" class="h-ih">{{ page }}</div>
+                  <div class="h-ih">{{ page }}</div>
                 </ng-template>
                 <ng-template ngbPaginationNext>
-                  <div (click)="scroll()" class="h-ih">
+                  <div class="h-ih">
                     <mat-icon class="pag-arrow" style="padding-bottom: 20px !important">
                       keyboard_arrow_right
                     </mat-icon>

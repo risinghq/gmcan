@@ -164,21 +164,6 @@
     height: auto;
     width: auto;
     font-size: 20px;
-    vertical-align: middle;
-    -webkit-transition: -webkit-transform 0.8s ease-in-out;
-    -ms-transition: -ms-transform 0.8s ease-in-out;
-    transition: transform 0.8s ease-in-out;
-  }
-
-  .abs-active {
-    transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-  }
-  .abs-not-active {
-    transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
   }
 }
 
