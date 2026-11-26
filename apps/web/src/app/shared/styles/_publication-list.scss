@@ -43,12 +43,12 @@
     @extend .plex-sans;
     font-size: 15px;
     letter-spacing: 0.3px;
-    color: #939393;
+    color: var(--muted-text);
   }
   .publication-rev {
     @extend .plex-sans;
     letter-spacing: 0.3px;
-    color: #939393;
+    color: var(--muted-text);
   }
 
   .line-1 {

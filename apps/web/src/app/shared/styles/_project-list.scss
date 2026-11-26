@@ -41,7 +41,7 @@
     font-size: 15px;
     line-height: 1;
     letter-spacing: 0.3px;
-    color: #939393;
+    color: var(--muted-text);
     background-color: #e8e8e8;
   }
   .project-mt {
@@ -59,12 +59,12 @@
     @extend .plex-sans;
     font-size: 15px;
     letter-spacing: 0.3px;
-    color: #939393;
+    color: var(--muted-text);
   }
   .project-rev {
     @extend .plex-sans;
     letter-spacing: 0.3px;
-    color: #939393;
+    color: var(--muted-text);
   }
 
   .line-1 {

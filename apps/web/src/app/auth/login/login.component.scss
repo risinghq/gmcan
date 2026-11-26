@@ -21,7 +21,7 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .back-div:hover .back-text,
@@ -33,7 +33,7 @@
   margin-right: 8px;
   width: max-content !important;
   height: max-content !important;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .login-card {
@@ -82,13 +82,13 @@ button {
   padding: 8px;
   width: 100%;
   border-radius: 4px;
-  border: solid 2px #9595b2;
-  color: #9595b2 !important;
+  border: solid 2px var(--muted-accent);
+  color: var(--muted-accent) !important;
   background-color: white !important;
 }
 
 .btn-grey > .link {
-  color: #9595b2 !important;
+  color: var(--muted-accent) !important;
 }
 
 .btn-grey > .link::before {

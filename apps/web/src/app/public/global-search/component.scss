@@ -20,7 +20,7 @@
   font-weight: 500;
   line-height: 1.54;
   letter-spacing: 0.3px;
-  color: #9595b2 !important;
+  color: var(--muted-accent) !important;
 }
 .global-link-active:hover {
   text-decoration: underline;
@@ -49,7 +49,7 @@
   margin-right: 8px;
   width: max-content !important;
   height: max-content !important;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .back-text {
@@ -58,7 +58,7 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .back-div {
@@ -105,7 +105,7 @@
   font-size: 16px;
   line-height: 1;
   letter-spacing: 0.3px;
-  color: #939393;
+  color: var(--muted-text);
 }
 .icon-search-toolbar {
   margin-top: auto;
@@ -201,7 +201,7 @@
   font-weight: 500;
   line-height: 1.75;
   letter-spacing: 0.3px;
-  color: #939393;
+  color: var(--muted-text);
 }
 
 .not-found-2 {

@@ -16,7 +16,7 @@
   font-weight: 500;
   line-height: 1.54;
   letter-spacing: 0.3px;
-  color: #9595b2 !important;
+  color: var(--muted-accent) !important;
 }
 .member-link-active:hover {
   text-decoration: underline;
@@ -56,7 +56,7 @@
   margin-top: 8px;
   font-weight: 500;
   letter-spacing: 0.3px;
-  color: #939393;
+  color: var(--muted-text);
 }
 
 .member-type-title {

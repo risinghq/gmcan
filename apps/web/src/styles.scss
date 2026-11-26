@@ -73,9 +73,10 @@ html {
 }
 
 :root {
+  --muted-text: #666666;
   --true-green: #039300;
   --black: #000000;
-  --gray: #9595b2 !important;
+  --muted-accent: #6e6e8c;
   --deep-green: #006400;
   --very-dark-blue: #000032;
   --pale-gray: #9595b2;
@@ -468,7 +469,7 @@ svg {
 }
 
 .header-text1 {
-  color: #9595b2;
+  color: var(--muted-accent);
   font-weight: 500;
 }
 .header-text2 {
@@ -524,7 +525,7 @@ svg {
   font-style: normal;
   line-height: 1.6;
   letter-spacing: 0.3px;
-  color: #9595b2;
+  color: var(--muted-accent);
   margin-bottom: 8px;
 }
 
@@ -576,7 +577,7 @@ svg {
 }
 
 ::placeholder {
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .icon-search {
@@ -590,7 +591,7 @@ svg {
   margin-top: 8px;
   @extend .plex-serif;
   font-weight: 500;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .share {
@@ -683,7 +684,7 @@ svg {
 }
 .mante-sub {
   @extend .plex-serif;
-  color: #9595b2;
+  color: var(--muted-accent);
 }
 
 .news-type {
@@ -1068,13 +1069,13 @@ circle {
   line-height: 1;
   width: max-content;
   border-radius: 4px;
-  border: solid 2px #9595b2;
-  color: #9595b2 !important;
+  border: solid 2px var(--muted-accent);
+  color: var(--muted-accent) !important;
   background-color: white !important;
 }
 
 .btn-grey > .link {
-  color: #9595b2 !important;
+  color: var(--muted-accent) !important;
 }
 
 .btn-grey > .link::before {
@@ -1100,7 +1101,7 @@ circle {
 }
 
 .grey-text {
-  color: #9595b2 !important;
+  color: var(--muted-accent) !important;
 }
 
 .grey-text::before {
@@ -1109,7 +1110,7 @@ circle {
 
 .grey-title {
   font-weight: 500;
-  color: #939393;
+  color: var(--muted-text);
 }
 
 .ml-24 {
