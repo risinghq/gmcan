@@ -8,8 +8,8 @@
 
 .back-icon {
   margin-right: 8px;
-  width: max-content !important;
-  height: max-content !important;
+  width: max-content;
+  height: max-content;
   color: var(--muted-accent);
 }
 
@@ -166,13 +166,6 @@
   margin-left: 16px;
   margin-right: 16px;
   width: 222px;
-}
-
-.width-normal {
-  z-index: 1;
-  padding: 11px 0px !important;
-  width: 270px !important;
-  margin-bottom: 0px;
 }
 
 .selector-users-input {

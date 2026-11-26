@@ -31,8 +31,8 @@
 
 .back-icon {
   margin-right: 8px;
-  width: max-content !important;
-  height: max-content !important;
+  width: max-content;
+  height: max-content;
   color: var(--muted-accent);
 }
 
@@ -59,7 +59,7 @@
 ::placeholder {
   color: #30393a;
   letter-spacing: 0.2px;
-  opacity: unset !important;
+  opacity: unset;
 }
 
 button {
@@ -118,7 +118,7 @@ form .ng-dirty.ng-invalid {
 
 .exito {
   @extend .error;
-  background-color: #006400 !important;
+  background-color: #006400;
 }
 
 .forgot {

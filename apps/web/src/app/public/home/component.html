@@ -142,10 +142,10 @@
       <a class="know-more-link" routerLink="/about-us/works">{{ language.knowWork2 }}</a>
     </div>
     <div class="flex-news btn-knowmore">
-      <a class="btn-black btn-nm" style="margin-right: 8px !important" routerLink="/about-us/works">
+      <a class="btn-black" routerLink="/about-us/works">
         <span class="btn-text2"> {{ language.goTo }} </span>
       </a>
-      <a class="btn-black btn-nm" style="margin-left: 8px !important" routerLink="/join-us">
+      <a class="btn-black" routerLink="/join-us">
         <span class="btn-text2"> {{ language.join }} </span>
       </a>
     </div>
@@ -174,7 +174,7 @@
   </div>
   <div class="publication-list">
     @for (publicacion of publicaciones | slice: 0 : 5; track publicacion; let i = $index) {
-    <div class="publication flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == publicaciones.length }">
+    <div class="publication flex-news">
       <div class="col-lg-4 col-md-12 nopd hide-mobile">
         @if (publicacion.kindCode !== 'thesis') {
         <div
@@ -340,7 +340,7 @@
   </div>
   <div class="publication-list">
     @for (proyecto of proyectos | slice: 0 : 5; track proyecto; let i = $index) {
-    <div class="project flex-news" [class]="{ notoppd: i === 0, 'no-border': i + 1 == proyectos.length }">
+    <div class="project flex-news">
       <div class="col-lg-4 col-md-12 nopd hide-mobile">
         <div class="project-code">{{ proyecto.code }}</div>
         <div class="project-rev mt-8">

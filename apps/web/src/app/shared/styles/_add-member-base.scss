@@ -8,8 +8,8 @@
 
 .back-icon {
   margin-right: 8px;
-  width: max-content !important;
-  height: max-content !important;
+  width: max-content;
+  height: max-content;
   color: var(--muted-accent);
 }
 
@@ -167,7 +167,7 @@
   font-size: 15px;
   letter-spacing: 0.3px;
   color: #000000;
-  margin-bottom: 0px !important;
+  margin-bottom: 0px;
 }
 
 .boxed input[type="radio"] {

@@ -31,8 +31,8 @@
 
 .back-icon {
   margin-right: 8px;
-  width: max-content !important;
-  height: max-content !important;
+  width: max-content;
+  height: max-content;
   color: var(--muted-accent);
 }
 
@@ -58,7 +58,7 @@
 ::placeholder {
   color: #30393a;
   letter-spacing: 0.2px;
-  opacity: unset !important;
+  opacity: unset;
 }
 
 .btn-black {
@@ -116,8 +116,8 @@ form .ng-dirty.ng-invalid {
 }
 
 .succesful-title {
-  margin-top: 78px !important;
-  margin-bottom: 78px !important;
+  margin-top: 78px;
+  margin-bottom: 78px;
 }
 
 @media (min-width: 961px) {
