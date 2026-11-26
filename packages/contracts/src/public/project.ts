@@ -5,7 +5,7 @@ import { CurrencyCodeSchema, FundingSourceCodeSchema, ProjectStatusCodeSchema } 
 export const PublicProjectMemberSchema = z.object({
   memberId: z.number(),
   name: z.string(),
-  photoUrl: z.string(),
+  photoUrl: z.string().nullable(),
   photoAlt: z.string(),
 });
 

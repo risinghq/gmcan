@@ -9,6 +9,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect } from "@angular/material/select";
 import { ActivatedRoute } from "@angular/router";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { CONTENT_LOCALES, localeForm, localeLabel } from "@app/shared/forms/locale-form";
 import type { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { type ReturnTarget, resolveReturnTo } from "@app/shared/routing/return-to";
@@ -148,6 +149,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
 @Component({
   selector: "app-publication-page",
   imports: [
+    AvatarComponent,
     ReactiveFormsModule,
     AutosizeModule,
     ContentFormComponent,
@@ -272,7 +274,12 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                         (onSelectionChange)="$event.isUserInput && link(row, candidate)"
                       >
                         @if (candidate.kind === "registered") {
-                          <img class="mr-12 img-user" [src]="candidate.photoUrl" [alt]="candidate.photoAlt" />
+                          <app-avatar
+                            class="mr-12 img-user"
+                            [src]="candidate.photoUrl"
+                            [alt]="candidate.photoAlt"
+                            [name]="candidate.name"
+                          />
                         }
                         {{ candidate.name }}
                       </mat-option>

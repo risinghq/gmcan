@@ -98,7 +98,12 @@
                   "registered") {
                   <div class="publication-members">
                     <div class="member-img-round">
-                      <img class="member-img" loading="lazy" src="{{ autor.photoUrl }}" alt="{{ autor.photoAlt }}" />
+                      <app-avatar
+                        class="member-img"
+                        [src]="autor.photoUrl"
+                        [alt]="autor.photoAlt"
+                        [name]="autor.name"
+                      />
                     </div>
                     <a
                       class="member-name plain-link"

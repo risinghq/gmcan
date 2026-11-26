@@ -11,7 +11,7 @@ export interface AdminNewsListItem {
   // null when the news kind has no translation in the request locale.
   categoryName: string | null;
   authorName: string;
-  authorPhotoUrl: string;
+  authorPhotoUrl: string | null;
   authorPhotoAlt: string;
 }
 
@@ -39,7 +39,7 @@ export interface AdminNewsListResponse {
 export interface AdminProjectMemberListItem {
   memberId: number;
   name: string;
-  photoUrl: string;
+  photoUrl: string | null;
   photoAlt: string;
 }
 
@@ -74,6 +74,6 @@ export interface AdminMemberListItem {
   memberTypeName: string;
   prefixCode: "dr" | "dra" | "mg" | "lic" | "bach" | "ing" | "none" | null;
   prefixName: string | null;
-  photoUrl: string;
+  photoUrl: string | null;
   photoAlt: string;
 }

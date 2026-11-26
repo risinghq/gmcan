@@ -26,7 +26,12 @@
               <div class="col-12 col-sm-6">
                 <div class="flex-news member-mt">
                   <div class="member-img-div">
-                    <img class="member-img" loading="lazy" src="{{ miembro.photoUrl }}" alt="{{ miembro.photoAlt }}" />
+                    <app-avatar
+                      class="member-img"
+                      [src]="miembro.photoUrl"
+                      [alt]="miembro.photoAlt"
+                      [name]="miembro.firstName + ' ' + miembro.lastName"
+                    />
                   </div>
                   <div class="member-text">
                     <div class="member-name full-width">

@@ -47,8 +47,14 @@
         }
       </div>
       <div class="right user-div flex-news">
-        <div class="user-img" [hidden]="!user()?.photoUrl">
-          <img class="img-css" [src]="user()?.photoUrl ?? ''" [alt]="user()?.photoAlt ?? ''" />
+        <div class="user-img">
+          <app-avatar
+            class="img-css"
+            [src]="user()?.photoUrl"
+            [alt]="user()?.photoAlt ?? ''"
+            [name]="userDisplayName()"
+            loading="eager"
+          />
         </div>
         <div class="ml-16">
           <div class="user-name">

@@ -8,7 +8,7 @@ export interface PublicNewsListItem {
   authorId: number;
   newsKindCode: "general" | "research" | "event";
   authorName: string;
-  authorPhotoUrl: string;
+  authorPhotoUrl: string | null;
   authorPhotoAlt: string;
   newsKindName: string;
 }

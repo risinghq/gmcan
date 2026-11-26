@@ -25,7 +25,7 @@ export type PublicationAuthorWrite = z.infer<typeof PublicationAuthorWriteSchema
  * used.
  */
 export type AuthorCandidate =
-  | { kind: "registered"; memberId: number; name: string; photoUrl: string; photoAlt: string }
+  | { kind: "registered"; memberId: number; name: string; photoUrl: string | null; photoAlt: string }
   | { kind: "external"; name: string };
 
 export const PublicationSubtypeWriteSchema = z.discriminatedUnion("kindCode", [
@@ -108,7 +108,7 @@ export const AdminPublicationListItemSchema = z.object({
   doi: z.string().nullable(),
   publishedAtLabel: z.string(),
   firstAuthorName: z.string(),
-  firstAuthorPhotoUrl: z.string(),
+  firstAuthorPhotoUrl: z.string().nullable(),
   firstAuthorPhotoAlt: z.string(),
 });
 

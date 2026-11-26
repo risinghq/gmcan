@@ -69,7 +69,7 @@ in production and under `bun run preview`, the API on port 3000 under
 `bun run dev` ([`config.ts`](../apps/api/config.ts)). A slot's file is returned
 as a URL string, or `null` when the slot is empty or soft-deleted. Publication
 files are returned as `{ "inline": ..., "download": ... }` instead. A member
-with no photo gets `/api/placeholders/member-photo`.
+with no photo gets a `null` photo URL, and the site draws their initials.
 
 | Endpoint                       | Response                                                            |
 | ------------------------------ | ------------------------------------------------------------------- |

@@ -33,7 +33,6 @@ These endpoints require no sign-in. All paths start with `/api`.
 | `GET /lookup`                                 | Reference lists the pages need (kinds, types, journals, and so on)                |
 | `GET /search?q=&types=`                       | Search across publications, members, news and projects                            |
 | `GET /assets/:id`, `GET /assets/:id/download` | A file ([assets](assets.md))                                                      |
-| `GET /placeholders/member-photo`              | The image shown for a member with no photo                                        |
 | `POST /email/contact`                         | Emails a membership request. Body: `name`, `reason`, `email`, `phone`             |
 | `POST /email/password-reset/*`                | `request`, `verify`, `confirm` ([authorization](authorization.md#password-reset)) |
 

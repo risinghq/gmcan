@@ -1,6 +1,7 @@
 import { DatePipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
+import { AvatarComponent } from "@app/shared/components/avatar.component";
 
 export interface NewsPreview {
   title: string;
@@ -8,13 +9,13 @@ export interface NewsPreview {
   body: string;
   image: string | null;
   kindName: string | null;
-  author: { name: string; photoUrl: string; photoAlt: string } | null;
+  author: { name: string; photoUrl: string | null; photoAlt: string } | null;
   publishedAt: Date | null;
 }
 
 @Component({
   selector: "app-news-preview-dialog",
-  imports: [DatePipe, MatDialogClose],
+  imports: [DatePipe, MatDialogClose, AvatarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "../../public/detail-news/component.scss",
   template: `
@@ -30,8 +31,14 @@ export interface NewsPreview {
           <p class="news-abstract">{{ data.summary }}</p>
         }
         <div class="author-div">
-          @if (data.author?.photoUrl) {
-            <img class="author-img" [src]="data.author?.photoUrl" [alt]="data.author?.photoAlt" />
+          @if (data.author; as author) {
+            <app-avatar
+              class="author-img"
+              [src]="author.photoUrl"
+              [alt]="author.photoAlt"
+              [name]="author.name"
+              loading="eager"
+            />
           }
           <div class="author-text">
             <div class="news-type">{{ data.kindName }}</div>

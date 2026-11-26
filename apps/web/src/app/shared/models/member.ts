@@ -12,7 +12,7 @@ export interface Member {
   maternalName: string | null;
   birthDate: string | null;
   bio: string | null;
-  photoUrl: string;
+  photoUrl: string | null;
   photoAlt: string;
   isActive: number;
   roleCode: "administrator" | "researcher" | "visitor";
