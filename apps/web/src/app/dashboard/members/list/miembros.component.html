@@ -2,11 +2,13 @@
   <div class="flex-news mb-16">
     <div class="search-news">
       <input
+        type="search"
         class="input-search-text"
+        aria-label="Buscar miembro por nombre, apellido, grado, cargo o correo."
         (keyup)="table.filterFrom($event)"
         placeholder="Buscar miembro por nombre, apellido, grado, cargo o correo."
       />
-      <mat-icon class="icon-search-toolbar">search</mat-icon>
+      <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
     </div>
     @if (canAdd) {
       <button type="button" class="center btn-black" (click)="addMember()">

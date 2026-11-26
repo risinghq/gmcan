@@ -49,6 +49,17 @@ $thetransition:
     -1px -1px 3px rgba(0, 0, 0, 0.1),
     1px 1px 3px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
+
+  .icon-btn {
+    position: relative;
+  }
+
+  // The pill is 32px tall; a 44px button would grow the toolbar, so the hit area extends past the icon instead.
+  .icon-btn::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+  }
 }
 
 .flag {

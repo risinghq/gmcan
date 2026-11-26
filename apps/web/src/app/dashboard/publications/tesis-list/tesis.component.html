@@ -3,11 +3,13 @@
     <div class="flex-news mb-16">
       <div class="search-news">
         <input
+          type="search"
           class="input-search-text"
+          aria-label="Buscar tesis por título, universidad o fecha de publicación"
           (keyup)="theses.filterFrom($event)"
           placeholder="Buscar tesis por título, universidad o fecha de publicación"
         />
-        <mat-icon class="icon-search-toolbar">search</mat-icon>
+        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
       </div>
       <button type="button" class="center btn-black" (click)="addThesis()">
         <span class="link">Agregar tesis</span>
@@ -76,11 +78,13 @@
     <div class="flex-news mb-16">
       <div class="search-news">
         <input
+          type="search"
           class="input-search-text"
+          aria-label="Buscar universidad por nombre"
           (keyup)="universities.filterFrom($event)"
           placeholder="Buscar universidad por nombre"
         />
-        <mat-icon class="icon-search-toolbar">search</mat-icon>
+        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
       </div>
       <button type="button" class="center btn-black" (click)="addUniversidad()">
         <span class="link">Agregar universidad</span>
