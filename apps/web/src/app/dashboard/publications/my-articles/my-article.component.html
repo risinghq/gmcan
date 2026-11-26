@@ -26,11 +26,11 @@
         @if (row.authors && row.authors.length != 0) {
           @let principal = row.authors[0];
           <div class="flex-news">
-            @if (principal.memberId) {
-              <div class="member-img-round mr-8">
+            <div class="member-img-round mr-8">
+              @if (principal.memberId) {
                 <img class="member-img" src="{{ principal.photoUrl }}" alt="{{ principal.photoAlt }}" />
-              </div>
-            }
+              }
+            </div>
             {{ principal.name }}
           </div>
         }
