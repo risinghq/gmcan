@@ -61,8 +61,6 @@ $thetransition:
 
 @media (max-width: 960px) {
   .not-found-div {
-    padding-left: 20px;
-    padding-right: 20px;
     padding-top: 46px;
     padding-bottom: 40px;
   }
@@ -81,19 +79,8 @@ $thetransition:
   }
 }
 
-@media (min-width: 961px) and (max-width: 1500px) {
+@media (min-width: 961px) {
   .not-found-div {
-    padding-left: 68px;
-    padding-right: 68px;
-    padding-top: 54px;
-    padding-bottom: 48px;
-  }
-}
-
-@media (min-width: 1500px) {
-  .not-found-div {
-    padding-left: 343px;
-    padding-right: 343px;
     padding-top: 54px;
     padding-bottom: 48px;
   }

@@ -187,8 +187,6 @@ form .ng-dirty.ng-invalid {
 
 @media (max-width: 960px) {
   .login-div {
-    padding-left: 20px;
-    padding-right: 20px;
     padding-top: 32px;
     padding-bottom: 221px;
   }
@@ -227,19 +225,8 @@ form .ng-dirty.ng-invalid {
   }
 }
 
-@media (min-width: 961px) and (max-width: 1500px) {
+@media (min-width: 961px) {
   .login-div {
-    padding-left: 68px;
-    padding-right: 68px;
-    padding-top: 64px;
-    padding-bottom: 186px;
-  }
-}
-
-@media (min-width: 1500px) {
-  .login-div {
-    padding-left: 343px;
-    padding-right: 343px;
     padding-top: 64px;
     padding-bottom: 186px;
   }

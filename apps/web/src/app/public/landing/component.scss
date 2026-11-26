@@ -6,6 +6,18 @@ $thetransition:
   transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
   visibility 0.25s;
 
+.main-toolbar {
+  padding-inline: var(--page-gutter);
+}
+
+.footer-div {
+  padding: 32px var(--page-gutter);
+
+  @media (max-width: 960px) {
+    padding: 16px 0 0;
+  }
+}
+
 .logo-nav {
   display: block;
   cursor: pointer;
@@ -397,12 +409,6 @@ mat-sidenav {
     height: 26px;
     vertical-align: unset;
   }
-  .footer-div {
-    padding-top: 16px;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 16px;
-  }
   .footer-title {
     font-size: 15px;
   }
@@ -465,19 +471,11 @@ mat-sidenav {
     width: 100%;
     justify-content: space-between;
   }
-  .footer-div {
-    padding-top: 32px !important;
-    padding-left: 343px !important;
-    padding-right: 343px !important;
-    padding-bottom: 32px !important;
-  }
   ::placeholder {
     color: var(--muted-text);
     opacity: 1;
   }
   .main-toolbar {
-    padding-left: 343px;
-    padding-right: 343px;
     height: 118px;
   }
   .contact-div {
@@ -518,19 +516,11 @@ mat-sidenav {
     width: 100%;
     justify-content: space-between;
   }
-  .footer-div {
-    padding-top: 32px;
-    padding-left: 67px;
-    padding-right: 67px;
-    padding-bottom: 32px;
-  }
   ::placeholder {
     color: var(--muted-text);
     opacity: 1;
   }
   .main-toolbar {
-    padding-left: 64px;
-    padding-right: 64px;
     height: 118px;
   }
   .contact-div {
@@ -574,23 +564,17 @@ mat-sidenav {
 @media (max-width: 960px) {
   .link-logo-div {
     justify-content: space-between;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-  .footer-div {
-    padding: 16px 0px 0px 0px;
+    padding-inline: var(--page-gutter);
   }
   ::placeholder {
     color: white;
     opacity: 1;
   }
   .main-toolbar {
-    padding-left: 24px;
-    padding-right: 24px;
     height: 56px;
   }
   .contact-div {
-    padding: 16px 24px;
+    padding: 16px var(--page-gutter);
   }
   .footer-info-2 {
     margin-top: 16px;
@@ -619,8 +603,7 @@ mat-sidenav {
   }
   .footer-down-bar {
     padding-top: 22px;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-inline: var(--page-gutter);
   }
   .logo-modal {
     height: 26px !important;

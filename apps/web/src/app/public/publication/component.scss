@@ -105,12 +105,6 @@
 @include publication-list.base;
 
 @media (min-width: 1500px) {
-  .publication-div {
-    padding-left: 343px !important;
-    padding-right: 343px !important;
-    padding-top: 24px !important;
-    padding-bottom: 40px !important;
-  }
   .card-publication {
     padding: 40px 40px 24px 40px;
   }
@@ -140,12 +134,6 @@
 }
 
 @media (max-width: 1500px) {
-  .publication-div {
-    padding-left: 68px;
-    padding-right: 68px;
-    padding-top: 24px;
-    padding-bottom: 40px;
-  }
   .card-publication {
     padding: 40px 40px 24px 40px;
   }
@@ -180,12 +168,6 @@
 
 @media (max-width: 960px) {
   @include publication-list.narrow;
-  .publication-div {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 12px;
-    padding-bottom: 20px;
-  }
   .card-publication {
     padding: 24px 16px 16px 16px;
   }

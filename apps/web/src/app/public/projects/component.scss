@@ -59,24 +59,6 @@
 
 @include project-list.summary;
 
-@media (min-width: 1500px) {
-  .project-div {
-    padding-left: 343px !important;
-    padding-right: 343px !important;
-    padding-top: 24px !important;
-    padding-bottom: 40px !important;
-  }
-}
-
-@media (max-width: 1500px) {
-  .project-div {
-    padding-left: 68px;
-    padding-right: 68px;
-    padding-top: 24px;
-    padding-bottom: 40px;
-  }
-}
-
 @media (min-width: 961px) {
   .project-links {
     padding-bottom: 8px;
@@ -121,9 +103,6 @@
     font-size: 13px;
   }
   @include project-list.narrow;
-  .project-div {
-    padding: 24px 16px;
-  }
   .project-header,
   .news-text-2 {
     font-size: 15px;

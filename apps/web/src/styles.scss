@@ -82,6 +82,11 @@ html {
   --pale-gray: #9595b2;
   --dark-blue: #00155b;
   --dark-forest-green: #003000;
+  --page-gutter: 20px;
+
+  @media (min-width: 961px) {
+    --page-gutter: max(68px, calc((100% - 1234px) / 2));
+  }
 }
 
 $thetransition:
@@ -220,6 +225,14 @@ app-root {
 }
 mat-sidenav-container {
   height: 100%;
+}
+
+.page {
+  padding: 12px var(--page-gutter) 20px;
+
+  @media (min-width: 961px) {
+    padding-block: 24px 40px;
+  }
 }
 
 mat-sidenav-content.page-column {
