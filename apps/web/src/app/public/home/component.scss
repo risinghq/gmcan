@@ -509,12 +509,6 @@ $thetransition:
   .segundo-box {
     padding-top: 24px !important;
   }
-  .home-div {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 12px;
-    padding-bottom: 20px;
-  }
   .numbers-div {
     display: block;
     justify-content: 8px;
@@ -631,24 +625,6 @@ $thetransition:
   .nopd {
     padding-left: unset !important;
     padding-right: unset !important;
-  }
-}
-
-@media (min-width: 961px) and (max-width: 1500px) {
-  .home-div {
-    padding-left: 68px;
-    padding-right: 68px;
-    padding-top: 24px;
-    padding-bottom: 40px;
-  }
-}
-
-@media (min-width: 1500px) {
-  .home-div {
-    padding-left: 343px;
-    padding-right: 343px;
-    padding-top: 24px;
-    padding-bottom: 40px;
   }
 }
 

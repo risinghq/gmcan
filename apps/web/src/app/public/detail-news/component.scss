@@ -2,7 +2,6 @@
   font-family: "IBM Plex Sans", sans-serif;
   letter-spacing: 0.3px;
   background-color: #f8f8f8;
-  padding: 24px max(68px, calc((100% - 1234px) / 2)) 40px;
 }
 
 .detail-links {
@@ -159,10 +158,6 @@ a.author-name:hover {
 }
 
 @media (max-width: 960px) {
-  .detail-div {
-    padding: 12px 20px 20px;
-  }
-
   .detail-links {
     padding-bottom: 16px;
     font-size: 13px;

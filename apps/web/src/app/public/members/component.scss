@@ -118,12 +118,6 @@
   color: var(--dark-forest-green);
 }
 @media (min-width: 1500px) {
-  .member-div {
-    padding-left: 343px !important;
-    padding-right: 343px !important;
-    padding-top: 24px !important;
-    padding-bottom: 40px !important;
-  }
   .member-links {
     padding-bottom: 8px;
   }
@@ -170,12 +164,6 @@
 }
 
 @media (max-width: 1500px) {
-  .member-div {
-    padding-left: 68px;
-    padding-right: 68px;
-    padding-top: 24px;
-    padding-bottom: 40px;
-  }
   .member-links {
     padding-bottom: 8px;
   }
@@ -222,12 +210,6 @@
 }
 
 @media (max-width: 960px) {
-  .member-div {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 12px;
-    padding-bottom: 20px;
-  }
   .member-links {
     padding-bottom: 16px;
   }
