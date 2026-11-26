@@ -102,7 +102,7 @@
   border: unset;
   background-color: inherit;
   @extend .plex-sans;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1;
   letter-spacing: 0.3px;
   color: #939393;
@@ -262,9 +262,6 @@
 }
 
 @media (max-width: 960px) {
-  .input-search-text {
-    font-size: 12px;
-  }
   .btn-black {
     margin-top: 16px;
   }
