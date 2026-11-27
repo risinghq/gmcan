@@ -43,12 +43,19 @@ import { ContentTable } from "./table";
     @let list = table();
     <div class="flex-news mb-16">
       <div class="search-news">
-        <input #search class="input-search-text" (keyup)="list.filter(search.value)" [placeholder]="searchLabel()" />
+        <input
+          #search
+          type="search"
+          class="input-search-text"
+          [attr.aria-label]="searchLabel()"
+          (keyup)="list.filter(search.value)"
+          [placeholder]="searchLabel()"
+        />
         <app-icon class="icon-search-toolbar" name="search" />
       </div>
-      <div class="center btn-black">
-        <a class="link" [routerLink]="list.addRoute">{{ addLabel() }}</a>
-      </div>
+      <a class="center btn-black" [routerLink]="list.addRoute">
+        <span class="link">{{ addLabel() }}</span>
+      </a>
     </div>
     <table mat-table [dataSource]="list.dataSource" [hidden]="list.notFound()" matSort>
       <ng-container matColumnDef="nombre">

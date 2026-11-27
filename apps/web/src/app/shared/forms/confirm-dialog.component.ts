@@ -26,10 +26,10 @@ export interface ConfirmDialogData {
     </div>
     <mat-dialog-content class="mat-text-dialog">{{ data.text }}</mat-dialog-content>
     <mat-dialog-actions class="mat-dialog-justify" align="end">
-      <div class="cancel-button link link-set" [mat-dialog-close]="true">{{ data.confirm }}</div>
-      <div class="black-btn" [mat-dialog-close]="false" cdkFocusInitial>
-        <div class="link link-set">{{ data.dismiss }}</div>
-      </div>
+      <button type="button" class="cancel-button link link-set" [mat-dialog-close]="true">{{ data.confirm }}</button>
+      <button type="button" class="btn-black" [mat-dialog-close]="false" cdkFocusInitial>
+        <span class="link link-set">{{ data.dismiss }}</span>
+      </button>
     </mat-dialog-actions>
   `,
 })
