@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { Title } from "@angular/platform-browser";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { Languages } from "@app/shared/models/languages";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -30,7 +30,7 @@ export default class LoginComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly loading = signal(false);
   readonly exito = signal<string | null>(null);
-  readonly recoverValue = signal(false);
+  readonly recoverValue = signal(inject(ActivatedRoute).snapshot.queryParamMap.has("recover"));
   readonly loginForm: FormGroup = this.fb.group({
     email: ["", [Validators.required, Validators.email]],
     password: ["", Validators.required],

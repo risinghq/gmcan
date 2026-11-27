@@ -12,7 +12,16 @@
 
 .back-div {
   width: max-content;
-  cursor: pointer;
+  text-decoration: none;
+}
+
+a.btn-black {
+  display: block;
+  text-decoration: none;
+}
+
+.status {
+  margin: 32px 0 0;
 }
 
 .back-text {
@@ -90,6 +99,7 @@ form .ng-dirty.ng-invalid {
 .login-subtitle {
   letter-spacing: 0.3px;
   color: #30393a;
+  text-wrap: pretty;
 }
 
 .succesful-title {

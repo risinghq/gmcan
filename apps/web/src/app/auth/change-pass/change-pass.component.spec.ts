@@ -18,9 +18,19 @@ describe("ChangePassComponent", () => {
   let fixture: ComponentFixture<ChangePassComponent>;
 
   const page = () => fixture.nativeElement as HTMLElement;
-  const spinner = () => page().querySelector(".loading-spinner");
-  const errorText = () => page().querySelector(".error")?.textContent?.trim() ?? null;
+  const verifying = () => page().querySelector('[role="status"]');
+  const heading = () => page().querySelector("h1")?.textContent?.trim();
+  const newLinkHref = () => page().querySelector(".login-card a.btn-black")?.getAttribute("href");
+  const alert = () => page().querySelector('[role="alert"]');
   const submit = () => page().querySelector<HTMLButtonElement>("button[type=submit]");
+
+  async function verifyAndFill(password: string) {
+    await open({ token: "good" });
+    http.expectOne(VERIFY).flush({ status: 200 });
+    await fixture.whenStable();
+    await type("Nueva contraseña", password);
+    await type("Repetir contraseña", password);
+  }
 
   async function open(query: Record<string, string>) {
     TestBed.configureTestingModule({
@@ -58,26 +68,43 @@ describe("ChangePassComponent", () => {
     http.verify();
   });
 
-  it("refuses a link with no token without asking the API", async () => {
+  it("refuses a link with no token without asking the API and offers a new link", async () => {
     await open({});
 
-    expect(errorText()).toContain("Token de recuperación no válido");
-    expect(spinner()).toBeNull();
+    expect(heading()).toBe("El enlace no es válido");
+    expect(page().textContent).toContain("incompleto");
+    expect(newLinkHref()).toBe("/login?recover=1");
+    expect(verifying()).toBeNull();
     expect(page().querySelector("form")).toBeNull();
   });
 
-  it("clears the spinner and shows the error when the API rejects the token", async () => {
+  it("offers a new link when the API rejects the token", async () => {
     await open({ token: "expired" });
     const verify = http.expectOne(VERIFY);
     expect(verify.request.body).toEqual({ token: "expired" });
-    expect(spinner()).not.toBeNull();
+    expect(verifying()).not.toBeNull();
 
     verify.flush({ error: "invalid token" }, { status: 400, statusText: "Bad Request" });
     await fixture.whenStable();
 
-    expect(spinner()).toBeNull();
-    expect(errorText()).toContain("Token inválido o expirado");
+    expect(verifying()).toBeNull();
+    expect(heading()).toBe("El enlace no es válido");
+    expect(page().textContent).toContain("expiró");
+    expect(newLinkHref()).toBe("/login?recover=1");
     expect(page().querySelector("form")).toBeNull();
+  });
+
+  it("keeps the form while saving and reports a failed save", async () => {
+    await verifyAndFill("new password 1");
+    submit()?.click();
+    await fixture.whenStable();
+
+    expect(submit()?.disabled).toBe(true);
+    http.expectOne(CONFIRM).flush({}, { status: 500, statusText: "Server Error" });
+    await fixture.whenStable();
+
+    expect(alert()?.textContent).toContain("No se pudo cambiar la contraseña");
+    expect(submit()?.disabled).toBe(false);
   });
 
   it("sends the new password with the token once both fields match", async () => {
@@ -100,7 +127,8 @@ describe("ChangePassComponent", () => {
     confirm.flush({ status: 200 });
     await fixture.whenStable();
 
-    expect(page().querySelector(".succesful-title")).not.toBeNull();
+    expect(heading()).toBe("¡Contraseña cambiada exitosamente!");
+    expect(newLinkHref()).toBe("/login");
     expect(page().querySelector("form")).toBeNull();
   });
 });
