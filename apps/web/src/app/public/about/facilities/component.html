@@ -5,47 +5,39 @@
     <div class="facilities-subtitle">{{ language().facilitiesText[0].subtitle }}</div>
     <div class="facilities-sub-divi"></div>
     <div class="facilities-text">{{ grupo().facilities }}</div>
-    @if (equipos().length > 0) {
-    <h2 class="equipment">{{ language().facilitiesText[0].equipment }}</h2>
-    <div>
-      @for (equipo of equipos(); track equipo; let i = $index) {
-      <div class="publication" [class.no-border]="i + 1 == equipos().length">
-        <div class="equipment-name mb-equipment">{{ equipo.name }}</div>
-        <mat-chip-set class="chip-row">
-          <mat-chip class="equipo-chip">
-            <span class="equipo-chip-label">CPU:</span>
-            <span class="equipo-chip-slick">{{ equipo.cpu || "-" }}</span>
-          </mat-chip>
-          <mat-chip class="equipo-chip">
-            <span class="equipo-chip-label">RAM:</span>
-            <span class="equipo-chip-slick">{{ equipo.ram || "-" }}</span>
-          </mat-chip>
-          <mat-chip class="equipo-chip">
-            <span class="equipo-chip-label">GPU:</span>
-            <span class="equipo-chip-slick">{{ equipo.gpu || "-" }}</span>
-          </mat-chip>
-          <mat-chip class="equipo-chip">
-            <span class="equipo-chip-label">HD:</span>
-            <span class="equipo-chip-slick">{{ equipo.storage || "-" }}</span>
-          </mat-chip>
-        </mat-chip-set>
-      </div>
+    @if (machines().length > 0) {
+    <h2 class="section-title">{{ language().facilitiesText[0].equipment }}</h2>
+    <div class="items">
+      @for (machine of machines(); track machine.id) {
+      <section>
+        <h3 class="item-name">{{ machine.name }}</h3>
+        @if (machine.specs.length > 0) {
+        <dl class="specs">
+          @for (spec of machine.specs; track spec.label) {
+          <div class="spec">
+            <dt>{{ spec.label }}:</dt>
+            <dd>{{ spec.value }}</dd>
+          </div>
+          }
+        </dl>
+        }
+      </section>
       }
     </div>
     } @if (software().length > 0) {
-    <h2 class="equipment">{{ language().facilitiesText[0].software }}</h2>
-    <div>
-      @for (soft of software(); track soft; let i = $index) {
-      <div class="publication" [class.no-border]="i + 1 == software().length">
-        <div class="equipment-name mb-8">{{ soft.name }}</div>
-        <div class="soft-description mb-8">{{ soft.description }}</div>
+    <h2 class="section-title">{{ language().facilitiesText[0].software }}</h2>
+    <div class="items">
+      @for (soft of software(); track soft.id) {
+      <section>
+        <h3 class="item-name">{{ soft.name }}</h3>
+        <p class="item-text">{{ soft.description }}</p>
         @if (soft.moreInfo) {
-        <div class="soft-more">
-          {{ language().facilitiesText[0].moreInfo }}:
-          <a class="soft-link" href="{{ soft.moreInfo }}" target="_blank">{{ soft.moreInfo }}</a>
-        </div>
+        <p class="item-text">
+          <span class="more-label">{{ language().facilitiesText[0].moreInfo }}:</span>
+          <a class="more-link" [href]="soft.moreInfo" target="_blank" rel="noopener">{{ soft.moreInfo }}</a>
+        </p>
         }
-      </div>
+      </section>
       }
     </div>
     }

@@ -17,6 +17,10 @@ function render(data: Partial<FacilitiesData>) {
   return {
     h1: page.querySelectorAll("h1").length,
     sections: [...page.querySelectorAll("h2")].map((heading) => heading.textContent?.trim()),
+    items: [...page.querySelectorAll("h3")].map((heading) => heading.textContent?.trim()),
+    specs: [...page.querySelectorAll("dl .spec")].map(
+      (spec) => `${spec.querySelector("dt")?.textContent?.trim()} ${spec.querySelector("dd")?.textContent?.trim()}`,
+    ),
   };
 }
 
@@ -26,6 +30,17 @@ describe("FacilitiesComponent", () => {
 
     expect(view.h1).toBe(1);
     expect(view.sections).toHaveLength(1);
+  });
+
+  it("lists each machine's known specs and leaves out the ones the group did not fill in", () => {
+    const view = render({
+      equipment: [
+        { id: 1, name: "P500", cpu: "Xeon E5-2698", ram: null, gpu: "Quadro K6000", storage: "" },
+      ] as FacilitiesData["equipment"],
+    });
+
+    expect(view.items).toEqual(["P500"]);
+    expect(view.specs).toEqual(["CPU: Xeon E5-2698", "GPU: Quadro K6000"]);
   });
 
   it("shows no section headings when the group lists nothing", () => {
