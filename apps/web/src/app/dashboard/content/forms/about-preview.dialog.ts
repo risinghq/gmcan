@@ -15,7 +15,9 @@ export interface AboutPreview {
   styleUrl: "../../../public/about/about-us/component.scss",
   template: `
     <div class="card-about scroll">
-      <img class="about-img" [src]="data.image ?? '/img/grupal.avif'" alt="" />
+      @if (data.image) {
+        <img class="about-img" [src]="data.image" alt="" />
+      }
       <div class="about-text-div">
         <div class="about-title">¿Quiénes Somos?</div>
         <div class="about-sub-divi"></div>
