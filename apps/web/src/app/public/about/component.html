@@ -1,13 +1,7 @@
 <div class="page about-div">
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="about-links">
-        <a class="about-link-active" routerLink="/">{{ facade.language().home }}</a>
-        <app-icon class="about-icon" name="caret-right" />
-        <span class="about-link-active">{{ facade.language().aboutUs }}</span>
-        <app-icon class="about-icon" name="caret-right" />
-        <span class="about-link short-text" aria-current="page">{{ facade.selectedCategory() }}</span>
-      </div>
+      <app-breadcrumb [trail]="[{ label: facade.language().aboutUs }, { label: facade.selectedCategory() }]" />
       <router-outlet />
     </div>
     <div class="col-lg-4 col-sm-6 col-12">

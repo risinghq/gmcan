@@ -8,33 +8,6 @@
   font-family: "IBM Plex Sans", serif;
 }
 
-.member-detail-icon {
-  vertical-align: middle;
-  height: 24px;
-}
-
-.member-detail-link {
-  @extend .plex-sans;
-  font-weight: 500;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-.member-detail-link-active:hover {
-  text-decoration: underline;
-  color: black;
-}
-.member-detail-link-active {
-  @extend .plex-sans;
-  font-weight: bold;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: #000000;
-  text-decoration: none;
-}
-
 .member-detail-div {
   background-color: #f8f8f8;
 }
@@ -123,11 +96,6 @@
 }
 
 @media (min-width: 1500px) {
-  .member-detail-links {
-    padding-bottom: 8px;
-  }
-  .member-detail-link-active,
-  .member-detail-link,
   .back-text,
   .detail-member-resum {
     font-size: 15px;
@@ -156,11 +124,6 @@
 }
 
 @media (max-width: 1500px) {
-  .member-detail-links {
-    padding-bottom: 8px;
-  }
-  .member-detail-link-active,
-  .member-detail-link,
   .back-text,
   .detail-member-resum {
     font-size: 15px;
@@ -192,11 +155,6 @@
 }
 
 @media (max-width: 960px) {
-  .member-detail-links {
-    padding-bottom: 16px;
-  }
-  .member-detail-link-active,
-  .member-detail-link,
   .member-detail-subtitle {
     font-size: 13px;
   }

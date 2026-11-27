@@ -1,11 +1,7 @@
 <div class="page project-div">
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="project-links">
-        <a class="project-link-active" routerLink="/">{{ language.home }}</a>
-        <app-icon class="project-icon" name="caret-right" />
-        <span class="project-link" aria-current="page">{{ language.projects }}</span>
-      </div>
+      <app-breadcrumb [trail]="[{ label: language.projects }]" />
       <div class="project-card-div">
         <div class="project-header">{{ language.projectsText[0].projectsTitle }}</div>
         <div class="project-subtext">{{ infoText }}</div>

@@ -4,34 +4,6 @@
   background-color: #f8f8f8;
 }
 
-.detail-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  padding-bottom: 8px;
-  font-size: 15px;
-  line-height: 1.54;
-}
-
-.detail-icon {
-  height: 24px;
-}
-
-.detail-link-active {
-  font-weight: 600;
-  color: #000000;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.detail-link {
-  font-weight: 500;
-  color: #6b6b8a;
-}
-
 .card-detail {
   border-radius: 4px;
   background-color: #ffffff;
@@ -158,11 +130,6 @@ a.author-name:hover {
 }
 
 @media (max-width: 960px) {
-  .detail-links {
-    padding-bottom: 16px;
-    font-size: 13px;
-  }
-
   .detail-img {
     height: 180px;
   }

@@ -1,11 +1,7 @@
 <div class="page member-div">
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="member-links">
-        <a class="member-link-active" routerLink="/">{{ language.home }}</a>
-        <app-icon class="member-icon" name="caret-right" />
-        <span class="member-link" aria-current="page">{{ language.members }}</span>
-      </div>
+      <app-breadcrumb [trail]="[{ label: language.members }]" />
       <div class="member-card">
         @let view = vm();
         <div class="member-title">{{ language.membersText[0].memberTitle }}</div>

@@ -6,18 +6,7 @@
   } @if (!loading() && usuario) {
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="member-detail-links">
-        <a class="member-detail-link-active" routerLink="/">{{ language.home }}</a>
-        @if (previouslink !== "/") {
-        <app-icon class="member-detail-icon" name="caret-right" />
-        } @if (previouslink !== "/") {
-        <a class="member-detail-link-active" [routerLink]="previouslink">{{ previouspage }}</a>
-        }
-        <app-icon class="member-detail-icon" name="caret-right" />
-        <span class="member-detail-link" aria-current="page">
-          {{ usuario.prefix }} {{ usuario.firstName }} {{ usuario.lastName }} {{ usuario.maternalName }}
-        </span>
-      </div>
+      <app-breadcrumb [trail]="trail()" />
       <div class="member-detail-card">
         <button type="button" class="flex-news back-div" (click)="return()">
           <app-icon class="back-icon" name="arrow-left" />

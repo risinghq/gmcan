@@ -12,33 +12,6 @@
   background-color: #f8f8f8;
 }
 
-.publication-link {
-  @extend .plex-sans;
-  font-weight: 500;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-.publication-link-active:hover {
-  text-decoration: underline;
-  color: black;
-}
-.publication-link-active {
-  @extend .plex-sans;
-  font-weight: bold;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: #000000;
-  text-decoration: none;
-}
-
-.publication-icon {
-  vertical-align: middle;
-  height: 24px;
-}
-
 .card-publication {
   border-radius: 4px;
   background-color: #ffffff;

@@ -1,11 +1,7 @@
 <div class="page join-div">
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="join-links">
-        <a class="join-link-active" routerLink="/">{{ language.home }}</a>
-        <app-icon class="join-icon" name="caret-right" />
-        <span class="join-link" aria-current="page">{{ language.join }}</span>
-      </div>
+      <app-breadcrumb [trail]="[{ label: language.join }]" />
       <div class="email-div">
         <button type="button" class="flex-news back-div" (click)="return()">
           <app-icon class="back-icon" name="arrow-left" />

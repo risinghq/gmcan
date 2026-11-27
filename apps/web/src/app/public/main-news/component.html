@@ -2,11 +2,7 @@
   @let allCharged = !news.isLoading(); @let newsItems = items(); @let total = news.value()?.total ?? 0;
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="main-news-links">
-        <a class="main-news-link-active" routerLink="/">{{ language.home }}</a>
-        <app-icon class="main-news-icon" name="caret-right" />
-        <span class="main-news-link" aria-current="page">{{ language.news }}</span>
-      </div>
+      <app-breadcrumb [trail]="[{ label: language.news }]" />
       <div class="news-list-div">
         @if (!allCharged) {
         <div class="spinner-pad">

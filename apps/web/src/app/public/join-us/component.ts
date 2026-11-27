@@ -2,7 +2,8 @@ import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@ang
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButton } from "@angular/material/button";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
-import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
+import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import type { EmailBody } from "@app/shared/models/emailBody";
@@ -21,7 +22,15 @@ import { AutosizeModule } from "ngx-autosize";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [RouterLink, IconComponent, FormsModule, ReactiveFormsModule, AutosizeModule, MatButton, NewsComponent],
+  imports: [
+    BreadcrumbComponent,
+    IconComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    AutosizeModule,
+    MatButton,
+    NewsComponent,
+  ],
 })
 export default class JoinUsComponent implements OnInit {
   fb = inject(FormBuilder);
