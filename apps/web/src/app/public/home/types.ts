@@ -27,9 +27,12 @@ export type HomeViewModel = {
   featuredNews: HomeNewsItem | null;
   linesPreview: PublicGroupTopic[];
   metodos: PublicGroupTopic[];
-  memberCount: number;
+  counters: HomeCounter[];
   aboutUs: string[];
-  articulos: number;
-  tesis: number;
-  resumenes: number;
+};
+
+export type HomeCounter = {
+  value: number;
+  label: string;
+  link: string;
 };

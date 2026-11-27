@@ -14,7 +14,7 @@ import { SessionService } from "@app/shared/services/session.service";
 import { EmphasisPipe } from "@app/shared/utils/emphasis";
 import { MoneyPipe } from "@app/shared/utils/money";
 
-import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
+import type { HomeCounter, HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
 @Component({
   selector: "app-home",
@@ -43,10 +43,7 @@ export default class HomeComponent implements OnInit {
 
   progress = 100;
   info: Group = createGroup();
-  memberCount = 0;
-  articulos = 0;
-  tesis = 0;
-  resumenes = 0;
+  counters: HomeCounter[] = [];
   linesPreview: HomeViewModel["linesPreview"] = [];
   newsItems: HomeNewsItem[] = [];
   featuredNews: HomeNewsItem | null = null;
@@ -66,10 +63,7 @@ export default class HomeComponent implements OnInit {
     this.featuredNews = home.featuredNews;
     this.linesPreview = home.linesPreview;
     this.metodos = home.metodos;
-    this.memberCount = home.memberCount;
+    this.counters = home.counters;
     this.aboutUs = home.aboutUs;
-    this.articulos = home.articulos;
-    this.tesis = home.tesis;
-    this.resumenes = home.resumenes;
   }
 }

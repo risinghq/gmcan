@@ -51,9 +51,12 @@ export const Languages = [
     noResultsProjects: "No se encontraron proyectos",
     noResultsNews: "No se encontraron noticias",
     noResultsMembers: "No se encontraron miembros",
-    articles: "Artículos",
-    thesis: "Tesis",
-    resumenes: "Resúmenes",
+    counters: {
+      members: { one: "Miembro", other: "Miembros" },
+      articles: { one: "Artículo", other: "Artículos" },
+      theses: { one: "Tesis", other: "Tesis" },
+      abstracts: { one: "Resumen", other: "Resúmenes" },
+    },
     seeMore: "Ver más",
     knowMore: "Saber más",
     aboutText: [
@@ -230,9 +233,12 @@ export const Languages = [
     noResultsProjects: "No projects found",
     noResultsNews: "No news found",
     noResultsMembers: "No members found",
-    articles: "Papers",
-    thesis: "Thesis",
-    resumenes: "Conference abstracts",
+    counters: {
+      members: { one: "Member", other: "Members" },
+      articles: { one: "Paper", other: "Papers" },
+      theses: { one: "Thesis", other: "Theses" },
+      abstracts: { one: "Conference abstract", other: "Conference abstracts" },
+    },
     seeMore: "See more",
     knowMore: "Learn more",
     aboutText: [

@@ -7,22 +7,12 @@
     <a class="white-btn" routerLink="/about-us/about">{{ language.knowAboutUs }}</a>
   </div>
   <div class="numbers-div">
-    <a class="box" routerLink="/members">
-      <span class="counter" id="users">{{ memberCount }}</span>
-      <span class="counter-text">{{ language.members }}</span>
+    @for (counter of counters; track $index) {
+    <a class="box" [routerLink]="counter.link">
+      <span class="counter">{{ counter.value }}</span>
+      <span class="counter-text">{{ counter.label }}</span>
     </a>
-    <a class="box" routerLink="/publications">
-      <span class="counter" id="articulos">{{ articulos }}</span>
-      <span class="counter-text">{{ language.articles }}</span>
-    </a>
-    <a class="box" routerLink="/publications">
-      <span class="counter" id="tesis">{{ tesis }}</span>
-      <span class="counter-text">{{ language.thesis }}</span>
-    </a>
-    <a class="box" routerLink="/publications">
-      <span class="counter" id="resumenes">{{ resumenes }}</span>
-      <span class="counter-text">{{ language.resumenes }}</span>
-    </a>
+    }
   </div>
   <div class="center know-more hide-mobile">
     {{ language.knowAbout }}
