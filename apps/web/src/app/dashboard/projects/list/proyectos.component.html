@@ -53,7 +53,7 @@
       </table>
       <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" />
       @if (table.notFound()) {
-        <span class="plex-sans">No se encontraron resultados</span>
+        <span>No se encontraron resultados</span>
       }
     </mat-tab>
     <mat-tab label="Fuentes de financiamiento">
@@ -79,7 +79,7 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
         </table>
       } @else {
-        <span class="plex-sans">No se encontraron resultados</span>
+        <span>No se encontraron resultados</span>
       }
     </mat-tab>
   </mat-tab-group>
@@ -131,7 +131,7 @@
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" />
     @if (table.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </div>
 }

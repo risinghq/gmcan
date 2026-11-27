@@ -303,7 +303,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
               </div>
             }
           </div>
-          <button type="button" class="add-author plex-sans" (click)="addAuthor()">
+          <button type="button" class="add-author" (click)="addAuthor()">
             <app-icon name="plus" /><span>Agregar autor</span>
           </button>
         </div>
@@ -325,14 +325,14 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
           <div class="flex-news">
             <div class="pdf-box mr-16">
               <app-icon class="pdf-icon" name="file-type-pdf" />
-              <span class="pdf-name plex-sans">{{ file()?.name ?? (item()?.asset ? "PDF actual" : "PDF") }}</span>
+              <span class="pdf-name">{{ file()?.name ?? (item()?.asset ? "PDF actual" : "PDF") }}</span>
             </div>
-            <label class="green-text plex-sans">
+            <label class="green-text">
               {{ file() || item()?.asset ? "Cambiar" : "Seleccionar PDF" }}
               <input class="file_upload" type="file" accept="application/pdf" (change)="pick($event)" />
             </label>
             @if (item()?.asset; as asset) {
-              <a class="green-text plex-sans ml-16" [href]="asset" target="_blank" rel="noopener">Ver PDF actual</a>
+              <a class="green-text ml-16" [href]="asset" target="_blank" rel="noopener">Ver PDF actual</a>
             }
           </div>
         </div>

@@ -1,11 +1,3 @@
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
-
 .dashboard-container {
   height: 100%;
 }
@@ -130,7 +122,6 @@
 }
 
 .bad-experience {
-  @extend .plex-sans;
   font-size: 20px;
   text-align: center;
   letter-spacing: 0.3px;
@@ -155,7 +146,6 @@
 }
 
 .btn-text {
-  @extend .plex-sans;
   font-weight: 600;
   font-size: 13px;
   text-align: center;
@@ -165,7 +155,6 @@
 }
 
 .anyway {
-  @extend .plex-sans;
   font-style: normal;
   font-weight: 500;
   font-size: 13px;

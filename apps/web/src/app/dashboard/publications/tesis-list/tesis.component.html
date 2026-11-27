@@ -64,7 +64,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="theses.notFound()" #thesesPaginator />
     @if (theses.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
   <mat-tab label="Universidad">
@@ -108,7 +108,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="universities.notFound()" #universitiesPaginator />
     @if (universities.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
 </mat-tab-group>

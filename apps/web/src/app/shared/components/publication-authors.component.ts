@@ -27,7 +27,6 @@ import type { PublicationAuthor } from "@gmcan/contracts/public";
   styles: `
     :host {
       display: block;
-      font-family: "IBM Plex Sans", serif;
       font-size: 15px;
       font-weight: 300;
       line-height: 1.33;

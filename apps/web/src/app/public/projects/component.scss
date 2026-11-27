@@ -1,11 +1,6 @@
 @use "../../shared/styles/project-list";
 
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
-
 .project-div {
-  @extend .plex-sans;
   background-color: #f8f8f8;
 }
 

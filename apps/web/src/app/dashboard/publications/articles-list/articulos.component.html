@@ -61,7 +61,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="articles.notFound()" #articlesPaginator />
     @if (articles.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
   <mat-tab label="Revistas">
@@ -99,7 +99,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="journals.notFound()" #journalsPaginator />
     @if (journals.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
 </mat-tab-group>

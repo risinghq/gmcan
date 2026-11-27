@@ -6,11 +6,13 @@
 @import "@fontsource/ibm-plex-sans/latin-500.css";
 @import "@fontsource/ibm-plex-sans/latin-600.css";
 @import "@fontsource/ibm-plex-sans/latin-700.css";
-@import "@fontsource/ibm-plex-serif/latin-400.css";
-@import "@fontsource/ibm-plex-serif/latin-400-italic.css";
-@import "@fontsource/ibm-plex-serif/latin-500.css";
-@import "@fontsource/ibm-plex-serif/latin-600.css";
-@import "@fontsource/ibm-plex-serif/latin-700.css";
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
 
 app-icon {
   display: inline-block;
@@ -36,7 +38,10 @@ html {
         primary: mat.$green-palette,
         theme-type: light,
       ),
-      typography: "IBM Plex Sans",
+      typography: (
+        "IBM Plex Sans",
+        sans-serif,
+      ),
       density: 0,
     )
   );
@@ -120,7 +125,6 @@ $thetransition:
 }
 
 .loading-text {
-  @extend .plex-sans;
   font-style: normal;
   font-weight: 500;
   font-size: 15px;
@@ -152,7 +156,6 @@ $thetransition:
   background-color: #30393a;
 }
 .footer-title {
-  @extend .plex-sans;
   font-weight: bold;
 }
 
@@ -163,14 +166,12 @@ $thetransition:
 }
 
 .footer-text-title {
-  @extend .plex-sans;
   font-weight: 600;
   color: #ffffff;
 }
 
 .footer-direction {
   white-space: break-spaces;
-  @extend .plex-sans;
   font-weight: normal;
 }
 
@@ -211,9 +212,6 @@ app-root {
 .inline-flex {
   display: inline-flex;
 }
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
 
 .google-html {
   display: block;
@@ -223,9 +221,6 @@ app-root {
   border-radius: 4px;
 }
 
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
 mat-sidenav-container {
   height: 100%;
 }
@@ -249,7 +244,6 @@ mat-sidenav-container {
 }
 
 .page-title {
-  @extend .plex-sans;
   margin: 0;
   font-size: 15px;
   font-weight: bold;
@@ -263,7 +257,6 @@ mat-sidenav-container {
 }
 
 .page-intro {
-  @extend .plex-sans;
   margin: 16px 0;
   font-size: 13px;
   font-weight: 300;
@@ -325,7 +318,6 @@ mat-sidenav-content.page-column {
   font-weight: 500;
   letter-spacing: 0.3px;
   color: #000000;
-  @extend .plex-sans;
   margin-right: 28px;
   font-weight: normal;
   text-decoration: unset;
@@ -355,7 +347,6 @@ mat-sidenav-content.page-column {
   font-weight: 500;
   letter-spacing: 0.3px;
   color: #000000;
-  @extend .plex-sans;
   font-weight: normal;
   text-decoration: unset;
   position: relative;
@@ -502,7 +493,6 @@ button.forgot {
 }
 
 .menu-text {
-  @extend .plex-sans;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.3px;
@@ -528,7 +518,6 @@ button.forgot {
   color: var(--black);
 }
 .green-text {
-  @extend .plex-serif;
   font-weight: 600;
   color: var(--true-green);
 }
@@ -552,19 +541,8 @@ button.forgot {
   border-top-right-radius: 10px;
 }
 
-.grupo-header {
-  @extend .plex-serif;
-}
-
-.card-text-question {
-  @extend .plex-serif;
-  font-weight: 500;
-  color: var(--very-dark-blue);
-}
-
 .card-text {
   margin-top: 8px;
-  @extend .plex-sans;
   font-weight: 300;
   color: var(--black);
   margin-bottom: 16px;
@@ -573,22 +551,6 @@ button.forgot {
 .card-text-2 {
   margin-top: unset;
   margin-bottom: 16px;
-}
-
-.btn-green {
-  @extend .plex-serif;
-  padding: 6px 16px 8px 16px;
-  border-radius: 200px;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
-  background-image: linear-gradient(90deg, var(--deep-green), var(--true-green));
-  font-weight: 600;
-  color: #ffffff;
-  line-height: unset;
-}
-
-.btn-green:hover {
-  background-color: var(--deep-green);
-  background-image: unset;
 }
 
 .header-text1 {
@@ -630,26 +592,6 @@ button.forgot {
   font-size: 20px;
   margin-top: -1.9px;
   margin-bottom: auto;
-}
-.carousel-card-title {
-  @extend .plex-serif;
-  font-weight: 600;
-  color: var(--black);
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  margin-bottom: 8px;
-}
-.carousel-card-authors {
-  @extend .plex-serif;
-  font-weight: normal;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.6;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-  margin-bottom: 8px;
 }
 
 .carousel-card-btn {
@@ -725,7 +667,6 @@ button.forgot {
 }
 
 .input-search {
-  @extend .plex-serif;
   border: unset;
   font-weight: normal;
   font-stretch: normal;
@@ -747,7 +688,6 @@ button.forgot {
 
 .fecha {
   margin-top: 8px;
-  @extend .plex-serif;
   font-weight: 500;
   color: var(--muted-accent);
 }
@@ -763,7 +703,6 @@ button.forgot {
     height: max-content;
     border-radius: 2px;
     margin-left: 8px;
-    @extend .plex-sans;
     letter-spacing: 0.3px;
     border: solid 1px #e5e5e5;
     background-color: #ffffff;
@@ -844,16 +783,6 @@ button.forgot {
   align-self: center;
   display: block ruby;
 }
-.mante-title {
-  @extend .plex-serif;
-  font-weight: bold;
-  color: var(--black);
-}
-.mante-sub {
-  @extend .plex-serif;
-  color: var(--muted-accent);
-}
-
 .news-type {
   line-height: 1;
   letter-spacing: 0.3px;
@@ -877,7 +806,6 @@ mat-spinner {
 }
 
 .not-found {
-  @extend .plex-sans;
   text-align: center;
   padding: 24px 8px;
   color: #000000;
@@ -1079,7 +1007,6 @@ circle {
 }
 
 .add-box {
-  @extend .plex-sans;
   padding: 24px;
   border-radius: 4px;
   background-color: #ffffff;

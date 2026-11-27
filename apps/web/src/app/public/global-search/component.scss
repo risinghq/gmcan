@@ -2,16 +2,7 @@
 @use "../projects/component.scss" as projectStyles;
 @use "../../shared/components/news/news.component.scss";
 
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
-
 .global-search-div {
-  @extend .plex-sans;
   background-color: #f8f8f8;
   min-height: 56vh;
 }
@@ -31,7 +22,6 @@
 
 .back-text {
   align-self: center;
-  @extend .plex-sans;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;
@@ -88,7 +78,6 @@
 }
 
 .miembro-name {
-  @extend .plex-sans;
   line-height: 1;
   font-weight: 600;
   letter-spacing: 0.3px;
@@ -96,7 +85,6 @@
 }
 
 .miembro-profile {
-  @extend .plex-sans;
   line-height: 0.75;
   letter-spacing: 0.3px;
   color: var(--deep-green);

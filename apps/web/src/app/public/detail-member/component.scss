@@ -1,13 +1,5 @@
 @use "../publication/component.scss";
 
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
-
 .member-detail-div {
   background-color: #f8f8f8;
 }
@@ -18,7 +10,6 @@
 }
 
 .member-detail-title {
-  @extend .plex-sans;
   font-weight: bold;
   line-height: 1;
   letter-spacing: 0.3px;
@@ -34,7 +25,6 @@
 
 .back-text {
   align-self: center;
-  @extend .plex-sans;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;
@@ -58,7 +48,6 @@
 
 .member-detail-type {
   margin-top: 8px;
-  @extend .plex-sans;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;
@@ -67,7 +56,6 @@
 
 .detail-member-resum {
   margin-top: 24px;
-  @extend .plex-sans;
   font-weight: 300;
   letter-spacing: 0.3px;
   color: #000000;
@@ -79,7 +67,6 @@
 
 .member-publications {
   margin-top: 24px;
-  @extend .plex-sans;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.3px;

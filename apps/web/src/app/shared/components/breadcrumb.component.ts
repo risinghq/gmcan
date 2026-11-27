@@ -35,7 +35,6 @@ export interface Crumb {
     :host {
       display: block;
       padding-bottom: 8px;
-      font-family: "IBM Plex Sans", serif;
     }
 
     ol {
