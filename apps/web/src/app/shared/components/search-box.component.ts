@@ -85,10 +85,6 @@ import { IconComponent } from "@app/shared/components/icon/icon.component";
       form {
         gap: 8px;
       }
-
-      button {
-        font-size: 13px;
-      }
     }
   `,
 })

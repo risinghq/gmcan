@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, inject, signal, ChangeDetectionStrategy 
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { BackLinkComponent } from "@app/shared/components/back-link.component";
 import { Languages } from "@app/shared/models/languages";
 import { AuthService } from "@app/shared/services/auth.service";
 import { EmailService } from "@app/shared/services/email.service";
@@ -15,7 +15,7 @@ import { finalize } from "rxjs";
   templateUrl: "./login.component.html",
   styleUrl: "./login.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [IconComponent, ReactiveFormsModule, RouterLink],
+  imports: [BackLinkComponent, ReactiveFormsModule, RouterLink],
 })
 export default class LoginComponent implements OnInit {
   private groupService = inject(GroupService);

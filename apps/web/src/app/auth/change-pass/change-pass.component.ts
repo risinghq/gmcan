@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, inject, signal } from "@angular/core";
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, RouterLink } from "@angular/router";
-import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { BackLinkComponent } from "@app/shared/components/back-link.component";
 import { EmailService } from "@app/shared/services/email.service";
 import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
@@ -16,7 +16,7 @@ function passwordsMatch(control: AbstractControl): { passwordMismatch: true } | 
   templateUrl: "./change-pass.component.html",
   styleUrl: "./change-pass.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent, ReactiveFormsModule, RouterLink],
+  imports: [BackLinkComponent, ReactiveFormsModule, RouterLink],
 })
 export default class ChangePassComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

@@ -1,8 +1,5 @@
 <div class="page login-div">
-  <a class="flex-news back-div" routerLink="/">
-    <app-icon class="back-icon" name="arrow-left" />
-    <span class="back-text">{{ language.backAll }}</span>
-  </a>
+  <a app-back-link routerLink="/">{{ language.backAll }}</a>
   <div class="login-card">
     <img class="logo-icon" [src]="grupoinfo().assets.header" alt="GMCAN" />
     @if (!recoverValue()) {
@@ -50,9 +47,8 @@
     } @else {
       @let recoverError = fieldError(emailForm, "email");
       <form [formGroup]="emailForm" (ngSubmit)="recover()">
-        <button type="button" class="flex-news back-div recover-back" (click)="change()">
-          <app-icon class="back-icon" name="arrow-left" />
-          <span class="back-text">{{ language.detailMemberText[0].back }}</span>
+        <button type="button" app-back-link class="recover-back" (click)="change()">
+          {{ language.detailMemberText[0].back }}
         </button>
         <h1 class="login-title recover-title">Recuperar contraseña</h1>
         <p class="login-subtitle">

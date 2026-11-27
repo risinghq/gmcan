@@ -8,47 +8,30 @@
 }
 
 .card-global {
+  margin-top: 16px;
+  padding: 16px;
   border-radius: 4px;
-  padding: 8px;
   background-color: #ffffff;
 }
 
-.back-icon {
-  margin-right: 8px;
-  width: max-content;
-  height: max-content;
-  color: var(--muted-accent);
-}
-
-.back-text {
-  align-self: center;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-
-.back-div:hover .back-text,
-.back-div:hover .back-icon {
-  color: black;
-}
-
 .global-results-title {
+  margin: 16px 0 0;
+  font-size: 22px;
   font-weight: bold;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.17;
+  line-height: 1.25;
   letter-spacing: 0.3px;
   color: #000000;
 }
 
 .publications-title {
   display: flex;
+  margin-top: 16px;
+  border-bottom: 2px solid #30393a;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.75;
   letter-spacing: 0.3px;
   color: #30393a;
-  border-bottom: 2px solid #30393a;
 }
 
 .length-text {
@@ -63,13 +46,19 @@
   padding-top: 16px;
 }
 
+.miembro-mt {
+  margin-top: 16px;
+}
+
 .miembro-img-div {
-  width: 62px;
-  height: 62px;
-  border-radius: 100px;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
   overflow: hidden;
   background-color: #c4c4c4;
 }
+
 .miembro-img {
   border-radius: inherit;
   width: inherit;
@@ -77,39 +66,35 @@
   object-fit: cover;
 }
 
+.miembro-text {
+  padding-left: 8px;
+}
+
 .miembro-name {
-  line-height: 1;
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1.3;
   letter-spacing: 0.3px;
   color: #000000;
 }
 
 .miembro-profile {
-  line-height: 0.75;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-size: 15px;
   letter-spacing: 0.3px;
   color: var(--deep-green);
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--dark-forest-green);
+  }
 }
 
-.profile-icon {
-  height: auto;
-  width: auto;
-  vertical-align: middle;
-}
 .profile-icon {
   font-size: 16px;
-  margin-left: -4px;
-  margin-top: -4px;
-  color: var(--deep-green);
-}
-
-.miembro-profile:hover {
-  cursor: pointer;
-  text-decoration: underline;
-  color: var(--dark-forest-green);
-}
-.miembro-profile:hover .profile-icon {
-  cursor: pointer;
-  color: var(--dark-forest-green);
 }
 
 .section-toggle {
@@ -118,34 +103,29 @@
 }
 
 .publication-abs-icon-2 {
-  height: 32px;
   width: auto;
+  height: 20px;
+  font-size: 20px;
 }
 
 .not-found-1 {
-  padding: 8px 0px;
+  padding: 8px 0;
+  font-size: 15px;
   font-weight: 500;
-  line-height: 1.75;
+  line-height: 1.5;
   letter-spacing: 0.3px;
   color: var(--muted-text);
 }
 
 .not-found-2 {
   @extend .not-found-1;
+  font-size: 17px;
 }
 
 @media (min-width: 961px) {
-  .global-text,
-  .back-text {
-    font-size: 15px;
-  }
   .card-global {
     margin-top: 8px;
     padding: 32px 24px 32px 40px;
-  }
-  .back-icon,
-  .publications-title {
-    font-size: 20px;
   }
   .global-results-title {
     margin-top: 24px;
@@ -153,77 +133,27 @@
   }
   .publications-title {
     margin-top: 32px;
+    font-size: 20px;
+  }
+  .miembro-mt {
+    margin-top: 24px;
   }
   .miembro-img-div {
     width: 62px;
     height: 62px;
   }
-  .miembro-profile {
-    margin-top: 8px;
-  }
-  .miembro-profile {
-    font-size: 15px;
-  }
   .miembro-text {
     padding-left: 16px;
   }
-  .miembro-mt {
-    margin-top: 24px;
+  .miembro-name {
+    font-size: 18px;
   }
   .publication-abs-icon-2 {
     height: 32px;
     font-size: 32px;
   }
   .not-found-1 {
-    font-size: 20px;
-  }
-  .not-found-2 {
-    font-size: 30px;
-  }
-}
-
-@media (max-width: 960px) {
-  .global-text,
-  .back-text {
-    font-size: 13px;
-  }
-  .card-global {
-    margin-top: 16px;
-    padding: 16px;
-  }
-  .back-icon {
     font-size: 16px;
-  }
-  .global-results-title {
-    margin-top: 16px;
-    font-size: 15px;
-  }
-  .publications-title {
-    font-size: 15px;
-    margin-top: 16px;
-  }
-  .miembro-img-div {
-    width: 46px;
-    height: 46px;
-  }
-  .miembro-profile {
-    margin-top: 4px;
-  }
-  .miembro-profile {
-    font-size: 13px;
-  }
-  .miembro-text {
-    padding-left: 8px;
-  }
-  .miembro-mt {
-    margin-top: 16px;
-  }
-  .publication-abs-icon-2 {
-    height: 20px;
-    font-size: 20px;
-  }
-  .not-found-1 {
-    font-size: 15px;
   }
   .not-found-2 {
     font-size: 20px;

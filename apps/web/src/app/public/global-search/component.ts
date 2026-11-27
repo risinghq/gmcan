@@ -11,6 +11,7 @@ import {
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { BackLinkComponent } from "@app/shared/components/back-link.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
@@ -46,6 +47,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    BackLinkComponent,
     PublicationItemComponent,
     SearchBoxComponent,
     ProjectMembersComponent,

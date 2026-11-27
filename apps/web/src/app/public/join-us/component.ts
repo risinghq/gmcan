@@ -2,8 +2,8 @@ import { Component, ElementRef, OnInit, inject, signal, ChangeDetectionStrategy 
 import { FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, RouterLink } from "@angular/router";
+import { BackLinkComponent } from "@app/shared/components/back-link.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
-import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { EmailService } from "@app/shared/services/email.service";
@@ -19,7 +19,7 @@ type JoinUsField = "nombre" | "razon" | "correo" | "telefono";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule, NewsComponent, RouterLink],
+  imports: [BackLinkComponent, BreadcrumbComponent, ReactiveFormsModule, NewsComponent, RouterLink],
 })
 export default class JoinUsComponent implements OnInit {
   private emailService = inject(EmailService);

@@ -7,35 +7,17 @@
 }
 
 .email-div {
+  padding: 16px;
   border-radius: 4px;
   background-color: #ffffff;
 }
 
-.back-icon {
-  margin-right: 8px;
-  width: max-content;
-  height: max-content;
-  color: var(--muted-accent);
-}
-
-.back-text {
-  align-self: center;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-
-.back-div:hover .back-text,
-.back-div:hover .back-icon {
-  color: black;
-}
-
 .input-email {
   width: inherit;
+  padding: 11px 16px;
   border: none;
   background-color: #f4f5f4;
-  padding: 11px 16px;
+  font-size: 16px;
 }
 
 .input-email[aria-invalid="true"] {
@@ -61,6 +43,7 @@
   width: 100%;
   min-height: 44px;
   padding: 12px;
+  font-size: 15px;
 
   .link {
     margin: 0 auto;
@@ -76,33 +59,39 @@
 }
 
 .email-title {
+  margin: 16px 0;
+  font-size: 22px;
   font-weight: bold;
-  line-height: 1.33;
+  line-height: 1.25;
   color: #000000;
 }
 
 .email-subtitle {
+  font-size: 17px;
   font-weight: 500;
-  line-height: 1.54;
+  line-height: 1.4;
   color: #30393a;
 }
 
+.flex-email {
+  margin-bottom: 16px;
+}
+
+.mb-16-8,
+.mb-8 {
+  margin-bottom: 8px;
+}
+
 @media (min-width: 961px) {
-  .back-text,
-  .input-email {
-    font-size: 15px;
-  }
-  .email-btn,
-  .email-subtitle {
-    font-size: 20px;
-  }
-  .email-title {
-    margin-top: 24px;
-    font-size: 30px;
-    margin-bottom: 24px;
-  }
   .email-div {
     padding: 32px 40px;
+  }
+  .email-title {
+    margin: 24px 0;
+    font-size: 30px;
+  }
+  .email-subtitle {
+    font-size: 20px;
   }
   .flex-email {
     display: flex;
@@ -116,46 +105,5 @@
   }
   .mb-16-8 {
     margin-bottom: 16px;
-  }
-  .back-icon {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 960px) {
-  .back-text,
-  .email-btn,
-  .email-subtitle {
-    font-size: 13px;
-  }
-  .input-email {
-    font-size: 16px;
-  }
-
-  .email-title {
-    margin-top: 16px;
-    font-size: 15px;
-    margin-bottom: 16px;
-  }
-  .email-div {
-    padding: 16px;
-  }
-  .flex-email {
-    display: block;
-    margin-bottom: 16px;
-  }
-  .mr-8,
-  .ml-8 {
-    margin-right: unset;
-    margin-left: unset;
-  }
-  .mb-16-8 {
-    margin-bottom: 8px;
-  }
-  .mb-8 {
-    margin-bottom: 8px;
-  }
-  .back-icon {
-    font-size: 16px;
   }
 }

@@ -245,9 +245,9 @@ mat-sidenav-container {
 
 .page-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
-  line-height: 1.17;
+  line-height: 1.25;
   letter-spacing: 0.3px;
   color: #000000;
 
@@ -473,21 +473,6 @@ mat-sidenav-content.page-column {
   }
 }
 
-.back-div {
-  width: max-content;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-button.back-div,
-button.forgot {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  text-align: left;
-}
-
 .clickable-row {
   cursor: pointer;
 }
@@ -512,7 +497,6 @@ button.forgot {
 .white-btn,
 .language,
 .expand-toggle,
-.back-div,
 .forgot,
 .search-top-div,
 .linea-text-green {
