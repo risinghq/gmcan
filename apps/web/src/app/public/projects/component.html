@@ -10,7 +10,7 @@
           <mat-tab label="{{ tipoProyecto }}">
             <app-search-box
               class="mt-16"
-              [placeholder]="searchText"
+              [placeholder]="language.projectsText[0].placeholder"
               [action]="language.searchMobile"
               [(query)]="query"
               (search)="search($event)"

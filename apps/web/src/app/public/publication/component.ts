@@ -55,13 +55,7 @@ export default class PublicationComponent implements OnInit {
   query = "";
   readonly tabLabels = computed(() => {
     const text = this.session.language().publicationsText?.[0];
-    return text
-      ? [
-          { label: text.nameTab1, search: text.search1 },
-          { label: text.nameTab2, search: text.search2 },
-          { label: text.nameTab3, search: text.search3 },
-        ]
-      : [];
+    return text ? [text.nameTab1, text.nameTab2, text.nameTab3] : [];
   });
   url = GLOBAL.url;
   infoText = "";

@@ -85,10 +85,7 @@ export const Languages = [
     projectsText: [
       {
         projectsTitle: "Nuestros Proyectos",
-        projectsText:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elit in ridiculus aliquam risus purus, et etiam convallis lorem. Molestie sed vel tristique viverra feugiat lacus massa neque. Aliquet feugiat faucibus tellus iaculis. Montes, turpis mattis gravida aliquet tellus phasellus. Facilisis eu, augue condimentum sapien est arcu. Nibh at turpis egestas.",
-        placeholder: "Buscar proyectos por título, línea de investigación, código o responsable",
-        placeholderMobile: "Buscar proyectos",
+        placeholder: "Título o miembro",
         projectsType1: "En ejecución",
         projectsType2: "Concluidos",
         linesInvestigation: "Línea de Investigación",
@@ -106,10 +103,7 @@ export const Languages = [
     publicationsText: [
       {
         publicationsTitle: "Nuestras Publicaciones",
-        publicationsText:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elit in ridiculus aliquam risus purus, et etiam convallis lorem. Molestie sed vel tristique viverra feugiat lacus massa neque. Aliquet feugiat faucibus tellus iaculis. Montes, turpis mattis gravida aliquet tellus phasellus. Facilisis eu, augue condimentum sapien est arcu. Nibh at turpis egestas.",
-        placeholder: "Buscar tesis por título, autor o tipo",
-        placeholderMobile: "Buscar publicaciones",
+        placeholder: "Título o autor",
         preview: "Vista previa",
         download: "Descargar",
         abstract: "Resumen",
@@ -117,9 +111,6 @@ export const Languages = [
         nameTab1: "Artículos",
         nameTab2: "Tesis",
         nameTab3: "Resúmenes en eventos",
-        search1: "Buscar artículos por título o autor",
-        search2: "Buscar tesis por título, autor o tipo",
-        search3: "Buscar resumen por título, evento o autor",
         seeMore: "Ver resumen",
         seeLess: "Ocultar resumen",
       },
@@ -278,10 +269,7 @@ export const Languages = [
     projectsText: [
       {
         projectsTitle: "Projects",
-        projectsText:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elit in ridiculus aliquam risus purus, et etiam convallis lorem. Molestie sed vel tristique viverra feugiat lacus massa neque. Aliquet feugiat faucibus tellus iaculis. Montes, turpis mattis gravida aliquet tellus phasellus. Facilisis eu, augue condimentum sapien est arcu. Nibh at turpis egestas.",
-        placeholder: "Search projects by title, research topic, code or responsible",
-        placeholderMobile: "Search projects",
+        placeholder: "Title or member",
         projectsType1: "Ongoing",
         projectsType2: "Finished",
         linesInvestigation: "Research topic",
@@ -299,10 +287,7 @@ export const Languages = [
     publicationsText: [
       {
         publicationsTitle: "Publications",
-        publicationsText:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elit in ridiculus aliquam risus purus, et etiam convallis lorem. Molestie sed vel tristique viverra feugiat lacus massa neque. Aliquet feugiat faucibus tellus iaculis. Montes, turpis mattis gravida aliquet tellus phasellus. Facilisis eu, augue condimentum sapien est arcu. Nibh at turpis egestas.",
-        placeholder: "Search thesis by title, author, or type",
-        placeholderMobile: "Search publications",
+        placeholder: "Title or author",
         preview: "Preview",
         download: "Download",
         abstract: "Abstract",
@@ -312,9 +297,6 @@ export const Languages = [
         nameTab1: "Papers",
         nameTab2: "Thesis",
         nameTab3: "Conference abstracts",
-        search1: "Search papers by title or author",
-        search2: "Search thesis by title, author or type",
-        search3: "Search conference abstract by title or author",
       },
     ],
     newsText: [

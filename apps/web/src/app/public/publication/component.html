@@ -7,10 +7,10 @@
         <p class="page-intro">{{ infoText }}</p>
         <mat-tab-group (selectedTabChange)="changeTab($event)">
           @for (tab of tabLabels(); track $index) {
-          <mat-tab label="{{ tab.label }}">
+          <mat-tab label="{{ tab }}">
             <app-search-box
               class="mt-16"
-              [placeholder]="tab.search"
+              [placeholder]="language.publicationsText[0].placeholder"
               [action]="language.searchMobile"
               [(query)]="query"
               (search)="search($event)"

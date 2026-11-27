@@ -8,13 +8,6 @@ export class BrowserService {
 
   readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  innerWidth(fallback = 0): number {
-    if (!this.isBrowser) {
-      return fallback;
-    }
-    return globalThis.innerWidth ?? fallback;
-  }
-
   reload(): void {
     if (this.isBrowser) {
       globalThis.location.reload();
