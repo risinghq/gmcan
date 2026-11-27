@@ -4,6 +4,7 @@ import type { PublicMember } from "@gmcan/contracts/public";
 import { catchError, defer, firstValueFrom, of } from "rxjs";
 
 import type { LookupData } from "../models/lookup";
+import { personName } from "../utils/person-name";
 import { GLOBAL } from "./global";
 
 // Pages and resolvers read lookups synchronously, so the app initializer awaits load() before the first route renders.
@@ -80,7 +81,7 @@ export class LookupService {
   memberName(member: Pick<PublicMember, "prefixCode" | "firstName" | "lastName" | "maternalName">): string {
     const shown = member.prefixCode !== "none" && member.prefixCode !== "bach";
     const title = shown ? this.data().prefixes.find((item) => item.code === member.prefixCode)?.label : undefined;
-    return [title, member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
+    return title ? `${title} ${personName(member)}` : personName(member);
   }
 
   universities() {

@@ -10,6 +10,7 @@ import { ProjectService } from "@app/shared/services/project.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { type AdminUniversity, type JournalItem, RefService } from "@app/shared/services/ref.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import { personName } from "@app/shared/utils/person-name";
 import type { AdminMember, AdminNews, AdminProject, AdminPublication, AuthorCandidate } from "@gmcan/contracts/admin";
 import { map } from "rxjs";
 
@@ -80,8 +81,7 @@ export const memberEditTitle: Derive<string> = (data, route) => {
   const member = data["item"] as AdminMember;
   const isFormer = route.queryParamMap.get("returnTo") === "miembros-antiguos";
   const section = isFormer ? "Miembros Antiguos" : "Miembros Activos";
-  const name = [member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
-  return `${section} - ${name}`;
+  return `${section} - ${personName(member)}`;
 };
 
 export const projectEditTitle: Derive<string> = (data) =>

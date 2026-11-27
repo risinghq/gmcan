@@ -1,6 +1,5 @@
 import { Component, computed, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import type { FacilitiesData } from "@app/public/about/data";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
@@ -10,7 +9,6 @@ import { SessionService } from "@app/shared/services/session.service";
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export default class FacilitiesComponent {
-  private seo = inject(SeoService);
   private session = inject(SessionService);
 
   readonly language = this.session.language;
@@ -29,8 +27,4 @@ export default class FacilitiesComponent {
       ].filter((spec) => spec.value),
     })),
   );
-
-  constructor() {
-    this.seo.setPageTitle("GMCAN | " + this.language().resources);
-  }
 }

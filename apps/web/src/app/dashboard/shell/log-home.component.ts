@@ -26,6 +26,7 @@ import { AuthzService } from "@app/shared/services/authz.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
+import { personName } from "@app/shared/utils/person-name";
 import { filter, map } from "rxjs";
 
 import { DASHBOARD_NAV, visibleNav } from "./nav";
@@ -68,7 +69,7 @@ export default class LogHomeComponent implements OnInit {
   readonly userDisplayName = computed(() => {
     const user = this.user();
     if (!user) return "";
-    return [user.firstName, user.lastName, user.maternalName].filter(Boolean).join(" ");
+    return personName(user);
   });
   public url: string;
   readonly grupoinfo = this.uiState.groupInfo;

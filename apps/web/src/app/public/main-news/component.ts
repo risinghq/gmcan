@@ -12,7 +12,6 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateText } from "@app/shared/utils/date";
 import {
@@ -65,7 +64,6 @@ export default class MainNewsComponent implements OnInit {
   lookup = inject(LookupService);
   private browser = inject(BrowserService);
   private session = inject(SessionService);
-  private seo = inject(SeoService);
 
   public newsTypes: NewsTypeFilter[] = [];
   url = GLOBAL.url;
@@ -102,7 +100,6 @@ export default class MainNewsComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    this.seo.setPageTitle("GMCAN | " + this.language.news);
     this.selectedCategoryName = this.language.newsText[0].categoryTitle;
     this.newsTypes = this.lookup
       .newsKinds()

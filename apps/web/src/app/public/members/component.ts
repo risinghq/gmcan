@@ -6,7 +6,6 @@ import { MemberRowComponent } from "@app/shared/components/member-row.component"
 import NewsComponent from "@app/shared/components/news/news.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import type { PublicMember } from "@gmcan/contracts/public";
 
@@ -23,7 +22,6 @@ export default class MembersComponent {
   private memberService = inject(MemberService);
   lookup = inject(LookupService);
   private session = inject(SessionService);
-  private seo = inject(SeoService);
 
   readonly language = this.session.language();
   private readonly memberTypes = this.lookup.memberTypes();
@@ -42,8 +40,4 @@ export default class MembersComponent {
 
     return { loading: false, memberGroups };
   });
-
-  constructor() {
-    this.seo.setPageTitle("GMCAN | " + this.language.members);
-  }
 }

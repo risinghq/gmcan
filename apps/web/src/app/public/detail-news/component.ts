@@ -42,7 +42,6 @@ export default class DetailNewsComponent {
   }
 
   private describe(item: PublicNewsDetail, url: string): void {
-    this.seo.setPageTitle(item.title);
     this.seo.setDescription(item.summary ?? "");
     this.seo.setImage(item.asset);
     this.seo.setStructuredData({

@@ -27,6 +27,7 @@ import { AssetService } from "@app/shared/services/asset.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
+import { personName } from "@app/shared/utils/person-name";
 import type { AdminNews, NewsWrite } from "@gmcan/contracts/admin";
 import type { NewsKindCode, NewsStatusCode } from "@gmcan/contracts/public";
 import { firstValueFrom, map } from "rxjs";
@@ -38,10 +39,6 @@ import { requiredText } from "../content/forms/text-fields";
 import { type NewsPreview, NewsPreviewDialog } from "./news-preview.dialog";
 
 const NEWS_LIST = "/dashboard/news";
-
-function fullName(member: AdminMemberListItem): string {
-  return [member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
-}
 
 function newsForm() {
   return new FormGroup({
@@ -182,7 +179,7 @@ export default class NewsPage implements OnInit, HasUnsavedChanges {
 
   readonly locales = CONTENT_LOCALES;
   readonly label = localeLabel;
-  readonly name = fullName;
+  readonly name = personName;
   readonly kinds = computed(() => this.lookup.newsKinds());
   readonly form = newsForm();
   readonly valid = toSignal(this.form.statusChanges.pipe(map((status) => status === "VALID")), {
@@ -236,7 +233,7 @@ export default class NewsPage implements OnInit, HasUnsavedChanges {
       body: fields?.body ?? "",
       image: file ? this.imageUrl : (this.item()?.asset ?? null),
       kindName: this.kinds().find((kind) => kind.code === value.newsKindCode)?.name ?? null,
-      author: author ? { name: fullName(author), photoUrl: author.photoUrl, photoAlt: author.photoAlt } : null,
+      author: author ? { name: personName(author), photoUrl: author.photoUrl, photoAlt: author.photoAlt } : null,
       publishedAt: value.publishedAt,
     };
     this.dialog.open(NewsPreviewDialog, { width: "871px", data });
