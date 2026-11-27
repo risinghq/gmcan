@@ -11,6 +11,10 @@ export function moneyLabel(minor: number, currencyCode: string, locale: string):
   }).format(minor / 100);
 }
 
+export function toMinorUnits(amount: number): number {
+  return Math.round(amount * 100);
+}
+
 @Pipe({ name: "money" })
 export class MoneyPipe implements PipeTransform {
   transform(minor: number, currencyCode: string, locale: string): string {

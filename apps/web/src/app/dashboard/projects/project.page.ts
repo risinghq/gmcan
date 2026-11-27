@@ -14,6 +14,7 @@ import type { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
+import { toMinorUnits } from "@app/shared/utils/money";
 import type { AdminProject, ProjectWrite } from "@gmcan/contracts/admin";
 import type { CurrencyCode, FundingSourceCode, ProjectStatusCode } from "@gmcan/contracts/public";
 import { firstValueFrom, map } from "rxjs";
@@ -36,7 +37,7 @@ function projectForm() {
     memberIds: new FormControl<number[]>([], { nonNullable: true, validators: Validators.required }),
     fundingSourceCode: new FormControl<FundingSourceCode | null>(null, Validators.required),
     currencyCode: new FormControl<CurrencyCode | null>(null, Validators.required),
-    fundedAmountMinor: new FormControl<number | null>(null, [Validators.required, Validators.pattern(/^\d+$/)]),
+    fundedAmount: new FormControl<number | null>(null, [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]),
     startDate: new FormControl<Date | null>(null, Validators.required),
     endDate: new FormControl<Date | null>(null),
     translations: localeForm(() => ({ title: requiredText(), description: requiredText() })),
@@ -50,9 +51,8 @@ type ProjectFormValue = ReturnType<ReturnType<typeof projectForm>["getRawValue"]
  * ends today. An ongoing project has none.
  */
 function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode): ProjectWrite {
-  const { code, researchLineId, memberIds, fundingSourceCode, currencyCode, fundedAmountMinor, startDate, endDate } =
-    value;
-  if (researchLineId === null || !fundingSourceCode || !currencyCode || fundedAmountMinor === null || !startDate) {
+  const { code, researchLineId, memberIds, fundingSourceCode, currencyCode, fundedAmount, startDate, endDate } = value;
+  if (researchLineId === null || !fundingSourceCode || !currencyCode || fundedAmount === null || !startDate) {
     throw new Error("The project form is incomplete");
   }
   return {
@@ -61,7 +61,7 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
     memberIds,
     fundingSourceCode,
     currencyCode,
-    fundedAmountMinor: Number(fundedAmountMinor),
+    fundedAmountMinor: toMinorUnits(Number(fundedAmount)),
     statusCode,
     startDate: toIsoDate(startDate),
     endDate: isOngoing(statusCode) ? null : toIsoDate(endDate ?? new Date()),
@@ -146,7 +146,7 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
           </div>
           <div class="full-width">
             <div class="text-category">Monto financiado <span class="red-text">*</span></div>
-            <input class="input-category" type="number" min="0" step="1" formControlName="fundedAmountMinor" />
+            <input class="input-category" type="number" min="0" step="0.01" formControlName="fundedAmount" />
           </div>
         </div>
         <div class="flex-news">
@@ -237,6 +237,7 @@ export default class ProjectPage implements OnInit, HasUnsavedChanges {
     if (item) {
       this.form.patchValue({
         ...item,
+        fundedAmount: item.fundedAmountMinor / 100,
         startDate: parseLocalDate(item.startDate) ?? null,
         endDate: item.endDate ? (parseLocalDate(item.endDate) ?? null) : null,
       });
