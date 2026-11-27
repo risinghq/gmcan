@@ -15,8 +15,8 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { PersonComponent } from "@app/shared/components/person.component";
 import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
 import { countMissingRequirements } from "@app/shared/member-publishability/utils";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
@@ -29,7 +29,7 @@ import { ListTable } from "@app/shared/tables/list-table";
   styleUrl: "./miembros.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AvatarComponent,
+    PersonComponent,
     IconComponent,
     MatTable,
     MatSort,

@@ -16,8 +16,8 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { PersonComponent } from "@app/shared/components/person.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import { RefService, type UniversityItem } from "@app/shared/services/ref.service";
@@ -32,7 +32,7 @@ import { type PublicationRow, publicationRows, publicationSearchText, publicatio
   styleUrl: "./tesis.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AvatarComponent,
+    PersonComponent,
     MatTabGroup,
     MatTab,
     IconComponent,

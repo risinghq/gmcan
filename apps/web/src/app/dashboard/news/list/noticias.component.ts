@@ -15,8 +15,8 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { PersonComponent } from "@app/shared/components/person.component";
 import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
@@ -41,7 +41,7 @@ interface NewsListItem {
   styleUrl: "./noticias.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AvatarComponent,
+    PersonComponent,
     MatTabGroup,
     MatTab,
     IconComponent,

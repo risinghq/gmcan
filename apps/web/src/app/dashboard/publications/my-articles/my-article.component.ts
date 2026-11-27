@@ -15,8 +15,8 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { PersonComponent } from "@app/shared/components/person.component";
 import { AuthService } from "@app/shared/services/auth.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
@@ -36,7 +36,7 @@ import {
   styleUrl: "./my-article.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AvatarComponent,
+    PersonComponent,
     IconComponent,
     MatTable,
     MatSort,

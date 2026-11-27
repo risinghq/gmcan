@@ -34,12 +34,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Autor(es)</th>
         <td mat-cell *matCellDef="let row">
           @for (autor of row.authors; track autor) {
-            <div class="flex-news">
-              <div class="member-img-round mr-8">
-                <app-avatar class="member-img" [src]="autor.photoUrl" [alt]="autor.photoAlt" [name]="autor.name" />
-              </div>
-              <div>{{ autor.name }}</div>
-            </div>
+            <app-person [name]="autor.name" [src]="autor.photoUrl" [alt]="autor.photoAlt" />
           }
         </td>
       </ng-container>

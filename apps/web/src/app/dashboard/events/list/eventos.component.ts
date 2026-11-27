@@ -15,8 +15,8 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { PersonComponent } from "@app/shared/components/person.component";
 import type { AdminPublicationListItem } from "@app/shared/models/admin-list";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
@@ -30,7 +30,7 @@ import { ListTable, byName } from "@app/shared/tables/list-table";
   styleUrl: "./eventos.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AvatarComponent,
+    PersonComponent,
     MatTabGroup,
     MatTab,
     IconComponent,
