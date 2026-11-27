@@ -9,7 +9,30 @@ import { dateLabel, dateText } from "@app/shared/utils/date";
 import type { PublicHome, PublicNewsListItem, PublicProject } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
-import type { HomeNewsItem, HomeProyecto, HomeViewModel } from "./types";
+import type { HomeCounter, HomeNewsItem, HomeProyecto, HomeViewModel } from "./types";
+
+type CounterLabels = Record<"members" | "articles" | "theses" | "abstracts", Record<"one" | "other", string>>;
+
+export function homeCounters(
+  home: Pick<PublicHome, "memberCount" | "publicationCounts">,
+  language: { locale: string; counters: CounterLabels },
+): HomeCounter[] {
+  const plural = new Intl.PluralRules(language.locale);
+  const counter = (value: number, labels: Record<"one" | "other", string>, link: string): HomeCounter => ({
+    value,
+    label: plural.select(value) === "one" ? labels.one : labels.other,
+    link,
+  });
+  const { counters } = language;
+  const counts = home.publicationCounts;
+
+  return [
+    counter(home.memberCount, counters.members, "/members"),
+    counter(counts.journal_article, counters.articles, "/publications"),
+    counter(counts.thesis, counters.theses, "/publications"),
+    counter(counts.conference_paper, counters.abstracts, "/publications"),
+  ];
+}
 
 @Injectable({ providedIn: "root" })
 export class HomeDataService {
@@ -33,11 +56,8 @@ export class HomeDataService {
       featuredNews: newsItems[0] ?? null,
       linesPreview: home.researchLines.slice(0, 3),
       metodos: home.methods,
-      memberCount: home.memberCount,
+      counters: homeCounters(home, this.session.language()),
       aboutUs: home.services,
-      articulos: home.publicationCounts.journal_article,
-      tesis: home.publicationCounts.thesis,
-      resumenes: home.publicationCounts.conference_paper,
     };
   }
 
