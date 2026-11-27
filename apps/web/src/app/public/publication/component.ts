@@ -2,11 +2,11 @@ import { SlicePipe } from "@angular/common";
 import { Component, OnInit, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { ActivatedRoute, RouterLink } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
 import { SearchBoxComponent } from "@app/shared/components/search-box.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -28,10 +28,9 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    PublicationAuthorsComponent,
     SearchBoxComponent,
     BreadcrumbComponent,
-    AvatarComponent,
-    RouterLink,
     MatProgressSpinner,
     IconComponent,
     MatTabGroup,

@@ -273,24 +273,7 @@
             >
           </div>
           }
-          <div class="flex-news publication-mt" style="flex-flow: wrap">
-            @for (author of publicacion.authors; track author; let last = $last) { @if (author.kind === "registered") {
-            <div class="publication-members">
-              <div class="member-img-round">
-                <app-avatar class="member-img" [src]="author.photoUrl" [alt]="author.photoAlt" [name]="author.name" />
-              </div>
-              <a
-                class="member-name plain-link"
-                [routerLink]="['/detail-member', author.memberId]"
-                [queryParams]="{ from: 'home' }"
-              >
-                {{ author.name }}{{ !last ? "," : "" }}
-              </a>
-            </div>
-            } @if (author.kind === "external") {
-            <div class="publication-authors">{{ author.name }}{{ !last ? "," : "" }}</div>
-            } }
-          </div>
+          <app-publication-authors class="publication-mt" [authors]="publicacion.authors" from="home" />
           <div class="abstract d-flex hide-mobile">{{ publicacion.abstract }}</div>
           <div class="flex-news mt-16 hide-desktop">
             @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {

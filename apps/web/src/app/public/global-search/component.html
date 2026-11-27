@@ -87,24 +87,7 @@
                 >
               </div>
               }
-              <div class="flex-news publication-mt" style="flex-flow: wrap">
-                @for (autor of publicacion.authors; track $index; let last = $last) { @if (autor.kind === "registered")
-                {
-                <div class="publication-members">
-                  <div class="member-img-round">
-                    <app-avatar class="member-img" [src]="autor.photoUrl" [alt]="autor.photoAlt" [name]="autor.name" />
-                  </div>
-                  <a
-                    class="member-name plain-link"
-                    [routerLink]="['/detail-member', autor.memberId]"
-                    [queryParams]="{ from: 'search' }"
-                    >{{ autor.name }}{{ !last ? "," : "" }}</a
-                  >
-                </div>
-                } @if (autor.kind === "external") {
-                <div class="publication-authors">{{ autor.name }}{{ !last ? "," : "" }}</div>
-                } }
-              </div>
+              <app-publication-authors class="publication-mt" [authors]="publicacion.authors" from="search" />
               <div class="flex-news mt-16">
                 @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
                 <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
@@ -286,7 +269,7 @@
             <div class="flex-news" [class.mb-24]="i + 1 != miembros().length">
               <div class="miembro-img-div">
                 <app-avatar
-                  class="member-img"
+                  class="miembro-img"
                   [src]="miembro.photoUrl"
                   [alt]="miembro.photoAlt"
                   [name]="miembro.firstName + ' ' + miembro.lastName"
