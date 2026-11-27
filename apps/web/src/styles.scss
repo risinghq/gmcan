@@ -894,75 +894,13 @@ circle {
   font-size: 13px;
 }
 
-.email-text {
-  @extend .plex-sans;
-  font-weight: bold;
-  color: #000000;
-  line-height: 1;
-}
-
-.success-text {
-  font-weight: 500;
-  color: #30393a;
-}
-
-.success-text-green {
-  @extend .success-text;
-  color: var(--deep-green);
-}
-
-.success-right {
-  @extend .plex-sans;
-  font-weight: 600;
-  color: #000000;
-  height: max-content;
-}
-
-.btn-under {
-  line-height: 1;
-}
-
-.btn-under2:hover {
-  text-decoration: underline;
-}
-
 .align-center {
   margin-left: auto;
   margin-right: auto;
 }
 
-@media (min-width: 961px) {
-  .bb {
-    display: flex;
-    border-bottom: 2px solid #e8e8e8;
-    padding-bottom: 22px;
-  }
-  .email-text {
-    font-size: 30px;
-    margin-top: auto;
-  }
-  .success-text,
-  .success-text-green {
-    font-size: 15px;
-  }
-  .success-right {
-    font-size: 20px;
-  }
-  .success-div {
-    display: flex;
-    margin-top: 24px;
-  }
-  .success-right {
-    padding: 16px 64px;
-    border: solid 2px #000000;
-    margin-left: auto;
-    line-height: 8px;
-    margin-top: auto;
-    margin-bottom: auto;
-  }
-  .news-type {
-    font-size: 13px;
-  }
+.news-type {
+  font-size: 13px;
 }
 
 @media (max-width: 960px) {
@@ -976,30 +914,6 @@ circle {
   }
   .ml-a {
     margin-left: auto;
-  }
-  .logo-modal {
-    height: 26px;
-  }
-  .email-text {
-    font-size: 15px;
-  }
-  .bb {
-    margin-bottom: 32px;
-  }
-  .email-center {
-    text-align: center;
-  }
-  .success-text,
-  .success-text-green,
-  .success-right {
-    font-size: 13px;
-  }
-  .success-right {
-    margin-top: 24px;
-    border: solid 1px #000000;
-    width: 100%;
-    padding: 9.5px;
-    line-height: 1;
   }
   .news-type {
     font-size: 13px;

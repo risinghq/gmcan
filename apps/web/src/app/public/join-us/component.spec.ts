@@ -85,7 +85,7 @@ describe("JoinUsComponent", () => {
     expect(TestBed.inject(MatDialog).openDialogs).toHaveLength(0);
   });
 
-  it("clears the message on the next attempt and opens the confirmation when it succeeds", async () => {
+  it("clears the message on the next attempt, then opens the confirmation and empties the form", async () => {
     await fillAndSend();
     contactRequest().flush({}, { status: 502, statusText: "Bad Gateway" });
     fixture.detectChanges();
@@ -99,5 +99,6 @@ describe("JoinUsComponent", () => {
 
     expect(alert()).toBeNull();
     expect(TestBed.inject(MatDialog).openDialogs).toHaveLength(1);
+    expect(fixture.componentInstance.user.getRawValue()).toEqual({ nombre: "", razon: "", correo: "", telefono: "" });
   });
 });
