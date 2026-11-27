@@ -37,6 +37,7 @@ export class ListTable<T> {
 
   show(rows: T[]): void {
     this.dataSource.data = rows;
+    this.notFound.set(this.dataSource.filteredData.length === 0);
   }
 
   attach(sort: MatSort, paginator: MatPaginator): void {
