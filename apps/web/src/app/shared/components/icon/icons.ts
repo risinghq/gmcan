@@ -4,6 +4,10 @@ import arrowLeft from "@tabler/icons/outline/arrow-left.svg";
 import arrowUp from "@tabler/icons/outline/arrow-up.svg";
 import article from "@tabler/icons/outline/article.svg";
 import book from "@tabler/icons/outline/book.svg";
+import brandFacebook from "@tabler/icons/outline/brand-facebook.svg";
+import brandLinkedin from "@tabler/icons/outline/brand-linkedin.svg";
+import brandWhatsapp from "@tabler/icons/outline/brand-whatsapp.svg";
+import brandX from "@tabler/icons/outline/brand-x.svg";
 import briefcase from "@tabler/icons/outline/briefcase.svg";
 import calendarEvent from "@tabler/icons/outline/calendar-event.svg";
 import chartBar from "@tabler/icons/outline/chart-bar.svg";
@@ -32,6 +36,10 @@ export const ICONS = {
   "arrow-up": arrowUp,
   article,
   book,
+  "brand-facebook": brandFacebook,
+  "brand-linkedin": brandLinkedin,
+  "brand-whatsapp": brandWhatsapp,
+  "brand-x": brandX,
   briefcase,
   "calendar-event": calendarEvent,
   "chart-bar": chartBar,

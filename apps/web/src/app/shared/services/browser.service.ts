@@ -21,13 +21,6 @@ export class BrowserService {
     }
   }
 
-  open(url: string, target?: string, features?: string): Window | null {
-    if (!this.isBrowser) {
-      return null;
-    }
-    return globalThis.open(url, target, features);
-  }
-
   locationHref(): string {
     if (!this.isBrowser) {
       return "";

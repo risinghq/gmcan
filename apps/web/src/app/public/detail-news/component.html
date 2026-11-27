@@ -32,7 +32,7 @@
               <time class="news-date" [attr.datetime]="newsItem.publishedAt">{{ news().writtenOn }}</time>
             </div>
           </div>
-          <app-shared-share-buttons class="share" [url]="shareUrl()" [title]="newsItem.title" />
+          <app-share-links class="share" [url]="shareUrl()" [title]="newsItem.title" />
           @if (newsItem.body) {
           <div class="detail-text" [innerHTML]="newsItem.body"></div>
           }
