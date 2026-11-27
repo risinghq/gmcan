@@ -227,17 +227,7 @@ $thetransition:
 }
 
 .btn-black {
-  display: block;
-  text-decoration: none;
-  text-align: center;
-  width: max-content;
-  cursor: pointer;
-  height: max-content;
-  background-color: unset;
-  border-radius: 4px;
-  border: solid 2px #000000;
-  background-color: unset;
-  color: black;
+  display: flex;
 }
 
 .btn-black.align-center {
@@ -458,7 +448,6 @@ $thetransition:
   .btn-black {
     margin-left: 24px;
     margin-top: 12px;
-    padding: 4px 8px;
   }
   .main-img-news {
     height: 321px;
@@ -580,7 +569,7 @@ $thetransition:
   }
   .btn-black {
     width: 100%;
-    padding: 4px 9px;
+    padding-inline: 8px;
     margin-bottom: 24px;
     margin-left: auto;
     margin-right: auto;
