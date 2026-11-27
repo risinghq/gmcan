@@ -118,7 +118,7 @@ function listPath(isActive: 0 | 1): string {
             </div>
             <div class="full-width">
               <div class="text-category">N° DNI / Pasaporte <span class="red-text">*</span></div>
-              <input formControlName="dni" class="input-category" placeholder="Insertar DNI/Pasaporte" />
+              <input formControlName="dni" class="input-category" placeholder="Ingresar DNI/Pasaporte" />
             </div>
           </div>
           @if (!item()) {

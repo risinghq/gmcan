@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, output, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from "@angular/core";
 
 import { IconComponent } from "../icon/icon.component";
 
@@ -8,7 +18,12 @@ import { IconComponent } from "../icon/icon.component";
   styleUrl: "./image-field.component.scss",
   imports: [IconComponent],
   template: `
-    <div class="text-category">{{ label() }}</div>
+    <div class="text-category">
+      {{ label() }}
+      @if (required()) {
+        <span class="red-text">*</span>
+      }
+    </div>
     <label class="picker">
       @if (shown(); as src) {
         <span class="tile"><img [src]="src" alt="" /></span>
@@ -16,12 +31,20 @@ import { IconComponent } from "../icon/icon.component";
         <span class="tile empty"><app-icon name="photo-up" /></span>
       }
       <span class="action">{{ shown() ? "Cambiar imagen" : "Insertar imagen" }}</span>
-      <input class="file_upload" type="file" accept="image/*" (change)="pick($event)" />
+      <input
+        class="file_upload"
+        type="file"
+        accept="image/*"
+        [attr.aria-label]="label()"
+        [attr.aria-required]="required() || null"
+        (change)="pick($event)"
+      />
     </label>
   `,
 })
 export class ImageFieldComponent {
   readonly label = input("Imagen");
+  readonly required = input(false, { transform: booleanAttribute });
   readonly current = input<string | null>(null);
   readonly picked = output<File>();
 
