@@ -1,14 +1,11 @@
 @use "@angular/material" as mat;
 @use "bootstrap-parts";
 
-@import "@fontsource/roboto/latin-300.css";
-@import "@fontsource/roboto/latin-400.css";
-@import "@fontsource/roboto/latin-500.css";
-@import "@fontsource/roboto/latin-700.css";
 @import "@fontsource/ibm-plex-sans/latin-300.css";
 @import "@fontsource/ibm-plex-sans/latin-400.css";
 @import "@fontsource/ibm-plex-sans/latin-500.css";
 @import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-700.css";
 @import "@fontsource/ibm-plex-serif/latin-400.css";
 @import "@fontsource/ibm-plex-serif/latin-400-italic.css";
 @import "@fontsource/ibm-plex-serif/latin-500.css";
@@ -39,7 +36,7 @@ html {
         primary: mat.$green-palette,
         theme-type: light,
       ),
-      typography: Roboto,
+      typography: "IBM Plex Sans",
       density: 0,
     )
   );
@@ -61,7 +58,6 @@ html {
     (
       container-height: 42px,
       container-vertical-padding: 9px,
-      container-text-font: "IBM Plex Sans",
       filled-container-color: #f4f5f4,
       filled-container-shape: 0,
       filled-active-indicator-color: transparent,
@@ -72,7 +68,6 @@ html {
   );
   @include mat.select-overrides(
     (
-      trigger-text-font: "IBM Plex Sans",
       placeholder-text-color: var(--muted-accent),
     )
   );
@@ -193,7 +188,7 @@ body {
 }
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
 p,
