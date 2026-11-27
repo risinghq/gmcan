@@ -6,6 +6,7 @@ import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -46,6 +47,7 @@ function toNewsCard(n: PublicNewsListItem, locale: string): PublicNewsCard {
     BreadcrumbComponent,
     RouterLink,
     IconComponent,
+    NewsMetaComponent,
     MatProgressSpinner,
     MatButton,
     MatMenuTrigger,

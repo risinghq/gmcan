@@ -50,6 +50,7 @@
     </div>
     }
   </div>
+  @if (featuredNews; as featured) {
   <div class="grey-title">{{ language.knowAbout }}</div>
   <div class="flex-news">
     <h2 class="black-title">{{ language.newsminus }}</h2>
@@ -59,65 +60,55 @@
   </div>
   <div class="row mb-news">
     <div class="col-lg-8 grid">
-      <div class="news-box display-sub-flex">
-        <div class="img-hover-zoom img-hover-zoom-s">
-          @if (!featuredNews.asset) {
-          <img class="main-img-news" loading="lazy" src="/img/grupal.avif" alt="" />
-          } @if (featuredNews.asset) {
-          <img class="main-img-news" loading="lazy" src="{{ featuredNews.asset }}" alt="" />
-          }
-        </div>
-        <div class="news-div mt-main" style="height: 100%">
-          <div class="flex-news mt-mb-flex">
-            <div class="news-type">{{ featuredNews.newsTypeNameLabel }}</div>
-            <div class="news-date">{{ featuredNews.publishedAtLabel }}</div>
-          </div>
-          <a
-            class="main-news-title plain-link"
-            [routerLink]="['/detail-news', featuredNews.id]"
-            [queryParams]="{ from: 'home' }"
-            >{{ featuredNews.title }}</a
-          >
-          <div class="main-news-res hide-mobile">{{ featuredNews.summary }}</div>
-          <div class="news-author main-author">{{ language.newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
-        </div>
-      </div>
+      <article class="news-card featured">
+        @if (featured.asset) {
+        <div class="news-img"><img loading="lazy" src="{{ featured.asset }}" alt="" /></div>
+        }
+        <app-news-meta
+          class="news-meta"
+          [type]="featured.newsTypeNameLabel"
+          [date]="featured.publishedAt"
+          [label]="featured.publishedAtLabel"
+        />
+        <a
+          class="main-news-title stretched-link"
+          [routerLink]="['/detail-news', featured.id]"
+          [queryParams]="{ from: 'home' }"
+          >{{ featured.title }}</a
+        >
+        <p class="main-news-res hide-mobile">{{ featured.summary }}</p>
+        <p class="news-author">{{ language.newsText[0].by }} {{ featured.authorNameLabel }}</p>
+      </article>
     </div>
     <div class="col-lg-4">
-      @for (newsItem of newsItems | slice: 1 : 3; track newsItem; let i = $index) {
-      <div class="news-box" [class.mb-other]="i == 0">
-        <div class="img-hover-zoom hide-mobile">
-          @if (newsItem.asset) {
-          <img class="other-img-news" loading="lazy" src="{{ newsItem.asset }}" alt="" />
-          }
+      @for (newsItem of newsItems | slice: 1 : 3; track newsItem.id) {
+      <article class="news-card other">
+        <div class="news-text">
+          <app-news-meta
+            class="news-meta"
+            [type]="newsItem.newsTypeNameLabel"
+            [date]="newsItem.publishedAt"
+            [label]="newsItem.publishedAtLabel"
+          />
+          <a
+            class="other-news-title stretched-link"
+            [routerLink]="['/detail-news', newsItem.id]"
+            [queryParams]="{ from: 'home' }"
+            >{{ newsItem.title }}</a
+          >
+          <p class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</p>
         </div>
-        <div class="flex-news">
-          <div class="news-div mt-other full-width">
-            <div class="flex-news mt-mb-flex">
-              <div class="other-news-type">{{ newsItem.newsTypeNameLabel }}</div>
-              <div class="other-news-date">{{ newsItem.publishedAtLabel }}</div>
-            </div>
-            <a
-              class="other-news-title plain-link"
-              [routerLink]="['/detail-news', newsItem.id]"
-              [queryParams]="{ from: 'home' }"
-              >{{ newsItem.title }}</a
-            >
-            <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
-          </div>
-          <div class="img-hover-zoom ml-16 other-img-news-div hide-desktop">
-            @if (newsItem.asset) {
-            <img class="other-img-news" loading="lazy" src="{{ newsItem.asset }}" alt="" />
-            }
-          </div>
-        </div>
-      </div>
+        @if (newsItem.asset) {
+        <div class="news-img"><img loading="lazy" src="{{ newsItem.asset }}" alt="" /></div>
+        }
+      </article>
       }
     </div>
   </div>
   <a class="btn-black hide-desktop" routerLink="/news">
     <span class="btn-text2"> {{ language.seeNews }} </span>
   </a>
+  }
   <div class="services-card">
     <img class="services-icon" loading="lazy" src="/img/icons/bulb.svg" alt="" />
     <div class="mt-services about-text">

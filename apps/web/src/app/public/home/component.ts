@@ -4,6 +4,7 @@ import { MatCard } from "@angular/material/card";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
 import { createGroup } from "@app/shared/models/factories";
@@ -25,6 +26,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
     MatProgressBar,
     MatCard,
     IconComponent,
+    NewsMetaComponent,
     SlicePipe,
     EmphasisPipe,
   ],
@@ -44,7 +46,7 @@ export default class HomeComponent implements OnInit {
   resumenes = 0;
   linesPreview: HomeViewModel["linesPreview"] = [];
   newsItems: HomeNewsItem[] = [];
-  featuredNews: HomeNewsItem = {} as HomeNewsItem;
+  featuredNews: HomeNewsItem | null = null;
   aboutUs: string[] = [];
   metodos: HomeViewModel["metodos"] = [];
   publicaciones: HomePublicacion[] = [];
@@ -58,7 +60,7 @@ export default class HomeComponent implements OnInit {
     this.publicaciones = home.publicaciones;
     this.proyectos = home.proyectos;
     this.newsItems = home.newsItems;
-    this.featuredNews = home.featuredNews ?? ({} as HomeNewsItem);
+    this.featuredNews = home.featuredNews;
     this.linesPreview = home.linesPreview;
     this.metodos = home.metodos;
     this.memberCount = home.memberCount;

@@ -54,7 +54,7 @@ describe("NewsComponent", () => {
   it("puts the type and date on one meta line with a machine-readable date", () => {
     const meta = render(2).querySelector(".other-news .news-meta");
 
-    expect(meta?.querySelector(".news-type")?.textContent).toBe("Investigación");
+    expect(meta?.querySelector(".type")?.textContent).toBe("Investigación");
     expect(meta?.querySelector("time")?.getAttribute("datetime")).toBe("2024-06-28");
   });
 
