@@ -47,6 +47,14 @@
   padding: 11px 16px;
 }
 
+.input-reason {
+  display: block;
+  min-height: calc(4lh + 22px);
+  max-height: calc(12lh + 22px);
+  field-sizing: content;
+  resize: vertical;
+}
+
 .email-btn {
   width: 100%;
   min-height: 44px;
