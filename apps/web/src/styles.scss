@@ -612,15 +612,22 @@ button.forgot {
 }
 
 .btn-black {
-  padding: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
   width: max-content;
+  height: max-content;
   line-height: 1;
+  text-align: center;
+  text-decoration: none;
   border-radius: 4px;
   border: solid 2px #000000;
   cursor: pointer;
   background-color: unset;
   color: black;
-  height: max-content;
 
   &:hover .link::before,
   &:focus-visible .link::before {
@@ -644,13 +651,6 @@ button.forgot {
 
 .btn-red {
   border-color: #a00000;
-}
-
-.mat-mdc-dialog-actions .btn-black {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 16px;
 }
 
 .mat-mdc-dialog-actions .cancel-button {
