@@ -71,47 +71,6 @@
     color: black;
   }
 
-  .member-img-round {
-    overflow: hidden;
-    width: 20px;
-    height: 20px;
-    border-radius: 40.5px;
-    background-color: #c4c4c4;
-  }
-  .member-img {
-    vertical-align: unset;
-    background-color: #c4c4c4;
-    width: inherit;
-    height: inherit;
-    object-fit: cover;
-  }
-
-  .publication-members {
-    display: flex;
-  }
-
-  .member-name:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  .member-name {
-    margin-left: 8px;
-    margin-right: 8px;
-    @extend .plex-sans;
-    font-weight: 300;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
-  }
-  .publication-authors {
-    margin-left: 4px;
-    @extend .plex-sans;
-    font-weight: 300;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
-  }
-
   .mt-16 {
     height: 36px;
     padding-top: 16px;
@@ -176,8 +135,6 @@
   .publication-title,
   .publication-date,
   .publication-rev,
-  .member-name,
-  .publication-authors,
   .publication-abstract,
   .abstract-title,
   .abstract,
@@ -199,8 +156,6 @@
   }
   .publication-title,
   .publication-rev,
-  .member-name,
-  .publication-authors,
   .publication-abstract,
   .abstract-title,
   .abstract,

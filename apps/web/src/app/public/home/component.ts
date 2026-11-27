@@ -3,9 +3,9 @@ import { Component, inject, OnInit, ChangeDetectionStrategy } from "@angular/cor
 import { MatCard } from "@angular/material/card";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ActivatedRoute, RouterLink } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
+import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { SessionService } from "@app/shared/services/session.service";
@@ -19,8 +19,8 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    PublicationAuthorsComponent,
     ProjectMembersComponent,
-    AvatarComponent,
     RouterLink,
     MatProgressBar,
     MatCard,
