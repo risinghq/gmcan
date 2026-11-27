@@ -45,18 +45,20 @@ $thetransition:
   @extend .plex-sans;
 }
 
+.numbers-div {
+  display: grid;
+}
+
 .box {
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 8px;
   text-decoration: none;
   color: #e8e8e8;
   border-radius: 4px;
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
   background-color: rgba(48, 57, 58, 0.6);
-  text-align: center;
-}
-
-.box.flex-news {
-  display: flex;
 }
 
 .box:hover {
@@ -79,12 +81,10 @@ $thetransition:
 
 .counter-text {
   cursor: pointer;
-  margin-left: 8px;
   font-weight: bold;
   line-height: 0.9;
   letter-spacing: 0.3px;
   color: #f5f5f5;
-  text-align: left;
 }
 
 .description-info {
@@ -377,12 +377,11 @@ $thetransition:
     align-self: start;
   }
   .box {
-    width: 284px;
-    padding: 20px 64px;
+    padding: 20px 16px;
   }
   .numbers-div {
-    justify-content: space-between;
-    display: flex;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
     margin-bottom: 39px;
   }
   .counter {
@@ -512,18 +511,14 @@ $thetransition:
     font-size: 13px;
   }
   .box {
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding: 8px;
   }
   .segundo-box {
     padding-top: 24px;
   }
   .numbers-div {
-    display: block;
-    justify-content: 8px;
-  }
-  .mb-box-8 {
-    margin-bottom: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
   .counter {
     font-size: 20px;
