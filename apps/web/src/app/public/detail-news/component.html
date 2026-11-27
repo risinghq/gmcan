@@ -23,13 +23,16 @@
               loading="eager"
             />
             <div class="author-text">
-              <div class="news-type">{{ newsItem.newsKindName }}</div>
               @if (newsItem.authorId) {
               <a class="author-name" [routerLink]="['/detail-member', newsItem.authorId]">{{ newsItem.authorName }}</a>
               } @else {
               <div class="author-name">{{ newsItem.authorName }}</div>
               }
-              <time class="news-date" [attr.datetime]="newsItem.publishedAt">{{ news().writtenOn }}</time>
+              <app-news-meta
+                [type]="newsItem.newsKindName"
+                [date]="newsItem.publishedAt"
+                [label]="news().publishedAtLabel"
+              />
             </div>
           </div>
           <app-share-links class="share" [url]="shareUrl()" [title]="newsItem.title" />

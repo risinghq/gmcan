@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent, type Crumb } from "@app/shared/components/breadcrumb.component";
+import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { ShareLinksComponent } from "@app/shared/components/share-links.component";
 import type { PublicNewsDetail } from "@app/shared/models/news";
@@ -17,7 +18,7 @@ import type { DetailNewsViewModel } from "./types";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbComponent, AvatarComponent, RouterLink, NewsComponent, ShareLinksComponent],
+  imports: [BreadcrumbComponent, AvatarComponent, RouterLink, NewsComponent, NewsMetaComponent, ShareLinksComponent],
 })
 export default class DetailNewsComponent {
   private readonly seo = inject(SeoService);

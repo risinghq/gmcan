@@ -2,6 +2,7 @@ import { DatePipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 
 export interface NewsPreview {
   title: string;
@@ -15,7 +16,7 @@ export interface NewsPreview {
 
 @Component({
   selector: "app-news-preview-dialog",
-  imports: [DatePipe, MatDialogClose, AvatarComponent],
+  imports: [DatePipe, MatDialogClose, AvatarComponent, NewsMetaComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "../../public/detail-news/component.scss",
   template: `
@@ -41,9 +42,12 @@ export interface NewsPreview {
             />
           }
           <div class="author-text">
-            <div class="news-type">{{ data.kindName }}</div>
             <div class="author-name">{{ data.author?.name }}</div>
-            <div class="news-date">{{ data.publishedAt | date: "d MMMM y" }}</div>
+            <app-news-meta
+              [type]="data.kindName ?? ''"
+              [date]="(data.publishedAt | date: 'yyyy-MM-dd') ?? ''"
+              [label]="(data.publishedAt | date: 'longDate') ?? ''"
+            />
           </div>
         </div>
         @if (data.body) {

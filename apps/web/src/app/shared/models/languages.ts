@@ -143,11 +143,6 @@ export const Languages = [
         seeLess: "Ocultar resumen",
       },
     ],
-    detailNewsText: [
-      {
-        writtenOnFormat: "'Escrito el' d 'de' MMMM 'del' y",
-      },
-    ],
     linesInvestigationText: [
       {
         projects: "Proyectos asociados",
@@ -339,11 +334,6 @@ export const Languages = [
         abstract: "Abstract",
         seeMore: "See More",
         seeLess: "See Less",
-      },
-    ],
-    detailNewsText: [
-      {
-        writtenOnFormat: "'Written on' MMMM d, y",
       },
     ],
     linesInvestigationText: [
