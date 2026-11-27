@@ -12,14 +12,7 @@ import {
   withHttpTransferCacheOptions,
   withNoIncrementalHydration,
 } from "@angular/platform-browser";
-import {
-  RedirectCommand,
-  Router,
-  provideRouter,
-  TitleStrategy,
-  withComponentInputBinding,
-  withNavigationErrorHandler,
-} from "@angular/router";
+import { provideRouter, TitleStrategy, withComponentInputBinding, withNavigationErrorHandler } from "@angular/router";
 import { toNavigationAppError } from "@app/shared/errors/app-error";
 import { AppErrorHandlingService } from "@app/shared/errors/app-error-handling.service";
 import { AppTitleStrategy } from "@app/shared/routing/app-title.strategy";
@@ -36,12 +29,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
-      withNavigationErrorHandler((error) => {
-        const mapped = toNavigationAppError(error.error ?? error);
-        inject(AppErrorHandlingService).handle(mapped);
-        const urlTree = inject(Router).createUrlTree(["/error"], { queryParams: { code: mapped.code } });
-        return new RedirectCommand(urlTree);
-      }),
+      withNavigationErrorHandler((error) =>
+        inject(AppErrorHandlingService).redirect(toNavigationAppError(error.error ?? error), error.url),
+      ),
     ),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideClientHydration(
