@@ -86,11 +86,9 @@ function passwordForm() {
           </app-member-fields>
         </form>
         <div class="flex-news mb-32">
-          <div class="right" [class.btn-grey]="!canSave()" [class.black-btn]="canSave()">
-            <button type="button" class="link link-set" [disabled]="!canSave()" (click)="save()">
-              Actualizar información
-            </button>
-          </div>
+          <button type="button" class="right btn-black" [disabled]="!canSave()" (click)="save()">
+            <span class="link link-set">Actualizar información</span>
+          </button>
         </div>
         <form [formGroup]="password">
           <div class="text-category mb-8">Cambiar contraseña</div>
@@ -114,11 +112,9 @@ function passwordForm() {
           </div>
         </form>
         <div class="flex-news">
-          <div class="right" [class.btn-grey]="!canChangePassword()" [class.black-btn]="canChangePassword()">
-            <button type="button" class="link link-set" [disabled]="!canChangePassword()" (click)="changePassword()">
-              Actualizar contraseña
-            </button>
-          </div>
+          <button type="button" class="right btn-black" [disabled]="!canChangePassword()" (click)="changePassword()">
+            <span class="link link-set">Actualizar contraseña</span>
+          </button>
         </div>
       </div>
     </div>

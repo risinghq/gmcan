@@ -408,6 +408,7 @@ button.forgot {
 }
 
 .btn-black,
+.cancel-button,
 .white-btn,
 .language,
 .expand-toggle,
@@ -613,12 +614,36 @@ button.forgot {
 .btn-black {
   padding: 8px;
   width: max-content;
+  line-height: 1;
   border-radius: 4px;
   border: solid 2px #000000;
   cursor: pointer;
   background-color: unset;
   color: black;
   height: max-content;
+
+  &:hover .link::before,
+  &:focus-visible .link::before {
+    visibility: visible;
+    transform: scaleX(1);
+  }
+
+  &:disabled {
+    border-color: var(--muted-accent);
+    cursor: default;
+
+    .link {
+      color: var(--muted-accent);
+    }
+
+    .link::before {
+      visibility: hidden;
+    }
+  }
+}
+
+.btn-red {
+  border-color: #a00000;
 }
 
 .input-search {
@@ -1006,9 +1031,12 @@ circle {
 
 .mat-dialog-justify {
   justify-content: space-between;
+  gap: 24px;
 }
 
 .cancel-button {
+  padding: 0;
+  border: 0;
   background-color: unset;
   font-size: 15px;
   font-weight: 500;
@@ -1076,28 +1104,6 @@ circle {
   background: unset;
   border: unset;
   outline: unset;
-}
-
-.black-btn {
-  cursor: pointer;
-  border-radius: 4px;
-  border: solid 2px #000000;
-  padding: 8px;
-  line-height: 1;
-  width: max-content;
-}
-
-.black-btn:hover {
-  cursor: pointer;
-}
-
-.red-btn {
-  cursor: pointer;
-  border-radius: 4px;
-  border: solid 2px #a00000;
-  padding: 8px;
-  line-height: 1;
-  width: max-content;
 }
 
 .link-set {

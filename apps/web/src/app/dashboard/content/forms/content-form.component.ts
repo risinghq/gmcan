@@ -20,19 +20,15 @@ import { IconComponent } from "@app/shared/components/icon/icon.component";
         <ng-content />
         <div class="flex-news">
           @if (deleteLabel(); as label) {
-            <div class="red-btn">
-              <button type="button" class="link link-set link-red" [disabled]="busy()" (click)="remove.emit()">
-                {{ label }}
-              </button>
-            </div>
+            <button type="button" class="btn-black btn-red" [disabled]="busy()" (click)="remove.emit()">
+              <span class="link link-set link-red">{{ label }}</span>
+            </button>
           }
           <div class="right flex-news">
             <ng-content select="[formAction]" />
-            <div [class.btn-grey]="!canSave()" [class.black-btn]="canSave()">
-              <button type="button" class="link link-set" [disabled]="!canSave()" (click)="save.emit()">
-                {{ saveLabel() }}
-              </button>
-            </div>
+            <button type="button" class="btn-black" [disabled]="!canSave()" (click)="save.emit()">
+              <span class="link link-set">{{ saveLabel() }}</span>
+            </button>
           </div>
         </div>
       </div>
