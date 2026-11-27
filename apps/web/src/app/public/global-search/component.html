@@ -10,11 +10,13 @@
       [(query)]="query"
       (search)="searchGlobal($event)"
     />
-    @if (proyectos().length == 0 && publicaciones().length == 0 && miembros().length == 0 && noticias().length == 0) {
-    <div class="not-found-2">{{ language().noResults }}</div>
-    } @if (proyectos().length > 0 || publicaciones().length > 0 || miembros().length > 0 || noticias().length > 0) {
+    @if (!mainColumn() && !sideColumn()) {
+    <p class="not-found">{{ language().noResults }}</p>
+    } @else {
     <div class="row">
-      <div class="col-12 col-lg-8">
+      @if (mainColumn()) {
+      <div class="col-12" [class.col-lg-8]="sideColumn()">
+        @if (publicaciones().length) {
         <div id="publications-list">
           <h2 class="publications-title">
             {{ language().publications }}
@@ -31,9 +33,7 @@
             </button>
           </h2>
           <div class="collapse" [class.show]="publicationExpanded()" id="collapsePublication">
-            @if (publicaciones().length == 0) {
-            <div class="not-found-1">{{ language().noResultsPublication }}</div>
-            } @for ( publicacion of publicaciones() | slice: (page1() - 1) * pageSize : (page1() - 1) * pageSize +
+            @for ( publicacion of publicaciones() | slice: (page1() - 1) * pageSize : (page1() - 1) * pageSize +
             pageSize; track publicacion.id) {
             <app-publication-item [publication]="publicacion" from="search" />
             } @if (publicaciones().length > 5) {
@@ -60,6 +60,7 @@
             }
           </div>
         </div>
+        } @if (proyectos().length) {
         <div id="projects-list">
           <h2 class="publications-title">
             {{ language().projects }}
@@ -76,9 +77,7 @@
             </button>
           </h2>
           <div class="collapse" [class.show]="projectExpanded()" id="collapseProjects">
-            @if (proyectos().length == 0) {
-            <div class="not-found-1">{{ language().noResultsProjects }}</div>
-            } @for ( proyecto of proyectos() | slice: (page2() - 1) * pageSize : (page2() - 1) * pageSize + pageSize;
+            @for ( proyecto of proyectos() | slice: (page2() - 1) * pageSize : (page2() - 1) * pageSize + pageSize;
             track proyecto.id ) {
             <app-project-item [project]="proyecto" from="search" />
             } @if (proyectos().length > 5) {
@@ -105,8 +104,11 @@
             }
           </div>
         </div>
+        }
       </div>
-      <div class="col-12 col-lg-4">
+      } @if (sideColumn()) {
+      <div class="col-12" [class.col-lg-4]="mainColumn()">
+        @if (miembros().length) {
         <div id="members-list">
           <h2 class="publications-title">
             {{ language().members }}
@@ -123,13 +125,12 @@
             </button>
           </h2>
           <div class="collapse miembro-mt" [class.show]="memberExpanded()" id="collapseMembers">
-            @if (miembros().length == 0) {
-            <div class="not-found-1">{{ language().noResultsMembers }}</div>
-            } @for (miembro of miembros(); track miembro.id; let i = $index) {
+            @for (miembro of miembros(); track miembro.id; let i = $index) {
             <app-member-row [class.mb-24]="i + 1 != miembros().length" [member]="miembro" from="search" />
             }
           </div>
         </div>
+        } @if (noticias().length) {
         <div id="news-list">
           <h2 class="publications-title">
             {{ language().news }}
@@ -146,9 +147,6 @@
             </button>
           </h2>
           <div class="collapse" [class.show]="newsExpanded()" id="collapseNews">
-            @if (noticias().length == 0) {
-            <div class="not-found-1">{{ language().noResultsNews }}</div>
-            } @else {
             <ul class="other-news-list">
               @for (noticia of noticias(); track noticia.id) {
               <li class="other-news">
@@ -176,10 +174,11 @@
               </li>
               }
             </ul>
-            }
           </div>
         </div>
+        }
       </div>
+      }
     </div>
     }
   </div>

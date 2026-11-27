@@ -83,6 +83,9 @@ export default class GlobalSearchComponent {
   protected readonly miembros = computed(() => this.results().members);
   protected readonly noticias = computed(() => this.results().news.map((news) => this.toNews(news)));
 
+  protected readonly mainColumn = computed(() => this.publicaciones().length > 0 || this.proyectos().length > 0);
+  protected readonly sideColumn = computed(() => this.miembros().length > 0 || this.noticias().length > 0);
+
   protected readonly page1 = linkedSignal({ source: this.results, computation: () => 1 });
   protected readonly page2 = linkedSignal({ source: this.results, computation: () => 1 });
 

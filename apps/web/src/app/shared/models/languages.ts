@@ -47,10 +47,6 @@ export const Languages = [
     shareOn: "Compartir en",
     results: "Resultados de búsqueda",
     noResults: "No se encontraron resultados",
-    noResultsPublication: "No se encontraron publicaciones",
-    noResultsProjects: "No se encontraron proyectos",
-    noResultsNews: "No se encontraron noticias",
-    noResultsMembers: "No se encontraron miembros",
     counters: {
       members: { one: "Miembro", other: "Miembros" },
       articles: { one: "Artículo", other: "Artículos" },
@@ -229,10 +225,6 @@ export const Languages = [
     shareOn: "Share on",
     results: "Search results",
     noResults: "No results found",
-    noResultsPublication: "No publications found",
-    noResultsProjects: "No projects found",
-    noResultsNews: "No news found",
-    noResultsMembers: "No members found",
     counters: {
       members: { one: "Member", other: "Members" },
       articles: { one: "Paper", other: "Papers" },
