@@ -27,14 +27,13 @@ import { SessionService } from "@app/shared/services/session.service";
       grid-template-columns: max-content 1fr;
       column-gap: 8px;
       font-size: 15px;
-      line-height: 1.33;
+      line-height: 24px;
       letter-spacing: 0.3px;
       color: #000000;
     }
 
     .label {
       font-weight: 500;
-      line-height: 20px;
     }
 
     ul {
@@ -65,12 +64,6 @@ import { SessionService } from "@app/shared/services/session.service";
 
     a:hover {
       text-decoration: underline;
-    }
-
-    @media (max-width: 960px) {
-      :host {
-        font-size: 13px;
-      }
     }
   `,
 })
