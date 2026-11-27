@@ -44,17 +44,18 @@ same local database and bucket as `bun run dev`.
 
 Run from the repository root.
 
-| Command             | What it does                                                   |
-| ------------------- | -------------------------------------------------------------- |
-| `bun run setup`     | Install dependencies, write `.dev.vars`, migrate and seed      |
-| `bun run dev`       | API on port 3000 and `ng serve` on port 4200                   |
-| `bun run preview`   | Production build of both Workers on port 4200                  |
-| `bun run check`     | Lint, typecheck, test and build, as CI runs them               |
-| `bun run test`      | Web tests (vitest) and API tests (`bun test`)                  |
-| `bun run typecheck` | `tsc --noEmit` for both apps                                   |
-| `bun run lint`      | oxlint, oxfmt `--check`, the icon subset and a gitleaks scan   |
-| `bun run fix`       | Apply safe oxlint fixes and format with oxfmt                  |
-| `bun run build`     | The Angular build and a `wrangler deploy --dry-run` of the API |
+| Command                  | What it does                                                       |
+| ------------------------ | ------------------------------------------------------------------ |
+| `bun run setup`          | Install dependencies, write `.dev.vars`, migrate and seed          |
+| `bun run dev`            | API on port 3000 and `ng serve` on port 4200                       |
+| `bun run preview`        | Production build of both Workers on port 4200                      |
+| `bun run check`          | Lint, typecheck, test, build and `styles:classes`, as CI runs them |
+| `bun run styles:classes` | Fail on a template class that no built stylesheet defines          |
+| `bun run test`           | Web tests (vitest) and API tests (`bun test`)                      |
+| `bun run typecheck`      | `tsc --noEmit` for both apps                                       |
+| `bun run lint`           | oxlint, oxfmt `--check`, the icon subset and a gitleaks scan       |
+| `bun run fix`            | Apply safe oxlint fixes and format with oxfmt                      |
+| `bun run build`          | The Angular build and a `wrangler deploy --dry-run` of the API     |
 
 `bun --filter api start` and `bun --filter web start` start one app.
 

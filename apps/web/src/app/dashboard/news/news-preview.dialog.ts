@@ -21,7 +21,7 @@ export interface NewsPreview {
   styleUrl: "../../public/detail-news/component.scss",
   template: `
     <article class="card-detail scroll">
-      <header class="news-header" [class.news-header-img]="data.image">
+      <header [class.news-header-img]="data.image">
         @if (data.image; as image) {
           <img class="detail-img" [src]="image" alt="" />
         }

@@ -46,7 +46,7 @@
               [pageSize]="pageSize"
               [collectionSize]="publicaciones().length"
             >
-              <ng-template class="unique-left" ngbPaginationPrevious>
+              <ng-template ngbPaginationPrevious>
                 <div class="h-ih">
                   <app-icon class="pag-arrow" name="chevron-left" />
                 </div>
@@ -108,11 +108,7 @@
                   </button>
                 </div>
               </div>
-              <div
-                class="collapse collapsed-resumen project-mt"
-                [class.show]="isExpanded('search-proj', i)"
-                [id]="'search-project-' + i"
-              >
+              <div class="collapse project-mt" [class.show]="isExpanded('search-proj', i)" [id]="'search-project-' + i">
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ language().projectsText[0].description }}: </strong>
                   {{ proyecto.description }}
@@ -144,7 +140,7 @@
               [pageSize]="pageSize"
               [collectionSize]="proyectos().length"
             >
-              <ng-template class="unique-left" ngbPaginationPrevious>
+              <ng-template ngbPaginationPrevious>
                 <div class="h-ih">
                   <app-icon class="pag-arrow" name="chevron-left" />
                 </div>

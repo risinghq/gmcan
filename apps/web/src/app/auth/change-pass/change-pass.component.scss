@@ -73,6 +73,13 @@ form .ng-dirty.ng-invalid {
   text-align: center;
 }
 
+.error-text {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #a00000;
+  text-align: start;
+}
+
 .login-subtitle {
   letter-spacing: 0.3px;
   color: #30393a;

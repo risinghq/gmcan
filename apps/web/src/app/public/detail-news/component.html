@@ -4,7 +4,7 @@
     <div class="col-lg-8 col-12">
       <app-breadcrumb [trail]="trail()" />
       <article class="card-detail">
-        <header class="news-header" [class.news-header-img]="newsItem.asset">
+        <header [class.news-header-img]="newsItem.asset">
           @if (newsItem.asset) {
           <img class="detail-img" [src]="newsItem.asset" alt="" fetchpriority="high" />
           }

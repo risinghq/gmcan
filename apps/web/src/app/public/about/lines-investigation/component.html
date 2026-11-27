@@ -60,7 +60,7 @@
             </div>
           </div>
           @if (isExpanded(projectKey(linea.id, i), i)) {
-          <div class="collapsed-resumen mt-16" [id]="'line-' + linea.id + '-project-' + i">
+          <div class="mt-16" [id]="'line-' + linea.id + '-project-' + i">
             <div class="abstract mb-8">
               <strong class="abstract-title"> {{ this.language().projectsText[0].description }}: </strong>
               {{ proyecto.description }}
@@ -93,7 +93,7 @@
           [pageSize]="pageSize"
           [collectionSize]="linea.proyectos.length"
         >
-          <ng-template class="unique-left" ngbPaginationPrevious>
+          <ng-template ngbPaginationPrevious>
             <div class="h-ih">
               <app-icon class="pag-arrow" name="chevron-left" />
             </div>
