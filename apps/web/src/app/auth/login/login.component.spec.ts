@@ -29,6 +29,8 @@ describe("LoginComponent", () => {
     const page = await open({});
 
     expect(page.querySelector("input[type=password]")).not.toBeNull();
+    expect(page.querySelector("h1")?.textContent?.trim()).toBe("Iniciar Sesión");
+    expect(page.querySelector("a.back-div")?.getAttribute("href")).toBe("/");
     expect(page.textContent).not.toContain("Recuperar contraseña");
   });
 
@@ -36,6 +38,6 @@ describe("LoginComponent", () => {
     const page = await open({ recover: "1" });
 
     expect(page.querySelector("input[type=password]")).toBeNull();
-    expect(page.textContent).toContain("Recuperar contraseña");
+    expect(page.querySelector("h1")?.textContent?.trim()).toBe("Recuperar contraseña");
   });
 });

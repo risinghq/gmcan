@@ -12,7 +12,7 @@
 
 .back-div {
   width: max-content;
-  cursor: pointer;
+  text-decoration: none;
 }
 
 .back-text {
@@ -63,7 +63,6 @@
 }
 
 button {
-  display: block;
   font: inherit;
 }
 
@@ -99,8 +98,11 @@ form .ng-dirty.ng-invalid {
 }
 
 .forgot {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   cursor: pointer;
-  margin-top: 24px;
+  margin: 10px auto 0;
   font-weight: 500;
   letter-spacing: 0.3px;
   color: #30393a;
@@ -112,7 +114,13 @@ form .ng-dirty.ng-invalid {
 }
 
 .recover-back {
-  margin-top: 32px;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 22px;
+}
+
+.login-title.recover-title {
+  margin-top: 28px;
 }
 
 @media (min-width: 961px) {
@@ -152,9 +160,6 @@ form .ng-dirty.ng-invalid {
   }
   .link {
     font-size: 15px;
-  }
-  .recover-title {
-    margin-top: 32px;
   }
   .login-subtitle {
     margin-bottom: 24px;

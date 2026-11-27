@@ -1,15 +1,13 @@
 <div class="page login-div">
-  <button type="button" class="flex-news back-div" (click)="return()">
+  <a class="flex-news back-div" routerLink="/">
     <app-icon class="back-icon" name="arrow-left" />
     <span class="back-text">{{ language.backAll }}</span>
-  </button>
+  </a>
   <div class="login-card">
-    <img class="logo-icon" [src]="grupoinfo().assets.header" alt="logo" />
+    <img class="logo-icon" [src]="grupoinfo().assets.header" alt="GMCAN" />
     @if (!recoverValue()) {
       <form [formGroup]="loginForm" (ngSubmit)="login()">
-        <div class="login-title">
-          {{ language.login }}
-        </div>
+        <h1 class="login-title">{{ language.login }}</h1>
         <input
           class="input-email full-width"
           [placeholder]="language.loginText[0].email"
@@ -41,10 +39,10 @@
           <app-icon class="back-icon" name="arrow-left" />
           <span class="back-text">{{ language.detailMemberText[0].back }}</span>
         </button>
-        <div class="login-title recover-title">Recuperar contraseña</div>
-        <div class="login-subtitle">
+        <h1 class="login-title recover-title">Recuperar contraseña</h1>
+        <p class="login-subtitle">
           Ingresa tu correo electrónico y te enviaremos un link para que puedas restaurar tu contraseña.
-        </div>
+        </p>
         <input
           class="input-email full-width"
           [placeholder]="language.loginText[0].email"
