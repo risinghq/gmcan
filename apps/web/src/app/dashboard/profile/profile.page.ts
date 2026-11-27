@@ -58,7 +58,7 @@ function passwordForm() {
   template: `
     <div class="pad">
       <div class="add-box">
-        <div class="flex-news">
+        <div class="form-head">
           <app-publishability-chip
             [memberId]="item().id"
             [memberName]="item().firstName + ' ' + item().lastName"

@@ -1,5 +1,12 @@
 @use "../../../shared/styles/add-linea-base";
 
+.form-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
 .locale-section {
   margin-block: 24px;
 }

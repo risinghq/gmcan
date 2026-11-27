@@ -10,7 +10,7 @@ import { BackLinkComponent } from "@app/shared/components/back-link.component";
   template: `
     <div class="pad">
       <div class="add-box">
-        <div class="flex-news">
+        <div class="form-head">
           <a app-back-link [routerLink]="backTo()">Volver</a>
           <div class="right obligatory-text"><span class="red-text">(*) </span>{{ note() }}</div>
         </div>
