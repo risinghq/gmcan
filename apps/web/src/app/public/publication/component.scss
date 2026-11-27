@@ -17,10 +17,6 @@
   background-color: #ffffff;
 }
 
-.icon-search {
-  color: var(--deep-green);
-}
-
 .card-publication-title {
   @extend .plex-sans;
   font-weight: bold;
@@ -38,43 +34,6 @@
   color: #000000;
 }
 
-.link {
-  font-weight: 600;
-  height: max-content;
-  margin: 0px;
-}
-
-.input-search-publication {
-  width: 100%;
-  vertical-align: middle;
-  padding: 4px 24px 4px 12px;
-  border-radius: 4px;
-  box-shadow:
-    -1px -1px 3px rgba(0, 0, 0, 0.1),
-    1px 1px 3px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  margin-right: 8px;
-  margin-left: 2px;
-  display: flex;
-}
-.input-search {
-  background-color: inherit;
-  @extend .plex-sans;
-  flex-grow: 200;
-  width: 17px;
-}
-.btn-green {
-  @extend .plex-sans;
-  border-radius: 4px;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
-  flex-grow: 1;
-}
-::placeholder {
-  @extend .plex-sans;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-
 @include publication-list.base;
 
 @media (min-width: 1500px) {
@@ -88,17 +47,6 @@
     padding-top: 24px;
     font-size: 15px;
     padding-bottom: 26px;
-  }
-  .input-search-publication {
-    padding: 8px;
-    margin-top: 16px;
-  }
-  .btn-black {
-    margin-top: 16px;
-  }
-  ::placeholder,
-  .input-search {
-    font-size: 15px;
   }
   ::ng-deep .pagination {
     justify-content: right;
@@ -117,17 +65,6 @@
     padding-top: 24px;
     font-size: 15px;
     padding-bottom: 26px;
-  }
-  .input-search-publication {
-    padding: 8px;
-    margin-top: 16px;
-  }
-  .btn-black {
-    margin-top: 16px;
-  }
-  ::placeholder,
-  .input-search {
-    font-size: 15px;
   }
   ::ng-deep .pagination {
     justify-content: right;
@@ -152,21 +89,8 @@
     font-size: 13px;
     padding-bottom: 10px;
   }
-  .input-search-publication {
-    padding: 4px;
-    margin-top: 8px;
-  }
-  .btn-black {
-    margin-top: 8px;
-  }
-  .link {
-    font-size: 12px;
-  }
   app-icon {
     font-size: 14px;
-  }
-  .input-search {
-    font-size: 16px;
   }
   ::ng-deep .pagination {
     justify-content: center;

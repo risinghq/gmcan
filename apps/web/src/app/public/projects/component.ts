@@ -1,6 +1,5 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute } from "@angular/router";
@@ -8,6 +7,7 @@ import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
+import { SearchBoxComponent } from "@app/shared/components/search-box.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -28,13 +28,12 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    SearchBoxComponent,
     ProjectMembersComponent,
     BreadcrumbComponent,
     IconComponent,
     MatTabGroup,
     MatTab,
-    FormsModule,
-    ReactiveFormsModule,
     MatProgressSpinner,
     NgbPagination,
     NgbPaginationPrevious,
@@ -45,7 +44,6 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   ],
 })
 export default class ProjectsComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly browser = inject(BrowserService);
   private readonly session = inject(SessionService);
@@ -57,7 +55,7 @@ export default class ProjectsComponent implements OnInit {
   tipoProyectos: string[] = [];
   activeTab = 0;
   allCharged: boolean | null = false;
-  searchForm: FormGroup;
+  query = "";
   url = GLOBAL.url;
   infoText = "";
   language: (typeof Languages)[number] = Languages[0];
@@ -66,12 +64,6 @@ export default class ProjectsComponent implements OnInit {
   screenWidth = 0;
   searchText = "";
   expandedKey: string | null = null;
-
-  constructor() {
-    this.searchForm = this.fb.group({
-      titulo: [""],
-    });
-  }
 
   @HostListener("window:resize", ["$event"])
   onResize(_event: Event): void {
@@ -111,7 +103,7 @@ export default class ProjectsComponent implements OnInit {
   changeTab($event: { index: number }): void {
     this.activeTab = $event.index;
     this.page = 1;
-    this.searchForm.controls["titulo"].setValue("");
+    this.query = "";
     this.currentProjects = $event.index === 0 ? this.allActive : this.allFinished;
   }
 

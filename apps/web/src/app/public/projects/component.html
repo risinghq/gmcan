@@ -8,25 +8,13 @@
         <mat-tab-group (selectedTabChange)="changeTab($event)">
           @for (tipoProyecto of tipoProyectos; track tipoProyecto; let j = $index) {
           <mat-tab label="{{ tipoProyecto }}">
-            <form class="mt-16" [formGroup]="searchForm">
-              <div class="flex-news">
-                <div class="input-search-project">
-                  <app-icon class="icon-search" name="search" />
-                  <input
-                    (keyup.enter)="search(titulo.value)"
-                    #titulo
-                    class="input-search"
-                    placeholder="{{ searchText }}"
-                    name="titulo"
-                    formControlName="titulo"
-                    autocomplete="off"
-                  />
-                </div>
-                <button type="button" (click)="search(titulo.value)" class="btn-black">
-                  <span class="link">{{ language.searchMobile }}</span>
-                </button>
-              </div>
-            </form>
+            <app-search-box
+              class="mt-16"
+              [placeholder]="searchText"
+              [action]="language.searchMobile"
+              [(query)]="query"
+              (search)="search($event)"
+            />
             @if (!allCharged) {
             <div class="spinner-pad">
               <mat-spinner class="auto mb-8" />

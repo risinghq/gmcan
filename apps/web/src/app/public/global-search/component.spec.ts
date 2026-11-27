@@ -115,7 +115,7 @@ describe("GlobalSearchComponent", () => {
     await search("graphene", { ...EMPTY, publications: [article(3, "Graphene sheets")] });
 
     expect(texts(".publication-title")).toEqual(["Graphene sheets"]);
-    expect(page().querySelector<HTMLInputElement>("input[name=nombre]")?.value).toBe("graphene");
+    expect(page().querySelector<HTMLInputElement>("[role=search] input")?.value).toBe("graphene");
   });
 
   it("pages publications five at a time and starts a new search on the first page", async () => {

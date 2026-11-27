@@ -13,23 +13,13 @@
         <mat-tab-group (selectedTabChange)="changeTab($event)">
           @for (tab of tabLabels(); track $index) {
           <mat-tab label="{{ tab.label }}">
-            <form class="flex-news" [formGroup]="searchForm">
-              <div class="input-search-publication">
-                <app-icon class="icon-search" name="search" />
-                <input
-                  (keyup.enter)="search(titulo.value)"
-                  #titulo
-                  class="input-search"
-                  placeholder="{{ tab.search }}"
-                  name="titulo"
-                  formControlName="titulo"
-                  autocomplete="off"
-                />
-              </div>
-              <button type="button" (click)="search(titulo.value)" class="btn-black">
-                <span class="link">{{ language.searchMobile }}</span>
-              </button>
-            </form>
+            <app-search-box
+              class="mt-16"
+              [placeholder]="tab.search"
+              [action]="language.searchMobile"
+              [(query)]="query"
+              (search)="search($event)"
+            />
             @if (!allCharged) {
             <div class="spinner-pad">
               <mat-spinner class="auto mb-8" />

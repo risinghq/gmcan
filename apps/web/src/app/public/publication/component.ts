@@ -1,6 +1,5 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, computed, inject, ChangeDetectionStrategy } from "@angular/core";
-import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, RouterLink } from "@angular/router";
@@ -8,6 +7,7 @@ import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { SearchBoxComponent } from "@app/shared/components/search-box.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -28,6 +28,7 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    SearchBoxComponent,
     BreadcrumbComponent,
     AvatarComponent,
     RouterLink,
@@ -35,8 +36,6 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
     IconComponent,
     MatTabGroup,
     MatTab,
-    FormsModule,
-    ReactiveFormsModule,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,
@@ -46,7 +45,6 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
   ],
 })
 export default class PublicationComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(SessionService);
   private readonly browser = inject(BrowserService);
@@ -59,7 +57,7 @@ export default class PublicationComponent implements OnInit {
   activeTab = 0;
   cargado = false;
   allCharged: boolean | null = false;
-  searchForm: FormGroup;
+  query = "";
   readonly tabLabels = computed(() => {
     const text = this.session.language().publicationsText?.[0];
     return text
@@ -76,12 +74,6 @@ export default class PublicationComponent implements OnInit {
   expandedKey: string | null = null;
   page = 1;
   pageSize = 5;
-
-  constructor() {
-    this.searchForm = this.fb.group({
-      titulo: [""],
-    });
-  }
 
   ngOnInit(): void {
     this.language = this.session.language();
@@ -104,7 +96,7 @@ export default class PublicationComponent implements OnInit {
   changeTab($event: { index: number }): void {
     this.activeTab = $event.index;
     this.page = 1;
-    this.searchForm.controls["titulo"].setValue("");
+    this.query = "";
     const sources = [this.allArticulos, this.allTesis, this.allResumenes];
     this.publicaciones = sources[$event.index] ?? [];
     this.allCharged = true;
