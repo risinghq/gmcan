@@ -42,7 +42,7 @@ describe("LoginComponent", () => {
 
     expect(page.querySelector("input[type=password]")).not.toBeNull();
     expect(page.querySelector("h1")?.textContent?.trim()).toBe("Iniciar Sesión");
-    expect(page.querySelector("a.back-div")?.getAttribute("href")).toBe("/");
+    expect(page.querySelector("a[app-back-link]")?.getAttribute("href")).toBe("/");
     expect(page.textContent).not.toContain("Recuperar contraseña");
   });
 

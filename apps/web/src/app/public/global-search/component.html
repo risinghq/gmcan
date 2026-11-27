@@ -1,10 +1,7 @@
 <div class="page global-search-div">
   <app-breadcrumb [trail]="[{ label: language().results }]" />
   <div class="card-global">
-    <a class="flex-news back-div" [routerLink]="previouslink">
-      <app-icon class="back-icon" name="arrow-left" />
-      <span class="back-text">{{ language().detailMemberText[0].back }}</span>
-    </a>
+    <a app-back-link [routerLink]="previouslink">{{ language().detailMemberText[0].back }}</a>
     <h1 class="global-results-title">{{ language().results }}</h1>
     <app-search-box
       class="mt-16"

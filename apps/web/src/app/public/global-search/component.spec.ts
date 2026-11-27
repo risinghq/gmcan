@@ -107,7 +107,7 @@ describe("GlobalSearchComponent", () => {
   });
 
   it("links back to the page the search started from", () => {
-    expect(page().querySelector("a.back-div")?.getAttribute("href")).toBe("/news");
+    expect(page().querySelector("a[app-back-link]")?.getAttribute("href")).toBe("/news");
   });
 
   it("titles the page with a single h1", () => {

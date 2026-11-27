@@ -4,6 +4,7 @@ import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { BackLinkComponent } from "@app/shared/components/back-link.component";
 import { BreadcrumbComponent, type Crumb } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
@@ -33,6 +34,7 @@ type MemberDisplay = PublicMember & { prefix: string; tipoMiembro: string };
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    BackLinkComponent,
     BreadcrumbComponent,
     AvatarComponent,
     MatProgressSpinner,

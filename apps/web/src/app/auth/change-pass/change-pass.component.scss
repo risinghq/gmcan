@@ -2,43 +2,36 @@
   margin: 32px 0 0;
 }
 
-.back-text {
-  align-self: center;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-
-.back-div:hover .back-text,
-.back-div:hover .back-icon {
-  color: black;
-}
-
-.back-icon {
-  margin-right: 8px;
-  width: max-content;
-  height: max-content;
-  color: var(--muted-accent);
+.login-div {
+  padding-top: 32px;
+  padding-bottom: 221px;
 }
 
 .login-card {
+  margin-top: 150px;
+  padding: 32px 16px;
   border-radius: 4px;
   background-color: #ffffff;
   text-align: center;
 }
 
+.logo-icon {
+  height: 26px;
+}
+
 .login-title {
+  margin-top: 32px;
+  margin-bottom: 24px;
   font-size: 20px;
   font-weight: 600;
   color: #000000;
-  margin-bottom: 24px;
 }
 
 .input-password {
-  background-color: #f5f5f5;
-  border: none;
   padding: 8px 16px;
+  border: none;
+  background-color: #f5f5f5;
+  font-size: 16px;
 }
 
 ::placeholder {
@@ -47,16 +40,22 @@
   opacity: unset;
 }
 
+.mt-input-16 {
+  margin-top: 8px;
+}
+
 .btn-black {
   width: 100%;
+  margin-top: 16px;
 }
 
 .link {
-  font-weight: 600;
-  line-height: 1;
   width: max-content;
   margin-left: auto;
   margin-right: auto;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 [aria-invalid="true"] {
@@ -65,11 +64,11 @@
 
 .error {
   margin-top: 16px;
-  line-height: 1;
+  padding: 13px;
   border-radius: 4px;
+  line-height: 1;
   color: white;
   background-color: rgba(160, 0, 0, 0.85);
-  padding: 13px;
   text-align: center;
 }
 
@@ -82,6 +81,9 @@
 }
 
 .login-subtitle {
+  margin-bottom: 16px;
+  font-size: 15px;
+  line-height: 1.5;
   letter-spacing: 0.3px;
   color: #30393a;
   text-wrap: pretty;
@@ -93,14 +95,15 @@
 }
 
 @media (min-width: 961px) {
-  .back-icon {
-    font-size: 20px;
+  .login-div {
+    padding-top: 64px;
+    padding-bottom: 186px;
   }
   .login-card {
+    width: 414px;
     margin-top: 108px;
     margin-left: auto;
     margin-right: auto;
-    width: 414px;
     padding: 40px 32px;
   }
   .error {
@@ -114,70 +117,16 @@
   .login-title {
     margin-top: 40px;
   }
-  .back-text,
-  .input-password,
-  .login-subtitle {
-    font-size: 15px;
-  }
   .mt-input-16 {
     margin-top: 16px;
   }
   .btn-black {
     margin-top: 24px;
   }
-  .link {
-    font-size: 15px;
-  }
   .recover-title {
     margin-top: 32px;
   }
   .login-subtitle {
     margin-bottom: 24px;
-  }
-}
-
-@media (max-width: 960px) {
-  .login-div {
-    padding-top: 32px;
-    padding-bottom: 221px;
-  }
-  .back-icon {
-    font-size: 16px;
-  }
-  .login-card {
-    margin-top: 150px;
-    padding: 32px 16px;
-  }
-  .logo-icon {
-    height: 26px;
-  }
-  .login-title {
-    margin-top: 32px;
-  }
-  .back-text,
-  .login-subtitle {
-    font-size: 13px;
-  }
-  .input-password {
-    font-size: 16px;
-  }
-  .mt-input-16 {
-    margin-top: 8px;
-  }
-  .btn-black {
-    margin-top: 16px;
-  }
-  .link {
-    font-size: 13px;
-  }
-  .login-subtitle {
-    margin-bottom: 16px;
-  }
-}
-
-@media (min-width: 961px) {
-  .login-div {
-    padding-top: 64px;
-    padding-bottom: 186px;
   }
 }

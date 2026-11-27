@@ -1,29 +1,3 @@
-.back-icon {
-  margin-right: 8px;
-  width: max-content;
-  height: max-content;
-  color: var(--muted-accent);
-}
-
-.back-text {
-  font-size: 15px;
-  align-self: center;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-
-.back-div {
-  width: max-content;
-  cursor: pointer;
-}
-
-.back-div:hover .back-text,
-.back-div:hover .back-icon {
-  color: black;
-}
-
 .green-text {
   cursor: pointer;
   font-size: 15px;

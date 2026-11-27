@@ -1,20 +1,17 @@
 import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { BackLinkComponent } from "@app/shared/components/back-link.component";
 
 @Component({
   selector: "app-content-form",
-  imports: [IconComponent, RouterLink],
+  imports: [BackLinkComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./content-form.scss",
   template: `
     <div class="pad">
       <div class="add-box">
         <div class="flex-news">
-          <a class="flex-news back-div" [routerLink]="backTo()">
-            <app-icon class="back-icon" name="arrow-left" />
-            <div class="back-text">Volver</div>
-          </a>
+          <a app-back-link [routerLink]="backTo()">Volver</a>
           <div class="right obligatory-text"><span class="red-text">(*) </span>{{ note() }}</div>
         </div>
         <ng-content />
