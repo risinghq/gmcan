@@ -9,15 +9,15 @@
         </button>
         <div class="email-title">{{ language.joinUsText[0].title }}</div>
         <div class="email-subtitle mb-16">{{ language.joinUsText[0].talkabout }}</div>
-        <form [formGroup]="user">
+        <form [formGroup]="user" (ngSubmit)="sendEmail()">
           <div class="full-width mb-16-8">
             <input
               class="input-email"
               placeholder="{{ language.joinUsText[0].name }}"
-              #nombre
+              [attr.aria-label]="language.joinUsText[0].name"
               name="nombre"
               formControlName="nombre"
-              autocomplete="off"
+              autocomplete="name"
               required
             />
           </div>
@@ -26,10 +26,10 @@
               autosize
               class="input-email"
               placeholder="{{ language.joinUsText[0].reason }}"
-              #razon
+              [attr.aria-label]="language.joinUsText[0].reason"
               name="razon"
               formControlName="razon"
-              autocomplete="off"
+              required
             ></textarea>
           </div>
           <div class="email-subtitle mb-16">{{ language.joinUsText[0].email }}</div>
@@ -38,11 +38,12 @@
               <input
                 class="input-email"
                 placeholder="{{ language.joinUsText[0].emailPlace }}"
-                #correo
+                [attr.aria-label]="language.joinUsText[0].emailPlace"
                 name="correo"
                 type="email"
                 formControlName="correo"
-                autocomplete="off"
+                autocomplete="email"
+                required
               />
             </div>
             <div class="full-width ml-8">
@@ -50,21 +51,17 @@
                 class="input-email"
                 type="tel"
                 placeholder="{{ language.joinUsText[0].telephone }}"
-                #telefono
+                [attr.aria-label]="language.joinUsText[0].telephone"
                 name="telefono"
                 formControlName="telefono"
-                autocomplete="off"
+                autocomplete="tel"
+                required
               />
             </div>
           </div>
           <div class="full-width mb-16-8">
-            <button
-              mat-button
-              [disabled]="user.invalid || sending()"
-              class="full-width email-btn btn-under"
-              (click)="sendEmail()"
-            >
-              <div class="btn-under">{{ language.joinUsText[0].send }}</div>
+            <button type="submit" class="btn-black email-btn" [disabled]="user.invalid || sending()">
+              <span class="link">{{ language.joinUsText[0].send }}</span>
             </button>
           </div>
           @if (sendFailed()) {

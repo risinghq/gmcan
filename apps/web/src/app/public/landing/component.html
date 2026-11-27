@@ -141,7 +141,7 @@
               type="button"
               class="icon-btn"
               [attr.aria-label]="language.searchMobile"
-              (click)="searchGlobal(nombre.value)"
+              (click)="searchGlobal(query.value)"
             >
               <app-icon class="icon-search-toolbar" name="search" />
             </button>
@@ -150,10 +150,10 @@
               class="input-search-text"
               [attr.aria-label]="language.search"
               placeholder="{{ language.search }}"
-              #nombre
+              #query
               autocomplete="off"
-              name="nombre"
-              (keyup.enter)="searchGlobal(nombre.value)"
+              name="q"
+              (keyup.enter)="searchGlobal(query.value)"
             />
           </div>
           <div class="languages mr-12">

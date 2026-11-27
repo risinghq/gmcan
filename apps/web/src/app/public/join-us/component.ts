@@ -22,15 +22,7 @@ import { AutosizeModule } from "ngx-autosize";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [
-    BreadcrumbComponent,
-    IconComponent,
-    FormsModule,
-    ReactiveFormsModule,
-    AutosizeModule,
-    MatButton,
-    NewsComponent,
-  ],
+  imports: [BreadcrumbComponent, IconComponent, FormsModule, ReactiveFormsModule, AutosizeModule, NewsComponent],
 })
 export default class JoinUsComponent implements OnInit {
   fb = inject(FormBuilder);
