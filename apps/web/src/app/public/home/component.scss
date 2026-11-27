@@ -544,7 +544,7 @@ $thetransition:
     margin-top: 36px;
   }
   .know-more-text {
-    font-size: 13px;
+    font-size: 15px;
   }
   .box {
     padding: 8px;
@@ -564,11 +564,21 @@ $thetransition:
   .white-btn,
   .linea-text,
   .linea-text-green,
-  .news-meta,
-  .news-author,
   .btn-black,
   .mt-services {
-    font-size: 13px;
+    font-size: 15px;
+  }
+  .description-info,
+  .linea-text,
+  .mt-services {
+    line-height: 1.5;
+  }
+  .linea-text {
+    height: calc(1.5em * 5);
+  }
+  .news-meta,
+  .news-author {
+    font-size: 14px;
   }
   .description-info {
     padding-top: 32px;
@@ -584,7 +594,7 @@ $thetransition:
   }
   .linea-title,
   .other-news-title {
-    font-size: 15px;
+    font-size: 16px;
   }
   .line-card {
     padding: 24px 24px 16px 24px;
