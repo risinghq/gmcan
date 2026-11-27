@@ -27,14 +27,6 @@ import { UiStateService } from "@app/shared/services/ui-state.service";
     p {
       margin: 0 0 8px;
     }
-
-    .btn-black {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
-      padding: 0 16px;
-      box-sizing: border-box;
-    }
   `,
   template: `
     <img class="sent-logo" [src]="groupInfo().assets.header" alt="GMCAN" />
