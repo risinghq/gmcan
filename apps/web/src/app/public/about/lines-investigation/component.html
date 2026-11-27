@@ -23,7 +23,7 @@
         (click)="toggleLine(linea.id)"
       >
         <ng-container [ngTemplateOutlet]="lineHeader" />
-        <app-icon class="project-abs-icon line-toggle-icon" name="chevron-down" />
+        <app-icon class="line-toggle-icon" name="chevron-down" />
       </button>
       } @else {
       <div class="line-header">
@@ -55,7 +55,7 @@
               >
                 {{ expandLabel( projectKey(linea.id, i), i, language().linesInvestigationText[0].seeMore,
                 language().linesInvestigationText[0].seeLess ) }}
-                <app-icon class="project-abs-icon" name="chevron-down" />
+                <app-icon name="chevron-down" />
               </button>
             </div>
           </div>
