@@ -155,11 +155,6 @@ type ListedPublication = PublicationDisplay<ListablePublication & { authors?: Pu
 
     .expand-toggle {
       color: #000000;
-      gap: 4px;
-
-      app-icon {
-        font-size: 20px;
-      }
     }
 
     .abstract {
@@ -197,10 +192,6 @@ type ListedPublication = PublicationDisplay<ListablePublication & { authors?: Pu
 
       .meta:has(> .wide-only:only-child) {
         display: none;
-      }
-
-      .expand-toggle app-icon {
-        font-size: 14px;
       }
 
       .abstract {
