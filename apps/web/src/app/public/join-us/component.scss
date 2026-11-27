@@ -52,26 +52,15 @@
 }
 
 .email-btn {
-  border-radius: 4px;
-  border: solid 2px #000000;
-  background-color: #ffffff;
-  font-weight: 600;
-  line-height: 2;
-  letter-spacing: 0.3px;
-  color: #000000;
-  padding: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
 
-  @media (min-width: 961px) {
-    padding: 12px;
+  .link {
+    margin: 0 auto;
+    font-size: inherit;
+    font-weight: 600;
   }
-
-  &:enabled:hover {
-    text-decoration: underline;
-  }
-}
-
-.email-btn:disabled {
-  border: solid 2px gray;
 }
 
 .send-error {
@@ -96,42 +85,7 @@ form .ng-dirty.ng-invalid {
   border: red solid 1px;
 }
 
-@media (min-width: 1500px) {
-  .back-text,
-  .input-email {
-    font-size: 15px;
-  }
-  .email-btn,
-  .email-subtitle {
-    font-size: 20px;
-  }
-  .email-title {
-    margin-top: 24px;
-    font-size: 30px;
-    margin-bottom: 24px;
-  }
-  .email-div {
-    padding: 32px 40px;
-  }
-  .flex-email {
-    display: flex;
-    margin-bottom: 24px;
-  }
-  .mr-8 {
-    margin-right: 8px;
-  }
-  .ml-8 {
-    margin-left: 8px;
-  }
-  .mb-16-8 {
-    margin-bottom: 16px;
-  }
-  .back-icon {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 1500px) {
+@media (min-width: 961px) {
   .back-text,
   .input-email {
     font-size: 15px;
