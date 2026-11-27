@@ -195,6 +195,12 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+p,
+li,
+blockquote {
+  overflow-wrap: anywhere;
+}
 app-root {
   height: inherit;
 }
