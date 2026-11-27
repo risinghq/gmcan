@@ -1026,6 +1026,12 @@ circle {
   margin: 72px 32px 8px 8px;
 }
 
+@media (max-width: 400px) {
+  .mat-mdc-tab.mdc-tab {
+    padding: 0 16px;
+  }
+}
+
 #previewNews,
 #previewAboutUs,
 #previewMethod,
