@@ -1,18 +1,18 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import type { AdminProject, ProjectWrite } from "@gmcan/contracts/admin";
+import type { PublicProject } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminProjectListItem } from "../models/admin-list";
-import type { ProjectWithMembers } from "../models/project";
 import { GLOBAL } from "./global";
 
 @Injectable({ providedIn: "root" })
 export class ProjectService {
   private http = inject(HttpClient);
 
-  listProjects(): Observable<ProjectWithMembers[]> {
-    return this.http.get<ProjectWithMembers[]>(GLOBAL.api("projects"));
+  listProjects(): Observable<PublicProject[]> {
+    return this.http.get<PublicProject[]>(GLOBAL.api("projects"));
   }
 
   listAdminProjects(): Observable<AdminProjectListItem[]> {

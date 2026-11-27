@@ -1,5 +1,4 @@
 @use "../publication/component.scss" as publicationStyles;
-@use "../projects/component.scss" as projectStyles;
 @use "../../shared/components/news/news.component.scss";
 
 .global-search-div {
@@ -36,14 +35,6 @@
 
 .length-text {
   margin-left: 4px;
-}
-
-.project-mt {
-  margin-top: 16px;
-}
-
-.project-pt {
-  padding-top: 16px;
 }
 
 .miembro-mt {

@@ -4,27 +4,27 @@ import type { About } from "@app/shared/models/about";
 import type { Equipment } from "@app/shared/models/equipment";
 import type { Group } from "@app/shared/models/group";
 import type { Method } from "@app/shared/models/method";
-import type { ProjectWithMembers } from "@app/shared/models/project";
 import type { ResearchLine } from "@app/shared/models/research-line";
 import type { Software } from "@app/shared/models/software";
 import { GroupService } from "@app/shared/services/group.service";
 import { MethodsService } from "@app/shared/services/methods.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
+import type { PublicProject } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
 export type FacilitiesData = { group: Group; equipment: Equipment[]; software: Software[] };
 
 export interface ResearchLineDisplay extends ResearchLine {
   description: string;
-  proyectos: ProjectWithMembers[];
+  proyectos: PublicProject[];
 }
 
 function failInvariant(message: string, details?: unknown): never {
   throw new RouteDataError({ code: "invariant_violation", message, details });
 }
 
-function toResearchLineDisplay(line: ResearchLine, proyectos: ProjectWithMembers[]): ResearchLineDisplay {
+function toResearchLineDisplay(line: ResearchLine, proyectos: PublicProject[]): ResearchLineDisplay {
   return { ...line, description: line.description ?? "", proyectos };
 }
 

@@ -1,7 +1,6 @@
-import type { PublicMember, PublicPublication } from "@gmcan/contracts/public";
+import type { PublicMember, PublicProject, PublicPublication } from "@gmcan/contracts/public";
 
 import type { Capability } from "./capabilities";
-import type { Project } from "./project";
 
 export interface Member {
   id: number;
@@ -32,7 +31,7 @@ export interface MemberPublishability {
 
 export interface MemberProfile {
   member: PublicMember | undefined;
-  projects: Project[];
+  projects: PublicProject[];
   publications: PublicPublication[];
 }
 

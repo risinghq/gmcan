@@ -212,17 +212,17 @@
     </a>
   </div>
   <div class="publication-list">
-    @for (proyecto of proyectos | slice: 0 : 5; track proyecto; let i = $index) {
+    @for (proyecto of proyectos | slice: 0 : 5; track proyecto.id; let i = $index) {
     <div class="project flex-news">
       <div class="col-lg-4 col-md-12 nopd hide-mobile">
         <div class="project-code">{{ proyecto.code }}</div>
         <div class="project-rev mt-8">
           <strong class="abstract-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
-          proyecto.lineasInvestigacion }}
+          proyecto.researchLine }}
         </div>
         <div class="project-rev">
           <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
-          {{ proyecto.fuenteFinanciamiento }}
+          {{ proyecto.fundingSource }}
         </div>
         <div class="project-rev">
           <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>
@@ -240,7 +240,7 @@
         </div>
         <div class="project-rev hide-desktop">
           <strong class="resp-title">{{ this.language.projectsText[0].linesInvestigation }}: </strong>{{
-          proyecto.lineasInvestigacion }}
+          proyecto.researchLine }}
         </div>
         <div class="project-pt">
           <app-project-members [members]="proyecto.members" from="home" />
@@ -266,7 +266,7 @@
           </div>
           <div class="abstract mb-8">
             <strong class="abstract-title"> {{ this.language.projectsText[0].source }}: </strong>
-            {{ proyecto.fuenteFinanciamiento }}
+            {{ proyecto.fundingSource }}
           </div>
           <div class="abstract mb-8">
             <strong class="abstract-title"> {{ this.language.projectsText[0].amount }}: </strong>

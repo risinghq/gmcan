@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, input } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
-import type { ProjectWithMembers } from "@app/shared/models/project";
 import type { PublicOrigin } from "@app/shared/routing/public-origin";
 import { SessionService } from "@app/shared/services/session.service";
+import type { PublicProjectMember } from "@gmcan/contracts/public";
 
 /** A project's responsible members, each linked to their profile with `from` as the page to return to. */
 @Component({
@@ -68,7 +68,7 @@ import { SessionService } from "@app/shared/services/session.service";
   `,
 })
 export class ProjectMembersComponent {
-  readonly members = input.required<ProjectWithMembers["members"]>();
+  readonly members = input.required<PublicProjectMember[]>();
   readonly from = input.required<PublicOrigin>();
 
   protected readonly language = inject(SessionService).language();

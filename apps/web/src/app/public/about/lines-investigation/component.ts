@@ -1,11 +1,10 @@
-import { DatePipe, NgTemplateOutlet, SlicePipe } from "@angular/common";
+import { NgTemplateOutlet, SlicePipe } from "@angular/common";
 import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import type { ResearchLineDisplay } from "@app/public/about/data";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
-import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
+import { ProjectItemComponent } from "@app/shared/components/project-item.component";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { MoneyPipe } from "@app/shared/utils/money";
 import {
   NgbPagination,
   NgbPaginationNext,
@@ -19,7 +18,7 @@ import {
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
-    ProjectMembersComponent,
+    ProjectItemComponent,
     IconComponent,
     NgbPagination,
     NgbPaginationPrevious,
@@ -27,8 +26,6 @@ import {
     NgbPaginationNext,
     NgTemplateOutlet,
     SlicePipe,
-    DatePipe,
-    MoneyPipe,
   ],
 })
 export default class LinesInvestigationComponent {
@@ -41,8 +38,6 @@ export default class LinesInvestigationComponent {
   public pageSize = 5;
   public expandedLineId: number | null = null;
   public pageByLineId: Record<number, number> = {};
-
-  expandedKey: string | null = null;
 
   constructor() {
     this.seo.setPageTitle("GMCAN | " + this.language().linesInvestigation);
@@ -62,22 +57,5 @@ export default class LinesInvestigationComponent {
 
   setPageForLine(lineId: number, page: number): void {
     this.pageByLineId[lineId] = page;
-  }
-
-  projectKey(lineId: number, index: number): string {
-    return `${lineId}:${index}`;
-  }
-
-  toggleExpanded(section: string, index: number): void {
-    const key = `${section}:${index}`;
-    this.expandedKey = this.expandedKey === key ? null : key;
-  }
-
-  isExpanded(section: string, index: number): boolean {
-    return this.expandedKey === `${section}:${index}`;
-  }
-
-  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
-    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 }

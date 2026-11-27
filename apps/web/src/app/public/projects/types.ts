@@ -1,14 +1,7 @@
-import type { ProjectWithMembers } from "@app/shared/models/project";
-
-export type ProjectDisplay = ProjectWithMembers & {
-  fechaI: string;
-  fechaF?: string;
-  lineasInvestigacion?: string;
-  fuenteFinanciamiento?: string;
-};
+import type { PublicProject } from "@gmcan/contracts/public";
 
 export type ProjectsViewModel = {
-  active: ProjectDisplay[];
-  finished: ProjectDisplay[];
+  active: PublicProject[];
+  finished: PublicProject[];
   infoText: string;
 };

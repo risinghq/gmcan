@@ -12,8 +12,6 @@ export type HomePublicacion = PublicationDisplay<PublicPublicationWithAuthors>;
 export type HomeProyecto = PublicProject & {
   fechaI: string;
   fechaF?: string;
-  lineasInvestigacion?: string;
-  fuenteFinanciamiento?: string;
 };
 
 export type HomeNewsItem = PublicNewsListItem & {

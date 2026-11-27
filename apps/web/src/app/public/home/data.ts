@@ -6,7 +6,7 @@ import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel, dateText } from "@app/shared/utils/date";
-import type { PublicGroupTopic, PublicHome, PublicNewsListItem, PublicProject } from "@gmcan/contracts/public";
+import type { PublicHome, PublicNewsListItem, PublicProject } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
 import type { HomeNewsItem, HomeProyecto, HomeViewModel } from "./types";
@@ -28,7 +28,7 @@ export class HomeDataService {
     return {
       info: group,
       publicaciones: home.publications.map(publicationDisplay(this.lookup, this.session.language().locale)),
-      proyectos: this.enrichProyectos(home.ongoingProjects, home.researchLines),
+      proyectos: this.enrichProyectos(home.ongoingProjects),
       newsItems,
       featuredNews: newsItems[0] ?? null,
       linesPreview: home.researchLines.slice(0, 3),
@@ -41,19 +41,12 @@ export class HomeDataService {
     };
   }
 
-  private enrichProyectos(proyectos: PublicProject[], lineas: PublicGroupTopic[]): HomeProyecto[] {
-    const fundingSources = this.lookup.fundingSources();
-
-    const lineasMap = new Map(lineas.map((l) => [l.id, l]));
-    const fuentesMap = new Map(fundingSources.map((f) => [f.code, f]));
-
+  private enrichProyectos(proyectos: PublicProject[]): HomeProyecto[] {
     const locale = this.session.language().locale;
     return proyectos.map((proyecto) => ({
       ...proyecto,
-      fechaI: dateLabel(proyecto.startDate, "MMMM, y", locale),
-      fechaF: dateLabel(proyecto.endDate, "MMMM, y", locale) || undefined,
-      lineasInvestigacion: lineasMap.get(proyecto.researchLineId)?.name,
-      fuenteFinanciamiento: fuentesMap.get(proyecto.fundingSourceCode)?.name,
+      fechaI: dateLabel(proyecto.startDate, "MMMM y", locale),
+      fechaF: dateLabel(proyecto.endDate, "MMMM y", locale) || undefined,
     }));
   }
 

@@ -79,57 +79,8 @@
             @if (proyectos().length == 0) {
             <div class="not-found-1">{{ language().noResultsProjects }}</div>
             } @for ( proyecto of proyectos() | slice: (page2() - 1) * pageSize : (page2() - 1) * pageSize + pageSize;
-            track proyecto.id; let i = $index ) {
-            <div class="project">
-              <div class="project-code">{{ proyecto.code }}</div>
-              <div class="flex-news project-mt">
-                <div class="project-title">{{ proyecto.title }}</div>
-              </div>
-              <div class="project-rev">
-                <strong class="resp-title">{{ language().projectsText[0].linesInvestigation }}: </strong>{{
-                proyecto.researchLine }}
-              </div>
-              <div class="project-pt">
-                <app-project-members [members]="proyecto.members" from="search" />
-                <div class="flex-news">
-                  <button
-                    type="button"
-                    class="expand-toggle project-abstract"
-                    [attr.aria-expanded]="isExpanded('search-proj', i)"
-                    [attr.aria-controls]="'search-project-' + i"
-                    (click)="toggleExpanded('search-proj', i)"
-                  >
-                    {{ expandLabel( "search-proj", i, language().projectsText[0].seeMore,
-                    language().projectsText[0].seeLess ) }}
-                    <app-icon name="chevron-down" />
-                  </button>
-                </div>
-              </div>
-              <div class="collapse project-mt" [class.show]="isExpanded('search-proj', i)" [id]="'search-project-' + i">
-                <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ language().projectsText[0].description }}: </strong>
-                  {{ proyecto.description }}
-                </div>
-                <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ language().projectsText[0].source }}: </strong>
-                  {{ proyecto.fundingSource }}
-                </div>
-                <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ language().projectsText[0].amount }}: </strong>
-                  {{ proyecto.fundedAmountMinor | money: proyecto.currencyCode : language().locale }}
-                </div>
-                <div class="abstract mb-8">
-                  <strong class="abstract-title"> {{ language().projectsText[0].dateStart }}: </strong>
-                  {{ proyecto.fechaI }}
-                </div>
-                @if (proyecto.fechaF) {
-                <div class="abstract">
-                  <strong class="abstract-title"> {{ language().projectsText[0].dateEnd }}: </strong>
-                  {{ proyecto.fechaF }}
-                </div>
-                }
-              </div>
-            </div>
+            track proyecto.id ) {
+            <app-project-item [project]="proyecto" from="search" />
             } @if (proyectos().length > 5) {
             <ngb-pagination
               [(page)]="page2"
