@@ -56,13 +56,17 @@ export class AvatarComponent {
 
   readonly failed = linkedSignal({ source: this.src, computation: () => false });
 
-  readonly initials = computed(() =>
-    this.name()
-      .split(/\s+/)
-      .map((word) => word.match(/\p{L}/u)?.[0] ?? "")
-      .filter(Boolean)
-      .slice(0, 2)
-      .join("")
-      .toLocaleUpperCase(),
-  );
+  readonly initials = computed(() => initials(this.name()));
+}
+
+/** A leading abbreviation followed by two more words is an academic prefix, as in "Dr. Ana Torres". */
+export function initials(name: string): string {
+  const words = name.split(/\s+/).filter(Boolean);
+  const named = words.length > 2 && words[0]!.endsWith(".") ? words.slice(1) : words;
+  return named
+    .map((word) => word.match(/\p{L}/u)?.[0] ?? "")
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toLocaleUpperCase();
 }
