@@ -116,17 +116,17 @@ describe("GlobalSearchComponent", () => {
 
   it("shows the not-found message when a search matches nothing", () => {
     expect(page().querySelector(".not-found-2")).not.toBeNull();
-    expect(page().querySelector(".publication")).toBeNull();
+    expect(page().querySelector("app-publication-item")).toBeNull();
   });
 
   it("names each publication's kind, journal and date from the lookup data", async () => {
     await search("nano", { ...EMPTY, publications: [article(1, "Nanotubes"), thesis(2, "Nanowires")] });
 
-    expect(texts(".publication-title")).toEqual(["Nanotubes", "Nanowires"]);
-    expect(texts(".publication-type")).toEqual(["Artículo", "Tesis doctoral"]);
-    expect(texts(".publication-rev")[0]).toContain("Nano Letters Vol. 12");
-    expect(texts(".publication-rev")).toContain("UNI");
-    expect(texts(".publication-date")).toContain("Marzo 2024");
+    expect(texts("app-publication-item .title")).toEqual(["Nanotubes", "Nanowires"]);
+    expect(texts(".publication-kind")).toEqual(["Artículo", "Tesis doctoral"]);
+    expect(texts("app-publication-item .meta")[0]).toContain("Nano Letters Vol. 12");
+    expect(texts("app-publication-item .meta")[1]).toContain("UNI");
+    expect(texts("app-publication-item .meta")[0]).toContain("Marzo 2024");
     expect(page().querySelector(".not-found-2")).toBeNull();
   });
 
@@ -150,20 +150,20 @@ describe("GlobalSearchComponent", () => {
     await search("nano", { ...EMPTY, publications: [article(1, "Nanotubes")] });
     await search("graphene", { ...EMPTY, publications: [article(3, "Graphene sheets")] });
 
-    expect(texts(".publication-title")).toEqual(["Graphene sheets"]);
+    expect(texts("app-publication-item .title")).toEqual(["Graphene sheets"]);
     expect(page().querySelector<HTMLInputElement>("[role=search] input")?.value).toBe("graphene");
   });
 
   it("pages publications five at a time and starts a new search on the first page", async () => {
     const many = Array.from({ length: 7 }, (_, index) => article(index + 1, `Paper ${index + 1}`));
     await search("paper", { ...EMPTY, publications: many });
-    expect(texts(".publication-title")).toHaveLength(5);
+    expect(texts("app-publication-item .title")).toHaveLength(5);
 
     page().querySelector<HTMLAnchorElement>("#publications-list ngb-pagination li:nth-last-child(2) a")?.click();
     await fixture.whenStable();
-    expect(texts(".publication-title")).toEqual(["Paper 6", "Paper 7"]);
+    expect(texts("app-publication-item .title")).toEqual(["Paper 6", "Paper 7"]);
 
     await search("paper", { ...EMPTY, publications: many.slice(0, 6) });
-    expect(texts(".publication-title")).toEqual(["Paper 1", "Paper 2", "Paper 3", "Paper 4", "Paper 5"]);
+    expect(texts("app-publication-item .title")).toEqual(["Paper 1", "Paper 2", "Paper 3", "Paper 4", "Paper 5"]);
   });
 });

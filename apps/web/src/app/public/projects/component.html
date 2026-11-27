@@ -36,7 +36,6 @@
                     <button
                       type="button"
                       class="expand-toggle project-abstract"
-                      [class.abstract-active]="isExpanded('proj', i)"
                       [attr.aria-expanded]="isExpanded('proj', i)"
                       [attr.aria-controls]="'project-' + i"
                       (click)="toggleExpanded('proj', i)"

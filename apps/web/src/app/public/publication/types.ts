@@ -1,15 +1,7 @@
+import type { PublicationDisplay as SharedPublicationDisplay } from "@app/shared/publication-display";
 import type { PublicPublicationWithAuthors } from "@gmcan/contracts/public";
 
-export type PublicationDisplay = PublicPublicationWithAuthors & {
-  fecha: string;
-  tipoPublicacion?: string;
-  tipoTesis?: string;
-  revista?: string;
-  universidad?: string;
-  evento?: string;
-  ciudad?: string | null;
-  pais?: string | null;
-};
+export type PublicationDisplay = SharedPublicationDisplay<PublicPublicationWithAuthors>;
 
 export type PublicationViewModel = {
   articulos: PublicationDisplay[];

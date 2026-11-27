@@ -1,20 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
+import { publicationDisplay } from "@app/shared/publication-display";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel, dateText } from "@app/shared/utils/date";
-import type {
-  PublicGroupTopic,
-  PublicHome,
-  PublicNewsListItem,
-  PublicProject,
-  PublicPublicationWithAuthors,
-} from "@gmcan/contracts/public";
+import type { PublicGroupTopic, PublicHome, PublicNewsListItem, PublicProject } from "@gmcan/contracts/public";
 import { firstValueFrom } from "rxjs";
 
-import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
+import type { HomeNewsItem, HomeProyecto, HomeViewModel } from "./types";
 
 @Injectable({ providedIn: "root" })
 export class HomeDataService {
@@ -32,7 +27,7 @@ export class HomeDataService {
 
     return {
       info: group,
-      publicaciones: this.enrichPublicaciones(home.publications),
+      publicaciones: home.publications.map(publicationDisplay(this.lookup, this.session.language().locale)),
       proyectos: this.enrichProyectos(home.ongoingProjects, home.researchLines),
       newsItems,
       featuredNews: newsItems[0] ?? null,
@@ -44,40 +39,6 @@ export class HomeDataService {
       tesis: home.publicationCounts.thesis,
       resumenes: home.publicationCounts.conference_paper,
     };
-  }
-
-  private enrichPublicaciones(publicaciones: PublicPublicationWithAuthors[]): HomePublicacion[] {
-    const publicationKinds = this.lookup.publicationKinds();
-    const thesisKinds = this.lookup.thesisKinds();
-    const journals = this.lookup.journals();
-    const universities = this.lookup.universities();
-    const events = this.lookup.events();
-
-    const tiposMap = new Map(publicationKinds.map((t) => [t.code, t]));
-    const tiposTesisMap = new Map(thesisKinds.map((t) => [t.code, t]));
-    const revistasMap = new Map(journals.map((j) => [j.id, j]));
-    const universidadesMap = new Map(universities.map((u) => [u.id, u]));
-    const eventosMap = new Map(events.map((e) => [e.id, e]));
-
-    return publicaciones.map((pub) => {
-      const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
-      const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
-      const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
-      const journalId = pub.subtype.kindCode === "journal_article" ? pub.subtype.journalArticle.journalId : null;
-      const evento = eventId ? eventosMap.get(eventId) : undefined;
-
-      return {
-        ...pub,
-        fecha: dateLabel(pub.publishedAt, "MMMM y", this.session.language().locale),
-        tipoPublicacion: tiposMap.get(pub.kindCode)?.name,
-        tipoTesis: thesisKindCode ? tiposTesisMap.get(thesisKindCode)?.name : undefined,
-        revista: journalId ? revistasMap.get(journalId)?.name : undefined,
-        universidad: universityId ? (universidadesMap.get(universityId)?.name ?? undefined) : undefined,
-        evento: evento?.name,
-        ciudad: evento?.city ?? null,
-        pais: evento?.country ?? null,
-      };
-    });
   }
 
   private enrichProyectos(proyectos: PublicProject[], lineas: PublicGroupTopic[]): HomeProyecto[] {

@@ -164,142 +164,43 @@
     </a>
   </div>
   <div class="publication-list">
-    @for (publicacion of publicaciones | slice: 0 : 5; track publicacion; let i = $index) {
-    <div class="publication flex-news">
+    @for (publicacion of publicaciones | slice: 0 : 5; track publicacion.id) {
+    <div class="publication flex-news hide-mobile">
       <div class="col-lg-4 col-md-12 nopd hide-mobile">
-        @if (publicacion.kindCode !== 'thesis') {
-        <div
-          class="publication-type"
-          [class]="{
-                'publication-type-1': publicacion.kindCode === 'journal_article',
-                'publication-type-3': publicacion.kindCode === 'conference_paper',
-              }"
-        >
-          {{ publicacion.tipoPublicacion }}
-        </div>
-        } @if (publicacion.kindCode === 'thesis') {
-        <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
-        }
-        <div class="flex-news flex-flow publication-mt">
-          <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
-          <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
-          @if (publicacion.revista != null && publicacion.revista != "") {
-          <div class="publication-rev">
-            {{ publicacion.revista }} Vol. {{ publicacion.subtype.kindCode === 'journal_article' ?
-            publicacion.subtype.journalArticle.issue : '' }} {{ publicacion.universidad }}
-          </div>
-          } @if (publicacion.universidad != null && publicacion.universidad != "") {
-          <div class="publication-rev">{{ publicacion.universidad }}</div>
-          } @if (publicacion.evento != null && publicacion.evento != "") {
-          <div class="publication-rev">{{ publicacion.evento }}</div>
-          } @if (publicacion.ciudad != null && publicacion.ciudad != "") {
-          <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
-          } @if (publicacion.ciudad != null && publicacion.ciudad != "") {
-          <div class="publication-rev">{{ publicacion.ciudad }}, {{ publicacion.pais }}</div>
+        <span class="publication-kind" [attr.data-kind]="publicacion.kindCode">{{ publicacion.kindLabel }}</span>
+        <div class="publication-meta publication-mt">
+          <span>{{ publicacion.date }}</span>
+          @if (publicacion.venue) {
+          <span>{{ publicacion.venue }}</span>
+          } @if (publicacion.place) {
+          <span>{{ publicacion.place }}</span>
           }
         </div>
-        @if (publicacion.doi != null) {
-        <div class="publication-rev line-1">
+        @if (publicacion.doi) {
+        <div class="publication-doi publication-mt">
           DOI:
-          <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
-            >{{ publicacion.doi }}</a
-          >
+          <a [href]="'https://doi.org/' + publicacion.doi" target="_blank" rel="noopener">{{ publicacion.doi }}</a>
         </div>
         } @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
-        <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
-          {{ this.language.publicationsText[0].preview }}
-        </a>
-        } @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
-        <a class="publication-green" href="{{ publicacion.asset.download }}">
-          {{ this.language.publicationsText[0].download }}
-        </a>
+        <div class="publication-links">
+          <a class="publication-green" [href]="publicacion.asset.inline" target="_blank" rel="noopener">
+            {{ language.publicationsText[0].preview }}
+          </a>
+          <a class="publication-green" [href]="publicacion.asset.download">
+            {{ language.publicationsText[0].download }}
+          </a>
+        </div>
         }
       </div>
       <div class="col-lg-8 col-md-12 nopd">
-        <div>
-          <div class="flex-news hide-desktop">
-            @if (publicacion.kindCode !== 'thesis') {
-            <div
-              class="publication-type"
-              [class]="{
-                    'publication-type-1': publicacion.kindCode === 'journal_article',
-                    'publication-type-3': publicacion.kindCode === 'conference_paper',
-                  }"
-            >
-              {{ publicacion.tipoPublicacion }}
-            </div>
-            } @if (publicacion.kindCode === 'thesis') {
-            <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
-            }
-            <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-              {{ publicacion.fecha }}
-            </div>
-          </div>
-          <div class="flex-news">
-            <div class="publication-title">{{ publicacion.title }}</div>
-          </div>
-          <div class="flex-news publication-mt hide-desktop">
-            <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
-            <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
-            @if (publicacion.revista != null && publicacion.revista != "") {
-            <div class="publication-rev">
-              {{ publicacion.revista }} Vol. {{ publicacion.subtype.kindCode === 'journal_article' ?
-              publicacion.subtype.journalArticle.issue : '' }} {{ publicacion.universidad }}
-            </div>
-            } @if (publicacion.universidad != null && publicacion.universidad != "") {
-            <div class="publication-rev">{{ publicacion.universidad }}</div>
-            } @if (publicacion.evento != null && publicacion.evento != "") {
-            <div class="publication-rev">{{ publicacion.evento }}</div>
-            } @if (publicacion.ciudad != null && publicacion.ciudad != "") {
-            <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
-            } @if (publicacion.ciudad != null && publicacion.ciudad != "") {
-            <div class="publication-rev">{{ publicacion.ciudad }}, {{ publicacion.pais }}</div>
-            }
-          </div>
-          @if (publicacion.doi != null) {
-          <div class="publication-rev line-1 d-flex hide-desktop">
-            DOI:
-            <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
-              >{{ publicacion.doi }}</a
-            >
-          </div>
-          }
-          <app-publication-authors class="publication-mt" [authors]="publicacion.authors" from="home" />
-          <div class="abstract d-flex hide-mobile">{{ publicacion.abstract }}</div>
-          <div class="flex-news mt-16 hide-desktop">
-            @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
-            <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
-              {{ this.language.publicationsText[0].preview }}
-            </a>
-            } @if (publicacion.kindCode !== 'conference_paper' && publicacion.asset) {
-            <a class="publication-green" href="{{ publicacion.asset.download }}">
-              {{ this.language.publicationsText[0].download }}
-            </a>
-            }
-            <button
-              type="button"
-              class="expand-toggle publication-abstract"
-              [class.abstract-active]="isExpanded('home-pub', i)"
-              [attr.aria-expanded]="isExpanded('home-pub', i)"
-              [attr.aria-controls]="'home-publication-' + i"
-              (click)="toggleExpanded('home-pub', i)"
-            >
-              {{ expandLabel( "home-pub", i, this.language.publicationsText[0].seeMore,
-              this.language.publicationsText[0].seeLess ) }}
-              <app-icon class="publication-abs-icon" name="chevron-down" />
-            </button>
-          </div>
-          <div
-            class="collapse collapsed-resumen"
-            [class.show]="isExpanded('home-pub', i)"
-            [id]="'home-publication-' + i"
-          >
-            <div class="abstract-title">{{ this.language.publicationsText[0].abstract }}:</div>
-            <div class="abstract">{{ publicacion.abstract }}</div>
-          </div>
-        </div>
+        <div class="publication-title">{{ publicacion.title }}</div>
+        <app-publication-authors class="publication-mt" [authors]="publicacion.authors" from="home" />
+        @if (publicacion.abstract) {
+        <div class="abstract">{{ publicacion.abstract }}</div>
+        }
       </div>
     </div>
+    <app-publication-item class="hide-desktop" [publication]="publicacion" from="home" />
     }
   </div>
   <a class="btn-black hide-desktop" routerLink="/publications">
@@ -350,7 +251,6 @@
             <button
               type="button"
               class="expand-toggle project-abstract"
-              [class.abstract-active]="isExpanded('home-proj', i)"
               [attr.aria-expanded]="isExpanded('home-proj', i)"
               [attr.aria-controls]="'home-project-' + i"
               (click)="toggleExpanded('home-proj', i)"

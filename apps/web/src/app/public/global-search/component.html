@@ -37,88 +37,8 @@
             @if (publicaciones().length == 0) {
             <div class="not-found-1">{{ language().noResultsPublication }}</div>
             } @for ( publicacion of publicaciones() | slice: (page1() - 1) * pageSize : (page1() - 1) * pageSize +
-            pageSize; track publicacion.id; let i = $index ) {
-            <div class="publication">
-              <div class="flex-news">
-                @if (publicacion.kindCode != 'thesis') {
-                <div
-                  class="publication-type"
-                  [class]="{
-                          'publication-type-1': publicacion.kindCode == 'journal_article',
-                          'publication-type-3': publicacion.kindCode == 'conference_paper',
-                        }"
-                >
-                  {{ publicacion.tipoPublicacion }}
-                </div>
-                } @if (publicacion.kindCode == 'thesis') {
-                <div class="publication-type publication-type-2">{{ publicacion.tipoTesis }}</div>
-                }
-                <div class="publication-date d-sm-block d-xs-block d-md-none d-lg-none d-xl-none">
-                  {{ publicacion.fecha }}
-                </div>
-              </div>
-              <div class="flex-news publication-mt">
-                <div class="publication-title">{{ publicacion.title }}</div>
-              </div>
-              <div class="flex-news publication-mt">
-                <div class="publication-date d-none d-md-block d-lg-block d-xl-block">{{ publicacion.fecha }}</div>
-                <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
-                @if (publicacion.revista != null && publicacion.revista != "") {
-                <div class="publication-rev">
-                  {{ publicacion.revista }} Vol. {{ publicacion.subtype.kindCode === 'journal_article' ?
-                  publicacion.subtype.journalArticle.issue : '' }} {{ publicacion.universidad }}
-                </div>
-                } @if (publicacion.universidad != null && publicacion.universidad != "") {
-                <div class="publication-rev">{{ publicacion.universidad }}</div>
-                } @if (publicacion.evento != null && publicacion.evento != "") {
-                <div class="publication-rev">{{ publicacion.evento }}</div>
-                } @if (publicacion.ciudad != null && publicacion.ciudad != "") {
-                <div class="elipse d-none d-md-block d-lg-block d-xl-block"></div>
-                } @if (publicacion.ciudad != null && publicacion.ciudad != "") {
-                <div class="publication-rev">{{ publicacion.ciudad }}, {{ publicacion.pais }}</div>
-                }
-              </div>
-              @if (publicacion.doi != null) {
-              <div class="publication-rev line-1">
-                DOI:
-                <a class="publication-rev link-DOI" href="https://doi.org/{{ publicacion.doi }}" target="_blank"
-                  >{{ publicacion.doi }}</a
-                >
-              </div>
-              }
-              <app-publication-authors class="publication-mt" [authors]="publicacion.authors" from="search" />
-              <div class="flex-news mt-16">
-                @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
-                <a class="publication-green" href="{{ publicacion.asset.inline }}" target="_blank">
-                  {{ language().publicationsText[0].preview }}
-                </a>
-                } @if (publicacion.kindCode != 'conference_paper' && publicacion.asset) {
-                <a class="publication-green" href="{{ publicacion.asset.download }}">
-                  {{ language().publicationsText[0].download }}
-                </a>
-                }
-                <button
-                  type="button"
-                  class="expand-toggle publication-abstract"
-                  [class.abstract-active]="isExpanded('search-pub', i)"
-                  [attr.aria-expanded]="isExpanded('search-pub', i)"
-                  [attr.aria-controls]="'search-publication-' + i"
-                  (click)="toggleExpanded('search-pub', i)"
-                >
-                  {{ expandLabel( "search-pub", i, language().publicationsText[0].seeMore,
-                  language().publicationsText[0].seeLess ) }}
-                  <app-icon class="publication-abs-icon" name="chevron-down" />
-                </button>
-              </div>
-              <div
-                class="collapse collapsed-resumen"
-                [class.show]="isExpanded('search-pub', i)"
-                [id]="'search-publication-' + i"
-              >
-                <div class="abstract-title">{{ language().publicationsText[0].abstract }}:</div>
-                <div class="abstract">{{ publicacion.abstract }}</div>
-              </div>
-            </div>
+            pageSize; track publicacion.id) {
+            <app-publication-item [publication]="publicacion" from="search" />
             } @if (publicaciones().length > 5) {
             <ngb-pagination
               [(page)]="page1"
@@ -178,7 +98,6 @@
                   <button
                     type="button"
                     class="expand-toggle project-abstract"
-                    [class.abstract-active]="isExpanded('search-proj', i)"
                     [attr.aria-expanded]="isExpanded('search-proj', i)"
                     [attr.aria-controls]="'search-project-' + i"
                     (click)="toggleExpanded('search-proj', i)"

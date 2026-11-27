@@ -1,5 +1,3 @@
-@use "../../shared/styles/publication-list";
-
 .plex-sans {
   font-family: "IBM Plex Sans", serif;
 }
@@ -12,10 +10,7 @@
   padding-bottom: 16px;
 }
 
-@include publication-list.base;
-
 @media (min-width: 961px) {
-  @include publication-list.wide;
   .page-card {
     padding-bottom: 24px;
   }
@@ -25,7 +20,6 @@
 }
 
 @media (max-width: 960px) {
-  @include publication-list.narrow;
   app-icon {
     font-size: 14px;
   }
