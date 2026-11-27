@@ -8,6 +8,7 @@ import { AuthService } from "@app/shared/services/auth.service";
 import { EmailService } from "@app/shared/services/email.service";
 import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
+import { finalize } from "rxjs";
 
 @Component({
   selector: "app-login",
@@ -27,6 +28,7 @@ export default class LoginComponent implements OnInit {
 
   readonly grupoinfo = this.uiState.groupInfo;
   readonly error = signal<string | null>(null);
+  readonly loading = signal(false);
   readonly exito = signal<string | null>(null);
   readonly recoverValue = signal(false);
   readonly loginForm: FormGroup = this.fb.group({
@@ -50,14 +52,18 @@ export default class LoginComponent implements OnInit {
       password: this.loginForm.controls["password"].value as string,
     };
     this.error.set(null);
-    this.authService.login(credentials).subscribe({
-      next: () => {
-        this.router.navigate(["/dashboard"]);
-      },
-      error: () => {
-        this.error.set("Correo electrónico o contraseña incorrectos");
-      },
-    });
+    this.loading.set(true);
+    this.authService
+      .login(credentials)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(["/dashboard"]);
+        },
+        error: () => {
+          this.error.set("Correo electrónico o contraseña incorrectos");
+        },
+      });
   }
 
   change(): void {
@@ -70,14 +76,18 @@ export default class LoginComponent implements OnInit {
     this.exito.set(null);
     this.error.set(null);
     if (this.emailForm.invalid) return;
-    this.emailService.requestPasswordReset(this.emailForm.controls["email"].value as string).subscribe({
-      next: () => {
-        this.exito.set("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
-      },
-      error: () => {
-        this.error.set("No se pudo procesar la solicitud. Intente más tarde.");
-      },
-    });
+    this.loading.set(true);
+    this.emailService
+      .requestPasswordReset(this.emailForm.controls["email"].value as string)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.exito.set("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
+        },
+        error: () => {
+          this.error.set("No se pudo procesar la solicitud. Intente más tarde.");
+        },
+      });
   }
 
   return(): void {

@@ -28,10 +28,8 @@
           required
           type="password"
         />
-        <button type="submit" [class]="{ 'btn-grey': loginForm.invalid, 'btn-black': !loginForm.invalid }">
-          <div class="link">
-            {{ language.loginText[0].login }}
-          </div>
+        <button type="submit" class="btn-black" [disabled]="loginForm.invalid || loading()">
+          <span class="link">{{ language.loginText[0].login }}</span>
         </button>
         <button type="button" class="forgot link" (click)="change()">
           {{ language.loginText[0].forgot }}
@@ -56,8 +54,8 @@
           autocomplete="email"
           required
         />
-        <button type="submit" [class]="{ 'btn-grey': emailForm.invalid, 'btn-black': !emailForm.invalid }">
-          <div class="link">Recuperar contraseña</div>
+        <button type="submit" class="btn-black" [disabled]="emailForm.invalid || loading()">
+          <span class="link">Recuperar contraseña</span>
         </button>
       </form>
     }
