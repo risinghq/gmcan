@@ -15,14 +15,9 @@
               [(query)]="query"
               (search)="search($event)"
             />
-            @if (!allCharged) {
-            <div class="spinner-pad">
-              <mat-spinner class="auto mb-8" />
-              <div class="loading-text center">Cargando</div>
-            </div>
-            } @if (allCharged && currentProjects.length == 0) {
+            @if (currentProjects.length == 0) {
             <div class="not-found">{{ language.projectsText[0].results }}</div>
-            } @if (allCharged && currentProjects.length > 0) {
+            } @else {
             <div>
               @for ( proyecto of currentProjects | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize;
               track proyecto; let i = $index ) {

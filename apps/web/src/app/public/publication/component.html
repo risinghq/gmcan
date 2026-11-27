@@ -1,9 +1,4 @@
 <div class="page publication-div">
-  @if (!cargado) {
-  <div>
-    <mat-spinner />
-  </div>
-  } @if (cargado) {
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="[{ label: language.publications }]" />
@@ -20,14 +15,9 @@
               [(query)]="query"
               (search)="search($event)"
             />
-            @if (!allCharged) {
-            <div class="spinner-pad">
-              <mat-spinner class="auto mb-8" />
-              <div class="loading-text center">Cargando</div>
-            </div>
-            } @if (allCharged && publicaciones.length == 0) {
+            @if (publicaciones.length == 0) {
             <div class="not-found">{{ language.publicationsText[0].results }}</div>
-            } @if (allCharged && publicaciones.length > 0) {
+            } @else {
             <div>
               @for ( publicacion of publicaciones | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize;
               track publicacion.id; let i = $index ) {
@@ -141,5 +131,4 @@
       <app-news />
     </div>
   </div>
-  }
 </div>

@@ -1,6 +1,5 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, computed, inject, ChangeDetectionStrategy } from "@angular/core";
-import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
@@ -31,7 +30,6 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
     PublicationAuthorsComponent,
     SearchBoxComponent,
     BreadcrumbComponent,
-    MatProgressSpinner,
     IconComponent,
     MatTabGroup,
     MatTab,
@@ -54,8 +52,6 @@ export default class PublicationComponent implements OnInit {
   private allResumenes: PublicationDisplay[] = [];
   publicaciones: PublicationDisplay[] = [];
   activeTab = 0;
-  cargado = false;
-  allCharged: boolean | null = false;
   query = "";
   readonly tabLabels = computed(() => {
     const text = this.session.language().publicationsText?.[0];
@@ -84,8 +80,6 @@ export default class PublicationComponent implements OnInit {
     this.allResumenes = pubData.resumenes;
     this.infoText = pubData.infoText;
     this.publicaciones = this.allArticulos;
-    this.allCharged = true;
-    this.cargado = true;
   }
 
   scroll(): void {
@@ -98,7 +92,6 @@ export default class PublicationComponent implements OnInit {
     this.query = "";
     const sources = [this.allArticulos, this.allTesis, this.allResumenes];
     this.publicaciones = sources[$event.index] ?? [];
-    this.allCharged = true;
   }
 
   search(value: string): void {
