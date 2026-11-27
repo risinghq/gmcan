@@ -58,7 +58,7 @@ export default class MyArticleComponent implements AfterViewInit {
   private readonly auth = inject(AuthService);
   private readonly lookup = inject(LookupService);
 
-  readonly displayedColumns = ["titulo", "primerAutor", "publicacion", "DOI"];
+  readonly displayedColumns = ["titulo", "primerAutor", "publicacion"];
   readonly table = new ListTable<PublicationRow>({ search: publicationSearchText, sort: publicationSort });
   private readonly publications = toSignal(
     inject(PublicationService).listPublications({ kindCode: "journal_article" }),

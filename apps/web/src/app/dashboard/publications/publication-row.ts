@@ -39,7 +39,6 @@ export const publicationSort: SortValues<PublicationRow> = {
   primerAutor: (row) => row.authors[0]?.name ?? "",
   autores: (row) => row.authors[0]?.name ?? "",
   publicacion: (row) => row.publishedAt,
-  DOI: (row) => row.doi ?? "",
   tipo: (row) => row.thesisTypeName,
   universidad: (row) => row.universityName,
   evento: (row) => row.eventName,

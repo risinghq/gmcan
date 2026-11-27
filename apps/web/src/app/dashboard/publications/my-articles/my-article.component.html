@@ -19,6 +19,16 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Título</th>
       <td mat-cell *matCellDef="let row">
         <button type="button" class="row-action">{{ row.title }}</button>
+        @if (row.doi) {
+          <a
+            class="link-DOI"
+            href="https://doi.org/{{ row.doi }}"
+            target="_blank"
+            rel="noopener"
+            (click)="$event.stopPropagation()"
+            >{{ row.doi }}</a
+          >
+        }
       </td>
     </ng-container>
 
@@ -36,13 +46,6 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Publicación</th>
       <td mat-cell *matCellDef="let row">
         {{ row.fecha }}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="DOI">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>DOI</th>
-      <td mat-cell *matCellDef="let row">
-        <a class="link-DOI" href="https://doi.org/{{ row.doi }}">{{ row.doi }} </a>
       </td>
     </ng-container>
 
