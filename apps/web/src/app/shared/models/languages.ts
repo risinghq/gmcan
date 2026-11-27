@@ -28,7 +28,6 @@ export const Languages = [
     seeNews: "Ver más noticias",
     join: "Únete al GMCAN",
     login: "Iniciar Sesión",
-    searchInput: "Buscar publicaciones, proyectos, miembros y noticias",
     contactUs: "Contáctanos",
     who: "¿Quiénes somos?",
     linesminus: "líneas de investigación",
@@ -57,11 +56,8 @@ export const Languages = [
     aboutText: [
       {
         aboutUs: "Sobre Nosotros",
-        aboutUsQuestion: "¿Quiénes somos?",
         ourObjectives: "Nuestros objetivos",
         ourObjectivesQuestion: "¿Qué hacemos?",
-        ourLineas: "Líneas de investigación",
-        ourLineasQuestion: "¿Qué buscamos?",
         ourServices: "Servicios",
         ourServicesQuestion: "¿Qué ofrecemos?",
       },
@@ -72,7 +68,6 @@ export const Languages = [
         password: "Contraseña",
         login: "Ingresar",
         forgot: "¿Olvidaste tu contraseña?",
-        error: "Correo o contraseña incorrectos",
       },
     ],
     membersText: [
@@ -145,7 +140,6 @@ export const Languages = [
       {
         title: "Facilidades y recursos",
         subtitle: "Nuestras herramientas",
-        text: "Quando ambulabat agendis admonere te qualis actio. Si ad corpus, quae plerumque Imaginare tecum in balineo quidam aquam fundes aliquod discrimen vituperiis usum alii furantur. Quando ambulabat agendis admonere te qualis actio. Quando ambulabat agendis admonere te qualis actio. Quando ambulabat agendis admonere te qualis actio. Quando ambulabat agendis admonere te qualis actio. ",
         equipment: "Equipos instalados",
         software: "Software",
         moreInfo: "Más Información",
@@ -212,7 +206,6 @@ export const Languages = [
     moreNews: "More News",
     join: "Join GMCAN",
     login: "Login",
-    searchInput: "Search publications, projects, members, and news",
     contactUs: "Contact Us",
     who: "What is GMCAN?",
     linesminus: "Research topics",
@@ -240,14 +233,9 @@ export const Languages = [
     knowMore: "Learn more",
     aboutText: [
       {
-        search: "Search publications, projects, members, and news",
-        searchMobile: "Search",
         aboutUs: "About Us",
-        aboutUsQuestion: "What is GMCAN?",
         ourObjectives: "Our objectives",
         ourObjectivesQuestion: "What do we do?",
-        ourLineas: "Research topics",
-        ourLineasQuestion: "What do we look for?",
         ourServices: "Services",
         ourServicesQuestion: "What do we offer?",
       },
@@ -258,7 +246,6 @@ export const Languages = [
         password: "Password",
         login: "Login",
         forgot: "Did you forget your password?",
-        error: "Incorrect email or password",
       },
     ],
     membersText: [
@@ -331,7 +318,6 @@ export const Languages = [
       {
         title: "Facilities and resources",
         subtitle: "Our tools",
-        text: "Quando ambulabat agendis admonere te qualis actio. Si ad corpus, quae plerumque Imaginare tecum in balineo quidam aquam fundes aliquod discrimen vituperiis usum alii furantur. Quando ambulabat agendis admonere te qualis actio. Quando ambulabat agendis admonere te qualis actio. Quando ambulabat agendis admonere te qualis actio. Quando ambulabat agendis admonere te qualis actio. ",
         equipment: "Electronic equipment",
         software: "Software",
         moreInfo: "More Info",
