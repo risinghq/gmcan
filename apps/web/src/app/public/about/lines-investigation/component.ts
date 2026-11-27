@@ -1,4 +1,4 @@
-import { DatePipe, SlicePipe } from "@angular/common";
+import { DatePipe, NgTemplateOutlet, SlicePipe } from "@angular/common";
 import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import type { ResearchLineDisplay } from "@app/public/about/data";
@@ -26,6 +26,7 @@ import {
     NgbPaginationPrevious,
     NgbPaginationNumber,
     NgbPaginationNext,
+    NgTemplateOutlet,
     SlicePipe,
     DatePipe,
   ],
