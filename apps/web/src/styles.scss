@@ -245,7 +245,7 @@ mat-sidenav-container {
 
 .page-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: bold;
   line-height: 1.17;
   letter-spacing: 0.3px;
@@ -256,17 +256,57 @@ mat-sidenav-container {
   }
 }
 
+.page-subtitle {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  color: var(--muted-text);
+
+  @media (min-width: 961px) {
+    font-size: 20px;
+  }
+}
+
+.page-rule {
+  width: 40px;
+  height: 2px;
+  margin: 12px 0 16px;
+  background-color: var(--deep-green);
+
+  @media (min-width: 961px) {
+    margin: 22px 0 16px;
+  }
+}
+
+.page-body {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+  color: #000000;
+
+  @media (min-width: 961px) {
+    font-size: 16px;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
 .page-intro {
   margin: 16px 0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 300;
-  line-height: 1.33;
+  line-height: 1.5;
   letter-spacing: 0.3px;
   color: #000000;
 
   @media (min-width: 961px) {
     margin: 24px 0;
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 

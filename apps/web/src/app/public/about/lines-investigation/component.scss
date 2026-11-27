@@ -5,17 +5,7 @@
   padding: 8px;
   background-color: #ffffff;
 }
-.lines-title {
-  line-height: 1.17;
-  letter-spacing: 0.3px;
-  font-weight: bold;
-  color: #000000;
-}
 .lines-subtitle {
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
   margin-bottom: 24px;
 }
 .lines-projects {
@@ -24,12 +14,6 @@
   letter-spacing: 0.3px;
   color: #30393a;
   border-bottom: 2px solid #30393a;
-}
-
-.line-line-div {
-  width: 40px;
-  height: 2px;
-  background-color: var(--deep-green);
 }
 
 .line-img {
@@ -91,17 +75,7 @@
     padding-right: 40px;
     padding-top: 32px;
   }
-  .lines-title {
-    font-size: 30px;
-  }
-  .lines-subtitle {
-    font-size: 15px;
-  }
   @include project-list.wide;
-  .line-line-div {
-    margin-top: 22px;
-    margin-bottom: 16px;
-  }
   .lines-projects {
     font-size: 20px;
   }
@@ -115,7 +89,7 @@
 
 @media (max-width: 960px) {
   .line-header {
-    grid-template-columns: 30px 1fr 24px;
+    grid-template-columns: 48px 1fr 24px;
     align-items: center;
   }
   .line-line-div,
@@ -124,8 +98,8 @@
   }
   .line-img-div {
     grid-row: auto;
-    width: 30px;
-    height: 30px;
+    width: 48px;
+    height: 48px;
   }
   .line-mb {
     margin-bottom: 24px;
@@ -138,17 +112,10 @@
     padding-right: 8px;
     padding-top: 16px;
   }
-  .lines-title,
   .lines-projects {
     font-size: 15px;
   }
-  .lines-subtitle {
-    font-size: 13px;
-  }
   @include project-list.narrow;
-  .line-line-div {
-    margin: 16px 0px;
-  }
   ::ng-deep .pagination {
     justify-content: center;
   }
