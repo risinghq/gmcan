@@ -1,112 +1,114 @@
-@use "../../publication/component.scss";
-
-.no-border {
-  border-bottom: unset;
-}
-
 .card-facilities {
   border-radius: 4px;
   padding: 8px;
   background-color: #ffffff;
 }
+
 .facilities-img {
   width: 100%;
   object-fit: cover;
   border-radius: 4px;
 }
+
 .facilities-title {
   line-height: 1.17;
   letter-spacing: 0.3px;
   font-weight: bold;
   color: #000000;
 }
+
 .facilities-subtitle {
   line-height: 1.75;
   letter-spacing: 0.3px;
   font-weight: 500;
   color: var(--muted-text);
 }
+
 .facilities-text {
   font-weight: 300;
   line-height: 1.33;
   letter-spacing: 0.3px;
   color: #000000;
 }
+
 .facilities-sub-divi {
   height: 2px;
   width: 40px;
   background-color: #006400;
 }
-.soft-more {
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
 
-.soft-link {
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-
-.equipment {
-  margin-top: 24px;
+.section-title {
+  margin: 0;
+  padding-bottom: 6px;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.3px;
   color: #30393a;
-  padding-bottom: 6px;
 }
-.equipment-name {
+
+.items {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  margin: 0;
   font-weight: bold;
   line-height: 1.33;
   letter-spacing: 0.3px;
   color: #000000;
 }
 
-.equipo-chip {
-  padding: 0;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  font-size: 15px;
-  border-radius: 4px;
-}
-
-.equipo-chip-label {
-  font-weight: 600;
-  color: rgb(147, 147, 147);
-}
-
-.equipo-chip-slick {
-  font-weight: 400;
-  color: rgb(147, 147, 147);
-  font-size: inherit;
-  font-family: inherit;
-  line-height: inherit;
-  letter-spacing: inherit;
-  text-decoration: none;
-  margin-left: 4px;
-}
-
-.chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 4px;
-  gap: 8px;
-}
-
-.soft-description {
+.item-text {
+  margin: 8px 0 0;
   font-weight: 300;
   line-height: 1.33;
   letter-spacing: 0.3px;
   color: #000000;
 }
 
-@media (min-width: 961px) {
-  .facilities-text {
-    margin-bottom: 32px;
+.more-label {
+  margin-right: 4px;
+  font-weight: 400;
+}
+
+.more-link {
+  color: inherit;
+}
+
+.specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+
+.spec {
+  display: flex;
+  gap: 4px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border: 1px solid #c8c8c8;
+  border-radius: 4px;
+  line-height: 1.33;
+  letter-spacing: 0.3px;
+
+  dt {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: #30393a;
   }
+
+  dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--muted-text);
+  }
+}
+
+@media (min-width: 961px) {
   .card-facilities {
     padding-bottom: 40px;
   }
@@ -114,43 +116,39 @@
     height: 300px;
   }
   .facilities-text-div {
-    padding-left: 40px;
-    padding-right: 40px;
-    padding-top: 32px;
+    padding: 32px 40px 0;
   }
   .facilities-title {
     font-size: 30px;
   }
   .facilities-subtitle,
-  .equipment {
+  .section-title {
     font-size: 20px;
   }
   .facilities-sub-divi {
     margin-top: 22px;
     margin-bottom: 16px;
   }
-  .facilities-text,
-  .equipment-name,
-  .equipo-chip,
-  .soft-description,
-  .soft-more,
-  .soft-link {
-    font-size: 15px;
+  .facilities-text {
+    margin-bottom: 8px;
   }
-  .equipment {
+  .section-title {
+    margin-top: 32px;
     border-bottom: solid 2px #30393a;
   }
-  .mb-equipment {
-    margin-bottom: 16px;
+  .items {
+    gap: 24px;
+    margin-top: 16px;
+  }
+  .facilities-text,
+  .item-name,
+  .item-text,
+  .spec {
+    font-size: 15px;
   }
 }
 
 @media (max-width: 960px) {
-  .equipment {
-    line-height: 1;
-    font-size: 15px;
-    border-bottom: solid 1px #30393a;
-  }
   .card-facilities {
     padding-bottom: 20px;
   }
@@ -158,9 +156,7 @@
     height: 128px;
   }
   .facilities-text-div {
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-top: 16px;
+    padding: 16px 8px 0;
   }
   .facilities-title {
     font-size: 15px;
@@ -169,19 +165,21 @@
     margin-top: 12px;
     margin-bottom: 12px;
   }
-  .facilities-text {
-    margin-bottom: 24px;
+  .section-title {
+    margin-top: 24px;
+    line-height: 1;
+    font-size: 15px;
+    border-bottom: solid 1px #30393a;
+  }
+  .items {
+    gap: 20px;
+    margin-top: 12px;
   }
   .facilities-text,
   .facilities-subtitle,
-  .equipment-name,
-  .equipo-chip,
-  .soft-description,
-  .soft-more,
-  .soft-link {
+  .item-name,
+  .item-text,
+  .spec {
     font-size: 13px;
-  }
-  .mb-equipment {
-    margin-bottom: 8px;
   }
 }
