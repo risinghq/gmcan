@@ -6,33 +6,44 @@
 
 .member-detail-card {
   border-radius: 4px;
+  padding: 16px;
   background-color: #ffffff;
 }
 
-.member-detail-title {
-  font-weight: bold;
-  line-height: 1;
-  letter-spacing: 0.3px;
-  color: #000000;
+.back-div {
+  min-height: 44px;
+  align-items: center;
+  width: max-content;
 }
 
 .back-icon {
   margin-right: 8px;
-  width: max-content;
-  height: max-content;
+  font-size: 20px;
   color: var(--muted-accent);
 }
 
 .back-text {
-  align-self: center;
+  font-size: 15px;
   font-weight: 500;
-  line-height: 1;
   letter-spacing: 0.3px;
   color: var(--muted-accent);
 }
 
+.back-div:hover .back-text,
+.back-div:hover .back-icon {
+  color: black;
+}
+
+.member-title-div {
+  margin-top: 16px;
+  text-align: center;
+}
+
 .member-detail-img-div {
-  border-radius: 100px;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  border-radius: 50%;
 }
 
 .member-detail-img {
@@ -43,142 +54,78 @@
 }
 
 .member-detail-name-div {
-  margin-left: 24px;
+  margin-top: 16px;
+}
+
+.member-detail-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1.25;
+  letter-spacing: 0.3px;
+  color: #000000;
 }
 
 .member-detail-type {
-  margin-top: 8px;
+  margin-top: 4px;
+  font-size: 15px;
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.4;
   letter-spacing: 0.3px;
   color: var(--muted-text);
 }
 
 .detail-member-resum {
   margin-top: 24px;
+  font-size: 15px;
   font-weight: 300;
+  line-height: 1.6;
   letter-spacing: 0.3px;
   color: #000000;
 }
 
-.flex-detail {
-  display: flex;
-}
-
 .member-publications {
-  margin-top: 24px;
+  margin: 32px 0 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #30393a;
+  font-size: 17px;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.4;
   letter-spacing: 0.3px;
   color: #30393a;
-  padding-bottom: 6px;
 }
 
-.back-div:hover .back-text,
-.back-div:hover .back-icon {
-  color: black;
-}
-
-@media (min-width: 1500px) {
-  .back-text,
-  .detail-member-resum {
-    font-size: 15px;
-  }
+@media (min-width: 961px) {
   .member-detail-card {
     padding: 32px 40px;
   }
-  .back-icon,
-  .member-detail-type,
-  .member-publications {
-    font-size: 20px;
-  }
-  .member-publications {
-    border-bottom: solid 2px #30393a;
-  }
-  .member-detail-title {
-    font-size: 30px;
-  }
   .member-title-div {
-    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 24px;
+    text-align: left;
   }
   .member-detail-img-div {
-    height: 100px;
+    flex: none;
     width: 100px;
-  }
-}
-
-@media (max-width: 1500px) {
-  .back-text,
-  .detail-member-resum {
-    font-size: 15px;
-  }
-  .member-detail-card {
-    padding: 32px 40px;
-  }
-  .member-detail-title {
-    font-size: 30px;
-  }
-  .member-publications {
-    border-bottom: solid 2px #30393a;
-  }
-  .member-detail-sub,
-  .member-detail-type,
-  .member-publications {
-    font-size: 20px;
-  }
-  .back-icon {
-    font-size: 20px;
-  }
-  .member-title-div {
-    margin-top: 32px;
-  }
-  .member-detail-img-div {
     height: 100px;
-    width: 100px;
-  }
-}
-
-@media (max-width: 960px) {
-  .member-detail-subtitle {
-    font-size: 13px;
-  }
-  .member-detail-card {
-    padding: 16px;
-  }
-  .member-detail-title {
-    font-size: 16px;
-  }
-  .member-detail-sub,
-  .back-text,
-  .member-detail-type,
-  .detail-member-resum {
-    font-size: 13px;
-  }
-  .member-publications {
-    line-height: 1;
-    font-size: 15px;
-    border-bottom: solid 1px #30393a;
-  }
-  .back-icon {
-    font-size: 16px;
-  }
-  .member-title-div {
-    margin-top: 22px;
-  }
-  .member-detail-img-div {
-    height: 75px;
-    width: 75px;
-  }
-  .member-detail-img-div {
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0;
   }
   .member-detail-name-div {
-    margin-top: 16px;
-    margin-left: unset;
+    margin-top: 0;
   }
-  .flex-detail {
-    text-align: center;
-    display: block;
+  .member-detail-title {
+    font-size: 30px;
+  }
+  .member-detail-type {
+    font-size: 18px;
+  }
+  .detail-member-resum {
+    font-size: 16px;
+  }
+  .member-publications {
+    border-bottom-width: 2px;
+    font-size: 20px;
   }
 }
