@@ -1,8 +1,9 @@
-import { DatePipe } from "@angular/common";
+import { formatDate } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogClose } from "@angular/material/dialog";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
+import { toIsoDate } from "@app/shared/utils/date";
 
 export interface NewsPreview {
   title: string;
@@ -16,7 +17,7 @@ export interface NewsPreview {
 
 @Component({
   selector: "app-news-preview-dialog",
-  imports: [DatePipe, MatDialogClose, AvatarComponent, NewsMetaComponent],
+  imports: [MatDialogClose, AvatarComponent, NewsMetaComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "../../public/detail-news/component.scss",
   template: `
@@ -43,11 +44,7 @@ export interface NewsPreview {
           }
           <div class="author-text">
             <div class="author-name">{{ data.author?.name }}</div>
-            <app-news-meta
-              [type]="data.kindName ?? ''"
-              [date]="(data.publishedAt | date: 'yyyy-MM-dd') ?? ''"
-              [label]="(data.publishedAt | date: 'longDate') ?? ''"
-            />
+            <app-news-meta [type]="data.kindName ?? ''" [date]="isoDate" [label]="dateLabel" />
           </div>
         </div>
         @if (data.body) {
@@ -60,4 +57,6 @@ export interface NewsPreview {
 })
 export class NewsPreviewDialog {
   readonly data = inject<NewsPreview>(MAT_DIALOG_DATA);
+  readonly isoDate = this.data.publishedAt ? toIsoDate(this.data.publishedAt) : "";
+  readonly dateLabel = this.data.publishedAt ? formatDate(this.data.publishedAt, "longDate", "es") : "";
 }
