@@ -5,7 +5,7 @@ import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
+import { PublicationItemComponent } from "@app/shared/components/publication-item.component";
 import { SearchBoxComponent } from "@app/shared/components/search-box.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -27,7 +27,7 @@ import type { PublicationDisplay, PublicationViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
-    PublicationAuthorsComponent,
+    PublicationItemComponent,
     SearchBoxComponent,
     BreadcrumbComponent,
     IconComponent,
@@ -60,7 +60,6 @@ export default class PublicationComponent implements OnInit {
   url = GLOBAL.url;
   infoText = "";
   language: (typeof Languages)[number] = Languages[0];
-  expandedKey: string | null = null;
   page = 1;
   pageSize = 5;
 
@@ -100,18 +99,5 @@ export default class PublicationComponent implements OnInit {
       );
     }
     this.page = 1;
-  }
-
-  toggleExpanded(section: string, index: number): void {
-    const key = `${section}:${index}`;
-    this.expandedKey = this.expandedKey === key ? null : key;
-  }
-
-  isExpanded(section: string, index: number): boolean {
-    return this.expandedKey === `${section}:${index}`;
-  }
-
-  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
-    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 }

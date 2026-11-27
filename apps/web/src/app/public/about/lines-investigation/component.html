@@ -49,7 +49,6 @@
               <button
                 type="button"
                 class="expand-toggle project-abstract"
-                [class.abstract-active]="isExpanded(projectKey(linea.id, i), i)"
                 [attr.aria-expanded]="isExpanded(projectKey(linea.id, i), i)"
                 [attr.aria-controls]="'line-' + linea.id + '-project-' + i"
                 (click)="toggleExpanded(projectKey(linea.id, i), i)"

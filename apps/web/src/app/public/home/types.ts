@@ -1,4 +1,5 @@
 import type { Group } from "@app/shared/models/group";
+import type { PublicationDisplay } from "@app/shared/publication-display";
 import type {
   PublicGroupTopic,
   PublicNewsListItem,
@@ -6,16 +7,7 @@ import type {
   PublicPublicationWithAuthors,
 } from "@gmcan/contracts/public";
 
-export type HomePublicacion = PublicPublicationWithAuthors & {
-  fecha: string;
-  tipoPublicacion?: string;
-  tipoTesis?: string;
-  revista?: string;
-  universidad?: string;
-  evento?: string;
-  ciudad?: string | null;
-  pais?: string | null;
-};
+export type HomePublicacion = PublicationDisplay<PublicPublicationWithAuthors>;
 
 export type HomeProyecto = PublicProject & {
   fechaI: string;

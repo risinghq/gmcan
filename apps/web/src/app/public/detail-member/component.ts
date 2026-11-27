@@ -7,6 +7,8 @@ import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent, type Crumb } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { PublicationItemComponent } from "@app/shared/components/publication-item.component";
+import { publicationDisplay } from "@app/shared/publication-display";
 import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -14,8 +16,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { dateLabel } from "@app/shared/utils/date";
-import type { PublicMember, PublicPublication } from "@gmcan/contracts/public";
+import type { PublicMember } from "@gmcan/contracts/public";
 import {
   NgbPagination,
   NgbPaginationPrevious,
@@ -25,17 +26,6 @@ import {
 import { map } from "rxjs";
 
 type MemberDisplay = PublicMember & { prefix: string; tipoMiembro: string };
-
-type PublicationDisplay = PublicPublication & {
-  fecha: string;
-  tipoPublicacion?: string;
-  tipoTesis?: string;
-  revista?: string;
-  universidad?: string;
-  evento?: string;
-  ciudad?: string;
-  pais?: string;
-};
 
 @Component({
   selector: "app-detail-member",
@@ -52,6 +42,7 @@ type PublicationDisplay = PublicPublication & {
     NgbPaginationNumber,
     NgbPaginationNext,
     NewsComponent,
+    PublicationItemComponent,
     RouterLink,
     SlicePipe,
   ],
@@ -82,35 +73,9 @@ export default class DetailMemberComponent {
     return { ...m, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
   });
 
-  readonly publications = computed((): PublicationDisplay[] => {
-    const pubTypesMap = new Map(this.lookup.publicationKinds().map((t) => [t.code, t]));
-    const thesisTypesMap = new Map(this.lookup.thesisKinds().map((t) => [t.code, t]));
-    const journalsMap = new Map(this.lookup.journals().map((j) => [j.id, j]));
-    const universitiesMap = new Map(this.lookup.universities().map((u) => [u.id, u]));
-    const eventsMap = new Map(this.lookup.events().map((e) => [e.id, e]));
-
-    // oxlint-disable-next-line oxc/no-map-spread -- the publications come from a resource signal, so each needs a copy
-    return (this.profile.value()?.publications ?? []).map((pub): PublicationDisplay => {
-      const fecha = dateLabel(pub.publishedAt, "MMMM y", this.session.language().locale);
-
-      const eventId = pub.subtype.kindCode === "conference_paper" ? pub.subtype.conferencePaper.eventId : null;
-      const universityId = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.universityId : null;
-      const thesisKindCode = pub.subtype.kindCode === "thesis" ? pub.subtype.thesis.thesisKindCode : null;
-      const journalId = pub.subtype.kindCode === "journal_article" ? pub.subtype.journalArticle.journalId : null;
-      const evento = eventId ? eventsMap.get(eventId) : undefined;
-
-      return {
-        ...pub,
-        fecha,
-        tipoPublicacion: pubTypesMap.get(pub.kindCode)?.name,
-        tipoTesis: thesisKindCode ? thesisTypesMap.get(thesisKindCode)?.name : undefined,
-        revista: journalId ? journalsMap.get(journalId)?.name : undefined,
-        universidad: universityId ? (universitiesMap.get(universityId)?.name ?? undefined) : undefined,
-        evento: evento?.name,
-        ciudad: evento?.city ?? undefined,
-        pais: evento?.country ?? undefined,
-      };
-    });
+  readonly publications = computed(() => {
+    const enrich = publicationDisplay(this.lookup, this.session.language().locale);
+    return (this.profile.value()?.publications ?? []).map(enrich);
   });
 
   readonly language = this.session.language();
@@ -128,7 +93,6 @@ export default class DetailMemberComponent {
 
   page = 1;
   pageSize = 5;
-  expandedKey: string | null = null;
 
   constructor() {
     effect(() => {
@@ -148,19 +112,6 @@ export default class DetailMemberComponent {
         affiliation: { "@type": "ResearchOrganization", name: "GMCAN", url: GLOBAL.appUrl },
       });
     });
-  }
-
-  toggleExpanded(section: string, index: number): void {
-    const key = `${section}:${index}`;
-    this.expandedKey = this.expandedKey === key ? null : key;
-  }
-
-  isExpanded(section: string, index: number): boolean {
-    return this.expandedKey === `${section}:${index}`;
-  }
-
-  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
-    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 
   scroll(): void {

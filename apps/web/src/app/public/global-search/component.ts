@@ -15,8 +15,9 @@ import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
-import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
+import { PublicationItemComponent } from "@app/shared/components/publication-item.component";
 import { SearchBoxComponent } from "@app/shared/components/search-box.component";
+import { publicationDisplay } from "@app/shared/publication-display";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -34,16 +35,6 @@ import { map } from "rxjs";
 import type { GlobalSearchViewModel } from "./types";
 
 type ProjectDisplay = GlobalSearchViewModel["projects"][number] & { fechaI: string; fechaF: string; moneda?: string };
-type PublicationDisplay = GlobalSearchViewModel["publications"][number] & {
-  fecha: string;
-  tipoPublicacion?: string;
-  tipoTesis?: string;
-  revista?: string;
-  universidad?: string;
-  evento?: string;
-  ciudad: string | null;
-  pais: string | null;
-};
 type NewsDisplay = GlobalSearchViewModel["news"][number] & { nombreTipoNoticia?: string; fechaFormateada: string };
 
 const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], projects: [] };
@@ -54,7 +45,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    PublicationAuthorsComponent,
+    PublicationItemComponent,
     SearchBoxComponent,
     ProjectMembersComponent,
     BreadcrumbComponent,
@@ -86,7 +77,9 @@ export default class GlobalSearchComponent {
     initialValue: EMPTY,
   });
 
-  protected readonly publicaciones = computed(() => this.results().publications.map((pub) => this.toPublication(pub)));
+  protected readonly publicaciones = computed(() =>
+    this.results().publications.map(publicationDisplay(this.lookup, this.language().locale)),
+  );
   protected readonly proyectos = computed(() => this.results().projects.map((project) => this.toProject(project)));
   protected readonly miembros = computed(() => this.results().members);
   protected readonly noticias = computed(() => this.results().news.map((news) => this.toNews(news)));
@@ -144,25 +137,6 @@ export default class GlobalSearchComponent {
       moneda: this.lookup.currencies().find((currency) => currency.code === project.currencyCode)?.symbol,
       fechaI: dateLabel(project.startDate, "MMMM, y", this.language().locale),
       fechaF: dateLabel(project.endDate, "MMMM, y", this.language().locale),
-    };
-  }
-
-  private toPublication(pub: GlobalSearchViewModel["publications"][number]): PublicationDisplay {
-    const subtype = pub.subtype;
-    const journalId = subtype.kindCode === "journal_article" ? subtype.journalArticle.journalId : undefined;
-    const thesis = subtype.kindCode === "thesis" ? subtype.thesis : undefined;
-    const eventId = subtype.kindCode === "conference_paper" ? subtype.conferencePaper.eventId : undefined;
-    const event = this.lookup.events().find((item) => item.id === eventId);
-    return {
-      ...pub,
-      tipoPublicacion: this.lookup.publicationKinds().find((kind) => kind.code === pub.kindCode)?.name,
-      revista: this.lookup.journals().find((journal) => journal.id === journalId)?.name,
-      universidad: this.lookup.universities().find((university) => university.id === thesis?.universityId)?.name,
-      tipoTesis: this.lookup.thesisKinds().find((kind) => kind.code === thesis?.thesisKindCode)?.name,
-      evento: event?.name,
-      ciudad: event?.city ?? null,
-      pais: event?.country ?? null,
-      fecha: dateLabel(pub.publishedAt, "MMMM y", this.language().locale),
     };
   }
 

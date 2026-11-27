@@ -7,6 +7,7 @@ import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
+import { PublicationItemComponent } from "@app/shared/components/publication-item.component";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { SessionService } from "@app/shared/services/session.service";
@@ -21,6 +22,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     PublicationAuthorsComponent,
+    PublicationItemComponent,
     ProjectMembersComponent,
     RouterLink,
     MatProgressBar,
