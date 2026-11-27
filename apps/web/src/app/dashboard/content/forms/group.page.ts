@@ -63,7 +63,7 @@ type GroupSlot = AssetSlot<"research_group">;
             <textarea class="input-category" formControlName="facilities"></textarea>
             <div class="flex-news">
               <div class="text-category">Trabajos futuros</div>
-              <button type="button" class="link green-text top-auto right plex-sans" (click)="preview(locale)">
+              <button type="button" class="link green-text top-auto right" (click)="preview(locale)">
                 Vista previa
               </button>
             </div>

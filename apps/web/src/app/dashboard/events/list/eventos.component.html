@@ -61,7 +61,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="abstracts.notFound()" #abstractsPaginator />
     @if (abstracts.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
   <mat-tab label="Eventos">
@@ -109,7 +109,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="events.notFound()" #eventsPaginator />
     @if (events.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
 </mat-tab-group>

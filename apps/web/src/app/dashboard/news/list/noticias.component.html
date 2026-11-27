@@ -81,7 +81,7 @@
         (page)="onPageChange($event)"
       />
     } @else {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
 
@@ -110,7 +110,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
       </table>
     } @else {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   </mat-tab>
 </mat-tab-group>

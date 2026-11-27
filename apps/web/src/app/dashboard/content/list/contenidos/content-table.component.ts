@@ -69,7 +69,7 @@ import { ContentTable } from "./table";
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="list.notFound()" />
     @if (list.notFound()) {
-      <span class="plex-sans">No se encontraron resultados</span>
+      <span>No se encontraron resultados</span>
     }
   `,
 })

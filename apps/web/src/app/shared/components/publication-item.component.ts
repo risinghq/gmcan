@@ -63,7 +63,6 @@ type ListedPublication = PublicationDisplay<ListablePublication & { authors?: Pu
       display: block;
       padding: 16px 0 20px;
       border-bottom: 2px solid #d7d7e1;
-      font-family: "IBM Plex Sans", serif;
       font-size: 15px;
       line-height: 1.33;
       letter-spacing: 0.3px;

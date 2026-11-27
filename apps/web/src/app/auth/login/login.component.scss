@@ -1,18 +1,5 @@
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
-
-.login-div {
-  @extend .plex-sans;
-}
-
 .back-text {
   align-self: center;
-  @extend .plex-sans;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.3px;

@@ -26,7 +26,6 @@ import { SessionService } from "@app/shared/services/session.service";
       display: grid;
       grid-template-columns: max-content 1fr;
       column-gap: 8px;
-      font-family: "IBM Plex Sans", serif;
       font-size: 15px;
       line-height: 1.33;
       letter-spacing: 0.3px;

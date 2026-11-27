@@ -63,7 +63,6 @@ import { IconComponent } from "@app/shared/components/icon/icon.component";
       padding: 0;
       border: 0;
       background: none;
-      font-family: "IBM Plex Sans", serif;
       font-size: 16px;
       line-height: 24px;
       letter-spacing: 0.3px;
@@ -77,7 +76,6 @@ import { IconComponent } from "@app/shared/components/icon/icon.component";
     button {
       flex: none;
       height: auto;
-      font-family: "IBM Plex Sans", serif;
       font-size: 15px;
       font-weight: 600;
       letter-spacing: 0.3px;

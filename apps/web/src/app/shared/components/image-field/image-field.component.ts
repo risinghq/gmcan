@@ -15,7 +15,7 @@ import { IconComponent } from "../icon/icon.component";
       } @else {
         <span class="tile empty"><app-icon name="photo-up" /></span>
       }
-      <span class="action plex-sans">{{ shown() ? "Cambiar imagen" : "Insertar imagen" }}</span>
+      <span class="action">{{ shown() ? "Cambiar imagen" : "Insertar imagen" }}</span>
       <input class="file_upload" type="file" accept="image/*" (change)="pick($event)" />
     </label>
   `,

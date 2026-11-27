@@ -1,14 +1,9 @@
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-}
-
 .member-div {
   background-color: #f8f8f8;
 }
 
 .member-type-title {
   padding-bottom: 8px;
-  @extend .plex-sans;
   font-size: 20px;
   font-weight: 500;
   line-height: 1.5;
@@ -44,7 +39,6 @@
 }
 
 .member-name {
-  @extend .plex-sans;
   font-size: 20px;
   line-height: 1;
   font-weight: 600;
@@ -53,7 +47,6 @@
 }
 
 .member-profile {
-  @extend .plex-sans;
   margin-top: 8px;
   font-size: 15px;
   line-height: 0.75;

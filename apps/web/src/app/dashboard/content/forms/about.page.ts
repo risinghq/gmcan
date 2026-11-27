@@ -59,7 +59,7 @@ type AboutForm = ReturnType<typeof aboutForm>;
             <div class="locale-title">{{ label(locale) }}</div>
             <div class="flex-news">
               <div class="text-category">Descripción <span class="red-text">*</span></div>
-              <button type="button" class="link green-text top-auto right plex-sans" (click)="preview(locale)">
+              <button type="button" class="link green-text top-auto right" (click)="preview(locale)">
                 Vista previa
               </button>
             </div>
