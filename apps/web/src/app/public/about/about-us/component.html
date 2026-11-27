@@ -1,13 +1,13 @@
 <div class="card-about">
   <img class="about-img" src="{{ aboutus().asset }}" alt="" />
   <div class="about-text-div">
-    <h1 class="about-title">{{ language().aboutText[0].aboutUs }}</h1>
-    <div class="about-sub-divi"></div>
-    <div class="about-text" [innerHTML]="aboutus().description"></div>
-    <h2 class="about-title about-top">{{ language().aboutText[0].ourObjectives }}</h2>
-    <div class="about-subtitle">{{ language().aboutText[0].ourObjectivesQuestion }}</div>
-    <div class="about-sub-divi"></div>
-    <div class="about-text">
+    <h1 class="page-title">{{ language().aboutText[0].aboutUs }}</h1>
+    <div class="page-rule"></div>
+    <div class="page-body" [innerHTML]="aboutus().description"></div>
+    <h2 class="page-title about-section">{{ language().aboutText[0].ourObjectives }}</h2>
+    <p class="page-subtitle">{{ language().aboutText[0].ourObjectivesQuestion }}</p>
+    <div class="page-rule"></div>
+    <div class="page-body">
       @for (paragraph of aboutus().objectivesContent.introParagraphs; track paragraph) {
       <p>{{ paragraph }}</p>
       }
@@ -20,10 +20,10 @@
         }
       </ul>
     </div>
-    <h2 class="about-title about-top">{{ language().aboutText[0].ourServices }}</h2>
-    <div class="about-subtitle">{{ language().aboutText[0].ourServicesQuestion }}</div>
-    <div class="about-sub-divi"></div>
-    <div class="about-text">
+    <h2 class="page-title about-section">{{ language().aboutText[0].ourServices }}</h2>
+    <p class="page-subtitle">{{ language().aboutText[0].ourServicesQuestion }}</p>
+    <div class="page-rule"></div>
+    <div class="page-body">
       @for (paragraph of aboutus().servicesContent.introParagraphs; track paragraph) {
       <p>{{ paragraph }}</p>
       }

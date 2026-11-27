@@ -1,10 +1,10 @@
 <div class="card-facilities">
   <img class="facilities-img" src="{{ grupo().assets.facilities }}" alt="" />
   <div class="facilities-text-div">
-    <h1 class="facilities-title">{{ language().facilitiesText[0].title }}</h1>
-    <div class="facilities-subtitle">{{ language().facilitiesText[0].subtitle }}</div>
-    <div class="facilities-sub-divi"></div>
-    <div class="facilities-text">{{ grupo().facilities }}</div>
+    <h1 class="page-title">{{ language().facilitiesText[0].title }}</h1>
+    <p class="page-subtitle">{{ language().facilitiesText[0].subtitle }}</p>
+    <div class="page-rule"></div>
+    <p class="page-body facilities-text">{{ grupo().facilities }}</p>
     @if (machines().length > 0) {
     <h2 class="section-title">{{ language().facilitiesText[0].equipment }}</h2>
     <div class="items">
@@ -30,9 +30,9 @@
       @for (soft of software(); track soft.id) {
       <section>
         <h3 class="item-name">{{ soft.name }}</h3>
-        <p class="item-text">{{ soft.description }}</p>
+        <p class="page-body item-text">{{ soft.description }}</p>
         @if (soft.moreInfo) {
-        <p class="item-text">
+        <p class="page-body item-text">
           <span class="more-label">{{ language().facilitiesText[0].moreInfo }}:</span>
           <a class="more-link" [href]="soft.moreInfo" target="_blank" rel="noopener">{{ soft.moreInfo }}</a>
         </p>

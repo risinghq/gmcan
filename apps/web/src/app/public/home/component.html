@@ -109,7 +109,7 @@
   }
   <div class="services-card">
     <img class="services-icon" loading="lazy" src="/img/icons/bulb.svg" alt="" />
-    <div class="mt-services about-text">
+    <div class="mt-services">
       @for (paragraph of aboutUs; track paragraph) {
       <p>
         @for (part of paragraph | emphasis; track $index) {@if (part.strong) {<strong>{{ part.text }}</strong>} @else

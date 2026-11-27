@@ -1,17 +1,15 @@
 <div class="card-methods">
   <h1 class="visually-hidden">{{ language().methods }}</h1>
   <div class="methods-text-div">
-    @for (method of methods(); track method; let i = $index) {
-    <div>
-      <div class="methods-img-div">
-        @if (method.asset) {
-        <img class="methods-img" src="{{ method.asset }}" alt="" />
-        }
-      </div>
-      <h2 class="methods-title">{{ method.name }}</h2>
-      <div class="methods-sub-divi"></div>
-      <div class="methods-text" [innerHTML]="method.description"></div>
-    </div>
+    @for (method of methods(); track method) {
+    <section>
+      @if (method.asset) {
+      <img class="methods-img" src="{{ method.asset }}" alt="" />
+      }
+      <h2 class="page-title">{{ method.name }}</h2>
+      <div class="page-rule"></div>
+      <div class="page-body" [innerHTML]="method.description"></div>
+    </section>
     }
   </div>
 </div>

@@ -19,14 +19,14 @@ export interface AboutPreview {
         <img class="about-img" [src]="data.image" alt="" />
       }
       <div class="about-text-div">
-        <div class="about-title">¿Quiénes Somos?</div>
-        <div class="about-sub-divi"></div>
-        <div class="about-text" [innerHTML]="data.about.description"></div>
+        <div class="page-title">¿Quiénes Somos?</div>
+        <div class="page-rule"></div>
+        <div class="page-body" [innerHTML]="data.about.description"></div>
         @for (section of sections; track section.title) {
-          <div class="about-title about-top">{{ section.title }}</div>
-          <div class="about-subtitle">{{ section.question }}</div>
-          <div class="about-sub-divi"></div>
-          <div class="about-text">
+          <div class="page-title about-section">{{ section.title }}</div>
+          <p class="page-subtitle">{{ section.question }}</p>
+          <div class="page-rule"></div>
+          <div class="page-body">
             @for (paragraph of data.about[section.key].introParagraphs; track $index) {
               <p>{{ paragraph }}</p>
             }

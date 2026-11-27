@@ -1,85 +1,35 @@
 .card-methods {
   border-radius: 4px;
-  padding: 8px;
+  padding: 8px 8px 20px;
   background-color: #ffffff;
 }
-.methods-title {
-  line-height: 1.17;
-  letter-spacing: 0.3px;
-  font-weight: bold;
-  color: #000000;
+
+.methods-text-div {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 16px 8px 0;
 }
-.methods-text {
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-.methods-sub-divi {
-  height: 2px;
-  width: 40px;
-  background-color: #006400;
-}
+
 .methods-img {
-  width: inherit;
-  height: 100%;
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
   object-fit: cover;
 }
 
 @media (min-width: 961px) {
-  .methods-text {
-    margin-bottom: 16px;
-  }
   .card-methods {
     padding-bottom: 40px;
   }
   .methods-text-div {
-    padding-left: 40px;
-    padding-right: 40px;
-    padding-top: 32px;
+    gap: 48px;
+    padding: 32px 40px 0;
   }
-  .methods-title {
-    font-size: 30px;
-  }
-  .methods-sub-divi {
-    margin-top: 22px;
-    margin-bottom: 16px;
-  }
-  .methods-text {
-    font-size: 15px;
-  }
-  .methods-img-div {
+  .methods-img {
     width: 100px;
     height: 100px;
     margin-bottom: 24px;
-  }
-}
-
-@media (max-width: 960px) {
-  .methods-img-div {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 16px;
-  }
-  .card-methods {
-    padding-bottom: 20px;
-  }
-  .methods-text-div {
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-top: 16px;
-  }
-  .methods-title {
-    font-size: 15px;
-  }
-  .methods-sub-divi {
-    margin-top: 12px;
-    margin-bottom: 12px;
-  }
-  .methods-text {
-    margin-bottom: 24px;
-  }
-  .methods-text {
-    font-size: 13px;
   }
 }

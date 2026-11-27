@@ -13,10 +13,10 @@ export interface FutureWorkPreview {
   template: `
     <div class="card-works scroll">
       <div class="works-text-div">
-        <div class="works-title">Trabajos Futuros</div>
-        <div class="works-subtitle">Perspectivas del Grupo</div>
-        <div class="works-sub-divi"></div>
-        <div class="works-text" [innerHTML]="data.futureWork"></div>
+        <div class="page-title">Trabajos Futuros</div>
+        <p class="page-subtitle">Perspectivas del Grupo</p>
+        <div class="page-rule"></div>
+        <div class="page-body" [innerHTML]="data.futureWork"></div>
       </div>
     </div>
     <div class="outside" [mat-dialog-close]="false">X</div>

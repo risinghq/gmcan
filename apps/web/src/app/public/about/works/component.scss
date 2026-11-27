@@ -1,30 +1,11 @@
 .card-works {
   border-radius: 4px;
-  padding: 8px;
+  padding: 8px 8px 20px;
   background-color: #ffffff;
 }
-.works-title {
-  line-height: 1.17;
-  letter-spacing: 0.3px;
-  font-weight: bold;
-  color: #000000;
-}
-.works-subtitle {
-  line-height: 1.75;
-  letter-spacing: 0.3px;
-  font-weight: 500;
-  color: var(--muted-text);
-}
-.works-text {
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-.works-sub-divi {
-  height: 2px;
-  width: 40px;
-  background-color: #006400;
+
+.works-text-div {
+  padding: 16px 8px 0;
 }
 
 @media (min-width: 961px) {
@@ -32,43 +13,6 @@
     padding-bottom: 40px;
   }
   .works-text-div {
-    padding-left: 40px;
-    padding-right: 40px;
-    padding-top: 32px;
-  }
-  .works-title {
-    font-size: 30px;
-  }
-  .works-subtitle {
-    font-size: 20px;
-  }
-  .works-sub-divi {
-    margin-top: 22px;
-    margin-bottom: 16px;
-  }
-  .works-text {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 960px) {
-  .card-works {
-    padding-bottom: 20px;
-  }
-  .works-text-div {
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-top: 16px;
-  }
-  .works-title {
-    font-size: 15px;
-  }
-  .works-sub-divi {
-    margin-top: 12px;
-    margin-bottom: 12px;
-  }
-  .works-text,
-  .works-subtitle {
-    font-size: 13px;
+    padding: 32px 40px 0;
   }
 }

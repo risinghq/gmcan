@@ -15,14 +15,12 @@ export interface MethodPreview {
   template: `
     <div class="card-methods">
       <div class="methods-text-div">
-        <div class="methods-img-div">
-          @if (data.image; as image) {
-            <img class="methods-img" [src]="image" alt="" />
-          }
-        </div>
-        <div class="methods-title">{{ data.name }}</div>
-        <div class="methods-sub-divi"></div>
-        <div class="methods-text" [innerHTML]="data.description"></div>
+        @if (data.image; as image) {
+          <img class="methods-img" [src]="image" alt="" />
+        }
+        <div class="page-title">{{ data.name }}</div>
+        <div class="page-rule"></div>
+        <div class="page-body" [innerHTML]="data.description"></div>
       </div>
     </div>
     <div class="outside" [mat-dialog-close]="false">X</div>
