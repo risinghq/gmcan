@@ -1,3 +1,4 @@
+import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
@@ -5,7 +6,6 @@ import { CONTENT_LOCALES, localeForm, localeLabel } from "@app/shared/forms/loca
 import type { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { GroupService } from "@app/shared/services/group.service";
 import type { AdminSoftware } from "@gmcan/contracts/admin";
-import { AutosizeModule } from "ngx-autosize";
 import { firstValueFrom, map } from "rxjs";
 
 import { ContentFormFlow } from "./content-form-flow";
@@ -15,7 +15,7 @@ import { optionalText, requiredText } from "./text-fields";
 
 @Component({
   selector: "app-software-page",
-  imports: [ReactiveFormsModule, AutosizeModule, ContentFormComponent],
+  imports: [ReactiveFormsModule, CdkTextareaAutosize, ContentFormComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./content-form.scss",
   template: `
@@ -34,7 +34,7 @@ import { optionalText, requiredText } from "./text-fields";
             <div class="text-category">Nombre del software <span class="red-text">*</span></div>
             <input class="input-category" formControlName="name" />
             <div class="text-category">Descripción</div>
-            <textarea class="input-category" formControlName="description" autosize></textarea>
+            <textarea class="input-category" formControlName="description" cdkTextareaAutosize></textarea>
           </div>
         }
       </form>

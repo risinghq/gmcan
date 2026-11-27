@@ -1,3 +1,4 @@
+import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, computed, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -16,7 +17,6 @@ import { ProjectService } from "@app/shared/services/project.service";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import type { AdminProject, ProjectWrite } from "@gmcan/contracts/admin";
 import type { CurrencyCode, FundingSourceCode, ProjectStatusCode } from "@gmcan/contracts/public";
-import { AutosizeModule } from "ngx-autosize";
 import { firstValueFrom, map } from "rxjs";
 
 import { ContentFormFlow } from "../content/forms/content-form-flow";
@@ -74,7 +74,7 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
   selector: "app-project-page",
   imports: [
     ReactiveFormsModule,
-    AutosizeModule,
+    CdkTextareaAutosize,
     ContentFormComponent,
     MatFormField,
     MatInput,
@@ -192,7 +192,7 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
                 class="input-category"
                 formControlName="description"
                 placeholder="Insertar descripción"
-                autosize
+                cdkTextareaAutosize
               ></textarea>
             </div>
           }
