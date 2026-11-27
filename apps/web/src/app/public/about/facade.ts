@@ -27,23 +27,21 @@ export class AboutFacade {
     { initialValue: this.router.url },
   );
 
-  readonly selectedCategory = computed(() => {
+  readonly categories = computed(() => {
     const language = this.language();
-    switch (this.currentRoute()) {
-      case "/about-us/about":
-      case "/about-us":
-        return language.who;
-      case "/about-us/lines-investigation":
-        return language.linesInvestigation;
-      case "/about-us/methods":
-        return language.methods;
-      case "/about-us/facilities-resources":
-        return language.resources;
-      case "/about-us/works":
-        return language.futureWorks;
-      default:
-        return "";
-    }
+    return [
+      { path: "/about-us/about", label: language.who },
+      { path: "/about-us/lines-investigation", label: language.linesInvestigation },
+      { path: "/about-us/methods", label: language.methods },
+      { path: "/about-us/facilities-resources", label: language.resources },
+      { path: "/about-us/works", label: language.futureWorks },
+    ];
+  });
+
+  readonly selectedCategory = computed(() => {
+    const path = this.currentRoute().split(/[?#]/)[0];
+    const current = path === "/about-us" ? "/about-us/about" : path;
+    return this.categories().find((category) => category.path === current)?.label ?? "";
   });
 
   readonly methods = signal<Method[]>([]);

@@ -1,13 +1,12 @@
 <div class="card-facilities">
   <img class="facilities-img" src="{{ grupo().assets.facilities }}" alt="" />
   <div class="facilities-text-div">
-    <div class="facilities-title">{{ language().facilitiesText[0].title }}</div>
+    <h1 class="facilities-title">{{ language().facilitiesText[0].title }}</h1>
     <div class="facilities-subtitle">{{ language().facilitiesText[0].subtitle }}</div>
     <div class="facilities-sub-divi"></div>
     <div class="facilities-text">{{ grupo().facilities }}</div>
-    @if (equipos().length > 0 && equipos().length != undefined) {
-    <div class="equipment">{{ language().facilitiesText[0].equipment }}</div>
-    } @if (equipos().length > 0) {
+    @if (equipos().length > 0) {
+    <h2 class="equipment">{{ language().facilitiesText[0].equipment }}</h2>
     <div>
       @for (equipo of equipos(); track equipo; let i = $index) {
       <div class="publication" [class.no-border]="i + 1 == equipos().length">
@@ -33,9 +32,8 @@
       </div>
       }
     </div>
-    } @if (equipos().length > 0) {
-    <div class="equipment">{{ language().facilitiesText[0].software }}</div>
     } @if (software().length > 0) {
+    <h2 class="equipment">{{ language().facilitiesText[0].software }}</h2>
     <div>
       @for (soft of software(); track soft; let i = $index) {
       <div class="publication" [class.no-border]="i + 1 == software().length">
