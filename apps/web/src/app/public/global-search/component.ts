@@ -132,10 +132,6 @@ export default class GlobalSearchComponent {
     this.browser.scrollIntoViewById("main-toolbar");
   }
 
-  return(): void {
-    this.router.navigateByUrl(this.previouslink);
-  }
-
   toggleSection(section: WritableSignal<boolean>): void {
     section.update((expanded) => !expanded);
   }

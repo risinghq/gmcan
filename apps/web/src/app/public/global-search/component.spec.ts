@@ -65,7 +65,7 @@ describe("GlobalSearchComponent", () => {
         provideRouter([]),
         {
           provide: ActivatedRoute,
-          useValue: { data, params, snapshot: { queryParamMap: convertToParamMap({}) } },
+          useValue: { data, params, snapshot: { queryParamMap: convertToParamMap({ from: "news" }) } },
         },
       ],
     });
@@ -92,6 +92,10 @@ describe("GlobalSearchComponent", () => {
   afterEach(() => {
     environment.apiUrl = original;
     TestBed.inject(HttpTestingController).verify();
+  });
+
+  it("links back to the page the search started from", () => {
+    expect(page().querySelector("a.back-div")?.getAttribute("href")).toBe("/news");
   });
 
   it("shows the not-found message when a search matches nothing", () => {

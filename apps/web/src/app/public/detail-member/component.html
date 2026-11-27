@@ -8,10 +8,10 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="trail()" />
       <div class="member-detail-card">
-        <button type="button" class="flex-news back-div" (click)="return()">
+        <a class="flex-news back-div" [routerLink]="previouslink">
           <app-icon class="back-icon" name="arrow-left" />
           <span class="back-text">{{ language.detailMemberText[0].back }}</span>
-        </button>
+        </a>
         <div class="flex-detail member-title-div">
           <div class="member-detail-img-div">
             <app-avatar

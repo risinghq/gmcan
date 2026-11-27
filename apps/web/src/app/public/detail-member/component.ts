@@ -2,7 +2,7 @@ import { SlicePipe } from "@angular/common";
 import { Component, computed, effect, inject, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Router, ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent, type Crumb } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
@@ -52,12 +52,12 @@ type PublicationDisplay = PublicPublication & {
     NgbPaginationNumber,
     NgbPaginationNext,
     NewsComponent,
+    RouterLink,
     SlicePipe,
   ],
 })
 export default class DetailMemberComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly memberService = inject(MemberService);
   private readonly lookup = inject(LookupService);
   private readonly session = inject(SessionService);
@@ -165,9 +165,5 @@ export default class DetailMemberComponent {
 
   scroll(): void {
     this.browser.scrollIntoViewById("main-toolbar");
-  }
-
-  return(): void {
-    this.router.navigateByUrl(this.previouslink);
   }
 }

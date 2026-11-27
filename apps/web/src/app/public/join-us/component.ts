@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
-import { Router, ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterLink } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
@@ -18,12 +18,11 @@ import { SentDialogComponent } from "./sent-dialog.component";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule, AutosizeModule, NewsComponent],
+  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule, AutosizeModule, NewsComponent, RouterLink],
 })
 export default class JoinUsComponent implements OnInit {
   private emailService = inject(EmailService);
   private dialog = inject(MatDialog);
-  private router = inject(Router);
   private route = inject(ActivatedRoute);
   private session = inject(SessionService);
   private seo = inject(SeoService);
@@ -38,16 +37,11 @@ export default class JoinUsComponent implements OnInit {
   readonly sendFailed = signal(false);
 
   language: any = {};
-  private previouslink = "/";
+  readonly previouslink = originRoute(parsePublicOrigin(this.route.snapshot.queryParamMap.get("from")));
 
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.join);
-    this.previouslink = originRoute(parsePublicOrigin(this.route.snapshot.queryParamMap.get("from")));
-  }
-
-  return(): void {
-    this.router.navigateByUrl(this.previouslink);
   }
 
   sendEmail(): void {
