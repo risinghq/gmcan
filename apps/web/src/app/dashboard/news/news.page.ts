@@ -1,3 +1,4 @@
+import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -29,7 +30,6 @@ import { NewsService } from "@app/shared/services/news.service";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import type { AdminNews, NewsWrite } from "@gmcan/contracts/admin";
 import type { NewsKindCode, NewsStatusCode } from "@gmcan/contracts/public";
-import { AutosizeModule } from "ngx-autosize";
 import { firstValueFrom, map } from "rxjs";
 
 import { ContentFormFlow } from "../content/forms/content-form-flow";
@@ -67,7 +67,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
   imports: [
     AvatarComponent,
     ReactiveFormsModule,
-    AutosizeModule,
+    CdkTextareaAutosize,
     ContentFormComponent,
     ImageFieldComponent,
     RichTextEditorComponent,
@@ -152,7 +152,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
               <div class="text-category">
                 Resumen <span>({{ fields.summary.value.length }}/500)</span> <span class="red-text">*</span>
               </div>
-              <textarea class="input-category" formControlName="summary" maxlength="500" autosize></textarea>
+              <textarea class="input-category" formControlName="summary" maxlength="500" cdkTextareaAutosize></textarea>
               <div class="flex-news">
                 <div class="text-category">Contenido <span class="red-text">*</span></div>
                 <button type="button" class="link green-text top-auto right plex-sans" (click)="preview(locale)">

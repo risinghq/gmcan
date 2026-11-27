@@ -1,3 +1,4 @@
+import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, computed, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -26,7 +27,6 @@ import type {
   PublicationWrite,
 } from "@gmcan/contracts/admin";
 import type { PublicationKindCode, ThesisKindCode } from "@gmcan/contracts/public";
-import { AutosizeModule } from "ngx-autosize";
 import { firstValueFrom, map } from "rxjs";
 
 import { ContentFormFlow } from "../content/forms/content-form-flow";
@@ -151,7 +151,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
   imports: [
     AvatarComponent,
     ReactiveFormsModule,
-    AutosizeModule,
+    CdkTextareaAutosize,
     ContentFormComponent,
     MatAutocomplete,
     MatAutocompleteTrigger,
@@ -321,7 +321,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                 class="input-category"
                 formControlName="abstract"
                 placeholder="Insertar resumen"
-                autosize
+                cdkTextareaAutosize
               ></textarea>
             </div>
           }

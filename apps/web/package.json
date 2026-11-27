@@ -46,7 +46,6 @@
     "bootstrap": "^5.3.9",
     "chart.js": "^4.6.2",
     "ng2-charts": "^11.0.0",
-    "ngx-autosize": "^2.0.4",
     "ngx-tiptap": "^15.0.0",
     "rxjs": "^7.8.2",
     "tslib": "^2.9.1",

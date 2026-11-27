@@ -1,3 +1,4 @@
+import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ReactiveFormsModule } from "@angular/forms";
@@ -7,7 +8,6 @@ import type { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { AssetService } from "@app/shared/services/asset.service";
 import { ResearchLinesService } from "@app/shared/services/research-lines.service";
 import type { AdminResearchLine } from "@gmcan/contracts/admin";
-import { AutosizeModule } from "ngx-autosize";
 import { firstValueFrom, map } from "rxjs";
 
 import { ContentFormFlow } from "./content-form-flow";
@@ -17,7 +17,7 @@ import { optionalText, requiredText } from "./text-fields";
 
 @Component({
   selector: "app-research-line-page",
-  imports: [ReactiveFormsModule, AutosizeModule, ContentFormComponent, ImageFieldComponent],
+  imports: [ReactiveFormsModule, CdkTextareaAutosize, ContentFormComponent, ImageFieldComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./content-form.scss",
   template: `
@@ -38,7 +38,7 @@ import { optionalText, requiredText } from "./text-fields";
                 <div class="text-category">Nombre de línea <span class="red-text">*</span></div>
                 <input class="input-category" formControlName="name" />
                 <div class="text-category">Descripción</div>
-                <textarea class="input-category" formControlName="description" autosize></textarea>
+                <textarea class="input-category" formControlName="description" cdkTextareaAutosize></textarea>
               </div>
             }
           </div>

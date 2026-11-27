@@ -1,3 +1,4 @@
+import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, inject, input, output } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { MatOption, provideNativeDateAdapter } from "@angular/material/core";
@@ -8,7 +9,6 @@ import { MatSelect } from "@angular/material/select";
 import { ImageFieldComponent } from "@app/shared/components/image-field/image-field.component";
 import { CONTENT_LOCALES, localeLabel } from "@app/shared/forms/locale-form";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { AutosizeModule } from "ngx-autosize";
 
 import { BIO_MAX, type ProfileForm } from "./member-form";
 
@@ -17,7 +17,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
   selector: "app-member-fields",
   imports: [
     ReactiveFormsModule,
-    AutosizeModule,
+    CdkTextareaAutosize,
     ImageFieldComponent,
     MatFormField,
     MatSuffix,
@@ -110,7 +110,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
               Resumen profesional · {{ label(locale) }}
               <span>({{ form().controls.translations.controls[locale]?.value?.bio?.length ?? 0 }}/{{ bioMax }})</span>
             </div>
-            <textarea formControlName="bio" autosize class="input-category" [maxlength]="bioMax"></textarea>
+            <textarea formControlName="bio" cdkTextareaAutosizeclass="input-category" [maxlength]="bioMax"></textarea>
           </div>
         }
       </div>
