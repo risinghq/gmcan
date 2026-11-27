@@ -5,8 +5,7 @@ $thetransition:
   transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
   visibility 0.25s;
 
-@include project-list.summary;
-@include project-list.base;
+@include project-list.styles;
 
 .project-mt {
   margin-top: 16px;
@@ -15,12 +14,7 @@ $thetransition:
   padding-top: 16px;
 }
 
-@media (min-width: 961px) {
-  @include project-list.wide;
-}
-
 @media (max-width: 960px) {
-  @include project-list.narrow;
   .btn-black {
     margin-top: 16px;
   }

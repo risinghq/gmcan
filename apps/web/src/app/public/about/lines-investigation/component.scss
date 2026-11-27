@@ -75,7 +75,6 @@
     padding-right: 40px;
     padding-top: 32px;
   }
-  @include project-list.wide;
   .lines-projects {
     font-size: 20px;
   }
@@ -115,11 +114,9 @@
   .lines-projects {
     font-size: 15px;
   }
-  @include project-list.narrow;
   ::ng-deep .pagination {
     justify-content: center;
   }
 }
 
-@include project-list.summary;
-@include project-list.base;
+@include project-list.styles;

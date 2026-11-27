@@ -1,5 +1,7 @@
 @use "../../shared/styles/project-list";
 
+@include project-list.styles;
+
 .project-div {
   background-color: #f8f8f8;
 }
@@ -8,10 +10,7 @@
   padding-bottom: 20px;
 }
 
-@include project-list.summary;
-
 @media (min-width: 961px) {
-  @include project-list.wide;
   .page-card {
     padding-bottom: 32px;
   }
@@ -21,10 +20,7 @@
 }
 
 @media (max-width: 960px) {
-  @include project-list.narrow;
   ::ng-deep .pagination {
     justify-content: center;
   }
 }
-
-@include project-list.base;

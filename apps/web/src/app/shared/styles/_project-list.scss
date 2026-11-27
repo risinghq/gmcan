@@ -1,100 +1,69 @@
-@mixin summary {
+@mixin styles {
+  .project {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #d7d7e1;
+  }
+
+  .project-code {
+    border-radius: 4px;
+    width: max-content;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    letter-spacing: 0.3px;
+    color: var(--muted-text);
+    background-color: #e8e8e8;
+  }
+
+  .project-mt {
+    margin: 8px 0 4px;
+  }
+
+  .project-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
+    color: #000000;
+  }
+
+  .project-rev,
+  .project-abstract,
+  .abstract,
+  .abstract-title,
+  .resp-title {
+    font-size: 15px;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+  }
+
+  .project-rev {
+    color: var(--muted-text);
+  }
+
+  .project-abstract,
+  .abstract,
+  .abstract-title {
+    color: #000000;
+  }
+
   .abstract {
     font-weight: 300;
-    letter-spacing: 0.3px;
-    color: #000000;
+  }
+
+  .abstract-title {
+    font-weight: normal;
   }
 
   .resp-title {
     font-weight: 500;
   }
 
-  .abstract-title {
-    font-weight: normal;
-    letter-spacing: 0.3px;
-    color: #000000;
-  }
-
-  .project-abstract {
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
-  }
-}
-
-@mixin base {
-  .project {
-    padding-top: 16px;
-    padding-bottom: 20px;
-    border-bottom: solid 2px #d7d7e1;
-  }
-
-  .project-code {
-    border-radius: 4px;
-    width: max-content;
-    padding: 6px 8px;
-    font-size: 15px;
-    line-height: 1;
-    letter-spacing: 0.3px;
-    color: var(--muted-text);
-    background-color: #e8e8e8;
-  }
-  .project-mt {
-    margin-top: 8px;
-  }
-  .project-title {
-    font-weight: bold;
-    line-height: 1.33;
-    letter-spacing: 0.3px;
-    color: #000000;
-  }
-  .project-date {
-    margin-top: auto;
-    margin-bottom: auto;
-    font-size: 15px;
-    letter-spacing: 0.3px;
-    color: var(--muted-text);
-  }
-  .project-rev {
-    letter-spacing: 0.3px;
-    color: var(--muted-text);
-  }
-
-  .line-1 {
-    line-height: 1;
-  }
-  .elipse {
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-top: auto;
-    margin-bottom: auto;
-    border-radius: 10px;
-    width: 4px;
-    height: 4px;
-    background-color: #c4c4c4;
-  }
-}
-
-// Include inside a media query for viewports wider than 960px.
-@mixin wide {
-  .abstract-title,
-  .abstract,
-  .project-abstract,
-  .project-rev,
-  .project-title,
-  .resp-title {
-    font-size: 15px;
-  }
-}
-
-// Include inside a media query for viewports up to 960px.
-@mixin narrow {
-  .abstract-title,
-  .abstract,
-  .project-abstract,
-  .project-rev,
-  .project-title,
-  .resp-title {
-    font-size: 13px;
+  @media (min-width: 961px) {
+    .project-title {
+      font-size: 18px;
+    }
   }
 }
