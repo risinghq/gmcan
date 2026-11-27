@@ -16,6 +16,7 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
+import { EmptyListComponent } from "@app/shared/components/empty-list.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PersonComponent } from "@app/shared/components/person.component";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -32,6 +33,7 @@ import { type PublicationRow, publicationRows, publicationSearchText, publicatio
   styleUrl: "./articulos.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EmptyListComponent,
     PersonComponent,
     MatTabGroup,
     MatTab,

@@ -26,6 +26,18 @@ describe("ListTable", () => {
     expect(table.dataSource.filteredData).toEqual([rows[0]]);
   });
 
+  it("tells an empty list from a search that matches nothing", () => {
+    const table = new ListTable<{ name: string }>({ search: (row) => [row.name] });
+    table.show([]);
+    expect(table.searching()).toBe(false);
+
+    table.filter("  zzz ");
+    expect(table.searching()).toBe(true);
+
+    table.filter("   ");
+    expect(table.searching()).toBe(false);
+  });
+
   it("keeps the active search when new rows arrive", () => {
     const table = new ListTable<{ name: string }>({ search: (row) => [row.name] });
     table.filter("zzz");

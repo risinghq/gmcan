@@ -23,6 +23,7 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
+import { EmptyListComponent } from "@app/shared/components/empty-list.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PersonComponent } from "@app/shared/components/person.component";
 import type { AdminProjectListItem } from "@app/shared/models/admin-list";
@@ -39,6 +40,7 @@ import { isOngoing } from "../project-status";
   styleUrl: "./proyectos.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EmptyListComponent,
     PersonComponent,
     MatTabGroup,
     MatTab,
@@ -83,7 +85,7 @@ export default class ProyectosComponent implements AfterViewInit {
   private readonly paginator = viewChild.required(MatPaginator);
   private readonly matSort = viewChild.required(MatSort);
 
-  private readonly fundingSearch = signal("");
+  protected readonly fundingSearch = signal("");
   readonly filteredFundingSources = computed(() => {
     const search = this.fundingSearch();
     return this.lookup.fundingSources().filter((source) => source.name.toLowerCase().includes(search));

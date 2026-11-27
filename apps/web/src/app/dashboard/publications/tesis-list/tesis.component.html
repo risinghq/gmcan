@@ -64,7 +64,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="theses.notFound()" #thesesPaginator />
     @if (theses.notFound()) {
-      <span>No se encontraron resultados</span>
+      <app-empty-list [searching]="theses.searching()">Todavía no hay tesis.</app-empty-list>
     }
   </mat-tab>
   <mat-tab label="Universidad">
@@ -108,7 +108,7 @@
 
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="universities.notFound()" #universitiesPaginator />
     @if (universities.notFound()) {
-      <span>No se encontraron resultados</span>
+      <app-empty-list [searching]="universities.searching()">Todavía no hay universidades.</app-empty-list>
     }
   </mat-tab>
 </mat-tab-group>

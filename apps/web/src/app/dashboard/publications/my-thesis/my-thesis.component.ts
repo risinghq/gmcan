@@ -15,6 +15,7 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { Router } from "@angular/router";
+import { EmptyListComponent } from "@app/shared/components/empty-list.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PersonComponent } from "@app/shared/components/person.component";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -36,6 +37,7 @@ import {
   styleUrl: "./my-thesis.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EmptyListComponent,
     PersonComponent,
     IconComponent,
     MatTable,
