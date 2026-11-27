@@ -204,11 +204,13 @@ form .ng-dirty.ng-invalid {
     margin-top: 32px;
   }
   .back-text,
-  .input-email,
-  .input-password,
   .forgot,
   .login-subtitle {
     font-size: 13px;
+  }
+  .input-email,
+  .input-password {
+    font-size: 16px;
   }
   .mt-input-16 {
     margin-top: 8px;

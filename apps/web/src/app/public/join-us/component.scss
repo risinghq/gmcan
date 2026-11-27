@@ -209,9 +209,11 @@ form .ng-dirty.ng-invalid {
   .join-link,
   .back-text,
   .email-btn,
-  .email-subtitle,
-  .input-email {
+  .email-subtitle {
     font-size: 13px;
+  }
+  .input-email {
+    font-size: 16px;
   }
 
   .email-title {
