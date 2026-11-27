@@ -71,17 +71,6 @@
     color: black;
   }
 
-  .mt-16 {
-    height: 36px;
-    padding-top: 16px;
-  }
-
-  @media (max-width: 336px) {
-    .mt-16 {
-      height: 52px;
-    }
-  }
-
   .publication-green:hover {
     cursor: pointer;
     padding-bottom: 2px;
