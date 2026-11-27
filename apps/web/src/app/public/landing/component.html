@@ -277,7 +277,7 @@
     <router-outlet />
     <footer class="footer-div text-white">
       <div class="footer-flex">
-        <div class="flex-news">
+        <div class="footer-logos">
           <a class="link-logo-div" routerLink="/">
             <img class="img-logo-white" loading="lazy" src="{{ groupInfo().assets.footer }}" alt="GMCAN" />
           </a>
@@ -326,25 +326,21 @@
                 <div class="footer-direction">{{ groupInfo().address }}</div>
               </div>
             </div>
-            <div class="footer-info footer-info-2 footerdiflex">
-              <div class="flex-news">
-                <div class="footer-icon-div">
+            <div class="footer-info-2 footer-contacts">
+              <a class="footer-contact" [href]="'mailto:' + groupInfo().email">
+                <span class="footer-icon-div">
                   <img class="footer-icon" src="/img/icons/mail.svg" alt="" />
-                </div>
-                <div class="footer-text" style="display: flex">
-                  <div class="footer-direction footer-email">{{ groupInfo().email }}</div>
-                </div>
-              </div>
-              <div class="flex-news">
-                @if (groupInfo().phone && groupInfo().phone != "") {
-                <div class="footer-icon-div ml-footer">
+                </span>
+                <span class="footer-text footer-direction">{{ groupInfo().email }}</span>
+              </a>
+              @if (groupInfo().phone) {
+              <a class="footer-contact" [href]="phoneHref()">
+                <span class="footer-icon-div">
                   <img class="footer-icon" src="/img/icons/phone.svg" alt="" />
-                </div>
-                }
-                <div class="footer-text" style="display: flex">
-                  <div class="footer-direction footer-email">{{ groupInfo().phone }}</div>
-                </div>
-              </div>
+                </span>
+                <span class="footer-text footer-direction">{{ groupInfo().phone }}</span>
+              </a>
+              }
             </div>
           </div>
           <div class="col-12 col-sm-6 google-maps">
