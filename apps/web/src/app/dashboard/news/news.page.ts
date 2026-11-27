@@ -92,7 +92,12 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
       <form [formGroup]="form" class="mt-24">
         <div class="flex-news full-width mb-32">
           <div class="mr-32">
-            <app-image-field label="Imagen de portada *" [current]="item()?.asset ?? null" (picked)="pick($event)" />
+            <app-image-field
+              label="Imagen de portada"
+              required
+              [current]="item()?.asset ?? null"
+              (picked)="pick($event)"
+            />
           </div>
           <div class="full-width">
             <div class="full-width flex-news">

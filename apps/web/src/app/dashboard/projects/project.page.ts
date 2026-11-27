@@ -134,7 +134,7 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
           <div class="mr-32 width-128">
             <div class="text-category">Moneda <span class="red-text">*</span></div>
             <mat-form-field class="form-field">
-              <mat-select placeholder="Tipo" formControlName="currencyCode">
+              <mat-select placeholder="Seleccionar moneda" formControlName="currencyCode">
                 @for (currency of currencies(); track currency.code) {
                   <mat-option [value]="currency.code">{{ currency.symbol }}</mat-option>
                 }
@@ -181,12 +181,12 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
             <div class="locale-section full-width" [formGroupName]="locale">
               <div class="locale-title">{{ label(locale) }}</div>
               <div class="text-category">Título del proyecto <span class="red-text">*</span></div>
-              <input class="input-category" formControlName="title" placeholder="Insertar título del proyecto" />
+              <input class="input-category" formControlName="title" placeholder="Ingresartítulo del proyecto" />
               <div class="text-category">Descripción <span class="red-text">*</span></div>
               <textarea
                 class="input-category"
                 formControlName="description"
-                placeholder="Insertar descripción"
+                placeholder="Ingresardescripción"
               ></textarea>
             </div>
           }

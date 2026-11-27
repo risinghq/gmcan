@@ -246,7 +246,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
           @if (kind() !== "thesis") {
             <div class="full-width">
               <div class="text-category">DOI</div>
-              <input class="input-category" formControlName="doi" placeholder="Insertar DOI" />
+              <input class="input-category" formControlName="doi" placeholder="IngresarDOI" />
             </div>
           }
         </div>
@@ -315,7 +315,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
               <div class="text-category">Título <span class="red-text">*</span></div>
               <input class="input-category" formControlName="title" placeholder="Ingresar título" />
               <div class="text-category">Resumen</div>
-              <textarea class="input-category" formControlName="abstract" placeholder="Insertar resumen"></textarea>
+              <textarea class="input-category" formControlName="abstract" placeholder="Ingresarresumen"></textarea>
             </div>
           }
         </div>
