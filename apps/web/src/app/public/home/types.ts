@@ -11,7 +11,6 @@ export type HomePublicacion = PublicationDisplay<PublicPublicationWithAuthors>;
 
 export type HomeProyecto = PublicProject & {
   fechaI: string;
-  fechaF?: string;
 };
 
 export type HomeNewsItem = PublicNewsListItem & {

@@ -1,17 +1,65 @@
-@use "../../shared/styles/project-list";
 @use "../../shared/components/news/news.component.scss";
 
 $thetransition:
   transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
   visibility 0.25s;
 
-@include project-list.styles;
+.project {
+  padding: 20px 0;
+  border-bottom: 1px solid #d7d7e1;
 
-.project-mt {
-  margin-top: 16px;
+  app-project-members {
+    margin-top: 16px;
+  }
+
+  .abstract {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+    overflow: hidden;
+  }
 }
-.project-pt {
-  padding-top: 16px;
+
+.project-code {
+  width: max-content;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+  color: var(--muted-text);
+  background-color: #e8e8e8;
+}
+
+.project-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.2px;
+  color: #000000;
+}
+
+.project-rev,
+.abstract {
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+.project-rev {
+  color: var(--muted-text);
+}
+
+.abstract {
+  font-weight: 300;
+  color: #000000;
+}
+
+.abstract-title {
+  font-weight: 500;
+  color: #000000;
 }
 
 @media (max-width: 960px) {
@@ -280,11 +328,11 @@ $thetransition:
   border-radius: 4px;
   background-color: #ffffff;
 
-  > :is(div, app-publication-item):first-of-type {
+  > :is(div, app-publication-item, app-project-item):first-of-type {
     padding-top: unset;
   }
 
-  > :is(div, app-publication-item):last-of-type {
+  > :is(div, app-publication-item, app-project-item):last-of-type {
     border-bottom: none;
   }
 }
