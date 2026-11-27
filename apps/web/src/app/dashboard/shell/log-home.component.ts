@@ -1,4 +1,6 @@
-import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
+import { BreakpointObserver } from "@angular/cdk/layout";
+import { Component, OnInit, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog } from "@angular/material/dialog";
 import { MatDivider } from "@angular/material/divider";
@@ -24,7 +26,7 @@ import { AuthzService } from "@app/shared/services/authz.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { UiStateService } from "@app/shared/services/ui-state.service";
-import { filter } from "rxjs";
+import { filter, map } from "rxjs";
 
 import { DASHBOARD_NAV, visibleNav } from "./nav";
 
@@ -68,7 +70,6 @@ export default class LogHomeComponent implements OnInit {
     if (!user) return "";
     return [user.firstName, user.lastName, user.maternalName].filter(Boolean).join(" ");
   });
-  screenWidth: number;
   public url: string;
   readonly grupoinfo = this.uiState.groupInfo;
   readonly nav = computed(() => visibleNav(DASHBOARD_NAV, (capability) => this.authz.can(capability)));
@@ -76,16 +77,18 @@ export default class LogHomeComponent implements OnInit {
   readonly dashboardTitle = signal("Dashboard");
   readonly toolbarBadge = signal<ToolbarBadge | null>(null);
 
+  private readonly breakpoints = inject(BreakpointObserver);
+  readonly wide = this.matches("(min-width: 1280px)");
+  private readonly phone = this.matches("(max-width: 959.98px)");
+  private readonly enteredAnyway = signal(false);
+  readonly phoneGate = computed(() => this.phone() && !this.enteredAnyway());
+
   constructor() {
-    this.screenWidth = window.innerWidth;
-    this.enterAny = this.screenWidth < 960;
     this.url = GLOBAL.url;
   }
 
-  @HostListener("window:resize", ["$event"])
-  onResize(_event: UIEvent): void {
-    this.screenWidth = window.innerWidth;
-    this.enterAny = this.screenWidth < 960;
+  private matches(query: string) {
+    return toSignal(this.breakpoints.observe(query).pipe(map((state) => state.matches)), { requireSync: true });
   }
 
   ngOnInit(): void {
@@ -121,9 +124,8 @@ export default class LogHomeComponent implements OnInit {
     });
   }
 
-  enterAny: boolean;
   enterAnyway(): void {
-    this.enterAny = false;
+    this.enteredAnyway.set(true);
   }
 
   async openDialogLogOff(): Promise<void> {
