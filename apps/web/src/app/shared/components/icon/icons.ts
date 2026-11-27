@@ -14,10 +14,12 @@ import circleCheck from "@tabler/icons/outline/circle-check.svg";
 import clockEdit from "@tabler/icons/outline/clock-edit.svg";
 import externalLink from "@tabler/icons/outline/external-link.svg";
 import fileDescription from "@tabler/icons/outline/file-description.svg";
+import fileTypePdf from "@tabler/icons/outline/file-type-pdf.svg";
 import history from "@tabler/icons/outline/history.svg";
 import layoutDashboard from "@tabler/icons/outline/layout-dashboard.svg";
 import menu from "@tabler/icons/outline/menu-2.svg";
 import news from "@tabler/icons/outline/news.svg";
+import photoUp from "@tabler/icons/outline/photo-up.svg";
 import school from "@tabler/icons/outline/school.svg";
 import search from "@tabler/icons/outline/search.svg";
 import user from "@tabler/icons/outline/user.svg";
@@ -41,10 +43,12 @@ export const ICONS = {
   "clock-edit": clockEdit,
   "external-link": externalLink,
   "file-description": fileDescription,
+  "file-type-pdf": fileTypePdf,
   history,
   "layout-dashboard": layoutDashboard,
   menu,
   news,
+  "photo-up": photoUp,
   school,
   search,
   user,

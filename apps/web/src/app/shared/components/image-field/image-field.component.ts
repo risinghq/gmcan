@@ -1,18 +1,21 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, output, signal } from "@angular/core";
 
+import { IconComponent } from "../icon/icon.component";
+
 @Component({
   selector: "app-image-field",
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./image-field.component.scss",
+  imports: [IconComponent],
   template: `
     <div class="text-category">{{ label() }}</div>
-    @if (shown(); as src) {
-      <div class="img-preview"><img class="img-set" [src]="src" alt="" /></div>
-    } @else {
-      <div class="news-img"><img class="icon-upload" src="/img/icons/upload.svg" alt="" /></div>
-    }
-    <label class="green-text mt-16">
-      <span class="plex-sans">{{ shown() ? "Cambiar imagen" : "Insertar imagen" }}</span>
+    <label class="picker">
+      @if (shown(); as src) {
+        <span class="tile"><img [src]="src" alt="" /></span>
+      } @else {
+        <span class="tile empty"><app-icon name="photo-up" /></span>
+      }
+      <span class="action plex-sans">{{ shown() ? "Cambiar imagen" : "Insertar imagen" }}</span>
       <input class="file_upload" type="file" accept="image/*" (change)="pick($event)" />
     </label>
   `,

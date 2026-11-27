@@ -328,9 +328,9 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
         <div class="full-width mb-16">
           <div class="text-category">PDF (opcional)</div>
           <div class="flex-news">
-            <div class="gray-box flex-news mr-16">
-              <img class="upload-icon mr-16" src="/img/icons/upload.svg" alt="" />
-              <span class="gray-pdf plex-sans">{{ file()?.name ?? (item()?.asset ? "PDF actual" : "PDF") }}</span>
+            <div class="pdf-box mr-16">
+              <app-icon class="pdf-icon" name="file-type-pdf" />
+              <span class="pdf-name plex-sans">{{ file()?.name ?? (item()?.asset ? "PDF actual" : "PDF") }}</span>
             </div>
             <label class="green-text plex-sans">
               {{ file() || item()?.asset ? "Cambiar" : "Seleccionar PDF" }}

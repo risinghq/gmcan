@@ -28,6 +28,28 @@
   }
 }
 
+.pdf-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 222px;
+  padding: 8px 16px;
+  background: #f4f5f4;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+}
+
+.pdf-icon {
+  font-size: 28px;
+  color: var(--muted-accent);
+}
+
+.pdf-name {
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  color: var(--muted-text);
+}
+
 .img-user {
   width: 24px;
   height: 24px;
