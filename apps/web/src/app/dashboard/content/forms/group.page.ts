@@ -61,11 +61,9 @@ type GroupSlot = AssetSlot<"research_group">;
             <textarea class="input-category" formControlName="summary"></textarea>
             <div class="text-category">Facilidades y recursos</div>
             <textarea class="input-category" formControlName="facilities"></textarea>
-            <div class="flex-news">
+            <div class="field-head">
               <div class="text-category">Trabajos futuros</div>
-              <button type="button" class="link green-text top-auto right" (click)="preview(locale)">
-                Vista previa
-              </button>
+              <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
             </div>
             <app-rich-text-editor formControlName="futureWork" />
             <div class="text-category">Sección Publicaciones</div>

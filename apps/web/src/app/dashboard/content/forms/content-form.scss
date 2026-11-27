@@ -16,8 +16,40 @@
   font-weight: 600;
 }
 
-.top-auto {
-  margin-top: 0;
+.field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+
+  .text-category {
+    margin-bottom: 0;
+  }
+}
+
+.field-count {
+  font-size: 13px;
+  color: var(--muted-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.field-action {
+  padding: 4px 0;
+  margin-block: -4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--true-green);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
 }
 
 button.link {
