@@ -25,11 +25,12 @@ async function open(url: string, config: Routes): Promise<HTMLElement> {
 }
 
 describe("NotFoundComponent", () => {
-  it("names the missing page in the tab title and links home", async () => {
+  it("names the missing page in the tab title and links home inside the site layout", async () => {
     const page = await open("/no-such-page", routes);
 
     expect(TestBed.inject(Title).getTitle()).toBe("GMCAN | Página no encontrada");
-    expect(page.querySelector("a")?.getAttribute("href")).toBe("/");
+    expect(page.querySelector("#main-toolbar")).not.toBeNull();
+    expect(page.querySelector("app-not-found .not-btn")?.getAttribute("href")).toBe("/");
   });
 
   it("sends a dashboard user back to the dashboard", async () => {

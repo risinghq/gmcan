@@ -1,5 +1,6 @@
 import { inject } from "@angular/core";
 import { Routes } from "@angular/router";
+import { SessionService } from "@app/shared/services/session.service";
 
 import { AboutDataService } from "./about/data";
 import { detailMemberResolver } from "./detail-member/resolver";
@@ -78,6 +79,11 @@ export default [
         resolve: { search: globalSearchResolver },
       },
       { path: "join-us", loadComponent: () => import("./join-us/component") },
+      {
+        path: "**",
+        loadComponent: () => import("@app/shared/not-found/not-found.component"),
+        title: () => inject(SessionService).language().notFound,
+      },
     ],
   },
 ] satisfies Routes;
