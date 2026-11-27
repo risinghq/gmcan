@@ -1,3 +1,4 @@
+import { MatPaginatorIntl } from "@angular/material/paginator";
 import { Routes } from "@angular/router";
 import {
   adminAboutResolver,
@@ -26,6 +27,7 @@ import {
   publicationItemResolver,
   universityItemResolver,
 } from "@app/dashboard/dashboard.resolvers";
+import { SpanishPaginatorIntl } from "@app/dashboard/shell/paginator-intl";
 import { adminCanActivateChildGuard, adminCanMatchGuard } from "@app/shared/guards/admin-auth.guard";
 import { canDeactivateGuard } from "@app/shared/guards/deactivate.guard";
 
@@ -36,6 +38,7 @@ export default [
     canMatch: [adminCanMatchGuard],
     canActivateChild: [adminCanActivateChildGuard],
     title: "Administrador",
+    providers: [{ provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }],
     children: [
       { path: "", loadComponent: () => import("./home/dashboard.component"), title: "Dashboard" },
       {
