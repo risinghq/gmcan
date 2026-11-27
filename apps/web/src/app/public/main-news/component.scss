@@ -11,16 +11,8 @@
   background-color: #f8f8f8;
 }
 
-.news-list-div {
-  border-radius: 4px;
-  background-color: #ffffff;
-}
-
-.main-news-title {
-  font-size: 30px;
-  font-weight: bold;
-  line-height: 1.17;
-  color: #000000;
+.page-card {
+  padding-bottom: 24px;
 }
 
 .news {
@@ -135,8 +127,8 @@
   .category {
     font-size: 15px;
   }
-  .news-list-div {
-    padding: 40px 40px 32px 40px;
+  .page-card {
+    padding-bottom: 32px;
   }
   .news {
     padding-top: 16px;
@@ -171,10 +163,6 @@
   .news-meta {
     font-size: 13px;
   }
-  .news-list-div {
-    padding: 24px 16px;
-  }
-  .main-news-title,
   .news-text-2 {
     font-size: 15px;
   }

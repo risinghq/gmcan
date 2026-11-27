@@ -2,10 +2,10 @@
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="[{ label: language.members }]" />
-      <div class="member-card">
+      <div class="page-card">
         @let view = vm();
-        <h1 class="member-title">{{ language.membersText[0].memberTitle }}</h1>
-        <div class="member-sub">{{ language.membersText[0].memberText }}</div>
+        <h1 class="page-title">{{ language.membersText[0].memberTitle }}</h1>
+        <p class="page-intro">{{ language.membersText[0].memberText }}</p>
         @if (view.loading) {
         <div class="spinner-pad">
           <mat-spinner class="auto mb-8" />
