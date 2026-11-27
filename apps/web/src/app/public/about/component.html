@@ -3,9 +3,9 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="about-links">
         <a class="about-link-active" routerLink="/">{{ facade.language().home }}</a>
-        <mat-icon class="about-icon"> arrow_right </mat-icon>
+        <app-icon class="about-icon" name="caret-right" />
         <span class="about-link-active">{{ facade.language().aboutUs }}</span>
-        <mat-icon class="about-icon"> arrow_right </mat-icon>
+        <app-icon class="about-icon" name="caret-right" />
         <span class="about-link short-text" aria-current="page">{{ facade.selectedCategory() }}</span>
       </div>
       <router-outlet />

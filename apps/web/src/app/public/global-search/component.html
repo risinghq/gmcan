@@ -1,18 +1,18 @@
 <div class="page global-search-div">
   <div class="global-links">
     <a class="global-link-active" routerLink="/">{{ language().home }}</a>
-    <mat-icon class="global-icon"> arrow_right </mat-icon>
+    <app-icon class="global-icon" name="caret-right" />
     <span class="global-link" aria-current="page">{{ language().results }}</span>
   </div>
   <div class="card-global">
     <button type="button" class="flex-news back-div" (click)="return()">
-      <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+      <app-icon class="back-icon" name="arrow-left" />
       <span class="back-text">{{ language().detailMemberText[0].back }}</span>
     </button>
     <div class="global-results-title">{{ language().results }}</div>
     <div class="flex-news">
       <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
         <input
           type="search"
           class="input-search-text"
@@ -46,7 +46,7 @@
               aria-controls="collapsePublication"
               (click)="toggleSection(publicationExpanded)"
             >
-              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+              <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
           </div>
           <div class="collapse" [class.show]="publicationExpanded()" id="collapsePublication">
@@ -140,7 +140,7 @@
                 >
                   {{ expandLabel( "search-pub", i, language().publicationsText[0].seeMore,
                   language().publicationsText[0].seeLess ) }}
-                  <mat-icon class="publication-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                  <app-icon class="publication-abs-icon" name="chevron-down" />
                 </button>
               </div>
               <div
@@ -161,7 +161,7 @@
             >
               <ng-template class="unique-left" ngbPaginationPrevious>
                 <div class="h-ih">
-                  <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+                  <app-icon class="pag-arrow" name="chevron-left" />
                 </div>
               </ng-template>
               <ng-template ngbPaginationNumber let-page>
@@ -169,7 +169,7 @@
               </ng-template>
               <ng-template ngbPaginationNext>
                 <div class="h-ih">
-                  <mat-icon class="pag-arrow" style="padding-bottom: 20px"> keyboard_arrow_right </mat-icon>
+                  <app-icon class="pag-arrow" name="chevron-right" />
                 </div>
               </ng-template>
             </ngb-pagination>
@@ -189,7 +189,7 @@
               aria-controls="collapseProjects"
               (click)="toggleSection(projectExpanded)"
             >
-              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+              <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
           </div>
           <div class="collapse" [class.show]="projectExpanded()" id="collapseProjects">
@@ -239,7 +239,7 @@
                   >
                     {{ expandLabel( "search-proj", i, language().projectsText[0].seeMore,
                     language().projectsText[0].seeLess ) }}
-                    <mat-icon class="project-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                    <app-icon class="project-abs-icon" name="chevron-down" />
                   </button>
                 </div>
               </div>
@@ -281,7 +281,7 @@
             >
               <ng-template class="unique-left" ngbPaginationPrevious>
                 <div class="h-ih">
-                  <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+                  <app-icon class="pag-arrow" name="chevron-left" />
                 </div>
               </ng-template>
               <ng-template ngbPaginationNumber let-page>
@@ -289,7 +289,7 @@
               </ng-template>
               <ng-template ngbPaginationNext>
                 <div class="h-ih">
-                  <mat-icon class="pag-arrow" style="padding-bottom: 20px"> keyboard_arrow_right </mat-icon>
+                  <app-icon class="pag-arrow" name="chevron-right" />
                 </div>
               </ng-template>
             </ngb-pagination>
@@ -311,7 +311,7 @@
               aria-controls="collapseMembers"
               (click)="toggleSection(memberExpanded)"
             >
-              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+              <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
           </div>
           <div class="collapse miembro-mt" [class.show]="memberExpanded()" id="collapseMembers">
@@ -337,7 +337,7 @@
                   [queryParams]="{ from: 'search' }"
                 >
                   {{ language().membersText[0].seeProfile }}
-                  <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                  <app-icon class="profile-icon" name="chevron-right" />
                 </a>
               </div>
             </div>
@@ -357,7 +357,7 @@
               aria-controls="collapseNews"
               (click)="toggleSection(newsExpanded)"
             >
-              <mat-icon class="publication-abs-icon-2" aria-hidden="true">keyboard_arrow_down</mat-icon>
+              <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
           </div>
           <div class="collapse" [class.show]="newsExpanded()" id="collapseNews">

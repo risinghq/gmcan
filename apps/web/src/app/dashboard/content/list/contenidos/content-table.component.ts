@@ -1,5 +1,4 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, inject, input, viewChild } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
@@ -15,6 +14,7 @@ import {
   MatTable,
 } from "@angular/material/table";
 import { Router, RouterLink } from "@angular/router";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 
 import { ContentTable } from "./table";
 
@@ -23,7 +23,7 @@ import { ContentTable } from "./table";
   styleUrl: "./content-table.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,
@@ -44,7 +44,7 @@ import { ContentTable } from "./table";
     <div class="flex-news mb-16">
       <div class="search-news">
         <input #search class="input-search-text" (keyup)="list.filter(search.value)" [placeholder]="searchLabel()" />
-        <mat-icon class="icon-search-toolbar">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <div class="center btn-black">
         <a class="link" [routerLink]="list.addRoute">{{ addLabel() }}</a>

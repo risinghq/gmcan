@@ -4,7 +4,7 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="main-news-links">
         <a class="main-news-link-active" routerLink="/">{{ language.home }}</a>
-        <mat-icon class="main-news-icon"> arrow_right </mat-icon>
+        <app-icon class="main-news-icon" name="caret-right" />
         <span class="main-news-link" aria-current="page">{{ language.news }}</span>
       </div>
       <div class="news-list-div">
@@ -18,7 +18,7 @@
           <div class="main-news-title">{{ language.newsText[0].newsTitle }}</div>
           <button mat-button class="right hide-desktop" [matMenuTriggerFor]="menu">
             {{ selectedCategoryName }}
-            <mat-icon> keyboard_arrow_down </mat-icon>
+            <app-icon name="chevron-down" />
           </button>
           <mat-menu #menu="matMenu" xPosition="before">
             <button mat-menu-item (click)="selectCategory(null, language.newsText[0].allNews)">
@@ -71,7 +71,7 @@
           >
             <ng-template class="unique-left" ngbPaginationPrevious>
               <div class="h-ih">
-                <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+                <app-icon class="pag-arrow" name="chevron-left" />
               </div>
             </ng-template>
             <ng-template ngbPaginationNumber let-page>
@@ -79,7 +79,7 @@
             </ng-template>
             <ng-template ngbPaginationNext>
               <div class="h-ih">
-                <mat-icon class="pag-arrow" style="padding-bottom: 20px"> keyboard_arrow_right </mat-icon>
+                <app-icon class="pag-arrow" name="chevron-right" />
               </div>
             </ng-template>
           </ngb-pagination>

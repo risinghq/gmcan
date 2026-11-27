@@ -10,9 +10,9 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MatIcon } from "@angular/material/icon";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -52,7 +52,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
   imports: [
     AvatarComponent,
     RouterLink,
-    MatIcon,
+    IconComponent,
     FormsModule,
     ReactiveFormsModule,
     NgbPagination,

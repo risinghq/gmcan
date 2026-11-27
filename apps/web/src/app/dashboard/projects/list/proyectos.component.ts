@@ -7,7 +7,6 @@ import {
   signal,
   viewChild,
 } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
@@ -25,6 +24,7 @@ import {
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import type { AdminProjectListItem } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
@@ -42,7 +42,7 @@ import { isOngoing } from "../project-status";
     AvatarComponent,
     MatTabGroup,
     MatTab,
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,

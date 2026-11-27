@@ -8,7 +8,7 @@
         (keyup)="table.filterFrom($event)"
         placeholder="Buscar miembro por nombre, apellido, grado, cargo o correo."
       />
-      <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+      <app-icon class="icon-search-toolbar" name="search" />
     </div>
     @if (canAdd) {
       <button type="button" class="center btn-black" (click)="addMember()">

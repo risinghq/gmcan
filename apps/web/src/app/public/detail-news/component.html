@@ -4,10 +4,10 @@
     <div class="col-lg-8 col-12">
       <div class="detail-links">
         <a class="detail-link-active" routerLink="/">{{ language().home }}</a>
-        <mat-icon class="detail-icon">arrow_right</mat-icon>
+        <app-icon class="detail-icon" name="caret-right" />
         @if (originRoute() !== "/") {
         <a class="detail-link-active" [routerLink]="originRoute()">{{ originLabel() }}</a>
-        <mat-icon class="detail-icon">arrow_right</mat-icon>
+        <app-icon class="detail-icon" name="caret-right" />
         }
         <span class="detail-link" aria-current="page">{{ language().detailNews }}</span>
       </div>

@@ -1,9 +1,9 @@
 import { DatePipe, SlicePipe } from "@angular/common";
 import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { RouterLink } from "@angular/router";
 import type { ResearchLineDisplay } from "@app/public/about/data";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
@@ -20,7 +20,7 @@ import {
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     AvatarComponent,
-    MatIcon,
+    IconComponent,
     RouterLink,
     NgbPagination,
     NgbPaginationPrevious,

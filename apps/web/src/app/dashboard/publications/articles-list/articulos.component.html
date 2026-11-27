@@ -9,7 +9,7 @@
           (keyup)="articles.filterFrom($event)"
           placeholder="Buscar artículos por título o fecha de publicación"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <button type="button" class="center btn-black" (click)="addArticle()">
         <span class="link">Agregar artículo</span>
@@ -81,7 +81,7 @@
           (keyup)="journals.filterFrom($event)"
           placeholder="Buscar revista por nombre"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <button type="button" class="center btn-black" (click)="addRevista()">
         <span class="link">Agregar revista</span>

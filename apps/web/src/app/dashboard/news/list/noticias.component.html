@@ -9,7 +9,7 @@
           (keyup)="onSearchChange($event)"
           placeholder="Buscar noticias"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <select class="input-search-text" aria-label="Filtrar por estado" (change)="onStatusChange($event)">
         <option value="">Todos los estados</option>
@@ -105,7 +105,7 @@
           (keyup)="onCategorySearch($event)"
           placeholder="Buscar categoría por nombre"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
     </div>
 

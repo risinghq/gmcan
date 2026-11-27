@@ -1,11 +1,11 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
@@ -29,7 +29,7 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   imports: [
     AvatarComponent,
     RouterLink,
-    MatIcon,
+    IconComponent,
     MatTabGroup,
     MatTab,
     FormsModule,

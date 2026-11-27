@@ -3,7 +3,7 @@
     <div class="sidenav-header">
       <div class="close-div">
         <button type="button" class="icon-btn tap-target" [attr.aria-label]="language.close" (click)="sidenav.close()">
-          <mat-icon class="close-icon">close</mat-icon>
+          <app-icon class="close-icon" name="x" />
         </button>
       </div>
       <div class="link2">
@@ -127,7 +127,7 @@
         [attr.aria-expanded]="inputExpand"
         (click)="expandInput()"
       >
-        <mat-icon class="icon-search-top" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-top" name="search" />
       </button>
     </div>
     <mat-toolbar id="main-toolbar" class="main-toolbar">
@@ -143,7 +143,7 @@
               [attr.aria-label]="language.searchMobile"
               (click)="searchGlobal(nombre.value)"
             >
-              <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+              <app-icon class="icon-search-toolbar" name="search" />
             </button>
             <input
               type="search"
@@ -195,7 +195,7 @@
               (mouseover)="menuTrigger.openMenu()"
             >
               <span class="link-3"> {{ language.aboutUs }} </span>
-              <mat-icon class="middle">arrow_drop_down</mat-icon>
+              <app-icon class="middle" name="caret-down" />
             </div>
             <mat-menu #menu="matMenu" [overlapTrigger]="false">
               <span (mouseleave)="menuTrigger.closeMenu()">
@@ -271,7 +271,7 @@
       </div>
       <button type="button" class="icon-btn tap-target right hide-desktop-nav" (click)="sidenav.open()">
         <span class="menu-text">{{ language.menu }}</span>
-        <mat-icon class="menu-icon">menu</mat-icon>
+        <app-icon class="menu-icon" name="menu" />
       </button>
     </mat-toolbar>
     <router-outlet />

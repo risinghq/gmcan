@@ -1,10 +1,10 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, computed, effect, inject, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource, toSignal } from "@angular/core/rxjs-interop";
-import { MatIcon } from "@angular/material/icon";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { Router, ActivatedRoute, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { Languages } from "@app/shared/models/languages";
 import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
@@ -45,7 +45,7 @@ type PublicationDisplay = PublicPublication & {
   imports: [
     AvatarComponent,
     MatProgressSpinner,
-    MatIcon,
+    IconComponent,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,

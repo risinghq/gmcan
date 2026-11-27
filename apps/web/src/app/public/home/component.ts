@@ -1,10 +1,10 @@
 import { SlicePipe } from "@angular/common";
 import { Component, inject, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { MatCard } from "@angular/material/card";
-import { MatIcon } from "@angular/material/icon";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { SessionService } from "@app/shared/services/session.service";
@@ -17,7 +17,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [AvatarComponent, RouterLink, MatProgressBar, MatCard, MatIcon, SlicePipe, EmphasisPipe],
+  imports: [AvatarComponent, RouterLink, MatProgressBar, MatCard, IconComponent, SlicePipe, EmphasisPipe],
 })
 export default class HomeComponent implements OnInit {
   private route = inject(ActivatedRoute);

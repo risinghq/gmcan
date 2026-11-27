@@ -3,12 +3,12 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="join-links">
         <a class="join-link-active" routerLink="/">{{ language.home }}</a>
-        <mat-icon class="join-icon"> arrow_right </mat-icon>
+        <app-icon class="join-icon" name="caret-right" />
         <span class="join-link" aria-current="page">{{ language.join }}</span>
       </div>
       <div class="email-div">
         <button type="button" class="flex-news back-div" (click)="return()">
-          <mat-icon class="back-icon" aria-hidden="true">arrow_back</mat-icon>
+          <app-icon class="back-icon" name="arrow-left" />
           <span class="back-text">{{ language.joinUsText[0].back }}</span>
         </button>
         <div class="email-title">{{ language.joinUsText[0].title }}</div>

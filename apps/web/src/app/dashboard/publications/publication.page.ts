@@ -5,11 +5,11 @@ import { MatAutocomplete, MatAutocompleteTrigger } from "@angular/material/autoc
 import { MatOption, provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from "@angular/material/datepicker";
 import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
-import { MatIcon } from "@angular/material/icon";
 import { MatInput } from "@angular/material/input";
 import { MatSelect } from "@angular/material/select";
 import { ActivatedRoute } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { CONTENT_LOCALES, localeForm, localeLabel } from "@app/shared/forms/locale-form";
 import type { HasUnsavedChanges } from "@app/shared/models/unsaved-changes";
 import { type ReturnTarget, resolveReturnTo } from "@app/shared/routing/return-to";
@@ -159,7 +159,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
     MatDatepickerInput,
     MatDatepickerToggle,
     MatFormField,
-    MatIcon,
+    IconComponent,
     MatInput,
     MatLabel,
     MatOption,
@@ -287,7 +287,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                   </mat-autocomplete>
                 </mat-form-field>
                 <button type="button" class="icon-button" [disabled]="first" (click)="moveUp(i)" title="Subir">
-                  <mat-icon>arrow_upward</mat-icon>
+                  <app-icon name="arrow-up" />
                 </button>
                 <button
                   type="button"
@@ -296,7 +296,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                   (click)="removeAuthor(i)"
                   title="Quitar"
                 >
-                  <mat-icon>clear</mat-icon>
+                  <app-icon name="x" />
                 </button>
               </div>
             }

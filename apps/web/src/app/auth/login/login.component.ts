@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
-import { MatIcon } from "@angular/material/icon";
 import { Title } from "@angular/platform-browser";
 import { Router } from "@angular/router";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { Languages } from "@app/shared/models/languages";
 import { AuthService } from "@app/shared/services/auth.service";
 import { EmailService } from "@app/shared/services/email.service";
@@ -14,7 +14,7 @@ import { UiStateService } from "@app/shared/services/ui-state.service";
   templateUrl: "./login.component.html",
   styleUrl: "./login.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatIcon, ReactiveFormsModule],
+  imports: [IconComponent, ReactiveFormsModule],
 })
 export default class LoginComponent implements OnInit {
   private groupService = inject(GroupService);

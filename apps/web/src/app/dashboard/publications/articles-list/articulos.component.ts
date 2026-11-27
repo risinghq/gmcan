@@ -1,6 +1,5 @@
 import { type AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, viewChild } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
@@ -18,6 +17,7 @@ import {
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
 import type { JournalItem } from "@app/shared/services/ref.service";
@@ -35,7 +35,7 @@ import { type PublicationRow, publicationRows, publicationSearchText, publicatio
     AvatarComponent,
     MatTabGroup,
     MatTab,
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,

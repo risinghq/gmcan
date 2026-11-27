@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
 import type { PublicNewsDetail } from "@app/shared/models/news";
@@ -17,7 +17,7 @@ import type { DetailNewsViewModel } from "./types";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AvatarComponent, MatIcon, RouterLink, NewsComponent, SharedShareButtonsComponent],
+  imports: [AvatarComponent, IconComponent, RouterLink, NewsComponent, SharedShareButtonsComponent],
 })
 export default class DetailNewsComponent {
   private readonly seo = inject(SeoService);

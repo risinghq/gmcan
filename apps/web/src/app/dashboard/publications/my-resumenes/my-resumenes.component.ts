@@ -1,6 +1,5 @@
 import { type AfterViewInit, ChangeDetectionStrategy, Component, effect, inject, viewChild } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
@@ -17,6 +16,7 @@ import {
 } from "@angular/material/table";
 import { Router } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { AuthService } from "@app/shared/services/auth.service";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { PublicationService } from "@app/shared/services/publication.service";
@@ -37,7 +37,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AvatarComponent,
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,

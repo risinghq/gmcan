@@ -10,7 +10,7 @@
             (keyup)="table.filterFrom($event)"
             placeholder="Buscar proyecto por título, fecha, código"
           />
-          <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+          <app-icon class="icon-search-toolbar" name="search" />
         </div>
         <button type="button" class="center btn-black" (click)="addProject()">
           <span class="link">Agregar proyecto</span>
@@ -76,7 +76,7 @@
             (keyup)="onFundingSearch($event)"
             placeholder="Buscar fuente por nombre"
           />
-          <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+          <app-icon class="icon-search-toolbar" name="search" />
         </div>
       </div>
       @if (filteredFundingSources().length > 0) {
@@ -105,7 +105,7 @@
           (keyup)="table.filterFrom($event)"
           placeholder="Buscar proyecto por título, fecha, código"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
     </div>
     <table mat-table [dataSource]="table.dataSource" [hidden]="table.notFound()" matSort>
