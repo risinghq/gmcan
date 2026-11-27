@@ -68,11 +68,7 @@ export default [
         data: { pageTitle: memberEditTitle },
         canDeactivate: [canDeactivateGuard],
       },
-      {
-        path: "publicaciones",
-        loadComponent: () => import("./publications/list/publicaciones.component"),
-        title: "Publicaciones",
-      },
+      { path: "publicaciones", redirectTo: "articulos" },
       {
         path: "proyectos-ejecucion",
         loadComponent: () => import("./projects/list/proyectos.component"),
