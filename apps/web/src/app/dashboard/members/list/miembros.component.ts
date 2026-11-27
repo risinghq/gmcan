@@ -55,17 +55,10 @@ export default class MiembrosComponent implements AfterViewInit {
   private readonly active = (inject(ActivatedRoute).snapshot.routeConfig?.path ?? "").includes("activos");
   readonly canAdd = this.active;
 
-  readonly displayedColumns = [
-    "firstName",
-    "lastName",
-    "maternalName",
-    "memberTypeName",
-    "prefixName",
-    "email",
-    "publishability",
-  ];
+  readonly displayedColumns = ["name", "memberTypeName", "prefixName", "publishability"];
   readonly table = new ListTable<AdminMemberListItem>({
     search: (row) => [row.firstName, row.lastName, row.maternalName, row.memberTypeName, row.prefixName, row.email],
+    sort: { name: (row) => this.fullName(row) },
   });
   private readonly paginator = viewChild.required(MatPaginator);
   private readonly matSort = viewChild.required(MatSort);
@@ -88,6 +81,10 @@ export default class MiembrosComponent implements AfterViewInit {
   editMember(id: number): void {
     const returnTo = this.active ? "miembros-activos" : "miembros-antiguos";
     this.router.navigate(["dashboard/edit-member/" + id], { queryParams: { returnTo } });
+  }
+
+  fullName(row: AdminMemberListItem): string {
+    return [row.firstName, row.lastName, row.maternalName].filter(Boolean).join(" ");
   }
 
   missingCount(row: AdminMemberListItem): number {

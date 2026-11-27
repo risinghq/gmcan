@@ -1,5 +1,17 @@
 @use "../../../shared/styles/noticias-base";
 
+.member {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.member-email {
+  font-size: 13px;
+  color: var(--muted-accent);
+}
+
 .status-chip {
   border: 0;
   cursor: pointer;
