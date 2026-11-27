@@ -134,6 +134,12 @@ $thetransition:
 
 .down-bar-div {
   align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+
+  .link {
+    margin-right: 0;
+  }
 
   > .center {
     display: flex;
@@ -313,29 +319,15 @@ mat-sidenav {
 }
 
 @media (min-width: 1025px) {
-  .link {
-    padding-bottom: 2px;
-  }
-  .link-box-text {
-    padding-bottom: 0;
-  }
-  .logo-nav {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    height: max-content;
-  }
-  .green-text,
-  .language {
+  .green-text {
     font-size: 18px;
   }
   .footer-title {
     font-size: 25px;
+    margin-bottom: 32px;
   }
   .footer-text {
     margin-left: 16px;
-  }
-  .footer-title {
-    margin-bottom: 32px;
   }
   .footer-icon-div {
     height: 40px;
@@ -356,68 +348,17 @@ mat-sidenav {
     margin-left: unset;
     margin-right: unset;
   }
-  .active {
-    border-bottom: 1px solid #30393a;
-  }
-  .login-div {
-    margin-top: unset;
-    padding-bottom: unset;
-    border-bottom: unset;
-    margin-bottom: unset;
-  }
-  .link-box,
-  .link-box2 {
-    padding: 4px 6px;
-  }
-  .languages {
-    margin-left: 16px;
-  }
-  .language {
-    font-size: 15px;
-    border: 1px solid #b5b5b5;
-    margin-right: 4px;
-    color: var(--muted-text);
-    padding: 4px;
-  }
-  .active-language {
-    color: var(--deep-green);
-    background-color: unset;
-    border: 1px solid #006400;
-  }
-  .img-logo-white {
-    height: 40px;
-  }
-  .mr-12 {
-    margin-right: 12px;
-  }
 }
-@media (max-width: 1025px) {
-  .active {
-    border-bottom: 2px solid #30393a;
-  }
+@media (max-width: 1024.98px) {
   .green-text {
     font-size: 16px;
   }
-  .link {
-    padding-bottom: 1px;
-  }
-  .link-box-text {
-    padding-bottom: 0;
-  }
-  .logo-nav {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    height: 26px;
-    vertical-align: unset;
-  }
   .footer-title {
     font-size: 15px;
+    margin-bottom: 22px;
   }
   .footer-text {
     margin-left: 8px;
-  }
-  .footer-title {
-    margin-bottom: 22px;
   }
   .footer-icon-div {
     height: 20px;
@@ -439,8 +380,69 @@ mat-sidenav {
     margin-left: auto;
     margin-right: auto;
   }
+}
+
+@media (min-width: 1280px) {
+  ::placeholder {
+    color: var(--muted-text);
+    opacity: 1;
+  }
+  .main-toolbar {
+    height: 118px;
+  }
+  .link {
+    padding-bottom: 2px;
+  }
+  .logo-nav {
+    padding-block: 8px;
+  }
+  .active {
+    border-bottom: 1px solid #30393a;
+  }
+  .link-box,
+  .link-box2 {
+    padding: 4px 6px;
+  }
+  .languages {
+    margin-left: 16px;
+  }
   .language {
-    font-size: 13px;
+    font-size: 15px;
+    border: 1px solid #b5b5b5;
+    margin-right: 4px;
+    color: var(--muted-text);
+    padding: 4px;
+  }
+  .active-language {
+    color: var(--deep-green);
+    background-color: unset;
+    border: 1px solid #006400;
+  }
+  .mr-12 {
+    margin-right: 12px;
+  }
+}
+@media (min-width: 1280px) and (max-width: 1439.98px) {
+  img.logo-nav {
+    height: 56px;
+  }
+}
+@media (max-width: 1279.98px) {
+  ::placeholder {
+    color: white;
+    opacity: 1;
+  }
+  .main-toolbar {
+    height: 56px;
+  }
+  .active {
+    border-bottom: 2px solid #30393a;
+  }
+  .link {
+    padding-bottom: 1px;
+  }
+  .logo-nav {
+    height: 26px;
   }
   .login-div {
     margin-top: 4px;
@@ -455,13 +457,14 @@ mat-sidenav {
   .languages {
     margin-left: auto;
   }
-  .active-language {
-    background: rgba(255, 255, 255, 0.2);
-  }
   .language {
+    font-size: 13px;
     margin-right: 2px;
     color: white;
     padding: 4px;
+  }
+  .active-language {
+    background: rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -487,13 +490,6 @@ mat-sidenav {
   }
   .link3 {
     white-space: nowrap;
-  }
-  ::placeholder {
-    color: var(--muted-text);
-    opacity: 1;
-  }
-  .main-toolbar {
-    height: 118px;
   }
   .contact-div {
     padding: 24px 24px 24px 40px;
@@ -527,13 +523,6 @@ mat-sidenav {
   .link-logo-div {
     justify-content: space-between;
     padding-inline: var(--page-gutter);
-  }
-  ::placeholder {
-    color: white;
-    opacity: 1;
-  }
-  .main-toolbar {
-    height: 56px;
   }
   .contact-div {
     padding: 16px var(--page-gutter);

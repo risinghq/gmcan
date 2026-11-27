@@ -181,15 +181,15 @@
             <img class="login-icon" src="/img/icons/login.svg" alt="" />
           </a>
         </div>
-        <div class="down-bar-div text-right">
-          <div class="center right">
+        <div class="down-bar-div">
+          <div class="center">
             <a class="link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
               {{ language.home }}
             </a>
           </div>
           <div class="center">
             <div
-              class="flex-news mr-28"
+              class="flex-news"
               [matMenuTriggerFor]="menu"
               #menuTrigger="matMenuTrigger"
               (mouseover)="menuTrigger.openMenu()"

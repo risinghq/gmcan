@@ -892,9 +892,6 @@ circle {
 .mb-8 {
   margin-bottom: 8px;
 }
-.mr-28 {
-  margin-right: 28px;
-}
 .mt-2-5 {
   margin-top: 5.5px;
 }
@@ -1152,12 +1149,12 @@ textarea.input-category {
     display: none !important;
   }
 }
-@media (max-width: 1049.98px) {
+@media (max-width: 1279.98px) {
   .hide-mobile-nav {
     display: none !important;
   }
 }
-@media (min-width: 1050px) {
+@media (min-width: 1280px) {
   .hide-desktop-nav {
     display: none !important;
   }
