@@ -20,6 +20,7 @@ import layoutDashboard from "@tabler/icons/outline/layout-dashboard.svg";
 import menu from "@tabler/icons/outline/menu-2.svg";
 import news from "@tabler/icons/outline/news.svg";
 import photoUp from "@tabler/icons/outline/photo-up.svg";
+import plus from "@tabler/icons/outline/plus.svg";
 import school from "@tabler/icons/outline/school.svg";
 import search from "@tabler/icons/outline/search.svg";
 import user from "@tabler/icons/outline/user.svg";
@@ -49,6 +50,7 @@ export const ICONS = {
   menu,
   news,
   "photo-up": photoUp,
+  plus,
   school,
   search,
   user,

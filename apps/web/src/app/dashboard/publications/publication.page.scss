@@ -14,9 +14,32 @@
   flex: 1;
 }
 
+.add-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--true-green);
+  cursor: pointer;
+
+  app-icon {
+    font-size: 18px;
+  }
+
+  &:hover span {
+    text-decoration: underline;
+  }
+}
+
 .icon-button {
   display: inline-flex;
-  padding: 4px;
+  padding: 10px;
   border: none;
   background: none;
   color: var(--deep-green);

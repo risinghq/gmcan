@@ -305,7 +305,9 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
               </div>
             }
           </div>
-          <button type="button" class="green-text plex-sans mb-8" (click)="addAuthor()">Agregar autor</button>
+          <button type="button" class="add-author plex-sans" (click)="addAuthor()">
+            <app-icon name="plus" /><span>Agregar autor</span>
+          </button>
         </div>
 
         <div formGroupName="translations">
