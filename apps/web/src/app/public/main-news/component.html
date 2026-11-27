@@ -28,36 +28,29 @@
         } @if (newsItems.length > 0 && allCharged) {
         <div>
           @for (newsItem of newsItems; track newsItem.id) {
-          <div class="news flex-news">
-            <div class="img-hover-zoom-2 img-div-zoom right pl-24 hide-desktop">
-              @if (!newsItem.asset) {
-              <img class="news-img" loading="lazy" src="/img/grupal.avif" alt="" />
-              } @if (newsItem.asset) {
-              <img class="news-img" loading="lazy" src="{{ newsItem.asset }}" alt="" />
-              }
-            </div>
+          <article class="news">
             <div class="news-text-div">
-              <div class="columna">
-                <div class="news-type">{{ newsItem.newsTypeNameLabel }}</div>
-                <div class="news-date right">{{ newsItem.publishedAtLabel }}</div>
-              </div>
+              <app-news-meta
+                class="news-meta"
+                [type]="newsItem.newsTypeNameLabel"
+                [date]="newsItem.publishedAt"
+                [label]="newsItem.publishedAtLabel"
+              />
               <a
-                class="news-text-2 plain-link"
+                class="news-text-2 stretched-link"
                 [routerLink]="['/detail-news', newsItem.id]"
                 [queryParams]="{ from: 'news' }"
                 >{{ newsItem.title }}</a
               >
-              <div class="news-abstract">{{ newsItem.summary }}</div>
-              <div class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
+              <p class="news-abstract">{{ newsItem.summary }}</p>
+              <p class="news-author">{{ language.newsText[0].by }} {{ newsItem.authorNameLabel }}</p>
             </div>
-            <div class="img-hover-zoom-2 img-div-zoom pl-24 hide-mobile">
-              @if (!newsItem.asset) {
-              <img class="news-img" loading="lazy" src="/img/grupal.avif" alt="" />
-              } @if (newsItem.asset) {
-              <img class="news-img" loading="lazy" src="{{ newsItem.asset }}" alt="" />
-              }
+            @if (newsItem.asset) {
+            <div class="news-img">
+              <img loading="lazy" src="{{ newsItem.asset }}" alt="" />
             </div>
-          </div>
+            }
+          </article>
           } @if (total > pageSize) {
           <ngb-pagination
             [page]="page"

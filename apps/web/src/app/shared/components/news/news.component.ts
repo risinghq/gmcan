@@ -2,6 +2,7 @@ import { SlicePipe } from "@angular/common";
 import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Router, ActivatedRoute, NavigationEnd, RouterLink } from "@angular/router";
+import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { NewsService } from "@app/shared/services/news.service";
@@ -20,7 +21,7 @@ type NewsDisplay = PublicNewsListItem & {
   templateUrl: "./news.component.html",
   styleUrl: "./news.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SlicePipe, RouterLink],
+  imports: [SlicePipe, RouterLink, NewsMetaComponent],
 })
 export default class NewsComponent {
   newsService = inject(NewsService);

@@ -124,10 +124,6 @@ $thetransition:
   padding-top: 64px;
 }
 
-.img-hover-zoom-2 {
-  border-radius: 4px;
-}
-
 .loading-text {
   @extend .plex-sans;
   font-style: normal;
@@ -749,6 +745,23 @@ button.forgot {
 .columna {
   @extend .full-width;
   display: flex;
+}
+.stretched-link {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::after {
+      outline: 2px solid var(--deep-green);
+      outline-offset: 2px;
+    }
+  }
 }
 .flex-news {
   display: flex;

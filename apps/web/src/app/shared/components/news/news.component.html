@@ -10,12 +10,17 @@
           <img src="{{ featuredNews.asset }}" alt="" />
         </div>
       }
-      <p class="news-meta">
-        <span class="news-type">{{ featuredNews.newsTypeNameLabel }}</span>
-        <span aria-hidden="true">·</span>
-        <time [attr.datetime]="featuredNews.publishedAt">{{ featuredNews.publishedAtLabel }}</time>
-      </p>
-      <a class="news-link" [routerLink]="['/detail-news', featuredNews.id]" [queryParams]="{ from: origin }">
+      <app-news-meta
+        class="news-meta"
+        [type]="featuredNews.newsTypeNameLabel"
+        [date]="featuredNews.publishedAt"
+        [label]="featuredNews.publishedAtLabel"
+      />
+      <a
+        class="news-link stretched-link"
+        [routerLink]="['/detail-news', featuredNews.id]"
+        [queryParams]="{ from: origin }"
+      >
         {{ featuredNews.title }}
       </a>
       <p class="news-author">{{ language().newsText[0].by }} {{ featuredNews.authorNameLabel }}</p>
@@ -25,12 +30,17 @@
     @for (newsItem of view.newsItems | slice: 0 : 10; track newsItem.id) {
       <li class="other-news">
         <div class="other-news-text">
-          <p class="news-meta">
-            <span class="news-type">{{ newsItem.newsTypeNameLabel }}</span>
-            <span aria-hidden="true">·</span>
-            <time [attr.datetime]="newsItem.publishedAt">{{ newsItem.publishedAtLabel }}</time>
-          </p>
-          <a class="news-link" [routerLink]="['/detail-news', newsItem.id]" [queryParams]="{ from: origin }">
+          <app-news-meta
+            class="news-meta"
+            [type]="newsItem.newsTypeNameLabel"
+            [date]="newsItem.publishedAt"
+            [label]="newsItem.publishedAtLabel"
+          />
+          <a
+            class="news-link stretched-link"
+            [routerLink]="['/detail-news', newsItem.id]"
+            [queryParams]="{ from: origin }"
+          >
             {{ newsItem.title }}
           </a>
           <p class="news-author">{{ language().newsText[0].by }} {{ newsItem.authorNameLabel }}</p>
