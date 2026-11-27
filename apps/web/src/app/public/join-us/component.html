@@ -10,16 +10,23 @@
         <h1 class="email-title">{{ language.joinUsText[0].title }}</h1>
         <h2 class="email-subtitle mb-16">{{ language.joinUsText[0].talkabout }}</h2>
         <form [formGroup]="user" (ngSubmit)="sendEmail()">
+          @let nombreError = fieldError("nombre"); @let razonError = fieldError("razon"); @let correoError =
+          fieldError("correo"); @let telefonoError = fieldError("telefono");
           <div class="full-width mb-16-8">
             <input
               class="input-email"
               placeholder="{{ language.joinUsText[0].name }}"
               [attr.aria-label]="language.joinUsText[0].name"
+              [attr.aria-invalid]="!!nombreError"
+              [attr.aria-describedby]="nombreError ? 'nombre-error' : null"
               name="nombre"
               formControlName="nombre"
               autocomplete="name"
               required
             />
+            @if (nombreError) {
+            <p class="field-error" id="nombre-error">{{ nombreError }}</p>
+            }
           </div>
           <div class="full-width mb-24">
             <textarea
@@ -27,10 +34,15 @@
               rows="4"
               placeholder="{{ language.joinUsText[0].reason }}"
               [attr.aria-label]="language.joinUsText[0].reason"
+              [attr.aria-invalid]="!!razonError"
+              [attr.aria-describedby]="razonError ? 'razon-error' : null"
               name="razon"
               formControlName="razon"
               required
             ></textarea>
+            @if (razonError) {
+            <p class="field-error" id="razon-error">{{ razonError }}</p>
+            }
           </div>
           <h2 class="email-subtitle mb-16">{{ language.joinUsText[0].email }}</h2>
           <div class="flex-email">
@@ -39,12 +51,17 @@
                 class="input-email"
                 placeholder="{{ language.joinUsText[0].emailPlace }}"
                 [attr.aria-label]="language.joinUsText[0].emailPlace"
+                [attr.aria-invalid]="!!correoError"
+                [attr.aria-describedby]="correoError ? 'correo-error' : null"
                 name="correo"
                 type="email"
                 formControlName="correo"
                 autocomplete="email"
                 required
               />
+              @if (correoError) {
+              <p class="field-error" id="correo-error">{{ correoError }}</p>
+              }
             </div>
             <div class="full-width ml-8">
               <input
@@ -52,15 +69,20 @@
                 type="tel"
                 placeholder="{{ language.joinUsText[0].telephone }}"
                 [attr.aria-label]="language.joinUsText[0].telephone"
+                [attr.aria-invalid]="!!telefonoError"
+                [attr.aria-describedby]="telefonoError ? 'telefono-error' : null"
                 name="telefono"
                 formControlName="telefono"
                 autocomplete="tel"
                 required
               />
+              @if (telefonoError) {
+              <p class="field-error" id="telefono-error">{{ telefonoError }}</p>
+              }
             </div>
           </div>
           <div class="full-width mb-16-8">
-            <button type="submit" class="btn-black email-btn" [disabled]="user.invalid || sending()">
+            <button type="submit" class="btn-black email-btn" [disabled]="sending()">
               <span class="link">{{ language.joinUsText[0].send }}</span>
             </button>
           </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ElementRef, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, RouterLink } from "@angular/router";
@@ -11,6 +11,8 @@ import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 import { SentDialogComponent } from "./sent-dialog.component";
+
+type JoinUsField = "nombre" | "razon" | "correo" | "telefono";
 
 @Component({
   selector: "app-join-us",
@@ -25,6 +27,7 @@ export default class JoinUsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private session = inject(SessionService);
   private seo = inject(SeoService);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly user = inject(FormBuilder).nonNullable.group({
     nombre: ["", Validators.required],
@@ -34,6 +37,7 @@ export default class JoinUsComponent implements OnInit {
   });
   readonly sending = signal(false);
   readonly sendFailed = signal(false);
+  readonly attempted = signal(false);
 
   language: any = {};
   readonly previouslink = originRoute(parsePublicOrigin(this.route.snapshot.queryParamMap.get("from")));
@@ -43,8 +47,23 @@ export default class JoinUsComponent implements OnInit {
     this.seo.setPageTitle("GMCAN | " + this.language.join);
   }
 
+  fieldError(name: JoinUsField): string | null {
+    const errors = this.user.controls[name].errors;
+    if (!this.attempted() || !errors) return null;
+
+    const text = this.language.joinUsText[0];
+    return errors["required"] ? text.required : text.invalidEmail;
+  }
+
   sendEmail(): void {
-    if (this.user.invalid || this.sending()) return;
+    if (this.sending()) return;
+
+    if (this.user.invalid) {
+      this.attempted.set(true);
+      const first = Object.entries(this.user.controls).find(([, control]) => control.invalid)?.[0];
+      this.host.nativeElement.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
+      return;
+    }
 
     this.sending.set(true);
     this.sendFailed.set(false);
@@ -55,6 +74,7 @@ export default class JoinUsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.sending.set(false);
+          this.attempted.set(false);
           this.user.reset();
           this.dialog.open(SentDialogComponent, {
             width: "530px",
