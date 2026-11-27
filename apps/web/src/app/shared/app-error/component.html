@@ -1,6 +1,7 @@
-<div class="error-wrap">
-  <h1>Ocurrió un error</h1>
-  <p>No se pudo cargar la información solicitada.</p>
-  <p class="error-code">Código: {{ code() }}</p>
-  <a routerLink="/">Ir al inicio</a>
+<div class="page not-found-div">
+  <h1 class="not-title">{{ language.errorTitle }}</h1>
+  <div class="not-text">{{ language.errorText }}</div>
+  <a class="btn-black not-btn" routerLink="/">
+    <span class="btn-text2">{{ language.notFoundBtn }}</span>
+  </a>
 </div>

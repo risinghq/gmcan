@@ -1,14 +1,20 @@
-import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/core";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { Component, RESPONSE_INIT, inject, ChangeDetectionStrategy } from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
   selector: "app-app-error",
   templateUrl: "./component.html",
-  styleUrl: "./component.scss",
+  styleUrl: "../not-found/not-found.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink],
 })
 export default class AppErrorComponent {
-  private route = inject(ActivatedRoute);
-  readonly code = computed(() => this.route.snapshot.queryParamMap.get("code") ?? "internal_error");
+  private response = inject(RESPONSE_INIT, { optional: true });
+
+  readonly language = inject(SessionService).language();
+
+  constructor() {
+    if (this.response) this.response.status = 500;
+  }
 }
