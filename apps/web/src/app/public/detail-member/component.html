@@ -1,9 +1,5 @@
 <div class="page member-detail-div">
-  @let usuario = member(); @let publicaciones = publications(); @if (loading()) {
-  <div>
-    <mat-spinner />
-  </div>
-  } @if (!loading() && usuario) {
+  @let usuario = member(); @let publicaciones = publications();
   <div class="row">
     <div class="col-12 col-lg-8">
       <app-breadcrumb [trail]="trail()" />
@@ -61,5 +57,4 @@
       <app-news />
     </div>
   </div>
-  }
 </div>

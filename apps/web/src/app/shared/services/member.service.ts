@@ -7,11 +7,11 @@ import type {
   MemberProfileWrite,
   MemberWrite,
 } from "@gmcan/contracts/admin";
-import type { MemberTypeCode, PublicMember } from "@gmcan/contracts/public";
+import type { MemberTypeCode, PublicMember, PublicMemberProfile } from "@gmcan/contracts/public";
 import { Observable } from "rxjs";
 
 import type { AdminMemberListItem } from "../models/admin-list";
-import type { MemberGroup, MemberProfile, MemberPublishability } from "../models/member";
+import type { MemberGroup, MemberPublishability } from "../models/member";
 import { GLOBAL } from "./global";
 
 @Injectable({ providedIn: "root" })
@@ -22,8 +22,8 @@ export class MemberService {
     return this.http.get<PublicMember[]>(GLOBAL.api("members"));
   }
 
-  getMemberProfile(id: number): Observable<MemberProfile> {
-    return this.http.get<MemberProfile>(GLOBAL.api(`members/${id}`));
+  getMemberProfile(id: number): Observable<PublicMemberProfile> {
+    return this.http.get<PublicMemberProfile>(GLOBAL.api(`members/${id}`));
   }
 
   listAdminMembers(params?: { isActive?: number; memberTypeCode?: MemberTypeCode }): Observable<AdminMemberListItem[]> {

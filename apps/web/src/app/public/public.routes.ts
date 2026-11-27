@@ -2,6 +2,7 @@ import { inject } from "@angular/core";
 import { Routes } from "@angular/router";
 
 import { AboutDataService } from "./about/data";
+import { detailMemberResolver } from "./detail-member/resolver";
 import { detailNewsResolver } from "./detail-news/resolver";
 import { globalSearchResolver } from "./global-search/resolver";
 import { homeResolver } from "./home/resolver";
@@ -66,7 +67,11 @@ export default [
         loadComponent: () => import("./detail-news/component"),
         resolve: { news: detailNewsResolver },
       },
-      { path: "detail-member/:id", loadComponent: () => import("./detail-member/component") },
+      {
+        path: "detail-member/:id",
+        loadComponent: () => import("./detail-member/component"),
+        resolve: { profile: detailMemberResolver },
+      },
       {
         path: "search/:id",
         loadComponent: () => import("./global-search/component"),
