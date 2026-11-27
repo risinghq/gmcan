@@ -16,7 +16,6 @@
   }
 
   .project-abstract {
-    margin-left: auto;
     line-height: 1.33;
     letter-spacing: 0.3px;
     color: #000000;
@@ -45,6 +44,7 @@
   }
   .project-title {
     font-weight: bold;
+    line-height: 1.33;
     letter-spacing: 0.3px;
     color: #000000;
   }
@@ -87,6 +87,7 @@
   .abstract,
   .project-abstract,
   .project-rev,
+  .project-title,
   .resp-title {
     font-size: 15px;
   }
@@ -98,6 +99,7 @@
   .abstract,
   .project-abstract,
   .project-rev,
+  .project-title,
   .resp-title {
     font-size: 13px;
   }
