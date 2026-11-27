@@ -20,6 +20,7 @@ export interface ListTableOptions<T> {
 export class ListTable<T> {
   readonly dataSource = new MatTableDataSource<T>([]);
   readonly notFound = signal(false);
+  readonly searching = signal(false);
 
   constructor({ search, sort }: ListTableOptions<T> = {}) {
     if (search) {
@@ -47,6 +48,7 @@ export class ListTable<T> {
 
   filter(text: string): void {
     this.dataSource.filter = text.trim().toLowerCase();
+    this.searching.set(this.dataSource.filter !== "");
     this.dataSource.paginator?.firstPage();
     this.notFound.set(this.dataSource.filteredData.length === 0);
   }

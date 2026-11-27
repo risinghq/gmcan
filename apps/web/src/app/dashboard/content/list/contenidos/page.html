@@ -12,15 +12,35 @@
     </a>
   </mat-tab>
   <mat-tab label="Líneas de investigación">
-    <app-content-table [table]="state.lines" searchLabel="Buscar línea por nombre" addLabel="Agregar línea" />
+    <app-content-table
+      [table]="state.lines"
+      searchLabel="Buscar línea por nombre"
+      addLabel="Agregar línea"
+      emptyLabel="Todavía no hay líneas de investigación."
+    />
   </mat-tab>
   <mat-tab label="Métodos">
-    <app-content-table [table]="state.methods" searchLabel="Buscar método por nombre" addLabel="Agregar método" />
+    <app-content-table
+      [table]="state.methods"
+      searchLabel="Buscar método por nombre"
+      addLabel="Agregar método"
+      emptyLabel="Todavía no hay métodos."
+    />
   </mat-tab>
   <mat-tab label="Facilidades y recursos">
     <div class="title mb-16">Equipos instalados</div>
-    <app-content-table [table]="state.equipment" searchLabel="Buscar equipo" addLabel="Agregar equipo" />
+    <app-content-table
+      [table]="state.equipment"
+      searchLabel="Buscar equipo"
+      addLabel="Agregar equipo"
+      emptyLabel="Todavía no hay equipos."
+    />
     <div class="title mb-16">Software</div>
-    <app-content-table [table]="state.software" searchLabel="Buscar software" addLabel="Agregar software" />
+    <app-content-table
+      [table]="state.software"
+      searchLabel="Buscar software"
+      addLabel="Agregar software"
+      emptyLabel="Todavía no hay software."
+    />
   </mat-tab>
 </mat-tab-group>

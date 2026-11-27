@@ -15,6 +15,7 @@ import {
 } from "@angular/material/table";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
+import { EmptyListComponent } from "@app/shared/components/empty-list.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PersonComponent } from "@app/shared/components/person.component";
 import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admin-list";
@@ -41,6 +42,7 @@ interface NewsListItem {
   styleUrl: "./noticias.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EmptyListComponent,
     PersonComponent,
     MatTabGroup,
     MatTab,
@@ -70,7 +72,7 @@ export default class NewsListComponent implements OnInit {
   displayedColumns2: string[] = ["name"];
   selectedTab = 0;
 
-  readonly items = signal<NewsListItem[]>([]);
+  readonly items = signal<NewsListItem[] | null>(null);
   readonly total = signal(0);
   pageSize = 10;
   pageIndex = 0;
@@ -80,8 +82,12 @@ export default class NewsListComponent implements OnInit {
   sortBy: AdminNewsSortBy = "publishedAt";
   sortOrder: "asc" | "desc" = "desc";
 
+  get filtering(): boolean {
+    return this.search !== "" || this.statusFilter !== "" || this.newsTypeFilter !== "";
+  }
+
   readonly newsTypes = computed(() => this.lookup.newsKinds());
-  private readonly categorySearch = signal("");
+  protected readonly categorySearch = signal("");
   readonly filteredNewsTypes = computed(() => {
     const search = this.categorySearch();
     return this.newsTypes().filter((x) => x.name.toLowerCase().includes(search));

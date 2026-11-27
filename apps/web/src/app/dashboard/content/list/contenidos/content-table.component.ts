@@ -14,6 +14,7 @@ import {
   MatTable,
 } from "@angular/material/table";
 import { Router, RouterLink } from "@angular/router";
+import { EmptyListComponent } from "@app/shared/components/empty-list.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 
 import { ContentTable } from "./table";
@@ -23,6 +24,7 @@ import { ContentTable } from "./table";
   styleUrl: "./content-table.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EmptyListComponent,
     IconComponent,
     MatTable,
     MatSort,
@@ -69,7 +71,7 @@ import { ContentTable } from "./table";
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="list.notFound()" />
     @if (list.notFound()) {
-      <span>No se encontraron resultados</span>
+      <app-empty-list [searching]="list.searching()">{{ emptyLabel() }}</app-empty-list>
     }
   `,
 })
@@ -79,6 +81,7 @@ export class ContentTableComponent implements AfterViewInit {
   readonly table = input.required<ContentTable>();
   readonly searchLabel = input.required<string>();
   readonly addLabel = input.required<string>();
+  readonly emptyLabel = input.required<string>();
 
   readonly columns = ["nombre"];
   private readonly tableSort = viewChild.required(MatSort);

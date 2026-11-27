@@ -53,7 +53,7 @@
       </table>
       <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" />
       @if (table.notFound()) {
-        <span>No se encontraron resultados</span>
+        <app-empty-list [searching]="table.searching()">Todavía no hay proyectos en ejecución.</app-empty-list>
       }
     </mat-tab>
     <mat-tab label="Fuentes de financiamiento">
@@ -79,7 +79,7 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns2"></tr>
         </table>
       } @else {
-        <span>No se encontraron resultados</span>
+        <app-empty-list [searching]="fundingSearch() !== ''">Todavía no hay fuentes de financiamiento.</app-empty-list>
       }
     </mat-tab>
   </mat-tab-group>
@@ -131,7 +131,7 @@
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" />
     @if (table.notFound()) {
-      <span>No se encontraron resultados</span>
+      <app-empty-list [searching]="table.searching()">Todavía no hay proyectos concluidos.</app-empty-list>
     }
   </div>
 }

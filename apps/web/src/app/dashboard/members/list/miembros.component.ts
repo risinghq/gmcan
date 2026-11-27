@@ -15,6 +15,7 @@ import {
   MatRow,
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
+import { EmptyListComponent } from "@app/shared/components/empty-list.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PersonComponent } from "@app/shared/components/person.component";
 import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
@@ -30,6 +31,7 @@ import { personName } from "@app/shared/utils/person-name";
   styleUrl: "./miembros.component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    EmptyListComponent,
     PersonComponent,
     IconComponent,
     MatTable,
