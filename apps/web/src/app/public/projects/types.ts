@@ -5,7 +5,6 @@ export type ProjectDisplay = ProjectWithMembers & {
   fechaF?: string;
   lineasInvestigacion?: string;
   fuenteFinanciamiento?: string;
-  moneda?: string;
 };
 
 export type ProjectsViewModel = {

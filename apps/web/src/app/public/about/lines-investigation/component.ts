@@ -5,6 +5,7 @@ import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { MoneyPipe } from "@app/shared/utils/money";
 import {
   NgbPagination,
   NgbPaginationNext,
@@ -27,6 +28,7 @@ import {
     NgTemplateOutlet,
     SlicePipe,
     DatePipe,
+    MoneyPipe,
   ],
 })
 export default class LinesInvestigationComponent {

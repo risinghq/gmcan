@@ -14,7 +14,6 @@ export type HomeProyecto = PublicProject & {
   fechaF?: string;
   lineasInvestigacion?: string;
   fuenteFinanciamiento?: string;
-  moneda?: string;
 };
 
 export type HomeNewsItem = PublicNewsListItem & {

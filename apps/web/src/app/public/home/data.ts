@@ -43,11 +43,9 @@ export class HomeDataService {
 
   private enrichProyectos(proyectos: PublicProject[], lineas: PublicGroupTopic[]): HomeProyecto[] {
     const fundingSources = this.lookup.fundingSources();
-    const monedas = this.lookup.currencies();
 
     const lineasMap = new Map(lineas.map((l) => [l.id, l]));
     const fuentesMap = new Map(fundingSources.map((f) => [f.code, f]));
-    const monedasMap = new Map(monedas.map((m) => [m.code, m]));
 
     const locale = this.session.language().locale;
     return proyectos.map((proyecto) => ({
@@ -56,7 +54,6 @@ export class HomeDataService {
       fechaF: dateLabel(proyecto.endDate, "MMMM, y", locale) || undefined,
       lineasInvestigacion: lineasMap.get(proyecto.researchLineId)?.name,
       fuenteFinanciamiento: fuentesMap.get(proyecto.fundingSourceCode)?.name,
-      moneda: monedasMap.get(proyecto.currencyCode)?.symbol,
     }));
   }
 
