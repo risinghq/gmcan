@@ -12,6 +12,9 @@ job in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs, in order:
    ([database](database.md#migrations)).
 2. `bun run deploy` in `apps/api`.
 3. `bun run deploy` in `apps/web`, which binds the `gmcan-api` service.
+4. `bun scripts/smoke.ts <site>`, which fails the run unless every public page
+   answers 200 with one `<h1>` and an unknown path answers 404. It opens the
+   first news item and member when they exist.
 
 The job reads the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets of
 the `production` environment. The same steps run by hand after
@@ -95,6 +98,7 @@ Email stays off until you configure it ([email](email.md)).
 ## Check a deployment
 
 ```sh
+bun scripts/smoke.ts https://<site>
 curl -s https://<site>/config.json
 curl -s 'https://<site>/api/news?pageSize=1'
 curl -s -o /dev/null -w '%{http_code}\n' https://<site>/
