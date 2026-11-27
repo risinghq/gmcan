@@ -24,6 +24,7 @@ export default [
         path: "publications",
         loadComponent: () => import("./publication/component"),
         resolve: { publications: publicationResolver },
+        title: () => inject(SessionService).language().publications,
       },
       { path: "news", loadComponent: () => import("./main-news/component") },
       { path: "members", loadComponent: () => import("./members/component") },

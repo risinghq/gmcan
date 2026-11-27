@@ -5,8 +5,8 @@
       <div class="page-card">
         <h1 class="page-title">{{ language.publicationsText[0].publicationsTitle }}</h1>
         <p class="page-intro">{{ infoText }}</p>
-        <mat-tab-group (selectedTabChange)="changeTab($event)">
-          @for (tab of tabLabels(); track $index) {
+        <mat-tab-group [selectedIndex]="activeTab()" (selectedIndexChange)="changeTab($event)">
+          @for (tab of tabLabels; track $index) {
           <mat-tab label="{{ tab }}">
             <app-search-box
               class="mt-16"
@@ -15,19 +15,19 @@
               [(query)]="query"
               (search)="search($event)"
             />
-            @if (publicaciones.length == 0) {
+            @if (publicaciones().length == 0) {
             <div class="not-found">{{ language.publicationsText[0].results }}</div>
             } @else {
             <div>
-              @for ( publicacion of publicaciones | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize;
-              track publicacion.id; let i = $index ) {
+              @for ( publicacion of publicaciones() | slice: (page() - 1) * pageSize : page() * pageSize; track
+              publicacion.id ) {
               <app-publication-item [publication]="publicacion" from="publications" />
-              } @if (publicaciones.length > 5) {
+              } @if (publicaciones().length > pageSize) {
               <ngb-pagination
                 [(page)]="page"
                 (pageChange)="scroll()"
                 [pageSize]="pageSize"
-                [collectionSize]="publicaciones.length"
+                [collectionSize]="publicaciones().length"
               >
                 <ng-template ngbPaginationPrevious>
                   <div class="h-ih">

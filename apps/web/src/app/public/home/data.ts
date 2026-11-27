@@ -18,10 +18,16 @@ export function homeCounters(
   language: { locale: string; counters: CounterLabels },
 ): HomeCounter[] {
   const plural = new Intl.PluralRules(language.locale);
-  const counter = (value: number, labels: Record<"one" | "other", string>, link: string): HomeCounter => ({
+  const counter = (
+    value: number,
+    labels: Record<"one" | "other", string>,
+    link: string,
+    queryParams?: HomeCounter["queryParams"],
+  ): HomeCounter => ({
     value,
     label: plural.select(value) === "one" ? labels.one : labels.other,
     link,
+    queryParams,
   });
   const { counters } = language;
   const counts = home.publicationCounts;
@@ -29,8 +35,8 @@ export function homeCounters(
   return [
     counter(home.memberCount, counters.members, "/members"),
     counter(counts.journal_article, counters.articles, "/publications"),
-    counter(counts.thesis, counters.theses, "/publications"),
-    counter(counts.conference_paper, counters.abstracts, "/publications"),
+    counter(counts.thesis, counters.theses, "/publications", { type: "thesis" }),
+    counter(counts.conference_paper, counters.abstracts, "/publications", { type: "conference_paper" }),
   ];
 }
 

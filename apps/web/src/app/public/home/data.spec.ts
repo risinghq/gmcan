@@ -20,4 +20,18 @@ describe("homeCounters", () => {
     expect(labels(24, 15, 2, 0)).toEqual(["24 Miembros", "15 Artículos", "2 Tesis", "0 Resúmenes"]);
     expect(labels(24, 15, 2, 0, en)).toEqual(["24 Members", "15 Papers", "2 Theses", "0 Conference abstracts"]);
   });
+
+  it("links each publication count to its own tab", () => {
+    const counts = { journal_article: 1, thesis: 1, conference_paper: 1 };
+    const links = homeCounters({ memberCount: 1, publicationCounts: counts }, es).map((c) => [
+      c.link,
+      c.queryParams?.type,
+    ]);
+    expect(links).toEqual([
+      ["/members", undefined],
+      ["/publications", undefined],
+      ["/publications", "thesis"],
+      ["/publications", "conference_paper"],
+    ]);
+  });
 });
