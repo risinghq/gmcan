@@ -379,6 +379,12 @@ mat-sidenav-content.page-column {
   }
 }
 
+.back-div {
+  width: max-content;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 button.back-div,
 button.forgot {
   padding: 0;

@@ -3,10 +3,10 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="[{ label: language.join }]" />
       <div class="email-div">
-        <button type="button" class="flex-news back-div" (click)="return()">
+        <a class="flex-news back-div" [routerLink]="previouslink">
           <app-icon class="back-icon" name="arrow-left" />
           <span class="back-text">{{ language.joinUsText[0].back }}</span>
-        </button>
+        </a>
         <div class="email-title">{{ language.joinUsText[0].title }}</div>
         <div class="email-subtitle mb-16">{{ language.joinUsText[0].talkabout }}</div>
         <form [formGroup]="user" (ngSubmit)="sendEmail()">
