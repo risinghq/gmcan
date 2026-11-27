@@ -66,7 +66,6 @@ export default class JoinUsComponent implements OnInit {
           this.dialog.open(SentDialogComponent, {
             width: "530px",
             maxWidth: "calc(100vw - 32px)",
-            panelClass: "confirm-dialog",
           });
         },
         error: () => {
