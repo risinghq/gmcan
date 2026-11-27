@@ -133,8 +133,6 @@ export const Languages = [
     linesInvestigationText: [
       {
         projects: "Proyectos asociados",
-        seeMore: "Ver descripción",
-        seeLess: "Ocultar descripción",
       },
     ],
     facilitiesText: [
@@ -312,8 +310,6 @@ export const Languages = [
     linesInvestigationText: [
       {
         projects: "Associated projects",
-        seeMore: "See description",
-        seeLess: "Hide description",
       },
     ],
     facilitiesText: [

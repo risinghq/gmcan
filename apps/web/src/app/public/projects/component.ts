@@ -5,14 +5,14 @@ import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
+import { ProjectItemComponent } from "@app/shared/components/project-item.component";
 import { SearchBoxComponent } from "@app/shared/components/search-box.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
-import { MoneyPipe } from "@app/shared/utils/money";
+import type { PublicProject } from "@gmcan/contracts/public";
 import {
   NgbPagination,
   NgbPaginationPrevious,
@@ -20,7 +20,7 @@ import {
   NgbPaginationNext,
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 
-import type { ProjectDisplay, ProjectsViewModel } from "./types";
+import type { ProjectsViewModel } from "./types";
 
 @Component({
   selector: "app-projects",
@@ -29,7 +29,7 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     SearchBoxComponent,
-    ProjectMembersComponent,
+    ProjectItemComponent,
     BreadcrumbComponent,
     IconComponent,
     MatTabGroup,
@@ -40,7 +40,6 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
     NgbPaginationNext,
     NewsComponent,
     SlicePipe,
-    MoneyPipe,
   ],
 })
 export default class ProjectsComponent implements OnInit {
@@ -49,9 +48,9 @@ export default class ProjectsComponent implements OnInit {
   private readonly session = inject(SessionService);
   private readonly seo = inject(SeoService);
 
-  private allActive: ProjectDisplay[] = [];
-  private allFinished: ProjectDisplay[] = [];
-  currentProjects: ProjectDisplay[] = [];
+  private allActive: PublicProject[] = [];
+  private allFinished: PublicProject[] = [];
+  currentProjects: PublicProject[] = [];
   tipoProyectos: string[] = [];
   activeTab = 0;
   query = "";
@@ -60,7 +59,6 @@ export default class ProjectsComponent implements OnInit {
   language: (typeof Languages)[number] = Languages[0];
   page = 1;
   pageSize = 5;
-  expandedKey: string | null = null;
 
   ngOnInit(): void {
     this.language = this.session.language();
@@ -101,24 +99,11 @@ export default class ProjectsComponent implements OnInit {
       this.currentProjects = source.filter(
         (p) =>
           p.title.toLowerCase().includes(q) ||
-          (p.lineasInvestigacion ?? "").toLowerCase().includes(q) ||
+          (p.researchLine ?? "").toLowerCase().includes(q) ||
           p.members.some((m) => m.name.toLowerCase().includes(q)),
       );
     }
     this.page = 1;
-  }
-
-  toggleExpanded(section: string, index: number): void {
-    const key = `${section}:${index}`;
-    this.expandedKey = this.expandedKey === key ? null : key;
-  }
-
-  isExpanded(section: string, index: number): boolean {
-    return this.expandedKey === `${section}:${index}`;
-  }
-
-  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
-    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 
   private syncLabels(): void {

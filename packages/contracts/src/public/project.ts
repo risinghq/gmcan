@@ -21,6 +21,8 @@ export const PublicProjectSchema = z.object({
   researchLineId: z.number(),
   currencyCode: CurrencyCodeSchema,
   fundingSourceCode: FundingSourceCodeSchema,
+  researchLine: z.string().nullable(),
+  fundingSource: z.string(),
   createdAt: z.string().nullable(),
   updatedAt: z.string().nullable(),
   members: z.array(PublicProjectMemberSchema),
