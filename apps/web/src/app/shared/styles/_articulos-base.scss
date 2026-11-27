@@ -1,7 +1,13 @@
 @use "./noticias-base";
 
 .link-DOI {
-  color: black;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  color: var(--muted-accent);
   text-decoration: underline;
 }
 .link-DOI:hover {

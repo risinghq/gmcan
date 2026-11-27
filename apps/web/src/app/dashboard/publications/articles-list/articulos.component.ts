@@ -56,7 +56,7 @@ export default class ArticulosComponent implements AfterViewInit {
   private readonly lookup = inject(LookupService);
   private readonly tabState = inject(TabStateService);
 
-  readonly displayedColumns = ["titulo", "primerAutor", "publicacion", "DOI"];
+  readonly displayedColumns = ["titulo", "primerAutor", "publicacion"];
   readonly displayedColumns2 = ["nombre"];
   readonly articles = new ListTable<PublicationRow>({ search: publicationSearchText, sort: publicationSort });
   readonly journals = new ListTable<JournalItem>({ sort: byName });
