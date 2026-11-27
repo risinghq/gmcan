@@ -47,7 +47,7 @@ export const Languages = [
     noResultsProjects: "No se encontraron proyectos",
     noResultsNews: "No se encontraron noticias",
     noResultsMembers: "No se encontraron miembros",
-    articles: "Articulos",
+    articles: "Artículos",
     thesis: "Tesis",
     resumenes: "Resúmenes",
     seeMore: "Ver más",
