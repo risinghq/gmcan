@@ -12,6 +12,7 @@ import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { MoneyPipe } from "@app/shared/utils/money";
 import {
   NgbPagination,
   NgbPaginationPrevious,
@@ -39,6 +40,7 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
     NgbPaginationNext,
     NewsComponent,
     SlicePipe,
+    MoneyPipe,
   ],
 })
 export default class ProjectsComponent implements OnInit {

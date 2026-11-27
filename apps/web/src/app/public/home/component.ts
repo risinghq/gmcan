@@ -12,6 +12,7 @@ import { createGroup } from "@app/shared/models/factories";
 import type { Group } from "@app/shared/models/group";
 import { SessionService } from "@app/shared/services/session.service";
 import { EmphasisPipe } from "@app/shared/utils/emphasis";
+import { MoneyPipe } from "@app/shared/utils/money";
 
 import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from "./types";
 
@@ -31,6 +32,7 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
     NewsMetaComponent,
     SlicePipe,
     EmphasisPipe,
+    MoneyPipe,
   ],
 })
 export default class HomeComponent implements OnInit {

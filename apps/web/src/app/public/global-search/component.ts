@@ -24,6 +24,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateLabel, dateText } from "@app/shared/utils/date";
+import { MoneyPipe } from "@app/shared/utils/money";
 import {
   NgbPagination,
   NgbPaginationNext,
@@ -34,7 +35,7 @@ import { map } from "rxjs";
 
 import type { GlobalSearchViewModel } from "./types";
 
-type ProjectDisplay = GlobalSearchViewModel["projects"][number] & { fechaI: string; fechaF: string; moneda?: string };
+type ProjectDisplay = GlobalSearchViewModel["projects"][number] & { fechaI: string; fechaF: string };
 type NewsDisplay = GlobalSearchViewModel["news"][number] & { nombreTipoNoticia?: string; fechaFormateada: string };
 
 const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], projects: [] };
@@ -58,6 +59,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
     NgbPaginationNumber,
     NgbPaginationNext,
     SlicePipe,
+    MoneyPipe,
   ],
 })
 export default class GlobalSearchComponent {
@@ -134,7 +136,6 @@ export default class GlobalSearchComponent {
   private toProject(project: GlobalSearchViewModel["projects"][number]): ProjectDisplay {
     return {
       ...project,
-      moneda: this.lookup.currencies().find((currency) => currency.code === project.currencyCode)?.symbol,
       fechaI: dateLabel(project.startDate, "MMMM, y", this.language().locale),
       fechaF: dateLabel(project.endDate, "MMMM, y", this.language().locale),
     };

@@ -60,7 +60,6 @@ async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectSta
         .on("research_line_translation.locale", "=", locale),
     )
     .innerJoin("funding_source", "funding_source.code", "project.fundingSourceCode")
-    .innerJoin("currency", "currency.code", "project.currencyCode")
     .select([
       "project.id as id",
       "project_translation.title as title",
@@ -77,7 +76,6 @@ async function listProjectsLocalizedRows(locale: Locale, statusCode?: ProjectSta
       "project.updatedAt as updatedAt",
       "research_line_translation.name as researchLine",
       "funding_source.name as fundingSource",
-      "currency.symbol as currencySymbol",
     ]);
   if (statusCode !== undefined) query = query.where("project.statusCode", "=", statusCode);
   if (memberId !== undefined) {

@@ -30,7 +30,6 @@ export class ProjectsDataService {
 
     const lineasMap = new Map(lineas.map((l) => [l.id, l]));
     const fuentesMap = new Map(this.lookup.fundingSources().map((f) => [f.code, f]));
-    const monedasMap = new Map(this.lookup.currencies().map((m) => [m.code, m]));
 
     const locale = this.session.language().locale;
     const enrich = (p: ProjectWithMembers): ProjectDisplay => {
@@ -40,7 +39,6 @@ export class ProjectsDataService {
         fechaF: dateLabel(p.endDate, "MMMM, y", locale) || undefined,
         lineasInvestigacion: lineasMap.get(p.researchLineId)?.name,
         fuenteFinanciamiento: fuentesMap.get(p.fundingSourceCode)?.name,
-        moneda: monedasMap.get(p.currencyCode)?.symbol,
       };
     };
 

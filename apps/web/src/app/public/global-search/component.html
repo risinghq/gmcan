@@ -123,7 +123,7 @@
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ language().projectsText[0].amount }}: </strong>
-                  {{ proyecto.moneda }}{{ proyecto.fundedAmountMinor }}
+                  {{ proyecto.fundedAmountMinor | money: proyecto.currencyCode : language().locale }}
                 </div>
                 <div class="abstract mb-8">
                   <strong class="abstract-title"> {{ language().projectsText[0].dateStart }}: </strong>
