@@ -13,34 +13,9 @@
   background-color: #f8f8f8;
 }
 
-.project-icon {
-  vertical-align: middle;
-  height: 24px;
-}
-
 .project-card-div {
   border-radius: 4px;
   background-color: #ffffff;
-}
-
-.project-link {
-  font-weight: 500;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-.project-link-active:hover {
-  text-decoration: underline;
-  color: black;
-}
-.project-link-active {
-  font-weight: bold;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: #000000;
-  text-decoration: none;
 }
 
 .project-header {
@@ -60,12 +35,7 @@
 @include project-list.summary;
 
 @media (min-width: 961px) {
-  .project-links {
-    padding-bottom: 8px;
-  }
   ::placeholder,
-  .project-link-active,
-  .project-link,
   .project-subtext {
     font-size: 15px;
   }
@@ -93,12 +63,7 @@
     padding-top: 12px;
     padding-bottom: 20px;
   }
-  .project-links {
-    padding-bottom: 16px;
-  }
   ::placeholder,
-  .project-link-active,
-  .project-link,
   .project-subtext {
     font-size: 13px;
   }

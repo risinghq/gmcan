@@ -1,9 +1,5 @@
 <div class="page global-search-div">
-  <div class="global-links">
-    <a class="global-link-active" routerLink="/">{{ language().home }}</a>
-    <app-icon class="global-icon" name="caret-right" />
-    <span class="global-link" aria-current="page">{{ language().results }}</span>
-  </div>
+  <app-breadcrumb [trail]="[{ label: language().results }]" />
   <div class="card-global">
     <button type="button" class="flex-news back-div" (click)="return()">
       <app-icon class="back-icon" name="arrow-left" />

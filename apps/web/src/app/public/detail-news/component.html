@@ -2,15 +2,7 @@
 <div class="page detail-div">
   <div class="row">
     <div class="col-lg-8 col-12">
-      <div class="detail-links">
-        <a class="detail-link-active" routerLink="/">{{ language().home }}</a>
-        <app-icon class="detail-icon" name="caret-right" />
-        @if (originRoute() !== "/") {
-        <a class="detail-link-active" [routerLink]="originRoute()">{{ originLabel() }}</a>
-        <app-icon class="detail-icon" name="caret-right" />
-        }
-        <span class="detail-link" aria-current="page">{{ language().detailNews }}</span>
-      </div>
+      <app-breadcrumb [trail]="trail()" />
       <article class="card-detail">
         <header class="news-header" [class.news-header-img]="newsItem.asset">
           @if (newsItem.asset) {

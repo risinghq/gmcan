@@ -6,11 +6,7 @@
   } @if (cargado) {
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
-      <div class="publication-links">
-        <a class="publication-link-active" routerLink="/">{{ language.home }}</a>
-        <app-icon class="publication-icon" name="caret-right" />
-        <span class="publication-link" aria-current="page">{{ language.publications }}</span>
-      </div>
+      <app-breadcrumb [trail]="[{ label: language.publications }]" />
       <div class="card-publication">
         <div class="card-publication-title">{{ language.publicationsText[0].publicationsTitle }}</div>
         <div class="card-publication-text">{{ infoText }}</div>

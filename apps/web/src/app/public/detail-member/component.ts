@@ -1,12 +1,12 @@
 import { SlicePipe } from "@angular/common";
-import { Component, OnInit, computed, effect, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, computed, effect, inject, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource, toSignal } from "@angular/core/rxjs-interop";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { Router, ActivatedRoute, RouterLink } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { BreadcrumbComponent, type Crumb } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { Languages } from "@app/shared/models/languages";
 import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -43,6 +43,7 @@ type PublicationDisplay = PublicPublication & {
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    BreadcrumbComponent,
     AvatarComponent,
     MatProgressSpinner,
     IconComponent,
@@ -52,10 +53,9 @@ type PublicationDisplay = PublicPublication & {
     NgbPaginationNext,
     NewsComponent,
     SlicePipe,
-    RouterLink,
   ],
 })
-export default class DetailMemberComponent implements OnInit {
+export default class DetailMemberComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly memberService = inject(MemberService);
@@ -113,13 +113,22 @@ export default class DetailMemberComponent implements OnInit {
     });
   });
 
-  public previouspage = "Inicio";
-  public previouslink = "/";
+  readonly language = this.session.language();
+
+  private readonly origin = parsePublicOrigin(this.route.snapshot.queryParamMap.get("from"));
+  readonly previouslink = originRoute(this.origin);
+  private readonly previouspage = originLabel(this.origin, this.language);
+
+  protected readonly trail = computed((): Crumb[] => {
+    const m = this.member();
+    const name = m ? [m.prefix, m.firstName, m.lastName, m.maternalName].filter(Boolean).join(" ") : "";
+    const current = { label: name };
+    return this.previouslink === "/" ? [current] : [{ label: this.previouspage, link: this.previouslink }, current];
+  });
+
   page = 1;
   pageSize = 5;
   expandedKey: string | null = null;
-
-  language: (typeof Languages)[number] = Languages[0];
 
   constructor() {
     effect(() => {
@@ -139,13 +148,6 @@ export default class DetailMemberComponent implements OnInit {
         affiliation: { "@type": "ResearchOrganization", name: "GMCAN", url: GLOBAL.appUrl },
       });
     });
-  }
-
-  ngOnInit(): void {
-    this.language = this.session.language();
-    const origin = parsePublicOrigin(this.route.snapshot.queryParamMap.get("from"));
-    this.previouslink = originRoute(origin);
-    this.previouspage = originLabel(origin, this.language);
   }
 
   toggleExpanded(section: string, index: number): void {

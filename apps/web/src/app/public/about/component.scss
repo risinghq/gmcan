@@ -47,29 +47,6 @@
   width: 40px;
   background-color: #006400;
 }
-.about-icon {
-  vertical-align: middle;
-  height: 24px;
-}
-.about-link {
-  @extend .plex-sans;
-  font-weight: 500;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-.about-link-active:hover {
-  text-decoration: underline;
-  color: black;
-}
-.about-link-active {
-  @extend .plex-sans;
-  font-weight: bold;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-  text-decoration: none;
-}
 @media (min-width: 1500px) {
   .card-about {
     padding-bottom: 40px;
@@ -95,11 +72,6 @@
   .about-top {
     padding-top: 32px;
   }
-  .about-links {
-    padding-bottom: 8px;
-  }
-  .about-link-active,
-  .about-link,
   .about-text {
     font-size: 15px;
   }
@@ -129,11 +101,6 @@
   .about-top {
     padding-top: 32px;
   }
-  .about-links {
-    padding-bottom: 8px;
-  }
-  .about-link-active,
-  .about-link,
   .about-text {
     font-size: 15px;
   }
@@ -161,11 +128,6 @@
   .about-top {
     padding-top: 24px;
   }
-  .about-links {
-    padding-bottom: 16px;
-  }
-  .about-link-active,
-  .about-link,
   .about-text,
   .about-subtitle {
     font-size: 13px;

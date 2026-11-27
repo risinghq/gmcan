@@ -6,33 +6,6 @@
   font-family: "IBM Plex Sans", serif;
 }
 
-.member-icon {
-  vertical-align: middle;
-  height: 24px;
-}
-
-.member-link {
-  @extend .plex-sans;
-  font-weight: 500;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-.member-link-active:hover {
-  text-decoration: underline;
-  color: black;
-}
-.member-link-active {
-  @extend .plex-sans;
-  font-weight: bold;
-  font-stretch: normal;
-  font-style: normal;
-  line-height: 1.54;
-  letter-spacing: 0.3px;
-  color: #000000;
-  text-decoration: none;
-}
-
 .member-div {
   background-color: #f8f8f8;
 }
@@ -118,11 +91,6 @@
   color: var(--dark-forest-green);
 }
 @media (min-width: 1500px) {
-  .member-links {
-    padding-bottom: 8px;
-  }
-  .member-link-active,
-  .member-link,
   .member-profile {
     font-size: 15px;
   }
@@ -164,11 +132,6 @@
 }
 
 @media (max-width: 1500px) {
-  .member-links {
-    padding-bottom: 8px;
-  }
-  .member-link-active,
-  .member-link,
   .member-profile {
     font-size: 15px;
   }
@@ -210,11 +173,6 @@
 }
 
 @media (max-width: 960px) {
-  .member-links {
-    padding-bottom: 16px;
-  }
-  .member-link-active,
-  .member-link,
   .member-subtitle {
     font-size: 13px;
   }
