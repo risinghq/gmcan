@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, inject, signal } from "@angular/core";
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
@@ -23,6 +23,7 @@ export default class ChangePassComponent implements OnInit {
   private readonly emailService = inject(EmailService);
   private readonly groupService = inject(GroupService);
   private readonly uiState = inject(UiStateService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly grupoInfo = this.uiState.groupInfo;
   protected readonly verifying = signal(false);
@@ -60,12 +61,15 @@ export default class ChangePassComponent implements OnInit {
       });
   }
 
-  protected get confirmPasswordControl(): AbstractControl {
-    return this.passwordForm.controls.confirmPassword;
-  }
-
   protected resetPassword(): void {
-    if (this.passwordForm.invalid || !this.tokenValid() || this.saving() || !this.resetToken) return;
+    if (!this.tokenValid() || this.saving() || !this.resetToken) return;
+
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      const first = this.fieldError("password") ? "password" : "confirmPassword";
+      this.host.nativeElement.querySelector<HTMLElement>(`form [name="${first}"]`)?.focus();
+      return;
+    }
 
     this.saving.set(true);
     this.saveFailed.set(false);
@@ -81,8 +85,18 @@ export default class ChangePassComponent implements OnInit {
       });
   }
 
-  protected hasError(controlName: "password" | "confirmPassword", errorType: string): boolean {
-    const control = this.passwordForm.controls[controlName];
-    return control.hasError(errorType) && control.touched;
+  protected fieldError(name: "password" | "confirmPassword"): string | null {
+    const control = this.passwordForm.controls[name];
+    if (!control.touched) return null;
+
+    if (name === "password") {
+      if (control.hasError("required")) return "Ingresa una contraseña.";
+      if (control.hasError("minlength")) return "La contraseña debe tener al menos 8 caracteres.";
+      return null;
+    }
+
+    if (control.hasError("required")) return "Repite la contraseña.";
+    if (this.passwordForm.hasError("passwordMismatch")) return "Las contraseñas no coinciden.";
+    return null;
   }
 }

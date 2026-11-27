@@ -20,6 +20,8 @@
         <span class="link">Ir al inicio de sesión</span>
       </a>
     } @else if (tokenValid()) {
+      @let passwordError = fieldError("password");
+      @let confirmError = fieldError("confirmPassword");
       <form [formGroup]="passwordForm" (ngSubmit)="resetPassword()">
         <h1 class="login-title recover-title">Establecer nueva contraseña</h1>
         <p class="login-subtitle">Tu nueva contraseña debe tener como mínimo 8 caracteres.</p>
@@ -27,33 +29,33 @@
           class="input-password mt-input-16 full-width"
           placeholder="Nueva contraseña"
           aria-label="Nueva contraseña"
+          [attr.aria-invalid]="passwordError ? true : null"
+          [attr.aria-describedby]="passwordError ? 'password-error' : null"
           type="password"
+          name="password"
           formControlName="password"
           autocomplete="new-password"
           required
         />
-        @if (hasError("password", "required")) {
-          <div class="error-text">La contraseña es requerida.</div>
-        }
-        @if (hasError("password", "minlength")) {
-          <div class="error-text">La contraseña debe tener al menos 8 caracteres.</div>
+        @if (passwordError) {
+          <p class="error-text" id="password-error">{{ passwordError }}</p>
         }
         <input
           class="input-password mt-input-16 full-width"
           placeholder="Repetir contraseña"
           aria-label="Repetir contraseña"
+          [attr.aria-invalid]="confirmError ? true : null"
+          [attr.aria-describedby]="confirmError ? 'confirm-password-error' : null"
           type="password"
+          name="confirmPassword"
           formControlName="confirmPassword"
           autocomplete="new-password"
           required
         />
-        @if (hasError("confirmPassword", "required")) {
-          <div class="error-text">Debes confirmar la contraseña.</div>
+        @if (confirmError) {
+          <p class="error-text" id="confirm-password-error">{{ confirmError }}</p>
         }
-        @if (passwordForm.hasError("passwordMismatch") && confirmPasswordControl.touched) {
-          <div class="error-text">Las contraseñas no coinciden.</div>
-        }
-        <button type="submit" class="btn-black" [disabled]="passwordForm.invalid || saving()">
+        <button type="submit" class="btn-black" [disabled]="saving()">
           <span class="link">Cambiar contraseña</span>
         </button>
       </form>

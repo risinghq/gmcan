@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ElementRef, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
@@ -25,6 +25,7 @@ export default class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private uiState = inject(UiStateService);
   private titleService = inject(Title);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly grupoinfo = this.uiState.groupInfo;
   readonly error = signal<string | null>(null);
@@ -45,8 +46,25 @@ export default class LoginComponent implements OnInit {
     this.groupService.getGroup().subscribe((group) => this.uiState.setGroupInfo(group));
   }
 
+  fieldError(form: FormGroup, name: "email" | "password"): string | null {
+    const control = form.controls[name];
+    if (!control.touched || !control.errors) return null;
+
+    if (!control.errors["required"]) return "Escribe un correo válido, como nombre@dominio.com.";
+    return name === "email" ? "Ingresa tu correo electrónico." : "Ingresa tu contraseña.";
+  }
+
+  private rejectInvalid(form: FormGroup): boolean {
+    if (form.valid) return false;
+
+    form.markAllAsTouched();
+    const first = Object.keys(form.controls).find((name) => form.controls[name].invalid);
+    this.host.nativeElement.querySelector<HTMLElement>(`form [name="${first}"]`)?.focus();
+    return true;
+  }
+
   login(): void {
-    if (this.loginForm.invalid) return;
+    if (this.loading() || this.rejectInvalid(this.loginForm)) return;
     const credentials = {
       email: this.loginForm.controls["email"].value as string,
       password: this.loginForm.controls["password"].value as string,
@@ -75,7 +93,7 @@ export default class LoginComponent implements OnInit {
   recover(): void {
     this.exito.set(null);
     this.error.set(null);
-    if (this.emailForm.invalid) return;
+    if (this.loading() || this.rejectInvalid(this.emailForm)) return;
     this.loading.set(true);
     this.emailService
       .requestPasswordReset(this.emailForm.controls["email"].value as string)
