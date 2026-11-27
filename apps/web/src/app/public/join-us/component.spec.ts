@@ -55,6 +55,51 @@ describe("JoinUsComponent", () => {
     http.verify();
   });
 
+  const fieldErrors = () => [...page().querySelectorAll(".field-error")].map((error) => error.textContent?.trim());
+  const input = (name: string) => page().querySelector<HTMLInputElement>(`[name="${name}"]`) as HTMLInputElement;
+
+  function type(name: string, value: string) {
+    input(name).value = value;
+    input(name).dispatchEvent(new Event("input"));
+    fixture.detectChanges();
+  }
+
+  it("names every missing field on an empty send and focuses the first one", () => {
+    const text = fixture.componentInstance.language.joinUsText[0];
+    document.body.appendChild(page());
+    expect(fieldErrors()).toEqual([]);
+    expect(sendButton().disabled).toBe(false);
+
+    sendButton().click();
+    fixture.detectChanges();
+
+    expect(fieldErrors()).toEqual([text.required, text.required, text.required, text.required]);
+    expect(input("nombre").getAttribute("aria-invalid")).toBe("true");
+    expect(input("nombre").getAttribute("aria-describedby")).toBe("nombre-error");
+    expect(document.activeElement).toBe(input("nombre"));
+    page().remove();
+  });
+
+  it("tells a malformed email apart from a missing one and clears each error once fixed", () => {
+    const text = fixture.componentInstance.language.joinUsText[0];
+    document.body.appendChild(page());
+    type("nombre", "Ana Torres");
+    type("razon", "I study neurons");
+    type("correo", "ana@");
+    type("telefono", "999");
+
+    sendButton().click();
+    fixture.detectChanges();
+    expect(fieldErrors()).toEqual([text.invalidEmail]);
+    expect(input("nombre").getAttribute("aria-invalid")).toBe("false");
+    expect(document.activeElement).toBe(input("correo"));
+    page().remove();
+
+    type("correo", "ana@example.test");
+    expect(fieldErrors()).toEqual([]);
+    expect(input("correo").hasAttribute("aria-describedby")).toBe(false);
+  });
+
   it("sends the application to the contact endpoint and locks the button while it is in flight", async () => {
     await fillAndSend();
 
