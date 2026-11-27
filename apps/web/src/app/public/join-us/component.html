@@ -7,8 +7,8 @@
           <app-icon class="back-icon" name="arrow-left" />
           <span class="back-text">{{ language.joinUsText[0].back }}</span>
         </a>
-        <div class="email-title">{{ language.joinUsText[0].title }}</div>
-        <div class="email-subtitle mb-16">{{ language.joinUsText[0].talkabout }}</div>
+        <h1 class="email-title">{{ language.joinUsText[0].title }}</h1>
+        <h2 class="email-subtitle mb-16">{{ language.joinUsText[0].talkabout }}</h2>
         <form [formGroup]="user" (ngSubmit)="sendEmail()">
           <div class="full-width mb-16-8">
             <input
@@ -32,7 +32,7 @@
               required
             ></textarea>
           </div>
-          <div class="email-subtitle mb-16">{{ language.joinUsText[0].email }}</div>
+          <h2 class="email-subtitle mb-16">{{ language.joinUsText[0].email }}</h2>
           <div class="flex-email">
             <div class="full-width mr-8 mb-8">
               <input

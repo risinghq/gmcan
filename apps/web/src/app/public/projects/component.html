@@ -3,7 +3,7 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="[{ label: language.projects }]" />
       <div class="project-card-div">
-        <div class="project-header">{{ language.projectsText[0].projectsTitle }}</div>
+        <h1 class="project-header">{{ language.projectsText[0].projectsTitle }}</h1>
         <div class="project-subtext">{{ infoText }}</div>
         <mat-tab-group (selectedTabChange)="changeTab($event)">
           @for (tipoProyecto of tipoProyectos; track tipoProyecto; let j = $index) {

@@ -3,7 +3,7 @@
 }
 <div class="page home-div primer-box">
   <div class="center">
-    <div class="description-info">{{ info.summary }}</div>
+    <h1 class="description-info">{{ info.summary }}</h1>
     <a class="white-btn" routerLink="/about-us/about">{{ language.knowAboutUs }}</a>
   </div>
   <div class="numbers-div">
@@ -31,7 +31,7 @@
 </div>
 <div class="page home-div segundo-box">
   <div class="grey-title hide-desktop">{{ language.knowAbout }}</div>
-  <div class="black-title hide-desktop">{{ language.linesminus }}</div>
+  <h2 class="black-title hide-desktop">{{ language.linesminus }}</h2>
   <div class="row lines-investigation">
     @for (linea of linesPreview; track linea.id) {
     <div class="col-lg-4 col-md-6 col-sm-12">
@@ -52,7 +52,7 @@
   </div>
   <div class="grey-title">{{ language.knowAbout }}</div>
   <div class="flex-news">
-    <div class="black-title">{{ language.newsminus }}</div>
+    <h2 class="black-title">{{ language.newsminus }}</h2>
     <a class="btn-black hide-mobile" routerLink="/news">
       <span class="btn-text2"> {{ language.seeNews }} </span>
     </a>
@@ -151,7 +151,7 @@
     </div>
   </div>
   <div class="grey-title mt-48">{{ language.knowAbout2 }}</div>
-  <div class="black-title">{{ language.methodsminus }}</div>
+  <h2 class="black-title">{{ language.methodsminus }}</h2>
   <div class="row">
     @for (metodo of metodos; track metodo; let i = $index) {
     <div class="col-lg-4 col-md-6 col-sm-12">
@@ -167,7 +167,7 @@
   </div>
   <div class="grey-title mt-publications">{{ language.knowAbout }}</div>
   <div class="flex-news">
-    <div class="black-title">{{ language.publicationsminus }}</div>
+    <h2 class="black-title">{{ language.publicationsminus }}</h2>
     <a class="btn-black hide-mobile" routerLink="/publications">
       <span class="btn-text2"> {{ language.seePublications }} </span>
     </a>
@@ -316,7 +316,7 @@
   </a>
   <div class="grey-title mt-publications">{{ language.knowAbout2 }}</div>
   <div class="flex-news">
-    <div class="black-title">{{ language.projectsminus }}</div>
+    <h2 class="black-title">{{ language.projectsminus }}</h2>
     <a class="btn-black hide-mobile" routerLink="/projects">
       <span class="btn-text2"> {{ language.seeProjects }} </span>
     </a>

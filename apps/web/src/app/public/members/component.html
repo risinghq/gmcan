@@ -4,7 +4,7 @@
       <app-breadcrumb [trail]="[{ label: language.members }]" />
       <div class="member-card">
         @let view = vm();
-        <div class="member-title">{{ language.membersText[0].memberTitle }}</div>
+        <h1 class="member-title">{{ language.membersText[0].memberTitle }}</h1>
         <div class="member-sub">{{ language.membersText[0].memberText }}</div>
         @if (view.loading) {
         <div class="spinner-pad">
@@ -16,7 +16,7 @@
           @for (tipoMiembro of view.memberGroups; track tipoMiembro.code) {
           <div class="member-type-container">
             @if (tipoMiembro.members.length > 0) {
-            <div class="member-type-title">{{ tipoMiembro.name }}</div>
+            <h2 class="member-type-title">{{ tipoMiembro.name }}</h2>
             <div class="row">
               @for (miembro of tipoMiembro.members; track miembro.id) {
               <div class="col-12 col-sm-6">

@@ -1,10 +1,10 @@
 <div class="card-about">
   <img class="about-img" src="{{ aboutus().asset }}" alt="" />
   <div class="about-text-div">
-    <div class="about-title">{{ language().aboutText[0].aboutUs }}</div>
+    <h1 class="about-title">{{ language().aboutText[0].aboutUs }}</h1>
     <div class="about-sub-divi"></div>
     <div class="about-text" [innerHTML]="aboutus().description"></div>
-    <div class="about-title about-top">{{ language().aboutText[0].ourObjectives }}</div>
+    <h2 class="about-title about-top">{{ language().aboutText[0].ourObjectives }}</h2>
     <div class="about-subtitle">{{ language().aboutText[0].ourObjectivesQuestion }}</div>
     <div class="about-sub-divi"></div>
     <div class="about-text">
@@ -20,7 +20,7 @@
         }
       </ul>
     </div>
-    <div class="about-title about-top">{{ language().aboutText[0].ourServices }}</div>
+    <h2 class="about-title about-top">{{ language().aboutText[0].ourServices }}</h2>
     <div class="about-subtitle">{{ language().aboutText[0].ourServicesQuestion }}</div>
     <div class="about-sub-divi"></div>
     <div class="about-text">

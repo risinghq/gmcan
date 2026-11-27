@@ -5,7 +5,7 @@
       <app-icon class="back-icon" name="arrow-left" />
       <span class="back-text">{{ language().detailMemberText[0].back }}</span>
     </a>
-    <div class="global-results-title">{{ language().results }}</div>
+    <h1 class="global-results-title">{{ language().results }}</h1>
     <app-search-box
       class="mt-16"
       [placeholder]="language().search"
@@ -19,10 +19,9 @@
     <div class="row">
       <div class="col-lg-8 col-sm-6 col-12">
         <div id="publications-list">
-          <div class="publications-title">
-            {{ language().publications }} @if (publicaciones().length >= 0) {
+          <h2 class="publications-title">
+            {{ language().publications }}
             <span class="length-text">({{ publicaciones().length }})</span>
-            }
             <button
               type="button"
               class="expand-toggle section-toggle"
@@ -33,7 +32,7 @@
             >
               <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
-          </div>
+          </h2>
           <div class="collapse" [class.show]="publicationExpanded()" id="collapsePublication">
             @if (publicaciones().length == 0) {
             <div class="not-found-1">{{ language().noResultsPublication }}</div>
@@ -145,10 +144,9 @@
           </div>
         </div>
         <div id="projects-list">
-          <div class="publications-title">
-            {{ language().projects }} @if (proyectos().length >= 0) {
+          <h2 class="publications-title">
+            {{ language().projects }}
             <span class="length-text">({{ proyectos().length }})</span>
-            }
             <button
               type="button"
               class="expand-toggle section-toggle"
@@ -159,7 +157,7 @@
             >
               <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
-          </div>
+          </h2>
           <div class="collapse" [class.show]="projectExpanded()" id="collapseProjects">
             @if (proyectos().length == 0) {
             <div class="not-found-1">{{ language().noResultsProjects }}</div>
@@ -247,10 +245,9 @@
       </div>
       <div class="col-lg-4 col-sm-6 col-12">
         <div id="members-list">
-          <div class="publications-title">
-            {{ language().members }} @if (miembros().length >= 0) {
+          <h2 class="publications-title">
+            {{ language().members }}
             <span class="length-text">({{ miembros().length }})</span>
-            }
             <button
               type="button"
               class="expand-toggle section-toggle"
@@ -261,7 +258,7 @@
             >
               <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
-          </div>
+          </h2>
           <div class="collapse miembro-mt" [class.show]="memberExpanded()" id="collapseMembers">
             @if (miembros().length == 0) {
             <div class="not-found-1">{{ language().noResultsMembers }}</div>
@@ -293,10 +290,9 @@
           </div>
         </div>
         <div id="news-list">
-          <div class="publications-title">
-            {{ language().news }} @if (noticias().length >= 0) {
+          <h2 class="publications-title">
+            {{ language().news }}
             <span class="length-text">({{ noticias().length }})</span>
-            }
             <button
               type="button"
               class="expand-toggle section-toggle"
@@ -307,7 +303,7 @@
             >
               <app-icon class="publication-abs-icon-2" name="chevron-down" />
             </button>
-          </div>
+          </h2>
           <div class="collapse" [class.show]="newsExpanded()" id="collapseNews">
             @if (noticias().length == 0) {
             <div class="not-found-1">{{ language().noResultsNews }}</div>
