@@ -21,7 +21,7 @@ import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admi
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
-import { dateLabel } from "@app/shared/utils/date";
+import { dateText } from "@app/shared/utils/date";
 
 interface NewsListItem {
   id: number;
@@ -109,7 +109,7 @@ export default class NewsListComponent implements OnInit {
     return {
       id: news.id,
       title: news.title,
-      publishedAtLabel: dateLabel(news.publishedAt, "MMMM dd, y", "es"),
+      publishedAtLabel: dateText(news.publishedAt, "mediumDate", "es"),
       categoryName: news.categoryName,
       authorName: news.authorName,
       authorPhotoUrl: news.authorPhotoUrl,

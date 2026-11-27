@@ -8,6 +8,10 @@ describe("date labels", () => {
     expect(dateLabel("2020-08-15", "MMMM y", "es")).toBe("Agosto 2020");
   });
 
+  it("puts the day before the month in a Spanish short date", () => {
+    expect(dateText("2024-06-11", "mediumDate", "es")).toBe("11 jun 2024");
+  });
+
   it("keeps the stored calendar day whatever the time zone", () => {
     expect(dateText("2020-08-01", "d", "en")).toBe("1");
   });
