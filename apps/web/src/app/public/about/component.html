@@ -1,10 +1,10 @@
 <div class="page about-div">
   <div class="row">
-    <div class="col-lg-8 col-sm-6 col-12">
+    <div class="col-12 col-lg-8">
       <app-breadcrumb [trail]="[{ label: facade.language().aboutUs }, { label: facade.selectedCategory() }]" />
       <router-outlet />
     </div>
-    <div class="col-lg-4 col-sm-6 col-12">
+    <div class="col-12 col-lg-4">
       <nav class="about-categories" [attr.aria-label]="facade.language().aboutUs">
         @for (category of categories(); track category.path) {
         <a

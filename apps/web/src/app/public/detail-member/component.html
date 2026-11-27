@@ -5,7 +5,7 @@
   </div>
   } @if (!loading() && usuario) {
   <div class="row">
-    <div class="col-lg-8 col-sm-6 col-12">
+    <div class="col-12 col-lg-8">
       <app-breadcrumb [trail]="trail()" />
       <div class="member-detail-card">
         <a class="flex-news back-div" [routerLink]="previouslink">
@@ -142,7 +142,7 @@
         }
       </div>
     </div>
-    <div class="col-lg-4 col-sm-6 col-12">
+    <div class="col-12 col-lg-4">
       <app-news />
     </div>
   </div>
