@@ -98,6 +98,10 @@ describe("GlobalSearchComponent", () => {
     expect(page().querySelector("a.back-div")?.getAttribute("href")).toBe("/news");
   });
 
+  it("titles the page with a single h1", () => {
+    expect(page().querySelectorAll("h1")).toHaveLength(1);
+  });
+
   it("shows the not-found message when a search matches nothing", () => {
     expect(page().querySelector(".not-found-2")).not.toBeNull();
     expect(page().querySelector(".publication")).toBeNull();

@@ -23,15 +23,15 @@
             />
           </div>
           <div class="member-detail-name-div">
-            <div class="member-detail-title">
+            <h1 class="member-detail-title">
               {{ usuario.prefix }} {{ usuario.firstName }} {{ usuario.lastName }} {{ usuario.maternalName }}
-            </div>
+            </h1>
             <div class="member-detail-type">{{ usuario.tipoMiembro }}</div>
           </div>
         </div>
         <div class="detail-member-resum">{{ usuario.bio }}</div>
         @if (publicaciones.length > 0) {
-        <div class="member-publications">{{ language.detailMemberText[0].publications }}</div>
+        <h2 class="member-publications">{{ language.detailMemberText[0].publications }}</h2>
         } @if (publicaciones.length > 0) {
         <div>
           @for ( publicacion of publicaciones | slice: (page - 1) * pageSize : (page - 1) * pageSize + pageSize; track

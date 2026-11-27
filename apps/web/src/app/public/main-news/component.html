@@ -11,7 +11,7 @@
         </div>
         } @if (allCharged) {
         <div class="columna">
-          <div class="main-news-title">{{ language.newsText[0].newsTitle }}</div>
+          <h1 class="main-news-title">{{ language.newsText[0].newsTitle }}</h1>
           <button mat-button class="right hide-desktop" [matMenuTriggerFor]="menu">
             {{ selectedCategoryName }}
             <app-icon name="chevron-down" />
@@ -85,7 +85,7 @@
       </div>
     </div>
     <div class="col-lg-4 col-sm-6 col-12 hide-mobile">
-      <div class="category-title">{{ language.newsText[0].categoryTitle }}</div>
+      <h2 class="category-title">{{ language.newsText[0].categoryTitle }}</h2>
       <button
         type="button"
         class="category"
