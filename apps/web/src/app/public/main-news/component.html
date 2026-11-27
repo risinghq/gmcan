@@ -22,7 +22,7 @@
         @if (news.isLoading()) {
         <div class="spinner-pad">
           <mat-spinner class="auto mb-8" />
-          <div class="loading-text center">Cargando</div>
+          <div class="loading-text center">{{ language.loading }}</div>
         </div>
         } @else if (newsItems.length > 0) {
         <div>
