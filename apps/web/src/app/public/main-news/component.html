@@ -1,7 +1,7 @@
 <div class="page main-news-div">
   @let newsItems = items(); @let total = news.value()?.total ?? 0;
   <div class="row">
-    <div class="col-lg-8 col-sm-6 col-12">
+    <div class="col-12 col-lg-8">
       <app-breadcrumb [trail]="[{ label: language.news }]" />
       <div class="page-card">
         <div class="columna">
@@ -76,7 +76,7 @@
         }
       </div>
     </div>
-    <div class="col-lg-4 col-sm-6 col-12 hide-mobile">
+    <div class="col-12 col-lg-4 hide-mobile">
       <h2 class="category-title">{{ language.newsText[0].categoryTitle }}</h2>
       <button
         type="button"
