@@ -1155,24 +1155,6 @@ circle {
   margin-bottom: 8px;
 }
 
-.btn-grey {
-  padding: 8px;
-  line-height: 1;
-  width: max-content;
-  border-radius: 4px;
-  border: solid 2px var(--muted-accent);
-  color: var(--muted-accent);
-  background-color: white;
-}
-
-.btn-grey > .link {
-  color: var(--muted-accent);
-}
-
-.btn-grey > .link::before {
-  width: unset;
-}
-
 .mb-32 {
   margin-bottom: 32px;
 }

@@ -44,8 +44,8 @@
         @if (passwordForm.hasError("passwordMismatch") && confirmPasswordControl.touched) {
           <div class="error-text">Las contraseñas no coinciden.</div>
         }
-        <button type="submit" class="btn-black" [class.btn-grey]="!isFormValid" [disabled]="!isFormValid">
-          <div class="link">Cambiar contraseña</div>
+        <button type="submit" class="btn-black" [disabled]="!isFormValid || loading()">
+          <span class="link">Cambiar contraseña</span>
         </button>
       </form>
     }
