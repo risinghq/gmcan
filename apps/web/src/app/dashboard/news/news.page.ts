@@ -140,19 +140,19 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
             @let fields = form.controls.translations.controls[locale].controls;
             <div class="locale-section full-width" [formGroupName]="locale">
               <div class="locale-title">{{ label(locale) }}</div>
-              <div class="text-category">
-                Título <span>({{ fields.title.value.length }}/100)</span> <span class="red-text">*</span>
+              <div class="field-head">
+                <div class="text-category">Título <span class="red-text">*</span></div>
+                <span class="field-count">{{ fields.title.value.length }}/100</span>
               </div>
               <input class="input-category" formControlName="title" maxlength="100" />
-              <div class="text-category">
-                Resumen <span>({{ fields.summary.value.length }}/500)</span> <span class="red-text">*</span>
+              <div class="field-head">
+                <div class="text-category">Resumen <span class="red-text">*</span></div>
+                <span class="field-count">{{ fields.summary.value.length }}/500</span>
               </div>
               <textarea class="input-category" formControlName="summary" maxlength="500"></textarea>
-              <div class="flex-news">
+              <div class="field-head">
                 <div class="text-category">Contenido <span class="red-text">*</span></div>
-                <button type="button" class="link green-text top-auto right" (click)="preview(locale)">
-                  Vista previa
-                </button>
+                <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
               </div>
               <app-rich-text-editor formControlName="body" />
             </div>

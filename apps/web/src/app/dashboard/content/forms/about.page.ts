@@ -57,11 +57,9 @@ type AboutForm = ReturnType<typeof aboutForm>;
           @let group = form.controls[locale]!;
           <div class="locale-section full-width" [formGroup]="group">
             <div class="locale-title">{{ label(locale) }}</div>
-            <div class="flex-news">
+            <div class="field-head">
               <div class="text-category">Descripción <span class="red-text">*</span></div>
-              <button type="button" class="link green-text top-auto right" (click)="preview(locale)">
-                Vista previa
-              </button>
+              <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
             </div>
             <app-rich-text-editor formControlName="description" />
             <div class="text-category mt-24">Objetivos</div>

@@ -38,11 +38,9 @@ import { requiredText } from "./text-fields";
             <div class="locale-title">{{ label(locale) }}</div>
             <div class="text-category">Nombre del método <span class="red-text">*</span></div>
             <input class="input-category" formControlName="name" />
-            <div class="flex-news">
+            <div class="field-head">
               <div class="text-category">Descripción <span class="red-text">*</span></div>
-              <button type="button" class="link green-text top-auto right" (click)="preview(locale)">
-                Vista previa
-              </button>
+              <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
             </div>
             <app-rich-text-editor formControlName="description" />
           </div>
