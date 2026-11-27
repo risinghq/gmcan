@@ -1,4 +1,4 @@
-import { Component, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
+import { Component, computed, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/material/sidenav";
@@ -61,6 +61,7 @@ export default class LandingComponent {
     ),
     { initialValue: this.uiState.groupInfo() },
   );
+  readonly phoneHref = computed(() => `tel:${(this.groupInfo().phone ?? "").replace(/[^\d+]/g, "")}`);
   url = GLOBAL.url;
   enteredButton = false;
   isMatMenuOpen = false;
