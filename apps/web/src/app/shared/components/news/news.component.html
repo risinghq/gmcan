@@ -4,57 +4,43 @@
   </h2>
   @let view = vm();
   @if (view.featuredNews; as featuredNews) {
-    <div class="img-hover-zoom">
+    <article class="featured-news">
       @if (featuredNews.asset) {
-        <img class="card-img-div" src="{{ featuredNews.asset }}" alt="" />
+        <div class="featured-news-img">
+          <img src="{{ featuredNews.asset }}" alt="" />
+        </div>
       }
-    </div>
-    <div class="card-text-div card-text-div-3">
-      <div class="flex-news flex-news-3">
-        <div class="news-type">
-          {{ featuredNews.newsTypeNameLabel }}
-        </div>
-        <div class="other-news-date">
-          {{ featuredNews.publishedAtLabel }}
-        </div>
-      </div>
-      <a
-        class="other-news-text-2 plain-link"
-        [routerLink]="['/detail-news', featuredNews.id]"
-        [queryParams]="{ from: origin }"
-      >
+      <p class="news-meta">
+        <span class="news-type">{{ featuredNews.newsTypeNameLabel }}</span>
+        <span aria-hidden="true">·</span>
+        <time [attr.datetime]="featuredNews.publishedAt">{{ featuredNews.publishedAtLabel }}</time>
+      </p>
+      <a class="news-link" [routerLink]="['/detail-news', featuredNews.id]" [queryParams]="{ from: origin }">
         {{ featuredNews.title }}
       </a>
-      <div class="news-author">{{ language().newsText[0].by }} {{ featuredNews.authorNameLabel }}</div>
-    </div>
+      <p class="news-author">{{ language().newsText[0].by }} {{ featuredNews.authorNameLabel }}</p>
+    </article>
   }
-  <div class="other-news-div">
-    @for (newsItem of view.newsItems | slice: 0 : numberShown; track newsItem.id; let i = $index) {
-      <div class="other-news flex-news">
-        <div class="other-news-text-div full-width pr-16">
-          <div class="flex-news flex-news-2">
-            <div class="news-type">
-              {{ newsItem.newsTypeNameLabel }}
-            </div>
-            <div class="other-news-date">
-              {{ newsItem.publishedAtLabel }}
-            </div>
-          </div>
-          <a
-            class="other-news-text-2 plain-link"
-            [routerLink]="['/detail-news', newsItem.id]"
-            [queryParams]="{ from: origin }"
-          >
+  <ul class="other-news-list">
+    @for (newsItem of view.newsItems | slice: 0 : 10; track newsItem.id) {
+      <li class="other-news">
+        <div class="other-news-text">
+          <p class="news-meta">
+            <span class="news-type">{{ newsItem.newsTypeNameLabel }}</span>
+            <span aria-hidden="true">·</span>
+            <time [attr.datetime]="newsItem.publishedAt">{{ newsItem.publishedAtLabel }}</time>
+          </p>
+          <a class="news-link" [routerLink]="['/detail-news', newsItem.id]" [queryParams]="{ from: origin }">
             {{ newsItem.title }}
           </a>
-          <div class="news-author">{{ language().newsText[0].by }} {{ newsItem.authorNameLabel }}</div>
+          <p class="news-author">{{ language().newsText[0].by }} {{ newsItem.authorNameLabel }}</p>
         </div>
-        <div class="img-hover-zoom-2 img-div-zoom">
-          @if (newsItem.asset) {
-            <img class="other-news-img" loading="lazy" src="{{ newsItem.asset }}" alt="" />
-          }
-        </div>
-      </div>
+        @if (newsItem.asset) {
+          <div class="other-news-img">
+            <img loading="lazy" src="{{ newsItem.asset }}" alt="" />
+          </div>
+        }
+      </li>
     }
-  </div>
+  </ul>
 </div>
