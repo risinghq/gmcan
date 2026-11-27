@@ -36,21 +36,21 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
               <div class="text-category">Primer nombre <span class="red-text">*</span></div>
-              <input formControlName="firstName" class="input-category" placeholder="Ingresarprimer nombre" />
+              <input formControlName="firstName" class="input-category" placeholder="Ingresar primer nombre" />
             </div>
             <div class="full-width">
               <div class="text-category">Segundo nombre</div>
-              <input formControlName="middleName" class="input-category" placeholder="Ingresarsegundo nombre" />
+              <input formControlName="middleName" class="input-category" placeholder="Ingresar segundo nombre" />
             </div>
           </div>
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
               <div class="text-category">Apellido paterno <span class="red-text">*</span></div>
-              <input formControlName="lastName" class="input-category" placeholder="Ingresarapellido paterno" />
+              <input formControlName="lastName" class="input-category" placeholder="Ingresar apellido paterno" />
             </div>
             <div class="full-width">
               <div class="text-category">Apellido materno</div>
-              <input formControlName="maternalName" class="input-category" placeholder="Ingresarapellido materno" />
+              <input formControlName="maternalName" class="input-category" placeholder="Ingresar apellido materno" />
             </div>
           </div>
           <div class="flex-news mb-8">
@@ -68,7 +68,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
                 type="email"
                 formControlName="email"
                 class="input-category"
-                placeholder="Ingresarcorreo electrónico"
+                placeholder="Ingresar correo electrónico"
                 [class.invalid-error]="emailTaken()"
               />
             </div>

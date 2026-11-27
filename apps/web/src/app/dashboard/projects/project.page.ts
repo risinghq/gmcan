@@ -181,12 +181,12 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
             <div class="locale-section full-width" [formGroupName]="locale">
               <div class="locale-title">{{ label(locale) }}</div>
               <div class="text-category">Título del proyecto <span class="red-text">*</span></div>
-              <input class="input-category" formControlName="title" placeholder="Ingresartítulo del proyecto" />
+              <input class="input-category" formControlName="title" placeholder="Ingresar título del proyecto" />
               <div class="text-category">Descripción <span class="red-text">*</span></div>
               <textarea
                 class="input-category"
                 formControlName="description"
-                placeholder="Ingresardescripción"
+                placeholder="Ingresar descripción"
               ></textarea>
             </div>
           }
