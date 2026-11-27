@@ -18,9 +18,8 @@ export class DetailNewsDataService {
       throw new Error(`News with ID ${id} not found`);
     }
 
-    const language = this.session.language();
-    const writtenOn = dateText(newsItem.publishedAt, language.detailNewsText[0].writtenOnFormat, language.locale);
+    const publishedAtLabel = dateText(newsItem.publishedAt, "longDate", this.session.language().locale);
 
-    return { newsItem, writtenOn };
+    return { newsItem, publishedAtLabel };
   }
 }
