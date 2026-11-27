@@ -1,6 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { AboutFacade } from "@app/public/about/facade";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 @Component({
@@ -11,7 +10,6 @@ import { SessionService } from "@app/shared/services/session.service";
   imports: [],
 })
 export default class MethodComponent {
-  private readonly seo = inject(SeoService);
   private readonly session = inject(SessionService);
   private readonly facade = inject(AboutFacade);
 
@@ -19,7 +17,6 @@ export default class MethodComponent {
   readonly methods = this.facade.methods;
 
   constructor() {
-    this.seo.setPageTitle("GMCAN | " + this.language().methods);
     void this.facade.loadMethods();
   }
 }

@@ -7,7 +7,6 @@ import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component
 import NewsComponent from "@app/shared/components/news/news.component";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { EmailService } from "@app/shared/services/email.service";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 
 import { SentDialogComponent } from "./sent-dialog.component";
@@ -26,7 +25,6 @@ export default class JoinUsComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private session = inject(SessionService);
-  private seo = inject(SeoService);
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly user = inject(FormBuilder).nonNullable.group({
@@ -44,7 +42,6 @@ export default class JoinUsComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    this.seo.setPageTitle("GMCAN | " + this.language.join);
   }
 
   fieldError(name: JoinUsField): string | null {

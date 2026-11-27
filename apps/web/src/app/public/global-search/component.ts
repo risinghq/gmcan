@@ -22,7 +22,6 @@ import { publicationDisplay } from "@app/shared/publication-display";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateText } from "@app/shared/utils/date";
 import {
@@ -66,7 +65,6 @@ export default class GlobalSearchComponent {
   private readonly router = inject(Router);
   private readonly lookup = inject(LookupService);
   private readonly browser = inject(BrowserService);
-  private readonly seo = inject(SeoService);
 
   protected readonly language = inject(SessionService).language;
   protected readonly query = signal("");
@@ -94,11 +92,7 @@ export default class GlobalSearchComponent {
   protected readonly newsExpanded = signal(true);
 
   constructor() {
-    this.route.params.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const nombre = params["id"] as string;
-      this.seo.setPageTitle("GMCAN | " + nombre);
-      this.query.set(nombre);
-    });
+    this.route.params.pipe(takeUntilDestroyed()).subscribe((params) => this.query.set(params["id"] as string));
   }
 
   searchGlobal(value: string): void {

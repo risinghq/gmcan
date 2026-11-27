@@ -14,6 +14,7 @@ import { GLOBAL } from "@app/shared/services/global";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
+import { personName } from "@app/shared/utils/person-name";
 import type { PublicMember, PublicMemberProfile } from "@gmcan/contracts/public";
 import {
   NgbPagination,
@@ -81,8 +82,7 @@ export default class DetailMemberComponent {
   constructor() {
     effect(() => {
       const m = this.member();
-      const name = [m.firstName, m.lastName, m.maternalName].filter(Boolean).join(" ");
-      this.seo.setPageTitle("GMCAN | " + name);
+      const name = personName(m);
       if (m.bio) this.seo.setDescription(m.bio);
       this.seo.setImage(m.photoUrl);
       this.seo.setStructuredData({

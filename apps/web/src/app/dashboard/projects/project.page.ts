@@ -15,6 +15,7 @@ import { LookupService } from "@app/shared/services/lookup.service";
 import { ProjectService } from "@app/shared/services/project.service";
 import { parseLocalDate, toIsoDate } from "@app/shared/utils/date";
 import { toMinorUnits } from "@app/shared/utils/money";
+import { personName } from "@app/shared/utils/person-name";
 import type { AdminProject, ProjectWrite } from "@gmcan/contracts/admin";
 import type { CurrencyCode, FundingSourceCode, ProjectStatusCode } from "@gmcan/contracts/public";
 import { firstValueFrom, map } from "rxjs";
@@ -25,10 +26,6 @@ import { RecordSave } from "../content/forms/record-save";
 import { requiredText } from "../content/forms/text-fields";
 import type { ResearchLineOption } from "../dashboard.resolvers";
 import { isOngoing, projectListPath } from "./project-status";
-
-function fullName(member: AdminMemberListItem): string {
-  return [member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
-}
 
 function projectForm() {
   return new FormGroup({
@@ -217,10 +214,12 @@ export default class ProjectPage implements OnInit, HasUnsavedChanges {
 
   readonly locales = CONTENT_LOCALES;
   readonly label = localeLabel;
-  readonly name = fullName;
+  readonly name = personName;
   readonly fundingSources = computed(() => this.lookup.fundingSources());
   readonly currencies = computed(() => this.lookup.currencies());
-  readonly sortedMembers = computed(() => this.members().toSorted((a, b) => fullName(a).localeCompare(fullName(b))));
+  readonly sortedMembers = computed(() =>
+    this.members().toSorted((a, b) => personName(a).localeCompare(personName(b))),
+  );
   readonly form = projectForm();
   readonly valid = toSignal(this.form.statusChanges.pipe(map((status) => status === "VALID")), {
     initialValue: false,

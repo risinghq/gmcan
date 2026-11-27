@@ -3,7 +3,6 @@ import { Component, inject, input, ChangeDetectionStrategy } from "@angular/core
 import type { ResearchLineDisplay } from "@app/public/about/data";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { ProjectItemComponent } from "@app/shared/components/project-item.component";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import {
   NgbPagination,
@@ -29,7 +28,6 @@ import {
   ],
 })
 export default class LinesInvestigationComponent {
-  private seo = inject(SeoService);
   private session = inject(SessionService);
 
   readonly language = this.session.language;
@@ -38,10 +36,6 @@ export default class LinesInvestigationComponent {
   public pageSize = 5;
   public expandedLineId: number | null = null;
   public pageByLineId: Record<number, number> = {};
-
-  constructor() {
-    this.seo.setPageTitle("GMCAN | " + this.language().linesInvestigation);
-  }
 
   toggleLine(lineId: number): void {
     this.expandedLineId = this.expandedLineId === lineId ? null : lineId;

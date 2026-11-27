@@ -10,7 +10,6 @@ import { SearchBoxComponent } from "@app/shared/components/search-box.component"
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
-import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import type { PublicProject } from "@gmcan/contracts/public";
 import {
@@ -46,7 +45,6 @@ export default class ProjectsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly browser = inject(BrowserService);
   private readonly session = inject(SessionService);
-  private readonly seo = inject(SeoService);
 
   private allActive: PublicProject[] = [];
   private allFinished: PublicProject[] = [];
@@ -62,7 +60,6 @@ export default class ProjectsComponent implements OnInit {
 
   ngOnInit(): void {
     this.language = this.session.language();
-    this.seo.setPageTitle("GMCAN | " + this.language.projects);
     this.page = 1;
     this.pageSize = 5;
 
