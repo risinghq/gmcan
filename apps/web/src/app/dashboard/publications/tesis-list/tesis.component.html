@@ -9,7 +9,7 @@
           (keyup)="theses.filterFrom($event)"
           placeholder="Buscar tesis por título, universidad o fecha de publicación"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <button type="button" class="center btn-black" (click)="addThesis()">
         <span class="link">Agregar tesis</span>
@@ -82,7 +82,7 @@
           (keyup)="universities.filterFrom($event)"
           placeholder="Buscar universidad por nombre"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <button type="button" class="center btn-black" (click)="addUniversidad()">
         <span class="link">Agregar universidad</span>

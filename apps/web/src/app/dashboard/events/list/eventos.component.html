@@ -9,7 +9,7 @@
           (keyup)="abstracts.filterFrom($event)"
           placeholder="Buscar resúmen por título, fecha de publicación o evento"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <button type="button" class="center btn-black" (click)="addResumen()">
         <span class="link">Agregar resumen</span>
@@ -84,7 +84,7 @@
           (keyup)="events.filterFrom($event)"
           placeholder="Buscar evento por nombre, país o ciudad"
         />
-        <mat-icon class="icon-search-toolbar" aria-hidden="true">search</mat-icon>
+        <app-icon class="icon-search-toolbar" name="search" />
       </div>
       <button type="button" class="center btn-black" (click)="addEvento()">
         <span class="link">Agregar evento</span>

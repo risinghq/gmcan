@@ -1,5 +1,4 @@
 import { type AfterViewInit, ChangeDetectionStrategy, Component, inject, viewChild } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
@@ -17,6 +16,7 @@ import {
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import type { AdminPublicationListItem } from "@app/shared/models/admin-list";
 import type { EventItem } from "@app/shared/services/event.service";
 import { EventService } from "@app/shared/services/event.service";
@@ -33,7 +33,7 @@ import { ListTable, byName } from "@app/shared/tables/list-table";
     AvatarComponent,
     MatTabGroup,
     MatTab,
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,

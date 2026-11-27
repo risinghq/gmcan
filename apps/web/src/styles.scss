@@ -15,28 +15,20 @@
 @import "@fontsource/ibm-plex-serif/latin-600.css";
 @import "@fontsource/ibm-plex-serif/latin-700.css";
 
-@font-face {
-  font-family: "Material Symbols Outlined";
-  font-style: normal;
-  font-weight: 400;
-  font-display: block;
-  src: url("./fonts/material-symbols.woff2") format("woff2");
-}
-
-.material-symbols-outlined {
-  font-family: "Material Symbols Outlined";
-  font-weight: normal;
-  font-style: normal;
+app-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
   font-size: 24px;
   line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  font-feature-settings: "liga";
-  -webkit-font-smoothing: antialiased;
+  user-select: none;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 html {
@@ -364,11 +356,11 @@ mat-sidenav-content.page-column {
   background: none;
   cursor: pointer;
 
-  .mat-icon {
+  app-icon {
     transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  &[aria-expanded="true"] .mat-icon {
+  &[aria-expanded="true"] app-icon {
     transform: rotate(180deg);
   }
 }
@@ -690,8 +682,6 @@ svg {
     .pag-arrow {
       color: var(--muted-text);
       font-size: 32px;
-      height: inherit;
-      width: inherit;
     }
   }
 }

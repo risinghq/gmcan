@@ -3,7 +3,7 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="member-links">
         <a class="member-link-active" routerLink="/">{{ language.home }}</a>
-        <mat-icon class="member-icon"> arrow_right </mat-icon>
+        <app-icon class="member-icon" name="caret-right" />
         <span class="member-link" aria-current="page">{{ language.members }}</span>
       </div>
       <div class="member-card">
@@ -43,7 +43,7 @@
                       [queryParams]="{ from: 'members' }"
                     >
                       {{ language.membersText[0].seeProfile }}
-                      <mat-icon class="profile-icon"> keyboard_arrow_right </mat-icon>
+                      <app-icon class="profile-icon" name="chevron-right" />
                     </a>
                   </div>
                 </div>

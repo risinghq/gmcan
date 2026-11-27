@@ -1,9 +1,10 @@
+import type { IconName } from "@app/shared/components/icon/icons";
 import type { Capability } from "@app/shared/models/capabilities";
 
 export interface NavLink {
   path: string;
   label: string;
-  icon: string;
+  icon: IconName;
   capability?: Capability;
 }
 
@@ -16,14 +17,14 @@ export interface NavSection {
 export const DASHBOARD_NAV: NavSection[] = [
   {
     links: [
-      { path: "/dashboard", label: "Dashboard", icon: "dashboard" },
-      { path: "/dashboard/news", label: "Noticias", icon: "chrome_reader_mode", capability: "news.write" },
+      { path: "/dashboard", label: "Dashboard", icon: "layout-dashboard" },
+      { path: "/dashboard/news", label: "Noticias", icon: "news", capability: "news.write" },
     ],
   },
   {
     title: "Miembros",
     links: [
-      { path: "/dashboard/miembros-activos", label: "Miembros Activos", icon: "group", capability: "members.read" },
+      { path: "/dashboard/miembros-activos", label: "Miembros Activos", icon: "users", capability: "members.read" },
       { path: "/dashboard/miembros-antiguos", label: "Miembros antiguos", icon: "history", capability: "members.read" },
     ],
   },
@@ -32,7 +33,12 @@ export const DASHBOARD_NAV: NavSection[] = [
     links: [
       { path: "/dashboard/articulos", label: "Artículos", icon: "article", capability: "publications.write" },
       { path: "/dashboard/tesis", label: "Tesis", icon: "school", capability: "publications.write" },
-      { path: "/dashboard/eventos", label: "Resumen en eventos", icon: "event", capability: "publications.write" },
+      {
+        path: "/dashboard/eventos",
+        label: "Resumen en eventos",
+        icon: "calendar-event",
+        capability: "publications.write",
+      },
     ],
   },
   {
@@ -41,13 +47,13 @@ export const DASHBOARD_NAV: NavSection[] = [
       {
         path: "/dashboard/proyectos-ejecucion",
         label: "Proyectos en ejecución",
-        icon: "pending_actions",
+        icon: "clock-edit",
         capability: "projects.write",
       },
       {
         path: "/dashboard/proyectos-concluidos",
         label: "Proyectos concluidos",
-        icon: "task_alt",
+        icon: "circle-check",
         capability: "projects.write",
       },
     ],
@@ -55,14 +61,16 @@ export const DASHBOARD_NAV: NavSection[] = [
   {
     title: "Mi perfil",
     links: [
-      { path: "/dashboard/perfil", label: "Mi información personal", icon: "person" },
+      { path: "/dashboard/perfil", label: "Mi información personal", icon: "user" },
       { path: "/dashboard/my-articles", label: "Mis artículos", icon: "article" },
       { path: "/dashboard/my-thesis", label: "Mis tesis", icon: "school" },
-      { path: "/dashboard/my-abstracts", label: "Mis resúmenes en eventos", icon: "event" },
+      { path: "/dashboard/my-abstracts", label: "Mis resúmenes en eventos", icon: "calendar-event" },
     ],
   },
   {
-    links: [{ path: "/dashboard/contenidos", label: "Contenidos", icon: "description", capability: "content.write" }],
+    links: [
+      { path: "/dashboard/contenidos", label: "Contenidos", icon: "file-description", capability: "content.write" },
+    ],
   },
 ];
 

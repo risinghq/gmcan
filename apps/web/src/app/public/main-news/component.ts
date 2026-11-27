@@ -1,10 +1,10 @@
 import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { rxResource } from "@angular/core/rxjs-interop";
 import { MatButton } from "@angular/material/button";
-import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { ActivatedRoute, RouterLink } from "@angular/router";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -43,7 +43,7 @@ function toNewsCard(n: PublicNewsListItem, locale: string): PublicNewsCard {
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     RouterLink,
-    MatIcon,
+    IconComponent,
     MatProgressSpinner,
     MatButton,
     MatMenuTrigger,

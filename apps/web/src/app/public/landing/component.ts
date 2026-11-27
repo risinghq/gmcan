@@ -1,10 +1,10 @@
 import { Component, inject, viewChild, ChangeDetectionStrategy } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { MatIcon } from "@angular/material/icon";
 import { MatMenuTrigger, MatMenu, MatMenuItem } from "@angular/material/menu";
 import { MatSidenavContainer, MatSidenav, MatSidenavContent } from "@angular/material/sidenav";
 import { MatToolbar } from "@angular/material/toolbar";
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { GLOBAL } from "@app/shared/services/global";
 import { GroupService } from "@app/shared/services/group.service";
 import { SeoService } from "@app/shared/services/seo.service";
@@ -21,7 +21,7 @@ import { distinctUntilChanged, filter, map, skip, tap } from "rxjs";
   imports: [
     MatSidenavContainer,
     MatSidenav,
-    MatIcon,
+    IconComponent,
     RouterLink,
     RouterLinkActive,
     MatSidenavContent,

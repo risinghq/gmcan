@@ -34,6 +34,7 @@
             "tsConfig": "tsconfig.app.json",
             "polyfills": ["@angular/localize/init"],
             "inlineStyleLanguage": "scss",
+            "loader": { ".svg": "text" },
             "assets": [{ "glob": "**/*", "input": "public" }],
             "styles": ["src/styles.scss"],
             "stylePreprocessorOptions": {

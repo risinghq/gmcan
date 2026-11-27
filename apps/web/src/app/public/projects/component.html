@@ -3,7 +3,7 @@
     <div class="col-lg-8 col-sm-6 col-12">
       <div class="project-links">
         <a class="project-link-active" routerLink="/">{{ language.home }}</a>
-        <mat-icon class="project-icon"> arrow_right </mat-icon>
+        <app-icon class="project-icon" name="caret-right" />
         <span class="project-link" aria-current="page">{{ language.projects }}</span>
       </div>
       <div class="project-card-div">
@@ -15,7 +15,7 @@
             <form class="mt-16" [formGroup]="searchForm">
               <div class="flex-news">
                 <div class="input-search-project">
-                  <mat-icon class="icon-search">search</mat-icon>
+                  <app-icon class="icon-search" name="search" />
                   <input
                     (keyup.enter)="search(titulo.value)"
                     #titulo
@@ -84,7 +84,7 @@
                     >
                       {{ expandLabel( "proj", i, this.language.projectsText[0].seeMore,
                       this.language.projectsText[0].seeLess ) }}
-                      <mat-icon class="project-abs-icon" aria-hidden="true">keyboard_arrow_down</mat-icon>
+                      <app-icon class="project-abs-icon" name="chevron-down" />
                     </button>
                   </div>
                 </div>
@@ -126,7 +126,7 @@
               >
                 <ng-template class="unique-left" ngbPaginationPrevious>
                   <div class="h-ih">
-                    <mat-icon class="pag-arrow"> keyboard_arrow_left </mat-icon>
+                    <app-icon class="pag-arrow" name="chevron-left" />
                   </div>
                 </ng-template>
                 <ng-template ngbPaginationNumber let-page>
@@ -134,7 +134,7 @@
                 </ng-template>
                 <ng-template ngbPaginationNext>
                   <div class="h-ih">
-                    <mat-icon class="pag-arrow" style="padding-bottom: 20px"> keyboard_arrow_right </mat-icon>
+                    <app-icon class="pag-arrow" name="chevron-right" />
                   </div>
                 </ng-template>
               </ngb-pagination>

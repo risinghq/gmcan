@@ -72,12 +72,10 @@ changes:
   [`services/assets/types.ts`](../apps/api/services/assets/types.ts) and
   [`validators.ts`](../apps/api/services/assets/validators.ts)
   ([assets](../docs/assets.md)).
-- **A new icon.** The app serves its own subset of Material Symbols, holding
-  only the icons the source uses: a `<mat-icon>` name, or an `icon: "..."` field
-  read by a binding listed in [`scripts/icon-font.ts`](../scripts/icon-font.ts).
-  After adding one, run `bun scripts/icon-font.ts` to download the new subset
-  into [`apps/web/src/fonts`](../apps/web/src/fonts). `bun run lint` fails on an
-  icon the subset lacks, and on `<mat-icon>` content it cannot read as a name.
+- **A new icon.** Pick it from [Tabler Icons](https://tabler.io/icons), import
+  its SVG in [`icons.ts`](../apps/web/src/app/shared/components/icon/icons.ts),
+  and draw it with `<app-icon name="..." />`. Only the imported icons ship in
+  the bundle.
 
 ## Documentation
 

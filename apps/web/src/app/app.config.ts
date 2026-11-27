@@ -6,7 +6,6 @@ import {
   provideAppInitializer,
   provideZonelessChangeDetection,
 } from "@angular/core";
-import { MAT_ICON_DEFAULT_OPTIONS } from "@angular/material/icon";
 import {
   provideClientHydration,
   withEventReplay,
@@ -57,6 +56,5 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAppInitializer(() => inject(LookupService).load()),
     { provide: TitleStrategy, useClass: AppTitleStrategy },
-    { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: "material-symbols-outlined" } },
   ],
 };

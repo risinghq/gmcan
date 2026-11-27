@@ -1,5 +1,4 @@
 import { Component, OnInit, inject, ChangeDetectionStrategy, computed, signal } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatSort, MatSortHeader, Sort } from "@angular/material/sort";
 import {
@@ -17,6 +16,7 @@ import {
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admin-list";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
@@ -44,7 +44,7 @@ interface NewsListItem {
     AvatarComponent,
     MatTabGroup,
     MatTab,
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,

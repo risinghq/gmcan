@@ -1,6 +1,6 @@
 import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
-import { MatIcon } from "@angular/material/icon";
 import { RouterOutlet, RouterLink, RouterLinkActive } from "@angular/router";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 
 import { AboutFacade } from "./facade";
 
@@ -8,7 +8,7 @@ import { AboutFacade } from "./facade";
   selector: "app-about",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
-  imports: [MatIcon, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [IconComponent, RouterOutlet, RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.Eager,
   providers: [AboutFacade],
 })

@@ -1,6 +1,5 @@
 import { type AfterViewInit, ChangeDetectionStrategy, Component, inject, viewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { MatIcon } from "@angular/material/icon";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort, MatSortHeader } from "@angular/material/sort";
 import {
@@ -17,6 +16,7 @@ import {
 } from "@angular/material/table";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
 import { countMissingRequirements } from "@app/shared/member-publishability/utils";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
@@ -30,7 +30,7 @@ import { ListTable } from "@app/shared/tables/list-table";
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AvatarComponent,
-    MatIcon,
+    IconComponent,
     MatTable,
     MatSort,
     MatColumnDef,

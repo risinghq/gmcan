@@ -18,7 +18,7 @@
             [routerLinkActiveOptions]="{ exact: true }"
             [activated]="active.isActive"
           >
-            <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+            <app-icon matListItemIcon [name]="link.icon" />
             <span matListItemTitle>{{ link.label }}</span>
           </a>
         }
@@ -34,7 +34,7 @@
         [attr.aria-expanded]="drawer.opened"
         (click)="drawer.toggle()"
       >
-        <mat-icon aria-hidden="true">menu</mat-icon>
+        <app-icon name="menu" />
       </button>
       <div class="flex-news">
         <div class="tool-text middle">{{ dashboardTitle() }}</div>
@@ -74,7 +74,7 @@
             #menuTrigger="matMenuTrigger"
             (mouseover)="menuTrigger.openMenu()"
           >
-            <mat-icon aria-hidden="true">arrow_drop_down</mat-icon>
+            <app-icon name="caret-down" />
           </button>
           <mat-menu #menu="matMenu" [overlapTrigger]="false">
             <span (mouseleave)="menuTrigger.closeMenu()">

@@ -2,7 +2,6 @@ import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy, compu
 import { MatIconButton } from "@angular/material/button";
 import { MatDialog } from "@angular/material/dialog";
 import { MatDivider } from "@angular/material/divider";
-import { MatIcon } from "@angular/material/icon";
 import {
   MatListItem,
   MatListItemIcon,
@@ -16,6 +15,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } fr
 import { NavigationEnd } from "@angular/router";
 import type { ToolbarBadge } from "@app/dashboard/dashboard.resolvers";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { confirmAction } from "@app/shared/forms/confirm-dialog.component";
 import type { Group } from "@app/shared/models/factories";
 import { deepestChild, deriveFromRoute, routeTitle } from "@app/shared/routing/derived-data";
@@ -40,7 +40,7 @@ import { DASHBOARD_NAV, visibleNav } from "./nav";
     RouterLink,
     RouterLinkActive,
     MatIconButton,
-    MatIcon,
+    IconComponent,
     MatMenuTrigger,
     MatMenu,
     MatMenuItem,
