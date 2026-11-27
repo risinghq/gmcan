@@ -175,29 +175,7 @@
             @if (miembros().length == 0) {
             <div class="not-found-1">{{ language().noResultsMembers }}</div>
             } @for (miembro of miembros(); track miembro.id; let i = $index) {
-            <div class="flex-news" [class.mb-24]="i + 1 != miembros().length">
-              <div class="miembro-img-div">
-                <app-avatar
-                  class="miembro-img"
-                  [src]="miembro.photoUrl"
-                  [alt]="miembro.photoAlt"
-                  [name]="miembro.firstName + ' ' + miembro.lastName"
-                />
-              </div>
-              <div class="miembro-text">
-                <div class="miembro-name full-width">
-                  {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
-                </div>
-                <a
-                  class="miembro-profile plain-link"
-                  [routerLink]="['/detail-member', miembro.id]"
-                  [queryParams]="{ from: 'search' }"
-                >
-                  {{ language().membersText[0].seeProfile }}
-                  <app-icon class="profile-icon" name="chevron-right" />
-                </a>
-              </div>
-            </div>
+            <app-member-row [class.mb-24]="i + 1 != miembros().length" [member]="miembro" from="search" />
             }
           </div>
         </div>

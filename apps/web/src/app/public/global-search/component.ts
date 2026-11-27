@@ -10,10 +10,10 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BackLinkComponent } from "@app/shared/components/back-link.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { MemberRowComponent } from "@app/shared/components/member-row.component";
 import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { PublicationItemComponent } from "@app/shared/components/publication-item.component";
@@ -52,7 +52,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
     SearchBoxComponent,
     ProjectMembersComponent,
     BreadcrumbComponent,
-    AvatarComponent,
+    MemberRowComponent,
     RouterLink,
     IconComponent,
     NewsMetaComponent,

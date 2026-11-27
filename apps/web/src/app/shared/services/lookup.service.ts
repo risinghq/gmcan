@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, inject, signal } from "@angular/core";
+import type { PublicMember } from "@gmcan/contracts/public";
 import { catchError, defer, firstValueFrom, of } from "rxjs";
 
 import type { LookupData } from "../models/lookup";
@@ -73,6 +74,13 @@ export class LookupService {
 
   prefixes() {
     return this.data().prefixes;
+  }
+
+  /** A member's public name. The "none" and "bach" prefixes print nothing. */
+  memberName(member: Pick<PublicMember, "prefixCode" | "firstName" | "lastName" | "maternalName">): string {
+    const shown = member.prefixCode !== "none" && member.prefixCode !== "bach";
+    const title = shown ? this.data().prefixes.find((item) => item.code === member.prefixCode)?.label : undefined;
+    return [title, member.firstName, member.lastName, member.maternalName].filter(Boolean).join(" ");
   }
 
   universities() {
