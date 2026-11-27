@@ -30,7 +30,7 @@ export function dateText(value: string | null | undefined, format: string, local
   return date ? formatDate(date, format, locale) : "";
 }
 
-/** {@link dateText} capitalized as the start of a line: "Junio, 2026". */
+/** {@link dateText} capitalized as the start of a line: "Junio 2026". */
 export function dateLabel(value: string | null | undefined, format: string, locale: string): string {
   const text = dateText(value, format, locale);
   return text.charAt(0).toUpperCase() + text.slice(1);
