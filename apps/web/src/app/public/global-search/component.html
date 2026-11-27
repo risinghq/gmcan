@@ -307,29 +307,34 @@
           <div class="collapse" [class.show]="newsExpanded()" id="collapseNews">
             @if (noticias().length == 0) {
             <div class="not-found-1">{{ language().noResultsNews }}</div>
-            } @for (noticia of noticias(); track noticia.id) {
-            <div class="news-div-list">
-              <div class="img-hover-zoom">
-                @if (!noticia.asset) {
-                <img class="card-img-div" loading="lazy" src="/img/grupal.avif" alt="" />
-                } @if (noticia.asset) {
-                <img class="card-img-div" loading="lazy" src="{{ noticia.asset }}" alt="" />
-                }
-              </div>
-              <div class="card-text-div card-text-div-3">
-                <div class="flex-news flex-news-3">
-                  <div class="news-type">{{ noticia.nombreTipoNoticia }}</div>
-                  <div class="other-news-date">{{ noticia.fechaFormateada }}</div>
+            } @else {
+            <ul class="other-news-list">
+              @for (noticia of noticias(); track noticia.id) {
+              <li class="other-news">
+                <div class="other-news-text">
+                  <app-news-meta
+                    class="news-meta"
+                    [type]="noticia.nombreTipoNoticia ?? ''"
+                    [date]="noticia.publishedAt"
+                    [label]="noticia.fechaFormateada"
+                  />
+                  <a
+                    class="news-link stretched-link"
+                    [routerLink]="['/detail-news', noticia.id]"
+                    [queryParams]="{ from: 'search' }"
+                  >
+                    {{ noticia.title }}
+                  </a>
+                  <p class="news-author">{{ language().newsText[0].by }} {{ noticia.authorName }}</p>
                 </div>
-                <a
-                  class="other-news-text-2 plain-link"
-                  [routerLink]="['/detail-news', noticia.id]"
-                  [queryParams]="{ from: 'search' }"
-                  >{{ noticia.title }}</a
-                >
-                <div class="news-author">{{ language().newsText[0].by }} {{ noticia.authorName }}</div>
-              </div>
-            </div>
+                @if (noticia.asset) {
+                <div class="other-news-img">
+                  <img loading="lazy" src="{{ noticia.asset }}" alt="" />
+                </div>
+                }
+              </li>
+              }
+            </ul>
             }
           </div>
         </div>

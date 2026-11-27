@@ -103,7 +103,7 @@
 }
 
 @media (max-width: 1299px) {
-  .other-news:nth-child(n + 6) {
+  .other-news-list.capped .other-news:nth-child(n + 6) {
     display: none;
   }
 }

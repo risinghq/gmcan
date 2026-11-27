@@ -13,6 +13,7 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
 import { SearchBoxComponent } from "@app/shared/components/search-box.component";
@@ -60,6 +61,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
     AvatarComponent,
     RouterLink,
     IconComponent,
+    NewsMetaComponent,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,

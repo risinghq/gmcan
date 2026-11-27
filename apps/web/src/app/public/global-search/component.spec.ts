@@ -29,6 +29,18 @@ function article(id: number, title: string): Publication {
   };
 }
 
+function newsItem(id: number, asset: string | null): GlobalSearchResults["news"][number] {
+  return {
+    id,
+    title: `Noticia ${id}`,
+    publishedAt: "2024-06-11",
+    asset,
+    newsKindCode: "event",
+    statusCode: "published",
+    authorName: "Ana Torres",
+  };
+}
+
 function thesis(id: number, title: string): Publication {
   return {
     ...article(id, title),
@@ -80,7 +92,7 @@ describe("GlobalSearchComponent", () => {
         journals: [{ id: 7, name: "Nano Letters" }],
         universities: [{ id: 3, name: "UNI" }],
         events: [],
-        newsKinds: [],
+        newsKinds: [{ code: "event", name: "Evento" }],
         currencies: [],
       } as Partial<LookupData>);
     await loaded;
@@ -116,6 +128,22 @@ describe("GlobalSearchComponent", () => {
     expect(texts(".publication-rev")).toContain("UNI");
     expect(texts(".publication-date")).toContain("Marzo 2024");
     expect(page().querySelector(".not-found-2")).toBeNull();
+  });
+
+  it("lists every news result as one link with its kind, date and an image only when it has one", async () => {
+    const many = Array.from({ length: 7 }, (_, index) =>
+      newsItem(index + 1, index === 0 ? "/assets/news-1.webp" : null),
+    );
+    await search("noticia", { ...EMPTY, news: many });
+    const rows = [...page().querySelectorAll("#collapseNews .other-news")];
+
+    expect(rows).toHaveLength(7);
+    for (const row of rows) {
+      expect(row.querySelectorAll("a")).toHaveLength(1);
+      expect(row.querySelector(".type")?.textContent).toBe("Evento");
+      expect(row.querySelector("time")?.getAttribute("datetime")).toBe("2024-06-11");
+    }
+    expect(rows.map((row) => row.querySelectorAll("img").length)).toEqual([1, 0, 0, 0, 0, 0, 0]);
   });
 
   it("replaces the results and the search box when the next search arrives", async () => {
