@@ -97,7 +97,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
           </div>
           <ng-content />
         </div>
-        <div class="ml-24 photo">
+        <div class="ml-24">
           <app-image-field label="Imagen de perfil" [current]="photoUrl()" (picked)="photo.emit($event)" />
         </div>
       </div>

@@ -46,11 +46,7 @@
                     </button>
                   </div>
                 </div>
-                <div
-                  class="collapse collapsed-resumen mt-16"
-                  [class.show]="isExpanded('proj', i)"
-                  [id]="'project-' + i"
-                >
+                <div class="collapse mt-16" [class.show]="isExpanded('proj', i)" [id]="'project-' + i">
                   <div class="abstract mb-8">
                     <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
                     {{ proyecto.description }}
@@ -82,7 +78,7 @@
                 [pageSize]="pageSize"
                 [collectionSize]="currentProjects.length"
               >
-                <ng-template class="unique-left" ngbPaginationPrevious>
+                <ng-template ngbPaginationPrevious>
                   <div class="h-ih">
                     <app-icon class="pag-arrow" name="chevron-left" />
                   </div>

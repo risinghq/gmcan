@@ -259,11 +259,7 @@
             </button>
           </div>
         </div>
-        <div
-          class="collapse collapsed-resumen project-mt"
-          [class.show]="isExpanded('home-proj', i)"
-          [id]="'home-project-' + i"
-        >
+        <div class="collapse project-mt" [class.show]="isExpanded('home-proj', i)" [id]="'home-project-' + i">
           <div class="abstract mb-8">
             <strong class="abstract-title"> {{ this.language.projectsText[0].description }}: </strong>
             {{ proyecto.description }}
