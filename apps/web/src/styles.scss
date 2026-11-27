@@ -691,17 +691,6 @@ button.forgot {
   color: var(--muted-accent);
 }
 
-.share {
-  @extend .fecha;
-  margin-top: unset;
-  display: inline-flex;
-}
-
-.share-icon {
-  margin-left: 12px;
-  align-self: center;
-}
-
 .preview-2 {
   margin-left: auto;
 }
@@ -835,19 +824,6 @@ mat-spinner {
   position: absolute;
   bottom: 0;
   right: 0;
-}
-.share-icon:hover {
-  border: solid 1px #b5b5b5;
-}
-.share-icon {
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  font-size: 15px;
-  padding: 7px;
-  border-radius: 4px;
-  border: solid 1px #30393a;
-  margin-left: 8px;
 }
 
 .not-found {

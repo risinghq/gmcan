@@ -3,7 +3,7 @@ import { RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent, type Crumb } from "@app/shared/components/breadcrumb.component";
 import NewsComponent from "@app/shared/components/news/news.component";
-import { SharedShareButtonsComponent } from "@app/shared/components/shared-share-buttons.component";
+import { ShareLinksComponent } from "@app/shared/components/share-links.component";
 import type { PublicNewsDetail } from "@app/shared/models/news";
 import { originLabel, originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { GLOBAL } from "@app/shared/services/global";
@@ -17,7 +17,7 @@ import type { DetailNewsViewModel } from "./types";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BreadcrumbComponent, AvatarComponent, RouterLink, NewsComponent, SharedShareButtonsComponent],
+  imports: [BreadcrumbComponent, AvatarComponent, RouterLink, NewsComponent, ShareLinksComponent],
 })
 export default class DetailNewsComponent {
   private readonly seo = inject(SeoService);
