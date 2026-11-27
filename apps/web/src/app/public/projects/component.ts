@@ -1,5 +1,5 @@
 import { SlicePipe } from "@angular/common";
-import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
@@ -58,23 +58,13 @@ export default class ProjectsComponent implements OnInit {
   language: (typeof Languages)[number] = Languages[0];
   page = 1;
   pageSize = 5;
-  screenWidth = 0;
-  searchText = "";
   expandedKey: string | null = null;
-
-  @HostListener("window:resize", ["$event"])
-  onResize(_event: Event): void {
-    this.screenWidth = this.browser.innerWidth();
-    this.setSearchText();
-  }
 
   ngOnInit(): void {
     this.language = this.session.language();
     this.seo.setPageTitle("GMCAN | " + this.language.projects);
-    this.screenWidth = this.browser.innerWidth();
     this.page = 1;
     this.pageSize = 5;
-    this.setSearchText();
 
     const projectsData = this.route.snapshot.data["projects"] as ProjectsViewModel;
     this.allActive = projectsData.active;
@@ -87,13 +77,6 @@ export default class ProjectsComponent implements OnInit {
 
   ngDoCheck(): void {
     this.syncLabels();
-  }
-
-  setSearchText(): void {
-    this.searchText = this.language.projectsText[0].placeholderMobile;
-    if (this.screenWidth > 960) {
-      this.searchText = this.language.projectsText[0].placeholder;
-    }
   }
 
   changeTab($event: { index: number }): void {
