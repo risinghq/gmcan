@@ -1,4 +1,3 @@
-import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ReactiveFormsModule } from "@angular/forms";
@@ -17,7 +16,7 @@ import { optionalText, requiredText } from "./text-fields";
 
 @Component({
   selector: "app-research-line-page",
-  imports: [ReactiveFormsModule, CdkTextareaAutosize, ContentFormComponent, ImageFieldComponent],
+  imports: [ReactiveFormsModule, ContentFormComponent, ImageFieldComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./content-form.scss",
   template: `
@@ -38,7 +37,7 @@ import { optionalText, requiredText } from "./text-fields";
                 <div class="text-category">Nombre de línea <span class="red-text">*</span></div>
                 <input class="input-category" formControlName="name" />
                 <div class="text-category">Descripción</div>
-                <textarea class="input-category" formControlName="description" cdkTextareaAutosize></textarea>
+                <textarea class="input-category" formControlName="description"></textarea>
               </div>
             }
           </div>

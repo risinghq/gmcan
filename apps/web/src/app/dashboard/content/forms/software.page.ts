@@ -1,4 +1,3 @@
-import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
@@ -15,7 +14,7 @@ import { optionalText, requiredText } from "./text-fields";
 
 @Component({
   selector: "app-software-page",
-  imports: [ReactiveFormsModule, CdkTextareaAutosize, ContentFormComponent],
+  imports: [ReactiveFormsModule, ContentFormComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./content-form.scss",
   template: `
@@ -34,7 +33,7 @@ import { optionalText, requiredText } from "./text-fields";
             <div class="text-category">Nombre del software <span class="red-text">*</span></div>
             <input class="input-category" formControlName="name" />
             <div class="text-category">Descripción</div>
-            <textarea class="input-category" formControlName="description" cdkTextareaAutosize></textarea>
+            <textarea class="input-category" formControlName="description"></textarea>
           </div>
         }
       </form>

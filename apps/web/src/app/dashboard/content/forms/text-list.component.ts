@@ -12,7 +12,7 @@ import { requiredText } from "./text-fields";
     <div class="mb-12">{{ label() }}</div>
     @for (control of list().controls; track control; let i = $index) {
       <div class="flex-news mb-12">
-        <textarea class="input-category full-width" rows="2" [formControl]="control"></textarea>
+        <textarea class="input-category full-width" [formControl]="control"></textarea>
         <button type="button" class="link green-text ml-16 plex-sans" (click)="remove(i)">Quitar</button>
       </div>
     }

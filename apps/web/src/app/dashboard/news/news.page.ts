@@ -1,4 +1,3 @@
-import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -67,7 +66,6 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
   imports: [
     AvatarComponent,
     ReactiveFormsModule,
-    CdkTextareaAutosize,
     ContentFormComponent,
     ImageFieldComponent,
     RichTextEditorComponent,
@@ -152,7 +150,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
               <div class="text-category">
                 Resumen <span>({{ fields.summary.value.length }}/500)</span> <span class="red-text">*</span>
               </div>
-              <textarea class="input-category" formControlName="summary" maxlength="500" cdkTextareaAutosize></textarea>
+              <textarea class="input-category" formControlName="summary" maxlength="500"></textarea>
               <div class="flex-news">
                 <div class="text-category">Contenido <span class="red-text">*</span></div>
                 <button type="button" class="link green-text top-auto right plex-sans" (click)="preview(locale)">
