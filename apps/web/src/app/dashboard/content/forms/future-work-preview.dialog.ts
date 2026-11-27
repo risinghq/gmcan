@@ -16,7 +16,7 @@ export interface FutureWorkPreview {
         <div class="works-title">Trabajos Futuros</div>
         <div class="works-subtitle">Perspectivas del Grupo</div>
         <div class="works-sub-divi"></div>
-        <div [innerHTML]="data.futureWork"></div>
+        <div class="works-text" [innerHTML]="data.futureWork"></div>
       </div>
     </div>
     <div class="outside" [mat-dialog-close]="false">X</div>

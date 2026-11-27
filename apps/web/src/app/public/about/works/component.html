@@ -3,6 +3,6 @@
     <h1 class="works-title">{{ language().worksText[0].title }}</h1>
     <div class="works-subtitle">{{ language().worksText[0].subtitle }}</div>
     <div class="works-sub-divi"></div>
-    <div [innerHTML]="group()?.futureWork ?? ''"></div>
+    <div class="works-text" [innerHTML]="group()?.futureWork ?? ''"></div>
   </div>
 </div>

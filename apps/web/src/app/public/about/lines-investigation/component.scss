@@ -1,24 +1,9 @@
 @use "../../../shared/styles/project-list";
 
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
-.plex-sans {
-  font-family: "IBM Plex Sans", serif;
-  @extend .plex-sans;
-}
-
 .card-lines {
-  @extend .plex-sans;
   border-radius: 4px;
   padding: 8px;
   background-color: #ffffff;
-}
-.lines-img {
-  width: 100%;
-  object-fit: cover;
-  border-radius: 4px;
 }
 .lines-title {
   line-height: 1.17;
@@ -39,22 +24,6 @@
   letter-spacing: 0.3px;
   color: #30393a;
   border-bottom: 2px solid #30393a;
-}
-.lines-text {
-  white-space: pre-wrap;
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-.lines-sub-divi {
-  height: 2px;
-  width: 40px;
-  background-color: #006400;
-}
-.lines-icon {
-  vertical-align: middle;
-  height: 24px;
 }
 
 .line-line-div {
@@ -99,14 +68,8 @@
     height: 100px;
     margin-bottom: 24px;
   }
-  .lines-text {
-    margin-bottom: 32px;
-  }
   .card-lines {
     padding-bottom: 40px;
-  }
-  .lines-img {
-    height: 300px;
   }
   .lines-text-div {
     padding-left: 40px;
@@ -117,13 +80,6 @@
     font-size: 30px;
   }
   .lines-subtitle {
-    font-size: 15px;
-  }
-  .lines-sub-divi {
-    margin-top: 22px;
-    margin-bottom: 16px;
-  }
-  .lines-text {
     font-size: 15px;
   }
   @include project-list.wide;
@@ -138,7 +94,6 @@
     margin-bottom: 32px;
   }
   ::ng-deep .pagination {
-    justify-content: right;
     justify-content: flex-end;
   }
 }
@@ -155,9 +110,6 @@
   .card-lines {
     padding-bottom: 20px;
   }
-  .lines-img {
-    height: 128px;
-  }
   .lines-text-div {
     padding-left: 8px;
     padding-right: 8px;
@@ -167,14 +119,6 @@
   .lines-projects {
     font-size: 15px;
   }
-  .lines-sub-divi {
-    margin-top: 12px;
-    margin-bottom: 12px;
-  }
-  .lines-text {
-    margin-bottom: 24px;
-  }
-  .lines-text,
   .lines-subtitle {
     font-size: 13px;
   }
