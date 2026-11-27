@@ -26,7 +26,7 @@ import {
 } from "@ng-bootstrap/ng-bootstrap/pagination";
 import { map } from "rxjs";
 
-type MemberDisplay = PublicMember & { prefix: string; tipoMiembro: string };
+type MemberDisplay = PublicMember & { name: string; tipoMiembro: string };
 
 @Component({
   selector: "app-detail-member",
@@ -69,10 +69,8 @@ export default class DetailMemberComponent {
   readonly member = computed((): MemberDisplay | null => {
     const m = this.profile.value()?.member;
     if (!m) return null;
-    const prefijo = m.prefixCode ? this.lookup.prefixes().find((p) => p.code === m.prefixCode) : undefined;
-    const prefix = prefijo && prefijo.label !== "none" && prefijo.label !== "bach" ? prefijo.label : "";
     const memberType = this.lookup.memberTypes().find((t) => t.code === m.memberTypeCode);
-    return { ...m, prefix, tipoMiembro: memberType?.nameSingular ?? "" };
+    return { ...m, name: this.lookup.memberName(m), tipoMiembro: memberType?.nameSingular ?? "" };
   });
 
   readonly publications = computed(() => {
@@ -88,8 +86,7 @@ export default class DetailMemberComponent {
 
   protected readonly trail = computed((): Crumb[] => {
     const m = this.member();
-    const name = m ? [m.prefix, m.firstName, m.lastName, m.maternalName].filter(Boolean).join(" ") : "";
-    const current = { label: name };
+    const current = { label: m?.name ?? "" };
     return this.previouslink === "/" ? [current] : [{ label: this.previouspage, link: this.previouslink }, current];
   });
 

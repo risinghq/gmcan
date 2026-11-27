@@ -19,31 +19,7 @@
             <h2 class="member-type-title">{{ tipoMiembro.name }}</h2>
             <div class="row">
               @for (miembro of tipoMiembro.members; track miembro.id) {
-              <div class="col-12 col-sm-6">
-                <div class="flex-news member-mt">
-                  <div class="member-img-div">
-                    <app-avatar
-                      class="member-img"
-                      [src]="miembro.photoUrl"
-                      [alt]="miembro.photoAlt"
-                      [name]="miembro.firstName + ' ' + miembro.lastName"
-                    />
-                  </div>
-                  <div class="member-text">
-                    <div class="member-name full-width">
-                      {{ miembro.prefix }} {{ miembro.firstName }} {{ miembro.lastName }} {{ miembro.maternalName }}
-                    </div>
-                    <a
-                      class="member-profile plain-link"
-                      [routerLink]="['/detail-member', miembro.id]"
-                      [queryParams]="{ from: 'members' }"
-                    >
-                      {{ language.membersText[0].seeProfile }}
-                      <app-icon class="profile-icon" name="chevron-right" />
-                    </a>
-                  </div>
-                </div>
-              </div>
+              <app-member-row class="col-12 col-sm-6 member-mt" [member]="miembro" from="members" />
               }
             </div>
             }

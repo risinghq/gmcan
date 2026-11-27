@@ -50,53 +50,6 @@
   margin-top: 16px;
 }
 
-.miembro-img-div {
-  flex: none;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  overflow: hidden;
-  background-color: #c4c4c4;
-}
-
-.miembro-img {
-  border-radius: inherit;
-  width: inherit;
-  height: inherit;
-  object-fit: cover;
-}
-
-.miembro-text {
-  padding-left: 8px;
-}
-
-.miembro-name {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-
-.miembro-profile {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 44px;
-  font-size: 15px;
-  letter-spacing: 0.3px;
-  color: var(--deep-green);
-
-  &:hover {
-    text-decoration: underline;
-    color: var(--dark-forest-green);
-  }
-}
-
-.profile-icon {
-  font-size: 16px;
-}
-
 .section-toggle {
   margin-top: auto;
   margin-left: auto;
@@ -137,16 +90,6 @@
   }
   .miembro-mt {
     margin-top: 24px;
-  }
-  .miembro-img-div {
-    width: 62px;
-    height: 62px;
-  }
-  .miembro-text {
-    padding-left: 16px;
-  }
-  .miembro-name {
-    font-size: 18px;
   }
   .publication-abs-icon-2 {
     height: 32px;

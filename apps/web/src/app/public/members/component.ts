@@ -1,10 +1,8 @@
 import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
-import { RouterLink } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
-import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { MemberRowComponent } from "@app/shared/components/member-row.component";
 import NewsComponent from "@app/shared/components/news/news.component";
 import { LookupService } from "@app/shared/services/lookup.service";
 import { MemberService } from "@app/shared/services/member.service";
@@ -12,15 +10,14 @@ import { SeoService } from "@app/shared/services/seo.service";
 import { SessionService } from "@app/shared/services/session.service";
 import type { PublicMember } from "@gmcan/contracts/public";
 
-type MemberDisplay = PublicMember & { prefix: string };
-type MemberTypeGroup = { code: string; name: string; members: MemberDisplay[] };
+type MemberTypeGroup = { code: string; name: string; members: PublicMember[] };
 
 @Component({
   selector: "app-members",
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [BreadcrumbComponent, AvatarComponent, RouterLink, IconComponent, MatProgressSpinner, NewsComponent],
+  imports: [BreadcrumbComponent, MemberRowComponent, MatProgressSpinner, NewsComponent],
 })
 export default class MembersComponent {
   private memberService = inject(MemberService);
@@ -30,7 +27,6 @@ export default class MembersComponent {
 
   readonly language = this.session.language();
   private readonly memberTypes = this.lookup.memberTypes();
-  private readonly prefixesMap = new Map(this.lookup.prefixes().map((prefix) => [prefix.code, prefix]));
   private readonly members = toSignal(this.memberService.listMembers());
   readonly vm = computed(() => {
     const members = this.members();
@@ -38,17 +34,10 @@ export default class MembersComponent {
       return { loading: true, memberGroups: [] as MemberTypeGroup[] };
     }
 
-    // oxlint-disable-next-line oxc/no-map-spread -- the members come from a signal, so each needs a copy
-    const processed = members.map((member): MemberDisplay => {
-      const prefixItem = member.prefixCode ? this.prefixesMap.get(member.prefixCode) : undefined;
-      const prefix = prefixItem && prefixItem.label !== "none" && prefixItem.label !== "bach" ? prefixItem.label : "";
-      return { ...member, prefix };
-    });
-
     const memberGroups = this.memberTypes.map((memberType) => ({
       code: memberType.code,
       name: memberType.name,
-      members: processed.filter((member) => member.memberTypeCode === memberType.code),
+      members: members.filter((member) => member.memberTypeCode === memberType.code),
     }));
 
     return { loading: false, memberGroups };
