@@ -6,27 +6,41 @@
   <div class="login-card">
     <img class="logo-icon" [src]="grupoinfo().assets.header" alt="GMCAN" />
     @if (!recoverValue()) {
+      @let emailError = fieldError(loginForm, "email");
+      @let passwordError = fieldError(loginForm, "password");
       <form [formGroup]="loginForm" (ngSubmit)="login()">
         <h1 class="login-title">{{ language.login }}</h1>
         <input
           class="input-email full-width"
           [placeholder]="language.loginText[0].email"
+          [attr.aria-label]="language.loginText[0].email"
+          [attr.aria-invalid]="emailError ? true : null"
+          [attr.aria-describedby]="emailError ? 'login-email-error' : null"
           name="email"
           formControlName="email"
           type="email"
           autocomplete="username"
           required
         />
+        @if (emailError) {
+          <p class="error-text" id="login-email-error">{{ emailError }}</p>
+        }
         <input
           class="input-password mt-input-16 full-width"
           [placeholder]="language.loginText[0].password"
+          [attr.aria-label]="language.loginText[0].password"
+          [attr.aria-invalid]="passwordError ? true : null"
+          [attr.aria-describedby]="passwordError ? 'login-password-error' : null"
           name="password"
           formControlName="password"
           autocomplete="current-password"
           required
           type="password"
         />
-        <button type="submit" class="btn-black" [disabled]="loginForm.invalid || loading()">
+        @if (passwordError) {
+          <p class="error-text" id="login-password-error">{{ passwordError }}</p>
+        }
+        <button type="submit" class="btn-black" [disabled]="loading()">
           <span class="link">{{ language.loginText[0].login }}</span>
         </button>
         <button type="button" class="forgot link" (click)="change()">
@@ -34,6 +48,7 @@
         </button>
       </form>
     } @else {
+      @let recoverError = fieldError(emailForm, "email");
       <form [formGroup]="emailForm" (ngSubmit)="recover()">
         <button type="button" class="flex-news back-div recover-back" (click)="change()">
           <app-icon class="back-icon" name="arrow-left" />
@@ -46,13 +61,19 @@
         <input
           class="input-email full-width"
           [placeholder]="language.loginText[0].email"
+          [attr.aria-label]="language.loginText[0].email"
+          [attr.aria-invalid]="recoverError ? true : null"
+          [attr.aria-describedby]="recoverError ? 'recover-email-error' : null"
           name="email"
           formControlName="email"
           type="email"
           autocomplete="email"
           required
         />
-        <button type="submit" class="btn-black" [disabled]="emailForm.invalid || loading()">
+        @if (recoverError) {
+          <p class="error-text" id="recover-email-error">{{ recoverError }}</p>
+        }
+        <button type="submit" class="btn-black" [disabled]="loading()">
           <span class="link">Recuperar contraseña</span>
         </button>
       </form>

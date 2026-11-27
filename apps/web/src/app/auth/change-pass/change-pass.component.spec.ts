@@ -23,6 +23,10 @@ describe("ChangePassComponent", () => {
   const newLinkHref = () => page().querySelector(".login-card a.btn-black")?.getAttribute("href");
   const alert = () => page().querySelector('[role="alert"]');
   const submit = () => page().querySelector<HTMLButtonElement>("button[type=submit]");
+  const errorFor = (placeholder: string) => {
+    const id = page().querySelector(`input[placeholder="${placeholder}"]`)?.getAttribute("aria-describedby");
+    return id ? (page().querySelector(`#${id}`)?.textContent?.trim() ?? null) : null;
+  };
 
   async function verifyAndFill(password: string) {
     await open({ token: "good" });
@@ -48,6 +52,7 @@ describe("ChangePassComponent", () => {
     });
     http = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(ChangePassComponent);
+    document.body.appendChild(page());
     await fixture.whenStable();
   }
 
@@ -65,6 +70,7 @@ describe("ChangePassComponent", () => {
 
   afterEach(() => {
     environment.apiUrl = original;
+    page().remove();
     http.verify();
   });
 
@@ -107,6 +113,21 @@ describe("ChangePassComponent", () => {
     expect(submit()?.disabled).toBe(false);
   });
 
+  it("names the empty field instead of sending an empty password", async () => {
+    await open({ token: "good" });
+    http.expectOne(VERIFY).flush({ status: 200 });
+    await fixture.whenStable();
+
+    submit()?.click();
+    await fixture.whenStable();
+
+    http.expectNone(CONFIRM);
+    expect(submit()?.disabled).toBe(false);
+    expect(errorFor("Nueva contraseña")).toBe("Ingresa una contraseña.");
+    expect(errorFor("Repetir contraseña")).toBe("Repite la contraseña.");
+    expect(document.activeElement?.getAttribute("name")).toBe("password");
+  });
+
   it("sends the new password with the token once both fields match", async () => {
     await open({ token: "good" });
     http.expectOne(VERIFY).flush({ status: 200 });
@@ -114,11 +135,14 @@ describe("ChangePassComponent", () => {
 
     await type("Nueva contraseña", "new password 1");
     await type("Repetir contraseña", "new password 2");
-    expect(page().textContent).toContain("Las contraseñas no coinciden.");
-    expect(submit()?.disabled).toBe(true);
+    submit()?.click();
+    await fixture.whenStable();
+    http.expectNone(CONFIRM);
+    expect(errorFor("Repetir contraseña")).toBe("Las contraseñas no coinciden.");
+    expect(document.activeElement?.getAttribute("name")).toBe("confirmPassword");
 
     await type("Repetir contraseña", "new password 1");
-    expect(submit()?.disabled).toBe(false);
+    expect(errorFor("Repetir contraseña")).toBeNull();
     submit()?.click();
     await fixture.whenStable();
 
