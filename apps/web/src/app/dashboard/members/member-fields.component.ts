@@ -58,7 +58,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
               <div class="text-category">Fecha de nacimiento</div>
-              <mat-form-field class="input-category">
+              <mat-form-field class="form-field">
                 <input matInput [matDatepicker]="birth" formControlName="birthDate" />
                 <mat-datepicker-toggle matSuffix [for]="birth" />
                 <mat-datepicker #birth />
@@ -78,7 +78,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
               <div class="text-category">Género</div>
-              <mat-form-field class="input-category">
+              <mat-form-field class="form-field">
                 <mat-select formControlName="genderCode">
                   @for (gender of lookup.genders(); track gender.code) {
                     <mat-option [value]="gender.code">{{ gender.name }}</mat-option>
@@ -88,7 +88,7 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
             </div>
             <div class="full-width">
               <div class="text-category">Máximo nivel académico alcanzado</div>
-              <mat-form-field class="input-category">
+              <mat-form-field class="form-field">
                 <mat-select formControlName="prefixCode">
                   @for (prefix of lookup.prefixes(); track prefix.code) {
                     <mat-option [value]="prefix.code">{{ prefix.label }}</mat-option>

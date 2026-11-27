@@ -59,7 +59,21 @@ html {
   );
   @include mat.form-field-overrides(
     (
-      filled-container-color: #f5f5f5,
+      container-height: 42px,
+      container-vertical-padding: 9px,
+      container-text-font: "IBM Plex Sans",
+      filled-container-color: #f4f5f4,
+      filled-container-shape: 0,
+      filled-active-indicator-color: transparent,
+      filled-hover-active-indicator-color: transparent,
+      filled-focus-active-indicator-color: var(--deep-green),
+      filled-input-text-placeholder-color: var(--muted-accent),
+    )
+  );
+  @include mat.select-overrides(
+    (
+      trigger-text-font: "IBM Plex Sans",
+      placeholder-text-color: var(--muted-accent),
     )
   );
 }
@@ -1121,6 +1135,11 @@ circle {
   border: none;
   line-height: 1;
   background-color: #f4f5f4;
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 8px;
 }
 
 .btn-grey {
