@@ -1,147 +1,74 @@
-<div class="main-content" id="main-content">
-  <div class="flex-news">
-    <div class="dashboard-card wd-1">
-      <div class="dashboard-title">¡Bienvenido al administrador del sistema!</div>
-      <div class="dashboard-subtitle">¿Qué deseas hacer?</div>
-      @if (authz.can("news.write")) {
-        <div class="flex-news item clickable" routerLink="/dashboard/news">
-          <img class="mr-16" src="/img/icons/newspaper.svg" />
-          <div>
-            <div class="item-title">Gestionar noticias</div>
-            <div class="item-subtitle">Puedes crear, editar o eliminar una noticia.</div>
-          </div>
-        </div>
+<div class="home">
+  <section class="dashboard-card actions">
+    <p class="dashboard-title">¡Bienvenido al administrador del sistema!</p>
+    <h2 class="dashboard-subtitle">¿Qué deseas hacer?</h2>
+    <ul class="action-list">
+      @for (action of actions(); track action.path) {
+        <li>
+          <a class="action" [routerLink]="action.path">
+            <app-icon class="action-icon" [name]="action.icon" />
+            <span>
+              <span class="item-title">{{ action.title }}</span>
+              <span class="item-subtitle">{{ action.text }}</span>
+            </span>
+          </a>
+        </li>
       }
-      @if (authz.can("members.read")) {
-        <div class="flex-news item clickable" routerLink="/dashboard/miembros-activos">
-          <img class="mr-16" src="/img/icons/members.svg" />
-          <div>
-            <div class="item-title">Gestionar miembros del grupo</div>
-            <div class="item-subtitle">Puedes crear, editar o eliminar a un miembro del grupo.</div>
-          </div>
-        </div>
+      @if (analytics()) {
+        <li class="action">
+          <app-icon class="action-icon" name="chart-bar" />
+          <span>
+            <span class="item-title">Visualizar analíticas de uso</span>
+            <span class="item-subtitle">Puedes visualizar cómo está siendo utilizada la plataforma.</span>
+            <span class="tools">
+              <a class="btn-black" [href]="googleAnalyticsUrl" target="_blank" rel="noopener">
+                Google Analytics <app-icon name="external-link" />
+              </a>
+              <a class="btn-black" [href]="hotjarUrl" target="_blank" rel="noopener">
+                Hotjar <app-icon name="external-link" />
+              </a>
+            </span>
+          </span>
+        </li>
       }
-      @if (authz.can("publications.write")) {
-        <div class="flex-news item clickable" routerLink="/dashboard/articulos">
-          <img class="mr-16" src="/img/icons/publicaciones.svg" />
-          <div>
-            <div class="item-title">Gestionar publicaciones</div>
-            <div class="item-subtitle">Puedes crear, editar o eliminar una publicación del grupo.</div>
-          </div>
-        </div>
-      }
-      @if (authz.can("projects.write")) {
-        <div class="flex-news item clickable" routerLink="/dashboard/proyectos-ejecucion">
-          <img class="mr-16" src="/img/icons/proyectos.svg" />
-          <div>
-            <div class="item-title">Gestionar proyectos</div>
-            <div class="item-subtitle">Puedes crear, editar o eliminar un proyecto del grupo.</div>
-          </div>
-        </div>
-      }
-      @if (authz.can("content.write")) {
-        <div class="flex-news item clickable" routerLink="/dashboard/contenidos">
-          <img class="mr-16" src="/img/icons/contenido.svg" />
-          <div>
-            <div class="item-title">Gestionar contenidos</div>
-            <div class="item-subtitle">Puedes modificar algunos contenidos de la plataforma.</div>
-          </div>
-        </div>
-      }
-      <div class="flex-news item clickable" routerLink="/dashboard/perfil">
-        <img class="mr-16" src="/img/icons/perfil.svg" />
-        <div>
-          <div class="item-title">Gestionar perfil</div>
-          <div class="item-subtitle">Puedes actualizar tu información personal.</div>
-        </div>
-      </div>
-      @if (authz.can("analytics.read")) {
-        <div class="flex-news item no-border">
-          <img class="mr-16" src="/img/icons/analitica.svg" />
-          <div>
-            <div class="item-title">Visualizar analíticas de uso</div>
-            <div class="item-subtitle">Puedes visualizar cómo está siendo utilizada la plataforma.</div>
-          </div>
-        </div>
-      }
-      @if (authz.can("analytics.read")) {
-        <div class="flex-news item" style="padding-top: 0px">
-          <div class="center btn-black mr-8">
-            <a
-              class="link"
-              href="https://analytics.google.com/analytics/web/?authuser=2#/a181640955p250909666/admin"
-              target="_blank"
-              routerLinkActive="active"
-            >
-              Google Analytics
-            </a>
-          </div>
-          <div class="center btn-black">
-            <a
-              class="link"
-              href="https://insights.hotjar.com/login?next=%2Fsites%2F2066869%2Fdashboard"
-              target="_blank"
-              routerLinkActive="active"
-            >
-              Hotjar
-            </a>
-          </div>
-        </div>
-      }
-      <div class="flex-news item last-item">
-        <img class="mr-16" src="/img/icons/book.svg" />
-        <a class="item-title" style="margin-top: auto; margin-bottom: auto" [href]="manualUrl" target="_blank">
-          Ver manual de usuario
+      <li>
+        <a class="action" [href]="manualUrl" target="_blank" rel="noopener">
+          <app-icon class="action-icon" name="book" />
+          <span class="item-title manual">Ver manual de usuario</span>
         </a>
-      </div>
+      </li>
+    </ul>
+  </section>
+  @if (analytics()) {
+    <div class="charts">
+      <section class="dashboard-card chart-card">
+        <header class="chart-header">
+          <h3 class="item-title">Miembros activos</h3>
+          <span class="chart-total">{{ members().total }}</span>
+        </header>
+        <canvas
+          baseChart
+          type="pie"
+          [datasets]="members().datasets"
+          [labels]="members().labels"
+          [options]="membersChartOptions"
+          [legend]="true"
+        ></canvas>
+      </section>
+      <section class="dashboard-card chart-card">
+        <header class="chart-header">
+          <h3 class="item-title">Publicaciones</h3>
+          <span class="chart-total">{{ publications().total }}</span>
+        </header>
+        <canvas
+          baseChart
+          type="bar"
+          [datasets]="publications().datasets"
+          [labels]="publications().labels"
+          [options]="publicationsChartOptions"
+          [legend]="false"
+        ></canvas>
+      </section>
     </div>
-    <div class="ml-16" style="width: max-content">
-      <div class="dashboard-card pd-8 wd-2">
-        <div class="flex-news">
-          <div>
-            <img class="mt-8" src="/img/icons/members.svg" />
-            <div class="mt-8 item-title bold">Miembros del grupo</div>
-          </div>
-          <div class="gray-box right">
-            <div class="item-subtitle">Miembros activos</div>
-            <div class="bg-number mt-8">{{ members().total }}</div>
-          </div>
-        </div>
-        <div class="mt-12" style="display: block">
-          <canvas
-            baseChart
-            type="pie"
-            [datasets]="members().datasets"
-            [labels]="members().labels"
-            [options]="membersChartOptions"
-            [legend]="true"
-          >
-          </canvas>
-        </div>
-      </div>
-      <div class="dashboard-card pd-8 wd-2 mt-16">
-        <div class="flex-news">
-          <div>
-            <img class="mt-8" src="/img/icons/publicaciones.svg" />
-            <div class="mt-8 item-title bold">Publicaciones</div>
-          </div>
-          <div class="gray-box right">
-            <div class="item-subtitle">Publicaciones</div>
-            <div class="bg-number mt-8">{{ publications().total }}</div>
-          </div>
-        </div>
-        <div class="mt-12" style="display: block">
-          <canvas
-            baseChart
-            type="bar"
-            [datasets]="publications().datasets"
-            [labels]="publications().labels"
-            [options]="publicationsChartOptions"
-            [legend]="false"
-          >
-          </canvas>
-        </div>
-      </div>
-    </div>
-  </div>
+  }
 </div>

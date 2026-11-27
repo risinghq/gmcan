@@ -3,12 +3,16 @@ import caretRight from "@tabler/icons/filled/caret-right.svg";
 import arrowLeft from "@tabler/icons/outline/arrow-left.svg";
 import arrowUp from "@tabler/icons/outline/arrow-up.svg";
 import article from "@tabler/icons/outline/article.svg";
+import book from "@tabler/icons/outline/book.svg";
+import briefcase from "@tabler/icons/outline/briefcase.svg";
 import calendarEvent from "@tabler/icons/outline/calendar-event.svg";
+import chartBar from "@tabler/icons/outline/chart-bar.svg";
 import chevronDown from "@tabler/icons/outline/chevron-down.svg";
 import chevronLeft from "@tabler/icons/outline/chevron-left.svg";
 import chevronRight from "@tabler/icons/outline/chevron-right.svg";
 import circleCheck from "@tabler/icons/outline/circle-check.svg";
 import clockEdit from "@tabler/icons/outline/clock-edit.svg";
+import externalLink from "@tabler/icons/outline/external-link.svg";
 import fileDescription from "@tabler/icons/outline/file-description.svg";
 import history from "@tabler/icons/outline/history.svg";
 import layoutDashboard from "@tabler/icons/outline/layout-dashboard.svg";
@@ -24,7 +28,10 @@ export const ICONS = {
   "arrow-left": arrowLeft,
   "arrow-up": arrowUp,
   article,
+  book,
+  briefcase,
   "calendar-event": calendarEvent,
+  "chart-bar": chartBar,
   "caret-down": caretDown,
   "caret-right": caretRight,
   "chevron-down": chevronDown,
@@ -32,6 +39,7 @@ export const ICONS = {
   "chevron-right": chevronRight,
   "circle-check": circleCheck,
   "clock-edit": clockEdit,
+  "external-link": externalLink,
   "file-description": fileDescription,
   history,
   "layout-dashboard": layoutDashboard,
