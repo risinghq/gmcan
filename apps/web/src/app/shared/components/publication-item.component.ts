@@ -61,10 +61,10 @@ type ListedPublication = PublicationDisplay<ListablePublication & { authors?: Pu
   styles: `
     :host {
       display: block;
-      padding: 16px 0 20px;
-      border-bottom: 2px solid #d7d7e1;
+      padding: 20px 0;
+      border-bottom: 1px solid #d7d7e1;
       font-size: 15px;
-      line-height: 1.33;
+      line-height: 1.5;
       letter-spacing: 0.3px;
       color: #000000;
     }
@@ -78,7 +78,10 @@ type ListedPublication = PublicationDisplay<ListablePublication & { authors?: Pu
 
     .title {
       margin-top: 8px;
-      font-weight: bold;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.2px;
     }
 
     .date,
@@ -167,16 +170,16 @@ type ListedPublication = PublicationDisplay<ListablePublication & { authors?: Pu
     }
 
     @media (min-width: 961px) {
+      .title {
+        font-size: 18px;
+      }
+
       .narrow-only {
         display: none;
       }
     }
 
     @media (max-width: 960px) {
-      :host {
-        font-size: 13px;
-      }
-
       .publication-kind {
         padding: 2px 4px;
         font-size: 12px;

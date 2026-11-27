@@ -29,7 +29,7 @@ import type { PublicationAuthor } from "@gmcan/contracts/public";
       display: block;
       font-size: 15px;
       font-weight: 300;
-      line-height: 1.33;
+      line-height: 24px;
       letter-spacing: 0.3px;
       color: #000000;
     }
@@ -61,12 +61,6 @@ import type { PublicationAuthor } from "@gmcan/contracts/public";
 
     a:hover {
       text-decoration: underline;
-    }
-
-    @media (max-width: 960px) {
-      :host {
-        font-size: 13px;
-      }
     }
   `,
 })
