@@ -58,9 +58,9 @@ type GroupSlot = AssetSlot<"research_group">;
           <div class="locale-section full-width" [formGroup]="form.controls.translations.controls[locale]!">
             <div class="locale-title">{{ label(locale) }}</div>
             <div class="text-category">Presentación del grupo <span class="red-text">*</span></div>
-            <textarea class="input-category" rows="4" formControlName="summary"></textarea>
+            <textarea class="input-category" formControlName="summary"></textarea>
             <div class="text-category">Facilidades y recursos</div>
-            <textarea class="input-category" rows="4" formControlName="facilities"></textarea>
+            <textarea class="input-category" formControlName="facilities"></textarea>
             <div class="flex-news">
               <div class="text-category">Trabajos futuros</div>
               <button type="button" class="link green-text top-auto right plex-sans" (click)="preview(locale)">
@@ -69,9 +69,9 @@ type GroupSlot = AssetSlot<"research_group">;
             </div>
             <app-rich-text-editor formControlName="futureWork" />
             <div class="text-category">Sección Publicaciones</div>
-            <textarea class="input-category" rows="3" formControlName="publicationsSection"></textarea>
+            <textarea class="input-category" formControlName="publicationsSection"></textarea>
             <div class="text-category">Sección Proyectos</div>
-            <textarea class="input-category" rows="3" formControlName="projectsSection"></textarea>
+            <textarea class="input-category" formControlName="projectsSection"></textarea>
           </div>
         }
       </form>

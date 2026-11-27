@@ -1,4 +1,3 @@
-import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { ChangeDetectionStrategy, Component, type OnInit, computed, inject, input, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
@@ -74,7 +73,6 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
   selector: "app-project-page",
   imports: [
     ReactiveFormsModule,
-    CdkTextareaAutosize,
     ContentFormComponent,
     MatFormField,
     MatInput,
@@ -192,7 +190,6 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
                 class="input-category"
                 formControlName="description"
                 placeholder="Insertar descripción"
-                cdkTextareaAutosize
               ></textarea>
             </div>
           }
