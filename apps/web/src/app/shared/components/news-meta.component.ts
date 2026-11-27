@@ -4,16 +4,14 @@ import { ChangeDetectionStrategy, Component, input } from "@angular/core";
   selector: "app-news-meta",
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <span class="type">{{ type() }}</span>
-    <span aria-hidden="true">·</span>
+    @if (type()) {
+      <span class="type">{{ type() }}</span><span aria-hidden="true">&nbsp;· </span>
+    }
     <time [attr.datetime]="date()">{{ label() }}</time>
   `,
   styles: `
     :host {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 6px;
+      display: block;
       line-height: 1.3;
       letter-spacing: 0.3px;
       color: #30393a;
