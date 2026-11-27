@@ -9,12 +9,12 @@ import {
   type WritableSignal,
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
+import { SearchBoxComponent } from "@app/shared/components/search-box.component";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -52,13 +52,12 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SearchBoxComponent,
     ProjectMembersComponent,
     BreadcrumbComponent,
     AvatarComponent,
     RouterLink,
     IconComponent,
-    FormsModule,
-    ReactiveFormsModule,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,
@@ -74,7 +73,7 @@ export default class GlobalSearchComponent {
   private readonly seo = inject(SeoService);
 
   protected readonly language = inject(SessionService).language;
-  protected readonly searchGlobalForm = inject(FormBuilder).group({ nombre: [""] });
+  protected readonly query = signal("");
   protected readonly pageSize = 5;
   protected readonly previouslink = originRoute(parsePublicOrigin(this.route.snapshot.queryParamMap.get("from")));
 
@@ -104,11 +103,12 @@ export default class GlobalSearchComponent {
     this.route.params.pipe(takeUntilDestroyed()).subscribe((params) => {
       const nombre = params["id"] as string;
       this.seo.setPageTitle("GMCAN | " + nombre);
-      this.searchGlobalForm.controls.nombre.setValue(nombre);
+      this.query.set(nombre);
     });
   }
 
   searchGlobal(value: string): void {
+    if (!value.trim()) return;
     const origin = parsePublicOrigin(this.route.snapshot.queryParamMap.get("from"));
     this.router.navigate(["/search/" + value], { queryParams: { from: origin } });
   }

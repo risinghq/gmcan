@@ -35,7 +35,6 @@
 @include project-list.summary;
 
 @media (min-width: 961px) {
-  ::placeholder,
   .project-subtext {
     font-size: 15px;
   }
@@ -63,7 +62,6 @@
     padding-top: 12px;
     padding-bottom: 20px;
   }
-  ::placeholder,
   .project-subtext {
     font-size: 13px;
   }
@@ -81,55 +79,9 @@
   .project-subtext {
     margin-bottom: 16px;
   }
-  .btn-black {
-    margin-top: 2px;
-  }
   app-icon {
     font-size: 14px;
   }
-  .link {
-    font-size: 12px;
-  }
-}
-
-.input-search-project {
-  width: 100%;
-  vertical-align: middle;
-  padding: 8px;
-  border-radius: 4px;
-  box-shadow:
-    -1px -1px 3px rgba(0, 0, 0, 0.1),
-    1px 1px 3px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  margin: 2px;
-  display: flex;
-}
-.input-search {
-  background-color: inherit;
-  @extend .plex-sans;
-  flex-grow: 200;
-  width: 17px;
-}
-.btn-green {
-  @extend .plex-sans;
-  border-radius: 4px;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.25);
-  flex-grow: 1;
-}
-::placeholder {
-  @extend .plex-sans;
-  letter-spacing: 0.3px;
-  color: var(--muted-accent);
-}
-
-.btn-black {
-  margin-left: 8px;
-}
-
-.link {
-  font-weight: 600;
-  height: max-content;
-  margin: 0px;
 }
 
 @include project-list.base;

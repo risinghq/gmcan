@@ -6,24 +6,13 @@
       <span class="back-text">{{ language().detailMemberText[0].back }}</span>
     </button>
     <div class="global-results-title">{{ language().results }}</div>
-    <div class="flex-news">
-      <form class="input-search-global full-width" [formGroup]="searchGlobalForm">
-        <app-icon class="icon-search-toolbar" name="search" />
-        <input
-          type="search"
-          class="input-search-text"
-          [attr.aria-label]="language().search"
-          placeholder="{{ language().search }}"
-          #nombre
-          name="nombre"
-          formControlName="nombre"
-          (keyup.enter)="searchGlobal(nombre.value)"
-        />
-      </form>
-      <button type="button" (click)="searchGlobal(nombre.value)" class="btn-black">
-        <span class="link">{{ language().searchMobile }}</span>
-      </button>
-    </div>
+    <app-search-box
+      class="mt-16"
+      [placeholder]="language().search"
+      [action]="language().searchMobile"
+      [(query)]="query"
+      (search)="searchGlobal($event)"
+    />
     @if (proyectos().length == 0 && publicaciones().length == 0 && miembros().length == 0 && noticias().length == 0) {
     <div class="not-found-2">{{ language().noResults }}</div>
     } @if (proyectos().length > 0 || publicaciones().length > 0 || miembros().length > 0 || noticias().length > 0) {
