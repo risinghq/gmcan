@@ -5,48 +5,19 @@
       <router-outlet />
     </div>
     <div class="col-lg-4 col-sm-6 col-12">
-      <div class="about-categories">
-        <div
+      <nav class="about-categories" [attr.aria-label]="facade.language().aboutUs">
+        @for (category of categories(); track category.path) {
+        <a
           class="about-category"
-          routerLink="./about"
+          [routerLink]="category.path"
           routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          [routerLinkActiveOptions]="pathOnly"
         >
-          {{ facade.language().who }}
-        </div>
-        <div
-          class="about-category"
-          routerLink="./lines-investigation"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          {{ facade.language().linesInvestigation }}
-        </div>
-        <div
-          class="about-category"
-          routerLink="./methods"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          {{ facade.language().methods }}
-        </div>
-        <div
-          class="about-category"
-          routerLink="./facilities-resources"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          {{ facade.language().resources }}
-        </div>
-        <div
-          class="about-category"
-          routerLink="./works"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          {{ facade.language().futureWorks }}
-        </div>
-      </div>
+          {{ category.label }}
+        </a>
+        }
+      </nav>
     </div>
   </div>
 </div>

@@ -1,4 +1,5 @@
 <div class="card-methods">
+  <h1 class="visually-hidden">{{ language().methods }}</h1>
   <div class="methods-text-div">
     @for (method of methods(); track method; let i = $index) {
     <div>
@@ -7,7 +8,7 @@
         <img class="methods-img" src="{{ method.asset }}" alt="" />
         }
       </div>
-      <div class="methods-title">{{ method.name }}</div>
+      <h2 class="methods-title">{{ method.name }}</h2>
       <div class="methods-sub-divi"></div>
       <div class="methods-text" [innerHTML]="method.description"></div>
     </div>
