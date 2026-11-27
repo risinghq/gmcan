@@ -1,5 +1,3 @@
-import type { PublicMember, PublicProject, PublicPublication } from "@gmcan/contracts/public";
-
 import type { Capability } from "./capabilities";
 
 export interface Member {
@@ -27,12 +25,6 @@ export interface MemberFull extends Member {
 export interface MemberPublishability {
   publishable: boolean;
   missing: string[];
-}
-
-export interface MemberProfile {
-  member: PublicMember | undefined;
-  projects: PublicProject[];
-  publications: PublicPublication[];
 }
 
 export interface MemberGroup {
