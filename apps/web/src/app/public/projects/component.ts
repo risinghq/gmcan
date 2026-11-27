@@ -1,6 +1,5 @@
 import { SlicePipe } from "@angular/common";
 import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from "@angular/core";
-import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
 import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
@@ -34,7 +33,6 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
     IconComponent,
     MatTabGroup,
     MatTab,
-    MatProgressSpinner,
     NgbPagination,
     NgbPaginationPrevious,
     NgbPaginationNumber,
@@ -54,7 +52,6 @@ export default class ProjectsComponent implements OnInit {
   currentProjects: ProjectDisplay[] = [];
   tipoProyectos: string[] = [];
   activeTab = 0;
-  allCharged: boolean | null = false;
   query = "";
   url = GLOBAL.url;
   infoText = "";
@@ -86,7 +83,6 @@ export default class ProjectsComponent implements OnInit {
 
     this.syncLabels();
     this.currentProjects = this.allActive;
-    this.allCharged = true;
   }
 
   ngDoCheck(): void {

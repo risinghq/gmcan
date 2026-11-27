@@ -1,15 +1,9 @@
 <div class="page main-news-div">
-  @let allCharged = !news.isLoading(); @let newsItems = items(); @let total = news.value()?.total ?? 0;
+  @let newsItems = items(); @let total = news.value()?.total ?? 0;
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="[{ label: language.news }]" />
       <div class="page-card">
-        @if (!allCharged) {
-        <div class="spinner-pad">
-          <mat-spinner class="auto mb-8" />
-          <div class="loading-text center">Cargando</div>
-        </div>
-        } @if (allCharged) {
         <div class="columna">
           <h1 class="page-title">{{ language.newsText[0].newsTitle }}</h1>
           <button mat-button class="right hide-desktop" [matMenuTriggerFor]="menu">
@@ -25,7 +19,12 @@
             }
           </mat-menu>
         </div>
-        } @if (newsItems.length > 0 && allCharged) {
+        @if (news.isLoading()) {
+        <div class="spinner-pad">
+          <mat-spinner class="auto mb-8" />
+          <div class="loading-text center">Cargando</div>
+        </div>
+        } @else if (newsItems.length > 0) {
         <div>
           @for (newsItem of newsItems; track newsItem.id) {
           <article class="news">
