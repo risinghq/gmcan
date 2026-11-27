@@ -61,12 +61,12 @@
     }
   </div>
   @if (error(); as message) {
-    <div class="error">
+    <div class="error" role="alert">
       {{ message }}
     </div>
   }
   @if (exito(); as message) {
-    <div class="exito">
+    <div class="exito" role="status">
       {{ message }}
     </div>
   }

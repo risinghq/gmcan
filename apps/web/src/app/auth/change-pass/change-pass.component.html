@@ -1,24 +1,32 @@
 <div class="page login-div">
-  <button type="button" class="flex-news back-div" (click)="returnToLogin()">
+  <a class="flex-news back-div" routerLink="/login">
     <app-icon class="back-icon" name="arrow-left" />
-    <span class="back-text">Volver a la página principal</span>
-  </button>
+    <span class="back-text">Volver al inicio de sesión</span>
+  </a>
   <div class="login-card">
-    <img class="logo-icon" src="{{ grupoInfo().assets.header }}" alt="logo" />
+    <img class="logo-icon" src="{{ grupoInfo().assets.header }}" alt="GMCAN" />
 
-    @if (loading()) {
-      <div class="loading-spinner" style="text-align: center; margin-top: 20px">
-        <p>Verificando...</p>
-      </div>
-    }
-
-    @if (tokenValid() && !success() && !loading()) {
+    @if (verifying()) {
+      <p class="login-subtitle status" role="status">Verificando el enlace…</p>
+    } @else if (linkProblem(); as problem) {
+      <h1 class="login-title recover-title">El enlace no es válido</h1>
+      <p class="login-subtitle">{{ problem }}</p>
+      <a class="btn-black" routerLink="/login" [queryParams]="{ recover: 1 }">
+        <span class="link">Solicitar un nuevo enlace</span>
+      </a>
+    } @else if (success()) {
+      <h1 class="login-title succesful-title">¡Contraseña cambiada exitosamente!</h1>
+      <a class="btn-black" routerLink="/login">
+        <span class="link">Ir al inicio de sesión</span>
+      </a>
+    } @else if (tokenValid()) {
       <form [formGroup]="passwordForm" (ngSubmit)="resetPassword()">
-        <div class="login-title recover-title">Establecer nueva contraseña</div>
-        <div class="login-subtitle">Tu nueva contraseña debe tener como mínimo 8 caracteres.</div>
+        <h1 class="login-title recover-title">Establecer nueva contraseña</h1>
+        <p class="login-subtitle">Tu nueva contraseña debe tener como mínimo 8 caracteres.</p>
         <input
           class="input-password mt-input-16 full-width"
           placeholder="Nueva contraseña"
+          aria-label="Nueva contraseña"
           type="password"
           formControlName="password"
           autocomplete="new-password"
@@ -33,6 +41,7 @@
         <input
           class="input-password mt-input-16 full-width"
           placeholder="Repetir contraseña"
+          aria-label="Repetir contraseña"
           type="password"
           formControlName="confirmPassword"
           autocomplete="new-password"
@@ -44,25 +53,13 @@
         @if (passwordForm.hasError("passwordMismatch") && confirmPasswordControl.touched) {
           <div class="error-text">Las contraseñas no coinciden.</div>
         }
-        <button type="submit" class="btn-black" [disabled]="!isFormValid || loading()">
+        <button type="submit" class="btn-black" [disabled]="passwordForm.invalid || saving()">
           <span class="link">Cambiar contraseña</span>
         </button>
       </form>
     }
-
-    @if (success()) {
-      <div>
-        <div class="login-title succesful-title">¡Contraseña cambiada exitosamente!</div>
-        <button type="button" (click)="returnToLogin()" class="btn-black">
-          <span class="link">Ir al inicio de sesión</span>
-        </button>
-      </div>
-    }
-
-    @if (error()) {
-      <div class="error">
-        {{ error() }}
-      </div>
-    }
   </div>
+  @if (saveFailed()) {
+    <div class="error" role="alert">No se pudo cambiar la contraseña. Inténtalo de nuevo.</div>
+  }
 </div>
