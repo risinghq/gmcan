@@ -3,8 +3,8 @@ import { Component, inject, OnInit, ChangeDetectionStrategy } from "@angular/cor
 import { MatCard } from "@angular/material/card";
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { ActivatedRoute, RouterLink } from "@angular/router";
-import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { NewsMetaComponent } from "@app/shared/components/news-meta.component";
+import { ProjectItemComponent } from "@app/shared/components/project-item.component";
 import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { PublicationAuthorsComponent } from "@app/shared/components/publication-authors.component";
 import { PublicationItemComponent } from "@app/shared/components/publication-item.component";
@@ -24,11 +24,11 @@ import type { HomeNewsItem, HomeProyecto, HomePublicacion, HomeViewModel } from 
   imports: [
     PublicationAuthorsComponent,
     PublicationItemComponent,
+    ProjectItemComponent,
     ProjectMembersComponent,
     RouterLink,
     MatProgressBar,
     MatCard,
-    IconComponent,
     NewsMetaComponent,
     SlicePipe,
     EmphasisPipe,
@@ -40,7 +40,6 @@ export default class HomeComponent implements OnInit {
   private session = inject(SessionService);
 
   language: any = {};
-  expandedKey: string | null = null;
 
   progress = 100;
   info: Group = createGroup();
@@ -72,18 +71,5 @@ export default class HomeComponent implements OnInit {
     this.articulos = home.articulos;
     this.tesis = home.tesis;
     this.resumenes = home.resumenes;
-  }
-
-  toggleExpanded(section: string, index: number): void {
-    const key = `${section}:${index}`;
-    this.expandedKey = this.expandedKey === key ? null : key;
-  }
-
-  isExpanded(section: string, index: number): boolean {
-    return this.expandedKey === `${section}:${index}`;
-  }
-
-  expandLabel(section: string, index: number, seeMore: string, seeLess: string): string {
-    return this.isExpanded(section, index) ? seeLess : seeMore;
   }
 }

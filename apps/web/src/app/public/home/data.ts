@@ -46,7 +46,6 @@ export class HomeDataService {
     return proyectos.map((proyecto) => ({
       ...proyecto,
       fechaI: dateLabel(proyecto.startDate, "MMMM y", locale),
-      fechaF: dateLabel(proyecto.endDate, "MMMM y", locale) || undefined,
     }));
   }
 
