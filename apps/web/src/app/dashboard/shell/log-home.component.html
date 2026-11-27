@@ -1,5 +1,5 @@
-<mat-drawer-container class="dashboard-container" [hidden]="enterAny">
-  <mat-drawer #drawer class="dashboard-drawer" mode="side" [opened]="!enterAny">
+<mat-drawer-container class="dashboard-container" [hidden]="phoneGate()">
+  <mat-drawer #drawer class="dashboard-drawer" [mode]="wide() ? 'side' : 'over'" [opened]="wide()">
     <img class="dashboard-icon" [src]="grupoinfo().assets.header" alt="logo" />
     <mat-nav-list class="dashboard-nav">
       @for (section of nav(); track $index) {
@@ -17,6 +17,7 @@
             #active="routerLinkActive"
             [routerLinkActiveOptions]="{ exact: true }"
             [activated]="active.isActive"
+            (click)="wide() || drawer.close()"
           >
             <app-icon matListItemIcon [name]="link.icon" />
             <span matListItemTitle>{{ link.label }}</span>
@@ -90,7 +91,7 @@
     <router-outlet />
   </div>
 </mat-drawer-container>
-<div class="block-div" [hidden]="!enterAny">
+<div class="block-div" [hidden]="!phoneGate()">
   <img class="icon-bad mb-56" [src]="grupoinfo().assets.header" alt="logo" />
   <div class="bad-experience mb-64">
     Para brindarte una mejor experiencia, recomendamos acceder al administrador desde una computadora de escritorio o
