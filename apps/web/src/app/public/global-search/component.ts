@@ -14,6 +14,7 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
+import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { originRoute, parsePublicOrigin } from "@app/shared/routing/public-origin";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { LookupService } from "@app/shared/services/lookup.service";
@@ -51,6 +52,7 @@ const EMPTY: GlobalSearchViewModel = { publications: [], members: [], news: [], 
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    ProjectMembersComponent,
     BreadcrumbComponent,
     AvatarComponent,
     RouterLink,

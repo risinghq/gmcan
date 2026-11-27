@@ -3,11 +3,11 @@ import { Component, OnInit, HostListener, inject, ChangeDetectionStrategy } from
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { ActivatedRoute, RouterLink } from "@angular/router";
-import { AvatarComponent } from "@app/shared/components/avatar.component";
+import { ActivatedRoute } from "@angular/router";
 import { BreadcrumbComponent } from "@app/shared/components/breadcrumb.component";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import NewsComponent from "@app/shared/components/news/news.component";
+import { ProjectMembersComponent } from "@app/shared/components/project-members.component";
 import { Languages } from "@app/shared/models/languages";
 import { BrowserService } from "@app/shared/services/browser.service";
 import { GLOBAL } from "@app/shared/services/global";
@@ -28,9 +28,8 @@ import type { ProjectDisplay, ProjectsViewModel } from "./types";
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
+    ProjectMembersComponent,
     BreadcrumbComponent,
-    AvatarComponent,
-    RouterLink,
     IconComponent,
     MatTabGroup,
     MatTab,

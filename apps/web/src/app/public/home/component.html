@@ -370,22 +370,7 @@
           proyecto.lineasInvestigacion }}
         </div>
         <div class="project-pt">
-          <div class="flex-news flex-flow">
-            <strong class="resp-title">{{ this.language.projectsText[0].responsable }}:</strong>
-            @for (member of proyecto.members; track member) {
-            <div class="project-members">
-              <div class="member-img-round">
-                <app-avatar class="member-img" [src]="member.photoUrl" [alt]="member.photoAlt" [name]="member.name" />
-              </div>
-              <a
-                class="member-name plain-link"
-                [routerLink]="['/detail-member', member.memberId]"
-                [queryParams]="{ from: 'home' }"
-                >{{ member.name }}</a
-              >
-            </div>
-            }
-          </div>
+          <app-project-members [members]="proyecto.members" from="home" />
           <div class="abstract hide-mobile">{{ proyecto.description }}</div>
           <div class="flex-news d-block hide-desktop">
             <button

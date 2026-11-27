@@ -96,10 +96,6 @@
     object-fit: cover;
   }
 
-  .project-members {
-    display: flex;
-  }
-
   .member-name:hover {
     text-decoration: underline;
     cursor: pointer;
@@ -135,6 +131,7 @@
   .abstract,
   .project-abstract,
   .member-name,
+  .project-rev,
   .resp-title {
     font-size: 15px;
   }
@@ -146,6 +143,7 @@
   .abstract,
   .project-abstract,
   .member-name,
+  .project-rev,
   .resp-title {
     font-size: 13px;
   }
