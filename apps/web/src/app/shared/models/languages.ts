@@ -183,7 +183,7 @@ export const Languages = [
     knowWork: "Know our",
     knowWork2: "future work",
     goTo: "Go to future work",
-    notFound: "Page not Found",
+    notFound: "Page not found",
     notFound2: "The page you are looking for is not available",
     notFoundBtn: "Go home",
     backAll: "Go Home",
