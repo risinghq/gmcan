@@ -1,9 +1,5 @@
 @use "../../shared/styles/project-list";
 
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
 .plex-sans {
   font-family: "IBM Plex Sans", serif;
 }
@@ -13,71 +9,26 @@
   background-color: #f8f8f8;
 }
 
-.project-card-div {
-  border-radius: 4px;
-  background-color: #ffffff;
-}
-
-.project-header {
-  font-size: 30px;
-  font-weight: bold;
-  line-height: 1.17;
-  color: #000000;
-}
-
-.project-subtext {
-  font-weight: 300;
-  line-height: 1.15;
-  letter-spacing: 0.3px;
-  color: #000000;
+.page-card {
+  padding-bottom: 20px;
 }
 
 @include project-list.summary;
 
 @media (min-width: 961px) {
-  .project-subtext {
-    font-size: 15px;
-  }
   @include project-list.wide;
-  .project-card-div {
-    padding: 40px 40px 32px 40px;
-  }
-  .project-header {
-    margin-bottom: 24px;
-    font-size: 30px;
+  .page-card {
+    padding-bottom: 32px;
   }
   ::ng-deep .pagination {
-    justify-content: right;
     justify-content: flex-end;
-  }
-  .project-subtext {
-    margin-bottom: 24px;
   }
 }
 
 @media (max-width: 960px) {
-  .project-card-div {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 12px;
-    padding-bottom: 20px;
-  }
-  .project-subtext {
-    font-size: 13px;
-  }
   @include project-list.narrow;
-  .project-header,
-  .news-text-2 {
-    font-size: 15px;
-  }
-  .project-header {
-    margin-bottom: 16px;
-  }
   ::ng-deep .pagination {
     justify-content: center;
-  }
-  .project-subtext {
-    margin-bottom: 16px;
   }
   app-icon {
     font-size: 14px;

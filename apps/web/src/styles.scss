@@ -237,6 +237,45 @@ mat-sidenav-container {
   }
 }
 
+.page-card {
+  border-radius: 4px;
+  background-color: #ffffff;
+  padding: 24px 16px 0;
+
+  @media (min-width: 961px) {
+    padding: 40px 40px 0;
+  }
+}
+
+.page-title {
+  @extend .plex-sans;
+  margin: 0;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1.17;
+  letter-spacing: 0.3px;
+  color: #000000;
+
+  @media (min-width: 961px) {
+    font-size: 30px;
+  }
+}
+
+.page-intro {
+  @extend .plex-sans;
+  margin: 16px 0;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.33;
+  letter-spacing: 0.3px;
+  color: #000000;
+
+  @media (min-width: 961px) {
+    margin: 24px 0;
+    font-size: 15px;
+  }
+}
+
 mat-sidenav-content.page-column {
   display: flex;
   flex-direction: column;

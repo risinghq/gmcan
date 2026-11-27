@@ -7,9 +7,9 @@
   <div class="row">
     <div class="col-lg-8 col-sm-6 col-12">
       <app-breadcrumb [trail]="[{ label: language.publications }]" />
-      <div class="card-publication">
-        <h1 class="card-publication-title">{{ language.publicationsText[0].publicationsTitle }}</h1>
-        <div class="card-publication-text">{{ infoText }}</div>
+      <div class="page-card">
+        <h1 class="page-title">{{ language.publicationsText[0].publicationsTitle }}</h1>
+        <p class="page-intro">{{ infoText }}</p>
         <mat-tab-group (selectedTabChange)="changeTab($event)">
           @for (tab of tabLabels(); track $index) {
           <mat-tab label="{{ tab.label }}">

@@ -1,9 +1,5 @@
 @use "../../shared/styles/publication-list";
 
-.plex-serif {
-  font-family: "IBM Plex Serif", serif;
-}
-
 .plex-sans {
   font-family: "IBM Plex Sans", serif;
 }
@@ -12,90 +8,28 @@
   background-color: #f8f8f8;
 }
 
-.card-publication {
-  border-radius: 4px;
-  background-color: #ffffff;
-}
-
-.card-publication-title {
-  @extend .plex-sans;
-  font-weight: bold;
-  line-height: 1.17;
-  letter-spacing: 0.3px;
-  color: #000000;
-}
-
-.card-publication-text {
-  @extend .plex-sans;
-  font-size: 15px;
-  font-weight: 300;
-  line-height: 1.33;
-  letter-spacing: 0.3px;
-  color: #000000;
+.page-card {
+  padding-bottom: 16px;
 }
 
 @include publication-list.base;
 
-@media (min-width: 1500px) {
-  .card-publication {
-    padding: 40px 40px 24px 40px;
-  }
-  .card-publication-title {
-    font-size: 30px;
-  }
-  .card-publication-text {
-    padding-top: 24px;
-    font-size: 15px;
-    padding-bottom: 26px;
-  }
-  ::ng-deep .pagination {
-    justify-content: right;
-    justify-content: flex-end;
-  }
-}
-
-@media (max-width: 1500px) {
-  .card-publication {
-    padding: 40px 40px 24px 40px;
-  }
-  .card-publication-title {
-    font-size: 30px;
-  }
-  .card-publication-text {
-    padding-top: 24px;
-    font-size: 15px;
-    padding-bottom: 26px;
-  }
-  ::ng-deep .pagination {
-    justify-content: right;
-    justify-content: flex-end;
-  }
-}
-
 @media (min-width: 961px) {
   @include publication-list.wide;
+  .page-card {
+    padding-bottom: 24px;
+  }
+  ::ng-deep .pagination {
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 960px) {
   @include publication-list.narrow;
-  .card-publication {
-    padding: 24px 16px 16px 16px;
-  }
-  .card-publication-title {
-    font-size: 15px;
-  }
-  .card-publication-text {
-    padding-top: 16px;
-    font-size: 13px;
-    padding-bottom: 10px;
-  }
   app-icon {
     font-size: 14px;
   }
   ::ng-deep .pagination {
     justify-content: center;
   }
-}
-.unique-left .ul .li {
-  margin-left: 0;
 }
