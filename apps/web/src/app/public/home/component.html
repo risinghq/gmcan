@@ -8,7 +8,7 @@
   </div>
   <div class="numbers-div">
     @for (counter of counters; track $index) {
-    <a class="box" [routerLink]="counter.link">
+    <a class="box" [routerLink]="counter.link" [queryParams]="counter.queryParams">
       <span class="counter">{{ counter.value }}</span>
       <span class="counter-text">{{ counter.label }}</span>
     </a>

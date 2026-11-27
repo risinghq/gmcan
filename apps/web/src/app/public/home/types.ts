@@ -5,6 +5,7 @@ import type {
   PublicNewsListItem,
   PublicProject,
   PublicPublicationWithAuthors,
+  PublicationKindCode,
 } from "@gmcan/contracts/public";
 
 export type HomePublicacion = PublicationDisplay<PublicPublicationWithAuthors>;
@@ -35,4 +36,5 @@ export type HomeCounter = {
   value: number;
   label: string;
   link: string;
+  queryParams?: { type: PublicationKindCode };
 };
