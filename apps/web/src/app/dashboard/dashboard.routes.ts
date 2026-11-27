@@ -48,17 +48,17 @@ export default [
       {
         path: "miembros-activos",
         loadComponent: () => import("./members/list/miembros.component"),
-        title: "Miembros Activos",
+        title: "Miembros activos",
       },
       {
         path: "miembros-antiguos",
         loadComponent: () => import("./members/list/miembros.component"),
-        title: "Miembros Antiguos",
+        title: "Miembros antiguos",
       },
       {
         path: "add-member",
         loadComponent: () => import("./members/member.page"),
-        title: "Miembros Activos - Agregar miembro",
+        title: "Miembros activos - Agregar miembro",
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -72,12 +72,12 @@ export default [
       {
         path: "proyectos-ejecucion",
         loadComponent: () => import("./projects/list/proyectos.component"),
-        title: "Proyectos en Ejecución",
+        title: "Proyectos en ejecución",
       },
       {
         path: "proyectos-concluidos",
         loadComponent: () => import("./projects/list/proyectos.component"),
-        title: "Proyectos Concluidos",
+        title: "Proyectos concluidos",
       },
       {
         path: "add-project",
@@ -121,7 +121,7 @@ export default [
         path: "perfil",
         loadComponent: () => import("./profile/profile.page"),
         resolve: { item: ownProfileResolver },
-        title: "Mi Perfil",
+        title: "Mi perfil",
         canDeactivate: [canDeactivateGuard],
       },
       { path: "contenidos", loadComponent: () => import("./content/list/contenidos/page"), title: "Contenidos" },
@@ -136,7 +136,7 @@ export default [
         path: "edit-quienes-somos",
         loadComponent: () => import("./content/forms/about.page"),
         resolve: { about: adminAboutResolver },
-        title: "Contenidos - Editar ¿Quiénes Somos?",
+        title: "Contenidos - Editar ¿Quiénes somos?",
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -185,14 +185,14 @@ export default [
         path: "add-software",
         loadComponent: () => import("./content/forms/software.page"),
         resolve: { item: softwareItemResolver, groupId: contentGroupIdResolver },
-        title: "Software - Agregar software",
+        title: "Contenidos - Agregar software",
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: "edit-software/:id",
         loadComponent: () => import("./content/forms/software.page"),
         resolve: { item: softwareItemResolver, groupId: contentGroupIdResolver },
-        title: "Software - Editar software",
+        title: "Contenidos - Editar software",
         canDeactivate: [canDeactivateGuard],
       },
       {
@@ -262,7 +262,7 @@ export default [
       {
         path: "eventos",
         loadComponent: () => import("./events/list/eventos.component"),
-        title: "Resúmenes en Eventos",
+        title: "Resúmenes en eventos",
       },
       {
         path: "add-resumen",
@@ -304,17 +304,17 @@ export default [
       {
         path: "my-articles",
         loadComponent: () => import("./publications/my-articles/my-article.component"),
-        title: "Mis Artículos",
+        title: "Mis artículos",
       },
       {
         path: "my-thesis",
         loadComponent: () => import("./publications/my-thesis/my-thesis.component"),
-        title: "Mis Tesis",
+        title: "Mis tesis",
       },
       {
         path: "my-abstracts",
         loadComponent: () => import("./publications/my-resumenes/my-resumenes.component"),
-        title: "Mis Resúmenes",
+        title: "Mis resúmenes en eventos",
       },
       {
         path: "**",
