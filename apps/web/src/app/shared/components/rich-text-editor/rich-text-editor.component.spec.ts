@@ -69,6 +69,15 @@ describe("RichTextEditorComponent", () => {
     expect(tree(fixture.componentInstance.form.controls.content.value)).toEqual([{ p: ["Existing content"] }]);
   });
 
+  it("offers no h1, so the content never repeats the title of the page that shows it", () => {
+    const options = [...(fixture.nativeElement as HTMLElement).querySelectorAll("select option")];
+    expect(options.map((option) => option.textContent?.trim())).toEqual(["Párrafo", "Título", "Subtítulo"]);
+
+    const editorComponent = fixture.componentInstance.editorComponent;
+    editorComponent.editor.commands.setContent("<h1>Pegado</h1>");
+    expect(tree(editorComponent.editor.getHTML())).toEqual([{ p: ["Pegado"] }]);
+  });
+
   it("types and formats content through the toolbar before reading its HTML value", () => {
     const editorComponent = fixture.componentInstance.editorComponent;
     editorComponent.editor.commands.setContent("<p></p>", { emitUpdate: false });

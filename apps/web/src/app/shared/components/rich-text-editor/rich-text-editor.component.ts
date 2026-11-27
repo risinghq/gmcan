@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation, forwardRef } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { MatButton } from "@angular/material/button";
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { TiptapEditorDirective } from "ngx-tiptap";
 
+const HEADING_LEVELS = [2, 3] as const;
+type HeadingLevel = (typeof HEADING_LEVELS)[number];
+
 interface HeadingOption {
   label: string;
-  value: "paragraph" | `heading-${number}`;
+  value: "paragraph" | `heading-${HeadingLevel}`;
 }
 
 @Component({
@@ -16,7 +18,7 @@ interface HeadingOption {
   styleUrl: "./rich-text-editor.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
-  imports: [MatButton, TiptapEditorDirective],
+  imports: [TiptapEditorDirective],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -27,18 +29,16 @@ interface HeadingOption {
 })
 export class RichTextEditorComponent implements ControlValueAccessor, OnDestroy {
   readonly headingOptions: HeadingOption[] = [
-    { label: "Paragraph", value: "paragraph" },
-    { label: "Heading 1", value: "heading-1" },
-    { label: "Heading 2", value: "heading-2" },
-    { label: "Heading 3", value: "heading-3" },
-    { label: "Heading 4", value: "heading-4" },
-    { label: "Heading 5", value: "heading-5" },
-    { label: "Heading 6", value: "heading-6" },
+    { label: "Párrafo", value: "paragraph" },
+    { label: "Título", value: "heading-2" },
+    { label: "Subtítulo", value: "heading-3" },
   ];
 
+  /** The page that shows the content owns its only h1. */
   readonly editor = new Editor({
     extensions: [
       StarterKit.configure({
+        heading: { levels: [...HEADING_LEVELS] },
         link: { openOnClick: false },
         underline: {},
       }),
@@ -70,7 +70,7 @@ export class RichTextEditorComponent implements ControlValueAccessor, OnDestroy 
   }
 
   get currentBlock(): HeadingOption["value"] {
-    for (const level of [1, 2, 3, 4, 5, 6]) {
+    for (const level of HEADING_LEVELS) {
       if (this.editor.isActive("heading", { level })) return `heading-${level}`;
     }
     return "paragraph";
@@ -83,7 +83,7 @@ export class RichTextEditorComponent implements ControlValueAccessor, OnDestroy 
       chain.setParagraph().run();
       return;
     }
-    chain.setHeading({ level: Number(value.slice("heading-".length)) as 1 | 2 | 3 | 4 | 5 | 6 }).run();
+    chain.setHeading({ level: Number(value.slice("heading-".length)) as HeadingLevel }).run();
   }
 
   toggleBold(): void {
@@ -108,7 +108,8 @@ export class RichTextEditorComponent implements ControlValueAccessor, OnDestroy 
 
   setLink(): void {
     const currentHref = this.editor.getAttributes("link")["href"] as string | undefined;
-    const href = typeof window === "undefined" ? null : window.prompt("Link URL", currentHref ?? "https://");
+    const href =
+      typeof window === "undefined" ? null : window.prompt("Dirección del enlace", currentHref ?? "https://");
     if (href === null) return;
     const normalizedHref = href.trim();
     if (normalizedHref) {
