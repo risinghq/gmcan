@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { Title } from "@angular/platform-browser";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { Languages } from "@app/shared/models/languages";
 import { AuthService } from "@app/shared/services/auth.service";
@@ -15,7 +15,7 @@ import { finalize } from "rxjs";
   templateUrl: "./login.component.html",
   styleUrl: "./login.component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [IconComponent, ReactiveFormsModule],
+  imports: [IconComponent, ReactiveFormsModule, RouterLink],
 })
 export default class LoginComponent implements OnInit {
   private groupService = inject(GroupService);
@@ -88,9 +88,5 @@ export default class LoginComponent implements OnInit {
           this.error.set("No se pudo procesar la solicitud. Intente más tarde.");
         },
       });
-  }
-
-  return(): void {
-    this.router.navigate(["/"]);
   }
 }
