@@ -52,18 +52,13 @@
   font-size: 20px;
 }
 
-.not-found-1 {
-  padding: 8px 0;
-  font-size: 15px;
+.not-found {
+  margin: 16px 0 0;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.3px;
   color: var(--muted-text);
-}
-
-.not-found-2 {
-  @extend .not-found-1;
-  font-size: 17px;
 }
 
 @media (min-width: 961px) {
@@ -86,10 +81,8 @@
     height: 32px;
     font-size: 32px;
   }
-  .not-found-1 {
-    font-size: 16px;
-  }
-  .not-found-2 {
+  .not-found {
+    margin-top: 32px;
     font-size: 20px;
   }
 }

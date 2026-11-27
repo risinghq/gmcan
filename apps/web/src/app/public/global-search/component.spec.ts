@@ -115,8 +115,16 @@ describe("GlobalSearchComponent", () => {
   });
 
   it("shows the not-found message when a search matches nothing", () => {
-    expect(page().querySelector(".not-found-2")).not.toBeNull();
+    expect(page().querySelector(".not-found")).not.toBeNull();
     expect(page().querySelector("app-publication-item")).toBeNull();
+  });
+
+  it("shows only the groups that matched, across the full width when one column is empty", async () => {
+    await search("noticia", { ...EMPTY, news: [newsItem(1, null)] });
+
+    expect(texts("h2.publications-title").map((text) => text?.split(/\s+/)[0])).toEqual(["Noticias"]);
+    expect(page().querySelector("#news-list")?.parentElement?.className).not.toContain("col-lg-4");
+    expect(page().querySelector(".not-found")).toBeNull();
   });
 
   it("names each publication's kind, journal and date from the lookup data", async () => {
@@ -127,7 +135,7 @@ describe("GlobalSearchComponent", () => {
     expect(texts("app-publication-item .meta")[0]).toContain("Nano Letters Vol. 12");
     expect(texts("app-publication-item .meta")[1]).toContain("UNI");
     expect(texts("app-publication-item .meta")[0]).toContain("Marzo 2024");
-    expect(page().querySelector(".not-found-2")).toBeNull();
+    expect(page().querySelector(".not-found")).toBeNull();
   });
 
   it("lists every news result as one link with its kind, date and an image only when it has one", async () => {
