@@ -750,25 +750,6 @@ button.forgot {
   @extend .full-width;
   display: flex;
 }
-.share2 {
-  flex-grow: 0.2;
-  justify-content: center;
-}
-.other-news {
-  border-top: 1px #e5e5e5 solid;
-  border-bottom: 1px #e5e5e5 solid;
-}
-.other-news-text {
-  @extend .plex-serif;
-  font-weight: 500;
-  color: var(--black);
-  flex-grow: 1;
-}
-
-.card-text-question-2 {
-  @extend .plex-sans;
-  color: var(--dark-blue);
-}
 .flex-news {
   display: flex;
 }
@@ -785,15 +766,6 @@ button.forgot {
   align-self: center;
   display: block ruby;
 }
-.date-icon {
-  color: var(--true-green);
-}
-
-.text-other {
-  @extend .plex-sans;
-  color: var(--black);
-}
-
 .mante-title {
   @extend .plex-serif;
   font-weight: bold;

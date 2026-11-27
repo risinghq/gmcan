@@ -1,11 +1,9 @@
 import { SlicePipe } from "@angular/common";
-import { Component, HostListener, computed, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, computed, inject, ChangeDetectionStrategy } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Router, ActivatedRoute, NavigationEnd, RouterLink } from "@angular/router";
 import type { PublicNewsListItem } from "@app/shared/models/news";
 import { parsePublicOrigin } from "@app/shared/routing/public-origin";
-import { BrowserService } from "@app/shared/services/browser.service";
-import { GLOBAL } from "@app/shared/services/global";
 import { NewsService } from "@app/shared/services/news.service";
 import { SessionService } from "@app/shared/services/session.service";
 import { dateText, parseLocalDate } from "@app/shared/utils/date";
@@ -21,14 +19,13 @@ type NewsDisplay = PublicNewsListItem & {
   selector: "app-news",
   templateUrl: "./news.component.html",
   styleUrl: "./news.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [SlicePipe, RouterLink],
 })
 export default class NewsComponent {
   newsService = inject(NewsService);
   route = inject(ActivatedRoute);
   router = inject(Router);
-  private browser = inject(BrowserService);
   private session = inject(SessionService);
 
   private readonly selectedNewsId = toSignal(this.route.paramMap.pipe(map((params) => Number(params.get("id")) || 0)), {
@@ -79,19 +76,5 @@ export default class NewsComponent {
       newsItems: enriched.slice(1),
     };
   });
-  url: string;
-
-  constructor() {
-    this.url = GLOBAL.url;
-  }
-
-  numberShown = this.browser.innerWidth() >= 1300 ? 10 : 5;
-
-  @HostListener("window:resize", ["$event"])
-  onResize(event: Event): void {
-    void event;
-    this.numberShown = this.browser.innerWidth() >= 1300 ? 10 : 5;
-  }
-
   readonly title = computed(() => (this.isDetailNews() ? this.language().moreNews : this.language().news));
 }
