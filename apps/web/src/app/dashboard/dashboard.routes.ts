@@ -1,3 +1,4 @@
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
 import { MatPaginatorIntl } from "@angular/material/paginator";
 import { Routes } from "@angular/router";
 import {
@@ -38,7 +39,10 @@ export default [
     canMatch: [adminCanMatchGuard],
     canActivateChild: [adminCanActivateChildGuard],
     title: "Administrador",
-    providers: [{ provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl }],
+    providers: [
+      { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl },
+      { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { subscriptSizing: "dynamic" } },
+    ],
     children: [
       { path: "", loadComponent: () => import("./home/dashboard.component"), title: "Dashboard" },
       {

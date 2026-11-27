@@ -103,7 +103,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
             <div class="full-width flex-news">
               <div class="full-width mr-26">
                 <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
-                <mat-form-field class="input-category">
+                <mat-form-field class="form-field">
                   <input matInput [matDatepicker]="dp" formControlName="publishedAt" />
                   <mat-datepicker-toggle matSuffix [for]="dp" />
                   <mat-datepicker #dp />
@@ -111,7 +111,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
               </div>
               <div class="full-width ml-26">
                 <div class="text-category">Categoría <span class="red-text">*</span></div>
-                <mat-form-field class="input-category">
+                <mat-form-field class="form-field">
                   <mat-select formControlName="newsKindCode">
                     @for (kind of kinds(); track kind.code) {
                       <mat-option [value]="kind.code">{{ kind.name }}</mat-option>
@@ -122,7 +122,7 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
             </div>
             <div class="full-width">
               <div class="text-category">Autor <span class="red-text">*</span></div>
-              <mat-form-field class="input-category">
+              <mat-form-field class="form-field">
                 <mat-select formControlName="authorId">
                   @for (author of authors(); track author.id) {
                     <mat-option [value]="author.id">

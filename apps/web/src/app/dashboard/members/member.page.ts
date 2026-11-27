@@ -108,7 +108,7 @@ function listPath(isActive: 0 | 1): string {
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
               <div class="text-category">Cargo <span class="red-text">*</span></div>
-              <mat-form-field class="input-category">
+              <mat-form-field class="form-field">
                 <mat-select formControlName="memberTypeCode">
                   @for (type of lookup.memberTypes(); track type.code) {
                     <mat-option [value]="type.code">{{ type.nameSingular }}</mat-option>

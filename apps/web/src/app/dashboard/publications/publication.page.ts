@@ -4,7 +4,7 @@ import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } fr
 import { MatAutocomplete, MatAutocompleteTrigger } from "@angular/material/autocomplete";
 import { MatOption, provideNativeDateAdapter } from "@angular/material/core";
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from "@angular/material/datepicker";
-import { MatFormField, MatLabel, MatSuffix } from "@angular/material/form-field";
+import { MatFormField, MatSuffix } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatSelect } from "@angular/material/select";
 import { ActivatedRoute } from "@angular/router";
@@ -161,7 +161,6 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
     MatFormField,
     IconComponent,
     MatInput,
-    MatLabel,
     MatOption,
     MatSelect,
     MatSuffix,
@@ -183,9 +182,13 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
         <div class="flex-news">
           <div class="mr-32 full-width">
             <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
-            <mat-form-field class="input-category">
-              <mat-label>Seleccionar fecha</mat-label>
-              <input matInput [matDatepicker]="published" formControlName="publishedAt" />
+            <mat-form-field class="form-field">
+              <input
+                matInput
+                placeholder="Seleccionar fecha"
+                [matDatepicker]="published"
+                formControlName="publishedAt"
+              />
               <mat-datepicker-toggle matSuffix [for]="published" />
               <mat-datepicker #published />
             </mat-form-field>
@@ -194,9 +197,8 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
             @case ("journal_article") {
               <div class="mr-32 full-width">
                 <div class="text-category">Revista <span class="red-text">*</span></div>
-                <mat-form-field class="input-category">
-                  <mat-label>Seleccionar revista</mat-label>
-                  <mat-select formControlName="journalId">
+                <mat-form-field class="form-field">
+                  <mat-select placeholder="Seleccionar revista" formControlName="journalId">
                     @for (journal of lookup.journals(); track journal.id) {
                       <mat-option [value]="journal.id">{{ journal.name }}</mat-option>
                     }
@@ -211,9 +213,8 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
             @case ("conference_paper") {
               <div class="mr-32 full-width">
                 <div class="text-category">Evento <span class="red-text">*</span></div>
-                <mat-form-field class="input-category">
-                  <mat-label>Seleccionar evento</mat-label>
-                  <mat-select formControlName="eventId">
+                <mat-form-field class="form-field">
+                  <mat-select placeholder="Seleccionar evento" formControlName="eventId">
                     @for (event of events(); track event.id) {
                       <mat-option [value]="event.id">{{ event.name }}</mat-option>
                     }
@@ -224,9 +225,8 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
             @case ("thesis") {
               <div class="mr-32 full-width">
                 <div class="text-category">Tipo de tesis <span class="red-text">*</span></div>
-                <mat-form-field class="input-category">
-                  <mat-label>Seleccionar tipo</mat-label>
-                  <mat-select formControlName="thesisKindCode">
+                <mat-form-field class="form-field">
+                  <mat-select placeholder="Seleccionar tipo" formControlName="thesisKindCode">
                     @for (thesisKind of lookup.thesisKinds(); track thesisKind.code) {
                       <mat-option [value]="thesisKind.code">{{ thesisKind.name }}</mat-option>
                     }
@@ -235,9 +235,8 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
               </div>
               <div class="mr-32 full-width">
                 <div class="text-category">Universidad <span class="red-text">*</span></div>
-                <mat-form-field class="input-category">
-                  <mat-label>Seleccionar universidad</mat-label>
-                  <mat-select formControlName="universityId">
+                <mat-form-field class="form-field">
+                  <mat-select placeholder="Seleccionar universidad" formControlName="universityId">
                     @for (university of lookup.universities(); track university.id) {
                       <mat-option [value]="university.id">{{ university.name }}</mat-option>
                     }
@@ -264,9 +263,14 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
             @for (row of form.controls.authors.controls; track row; let i = $index; let first = $first) {
               <div class="author-row" [formGroupName]="i">
                 <span class="author-order">{{ i + 1 }}</span>
-                <mat-form-field class="input-category author-name">
-                  <mat-label>{{ first ? "Primer autor" : "Autor" }}</mat-label>
-                  <input matInput formControlName="name" [matAutocomplete]="names" (input)="unlink(row)" />
+                <mat-form-field class="form-field author-name">
+                  <input
+                    matInput
+                    [placeholder]="first ? 'Primer autor' : 'Autor'"
+                    formControlName="name"
+                    [matAutocomplete]="names"
+                    (input)="unlink(row)"
+                  />
                   <mat-autocomplete #names="matAutocomplete">
                     @for (candidate of matching(row.controls.name.value); track $index) {
                       <mat-option
