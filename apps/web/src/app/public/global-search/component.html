@@ -203,27 +203,7 @@
                 proyecto.researchLine }}
               </div>
               <div class="project-pt">
-                <div class="flex-news flex-flow">
-                  <strong class="resp-title">{{ language().projectsText[0].responsable }}:</strong>
-                  @for (member of proyecto.members; track member.memberId) {
-                  <div class="project-members">
-                    <div class="member-img-round">
-                      <app-avatar
-                        class="member-img"
-                        [src]="member.photoUrl"
-                        [alt]="member.photoAlt"
-                        [name]="member.name"
-                      />
-                    </div>
-                    <a
-                      class="member-name plain-link"
-                      [routerLink]="['/detail-member', member.memberId]"
-                      [queryParams]="{ from: 'search' }"
-                      >{{ member.name }}</a
-                    >
-                  </div>
-                  }
-                </div>
+                <app-project-members [members]="proyecto.members" from="search" />
                 <div class="flex-news">
                   <button
                     type="button"
