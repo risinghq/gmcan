@@ -80,7 +80,7 @@ export const newsToolbarBadge: Derive<ToolbarBadge> = (data) =>
 export const memberEditTitle: Derive<string> = (data, route) => {
   const member = data["item"] as AdminMember;
   const isFormer = route.queryParamMap.get("returnTo") === "miembros-antiguos";
-  const section = isFormer ? "Miembros Antiguos" : "Miembros Activos";
+  const section = isFormer ? "Miembros antiguos" : "Miembros activos";
   return `${section} - ${personName(member)}`;
 };
 

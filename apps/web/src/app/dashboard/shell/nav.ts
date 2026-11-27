@@ -24,7 +24,7 @@ export const DASHBOARD_NAV: NavSection[] = [
   {
     title: "Miembros",
     links: [
-      { path: "/dashboard/miembros-activos", label: "Miembros Activos", icon: "users", capability: "members.read" },
+      { path: "/dashboard/miembros-activos", label: "Miembros activos", icon: "users", capability: "members.read" },
       { path: "/dashboard/miembros-antiguos", label: "Miembros antiguos", icon: "history", capability: "members.read" },
     ],
   },
@@ -35,7 +35,7 @@ export const DASHBOARD_NAV: NavSection[] = [
       { path: "/dashboard/tesis", label: "Tesis", icon: "school", capability: "publications.write" },
       {
         path: "/dashboard/eventos",
-        label: "Resumen en eventos",
+        label: "Resúmenes en eventos",
         icon: "calendar-event",
         capability: "publications.write",
       },

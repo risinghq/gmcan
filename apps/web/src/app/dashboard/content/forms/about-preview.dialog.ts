@@ -19,7 +19,7 @@ export interface AboutPreview {
         <img class="about-img" [src]="data.image" alt="" />
       }
       <div class="about-text-div">
-        <div class="page-title">¿Quiénes Somos?</div>
+        <div class="page-title">¿Quiénes somos?</div>
         <div class="page-rule"></div>
         <div class="page-body" [innerHTML]="data.about.description"></div>
         @for (section of sections; track section.title) {
