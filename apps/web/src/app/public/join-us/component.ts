@@ -1,4 +1,3 @@
-import { CdkTextareaAutosize } from "@angular/cdk/text-field";
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
@@ -18,7 +17,7 @@ import { SentDialogComponent } from "./sent-dialog.component";
   templateUrl: "./component.html",
   styleUrl: "./component.scss",
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule, CdkTextareaAutosize, NewsComponent, RouterLink],
+  imports: [BreadcrumbComponent, IconComponent, ReactiveFormsModule, NewsComponent, RouterLink],
 })
 export default class JoinUsComponent implements OnInit {
   private emailService = inject(EmailService);
