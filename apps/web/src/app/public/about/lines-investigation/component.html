@@ -2,34 +2,35 @@
   <div class="lines-text-div">
     @for (linea of lineasProyecto(); track linea.id) {
     <div class="line-mb">
-      <button type="button" class="line-toggle" (click)="toggleLine(linea.id)">
-        <div class="line-toggle-header">
-          <div class="line-img-div">
-            @if (linea.asset) {
-            <img class="line-img" src="{{ linea.asset }}" alt="" />
-            } @else {
-            <img class="line-img" src="/img/prop_estruc.avif" alt="" />
-            }
-          </div>
-          <div>
-            <div class="lines-title">{{ linea.name }}</div>
-            <div class="line-line-div"></div>
-            <div class="lines-subtitle">{{ linea.description }}</div>
-          </div>
-          <app-icon
-            class="project-abs-icon line-toggle-icon"
-            [class]="{
-              'abs-active': isLineExpanded(linea.id),
-              'abs-not-active': !isLineExpanded(linea.id),
-            }"
-            name="chevron-down"
-          />
+      <ng-template #lineHeader>
+        <div class="line-img-div">
+          <img class="line-img" [src]="linea.asset || '/img/prop_estruc.avif'" alt="" />
         </div>
-      </button>
+        <div>
+          <div class="lines-title">{{ linea.name }}</div>
+          <div class="line-line-div"></div>
+          <div class="lines-subtitle">{{ linea.description }}</div>
+        </div>
+      </ng-template>
 
-      @if (isLineExpanded(linea.id)) {
+      @if (linea.proyectos.length) {
+      <button
+        type="button"
+        class="line-toggle line-header"
+        [attr.aria-expanded]="isLineExpanded(linea.id)"
+        [attr.aria-controls]="'line-' + linea.id + '-projects'"
+        (click)="toggleLine(linea.id)"
+      >
+        <ng-container [ngTemplateOutlet]="lineHeader" />
+        <app-icon class="project-abs-icon line-toggle-icon" name="chevron-down" />
+      </button>
+      } @else {
+      <div class="line-header">
+        <ng-container [ngTemplateOutlet]="lineHeader" />
+      </div>
+      } @if (isLineExpanded(linea.id)) {
       <div class="lines-projects">{{ language().linesInvestigationText[0].projects }}</div>
-      <div>
+      <div [id]="'line-' + linea.id + '-projects'">
         @for (proyecto of linea.proyectos | slice: (pageForLine(linea.id) - 1) * pageSize : (pageForLine(linea.id) - 1)
         * pageSize + pageSize; track proyecto.id; let i = $index ) {
         <div class="project">
