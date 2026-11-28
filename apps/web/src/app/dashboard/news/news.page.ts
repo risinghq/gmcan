@@ -99,28 +99,26 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
               (picked)="pick($event)"
             />
           </div>
-          <div class="full-width">
-            <div class="full-width flex-news">
-              <div class="full-width mr-26">
-                <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
-                <mat-form-field class="form-field">
-                  <input matInput [matDatepicker]="dp" formControlName="publishedAt" />
-                  <mat-datepicker-toggle matSuffix [for]="dp" />
-                  <mat-datepicker #dp />
-                </mat-form-field>
-              </div>
-              <div class="full-width ml-26">
-                <div class="text-category">Categoría <span class="red-text">*</span></div>
-                <mat-form-field class="form-field">
-                  <mat-select formControlName="newsKindCode">
-                    @for (kind of kinds(); track kind.code) {
-                      <mat-option [value]="kind.code">{{ kind.name }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
+          <div class="news-meta">
+            <div>
+              <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
+              <mat-form-field class="form-field">
+                <input matInput [matDatepicker]="dp" formControlName="publishedAt" />
+                <mat-datepicker-toggle matSuffix [for]="dp" />
+                <mat-datepicker #dp />
+              </mat-form-field>
             </div>
-            <div class="full-width">
+            <div>
+              <div class="text-category">Categoría <span class="red-text">*</span></div>
+              <mat-form-field class="form-field">
+                <mat-select formControlName="newsKindCode">
+                  @for (kind of kinds(); track kind.code) {
+                    <mat-option [value]="kind.code">{{ kind.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="news-author">
               <div class="text-category">Autor <span class="red-text">*</span></div>
               <mat-form-field class="form-field">
                 <mat-select formControlName="authorId">
