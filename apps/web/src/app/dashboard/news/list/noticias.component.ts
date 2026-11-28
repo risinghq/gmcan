@@ -22,6 +22,7 @@ import type { AdminNewsListItem, AdminNewsSortBy } from "@app/shared/models/admi
 import { LookupService } from "@app/shared/services/lookup.service";
 import { NewsService } from "@app/shared/services/news.service";
 import { TabStateService } from "@app/shared/services/tab-state.service";
+import { PAGE_SIZE } from "@app/shared/tables/list-table";
 import { dateText } from "@app/shared/utils/date";
 
 interface NewsListItem {
@@ -74,7 +75,8 @@ export default class NewsListComponent implements OnInit {
 
   readonly items = signal<NewsListItem[] | null>(null);
   readonly total = signal(0);
-  pageSize = 10;
+  pageSize = PAGE_SIZE;
+  readonly PAGE_SIZE = PAGE_SIZE;
   pageIndex = 0;
   search = "";
   statusFilter: "" | "draft" | "published" | "archived" = "";

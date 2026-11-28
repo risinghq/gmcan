@@ -62,7 +62,7 @@
       ></tr>
     </table>
 
-    <mat-paginator [hidden]="theses.notFound()" #thesesPaginator />
+    <mat-paginator [hidden]="!theses.paged()" #thesesPaginator />
     @if (theses.notFound()) {
       <app-empty-list [searching]="theses.searching()">Todavía no hay tesis.</app-empty-list>
     }
@@ -106,7 +106,7 @@
       ></tr>
     </table>
 
-    <mat-paginator [hidden]="universities.notFound()" #universitiesPaginator />
+    <mat-paginator [hidden]="!universities.paged()" #universitiesPaginator />
     @if (universities.notFound()) {
       <app-empty-list [searching]="universities.searching()">Todavía no hay universidades.</app-empty-list>
     }

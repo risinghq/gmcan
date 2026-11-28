@@ -55,7 +55,7 @@
     ></tr>
   </table>
 
-  <mat-paginator [hidden]="table.notFound()" #tablePaginator />
+  <mat-paginator [hidden]="!table.paged()" #tablePaginator />
   @if (table.notFound()) {
     <app-empty-list [searching]="table.searching()">Todavía no tienes resúmenes en eventos.</app-empty-list>
   }

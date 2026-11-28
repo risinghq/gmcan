@@ -69,7 +69,7 @@ import { ContentTable } from "./table";
       <tr mat-header-row *matHeaderRowDef="columns"></tr>
       <tr mat-row class="clickable-row" *matRowDef="let row; columns: columns" (click)="edit(row.id)"></tr>
     </table>
-    <mat-paginator [hidden]="list.notFound()" />
+    <mat-paginator [hidden]="!list.paged()" />
     @if (list.notFound()) {
       <app-empty-list [searching]="list.searching()">{{ emptyLabel() }}</app-empty-list>
     }
