@@ -1,0 +1,17 @@
+.field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+
+  .text-category {
+    margin-bottom: 0;
+  }
+}
+
+.field-count {
+  font-size: 13px;
+  color: var(--muted-text);
+  font-variant-numeric: tabular-nums;
+}
