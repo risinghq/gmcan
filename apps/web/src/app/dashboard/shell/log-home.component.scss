@@ -12,6 +12,16 @@
   flex: 1;
   overflow-y: auto;
   padding-top: 0;
+  --mat-list-list-item-one-line-container-height: 44px;
+}
+
+.dashboard-nav .mat-mdc-subheader {
+  margin: 16px 16px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.3px;
+  color: var(--muted-text);
 }
 
 .dashboard-nav .active {
