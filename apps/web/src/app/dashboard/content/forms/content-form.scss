@@ -17,6 +17,19 @@
   font-weight: 600;
 }
 
+.readonly-fields {
+  margin: 0 0 8px;
+}
+
+.field-value {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #30393a;
+}
+
 .field-action {
   padding: 4px 0;
   margin-block: -4px;
