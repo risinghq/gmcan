@@ -57,12 +57,14 @@
 
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
-          <td
-            mat-cell
-            *matCellDef="let row"
-            [class]="{ 'on-status': row.statusCode === 'published', 'off-status': row.statusCode !== 'published' }"
-          >
-            {{ row.statusLabel }}
+          <td mat-cell *matCellDef="let row">
+            <span
+              class="status-chip"
+              [class.status-ready]="row.statusCode === 'published'"
+              [class.status-draft]="row.statusCode === 'draft'"
+              [class.status-archived]="row.statusCode === 'archived'"
+              >{{ row.statusLabel }}</span
+            >
           </td>
         </ng-container>
 
