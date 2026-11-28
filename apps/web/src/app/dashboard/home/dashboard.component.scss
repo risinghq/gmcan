@@ -135,3 +135,41 @@ a.action:hover .item-title {
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
+
+.pie {
+  position: relative;
+  max-width: 240px;
+  margin-inline: auto;
+}
+
+.chart-legend {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  color: #30393a;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-label {
+  flex: 1;
+}
+
+.legend-count {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

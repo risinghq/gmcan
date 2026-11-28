@@ -14,7 +14,6 @@ import {
   CategoryScale,
   type ChartDataset,
   type ChartOptions,
-  Legend,
   LinearScale,
   PieController,
   Tooltip,
@@ -24,11 +23,11 @@ import { EMPTY } from "rxjs";
 
 const PALETTE = [
   "rgba(13,56,0,1)",
-  "rgba(0,133,51,1)",
-  "rgba(0,204,24,1)",
-  "rgba(120,240,0,1)",
-  "rgba(142,236,152,1)",
-  "rgba(0,48,0,1)",
+  "rgba(0,107,46,1)",
+  "rgba(0,163,58,1)",
+  "rgba(92,214,92,1)",
+  "rgba(179,237,176,1)",
+  "rgba(118,140,122,1)",
 ];
 
 interface Action {
@@ -86,6 +85,7 @@ const ACTIONS: Action[] = [
 function chart(items: DashboardCountItem[], label: string, style: Partial<ChartDataset>) {
   return {
     total: items.reduce((sum, item) => sum + item.count, 0),
+    legend: items.map((item, index) => ({ ...item, color: PALETTE[index % PALETTE.length] })),
     labels: items.map((item) => item.label),
     datasets: [{ ...style, data: items.map((item) => item.count), label }] as ChartDataset[],
   };
@@ -99,16 +99,7 @@ function chart(items: DashboardCountItem[], label: string, style: Partial<ChartD
   imports: [RouterLink, IconComponent, BaseChartDirective],
   providers: [
     provideCharts({
-      registerables: [
-        PieController,
-        ArcElement,
-        BarController,
-        BarElement,
-        CategoryScale,
-        LinearScale,
-        Legend,
-        Tooltip,
-      ],
+      registerables: [PieController, ArcElement, BarController, BarElement, CategoryScale, LinearScale, Tooltip],
     }),
   ],
 })
@@ -143,9 +134,13 @@ export default class DashboardComponent {
     }),
   );
 
-  readonly membersChartOptions: ChartOptions = {
+  readonly membersChartOptions: ChartOptions = { responsive: true };
+  readonly publicationsChartOptions: ChartOptions = {
     responsive: true,
-    plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { family: "IBM Plex Sans" } } } },
+    indexAxis: "y",
+    scales: {
+      x: { ticks: { precision: 0 } },
+      y: { ticks: { color: "#30393a", font: { family: "IBM Plex Sans", size: 13 } } },
+    },
   };
-  readonly publicationsChartOptions: ChartOptions = { responsive: true, indexAxis: "y" };
 }
