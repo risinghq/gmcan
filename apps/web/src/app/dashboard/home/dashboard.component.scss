@@ -173,3 +173,33 @@ a.action:hover .item-title {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+
+.bar-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  color: #30393a;
+
+  li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+  }
+}
+
+.bar-track {
+  grid-column: 1 / -1;
+  height: 8px;
+  border-radius: 999px;
+  background-color: #eef3ee;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--deep-green);
+}
