@@ -59,7 +59,7 @@
       ></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="abstracts.notFound()" #abstractsPaginator />
+    <mat-paginator [hidden]="abstracts.notFound()" #abstractsPaginator />
     @if (abstracts.notFound()) {
       <app-empty-list [searching]="abstracts.searching()">Todavía no hay resúmenes.</app-empty-list>
     }
@@ -107,7 +107,7 @@
       ></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="events.notFound()" #eventsPaginator />
+    <mat-paginator [hidden]="events.notFound()" #eventsPaginator />
     @if (events.notFound()) {
       <app-empty-list [searching]="events.searching()">Todavía no hay eventos.</app-empty-list>
     }

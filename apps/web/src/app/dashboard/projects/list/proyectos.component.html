@@ -51,7 +51,7 @@
           (click)="editProject(row.id)"
         ></tr>
       </table>
-      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" />
+      <mat-paginator [hidden]="table.notFound()" />
       @if (table.notFound()) {
         <app-empty-list [searching]="table.searching()">Todavía no hay proyectos en ejecución.</app-empty-list>
       }
@@ -129,7 +129,7 @@
         (click)="editProject(row.id)"
       ></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="table.notFound()" />
+    <mat-paginator [hidden]="table.notFound()" />
     @if (table.notFound()) {
       <app-empty-list [searching]="table.searching()">Todavía no hay proyectos concluidos.</app-empty-list>
     }
