@@ -34,16 +34,20 @@ import { requiredText } from "./text-fields";
       <form [formGroup]="form" class="mt-24">
         <app-image-field [current]="item()?.asset ?? null" (picked)="pick($event)" />
         @for (locale of locales; track locale) {
-          <div class="locale-section full-width" [formGroupName]="locale">
-            <div class="locale-title">{{ label(locale) }}</div>
-            <div class="text-category">Nombre del método <span class="red-text">*</span></div>
-            <input class="input-category" formControlName="name" />
+          <fieldset class="locale-section full-width" [formGroupName]="locale">
+            <legend class="locale-title">{{ label(locale) }}</legend>
+            <label class="text-category" [for]="locale + '-name'">
+              Nombre del método <span class="red-text">*</span>
+            </label>
+            <input class="input-category" [id]="locale + '-name'" formControlName="name" />
             <div class="field-head">
-              <div class="text-category">Descripción <span class="red-text">*</span></div>
+              <div class="text-category" [id]="locale + '-description'">
+                Descripción <span class="red-text">*</span>
+              </div>
               <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
             </div>
-            <app-rich-text-editor formControlName="description" />
-          </div>
+            <app-rich-text-editor formControlName="description" [labelledBy]="locale + '-description'" />
+          </fieldset>
         }
       </form>
     </app-content-form>

@@ -107,9 +107,9 @@ function listPath(isActive: 0 | 1): string {
         >
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
-              <div class="text-category">Cargo <span class="red-text">*</span></div>
+              <div class="text-category" id="member-type-label">Cargo <span class="red-text">*</span></div>
               <mat-form-field class="form-field">
-                <mat-select formControlName="memberTypeCode">
+                <mat-select formControlName="memberTypeCode" aria-labelledby="member-type-label">
                   @for (type of lookup.memberTypes(); track type.code) {
                     <mat-option [value]="type.code">{{ type.nameSingular }}</mat-option>
                   }
@@ -117,21 +117,30 @@ function listPath(isActive: 0 | 1): string {
               </mat-form-field>
             </div>
             <div class="full-width">
-              <div class="text-category">N° DNI / Pasaporte <span class="red-text">*</span></div>
-              <input formControlName="dni" class="input-category" placeholder="Ingresar DNI/Pasaporte" />
+              <label class="text-category" for="member-dni">N° DNI / Pasaporte <span class="red-text">*</span></label>
+              <input id="member-dni" formControlName="dni" class="input-category" />
             </div>
           </div>
           @if (!item()) {
             <div class="flex-news mb-8" formGroupName="credentials">
               <div class="mr-32 full-width">
-                <div class="text-category">
+                <label class="text-category" for="member-password">
                   Contraseña (mínimo {{ minPassword }} caracteres) <span class="red-text">*</span>
-                </div>
-                <input type="password" formControlName="password" class="input-category" autocomplete="new-password" />
+                </label>
+                <input
+                  id="member-password"
+                  type="password"
+                  formControlName="password"
+                  class="input-category"
+                  autocomplete="new-password"
+                />
               </div>
               <div class="full-width">
-                <div class="text-category">Repetir contraseña <span class="red-text">*</span></div>
+                <label class="text-category" for="member-confirm-password">
+                  Repetir contraseña <span class="red-text">*</span>
+                </label>
                 <input
+                  id="member-confirm-password"
                   type="password"
                   formControlName="confirmPassword"
                   class="input-category"
@@ -142,27 +151,27 @@ function listPath(isActive: 0 | 1): string {
             </div>
           }
         </app-member-fields>
-        <div class="full-width mb-16">
-          <div class="text-category">
+        <fieldset class="full-width mb-16">
+          <legend class="text-category">
             ¿Coordinador? Tendrá acceso para manejar permisos de otros coordinadores, gestionar miembros y visualizar
             analíticas
-          </div>
+          </legend>
           <div class="boxed">
             <input type="radio" id="coordNo" formControlName="roleCode" value="researcher" />
             <label class="mr-16" for="coordNo">No</label>
             <input type="radio" id="coordYes" formControlName="roleCode" value="administrator" />
             <label for="coordYes">Sí</label>
           </div>
-        </div>
-        <div class="full-width mb-16">
-          <div class="text-category">¿Miembro antiguo? (Ex-miembro)</div>
+        </fieldset>
+        <fieldset class="full-width mb-16">
+          <legend class="text-category">¿Miembro antiguo? (Ex-miembro)</legend>
           <div class="boxed">
             <input type="radio" id="formerNo" formControlName="isActive" [value]="1" />
             <label class="mr-16" for="formerNo">No</label>
             <input type="radio" id="formerYes" formControlName="isActive" [value]="0" />
             <label for="formerYes">Sí</label>
           </div>
-        </div>
+        </fieldset>
       </form>
     </app-content-form>
   `,

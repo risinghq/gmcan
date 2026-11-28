@@ -28,18 +28,20 @@ import { optionalText, requiredText } from "./text-fields";
     >
       <form [formGroup]="form" class="mt-24 mb-32">
         @for (locale of locales; track locale) {
-          <div class="locale-section full-width" [formGroupName]="locale">
-            <div class="locale-title">{{ label(locale) }}</div>
-            <div class="text-category">Nombre del software <span class="red-text">*</span></div>
-            <input class="input-category" formControlName="name" />
-            <div class="text-category">Descripción</div>
-            <textarea class="input-category" formControlName="description"></textarea>
-          </div>
+          <fieldset class="locale-section full-width" [formGroupName]="locale">
+            <legend class="locale-title">{{ label(locale) }}</legend>
+            <label class="text-category" [for]="locale + '-name'">
+              Nombre del software <span class="red-text">*</span>
+            </label>
+            <input class="input-category" [id]="locale + '-name'" formControlName="name" />
+            <label class="text-category" [for]="locale + '-description'">Descripción</label>
+            <textarea class="input-category" [id]="locale + '-description'" formControlName="description"></textarea>
+          </fieldset>
         }
       </form>
       <div class="full-width mb-32">
-        <div class="text-category">Enlace</div>
-        <input class="input-category" type="url" [formControl]="moreInfo" />
+        <label class="text-category" for="software-link">Enlace</label>
+        <input id="software-link" class="input-category" type="url" [formControl]="moreInfo" />
       </div>
     </app-content-form>
   `,

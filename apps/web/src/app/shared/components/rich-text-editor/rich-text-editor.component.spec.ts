@@ -10,7 +10,8 @@ import { RichTextEditorComponent } from "./rich-text-editor.component";
   imports: [ReactiveFormsModule, RichTextEditorComponent],
   template: `
     <form [formGroup]="form">
-      <app-rich-text-editor formControlName="content" />
+      <div id="content-label">Contenido</div>
+      <app-rich-text-editor formControlName="content" labelledBy="content-label" />
     </form>
   `,
 })
@@ -67,6 +68,13 @@ describe("RichTextEditorComponent", () => {
 
     expect(tree(editor?.innerHTML ?? "")).toEqual([{ p: ["Existing content"] }]);
     expect(tree(fixture.componentInstance.form.controls.content.value)).toEqual([{ p: ["Existing content"] }]);
+  });
+
+  it("names the editable area by the visible label the form gives it", () => {
+    const editor = (fixture.nativeElement as HTMLElement).querySelector(".ProseMirror");
+    const labelId = editor?.getAttribute("aria-labelledby") ?? "";
+
+    expect(document.getElementById(labelId)?.textContent).toBe("Contenido");
   });
 
   it("offers no h1, so the content never repeats the title of the page that shows it", () => {

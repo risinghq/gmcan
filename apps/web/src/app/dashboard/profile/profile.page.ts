@@ -94,14 +94,23 @@ function passwordForm() {
           <div class="text-category mb-8">Cambiar contraseña</div>
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
-              <div class="text-category">
+              <label class="text-category" for="profile-password">
                 Nueva contraseña (mínimo {{ minPassword }} caracteres) <span class="red-text">*</span>
-              </div>
-              <input type="password" formControlName="password" class="input-category" autocomplete="new-password" />
+              </label>
+              <input
+                id="profile-password"
+                type="password"
+                formControlName="password"
+                class="input-category"
+                autocomplete="new-password"
+              />
             </div>
             <div class="full-width">
-              <div class="text-category">Confirmar nueva contraseña <span class="red-text">*</span></div>
+              <label class="text-category" for="profile-confirm-password">
+                Confirmar nueva contraseña <span class="red-text">*</span>
+              </label>
               <input
+                id="profile-confirm-password"
                 type="password"
                 formControlName="confirmPassword"
                 class="input-category"

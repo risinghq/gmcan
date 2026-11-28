@@ -96,13 +96,15 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
       <form [formGroup]="form" class="mt-24 mb-32">
         <div class="flex-news">
           <div class="mr-32 full-width">
-            <div class="text-category">Código <span class="red-text">*</span></div>
-            <input class="input-category" formControlName="code" />
+            <label class="text-category" for="project-code">Código <span class="red-text">*</span></label>
+            <input id="project-code" class="input-category" formControlName="code" />
           </div>
           <div class="full-width">
-            <div class="text-category">Línea de investigación <span class="red-text">*</span></div>
+            <div class="text-category" id="project-line-label">
+              Línea de investigación <span class="red-text">*</span>
+            </div>
             <mat-form-field class="form-field">
-              <mat-select placeholder="Seleccionar línea" formControlName="researchLineId">
+              <mat-select formControlName="researchLineId" aria-labelledby="project-line-label">
                 @for (line of researchLines(); track line.id) {
                   <mat-option [value]="line.id">{{ line.name }}</mat-option>
                 }
@@ -111,9 +113,9 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
           </div>
         </div>
         <div class="full-width mt-16">
-          <div class="text-category">Responsable(s) <span class="red-text">*</span></div>
+          <div class="text-category" id="project-members-label">Responsable(s) <span class="red-text">*</span></div>
           <mat-form-field class="form-field">
-            <mat-select placeholder="Seleccionar responsables" formControlName="memberIds" multiple>
+            <mat-select formControlName="memberIds" multiple aria-labelledby="project-members-label">
               @for (member of sortedMembers(); track member.id) {
                 <mat-option [value]="member.id">{{ name(member) }}</mat-option>
               }
@@ -122,9 +124,11 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
         </div>
         <div class="flex-news mt-8">
           <div class="mr-32 full-width">
-            <div class="text-category">Fuente de financiamiento <span class="red-text">*</span></div>
+            <div class="text-category" id="project-funding-label">
+              Fuente de financiamiento <span class="red-text">*</span>
+            </div>
             <mat-form-field class="form-field">
-              <mat-select placeholder="Seleccionar fuente de financiamiento" formControlName="fundingSourceCode">
+              <mat-select formControlName="fundingSourceCode" aria-labelledby="project-funding-label">
                 @for (source of fundingSources(); track source.code) {
                   <mat-option [value]="source.code">{{ source.name }}</mat-option>
                 }
@@ -132,9 +136,9 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
             </mat-form-field>
           </div>
           <div class="mr-32 width-128">
-            <div class="text-category">Moneda <span class="red-text">*</span></div>
+            <div class="text-category" id="project-currency-label">Moneda <span class="red-text">*</span></div>
             <mat-form-field class="form-field">
-              <mat-select placeholder="Seleccionar moneda" formControlName="currencyCode">
+              <mat-select formControlName="currencyCode" aria-labelledby="project-currency-label">
                 @for (currency of currencies(); track currency.code) {
                   <mat-option [value]="currency.code">{{ currency.symbol }}</mat-option>
                 }
@@ -142,34 +146,31 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
             </mat-form-field>
           </div>
           <div class="full-width">
-            <div class="text-category">Monto financiado <span class="red-text">*</span></div>
-            <input class="input-category" type="number" min="0" step="0.01" formControlName="fundedAmount" />
+            <label class="text-category" for="project-amount">Monto financiado <span class="red-text">*</span></label>
+            <input
+              id="project-amount"
+              class="input-category"
+              type="number"
+              min="0"
+              step="0.01"
+              formControlName="fundedAmount"
+            />
           </div>
         </div>
         <div class="flex-news">
           <div class="width-479 mr-26">
-            <div class="text-category">Fecha de inicio <span class="red-text">*</span></div>
+            <label class="text-category" for="project-start">Fecha de inicio <span class="red-text">*</span></label>
             <mat-form-field class="form-field">
-              <input
-                matInput
-                placeholder="Seleccionar fecha de inicio"
-                [matDatepicker]="start"
-                formControlName="startDate"
-              />
+              <input id="project-start" matInput [matDatepicker]="start" formControlName="startDate" />
               <mat-datepicker-toggle matSuffix [for]="start" />
               <mat-datepicker #start />
             </mat-form-field>
           </div>
           @if (concluded()) {
             <div class="width-479">
-              <div class="text-category">Fecha de fin <span class="red-text">*</span></div>
+              <label class="text-category" for="project-end">Fecha de fin <span class="red-text">*</span></label>
               <mat-form-field class="form-field">
-                <input
-                  matInput
-                  placeholder="Seleccionar fecha de fin"
-                  [matDatepicker]="end"
-                  formControlName="endDate"
-                />
+                <input id="project-end" matInput [matDatepicker]="end" formControlName="endDate" />
                 <mat-datepicker-toggle matSuffix [for]="end" />
                 <mat-datepicker #end />
               </mat-form-field>
@@ -178,17 +179,17 @@ function toProjectWrite(value: ProjectFormValue, statusCode: ProjectStatusCode):
         </div>
         <div formGroupName="translations">
           @for (locale of locales; track locale) {
-            <div class="locale-section full-width" [formGroupName]="locale">
-              <div class="locale-title">{{ label(locale) }}</div>
-              <div class="text-category">Título del proyecto <span class="red-text">*</span></div>
-              <input class="input-category" formControlName="title" placeholder="Ingresar título del proyecto" />
-              <div class="text-category">Descripción <span class="red-text">*</span></div>
-              <textarea
-                class="input-category"
-                formControlName="description"
-                placeholder="Ingresar descripción"
-              ></textarea>
-            </div>
+            <fieldset class="locale-section full-width" [formGroupName]="locale">
+              <legend class="locale-title">{{ label(locale) }}</legend>
+              <label class="text-category" [for]="locale + '-title'">
+                Título del proyecto <span class="red-text">*</span>
+              </label>
+              <input class="input-category" [id]="locale + '-title'" formControlName="title" />
+              <label class="text-category" [for]="locale + '-description'">
+                Descripción <span class="red-text">*</span>
+              </label>
+              <textarea class="input-category" [id]="locale + '-description'" formControlName="description"></textarea>
+            </fieldset>
           }
         </div>
       </form>

@@ -14,6 +14,11 @@ textarea {
   font-family: inherit;
 }
 
+legend {
+  float: none;
+  font-size: inherit;
+}
+
 app-icon {
   display: inline-block;
   flex-shrink: 0;
@@ -1039,11 +1044,17 @@ circle {
 }
 
 .text-category {
+  display: block;
   font-size: 15px;
   font-weight: bold;
   letter-spacing: 0.2px;
   color: #30393a;
   margin-bottom: 8px;
+}
+
+.locale-title {
+  margin-bottom: 8px;
+  font-weight: 600;
 }
 
 .red-text {

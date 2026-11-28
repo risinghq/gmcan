@@ -32,13 +32,19 @@ import { optionalText, requiredText } from "./text-fields";
         <div class="flex-news full-width">
           <div class="full-width mr-32">
             @for (locale of locales; track locale) {
-              <div class="locale-section" [formGroupName]="locale">
-                <div class="locale-title">{{ label(locale) }}</div>
-                <div class="text-category">Nombre de línea <span class="red-text">*</span></div>
-                <input class="input-category" formControlName="name" />
-                <div class="text-category">Descripción</div>
-                <textarea class="input-category" formControlName="description"></textarea>
-              </div>
+              <fieldset class="locale-section" [formGroupName]="locale">
+                <legend class="locale-title">{{ label(locale) }}</legend>
+                <label class="text-category" [for]="locale + '-name'">
+                  Nombre de línea <span class="red-text">*</span>
+                </label>
+                <input class="input-category" [id]="locale + '-name'" formControlName="name" />
+                <label class="text-category" [for]="locale + '-description'">Descripción</label>
+                <textarea
+                  class="input-category"
+                  [id]="locale + '-description'"
+                  formControlName="description"
+                ></textarea>
+              </fieldset>
             }
           </div>
           <app-image-field [current]="item()?.asset ?? null" (picked)="image.set($event)" />

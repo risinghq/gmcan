@@ -179,14 +179,11 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
       <form [formGroup]="form" class="mt-24 mb-32">
         <div class="flex-news details-row">
           <div class="full-width">
-            <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
+            <label class="text-category" for="publication-date">
+              Fecha de publicación <span class="red-text">*</span>
+            </label>
             <mat-form-field class="form-field">
-              <input
-                matInput
-                placeholder="Seleccionar fecha"
-                [matDatepicker]="published"
-                formControlName="publishedAt"
-              />
+              <input id="publication-date" matInput [matDatepicker]="published" formControlName="publishedAt" />
               <mat-datepicker-toggle matSuffix [for]="published" />
               <mat-datepicker #published />
             </mat-form-field>
@@ -194,9 +191,9 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
           @switch (kind()) {
             @case ("journal_article") {
               <div class="full-width">
-                <div class="text-category">Revista <span class="red-text">*</span></div>
+                <div class="text-category" id="publication-journal-label">Revista <span class="red-text">*</span></div>
                 <mat-form-field class="form-field">
-                  <mat-select placeholder="Seleccionar revista" formControlName="journalId">
+                  <mat-select formControlName="journalId" aria-labelledby="publication-journal-label">
                     @for (journal of lookup.journals(); track journal.id) {
                       <mat-option [value]="journal.id">{{ journal.name }}</mat-option>
                     }
@@ -204,15 +201,22 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                 </mat-form-field>
               </div>
               <div class="full-width">
-                <div class="text-category">Volumen</div>
-                <input class="input-category" type="number" min="1" step="1" formControlName="issue" />
+                <label class="text-category" for="publication-issue">Volumen</label>
+                <input
+                  id="publication-issue"
+                  class="input-category"
+                  type="number"
+                  min="1"
+                  step="1"
+                  formControlName="issue"
+                />
               </div>
             }
             @case ("conference_paper") {
               <div class="full-width">
-                <div class="text-category">Evento <span class="red-text">*</span></div>
+                <div class="text-category" id="publication-event-label">Evento <span class="red-text">*</span></div>
                 <mat-form-field class="form-field">
-                  <mat-select placeholder="Seleccionar evento" formControlName="eventId">
+                  <mat-select formControlName="eventId" aria-labelledby="publication-event-label">
                     @for (event of events(); track event.id) {
                       <mat-option [value]="event.id">{{ event.name }}</mat-option>
                     }
@@ -222,9 +226,11 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
             }
             @case ("thesis") {
               <div class="full-width">
-                <div class="text-category">Tipo de tesis <span class="red-text">*</span></div>
+                <div class="text-category" id="publication-thesis-kind-label">
+                  Tipo de tesis <span class="red-text">*</span>
+                </div>
                 <mat-form-field class="form-field">
-                  <mat-select placeholder="Seleccionar tipo" formControlName="thesisKindCode">
+                  <mat-select formControlName="thesisKindCode" aria-labelledby="publication-thesis-kind-label">
                     @for (thesisKind of lookup.thesisKinds(); track thesisKind.code) {
                       <mat-option [value]="thesisKind.code">{{ thesisKind.name }}</mat-option>
                     }
@@ -232,9 +238,11 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                 </mat-form-field>
               </div>
               <div class="full-width">
-                <div class="text-category">Universidad <span class="red-text">*</span></div>
+                <div class="text-category" id="publication-university-label">
+                  Universidad <span class="red-text">*</span>
+                </div>
                 <mat-form-field class="form-field">
-                  <mat-select placeholder="Seleccionar universidad" formControlName="universityId">
+                  <mat-select formControlName="universityId" aria-labelledby="publication-university-label">
                     @for (university of lookup.universities(); track university.id) {
                       <mat-option [value]="university.id">{{ university.name }}</mat-option>
                     }
@@ -245,8 +253,8 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
           }
           @if (kind() !== "thesis") {
             <div class="full-width">
-              <div class="text-category">DOI</div>
-              <input class="input-category" formControlName="doi" placeholder="Ingresar DOI" />
+              <label class="text-category" for="publication-doi">DOI</label>
+              <input id="publication-doi" class="input-category" formControlName="doi" />
             </div>
           }
         </div>
@@ -265,6 +273,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                   <input
                     matInput
                     [placeholder]="first ? 'Primer autor' : 'Autor'"
+                    [attr.aria-label]="'Autor ' + (i + 1)"
                     formControlName="name"
                     [matAutocomplete]="names"
                     (input)="unlink(row)"
@@ -288,7 +297,13 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                     }
                   </mat-autocomplete>
                 </mat-form-field>
-                <button type="button" class="icon-button" [disabled]="first" (click)="moveUp(i)" title="Subir">
+                <button
+                  type="button"
+                  class="icon-button"
+                  [disabled]="first"
+                  (click)="moveUp(i)"
+                  [attr.aria-label]="'Subir autor ' + (i + 1)"
+                >
                   <app-icon name="arrow-up" />
                 </button>
                 <button
@@ -296,7 +311,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                   class="icon-button"
                   [disabled]="form.controls.authors.length === 1"
                   (click)="removeAuthor(i)"
-                  title="Quitar"
+                  [attr.aria-label]="'Quitar autor ' + (i + 1)"
                 >
                   <app-icon name="x" />
                 </button>
@@ -310,18 +325,18 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
 
         <div formGroupName="translations">
           @for (locale of locales; track locale) {
-            <div class="locale-section full-width" [formGroupName]="locale">
-              <div class="locale-title">{{ label(locale) }}</div>
-              <div class="text-category">Título <span class="red-text">*</span></div>
-              <input class="input-category" formControlName="title" placeholder="Ingresar título" />
-              <div class="text-category">Resumen</div>
-              <textarea class="input-category" formControlName="abstract" placeholder="Ingresar resumen"></textarea>
-            </div>
+            <fieldset class="locale-section full-width" [formGroupName]="locale">
+              <legend class="locale-title">{{ label(locale) }}</legend>
+              <label class="text-category" [for]="locale + '-title'">Título <span class="red-text">*</span></label>
+              <input class="input-category" [id]="locale + '-title'" formControlName="title" />
+              <label class="text-category" [for]="locale + '-abstract'">Resumen</label>
+              <textarea class="input-category" [id]="locale + '-abstract'" formControlName="abstract"></textarea>
+            </fieldset>
           }
         </div>
 
         <div class="full-width mb-16">
-          <div class="text-category">PDF (opcional)</div>
+          <div class="text-category" id="publication-pdf-label">PDF (opcional)</div>
           <div class="flex-news">
             <div class="pdf-box mr-16">
               <app-icon class="pdf-icon" name="file-type-pdf" />
@@ -329,7 +344,13 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
             </div>
             <label class="green-text">
               {{ file() || item()?.asset ? "Cambiar" : "Seleccionar PDF" }}
-              <input class="file_upload" type="file" accept="application/pdf" (change)="pick($event)" />
+              <input
+                class="file_upload"
+                type="file"
+                accept="application/pdf"
+                aria-labelledby="publication-pdf-label"
+                (change)="pick($event)"
+              />
             </label>
             @if (item()?.asset; as asset) {
               <a class="green-text ml-16" [href]="asset" target="_blank" rel="noopener">Ver PDF actual</a>
