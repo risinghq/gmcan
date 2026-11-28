@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, input } from "@angular/core";
 import { AvatarComponent } from "@app/shared/components/avatar.component";
 
-/** A small avatar beside a person's name on one line. Projected content replaces the name as the label. */
+/**
+ * A small avatar beside a person's name on one line. Projected content replaces the name as the label, and
+ * `--person-avatar` sizes the avatar for a taller label.
+ */
 @Component({
   selector: "app-person",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,8 +28,8 @@ import { AvatarComponent } from "@app/shared/components/avatar.component";
     }
 
     app-avatar {
-      width: 20px;
-      height: 20px;
+      width: var(--person-avatar, 20px);
+      height: var(--person-avatar, 20px);
     }
   `,
 })

@@ -1,6 +1,11 @@
 @use "../../../shared/styles/noticias-base";
 @use "../../../shared/styles/status-chip";
 
+app-person {
+  --person-avatar: 36px;
+  gap: 12px;
+}
+
 .member {
   display: flex;
   flex-direction: column;
