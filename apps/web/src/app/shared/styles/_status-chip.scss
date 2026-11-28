@@ -1,0 +1,30 @@
+.status-chip {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+button.status-chip {
+  cursor: pointer;
+}
+
+.status-ready {
+  background-color: #dff6e7;
+  color: #0e6b32;
+}
+
+.status-draft {
+  background-color: #fff0d3;
+  color: #8c5000;
+}
+
+.status-archived {
+  background-color: #ececec;
+  color: #4a4a4a;
+}

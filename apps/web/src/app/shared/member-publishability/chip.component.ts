@@ -9,29 +9,7 @@ import { countMissingRequirements, publishabilityTooltip } from "./utils";
 @Component({
   selector: "app-publishability-chip",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .status-chip {
-      border: 0;
-      border-radius: 999px;
-      cursor: pointer;
-      display: inline-block;
-      font: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1;
-      padding: 6px 10px;
-    }
-
-    .status-ready {
-      background-color: #dff6e7;
-      color: #0e6b32;
-    }
-
-    .status-draft {
-      background-color: #fff0d3;
-      color: #8c5000;
-    }
-  `,
+  styleUrl: "../styles/_status-chip.scss",
   template: `
     @if (status.value(); as state) {
       <button
