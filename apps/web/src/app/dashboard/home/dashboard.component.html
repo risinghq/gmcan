@@ -72,14 +72,15 @@
           <h3 class="item-title">Publicaciones</h3>
           <span class="chart-total">{{ publications().total }}</span>
         </header>
-        <canvas
-          baseChart
-          type="bar"
-          [datasets]="publications().datasets"
-          [labels]="publications().labels"
-          [options]="publicationsChartOptions"
-          [legend]="false"
-        ></canvas>
+        <ul class="bar-list">
+          @for (item of publications().rows; track item.code) {
+            <li>
+              <span class="legend-label">{{ item.label }}</span>
+              <span class="legend-count">{{ item.count }}</span>
+              <span class="bar-track"><span class="bar" [style.width.%]="item.share"></span></span>
+            </li>
+          }
+        </ul>
       </section>
     </div>
   }

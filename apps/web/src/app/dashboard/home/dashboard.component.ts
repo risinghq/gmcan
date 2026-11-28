@@ -7,17 +7,7 @@ import type { Capability } from "@app/shared/models/capabilities";
 import { AuthzService } from "@app/shared/services/authz.service";
 import { type DashboardCountItem, DashboardService } from "@app/shared/services/dashboard.service";
 import { GLOBAL } from "@app/shared/services/global";
-import {
-  ArcElement,
-  BarController,
-  BarElement,
-  CategoryScale,
-  type ChartDataset,
-  type ChartOptions,
-  LinearScale,
-  PieController,
-  Tooltip,
-} from "chart.js";
+import { ArcElement, type ChartDataset, type ChartOptions, PieController, Tooltip } from "chart.js";
 import { BaseChartDirective, provideCharts } from "ng2-charts";
 import { EMPTY } from "rxjs";
 
@@ -91,6 +81,14 @@ function chart(items: DashboardCountItem[], label: string, style: Partial<ChartD
   };
 }
 
+function bars(items: DashboardCountItem[]) {
+  const longest = Math.max(1, ...items.map((item) => item.count));
+  return {
+    total: items.reduce((sum, item) => sum + item.count, 0),
+    rows: items.map((item) => ({ ...item, share: (item.count / longest) * 100 })),
+  };
+}
+
 @Component({
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
@@ -99,7 +97,7 @@ function chart(items: DashboardCountItem[], label: string, style: Partial<ChartD
   imports: [RouterLink, IconComponent, BaseChartDirective],
   providers: [
     provideCharts({
-      registerables: [PieController, ArcElement, BarController, BarElement, CategoryScale, LinearScale, Tooltip],
+      registerables: [PieController, ArcElement, Tooltip],
     }),
   ],
 })
@@ -126,21 +124,7 @@ export default class DashboardComponent {
     }),
   );
 
-  readonly publications = computed(() =>
-    chart(this.summary()?.publicationsByKind ?? [], "Cantidad", {
-      backgroundColor: PALETTE,
-      borderColor: PALETTE[0],
-      borderWidth: 2,
-    }),
-  );
+  readonly publications = computed(() => bars(this.summary()?.publicationsByKind ?? []));
 
   readonly membersChartOptions: ChartOptions = { responsive: true };
-  readonly publicationsChartOptions: ChartOptions = {
-    responsive: true,
-    indexAxis: "y",
-    scales: {
-      x: { ticks: { precision: 0 } },
-      y: { ticks: { color: "#30393a", font: { family: "IBM Plex Sans", size: 13 } } },
-    },
-  };
 }
