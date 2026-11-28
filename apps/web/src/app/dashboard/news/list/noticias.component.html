@@ -11,13 +11,13 @@
         />
         <app-icon class="icon-search-toolbar" name="search" />
       </div>
-      <select class="input-search-text" aria-label="Filtrar por estado" (change)="onStatusChange($event)">
+      <select class="filter-select" aria-label="Filtrar por estado" (change)="onStatusChange($event)">
         <option value="">Todos los estados</option>
         <option value="published">Publicado</option>
         <option value="draft">Borrador</option>
         <option value="archived">Archivado</option>
       </select>
-      <select class="input-search-text" aria-label="Filtrar por categoría" (change)="onNewsTypeChange($event)">
+      <select class="filter-select" aria-label="Filtrar por categoría" (change)="onNewsTypeChange($event)">
         <option value="">Todas las categorías</option>
         @for (newsType of newsTypes(); track newsType.code) {
           <option [value]="newsType.code">{{ newsType.name }}</option>
