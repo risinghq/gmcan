@@ -1,5 +1,17 @@
 @use "../../shared/styles/add-news-base";
 
+.news-meta {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 32px;
+  align-content: start;
+}
+
+.news-author {
+  grid-column: 1 / -1;
+}
+
 .img-user {
   width: 24px;
   height: 24px;
