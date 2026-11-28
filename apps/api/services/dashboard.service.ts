@@ -21,6 +21,7 @@ export async function getDashboardSummary(locale: Locale = DEFAULT_LOCALE) {
           .onRef("member_type_translation.memberTypeCode", "=", "member.memberTypeCode")
           .on("member_type_translation.locale", "=", locale),
       )
+      .where("member.isActive", "=", 1)
       .select((eb) => [
         "member.memberTypeCode as code",
         "member_type_translation.name as label",
