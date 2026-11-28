@@ -59,7 +59,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row class="clickable-row" *matRowDef="let row; columns: displayedColumns" (click)="editMember(row.id)"></tr>
   </table>
-  <mat-paginator [hidden]="table.notFound()" />
+  <mat-paginator [hidden]="!table.paged()" />
   @if (table.notFound()) {
     <app-empty-list [searching]="table.searching()">
       Todavía no hay miembros {{ canAdd ? "activos" : "antiguos" }}.

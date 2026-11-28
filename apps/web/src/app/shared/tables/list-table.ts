@@ -1,7 +1,15 @@
 import { signal } from "@angular/core";
-import type { MatPaginator } from "@angular/material/paginator";
+import type { MatPaginator, MatPaginatorDefaultOptions } from "@angular/material/paginator";
 import type { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
+
+/** The smallest page a dashboard table offers, so a list no longer than this never needs a paginator. */
+export const PAGE_SIZE = 10;
+
+export const PAGINATOR_DEFAULTS: MatPaginatorDefaultOptions = {
+  pageSize: PAGE_SIZE,
+  pageSizeOptions: [PAGE_SIZE, 25, 100],
+};
 
 /** The value a sortable column orders its rows by, keyed by the column's `matColumnDef` name. */
 export type SortValues<T> = Record<string, (row: T) => string | number>;
@@ -20,6 +28,7 @@ export interface ListTableOptions<T> {
 export class ListTable<T> {
   readonly dataSource = new MatTableDataSource<T>([]);
   readonly notFound = signal(false);
+  readonly paged = signal(false);
   readonly searching = signal(false);
 
   constructor({ search, sort }: ListTableOptions<T> = {}) {
@@ -38,7 +47,7 @@ export class ListTable<T> {
 
   show(rows: T[]): void {
     this.dataSource.data = rows;
-    this.notFound.set(this.dataSource.filteredData.length === 0);
+    this.count();
   }
 
   attach(sort: MatSort, paginator: MatPaginator): void {
@@ -50,7 +59,13 @@ export class ListTable<T> {
     this.dataSource.filter = text.trim().toLowerCase();
     this.searching.set(this.dataSource.filter !== "");
     this.dataSource.paginator?.firstPage();
-    this.notFound.set(this.dataSource.filteredData.length === 0);
+    this.count();
+  }
+
+  private count(): void {
+    const matches = this.dataSource.filteredData.length;
+    this.notFound.set(matches === 0);
+    this.paged.set(matches > PAGE_SIZE);
   }
 
   filterFrom(event: Event): void {

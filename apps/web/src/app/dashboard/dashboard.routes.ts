@@ -31,6 +31,7 @@ import {
 import { SpanishPaginatorIntl } from "@app/dashboard/shell/paginator-intl";
 import { adminCanActivateChildGuard, adminCanMatchGuard } from "@app/shared/guards/admin-auth.guard";
 import { canDeactivateGuard } from "@app/shared/guards/deactivate.guard";
+import { PAGINATOR_DEFAULTS } from "@app/shared/tables/list-table";
 
 export default [
   {
@@ -42,7 +43,7 @@ export default [
     providers: [
       { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl },
       { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { subscriptSizing: "dynamic" } },
-      { provide: MAT_PAGINATOR_DEFAULT_OPTIONS, useValue: { pageSize: 10, pageSizeOptions: [10, 25, 100] } },
+      { provide: MAT_PAGINATOR_DEFAULT_OPTIONS, useValue: PAGINATOR_DEFAULTS },
     ],
     children: [
       { path: "", loadComponent: () => import("./home/dashboard.component"), title: "Dashboard" },

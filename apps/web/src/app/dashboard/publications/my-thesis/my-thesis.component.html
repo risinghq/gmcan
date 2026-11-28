@@ -56,7 +56,7 @@
     <tr mat-row class="clickable-row" *matRowDef="let row; columns: displayedColumns" (click)="editThesis(row.id)"></tr>
   </table>
 
-  <mat-paginator [hidden]="table.notFound()" #tablePaginator />
+  <mat-paginator [hidden]="!table.paged()" #tablePaginator />
   @if (table.notFound()) {
     <app-empty-list [searching]="table.searching()">Todavía no tienes tesis.</app-empty-list>
   }
