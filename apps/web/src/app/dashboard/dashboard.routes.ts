@@ -1,5 +1,5 @@
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from "@angular/material/form-field";
-import { MatPaginatorIntl } from "@angular/material/paginator";
+import { MAT_PAGINATOR_DEFAULT_OPTIONS, MatPaginatorIntl } from "@angular/material/paginator";
 import { Routes } from "@angular/router";
 import {
   adminAboutResolver,
@@ -42,6 +42,7 @@ export default [
     providers: [
       { provide: MatPaginatorIntl, useClass: SpanishPaginatorIntl },
       { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { subscriptSizing: "dynamic" } },
+      { provide: MAT_PAGINATOR_DEFAULT_OPTIONS, useValue: { pageSize: 10, pageSizeOptions: [10, 25, 100] } },
     ],
     children: [
       { path: "", loadComponent: () => import("./home/dashboard.component"), title: "Dashboard" },

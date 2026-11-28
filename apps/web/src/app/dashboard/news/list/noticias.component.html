@@ -74,13 +74,7 @@
           (click)="editNews(row.id)"
         ></tr>
       </table>
-      <mat-paginator
-        [length]="total()"
-        [pageIndex]="pageIndex"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 25, 100]"
-        (page)="onPageChange($event)"
-      />
+      <mat-paginator [length]="total()" [pageIndex]="pageIndex" [pageSize]="pageSize" (page)="onPageChange($event)" />
     } @else if (rows) {
       <app-empty-list [searching]="filtering">Todavía no hay noticias.</app-empty-list>
     }

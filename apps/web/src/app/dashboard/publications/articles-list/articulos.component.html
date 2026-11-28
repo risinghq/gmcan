@@ -59,7 +59,7 @@
       ></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="articles.notFound()" #articlesPaginator />
+    <mat-paginator [hidden]="articles.notFound()" #articlesPaginator />
     @if (articles.notFound()) {
       <app-empty-list [searching]="articles.searching()">Todavía no hay artículos.</app-empty-list>
     }
@@ -97,7 +97,7 @@
       ></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [hidden]="journals.notFound()" #journalsPaginator />
+    <mat-paginator [hidden]="journals.notFound()" #journalsPaginator />
     @if (journals.notFound()) {
       <app-empty-list [searching]="journals.searching()">Todavía no hay revistas.</app-empty-list>
     }
