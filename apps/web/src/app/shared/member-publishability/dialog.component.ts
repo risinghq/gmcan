@@ -9,7 +9,7 @@ import {
 } from "@angular/material/dialog";
 
 import type { MemberPublishability } from "../models/member";
-import { publishabilityMissingItems } from "./utils";
+import { publishabilityStatus } from "./utils";
 
 interface PublishabilityDialogData {
   memberName: string;
@@ -25,8 +25,5 @@ interface PublishabilityDialogData {
 })
 export class PublishabilityDialogComponent {
   protected data = inject<PublishabilityDialogData>(MAT_DIALOG_DATA);
-
-  protected missingItems(): string[] {
-    return publishabilityMissingItems(this.data.publishability);
-  }
+  protected status = publishabilityStatus(this.data.publishability);
 }

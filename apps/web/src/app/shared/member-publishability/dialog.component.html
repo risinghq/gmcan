@@ -1,13 +1,11 @@
 <h2 mat-dialog-title>Estado de publicación</h2>
 <div mat-dialog-content>
   <p><strong>Miembro:</strong> {{ data.memberName }}</p>
-  @if (data.publishability.publishable) {
-    <p>Listo para mostrarse en público.</p>
-  } @else {
-    <p>Borrador. Requisitos pendientes:</p>
+  <p>{{ status.summary }}</p>
+  @if (status.reasons.length > 0) {
     <ul>
-      @for (item of missingItems(); track item) {
-        <li>{{ item }}</li>
+      @for (reason of status.reasons; track reason) {
+        <li>{{ reason }}</li>
       }
     </ul>
   }
