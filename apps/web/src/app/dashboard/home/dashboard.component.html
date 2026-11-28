@@ -46,14 +46,26 @@
           <h3 class="item-title">Miembros activos</h3>
           <span class="chart-total">{{ members().total }}</span>
         </header>
-        <canvas
-          baseChart
-          type="pie"
-          [datasets]="members().datasets"
-          [labels]="members().labels"
-          [options]="membersChartOptions"
-          [legend]="true"
-        ></canvas>
+        <div class="pie">
+          <canvas
+            baseChart
+            type="pie"
+            [datasets]="members().datasets"
+            [labels]="members().labels"
+            [options]="membersChartOptions"
+            [legend]="false"
+            aria-hidden="true"
+          ></canvas>
+        </div>
+        <ul class="chart-legend">
+          @for (item of members().legend; track item.code) {
+            <li>
+              <span class="swatch" [style.background-color]="item.color"></span>
+              <span class="legend-label">{{ item.label }}</span>
+              <span class="legend-count">{{ item.count }}</span>
+            </li>
+          }
+        </ul>
       </section>
       <section class="dashboard-card chart-card">
         <header class="chart-header">
