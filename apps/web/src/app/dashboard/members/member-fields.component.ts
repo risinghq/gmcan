@@ -35,49 +35,55 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
         <div class="full-width">
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
-              <div class="text-category">Primer nombre <span class="red-text">*</span></div>
-              <input formControlName="firstName" class="input-category" placeholder="Ingresar primer nombre" />
+              <label class="text-category" for="member-first-name">
+                Primer nombre <span class="red-text">*</span>
+              </label>
+              <input id="member-first-name" formControlName="firstName" class="input-category" />
             </div>
             <div class="full-width">
-              <div class="text-category">Segundo nombre</div>
-              <input formControlName="middleName" class="input-category" placeholder="Ingresar segundo nombre" />
+              <label class="text-category" for="member-middle-name">Segundo nombre</label>
+              <input id="member-middle-name" formControlName="middleName" class="input-category" />
             </div>
           </div>
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
-              <div class="text-category">Apellido paterno <span class="red-text">*</span></div>
-              <input formControlName="lastName" class="input-category" placeholder="Ingresar apellido paterno" />
+              <label class="text-category" for="member-last-name">
+                Apellido paterno <span class="red-text">*</span>
+              </label>
+              <input id="member-last-name" formControlName="lastName" class="input-category" />
             </div>
             <div class="full-width">
-              <div class="text-category">Apellido materno</div>
-              <input formControlName="maternalName" class="input-category" placeholder="Ingresar apellido materno" />
+              <label class="text-category" for="member-maternal-name">Apellido materno</label>
+              <input id="member-maternal-name" formControlName="maternalName" class="input-category" />
             </div>
           </div>
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
-              <div class="text-category">Fecha de nacimiento</div>
+              <label class="text-category" for="member-birth-date">Fecha de nacimiento</label>
               <mat-form-field class="form-field">
-                <input matInput [matDatepicker]="birth" formControlName="birthDate" />
+                <input id="member-birth-date" matInput [matDatepicker]="birth" formControlName="birthDate" />
                 <mat-datepicker-toggle matSuffix [for]="birth" />
                 <mat-datepicker #birth />
               </mat-form-field>
             </div>
             <div class="full-width">
-              <div class="text-category">Correo electrónico <span class="red-text">*</span></div>
+              <label class="text-category" for="member-email">
+                Correo electrónico <span class="red-text">*</span>
+              </label>
               <input
+                id="member-email"
                 type="email"
                 formControlName="email"
                 class="input-category"
-                placeholder="Ingresar correo electrónico"
                 [class.invalid-error]="emailTaken()"
               />
             </div>
           </div>
           <div class="flex-news mb-8">
             <div class="mr-32 full-width">
-              <div class="text-category">Género</div>
+              <div class="text-category" id="member-gender-label">Género</div>
               <mat-form-field class="form-field">
-                <mat-select formControlName="genderCode">
+                <mat-select formControlName="genderCode" aria-labelledby="member-gender-label">
                   @for (gender of lookup.genders(); track gender.code) {
                     <mat-option [value]="gender.code">{{ gender.name }}</mat-option>
                   }
@@ -85,9 +91,9 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
               </mat-form-field>
             </div>
             <div class="full-width">
-              <div class="text-category">Máximo nivel académico alcanzado</div>
+              <div class="text-category" id="member-prefix-label">Máximo nivel académico alcanzado</div>
               <mat-form-field class="form-field">
-                <mat-select formControlName="prefixCode">
+                <mat-select formControlName="prefixCode" aria-labelledby="member-prefix-label">
                   @for (prefix of lookup.prefixes(); track prefix.code) {
                     <mat-option [value]="prefix.code">{{ prefix.label }}</mat-option>
                   }
@@ -105,12 +111,17 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
         @for (locale of locales; track locale) {
           <div class="locale-section full-width" [formGroupName]="locale">
             <div class="field-head">
-              <div class="text-category">Resumen profesional · {{ label(locale) }}</div>
+              <label class="text-category" [for]="locale + '-bio'">Resumen profesional · {{ label(locale) }}</label>
               <span class="field-count"
                 >{{ form().controls.translations.controls[locale]?.value?.bio?.length ?? 0 }}/{{ bioMax }}</span
               >
             </div>
-            <textarea formControlName="bio" class="input-category" [maxlength]="bioMax"></textarea>
+            <textarea
+              [id]="locale + '-bio'"
+              formControlName="bio"
+              class="input-category"
+              [maxlength]="bioMax"
+            ></textarea>
           </div>
         }
       </div>

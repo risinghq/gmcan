@@ -29,27 +29,29 @@ import { optionalText, requiredText } from "./text-fields";
       <form [formGroup]="form" class="mt-24 mb-32">
         <div class="flex-news">
           <div class="mr-32 full-width">
-            <div class="text-category">Nombre del equipo <span class="red-text">*</span></div>
-            <input class="input-category" formControlName="name" />
+            <label class="text-category" for="equipment-name">
+              Nombre del equipo <span class="red-text">*</span>
+            </label>
+            <input id="equipment-name" class="input-category" formControlName="name" />
           </div>
           <div class="full-width">
-            <div class="text-category">CPU</div>
-            <input class="input-category" formControlName="cpu" />
+            <label class="text-category" for="equipment-cpu">CPU</label>
+            <input id="equipment-cpu" class="input-category" formControlName="cpu" />
           </div>
         </div>
         <div class="flex-news">
           <div class="mr-32 full-width">
-            <div class="text-category">RAM</div>
-            <input class="input-category" formControlName="ram" />
+            <label class="text-category" for="equipment-ram">RAM</label>
+            <input id="equipment-ram" class="input-category" formControlName="ram" />
           </div>
           <div class="full-width">
-            <div class="text-category">GPU</div>
-            <input class="input-category" formControlName="gpu" />
+            <label class="text-category" for="equipment-gpu">GPU</label>
+            <input id="equipment-gpu" class="input-category" formControlName="gpu" />
           </div>
         </div>
         <div class="mr-32 mid-width">
-          <div class="text-category">HD</div>
-          <input class="input-category" formControlName="storage" />
+          <label class="text-category" for="equipment-storage">HD</label>
+          <input id="equipment-storage" class="input-category" formControlName="storage" />
         </div>
       </form>
     </app-content-form>

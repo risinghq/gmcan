@@ -12,8 +12,19 @@ import { requiredText } from "./text-fields";
     <div class="mb-12">{{ label() }}</div>
     @for (control of list().controls; track control; let i = $index) {
       <div class="flex-news mb-12">
-        <textarea class="input-category full-width" [formControl]="control"></textarea>
-        <button type="button" class="link green-text ml-16" (click)="remove(i)">Quitar</button>
+        <textarea
+          class="input-category full-width"
+          [formControl]="control"
+          [attr.aria-label]="label() + ' ' + (i + 1)"
+        ></textarea>
+        <button
+          type="button"
+          class="link green-text ml-16"
+          [attr.aria-label]="'Quitar ' + label().toLowerCase() + ' ' + (i + 1)"
+          (click)="remove(i)"
+        >
+          Quitar
+        </button>
       </div>
     }
     <button type="button" class="link green-text mb-12" (click)="add()">+ Agregar</button>

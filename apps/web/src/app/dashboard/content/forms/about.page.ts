@@ -55,26 +55,32 @@ type AboutForm = ReturnType<typeof aboutForm>;
         <app-image-field label="Imagen del equipo" [current]="about().asset" (picked)="pick($event)" />
         @for (locale of locales; track locale) {
           @let group = form.controls[locale]!;
-          <div class="locale-section full-width" [formGroup]="group">
-            <div class="locale-title">{{ label(locale) }}</div>
+          <fieldset class="locale-section full-width" [formGroup]="group">
+            <legend class="locale-title">{{ label(locale) }}</legend>
             <div class="field-head">
-              <div class="text-category">Descripción <span class="red-text">*</span></div>
+              <div class="text-category" [id]="locale + '-description'">
+                Descripción <span class="red-text">*</span>
+              </div>
               <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
             </div>
-            <app-rich-text-editor formControlName="description" />
-            <div class="text-category mt-24">Objetivos</div>
-            <app-text-list
-              label="Párrafos introductorios"
-              [list]="group.controls.objectivesContent.controls.introParagraphs"
-            />
-            <app-text-list label="Objetivos" [list]="group.controls.objectivesContent.controls.items" />
-            <div class="text-category mt-24">Servicios</div>
-            <app-text-list
-              label="Párrafos introductorios"
-              [list]="group.controls.servicesContent.controls.introParagraphs"
-            />
-            <app-text-list label="Servicios" [list]="group.controls.servicesContent.controls.items" />
-          </div>
+            <app-rich-text-editor formControlName="description" [labelledBy]="locale + '-description'" />
+            <fieldset class="mt-24">
+              <legend class="text-category">Objetivos</legend>
+              <app-text-list
+                label="Párrafos introductorios"
+                [list]="group.controls.objectivesContent.controls.introParagraphs"
+              />
+              <app-text-list label="Objetivos" [list]="group.controls.objectivesContent.controls.items" />
+            </fieldset>
+            <fieldset class="mt-24">
+              <legend class="text-category">Servicios</legend>
+              <app-text-list
+                label="Párrafos introductorios"
+                [list]="group.controls.servicesContent.controls.introParagraphs"
+              />
+              <app-text-list label="Servicios" [list]="group.controls.servicesContent.controls.items" />
+            </fieldset>
+          </fieldset>
         }
       </form>
     </app-content-form>

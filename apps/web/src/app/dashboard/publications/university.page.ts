@@ -30,11 +30,13 @@ const UNIVERSITY_LIST = "/dashboard/tesis";
     >
       <form [formGroup]="form" class="mt-24 mb-32">
         @for (locale of locales; track locale) {
-          <div class="locale-section full-width" [formGroupName]="locale">
-            <div class="locale-title">{{ label(locale) }}</div>
-            <div class="text-category">Nombre oficial de la universidad <span class="red-text">*</span></div>
-            <input class="input-category" formControlName="name" placeholder="Ingresar nombre" />
-          </div>
+          <fieldset class="locale-section full-width" [formGroupName]="locale">
+            <legend class="locale-title">{{ label(locale) }}</legend>
+            <label class="text-category" [for]="locale + '-name'">
+              Nombre oficial de la universidad <span class="red-text">*</span>
+            </label>
+            <input class="input-category" [id]="locale + '-name'" formControlName="name" />
+          </fieldset>
         }
       </form>
     </app-content-form>

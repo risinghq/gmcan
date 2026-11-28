@@ -28,8 +28,10 @@ const JOURNAL_LIST = "/dashboard/articulos";
       (remove)="remove()"
     >
       <div class="full-width mt-24 mb-32">
-        <div class="text-category">Nombre oficial de la revista <span class="red-text">*</span></div>
-        <input class="input-category" [formControl]="name" placeholder="Ingresar nombre" />
+        <label class="text-category" for="journal-name">
+          Nombre oficial de la revista <span class="red-text">*</span>
+        </label>
+        <input id="journal-name" class="input-category" [formControl]="name" />
       </div>
     </app-content-form>
   `,

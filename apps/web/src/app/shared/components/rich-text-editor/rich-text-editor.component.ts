@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation, forwardRef } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  ViewEncapsulation,
+  effect,
+  forwardRef,
+  input,
+} from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
@@ -28,6 +36,9 @@ interface HeadingOption {
   ],
 })
 export class RichTextEditorComponent implements ControlValueAccessor, OnDestroy {
+  /** The id of the visible label that names the editable area. */
+  readonly labelledBy = input.required<string>();
+
   readonly headingOptions: HeadingOption[] = [
     { label: "Párrafo", value: "paragraph" },
     { label: "Título", value: "heading-2" },
@@ -44,6 +55,10 @@ export class RichTextEditorComponent implements ControlValueAccessor, OnDestroy 
       }),
     ],
   });
+
+  constructor() {
+    effect(() => this.editor.setOptions({ editorProps: { attributes: { "aria-labelledby": this.labelledBy() } } }));
+  }
 
   private onChange: (value: string) => void = () => {};
   private onTouched: () => void = () => {};

@@ -43,21 +43,23 @@ function toTranslations(value: Translations<EventFields>): Translations<EventTra
     >
       <form [formGroup]="form" class="mt-24 mb-32">
         @for (locale of locales; track locale) {
-          <div class="locale-section full-width" [formGroupName]="locale">
-            <div class="locale-title">{{ label(locale) }}</div>
-            <div class="text-category">Nombre oficial del evento <span class="red-text">*</span></div>
-            <input class="input-category" formControlName="name" placeholder="Ingresar nombre" />
+          <fieldset class="locale-section full-width" [formGroupName]="locale">
+            <legend class="locale-title">{{ label(locale) }}</legend>
+            <label class="text-category" [for]="locale + '-name'">
+              Nombre oficial del evento <span class="red-text">*</span>
+            </label>
+            <input class="input-category" [id]="locale + '-name'" formControlName="name" />
             <div class="flex-news mt-8">
               <div class="mr-32 full-width">
-                <div class="text-category">País</div>
-                <input class="input-category" formControlName="country" placeholder="Ingresar país" />
+                <label class="text-category" [for]="locale + '-country'">País</label>
+                <input class="input-category" [id]="locale + '-country'" formControlName="country" />
               </div>
               <div class="full-width">
-                <div class="text-category">Ciudad</div>
-                <input class="input-category" formControlName="city" placeholder="Ingresar ciudad" />
+                <label class="text-category" [for]="locale + '-city'">Ciudad</label>
+                <input class="input-category" [id]="locale + '-city'" formControlName="city" />
               </div>
             </div>
-          </div>
+          </fieldset>
         }
       </form>
     </app-content-form>

@@ -46,31 +46,37 @@ type GroupSlot = AssetSlot<"research_group">;
         </div>
         <div class="flex-news">
           <div class="full-width mb-24 mr-32">
-            <div class="text-category">Correo del grupo</div>
-            <input class="input-category" type="email" formControlName="email" />
+            <label class="text-category" for="group-email">Correo del grupo</label>
+            <input id="group-email" class="input-category" type="email" formControlName="email" />
           </div>
           <div class="full-width mb-24">
-            <div class="text-category">Teléfono del grupo</div>
-            <input class="input-category" formControlName="phone" />
+            <label class="text-category" for="group-phone">Teléfono del grupo</label>
+            <input id="group-phone" class="input-category" formControlName="phone" />
           </div>
         </div>
         @for (locale of locales; track locale) {
-          <div class="locale-section full-width" [formGroup]="form.controls.translations.controls[locale]!">
-            <div class="locale-title">{{ label(locale) }}</div>
-            <div class="text-category">Presentación del grupo <span class="red-text">*</span></div>
-            <textarea class="input-category" formControlName="summary"></textarea>
-            <div class="text-category">Facilidades y recursos</div>
-            <textarea class="input-category" formControlName="facilities"></textarea>
+          <fieldset class="locale-section full-width" [formGroup]="form.controls.translations.controls[locale]!">
+            <legend class="locale-title">{{ label(locale) }}</legend>
+            <label class="text-category" [for]="locale + '-summary'">
+              Presentación del grupo <span class="red-text">*</span>
+            </label>
+            <textarea class="input-category" [id]="locale + '-summary'" formControlName="summary"></textarea>
+            <label class="text-category" [for]="locale + '-facilities'">Facilidades y recursos</label>
+            <textarea class="input-category" [id]="locale + '-facilities'" formControlName="facilities"></textarea>
             <div class="field-head">
-              <div class="text-category">Trabajos futuros</div>
+              <div class="text-category" [id]="locale + '-future-work'">Trabajos futuros</div>
               <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
             </div>
-            <app-rich-text-editor formControlName="futureWork" />
-            <div class="text-category">Sección Publicaciones</div>
-            <textarea class="input-category" formControlName="publicationsSection"></textarea>
-            <div class="text-category">Sección Proyectos</div>
-            <textarea class="input-category" formControlName="projectsSection"></textarea>
-          </div>
+            <app-rich-text-editor formControlName="futureWork" [labelledBy]="locale + '-future-work'" />
+            <label class="text-category" [for]="locale + '-publications'">Sección Publicaciones</label>
+            <textarea
+              class="input-category"
+              [id]="locale + '-publications'"
+              formControlName="publicationsSection"
+            ></textarea>
+            <label class="text-category" [for]="locale + '-projects'">Sección Proyectos</label>
+            <textarea class="input-category" [id]="locale + '-projects'" formControlName="projectsSection"></textarea>
+          </fieldset>
         }
       </form>
     </app-content-form>

@@ -101,17 +101,19 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
           </div>
           <div class="news-meta">
             <div>
-              <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
+              <label class="text-category" for="news-published-at">
+                Fecha de publicación <span class="red-text">*</span>
+              </label>
               <mat-form-field class="form-field">
-                <input matInput [matDatepicker]="dp" formControlName="publishedAt" />
+                <input id="news-published-at" matInput [matDatepicker]="dp" formControlName="publishedAt" />
                 <mat-datepicker-toggle matSuffix [for]="dp" />
                 <mat-datepicker #dp />
               </mat-form-field>
             </div>
             <div>
-              <div class="text-category">Categoría <span class="red-text">*</span></div>
+              <div class="text-category" id="news-kind-label">Categoría <span class="red-text">*</span></div>
               <mat-form-field class="form-field">
-                <mat-select formControlName="newsKindCode">
+                <mat-select formControlName="newsKindCode" aria-labelledby="news-kind-label">
                   @for (kind of kinds(); track kind.code) {
                     <mat-option [value]="kind.code">{{ kind.name }}</mat-option>
                   }
@@ -119,9 +121,9 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
               </mat-form-field>
             </div>
             <div class="news-author">
-              <div class="text-category">Autor <span class="red-text">*</span></div>
+              <div class="text-category" id="news-author-label">Autor <span class="red-text">*</span></div>
               <mat-form-field class="form-field">
-                <mat-select formControlName="authorId">
+                <mat-select formControlName="authorId" aria-labelledby="news-author-label">
                   @for (author of authors(); track author.id) {
                     <mat-option [value]="author.id">
                       <app-avatar
@@ -141,24 +143,31 @@ function toNewsWrite(value: NewsFormValue, statusCode: NewsStatusCode): NewsWrit
         <div formGroupName="translations">
           @for (locale of locales; track locale) {
             @let fields = form.controls.translations.controls[locale].controls;
-            <div class="locale-section full-width" [formGroupName]="locale">
-              <div class="locale-title">{{ label(locale) }}</div>
+            <fieldset class="locale-section full-width" [formGroupName]="locale">
+              <legend class="locale-title">{{ label(locale) }}</legend>
               <div class="field-head">
-                <div class="text-category">Título <span class="red-text">*</span></div>
+                <label class="text-category" [for]="locale + '-title'">Título <span class="red-text">*</span></label>
                 <span class="field-count">{{ fields.title.value.length }}/100</span>
               </div>
-              <input class="input-category" formControlName="title" maxlength="100" />
+              <input class="input-category" [id]="locale + '-title'" formControlName="title" maxlength="100" />
               <div class="field-head">
-                <div class="text-category">Resumen <span class="red-text">*</span></div>
+                <label class="text-category" [for]="locale + '-summary'">
+                  Resumen <span class="red-text">*</span>
+                </label>
                 <span class="field-count">{{ fields.summary.value.length }}/500</span>
               </div>
-              <textarea class="input-category" formControlName="summary" maxlength="500"></textarea>
+              <textarea
+                class="input-category"
+                [id]="locale + '-summary'"
+                formControlName="summary"
+                maxlength="500"
+              ></textarea>
               <div class="field-head">
-                <div class="text-category">Contenido <span class="red-text">*</span></div>
+                <div class="text-category" [id]="locale + '-body'">Contenido <span class="red-text">*</span></div>
                 <button type="button" class="field-action" (click)="preview(locale)">Vista previa</button>
               </div>
-              <app-rich-text-editor formControlName="body" />
-            </div>
+              <app-rich-text-editor formControlName="body" [labelledBy]="locale + '-body'" />
+            </fieldset>
           }
         </div>
       </form>
