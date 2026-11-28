@@ -19,7 +19,7 @@ import { EmptyListComponent } from "@app/shared/components/empty-list.component"
 import { IconComponent } from "@app/shared/components/icon/icon.component";
 import { PersonComponent } from "@app/shared/components/person.component";
 import { PublishabilityDialogComponent } from "@app/shared/member-publishability/dialog.component";
-import { countMissingRequirements } from "@app/shared/member-publishability/utils";
+import { publishabilityStatus } from "@app/shared/member-publishability/utils";
 import type { AdminMemberListItem } from "@app/shared/models/admin-list";
 import { MemberService } from "@app/shared/services/member.service";
 import { ListTable } from "@app/shared/tables/list-table";
@@ -59,7 +59,8 @@ export default class MiembrosComponent implements AfterViewInit {
   readonly canAdd = this.active;
 
   readonly fullName = personName;
-  readonly displayedColumns = ["name", "memberTypeName", "prefixName", "publishability"];
+  /** Former members never reach the public site, so their publication state says nothing. */
+  readonly displayedColumns = ["name", "memberTypeName", "prefixName", ...(this.active ? ["publishability"] : [])];
   readonly table = new ListTable<AdminMemberListItem>({
     search: (row) => [row.firstName, row.lastName, row.maternalName, row.memberTypeName, row.prefixName, row.email],
     sort: { name: personName },
@@ -87,9 +88,7 @@ export default class MiembrosComponent implements AfterViewInit {
     this.router.navigate(["dashboard/edit-member/" + id], { queryParams: { returnTo } });
   }
 
-  missingCount(row: AdminMemberListItem): number {
-    return countMissingRequirements(row.publishability);
-  }
+  readonly publishabilityStatus = publishabilityStatus;
 
   openPublishability(row: AdminMemberListItem, event: Event): void {
     event.stopPropagation();

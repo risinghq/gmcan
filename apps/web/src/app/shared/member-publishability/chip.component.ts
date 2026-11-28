@@ -4,23 +4,23 @@ import { MatDialog } from "@angular/material/dialog";
 
 import { MemberService } from "../services/member.service";
 import { PublishabilityDialogComponent } from "./dialog.component";
-import { countMissingRequirements, publishabilityTooltip } from "./utils";
+import { publishabilityStatus } from "./utils";
 
 @Component({
   selector: "app-publishability-chip",
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "../styles/_status-chip.scss",
   template: `
-    @if (status.value(); as state) {
+    @if (state(); as state) {
       <button
         type="button"
         class="status-chip"
-        [class.status-ready]="state.publishable"
-        [class.status-draft]="!state.publishable"
-        [title]="tooltip()"
+        [class.status-ready]="state.tone === 'ready'"
+        [class.status-draft]="state.tone === 'draft'"
+        [class.status-archived]="state.tone === 'hidden'"
         (click)="details()"
       >
-        {{ state.publishable ? "Público" : "Borrador · " + missing() }}
+        {{ state.label }}
       </button>
     }
   `,
@@ -40,10 +40,9 @@ export class PublishabilityChipComponent {
       params.own ? this.members.getOwnPublishability() : this.members.getMemberPublishability(params.id),
   });
 
-  readonly tooltip = computed(() => publishabilityTooltip(this.status.value() ?? null));
-  readonly missing = computed(() => {
-    const state = this.status.value();
-    return state ? countMissingRequirements(state) : 0;
+  readonly state = computed(() => {
+    const publishability = this.status.value();
+    return publishability ? publishabilityStatus(publishability) : null;
   });
 
   refresh(): void {

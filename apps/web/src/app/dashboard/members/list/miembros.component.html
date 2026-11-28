@@ -44,15 +44,17 @@
     <ng-container matColumnDef="publishability">
       <th mat-header-cell *matHeaderCellDef>Estado</th>
       <td mat-cell *matCellDef="let row">
-        @if (row.publishability.publishable) {
-          <button type="button" class="status-chip status-ready" (click)="openPublishability(row, $event)">
-            Público
-          </button>
-        } @else {
-          <button type="button" class="status-chip status-draft" (click)="openPublishability(row, $event)">
-            Borrador · {{ missingCount(row) }}
-          </button>
-        }
+        @let status = publishabilityStatus(row.publishability);
+        <button
+          type="button"
+          class="status-chip"
+          [class.status-ready]="status.tone === 'ready'"
+          [class.status-draft]="status.tone === 'draft'"
+          [class.status-archived]="status.tone === 'hidden'"
+          (click)="openPublishability(row, $event)"
+        >
+          {{ status.label }}
+        </button>
       </td>
     </ng-container>
 

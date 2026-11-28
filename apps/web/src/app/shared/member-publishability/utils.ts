@@ -1,25 +1,47 @@
 import type { MemberPublishability } from "../models/member";
 
-const REQUIREMENT_LABELS: Record<string, string> = {
-  member: "Miembro inexistente",
-  dni: "DNI",
-  email: "Correo",
-  firstName: "Nombres",
+export type PublishabilityTone = "ready" | "draft" | "hidden";
+
+export interface PublishabilityStatus {
+  tone: PublishabilityTone;
+  label: string;
+  summary: string;
+  reasons: string[];
+}
+
+const MISSING_DATA: Record<string, string> = {
+  dni: "N° DNI / Pasaporte",
+  email: "Correo electrónico",
+  firstName: "Primer nombre",
   lastName: "Apellido paterno",
-  isActive: "Miembro activo",
-  roleCode: "Las cuentas de administrador no se publican",
 };
 
-export function countMissingRequirements(publishability: MemberPublishability): number {
-  return publishability.missing.length;
-}
+const HIDDEN_BY: Record<string, string> = {
+  member: "El miembro no existe",
+  isActive: "Es un miembro antiguo",
+  roleCode: "Es una cuenta de administrador",
+};
 
-export function publishabilityTooltip(publishability: MemberPublishability | null): string {
-  if (!publishability) return "Estado de publicación no disponible";
-  if (publishability.publishable) return "Listo para mostrarse en público";
-  return `Borrador: ${countMissingRequirements(publishability)} requisito(s) pendiente(s)`;
-}
+export function publishabilityStatus(publishability: MemberPublishability): PublishabilityStatus {
+  if (publishability.publishable) {
+    return { tone: "ready", label: "Público", summary: "Se muestra en el sitio público.", reasons: [] };
+  }
 
-export function publishabilityMissingItems(publishability: MemberPublishability): string[] {
-  return publishability.missing.map((field) => REQUIREMENT_LABELS[field] ?? field);
+  const hiddenBy = publishability.missing.filter((field) => field in HIDDEN_BY);
+  if (hiddenBy.length > 0) {
+    return {
+      tone: "hidden",
+      label: "Oculto",
+      summary: "No se muestra en el sitio público:",
+      reasons: hiddenBy.map((field) => HIDDEN_BY[field]),
+    };
+  }
+
+  const reasons = publishability.missing.map((field) => MISSING_DATA[field] ?? field);
+  return {
+    tone: "draft",
+    label: `Borrador · ${reasons.length}`,
+    summary: "Completa estos datos para mostrarlo en el sitio público:",
+    reasons,
+  };
 }
