@@ -1,4 +1,5 @@
 @use "../../../shared/styles/add-linea-base";
+@use "../../../shared/styles/field-head";
 
 .form-head {
   display: flex;
@@ -14,24 +15,6 @@
 .locale-title {
   margin-bottom: 8px;
   font-weight: 600;
-}
-
-.field-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 8px;
-
-  .text-category {
-    margin-bottom: 0;
-  }
-}
-
-.field-count {
-  font-size: 13px;
-  color: var(--muted-text);
-  font-variant-numeric: tabular-nums;
 }
 
 .field-action {

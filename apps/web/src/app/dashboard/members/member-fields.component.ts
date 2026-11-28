@@ -104,9 +104,11 @@ import { BIO_MAX, type ProfileForm } from "./member-form";
       <div formGroupName="translations">
         @for (locale of locales; track locale) {
           <div class="locale-section full-width" [formGroupName]="locale">
-            <div class="text-category">
-              Resumen profesional · {{ label(locale) }}
-              <span>({{ form().controls.translations.controls[locale]?.value?.bio?.length ?? 0 }}/{{ bioMax }})</span>
+            <div class="field-head">
+              <div class="text-category">Resumen profesional · {{ label(locale) }}</div>
+              <span class="field-count"
+                >{{ form().controls.translations.controls[locale]?.value?.bio?.length ?? 0 }}/{{ bioMax }}</span
+              >
             </div>
             <textarea formControlName="bio" class="input-category" [maxlength]="bioMax"></textarea>
           </div>

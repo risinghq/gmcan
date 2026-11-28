@@ -177,8 +177,8 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
       (remove)="remove()"
     >
       <form [formGroup]="form" class="mt-24 mb-32">
-        <div class="flex-news">
-          <div class="mr-32 full-width">
+        <div class="flex-news details-row">
+          <div class="full-width">
             <div class="text-category">Fecha de publicación <span class="red-text">*</span></div>
             <mat-form-field class="form-field">
               <input
@@ -193,7 +193,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
           </div>
           @switch (kind()) {
             @case ("journal_article") {
-              <div class="mr-32 full-width">
+              <div class="full-width">
                 <div class="text-category">Revista <span class="red-text">*</span></div>
                 <mat-form-field class="form-field">
                   <mat-select placeholder="Seleccionar revista" formControlName="journalId">
@@ -203,13 +203,13 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                   </mat-select>
                 </mat-form-field>
               </div>
-              <div class="mr-32 full-width">
+              <div class="full-width">
                 <div class="text-category">Volumen</div>
                 <input class="input-category" type="number" min="1" step="1" formControlName="issue" />
               </div>
             }
             @case ("conference_paper") {
-              <div class="mr-32 full-width">
+              <div class="full-width">
                 <div class="text-category">Evento <span class="red-text">*</span></div>
                 <mat-form-field class="form-field">
                   <mat-select placeholder="Seleccionar evento" formControlName="eventId">
@@ -221,7 +221,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
               </div>
             }
             @case ("thesis") {
-              <div class="mr-32 full-width">
+              <div class="full-width">
                 <div class="text-category">Tipo de tesis <span class="red-text">*</span></div>
                 <mat-form-field class="form-field">
                   <mat-select placeholder="Seleccionar tipo" formControlName="thesisKindCode">
@@ -231,7 +231,7 @@ function candidateName(candidates: readonly AuthorCandidate[], memberId: number)
                   </mat-select>
                 </mat-form-field>
               </div>
-              <div class="mr-32 full-width">
+              <div class="full-width">
                 <div class="text-category">Universidad <span class="red-text">*</span></div>
                 <mat-form-field class="form-field">
                   <mat-select placeholder="Seleccionar universidad" formControlName="universityId">
