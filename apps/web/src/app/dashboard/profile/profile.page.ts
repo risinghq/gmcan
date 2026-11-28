@@ -73,16 +73,16 @@ function passwordForm() {
             [emailTaken]="emailTaken()"
             (photo)="image.set($event)"
           >
-            <div class="flex-news mb-8">
+            <dl class="flex-news readonly-fields">
               <div class="mr-32 full-width">
-                <div class="text-category">Cargo</div>
-                <div class="input-category" data-testid="member-type">{{ memberType() }}</div>
+                <dt class="text-category">Cargo</dt>
+                <dd class="field-value" data-testid="member-type">{{ memberType() }}</dd>
               </div>
               <div class="full-width">
-                <div class="text-category">N° DNI / Pasaporte</div>
-                <div class="input-category" data-testid="dni">{{ item().dni }}</div>
+                <dt class="text-category">N° DNI / Pasaporte</dt>
+                <dd class="field-value" data-testid="dni">{{ item().dni }}</dd>
               </div>
-            </div>
+            </dl>
           </app-member-fields>
         </form>
         <div class="flex-news mb-32">
